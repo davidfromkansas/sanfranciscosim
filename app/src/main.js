@@ -241,7 +241,7 @@ async function boot() {
     env.updateClouds(Math.min(1, elapsed));
     env.updateShadow(pivotWorld, rig.state.distance);
 
-    signs.update(rig.state.distance);
+    signs.update(rig.state.distance, rig.state.yaw);
     // Tilt-shift + grade in diorama mode; a straight canvas render otherwise.
     post.render(scene, camera);
 
