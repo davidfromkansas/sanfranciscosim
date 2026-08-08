@@ -133,10 +133,11 @@ function treeArchetype() {
 }
 
 // Toy trees: a lollipop. Low-detail icosahedron canopy on a stubby trunk, in
-// saturated model-railway greens.
+// saturated model-railway greens. The canopy is non-indexed, so the trunk is
+// converted to match: mergeGeometries returns null on a mixed list.
 function toyTreeArchetype() {
   const parts = [];
-  const trunk = new CylinderGeometry(0.55, 0.7, 3.4, 6, 1);
+  const trunk = new CylinderGeometry(0.55, 0.7, 3.4, 6, 1).toNonIndexed();
   trunk.translate(0, 1.7, 0);
   const trunkColors = new Float32Array(trunk.attributes.position.count * 3);
   for (let i = 0; i < trunk.attributes.position.count; i++) {

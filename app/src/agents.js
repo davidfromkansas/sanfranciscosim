@@ -265,15 +265,17 @@ function craneArchetype() {
 }
 
 function balloonArchetype() {
+  // The icosahedron envelope is non-indexed, so the other parts must be too:
+  // mergeGeometries returns null when index presence is mixed across the list.
   const parts = [];
   const envelope = new IcosahedronGeometry(9, 2);
   envelope.scale(1, 1.25, 1);
   envelope.translate(0, 11, 0);
   parts.push(envelope);
-  const tether = new CylinderGeometry(0.16, 0.16, 5, 4);
+  const tether = new CylinderGeometry(0.16, 0.16, 5, 4).toNonIndexed();
   tether.translate(0, 1.6, 0);
   parts.push(tether);
-  const basket = new BoxGeometry(3, 2.4, 3);
+  const basket = new BoxGeometry(3, 2.4, 3).toNonIndexed();
   basket.translate(0, -1.2, 0);
   parts.push(basket);
   const merged = mergeGeometries(parts, false);
@@ -598,12 +600,12 @@ export function createAgents(scene, data, city) {
         return g;
       })(),
       (() => {
-        const g = new BoxGeometry(0.7, 0.7, 7);
+        const g = new BoxGeometry(0.7, 0.7, 7).toNonIndexed();
         g.translate(0, 1.2, -6);
         return g;
       })(),
       (() => {
-        const g = new BoxGeometry(0.5, 2.6, 0.5);
+        const g = new BoxGeometry(0.5, 2.6, 0.5).toNonIndexed();
         g.translate(0, 2.2, -9);
         return g;
       })(),
