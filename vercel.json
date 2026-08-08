@@ -4,6 +4,12 @@
   "outputDirectory": "app/dist",
   "installCommand": "echo skip",
   "rewrites": [{ "source": "/favicon.ico", "destination": "/favicon.svg" }],
+  "functions": {
+    "api/agent.js": {
+      "includeFiles": "api/_data/**",
+      "maxDuration": 60
+    }
+  },
   "headers": [
     {
       "source": "/tiles/(.*).bin",
