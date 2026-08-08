@@ -125,6 +125,7 @@ const manifest = {
   palette: PALETTE,
   streetClasses: STREET_CLASSES,
   landKinds: LAND_KINDS,
+  landuse: landcover.raster,
   landmarks: LANDMARKS,
   parks: NAMED_PARKS,
   viewPresets: VIEW_PRESETS,
@@ -139,6 +140,7 @@ await rm(APP_TILES, { recursive: true, force: true });
 await mkdir(APP_TILES, { recursive: true });
 await writeFile(new URL('manifest.json', APP_TILES), JSON.stringify(manifest));
 await copyFile(new URL('terrain.bin', OUT), new URL('terrain.bin', APP_TILES));
+await copyFile(new URL('landuse.bin', OUT), new URL('landuse.bin', APP_TILES));
 for (const name of ['buildings', 'streets', 'landcover']) {
   const src = new URL(`${name}/`, OUT);
   const dst = new URL(`${name}/`, APP_TILES);

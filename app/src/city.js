@@ -1,0 +1,503 @@
+// Tile streaming + LOD. Three tiers of work:
+//   * FAR  — one merged prism mesh per 2 km super-cell, built once, always on.
+//   * NEAR — full footprint extrusion per 1 km chunk inside ~2.4 km, built on
+//            demand, dither cross-faded against the far tier's matching quadrant.
+//   * GROUND — street ribbons + landcover merged per super-cell, plus instanced
+//            trees and street lamps.
+// Everything is produced in workers from binary blobs; the main thread only
+// uploads buffers.
+
+import {
+  BufferAttribute,
+  BufferGeometry,
+  Color,
+  ConeGeometry,
+  CylinderGeometry,
+  DynamicDrawUsage,
+  InstancedMesh,
+  Matrix4,
+  Mesh,
+  MeshBasicMaterial,
+  Object3D,
+  SphereGeometry,
+  Vector3,
+} from 'three';
+import { mergeGeometries } from 'three/addons/utils/BufferGeometryUtils.js';
+import {
+  createBuildingMaterial,
+  createFarBuildingMaterial,
+  createGroundMaterial,
+  createTreeMaterial,
+} from './materials.js';
+import { shared } from './env.js';
+import { tileUrl } from './data.js';
+
+const GROUP = 2000;
+const CHUNK = 1000;
+const NEAR_ENTER = 2400;
+const NEAR_EXIT = 3100;
+const TREE_RANGE = 3400;
+const LAMP_RANGE = 2600;
+const FADE_SPEED = 2.2; // per second
+
+class WorkerPool {
+  constructor(size) {
+    this.workers = [];
+    this.queue = [];
+    this.pending = new Map();
+    this.nextId = 1;
+    for (let i = 0; i < size; i++) {
+      const worker = new Worker(new URL('./city.worker.js', import.meta.url), { type: 'module' });
+      worker.onmessage = (event) => {
+        const entry = this.pending.get(event.data.id);
+        this.pending.delete(event.data.id);
+        worker.busy = false;
+        if (entry) {
+          if (event.data.type === 'error') entry.reject(new Error(event.data.message));
+          else entry.resolve(event.data);
+        }
+        this.drain();
+      };
+      worker.busy = false;
+      this.workers.push(worker);
+    }
+  }
+
+  run(message, transfer = []) {
+    return new Promise((resolve, reject) => {
+      const id = this.nextId++;
+      this.queue.push({ message: { ...message, id }, transfer, resolve, reject, id });
+      this.drain();
+    });
+  }
+
+  drain() {
+    for (const worker of this.workers) {
+      if (worker.busy || this.queue.length === 0) continue;
+      const job = this.queue.shift();
+      worker.busy = true;
+      this.pending.set(job.id, job);
+      worker.postMessage(job.message, job.transfer);
+    }
+  }
+
+  get load() {
+    return this.queue.length + this.pending.size;
+  }
+}
+
+function groupKeyFor(x, z, extent) {
+  const gx = Math.floor((x - extent.minX) / GROUP);
+  const gz = Math.floor((z - extent.minZ) / GROUP);
+  return `${gx}_${gz}`;
+}
+
+function makeAttributes(geometry, data) {
+  geometry.setAttribute('position', new BufferAttribute(data.positions, 3));
+  geometry.setAttribute('normal', new BufferAttribute(data.normals, 3));
+  geometry.setAttribute('color', new BufferAttribute(data.colors, 3, true));
+  geometry.setIndex(new BufferAttribute(data.indices, 1));
+}
+
+function treeArchetype() {
+  const parts = [];
+  const trunk = new CylinderGeometry(0.34, 0.46, 3.2, 5, 1);
+  trunk.translate(0, 1.6, 0);
+  const trunkColors = new Float32Array(trunk.attributes.position.count * 3);
+  for (let i = 0; i < trunk.attributes.position.count; i++) {
+    trunkColors[i * 3] = 0.29;
+    trunkColors[i * 3 + 1] = 0.21;
+    trunkColors[i * 3 + 2] = 0.15;
+  }
+  trunk.setAttribute('color', new BufferAttribute(trunkColors, 3));
+  parts.push(trunk);
+
+  const canopy = new ConeGeometry(3.1, 8.4, 7, 2);
+  canopy.translate(0, 7.4, 0);
+  const canopyColors = new Float32Array(canopy.attributes.position.count * 3);
+  const pos = canopy.attributes.position;
+  for (let i = 0; i < pos.count; i++) {
+    const shade = 0.78 + (pos.getY(i) / 12) * 0.4;
+    canopyColors[i * 3] = 0.17 * shade;
+    canopyColors[i * 3 + 1] = 0.33 * shade;
+    canopyColors[i * 3 + 2] = 0.16 * shade;
+  }
+  canopy.setAttribute('color', new BufferAttribute(canopyColors, 3));
+  parts.push(canopy);
+
+  const merged = mergeGeometries(parts, false);
+  for (const part of parts) part.dispose();
+  return merged;
+}
+
+export function createCity(scene, data) {
+  const { manifest, indexes } = data;
+  const extent = manifest.extent;
+  const palette = manifest.palette.map((p) => p.color.map((c) => Math.round(c * 255)));
+  const pool = new WorkerPool(Math.max(2, Math.min(6, (navigator.hardwareConcurrency || 4) - 1)));
+
+  const blobCache = new Map(); // `${kind}:${cellKey}` -> ArrayBuffer
+  const groups = new Map();
+  const chunks = new Map();
+  const stats = { cellsLoaded: 0, cellsTotal: 0, nearChunks: 0, farGroups: 0, groundGroups: 0, trees: 0, lamps: 0 };
+  const paths = [];
+  let onPathsReady = () => {};
+
+  const groundMaterial = createGroundMaterial();
+  const quality = { windows: 1 };
+  const treeMaterial = createTreeMaterial();
+  const lampMaterial = new MeshBasicMaterial({ color: new Color(1.0, 0.82, 0.55), transparent: true, opacity: 0 });
+  const treeGeometry = treeArchetype();
+  const lampGeometry = new SphereGeometry(0.9, 6, 4);
+
+  function group(key) {
+    let g = groups.get(key);
+    if (!g) {
+      const [gx, gz] = key.split('_').map(Number);
+      g = {
+        key,
+        gx,
+        gz,
+        originX: extent.minX + gx * GROUP,
+        originZ: extent.minZ + gz * GROUP,
+        buildingCells: [],
+        streetCells: [],
+        landcoverCells: [],
+        farMesh: null,
+        groundMesh: null,
+        trees: null,
+        lamps: null,
+        quadFade: [1, 1, 1, 1],
+        requested: false,
+        groundRequested: false,
+      };
+      g.center = new Vector3(g.originX + GROUP / 2, 0, g.originZ + GROUP / 2);
+      groups.set(key, g);
+    }
+    return g;
+  }
+
+  function chunk(key) {
+    let c = chunks.get(key);
+    if (!c) {
+      const [cx, cz] = key.split('_').map(Number);
+      const originX = extent.minX + cx * CHUNK;
+      const originZ = extent.minZ + cz * CHUNK;
+      c = {
+        key,
+        cx,
+        cz,
+        originX,
+        originZ,
+        cells: [],
+        mesh: null,
+        material: null,
+        fade: 0,
+        active: false,
+        requested: false,
+        center: new Vector3(originX + CHUNK / 2, 0, originZ + CHUNK / 2),
+        group: null,
+        quadrant: 0,
+      };
+      chunks.set(key, c);
+    }
+    return c;
+  }
+
+  // Index the baked cells into runtime groups/chunks.
+  for (const cell of indexes.buildings.cells) {
+    const cx = cell.originX + 250;
+    const cz = cell.originZ + 250;
+    const g = group(groupKeyFor(cx, cz, extent));
+    g.buildingCells.push(cell);
+    const chunkKey = `${Math.floor((cx - extent.minX) / CHUNK)}_${Math.floor((cz - extent.minZ) / CHUNK)}`;
+    const c = chunk(chunkKey);
+    c.cells.push(cell);
+    c.group = g;
+    c.quadrant =
+      (c.originX - g.originX >= CHUNK ? 1 : 0) + (c.originZ - g.originZ >= CHUNK ? 2 : 0);
+  }
+  for (const cell of indexes.streets.cells) {
+    group(groupKeyFor(cell.originX + 250, cell.originZ + 250, extent)).streetCells.push(cell);
+  }
+  for (const cell of indexes.landcover.cells) {
+    group(groupKeyFor(cell.originX + 250, cell.originZ + 250, extent)).landcoverCells.push(cell);
+  }
+  stats.cellsTotal =
+    indexes.buildings.cells.length + indexes.streets.cells.length + indexes.landcover.cells.length;
+
+  const inflight = new Set();
+  async function blob(kind, cellKey) {
+    const id = `${kind}:${cellKey}`;
+    const cached = blobCache.get(id);
+    if (cached) return cached;
+    while (inflight.size > 28) await new Promise((r) => setTimeout(r, 8));
+    inflight.add(id);
+    try {
+      const res = await fetch(tileUrl(`${kind}/${cellKey}.bin`));
+      if (!res.ok) throw new Error(`${id}: ${res.status}`);
+      const buffer = await res.arrayBuffer();
+      blobCache.set(id, buffer);
+      stats.cellsLoaded++;
+      return buffer;
+    } finally {
+      inflight.delete(id);
+    }
+  }
+
+  async function buildFarGroup(g) {
+    if (g.requested || g.buildingCells.length === 0) return;
+    g.requested = true;
+    const blobs = await Promise.all(
+      g.buildingCells.map(async (cell) => ({ buffer: await blob('buildings', cell.key) }))
+    );
+    const result = await pool.run(
+      {
+        type: 'far',
+        key: g.key,
+        originX: g.originX,
+        originZ: g.originZ,
+        groupSize: GROUP,
+        palette,
+        blobs,
+      },
+      []
+    );
+    if (result.positions.length === 0) return;
+    const geometry = new BufferGeometry();
+    makeAttributes(geometry, result);
+    geometry.setAttribute('aQuad', new BufferAttribute(result.quads, 1));
+    geometry.computeBoundingSphere();
+    const material = createFarBuildingMaterial();
+    const mesh = new Mesh(geometry, material);
+    mesh.position.set(g.originX, 0, g.originZ);
+    mesh.castShadow = true;
+    mesh.receiveShadow = true;
+    mesh.name = `far-${g.key}`;
+    scene.add(mesh);
+    g.farMesh = mesh;
+    g.farUniforms = material.uniformsHolder;
+    stats.farGroups++;
+  }
+
+  async function buildGround(g) {
+    if (g.groundRequested) return;
+    g.groundRequested = true;
+    if (g.streetCells.length === 0 && g.landcoverCells.length === 0) return;
+    const [streets, landcover] = await Promise.all([
+      Promise.all(g.streetCells.map(async (cell) => ({ buffer: await blob('streets', cell.key) }))),
+      Promise.all(g.landcoverCells.map(async (cell) => ({ buffer: await blob('landcover', cell.key) }))),
+    ]);
+    const result = await pool.run({
+      type: 'ground',
+      key: g.key,
+      originX: g.originX,
+      originZ: g.originZ,
+      streets,
+      landcover,
+      streetClasses: manifest.streetClasses,
+      landKinds: manifest.landKinds,
+    });
+
+    if (result.positions.length > 0) {
+      const geometry = new BufferGeometry();
+      makeAttributes(geometry, result);
+      geometry.setAttribute('aKind', new BufferAttribute(result.kinds, 1));
+      geometry.computeBoundingSphere();
+      const mesh = new Mesh(geometry, groundMaterial);
+      mesh.position.set(g.originX, 0, g.originZ);
+      mesh.receiveShadow = true;
+      mesh.name = `ground-${g.key}`;
+      scene.add(mesh);
+      g.groundMesh = mesh;
+      stats.groundGroups++;
+    }
+
+    if (result.trees.length > 0) {
+      const count = result.trees.length / 4;
+      const trees = new InstancedMesh(treeGeometry, treeMaterial, count);
+      const matrix = new Matrix4();
+      const dummy = new Object3D();
+      for (let i = 0; i < count; i++) {
+        const x = result.trees[i * 4];
+        const y = result.trees[i * 4 + 1];
+        const z = result.trees[i * 4 + 2];
+        const variant = result.trees[i * 4 + 3];
+        dummy.position.set(x, y, z);
+        const s = 0.62 + variant * 0.26 + ((x * 7.3 + z * 3.1) % 1) * 0.35;
+        dummy.scale.set(s, s * (0.85 + variant * 0.2), s);
+        dummy.rotation.y = ((x * 13.7 + z * 5.3) % 1) * Math.PI * 2;
+        dummy.updateMatrix();
+        matrix.copy(dummy.matrix);
+        trees.setMatrixAt(i, matrix);
+      }
+      trees.instanceMatrix.needsUpdate = true;
+      trees.castShadow = false;
+      trees.receiveShadow = false;
+      trees.frustumCulled = true;
+      trees.name = `trees-${g.key}`;
+      trees.visible = false;
+      scene.add(trees);
+      g.trees = trees;
+      stats.trees += count;
+    }
+
+    if (result.lamps.length > 0) {
+      const count = result.lamps.length / 3;
+      const lamps = new InstancedMesh(lampGeometry, lampMaterial, count);
+      const dummy = new Object3D();
+      for (let i = 0; i < count; i++) {
+        dummy.position.set(result.lamps[i * 3], result.lamps[i * 3 + 1], result.lamps[i * 3 + 2]);
+        dummy.scale.setScalar(1);
+        dummy.updateMatrix();
+        lamps.setMatrixAt(i, dummy.matrix);
+      }
+      lamps.instanceMatrix.needsUpdate = true;
+      lamps.instanceMatrix.setUsage(DynamicDrawUsage);
+      lamps.visible = false;
+      lamps.name = `lamps-${g.key}`;
+      scene.add(lamps);
+      g.lamps = lamps;
+      stats.lamps += count;
+    }
+
+    if (result.paths.length) {
+      for (const path of result.paths) paths.push(path);
+      onPathsReady(paths);
+    }
+  }
+
+  async function buildNearChunk(c) {
+    if (c.requested || c.cells.length === 0) return;
+    c.requested = true;
+    const blobs = await Promise.all(c.cells.map(async (cell) => ({ buffer: await blob('buildings', cell.key) })));
+    const result = await pool.run({
+      type: 'near',
+      key: c.key,
+      originX: c.originX,
+      originZ: c.originZ,
+      palette,
+      blobs,
+    });
+    if (!c.active) {
+      c.requested = false;
+      return;
+    }
+    if (result.positions.length === 0) return;
+    const geometry = new BufferGeometry();
+    makeAttributes(geometry, result);
+    geometry.setAttribute('aMeta', new BufferAttribute(result.meta, 2));
+    geometry.setAttribute('aLocalY', new BufferAttribute(result.localY, 1));
+    geometry.computeBoundingSphere();
+    const material = createBuildingMaterial({ windows: quality.windows });
+    material.uniformsHolder.uFade.value = 0;
+    const mesh = new Mesh(geometry, material);
+    mesh.position.set(c.originX, 0, c.originZ);
+    mesh.castShadow = true;
+    mesh.receiveShadow = true;
+    mesh.name = `near-${c.key}`;
+    scene.add(mesh);
+    c.mesh = mesh;
+    c.material = material;
+    stats.nearChunks++;
+  }
+
+  function disposeChunk(c) {
+    if (c.mesh) {
+      scene.remove(c.mesh);
+      c.mesh.geometry.dispose();
+      c.material.dispose();
+      c.mesh = null;
+      c.material = null;
+      stats.nearChunks--;
+    }
+    c.fade = 0;
+    c.requested = false;
+  }
+
+  // Load order: nearest to the hero pivot first, so the city fills in from the
+  // middle of the frame outward.
+  function preload(origin) {
+    const ordered = [...groups.values()].sort(
+      (a, b) => a.center.distanceToSquared(origin) - b.center.distanceToSquared(origin)
+    );
+    // Four pipelines in flight: enough to keep every worker fed and the fetch
+    // queue saturated without starving the render loop of main-thread time.
+    async function pump(items, work, lanes = 4) {
+      let cursor = 0;
+      const lane = async () => {
+        while (cursor < items.length) {
+          const item = items[cursor++];
+          await work(item).catch((err) => console.warn('tile group failed', item.key, err));
+        }
+      };
+      await Promise.all(Array.from({ length: lanes }, lane));
+    }
+
+    // Stream silhouette and ground together. Streets, trees, lamps, and traffic
+    // paths become alive near the opening view while distant skyline groups keep
+    // filling in behind them.
+    Promise.all([pump(ordered, buildFarGroup, 3), pump(ordered, buildGround, 3)]);
+  }
+
+  const tmp = new Vector3();
+
+  function update(dt, cameraTarget, cameraPos, quality) {
+    // Near tier activation with hysteresis so cells never thrash on the boundary.
+    for (const c of chunks.values()) {
+      tmp.copy(c.center);
+      tmp.y = cameraTarget.y;
+      const dist = Math.min(cameraPos.distanceTo(tmp), cameraTarget.distanceTo(tmp));
+      const wantNear = dist < NEAR_ENTER * quality.nearScale;
+      const dropNear = dist > NEAR_EXIT * quality.nearScale;
+      if (wantNear && !c.active) {
+        c.active = true;
+        buildNearChunk(c).catch((err) => console.warn('near chunk failed', c.key, err));
+      } else if (dropNear && c.active) {
+        c.active = false;
+        if (c.mesh) c.fade = Math.min(c.fade, 1);
+      }
+
+      const target = c.active && c.mesh ? 1 : 0;
+      if (c.fade !== target) {
+        const step = FADE_SPEED * dt;
+        c.fade = target > c.fade ? Math.min(target, c.fade + step) : Math.max(target, c.fade - step);
+        if (c.material) c.material.uniformsHolder.uFade.value = c.fade;
+      }
+      if (!c.active && c.fade <= 0 && c.mesh) disposeChunk(c);
+
+      // The far tier's matching quadrant is the inverse of the near fade.
+      if (c.group) c.group.quadFade[c.quadrant] = 1 - c.fade;
+    }
+
+    for (const g of groups.values()) {
+      if (g.farUniforms) g.farUniforms.uQuadFade.value.set(...g.quadFade);
+      tmp.copy(g.center);
+      tmp.y = cameraTarget.y;
+      const dist = cameraTarget.distanceTo(tmp);
+      if (g.trees) g.trees.visible = dist < TREE_RANGE * quality.treeScale;
+      if (g.lamps) g.lamps.visible = shared.uNight.value > 0.08 && dist < LAMP_RANGE;
+    }
+    lampMaterial.opacity = Math.min(0.85, shared.uNight.value * 0.95);
+  }
+
+  return {
+    update,
+    preload,
+    stats,
+    paths,
+    onPaths(cb) {
+      onPathsReady = cb;
+      if (paths.length) cb(paths);
+    },
+    get progress() {
+      return stats.cellsTotal ? stats.cellsLoaded / stats.cellsTotal : 0;
+    },
+    setQuality(q) {
+      quality.windows = q.windows;
+      for (const c of chunks.values()) {
+        if (c.material) c.material.uniformsHolder.uWindows.value = q.windows;
+      }
+    },
+  };
+}

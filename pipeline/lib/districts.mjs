@@ -4,13 +4,13 @@
 
 export const PALETTE = [
   { id: 'glass', color: [0.42, 0.5, 0.58], windows: 0.95 }, // downtown curtain wall
-  { id: 'brick', color: [0.55, 0.36, 0.29], windows: 0.55 }, // SoMa / Mission masonry
+  { id: 'brick', color: [0.5, 0.4, 0.35], windows: 0.55 }, // SoMa / Mission masonry
   { id: 'pastel', color: [0.78, 0.74, 0.66], windows: 0.4 }, // Sunset / Richmond stucco rows
   { id: 'cream', color: [0.85, 0.82, 0.74], windows: 0.45 }, // Russian / Nob / Marina
-  { id: 'victorian', color: [0.72, 0.66, 0.72], windows: 0.45 }, // Haight / Alamo / Castro
+  { id: 'victorian', color: [0.71, 0.67, 0.68], windows: 0.45 }, // Haight / Alamo / Castro
   { id: 'industrial', color: [0.5, 0.5, 0.48], windows: 0.3 }, // Bayview / Hunters Point
   { id: 'stone', color: [0.68, 0.66, 0.6], windows: 0.5 }, // civic center
-  { id: 'presidio', color: [0.6, 0.44, 0.36], windows: 0.35 }, // Presidio red brick
+  { id: 'presidio', color: [0.56, 0.45, 0.4], windows: 0.35 }, // Presidio red brick
 ];
 
 const P = Object.fromEntries(PALETTE.map((p, i) => [p.id, i]));

@@ -4,7 +4,16 @@
 
 import { mkdir, writeFile, readFile } from 'node:fs/promises';
 import earcut from 'earcut';
-import { CELL_SIZE, GRID, cellIndex, cellOrigin, hash01, insideBBox, project } from './lib/geo.mjs';
+import {
+  CELL_SIZE,
+  EXTENT,
+  GRID,
+  cellIndex,
+  cellOrigin,
+  hash01,
+  insideBBox,
+  project,
+} from './lib/geo.mjs';
 import { ringArea, ringBBox, ringCentroid } from './lib/poly.mjs';
 import { loadHeightmap } from './lib/heightmap.mjs';
 import { writeLandcoverBlob } from './lib/binio.mjs';
@@ -186,11 +195,37 @@ function cellFor(x, z) {
   return cell;
 }
 
+// Coarse landuse raster: lets the terrain shader tint distant parks, beaches
+// and water without loading any landcover geometry, so Golden Gate Park still
+// reads as a dark green rectangle from the 9 km hero view.
+const RASTER = 1024;
+const landuse = new Uint8Array(RASTER * RASTER).fill(255);
+const rasterCellX = (EXTENT.maxX - EXTENT.minX) / RASTER;
+const rasterCellZ = (EXTENT.maxZ - EXTENT.minZ) / RASTER;
+
+function rasterizeTriangle(kind, tri) {
+  const xs = [tri[0], tri[2], tri[4]];
+  const zs = [tri[1], tri[3], tri[5]];
+  const i0 = Math.max(0, Math.floor((Math.min(...xs) - EXTENT.minX) / rasterCellX));
+  const i1 = Math.min(RASTER - 1, Math.ceil((Math.max(...xs) - EXTENT.minX) / rasterCellX));
+  const j0 = Math.max(0, Math.floor((Math.min(...zs) - EXTENT.minZ) / rasterCellZ));
+  const j1 = Math.min(RASTER - 1, Math.ceil((Math.max(...zs) - EXTENT.minZ) / rasterCellZ));
+  const ring = [tri[0], tri[1], tri[2], tri[3], tri[4], tri[5]];
+  for (let j = j0; j <= j1; j++) {
+    const z = EXTENT.minZ + (j + 0.5) * rasterCellZ;
+    for (let i = i0; i <= i1; i++) {
+      const x = EXTENT.minX + (i + 0.5) * rasterCellX;
+      if (pointInRing(x, z, ring)) landuse[j * RASTER + i] = kind;
+    }
+  }
+}
+
 function addTriangle(kind, tri, waterLevel) {
   const cx = (tri[0] + tri[2] + tri[4]) / 3;
   const cz = (tri[1] + tri[3] + tri[5]) / 3;
   const cell = cellFor(cx, cz);
   if (!cell) return;
+  rasterizeTriangle(kind, tri);
   // Weld shared corners: the terrain-following subdivision generates midpoints
   // that neighbouring triangles reuse, so welding cuts the blob size ~4x.
   for (let k = 0; k < 3; k++) {
@@ -348,9 +383,28 @@ const stats = {
   missingParks,
 };
 
+await writeFile(new URL('landuse.bin', OUT), Buffer.from(landuse.buffer));
+
 await writeFile(
   new URL('landcover.json', OUT),
-  JSON.stringify({ cellSize: CELL_SIZE, grid: GRID, kinds: LAND_KINDS, stats, cells: index }, null, 1)
+  JSON.stringify(
+    {
+      cellSize: CELL_SIZE,
+      grid: GRID,
+      kinds: LAND_KINDS,
+      raster: {
+        size: RASTER,
+        minX: EXTENT.minX,
+        minZ: EXTENT.minZ,
+        cellX: rasterCellX,
+        cellZ: rasterCellZ,
+      },
+      stats,
+      cells: index,
+    },
+    null,
+    1
+  )
 );
 
 console.log(
