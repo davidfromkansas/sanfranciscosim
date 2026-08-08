@@ -532,6 +532,10 @@ export function createCity(scene, data) {
       }
     }
 
+    // cellsLoaded counts blobs held for the current tier, so the tile readout
+    // stays coherent instead of accumulating across swaps.
+    stats.cellsLoaded = blobCache.size;
+
     for (const g of reload) buildGround(g).catch((err) => console.warn('ground reload failed', g.key, err));
   }
 

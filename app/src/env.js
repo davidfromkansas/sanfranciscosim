@@ -151,7 +151,8 @@ export function createEnvironment(scene) {
   const hemi = new HemisphereLight(DAY.hemiSky.clone(), DAY.hemiGround.clone(), DAY.hemiIntensity);
   scene.add(hemi);
 
-  scene.fog = new FogExp2(DAY.fog.clone().getHex(), 0.000019);
+  const FOG_DENSITY = 0.000019;
+  scene.fog = new FogExp2(DAY.fog.clone().getHex(), FOG_DENSITY);
 
   const state = { time: 0, shadowsEnabled: true };
 
@@ -187,7 +188,7 @@ export function createEnvironment(scene) {
 
     shared.uSunColor.value.copy(sun.color);
     shared.uSkyColor.value.copy(hemi.color);
-    if (scene.fog) scene.fog.color.copy(DAY.fog).lerp(NIGHT.fog, night);
+    scene.fog.color.copy(DAY.fog).lerp(NIGHT.fog, night);
     // Overcast reads as shade only while there is sun to block.
     shared.uCloudCover.value = 0.32 * (1 - night * 0.85);
   }
@@ -228,11 +229,13 @@ export function createEnvironment(scene) {
   }
 
   // Diorama lighting: a bright tabletop key light, soft sky fill and no fog, so
-  // the model reads as a physical object rather than an atmosphere.
-  const savedFog = scene.fog;
+  // the model reads as a physical object rather than an atmosphere. The fog is
+  // switched off by density, not by nulling scene.fog: everything that reads
+  // scene.fog (water's fog uniforms, every material's compiled fog chunk) keeps
+  // working, and no shader is recompiled on the toggle.
   function setToy(on) {
     shared.uToy.value = on ? 1 : 0;
-    scene.fog = on ? null : savedFog;
+    scene.fog.density = on ? 0 : FOG_DENSITY;
     sun.shadow.radius = on ? 3 : 1;
     state.toy = on;
     setTime(state.time);
