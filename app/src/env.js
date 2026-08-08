@@ -354,5 +354,18 @@ export function createEnvironment(scene) {
   }
 
   setTime(0);
-  return { sky, sun, hemi, setTime, setToy, updateClouds, updateShadow, setShadowQuality, state };
+  return {
+    sky,
+    sun,
+    hemi,
+    moon: nightSky,
+    stars,
+    setTime,
+    setToy,
+    updateClouds,
+    updateShadow,
+    updateNightSky,
+    setShadowQuality,
+    state,
+  };
 }
