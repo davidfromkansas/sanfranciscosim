@@ -187,7 +187,7 @@ export function createEnvironment(scene) {
 
     shared.uSunColor.value.copy(sun.color);
     shared.uSkyColor.value.copy(hemi.color);
-    scene.fog.color.copy(DAY.fog).lerp(NIGHT.fog, night);
+    if (scene.fog) scene.fog.color.copy(DAY.fog).lerp(NIGHT.fog, night);
     // Overcast reads as shade only while there is sun to block.
     shared.uCloudCover.value = 0.32 * (1 - night * 0.85);
   }
