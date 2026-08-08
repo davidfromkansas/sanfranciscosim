@@ -2,7 +2,7 @@
 // terrain-draped meshes, plus a deterministic tree scatter for runtime
 // instancing.
 
-import { mkdir, writeFile, readFile } from 'node:fs/promises';
+import { mkdir, rm, writeFile, readFile } from 'node:fs/promises';
 import earcut from 'earcut';
 import {
   CELL_SIZE,
@@ -350,6 +350,8 @@ for (const el of raw.elements) {
   }
 }
 
+// Stale cells from an earlier bake would linger and desync the index.
+await rm(CELLS_OUT, { recursive: true, force: true });
 await mkdir(CELLS_OUT, { recursive: true });
 let bytes = 0;
 const index = [];

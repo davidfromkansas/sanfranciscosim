@@ -26,6 +26,33 @@ const DITHER = /* glsl */ `
   }
 `;
 
+// Cloud shadows: two scrolling value-noise octaves in world XZ, sampled per
+// fragment, so soft shadow blankets drift across the city with the wind.
+const CLOUDS = /* glsl */ `
+  uniform float uCloudCover;
+  uniform vec2 uCloudDrift;
+
+  float cloudNoise(vec2 p) {
+    vec2 i = floor(p);
+    vec2 f = fract(p);
+    f = f * f * (3.0 - 2.0 * f);
+    float a = fract(sin(dot(i, vec2(127.1, 311.7))) * 43758.5453);
+    float b = fract(sin(dot(i + vec2(1.0, 0.0), vec2(127.1, 311.7))) * 43758.5453);
+    float c = fract(sin(dot(i + vec2(0.0, 1.0), vec2(127.1, 311.7))) * 43758.5453);
+    float d = fract(sin(dot(i + vec2(1.0, 1.0), vec2(127.1, 311.7))) * 43758.5453);
+    return mix(mix(a, b, f.x), mix(c, d, f.x), f.y);
+  }
+
+  float cloudShadow(vec2 world) {
+    vec2 p = world * 0.00055 + uCloudDrift;
+    float n = cloudNoise(p) * 0.65 + cloudNoise(p * 2.3 + 11.0) * 0.35;
+    float shade = smoothstep(0.42, 0.72, n);
+    return 1.0 - shade * uCloudCover;
+  }
+`;
+
+const CLOUD_UNIFORMS = () => ({ uCloudCover: shared.uCloudCover, uCloudDrift: shared.uCloudDrift });
+
 const HASH = /* glsl */ `
   float hash13(vec3 p) {
     p = fract(p * 0.1031);
@@ -41,6 +68,7 @@ export function createBuildingMaterial({ windows = 1 } = {}) {
     uNight: shared.uNight,
     uWindows: { value: windows },
     uSunColor: shared.uSunColor,
+    ...CLOUD_UNIFORMS(),
   };
 
   // Declared as a normal function: `this` is the material instance, so every
@@ -81,7 +109,8 @@ export function createBuildingMaterial({ windows = 1 } = {}) {
         varying float vIsWall;
         varying float vLocalY;
         ${DITHER}
-        ${HASH}`
+        ${HASH}
+        ${CLOUDS}`
       )
       .replace(
         '#include <clipping_planes_fragment>',
@@ -127,6 +156,7 @@ export function createBuildingMaterial({ windows = 1 } = {}) {
           float warm = 0.7 + hash13(vec3(col, row, seed * 91.0)) * 0.6;
           emissive += vec3(1.0, 0.78, 0.5) * on * warm * 1.5 * uNight;
         }
+        diffuseColor.rgb *= cloudShadow(vCityWorld.xz);
         totalEmissiveRadiance += emissive;`
       );
   };
@@ -188,7 +218,7 @@ export function createFarBuildingMaterial() {
 // ground. Asphalt (kind 64) picks up a faint warm sheen at night.
 export function createGroundMaterial() {
   const material = new MeshLambertMaterial({ vertexColors: true, dithering: true });
-  material.uniformsHolder = { uNight: shared.uNight };
+  material.uniformsHolder = { uNight: shared.uNight, ...CLOUD_UNIFORMS() };
   material.polygonOffset = true;
   material.polygonOffsetFactor = -2;
   material.polygonOffsetUnits = -2;
@@ -200,7 +230,13 @@ export function createGroundMaterial() {
         '#include <common>',
         `#include <common>
         attribute float aKind;
-        varying float vKind;`
+        varying float vKind;
+        varying vec2 vGroundWorld;`
+      )
+      .replace(
+        '#include <worldpos_vertex>',
+        `#include <worldpos_vertex>
+        vGroundWorld = (modelMatrix * vec4(transformed, 1.0)).xz;`
       )
       .replace(
         '#include <begin_vertex>',
@@ -212,12 +248,15 @@ export function createGroundMaterial() {
         '#include <common>',
         `#include <common>
         uniform float uNight;
-        varying float vKind;`
+        varying float vKind;
+        varying vec2 vGroundWorld;
+        ${CLOUDS}`
       )
       .replace(
         '#include <color_fragment>',
         `#include <color_fragment>
         float asphalt = step(63.5, vKind);
+        diffuseColor.rgb *= cloudShadow(vGroundWorld);
         totalEmissiveRadiance += vec3(1.0, 0.72, 0.42) * asphalt * uNight * 0.06;`
       );
   };
@@ -225,8 +264,33 @@ export function createGroundMaterial() {
   return material;
 }
 
+// Terrain and trees: the same drifting cloud shade, so a shadow blanket crosses
+// hillside, park and rooftop as one.
+export function createCloudShadedMaterial() {
+  const material = new MeshLambertMaterial({ vertexColors: true, dithering: true });
+  material.uniformsHolder = CLOUD_UNIFORMS();
+  material.onBeforeCompile = function patchCloudShaded(shader) {
+    Object.assign(shader.uniforms, this.uniformsHolder);
+    shader.vertexShader = shader.vertexShader
+      .replace('#include <common>', `#include <common>\n        varying vec2 vCloudWorld;`)
+      .replace(
+        '#include <worldpos_vertex>',
+        `#include <worldpos_vertex>
+        vCloudWorld = (modelMatrix * vec4(transformed, 1.0)).xz;`
+      );
+    shader.fragmentShader = shader.fragmentShader
+      .replace('#include <common>', `#include <common>\n        varying vec2 vCloudWorld;\n        ${CLOUDS}`)
+      .replace(
+        '#include <color_fragment>',
+        `#include <color_fragment>
+        diffuseColor.rgb *= cloudShadow(vCloudWorld);`
+      );
+  };
+  return material;
+}
+
 export function createTreeMaterial() {
-  return new MeshLambertMaterial({ vertexColors: true, dithering: true });
+  return createCloudShadedMaterial();
 }
 
 export const PALETTE_TINT = new Color();

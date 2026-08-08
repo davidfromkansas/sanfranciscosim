@@ -18,6 +18,7 @@ import { createTerrain } from './terrain.js';
 import { createWater } from './water.js';
 import { createCity } from './city.js';
 import { createLandmarks } from './landmarks.js';
+import { createPiers } from './piers.js';
 import { createAgents } from './agents.js';
 import { createCameraRig } from './camera.js';
 import { QUALITY, createLoader, createUI } from './ui.js';
@@ -44,6 +45,7 @@ async function boot() {
   loader.set(0.75);
   const water = createWater(scene);
   const landmarks = createLandmarks(scene, data);
+  const piers = createPiers(scene, data);
   loader.set(0.9);
 
   const city = createCity(scene, data);
@@ -141,6 +143,7 @@ async function boot() {
     city,
     agents,
     landmarks,
+    piers,
     presets,
     goTo(lon, lat, distance = 900, yaw = 210, pitch = 24) {
       const [x, z] = data.project(lon, lat);
@@ -175,7 +178,10 @@ async function boot() {
   let loaderDone = false;
 
   function frame(now) {
-    const dt = Math.min(0.05, (now - last) / 1000);
+    // Simulation dt is clamped so a stall cannot teleport the city, but the fps
+    // readout must use real wall time or it reports the clamp (20) forever.
+    const elapsed = (now - last) / 1000;
+    const dt = Math.min(0.05, elapsed);
     last = now;
     shared.uTime.value += dt;
 
@@ -193,12 +199,15 @@ async function boot() {
     agents.update(dt, pivotWorld, camera.position);
     landmarks.update();
     water.update(camera.position);
+    // Clouds drift on wall time so the sky moves at the same rate whatever the
+    // frame rate; the simulation clamp would slow them to a crawl below 20 fps.
+    env.updateClouds(Math.min(1, elapsed));
     env.updateShadow(pivotWorld, rig.state.distance);
 
     renderer.render(scene, camera);
 
     frames++;
-    fpsAccumulator += dt;
+    fpsAccumulator += elapsed;
     if (fpsAccumulator > 0.5) {
       fps = frames / fpsAccumulator;
       frames = 0;

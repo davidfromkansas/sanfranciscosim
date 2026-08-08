@@ -2,20 +2,23 @@
 // projection helpers plus sampleElevation() that everything else builds on.
 
 const TILES = `${import.meta.env.BASE_URL}tiles/`;
+// Injected from the bake timestamp at build time; busts the long-lived tile
+// cache whenever the data is re-baked under the same file names.
+const VERSION = `?v=${encodeURIComponent(__TILES_VERSION__)}`;
+
+export const tileUrl = (path) => TILES + path + VERSION;
 
 async function json(path) {
-  const res = await fetch(TILES + path);
+  const res = await fetch(tileUrl(path));
   if (!res.ok) throw new Error(`failed to load ${path}: ${res.status}`);
   return res.json();
 }
 
 async function bin(path) {
-  const res = await fetch(TILES + path);
+  const res = await fetch(tileUrl(path));
   if (!res.ok) throw new Error(`failed to load ${path}: ${res.status}`);
   return res.arrayBuffer();
 }
-
-export const tileUrl = (path) => TILES + path;
 
 export async function loadCore(onProgress = () => {}) {
   const manifest = await json('manifest.json');

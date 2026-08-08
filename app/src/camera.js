@@ -170,11 +170,15 @@ export function createCameraRig(camera, domElement, sampleElevation, extent) {
       state.pitch = Math.min(86 * DEG, Math.max(6 * DEG, state.pitch + dy * 0.004));
       pitchLocked = true;
     } else if (dragMode === 'pan') {
-      // Grab-pan: keep the ground point that was under the cursor under it.
+      // Grab-pan: keep the ground point that was under the cursor under it. The
+      // camera has to be moved with the pivot immediately, otherwise the next
+      // move event raycasts through a stale camera and the grabbed point walks
+      // away across a drag.
       if (screenToGround(pointer.x, pointer.y, dragTarget)) {
         state.pivot.x -= dragTarget.x - panPlanePoint.x;
         state.pivot.z -= dragTarget.z - panPlanePoint.z;
         clampPivot();
+        apply();
       }
     }
   }
@@ -184,6 +188,11 @@ export function createCameraRig(camera, domElement, sampleElevation, extent) {
   function onWheel(event) {
     event.preventDefault();
     animation = null;
+    // Wheel events carry their own cursor position: zooming must aim there even
+    // if no pointermove arrived first.
+    const rect = domElement.getBoundingClientRect();
+    pointer.x = ((event.clientX - rect.left) / rect.width) * 2 - 1;
+    pointer.y = -((event.clientY - rect.top) / rect.height) * 2 + 1;
     const scale = Math.exp(
       (event.deltaY > 0 ? 1 : -1) * Math.min(0.35, Math.abs(event.deltaY) * 0.0022)
     );
@@ -199,6 +208,7 @@ export function createCameraRig(camera, domElement, sampleElevation, extent) {
     }
     state.distance = next;
     if (!pitchLocked) state.pitch = pitchForDistance(state.distance);
+    apply();
   }
 
   function onContextMenu(event) {

@@ -141,42 +141,40 @@ function deckLevelAt(path, x, z) {
   return best;
 }
 
+// Deck nodes and tower anchors as baked by pipeline/bridges.mjs: real OSM
+// centrelines, real tower positions, deck profile that meets both abutments.
+function bakedBridge(ctx) {
+  const spec = ctx.bridge;
+  const p = (lon, lat, y) => {
+    const [x, z] = ctx.project(lon, lat);
+    return [x, y, z];
+  };
+  const nodes = spec.nodes.map(([lon, lat, y]) => p(lon, lat, y));
+  const anchors = spec.towers.map(([lon, lat]) => p(lon, lat, 0));
+  const first = anchors[0] ?? nodes[0];
+  const last = anchors[anchors.length - 1] ?? nodes[nodes.length - 1];
+  const yaw = Math.atan2(last[0] - first[0], last[2] - first[2]);
+  return { spec, p, nodes, towers: anchors.map((at) => ({ at, yaw })), yaw };
+}
+
 const builders = {
   // 1,280 m main span, 227 m towers, deck 67 m over the strait, International
-  // Orange.
+  // Orange. Geometry comes from the baked OSM centreline.
   goldenGateBridge(ctx) {
     const kit = new Kit(160);
-    const p = (lon, lat, y) => {
-      const [x, z] = ctx.project(lon, lat);
-      return [x, y, z];
-    };
-    const nodes = [
-      p(-122.4746, 37.8032, 30),
-      p(-122.4756, 37.8069, 62),
-      p(-122.4767, 37.8102, 70),
-      p(-122.4777, 37.8178, 76),
-      p(-122.4787, 37.8253, 70),
-      p(-122.4792, 37.8299, 62),
-      p(-122.4799, 37.8341, 42),
-    ];
-    const southTower = p(-122.4767, 37.8102, 0);
-    const northTower = p(-122.4787, 37.8253, 0);
-    const yaw = Math.atan2(northTower[0] - southTower[0], northTower[2] - southTower[2]);
+    const { spec, nodes, towers } = bakedBridge(ctx);
     suspensionBridge(kit, {
       nodes,
-      towers: [
-        { at: southTower, yaw },
-        { at: northTower, yaw },
-      ],
-      deckWidth: 27,
-      towerHeight: 227,
+      towers,
+      deckWidth: spec.deckWidth,
+      towerHeight: spec.towerHeight,
       deckColor: ORANGE,
       towerColor: ORANGE,
-      sag: 120,
+      sag: spec.sag,
     });
     // Aircraft beacons on the tower tops.
-    for (const t of [southTower, northTower]) {
-      kit.glowSphere(3, '#ff5544', { x: t[0], y: 229, z: t[2] });
+    for (const t of towers) {
+      kit.glowSphere(3, '#ff5544', { x: t.at[0], y: spec.towerHeight + 2, z: t.at[2] });
     }
     return kit.finish('goldenGateBridge');
   },
@@ -185,73 +183,60 @@ const builders = {
   // single self-anchored tower toward Oakland.
   bayBridge(ctx) {
     const kit = new Kit(150);
-    const p = (lon, lat, y) => {
-      const [x, z] = ctx.project(lon, lat);
-      return [x, y, z];
-    };
-    const west = [
-      p(-122.3885, 37.7893, 34),
-      p(-122.3833, 37.793, 58),
-      p(-122.3775, 37.7972, 62),
-      p(-122.3718, 37.8013, 58),
-      p(-122.3668, 37.805, 44),
-    ];
-    const t1 = p(-122.3833, 37.793, 0);
-    const t2 = p(-122.3718, 37.8013, 0);
-    const yaw = Math.atan2(t2[0] - t1[0], t2[2] - t1[2]);
+    const { spec, p, nodes, towers, yaw } = bakedBridge(ctx);
     suspensionBridge(kit, {
-      nodes: west,
-      towers: [
-        { at: t1, yaw },
-        { at: t2, yaw },
-      ],
-      deckWidth: 24,
-      towerHeight: 160,
+      nodes,
+      towers,
+      deckWidth: spec.deckWidth,
+      towerHeight: spec.towerHeight,
       deckColor: '#9aa0a6',
       towerColor: '#9aa0a6',
-      sag: 78,
+      sag: spec.sag,
     });
 
-    // Yerba Buena approach + tunnel portal.
-    const portal = p(-122.3648, 37.8065, 44);
+    // Yerba Buena tunnel portal at the west end of the east span.
+    const portal = p(...spec.portal);
     kit.box(26, 16, 40, CONCRETE, { x: portal[0], y: portal[1] + 4, z: portal[2], rotY: yaw });
 
-    // East span: single tower with a curved cable over the deck.
-    const east = [p(-122.3617, 37.8095, 44), p(-122.3555, 37.8137, 40), p(-122.3495, 37.8175, 36)];
+    // East span: skyway on concrete columns, then the self-anchored tower.
+    const east = spec.east.nodes.map(([lon, lat, y]) => p(lon, lat, y));
+    let sinceColumn = Infinity;
     for (let i = 0; i < east.length - 1; i++) {
       const a = east[i];
       const b = east[i + 1];
       const dx = b[0] - a[0];
       const dz = b[2] - a[2];
       const len = Math.hypot(dx, dz);
-      kit.box(28, 2.6, len, '#9aa0a6', {
+      if (len < 0.5) continue;
+      const rise = b[1] - a[1];
+      kit.box(spec.east.deckWidth, 2.6, Math.hypot(len, rise), '#9aa0a6', {
         x: (a[0] + b[0]) / 2,
         y: (a[1] + b[1]) / 2,
         z: (a[2] + b[2]) / 2,
         rotY: Math.atan2(dx, dz),
+        rotX: -Math.atan2(rise, len),
       });
-      for (let s = 0; s < len; s += 60) {
-        const t = s / len;
-        kit.box(9, (a[1] + (b[1] - a[1]) * t) * 0.9, 9, CONCRETE, {
-          x: a[0] + dx * t,
-          y: (a[1] + (b[1] - a[1]) * t) / 2,
-          z: a[2] + dz * t,
-        });
+      sinceColumn += len;
+      if (sinceColumn >= 120) {
+        sinceColumn = 0;
+        const groundY = Math.min(a[1] - 4, Math.max(-8, ctx.sampleElevation(a[0], a[2])));
+        kit.box(9, a[1] - groundY, 9, CONCRETE, { x: a[0], y: (a[1] + groundY) / 2, z: a[2] });
       }
     }
-    const eastTower = p(-122.3592, 37.8112, 0);
-    kit.box(9, 160, 9, WHITE, { x: eastTower[0], y: 80, z: eastTower[2] });
+    const eastTower = p(...spec.east.tower, 0);
+    const towerTop = spec.east.towerHeight;
+    kit.box(9, towerTop, 9, WHITE, { x: eastTower[0], y: towerTop / 2, z: eastTower[2] });
     kit.tube(
       [
-        [east[0][0], 44, east[0][2]],
-        [eastTower[0], 150, eastTower[2]],
-        [east[2][0], 40, east[2][2]],
+        [east[0][0], east[0][1], east[0][2]],
+        [eastTower[0], towerTop * 0.94, eastTower[2]],
+        [east[east.length - 1][0], east[east.length - 1][1], east[east.length - 1][2]],
       ],
       1.4,
       '#d8d3c8',
       4
     );
-    kit.glowSphere(3, '#ff5544', { x: eastTower[0], y: 162, z: eastTower[2] });
+    kit.glowSphere(3, '#ff5544', { x: eastTower[0], y: towerTop + 2, z: eastTower[2] });
     return kit.finish('bayBridge');
   },
 
@@ -719,9 +704,13 @@ export function createLandmarks(scene, data) {
   for (const landmark of manifest.landmarks) {
     const builder = builders[landmark.id];
     if (!builder) continue;
+    // The two bridges are built from baked OSM centrelines; without them there
+    // is nothing to draw.
+    const bridge = manifest.bridges?.[landmark.id];
+    if (!bridge && /Bridge$/.test(landmark.id)) continue;
     const [x, z] = project(landmark.lon, landmark.lat);
     const y = Math.max(0, sampleElevation(x, z));
-    const object = builder({ x, y, z, project, sampleElevation, landmark });
+    const object = builder({ x, y, z, project, sampleElevation, landmark, bridge });
     group.add(object);
     built.push({ landmark, object, position: new Vector3(x, y, z) });
   }

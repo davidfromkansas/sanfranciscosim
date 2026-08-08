@@ -12,6 +12,7 @@ import {
   Mesh,
   ShaderMaterial,
   SphereGeometry,
+  Vector2,
   Vector3,
 } from 'three';
 
@@ -23,7 +24,13 @@ export const shared = {
   uSunColor: { value: new Color(1.0, 0.78, 0.5) },
   uSkyColor: { value: new Color(0.42, 0.56, 0.72) },
   uNight: { value: 0 },
+  // Drifting cloud shadows: cover fades out as night falls, drift is advanced
+  // every frame by the prevailing westerly.
+  uCloudCover: { value: 0.32 },
+  uCloudDrift: { value: new Vector2(0, 0) },
 };
+
+const CLOUD_WIND = [0.0042, 0.0016];
 
 const SKY_VERT = /* glsl */ `
   varying vec3 vDir;
@@ -162,6 +169,13 @@ export function createEnvironment(scene) {
     shared.uSunColor.value.copy(sun.color);
     shared.uSkyColor.value.copy(hemi.color);
     scene.fog.color.copy(DAY.fog).lerp(NIGHT.fog, night);
+    // Overcast reads as shade only while there is sun to block.
+    shared.uCloudCover.value = 0.32 * (1 - night * 0.85);
+  }
+
+  function updateClouds(dt) {
+    shared.uCloudDrift.value.x += CLOUD_WIND[0] * dt;
+    shared.uCloudDrift.value.y += CLOUD_WIND[1] * dt;
   }
 
   // Keep the shadow frustum tight around the camera pivot: at street level it
@@ -195,5 +209,5 @@ export function createEnvironment(scene) {
   }
 
   setTime(0);
-  return { sky, sun, hemi, setTime, updateShadow, setShadowQuality, state };
+  return { sky, sun, hemi, setTime, updateClouds, updateShadow, setShadowQuality, state };
 }

@@ -8,7 +8,11 @@ export default [
     languageOptions: {
       ecmaVersion: 2023,
       sourceType: 'module',
-      globals: { ...globals.browser, ...globals.worker },
+      globals: {
+        ...globals.browser,
+        ...globals.worker,
+        __TILES_VERSION__: 'readonly',
+      },
     },
     rules: {
       'no-unused-vars': ['error', { argsIgnorePattern: '^_' }],

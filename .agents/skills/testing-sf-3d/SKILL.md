@@ -58,3 +58,44 @@ No env vars or secrets are required. **Devin Secrets Needed:** none.
 Take two screenshots ~5 s apart at an unchanged camera (e.g. preset `7` Ferry Building) and diff crops
 with PIL; cars along the Embarcadero and boats/ferries on the bay should shift. A pixel diff of the whole
 frame is not enough on its own because the water shader animates every frame.
+Under software GL only ~2–5 frames render in 10 s, so allow 12–15 s between frames and accept small
+diff counts (a few hundred changed pixels) as motion.
+
+## Synthetic vs real input (important)
+- Synthetic `KeyboardEvent` works only for handlers that read `event.code` (camera pan/rotate in
+  `camera.js`). Handlers that read `event.key` — the backtick overlay toggle in `ui.js`, and `H`/number
+  presets in `main.js` — are **missed** unless you set `key` too. Prefer real keys:
+  `export DISPLAY=:0; xdotool key h` / `key 1` / `key grave` / `key F3`.
+- `DISPLAY` may be unset in fresh shells and `:1` does not exist; use `:0` (`ls /tmp/.X11-unix` to confirm).
+  `xdotool getactivewindow` fails (no `_NET_ACTIVE_WINDOW`) but `mousemove`/`key`/`click` still work.
+- `import -window root` captures can lag the live canvas, so a pixel diff may show "no change" even when
+  the UI did change. For UI toggles, assert on DOM state via console (e.g.
+  `document.getElementById('debug').hidden`) rather than pixels.
+- Middle-drag also orbits (`camera.js` maps right OR middle button to rotate).
+
+## Measuring instead of trusting the overlay
+- The overlay `fps` field can read a constant `20` while the renderer actually draws 0.1–0.4 frames/sec.
+  Measure real cadence from deltas of `SF.renderer.info.render.frame` (or a rAF counter) over ~10 s and
+  report both numbers; never quote overlay fps as measured performance.
+- Long async probes: assign results to `window.__x` inside an async IIFE and read them back on a later
+  console call — console evaluation does not await promises.
+- Because only 2–3 frames elapse per key-hold, ratio-based control assertions (e.g. Shift boost ≈3.4×)
+  are unreliable; zoom-scaled pan speed (≥10× between distance 9000 and 150) still resolves cleanly.
+
+## Geometry/continuity probing recipes
+- Landmark screen position: traverse `SF.scene` for the named object, build its world bbox centre, then
+  `v.project(SF.camera)` → pixels. Note `getWorldPosition` returns the origin for landmark groups whose
+  geometry carries the offset, so use the bbox.
+- Deck-vs-ground continuity and freeway elevation: `SF.goTo(lon, lat, 600, 0, 88)` (near top-down) then
+  `SF.pick(0, 0)`; compare the y of the street hit (`near-*`/`far-*`) against the `terrain-*`/`ground-*`
+  hit. A large positive delta means an elevated deck; a `water` hit with no terrain means it ends mid-bay.
+- Zoom-to-cursor tests: the wheel handler picks the **terrain** under the pointer, not buildings, so a ray
+  through a tower's pixel continues to the ground far behind it — aim at the target's base, and expect the
+  pivot to converge only partially (it may end >1 km away; verify with pivot-to-landmark distance in metres).
+
+## Known findings to re-check rather than re-discover
+Audited on the re-baked local build: bridge deck ends do not meet land (Golden Gate both ends, Bay Bridge
+both ends), the camera has no building collision (only a terrain floor clamp, so low `distance` values put
+it inside meshes), grab-pan slips tens of metres, freeway decks float without piers while some freeways are
+flat on the ground, and cloud shadows are absent. Memory does **not** leak (geometries/heap plateau).
+These may still be open; probe them first before assuming regressions elsewhere.
