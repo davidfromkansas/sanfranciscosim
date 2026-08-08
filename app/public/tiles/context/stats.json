@@ -1,0 +1,685 @@
+{
+ "generated": "2026-08-08T19:25:36.054Z",
+ "buildings": 174845,
+ "cells": 598,
+ "categories": [
+  {
+   "cat": 0,
+   "id": "misc",
+   "label": "Building",
+   "count": 10551,
+   "night": 3
+  },
+  {
+   "cat": 1,
+   "id": "house",
+   "label": "House",
+   "count": 124543,
+   "night": 0
+  },
+  {
+   "cat": 2,
+   "id": "apartments",
+   "label": "Apartments",
+   "count": 14028,
+   "night": 0
+  },
+  {
+   "cat": 3,
+   "id": "office",
+   "label": "Office",
+   "count": 2763,
+   "night": 3
+  },
+  {
+   "cat": 4,
+   "id": "retail",
+   "label": "Retail",
+   "count": 8045,
+   "night": 1
+  },
+  {
+   "cat": 5,
+   "id": "restaurant_cafe",
+   "label": "Restaurant / Café",
+   "count": 2848,
+   "night": 1
+  },
+  {
+   "cat": 6,
+   "id": "bar",
+   "label": "Bar",
+   "count": 525,
+   "night": 1
+  },
+  {
+   "cat": 7,
+   "id": "hotel",
+   "label": "Hotel",
+   "count": 1463,
+   "night": 0
+  },
+  {
+   "cat": 8,
+   "id": "worship",
+   "label": "Place of worship",
+   "count": 634,
+   "night": 3
+  },
+  {
+   "cat": 9,
+   "id": "school",
+   "label": "School",
+   "count": 1060,
+   "night": 3
+  },
+  {
+   "cat": 10,
+   "id": "university",
+   "label": "University",
+   "count": 505,
+   "night": 3
+  },
+  {
+   "cat": 11,
+   "id": "hospital",
+   "label": "Hospital",
+   "count": 116,
+   "night": 2
+  },
+  {
+   "cat": 12,
+   "id": "clinic",
+   "label": "Clinic",
+   "count": 1385,
+   "night": 2
+  },
+  {
+   "cat": 13,
+   "id": "fire_station",
+   "label": "Fire station",
+   "count": 57,
+   "night": 2
+  },
+  {
+   "cat": 14,
+   "id": "police",
+   "label": "Police station",
+   "count": 23,
+   "night": 2
+  },
+  {
+   "cat": 15,
+   "id": "library",
+   "label": "Library",
+   "count": 49,
+   "night": 1
+  },
+  {
+   "cat": 16,
+   "id": "museum",
+   "label": "Museum",
+   "count": 235,
+   "night": 1
+  },
+  {
+   "cat": 17,
+   "id": "theater_cinema",
+   "label": "Theater / Cinema",
+   "count": 277,
+   "night": 1
+  },
+  {
+   "cat": 18,
+   "id": "government",
+   "label": "Government",
+   "count": 431,
+   "night": 2
+  },
+  {
+   "cat": 19,
+   "id": "industrial",
+   "label": "Industrial",
+   "count": 2031,
+   "night": 3
+  },
+  {
+   "cat": 20,
+   "id": "warehouse",
+   "label": "Warehouse",
+   "count": 239,
+   "night": 3
+  },
+  {
+   "cat": 21,
+   "id": "gas_station",
+   "label": "Gas station",
+   "count": 116,
+   "night": 1
+  },
+  {
+   "cat": 22,
+   "id": "supermarket",
+   "label": "Supermarket",
+   "count": 345,
+   "night": 1
+  },
+  {
+   "cat": 23,
+   "id": "parking_garage",
+   "label": "Parking garage",
+   "count": 1859,
+   "night": 3
+  },
+  {
+   "cat": 24,
+   "id": "gym",
+   "label": "Gym",
+   "count": 405,
+   "night": 1
+  },
+  {
+   "cat": 25,
+   "id": "transit_station",
+   "label": "Transit station",
+   "count": 312,
+   "night": 2
+  }
+ ],
+ "subcategories": [
+  {
+   "sub": "apartments",
+   "label": "Apartments",
+   "count": 5312
+  },
+  {
+   "sub": "shop",
+   "label": "Shop",
+   "count": 2153
+  },
+  {
+   "sub": "office",
+   "label": "Office",
+   "count": 1891
+  },
+  {
+   "sub": "restaurant",
+   "label": "Restaurant",
+   "count": 1831
+  },
+  {
+   "sub": "hotel",
+   "label": "Hotel",
+   "count": 1308
+  },
+  {
+   "sub": "salon",
+   "label": "Salon",
+   "count": 1030
+  },
+  {
+   "sub": "clinic",
+   "label": "Clinic",
+   "count": 958
+  },
+  {
+   "sub": "house",
+   "label": "House",
+   "count": 924
+  },
+  {
+   "sub": "parking_garage",
+   "label": "Parking garage",
+   "count": 908
+  },
+  {
+   "sub": "community_center",
+   "label": "Community center",
+   "count": 710
+  },
+  {
+   "sub": "factory",
+   "label": "Factory",
+   "count": 688
+  },
+  {
+   "sub": "church",
+   "label": "Church",
+   "count": 571
+  },
+  {
+   "sub": "cafe",
+   "label": "Café",
+   "count": 529
+  },
+  {
+   "sub": "preschool",
+   "label": "Preschool",
+   "count": 472
+  },
+  {
+   "sub": "auto_repair",
+   "label": "Auto repair",
+   "count": 455
+  },
+  {
+   "sub": "elementary_school",
+   "label": "Elementary school",
+   "count": 445
+  },
+  {
+   "sub": "bar",
+   "label": "Bar",
+   "count": 417
+  },
+  {
+   "sub": "civic_office",
+   "label": "Civic office",
+   "count": 358
+  },
+  {
+   "sub": "trade_school",
+   "label": "Trade school",
+   "count": 351
+  },
+  {
+   "sub": "gym",
+   "label": "Gym",
+   "count": 305
+  },
+  {
+   "sub": "corner_store",
+   "label": "Corner store",
+   "count": 282
+  },
+  {
+   "sub": "muni_station",
+   "label": "Muni station",
+   "count": 227
+  },
+  {
+   "sub": "theater",
+   "label": "Theater",
+   "count": 226
+  },
+  {
+   "sub": "hardware_store",
+   "label": "Hardware store",
+   "count": 225
+  },
+  {
+   "sub": "grocery",
+   "label": "Grocery store",
+   "count": 218
+  },
+  {
+   "sub": "laundromat",
+   "label": "Laundromat",
+   "count": 194
+  },
+  {
+   "sub": "dental",
+   "label": "Dental office",
+   "count": 193
+  },
+  {
+   "sub": "bank",
+   "label": "Bank",
+   "count": 187
+  },
+  {
+   "sub": "taqueria",
+   "label": "Taquería",
+   "count": 177
+  },
+  {
+   "sub": "gallery",
+   "label": "Gallery",
+   "count": 169
+  },
+  {
+   "sub": "bakery",
+   "label": "Bakery",
+   "count": 154
+  },
+  {
+   "sub": "utility",
+   "label": "Utility building",
+   "count": 148
+  },
+  {
+   "sub": "pet_store",
+   "label": "Pet store",
+   "count": 136
+  },
+  {
+   "sub": "tech_hq",
+   "label": "Tech office",
+   "count": 132
+  },
+  {
+   "sub": "supermarket",
+   "label": "Supermarket",
+   "count": 127
+  },
+  {
+   "sub": "pizzeria",
+   "label": "Pizzeria",
+   "count": 123
+  },
+  {
+   "sub": "university",
+   "label": "University",
+   "count": 114
+  },
+  {
+   "sub": "dry_cleaner",
+   "label": "Dry cleaner",
+   "count": 112
+  },
+  {
+   "sub": "florist",
+   "label": "Florist",
+   "count": 107
+  },
+  {
+   "sub": "pharmacy",
+   "label": "Pharmacy",
+   "count": 102
+  },
+  {
+   "sub": "gas_station",
+   "label": "Gas station",
+   "count": 101
+  },
+  {
+   "sub": "middle_school",
+   "label": "Middle school",
+   "count": 83
+  },
+  {
+   "sub": "car_dealer",
+   "label": "Car dealership",
+   "count": 79
+  },
+  {
+   "sub": "distribution",
+   "label": "Distribution center",
+   "count": 78
+  },
+  {
+   "sub": "hospital",
+   "label": "Hospital",
+   "count": 66
+  },
+  {
+   "sub": "high_school",
+   "label": "High school",
+   "count": 60
+  },
+  {
+   "sub": "museum",
+   "label": "Museum",
+   "count": 59
+  },
+  {
+   "sub": "yoga_studio",
+   "label": "Yoga studio",
+   "count": 57
+  },
+  {
+   "sub": "fire_station",
+   "label": "Fire station",
+   "count": 57
+  },
+  {
+   "sub": "bookstore",
+   "label": "Bookstore",
+   "count": 56
+  },
+  {
+   "sub": "self_storage",
+   "label": "Self storage",
+   "count": 56
+  },
+  {
+   "sub": "ferry_terminal",
+   "label": "Ferry terminal",
+   "count": 53
+  },
+  {
+   "sub": "post_office",
+   "label": "Post office",
+   "count": 52
+  },
+  {
+   "sub": "medical_center",
+   "label": "Medical center",
+   "count": 50
+  },
+  {
+   "sub": "library",
+   "label": "Library",
+   "count": 49
+  },
+  {
+   "sub": "nightclub",
+   "label": "Nightclub",
+   "count": 48
+  },
+  {
+   "sub": "workshop",
+   "label": "Workshop",
+   "count": 47
+  },
+  {
+   "sub": "dispensary",
+   "label": "Dispensary",
+   "count": 47
+  },
+  {
+   "sub": "thrift_store",
+   "label": "Thrift store",
+   "count": 47
+  },
+  {
+   "sub": "senior_housing",
+   "label": "Senior housing",
+   "count": 46
+  },
+  {
+   "sub": "martial_arts",
+   "label": "Martial arts studio",
+   "count": 43
+  },
+  {
+   "sub": "college",
+   "label": "College",
+   "count": 40
+  },
+  {
+   "sub": "temple",
+   "label": "Temple",
+   "count": 40
+  },
+  {
+   "sub": "warehouse",
+   "label": "Warehouse",
+   "count": 40
+  },
+  {
+   "sub": "event_venue",
+   "label": "Event venue",
+   "count": 40
+  },
+  {
+   "sub": "motel",
+   "label": "Motel",
+   "count": 39
+  },
+  {
+   "sub": "veterinary",
+   "label": "Veterinary clinic",
+   "count": 38
+  },
+  {
+   "sub": "hostel",
+   "label": "Hostel",
+   "count": 35
+  },
+  {
+   "sub": "bart_station",
+   "label": "BART station",
+   "count": 32
+  },
+  {
+   "sub": "wine_bar",
+   "label": "Wine bar",
+   "count": 31
+  },
+  {
+   "sub": "ice_cream",
+   "label": "Ice cream shop",
+   "count": 30
+  },
+  {
+   "sub": "concert_hall",
+   "label": "Concert hall",
+   "count": 29
+  },
+  {
+   "sub": "brewery",
+   "label": "Brewery",
+   "count": 29
+  },
+  {
+   "sub": "inn",
+   "label": "Inn",
+   "count": 24
+  },
+  {
+   "sub": "police_station",
+   "label": "Police station",
+   "count": 23
+  },
+  {
+   "sub": "cinema",
+   "label": "Cinema",
+   "count": 22
+  },
+  {
+   "sub": "coworking",
+   "label": "Coworking space",
+   "count": 17
+  },
+  {
+   "sub": "ev_charging",
+   "label": "EV charging",
+   "count": 15
+  },
+  {
+   "sub": "consulate",
+   "label": "Consulate",
+   "count": 15
+  },
+  {
+   "sub": "synagogue",
+   "label": "Synagogue",
+   "count": 15
+  },
+  {
+   "sub": "dormitory",
+   "label": "Dormitory",
+   "count": 10
+  },
+  {
+   "sub": "mosque",
+   "label": "Mosque",
+   "count": 5
+  },
+  {
+   "sub": "courthouse",
+   "label": "Courthouse",
+   "count": 5
+  },
+  {
+   "sub": "food_hall",
+   "label": "Food hall",
+   "count": 4
+  },
+  {
+   "sub": "aquarium",
+   "label": "Aquarium",
+   "count": 4
+  },
+  {
+   "sub": "marina",
+   "label": "Marina",
+   "count": 3
+  },
+  {
+   "sub": "greenhouse",
+   "label": "Greenhouse",
+   "count": 3
+  },
+  {
+   "sub": "science_center",
+   "label": "Science center",
+   "count": 3
+  },
+  {
+   "sub": "cathedral",
+   "label": "Cathedral",
+   "count": 2
+  },
+  {
+   "sub": "radio_tower",
+   "label": "Radio tower",
+   "count": 2
+  },
+  {
+   "sub": "data_center",
+   "label": "Data center",
+   "count": 1
+  },
+  {
+   "sub": "meeting_house",
+   "label": "Meeting house",
+   "count": 1
+  },
+  {
+   "sub": "city_hall",
+   "label": "City hall",
+   "count": 1
+  }
+ ],
+ "sources": {
+  "landuse": 140759,
+  "business": 10191,
+  "heuristic": 7285,
+  "datasf": 1295,
+  "overture": 6674,
+  "osm": 8641
+ },
+ "confidence": [
+  148044,
+  15319,
+  4513,
+  6969
+ ],
+ "streets": {
+  "named": 2509,
+  "km": 1976
+ },
+ "parks": 252,
+ "neighborhoods": 41,
+ "notables": {
+  "total": 5000,
+  "tierA": 300
+ },
+ "attribution": [
+  "Building footprints, streets, facilities, schools, business registry, land use, parks and neighbourhoods: DataSF (data.sfgov.org)",
+  "Tags and names: OpenStreetMap contributors (ODbL)",
+  "Places: Overture Maps Foundation (which distributes the Foursquare open places records)"
+ ]
+}

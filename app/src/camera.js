@@ -19,6 +19,9 @@ export function createCameraRig(camera, domElement, sampleElevation, extent) {
     maxDistance: 16000,
     boost: 1,
     edgeScroll: true,
+    // Set while the rig is aimed at a focused entity's mid-height instead of the
+    // ground under the pivot; any manual movement releases it.
+    holdY: false,
     velocity: new Vector3(),
     yawVelocity: 0,
   };
@@ -232,6 +235,7 @@ export function createCameraRig(camera, domElement, sampleElevation, extent) {
       state.pitch = Math.min(86 * DEG, Math.max(6 * DEG, state.pitch + dy * 0.004));
       pitchLocked = true;
     } else if (dragMode === 'pan') {
+      state.holdY = false;
       // Grab-pan: keep the ground point that was under the cursor under it. The
       // camera has to be moved with the pivot immediately, otherwise the next
       // move event raycasts through a stale camera and the grabbed point walks
@@ -250,6 +254,7 @@ export function createCameraRig(camera, domElement, sampleElevation, extent) {
   function onWheel(event) {
     event.preventDefault();
     animation = null;
+    state.holdY = false;
     // Wheel events carry their own cursor position: zooming must aim there even
     // if no pointermove arrived first.
     const rect = domElement.getBoundingClientRect();
@@ -315,8 +320,17 @@ export function createCameraRig(camera, domElement, sampleElevation, extent) {
       state.pitch = animation.fromPitch + (animation.toPitch - animation.fromPitch) * e;
       state.distance =
         animation.fromDistance * (animation.toDistance / animation.fromDistance) ** e;
-      if (animation.t >= 1) animation = null;
-      state.pivot.y += (groundHeight(state.pivot.x, state.pivot.z) - state.pivot.y) * Math.min(1, dt * 6);
+      // Aim: the camera re-targets every frame of the tween, so a flight to a
+      // tower keeps looking at its mid-height rather than swinging up at the end.
+      if (animation.toY === null) {
+        state.pivot.y += (groundHeight(state.pivot.x, state.pivot.z) - state.pivot.y) * Math.min(1, dt * 6);
+      } else {
+        state.pivot.y = animation.fromY + (animation.toY - animation.fromY) * e;
+      }
+      if (animation.t >= 1) {
+        state.holdY = animation.toY !== null;
+        animation = null;
+      }
       apply();
       return;
     }
@@ -345,6 +359,7 @@ export function createCameraRig(camera, domElement, sampleElevation, extent) {
       if (pointerPx.y > h - band) mz -= (pointerPx.y - (h - band)) / band;
     }
 
+    if (mx !== 0 || mz !== 0) state.holdY = false;
     moveTarget.set(0, 0, 0).addScaledVector(forward, mz * speed).addScaledVector(right, mx * speed);
     // Smoothed velocity: no jerk on key press or release.
     state.velocity.lerp(moveTarget, Math.min(1, dt * 7));
@@ -384,19 +399,27 @@ export function createCameraRig(camera, domElement, sampleElevation, extent) {
       if (!pitchLocked) state.pitch = pitchForDistance(state.distance);
     }
 
-    // The pivot rides the terrain, so pushing uphill tilts the whole view up.
-    const ground = groundHeight(state.pivot.x, state.pivot.z);
-    state.pivot.y += (ground - state.pivot.y) * Math.min(1, dt * 5);
+    // The pivot rides the terrain, so pushing uphill tilts the whole view up —
+    // unless it is held at a focused entity's mid-height.
+    if (!state.holdY) {
+      const ground = groundHeight(state.pivot.x, state.pivot.z);
+      state.pivot.y += (ground - state.pivot.y) * Math.min(1, dt * 5);
+    }
     apply();
   }
 
+  // `preset.y` aims at a point above the ground (an entity's mid-height) and
+  // holds that aim after the flight; without it the rig lands on the terrain.
   function flyTo(preset, duration = 2.4) {
+    const toY = Number.isFinite(preset.y) ? preset.y : null;
     animation = {
       t: 0,
       duration,
       start: performance.now(),
       fromPivot: state.pivot.clone(),
-      toPivot: new Vector3(preset.x, groundHeight(preset.x, preset.z), preset.z),
+      fromY: state.pivot.y,
+      toY,
+      toPivot: new Vector3(preset.x, toY ?? groundHeight(preset.x, preset.z), preset.z),
       fromYaw: state.yaw,
       toYaw: normaliseYaw(state.yaw, preset.yaw * DEG),
       fromPitch: state.pitch,
@@ -408,7 +431,8 @@ export function createCameraRig(camera, domElement, sampleElevation, extent) {
   }
 
   function set(preset) {
-    state.pivot.set(preset.x, groundHeight(preset.x, preset.z), preset.z);
+    state.holdY = Number.isFinite(preset.y);
+    state.pivot.set(preset.x, state.holdY ? preset.y : groundHeight(preset.x, preset.z), preset.z);
     state.yaw = preset.yaw * DEG;
     state.pitch = preset.pitch * DEG;
     state.distance = preset.distance;

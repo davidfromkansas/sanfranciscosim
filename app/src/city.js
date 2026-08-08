@@ -458,6 +458,8 @@ export function createCity(scene, data) {
     makeAttributes(geometry, result);
     geometry.setAttribute('aMeta', new BufferAttribute(result.meta, 2));
     geometry.setAttribute('aLocalY', new BufferAttribute(result.localY, 1));
+    // The lore flag byte: night profile, glow and band suppression per vertex.
+    if (result.flag) geometry.setAttribute('aFlag', new BufferAttribute(result.flag, 1));
     geometry.computeBoundingSphere();
     const material = toyTier
       ? createToyBuildingMaterial()

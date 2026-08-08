@@ -4,12 +4,21 @@
 // shared uniforms exported here.
 
 import {
+  AdditiveBlending,
   BackSide,
+  BufferAttribute,
+  BufferGeometry,
   Color,
   DirectionalLight,
+  DoubleSide,
   FogExp2,
   HemisphereLight,
+  IcosahedronGeometry,
   Mesh,
+  MeshBasicMaterial,
+  PlaneGeometry,
+  Points,
+  PointsMaterial,
   ShaderMaterial,
   SphereGeometry,
   Vector2,
@@ -109,6 +118,21 @@ const TOY = {
   hemiIntensity: 1.1,
 };
 
+// Toy night (§3): deep navy rather than black, so the model still reads as a
+// painted object sitting on a table in a dark room. Moonlight is pale blue and
+// weak enough that the warm windows carry the picture.
+const TOY_NIGHT = {
+  horizon: new Color(0x2c3a5c),
+  zenith: new Color(0x1a2340),
+  sun: new Color(0xb8c8e8),
+  sunIntensity: 0.5,
+  hemiSky: new Color(0x223056),
+  hemiGround: new Color(0x33291f),
+  hemiIntensity: 0.42,
+  fog: new Color(0x1e2740),
+};
+const STAR_COUNT = 2000;
+
 export function createEnvironment(scene) {
   const skyUniforms = {
     uSunDir: shared.uSunDir,
@@ -151,6 +175,90 @@ export function createEnvironment(scene) {
   const hemi = new HemisphereLight(DAY.hemiSky.clone(), DAY.hemiGround.clone(), DAY.hemiIntensity);
   scene.add(hemi);
 
+  // ------------------------------------------------------------- night sky kit
+  // A low-poly cream moon, one soft halo quad behind it, and a field of stars.
+  // All three live on a single group that is only shown once night is under way,
+  // so the daytime scene graph is untouched.
+  const nightSky = new Mesh(
+    new IcosahedronGeometry(700, 1),
+    new MeshBasicMaterial({ color: 0xf6eede, fog: false, transparent: true, opacity: 0 })
+  );
+  nightSky.position.set(9000, 7000, -14000);
+  nightSky.renderOrder = -900;
+  nightSky.frustumCulled = false;
+  nightSky.visible = false;
+  scene.add(nightSky);
+
+  // A radial falloff, not a flat panel: an additive quad with a constant colour
+  // reads as a rectangle in the sky, which is exactly what a halo must not do.
+  const halo = new Mesh(
+    new PlaneGeometry(4200, 4200),
+    new ShaderMaterial({
+      uniforms: { uOpacity: { value: 0 }, uColor: { value: new Color(0xdfe6f6) } },
+      vertexShader: /* glsl */ `
+        varying vec2 vUv;
+        void main() {
+          vUv = uv;
+          gl_Position = projectionMatrix * modelViewMatrix * vec4(position, 1.0);
+        }
+      `,
+      fragmentShader: /* glsl */ `
+        uniform float uOpacity;
+        uniform vec3 uColor;
+        varying vec2 vUv;
+        void main() {
+          float r = length(vUv - 0.5) * 2.0;
+          // Bright close to the moon, gone well before the quad's edge.
+          float glow = pow(clamp(1.0 - r, 0.0, 1.0), 2.6);
+          gl_FragColor = vec4(uColor * glow, glow * uOpacity);
+        }
+      `,
+      transparent: true,
+      blending: AdditiveBlending,
+      depthWrite: false,
+      depthTest: false,
+      side: DoubleSide,
+      fog: false,
+    })
+  );
+  halo.position.copy(nightSky.position);
+  halo.renderOrder = -950;
+  halo.frustumCulled = false;
+  halo.visible = false;
+  scene.add(halo);
+
+  const starPositions = new Float32Array(STAR_COUNT * 3);
+  for (let i = 0; i < STAR_COUNT; i++) {
+    // Uniform over the upper hemisphere of a 24 km shell.
+    const u = (i * 2654435761) % 4096;
+    const a = ((i * 7919) % 10007) / 10007;
+    const theta = (u / 4096) * Math.PI * 2;
+    const y = 0.06 + a * 0.94;
+    const r = Math.sqrt(Math.max(0, 1 - y * y));
+    starPositions[i * 3] = Math.cos(theta) * r * 24000;
+    starPositions[i * 3 + 1] = y * 24000;
+    starPositions[i * 3 + 2] = Math.sin(theta) * r * 24000;
+  }
+  const starGeometry = new BufferGeometry();
+  starGeometry.setAttribute('position', new BufferAttribute(starPositions, 3));
+  const stars = new Points(
+    starGeometry,
+    new PointsMaterial({
+      color: 0xdce6ff,
+      size: 90,
+      sizeAttenuation: true,
+      transparent: true,
+      opacity: 0,
+      depthWrite: false,
+      depthTest: false,
+      fog: false,
+    })
+  );
+  stars.renderOrder = -960;
+  stars.frustumCulled = false;
+  stars.visible = false;
+  scene.add(stars);
+
   const FOG_DENSITY = 0.000019;
   scene.fog = new FogExp2(DAY.fog.clone().getHex(), FOG_DENSITY);
 
@@ -179,18 +287,41 @@ export function createEnvironment(scene) {
     hemi.intensity = DAY.hemiIntensity + (NIGHT.hemiIntensity - DAY.hemiIntensity) * night;
 
     if (state.toy) {
-      sun.color.copy(TOY.sun);
-      sun.intensity = TOY.sunIntensity;
-      hemi.color.copy(TOY.hemiSky);
-      hemi.groundColor.copy(TOY.hemiGround);
-      hemi.intensity = TOY.hemiIntensity;
+      // Day stays exactly as the diorama shipped; night lerps towards moonlight.
+      sun.color.copy(TOY.sun).lerp(TOY_NIGHT.sun, night);
+      sun.intensity = TOY.sunIntensity + (TOY_NIGHT.sunIntensity - TOY.sunIntensity) * night;
+      hemi.color.copy(TOY.hemiSky).lerp(TOY_NIGHT.hemiSky, night);
+      hemi.groundColor.copy(TOY.hemiGround).lerp(TOY_NIGHT.hemiGround, night);
+      hemi.intensity = TOY.hemiIntensity + (TOY_NIGHT.hemiIntensity - TOY.hemiIntensity) * night;
+      sun.shadow.radius = 3 + night * 3;
     }
+
+    // The moon, its halo and the stars come up together, and only at night.
+    const lift = Math.max(0, (night - 0.25) / 0.75);
+    nightSky.visible = lift > 0.001;
+    halo.visible = nightSky.visible;
+    stars.visible = nightSky.visible;
+    nightSky.material.opacity = lift;
+    halo.material.uniforms.uOpacity.value = lift * 0.85;
+    stars.material.opacity = lift * 0.9;
+    skyUniforms.uHorizonNight.value.copy(state.toy ? TOY_NIGHT.horizon : NIGHT.horizon);
+    skyUniforms.uZenithNight.value.copy(state.toy ? TOY_NIGHT.zenith : NIGHT.zenith);
 
     shared.uSunColor.value.copy(sun.color);
     shared.uSkyColor.value.copy(hemi.color);
-    scene.fog.color.copy(DAY.fog).lerp(NIGHT.fog, night);
+    scene.fog.color.copy(DAY.fog).lerp(state.toy ? TOY_NIGHT.fog : NIGHT.fog, night);
     // Overcast reads as shade only while there is sun to block.
     shared.uCloudCover.value = 0.32 * (1 - night * 0.85);
+  }
+
+  // The moon is a fixed feature of the sky dome, not of the world: it rides
+  // with the camera so it never sits behind a hill.
+  function updateNightSky(camera) {
+    if (!nightSky.visible) return;
+    nightSky.position.set(camera.position.x + 9000, 7000, camera.position.z - 14000);
+    halo.position.copy(nightSky.position);
+    halo.lookAt(camera.position);
+    stars.position.set(camera.position.x, 0, camera.position.z);
   }
 
   function updateClouds(dt) {
@@ -242,5 +373,18 @@ export function createEnvironment(scene) {
   }
 
   setTime(0);
-  return { sky, sun, hemi, setTime, setToy, updateClouds, updateShadow, setShadowQuality, state };
+  return {
+    sky,
+    sun,
+    hemi,
+    moon: nightSky,
+    stars,
+    setTime,
+    setToy,
+    updateClouds,
+    updateShadow,
+    updateNightSky,
+    setShadowQuality,
+    state,
+  };
 }

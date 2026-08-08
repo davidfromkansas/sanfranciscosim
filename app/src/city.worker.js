@@ -3,6 +3,14 @@
 // transfer-ready typed arrays. No JSON, no parsing, no allocation on the main
 // thread.
 
+import { emitProps, makeCtx } from './props.js';
+
+// Night lighting profile per category (0 residential, 1 commercial, 2 always-on,
+// 3 dark), mirrored from pipeline/taxonomy.mjs. The bake already folds this into
+// each record's night byte; the table is here only so props inherit the same
+// profile as the building they sit on.
+const NIGHT_PROFILE_OF = (nightByte) => Math.floor((nightByte + 0.5) / 4);
+
 function readBuildings(buffer) {
   const dv = new DataView(buffer);
   const version = dv.getUint16(4, true);
@@ -39,6 +47,18 @@ function readBuildings(buffer) {
     roofPalette = new Uint8Array(buffer, off, count);
     off += count;
   }
+  // Version 3 adds the lore bytes: category, street heading and night flag.
+  let cat = null;
+  let yaw = null;
+  let night = null;
+  if (version >= 3) {
+    cat = new Uint8Array(buffer, off, count);
+    off += count;
+    yaw = new Uint8Array(buffer, off, count);
+    off += count;
+    night = new Uint8Array(buffer, off, count);
+    off += count;
+  }
   off = Math.ceil(off / 2) * 2;
   const verts = new Int16Array(buffer, off, vertexTotal * 2);
   off += 4 * vertexTotal;
@@ -48,6 +68,9 @@ function readBuildings(buffer) {
     version,
     flags,
     roofPalette,
+    cat,
+    yaw,
+    night,
     count,
     originX,
     originZ,
@@ -244,6 +267,7 @@ function buildNear(blobs, originX, originZ, palette) {
 // extra records flagged so the window-band shader leaves it alone.
 const TOY_FLAG_PITCHED = 1;
 const TOY_FLAG_GARNISH = 2;
+const TOY_PROP_MASK = 0xf8; // bits 3..7 of the record flag byte carry PROP.*
 const TOY_FLOOR = 3.5;
 const TOY_ROOF_RISE = 2.5;
 
@@ -251,7 +275,9 @@ function buildToy(blobs, originX, originZ, palette) {
   let vertexEstimate = 0;
   const parsed = blobs.map((b) => {
     const d = readBuildings(b.buffer);
-    for (let i = 0; i < d.count; i++) vertexEstimate += d.vertCount[i] * 9 + d.idxCount[i] + 24;
+    // 9 vertices per ring point covers the two wall bands and the roof; the
+    // constant is the pitched-roof prism plus the lore props' worst case.
+    for (let i = 0; i < d.count; i++) vertexEstimate += d.vertCount[i] * 9 + d.idxCount[i] + 420;
     return d;
   });
 
@@ -260,14 +286,18 @@ function buildToy(blobs, originX, originZ, palette) {
   const colors = new Uint8Array(vertexEstimate * 3);
   const meta = new Uint8Array(vertexEstimate * 2);
   const localY = new Uint16Array(vertexEstimate);
+  const flagAttr = new Uint8Array(vertexEstimate);
   const indices = new Uint32Array(vertexEstimate * 2);
   let v = 0;
   let ix = 0;
   let buildingCount = 0;
+  let propTriangles = 0;
+  let vertexFlag = 0;
 
   // One flat-shaded polygon. `ref` orients the face: the winding is flipped if
   // the computed normal points the wrong way, so nothing is inside-out.
   function face(points, ref, col, isWall, seed, base) {
+    if (v + points.length > vertexEstimate) return;
     let nx = 0;
     let ny = 0;
     let nz = 0;
@@ -309,6 +339,7 @@ function buildToy(blobs, originX, originZ, palette) {
       meta[v * 2] = seed;
       meta[v * 2 + 1] = isWall ? 1 : 0;
       localY[v] = Math.min(65535, Math.round(Math.max(0, p[1] - base) * 10));
+      flagAttr[v] = vertexFlag;
       v++;
     }
     for (let k = 2; k < ordered.length; k++) {
@@ -330,7 +361,10 @@ function buildToy(blobs, originX, originZ, palette) {
       const pitched = (flags & TOY_FLAG_PITCHED) !== 0;
       const pal = palette[d.palette[b]] || palette[0];
       const seed = d.seed[b];
+      const nightByte = d.night ? d.night[b] : 12; // 12 = dark profile, no glow
       if (!garnish) buildingCount++;
+      // Walls carry the building's own night flag; props override it per face.
+      vertexFlag = nightByte;
 
       const ring = new Float64Array(n * 2);
       let cx = 0;
@@ -440,6 +474,7 @@ function buildToy(blobs, originX, originZ, palette) {
           meta[v * 2] = seed;
           meta[v * 2 + 1] = 0;
           localY[v] = Math.min(65535, Math.round((top - base) * 10));
+          flagAttr[v] = vertexFlag;
           v++;
         }
         const io = d.idxOffset[b];
@@ -448,6 +483,48 @@ function buildToy(blobs, originX, originZ, palette) {
           indices[ix++] = roofStart + d.indices[io + k + 2];
           indices[ix++] = roofStart + d.indices[io + k + 1];
         }
+      }
+
+      // ------------------------------------------------------------ lore props
+      // The category recipes. They read the same record the mass came from, so a
+      // fire station's engine bays line up with its own street face, and they
+      // write into the same merged buffers: no extra draw call, no new mesh.
+      if (d.cat && !garnish) {
+        const profile = NIGHT_PROFILE_OF(nightByte);
+        const before = ix;
+        const propFace = (points, ref, col, glow) => {
+          // Props never grow window bands (aMeta.y = 0) and carry their own glow
+          // bit, so a marquee lights up while the wall behind it does not.
+          vertexFlag = profile * 4 + (glow ? 2 : 0) + 1;
+          face(points, ref, col, false, seed, base);
+        };
+        const angle = (d.yaw[b] / 256) * Math.PI * 2;
+        const ux = Math.cos(angle);
+        const uz = Math.sin(angle);
+        // Half-extents of this footprint measured in the street frame.
+        let hu = 0;
+        let hv = 0;
+        for (let k = 0; k < n; k++) {
+          const dx = ring[k * 2] - cx;
+          const dz = ring[k * 2 + 1] - cz;
+          hu = Math.max(hu, Math.abs(dx * ux + dz * uz));
+          hv = Math.max(hv, Math.abs(-dx * uz + dz * ux));
+        }
+        const ctx = makeCtx({ cx, cz, ux, uz, vx: -uz, vz: ux }, propFace);
+        const roofPal = palette[d.roofPalette ? d.roofPalette[b] : 0] || pal;
+        emitProps(ctx, {
+          cat: d.cat[b],
+          props: (flags & TOY_PROP_MASK) >> 3,
+          hu,
+          hv,
+          base,
+          top: pitched && n === 4 ? top + TOY_ROOF_RISE : top,
+          seed,
+          wall: pal,
+          roof: roofPal,
+        });
+        propTriangles += (ix - before) / 3;
+        vertexFlag = nightByte;
       }
     }
   }
@@ -458,8 +535,10 @@ function buildToy(blobs, originX, originZ, palette) {
     colors: colors.subarray(0, v * 3),
     meta: meta.subarray(0, v * 2),
     localY: localY.subarray(0, v),
+    flag: flagAttr.subarray(0, v),
     indices: indices.subarray(0, ix),
     buildingCount,
+    propTriangles,
   };
 }
 
@@ -758,14 +837,16 @@ self.onmessage = (event) => {
         msg.type === 'toy'
           ? buildToy(msg.blobs, msg.originX, msg.originZ, msg.palette)
           : buildNear(msg.blobs, msg.originX, msg.originZ, msg.palette);
-      self.postMessage({ id: msg.id, type: msg.type, key: msg.key, ...out }, [
+      const transfer = [
         out.positions.buffer,
         out.normals.buffer,
         out.colors.buffer,
         out.meta.buffer,
         out.localY.buffer,
         out.indices.buffer,
-      ]);
+      ];
+      if (out.flag) transfer.push(out.flag.buffer);
+      self.postMessage({ id: msg.id, type: msg.type, key: msg.key, ...out }, transfer);
     } else if (msg.type === 'far') {
       const out = buildFar(msg.blobs, msg.originX, msg.originZ, msg.palette, msg.groupSize);
       self.postMessage({ id: msg.id, type: 'far', key: msg.key, ...out }, [

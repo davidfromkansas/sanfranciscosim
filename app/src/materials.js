@@ -174,9 +174,22 @@ export function createBuildingMaterial({ windows = 1 } = {}) {
 // window bands keyed to absolute world height so every 3.5 m floor lines up
 // across the whole city. Rooftop garnish is flagged aMeta.y = 0 so HVAC boxes
 // and solar panels never grow window bands.
+// The lore flag byte rides along per vertex:
+//   flag = profile * 4 + glowProp * 2 + suppressBands
+// Profiles are 0 residential, 1 commercial, 2 always-on, 3 dark; `glowProp`
+// marks a prop that is itself a light (marquee, gas canopy, neon blade), and
+// `suppressBands` turns off the window grid for a wall that should not have one
+// (a church, a warehouse, a parking deck) and for every prop.
+const FLAG_DECODE = /* glsl */ `
+  float f = vFlag + 0.5;
+  float suppress = mod(floor(f), 2.0);
+  float glowProp  = mod(floor(f / 2.0), 2.0);
+  float profile   = floor(f / 4.0);
+`;
+
 export function createToyBuildingMaterial() {
   const material = new MeshLambertMaterial({ vertexColors: true, dithering: true });
-  material.uniformsHolder = { uFade: { value: 1 }, uFloor: { value: 3.5 } };
+  material.uniformsHolder = { uFade: { value: 1 }, uFloor: { value: 3.5 }, uNight: shared.uNight };
 
   material.onBeforeCompile = function patchToy(shader) {
     Object.assign(shader.uniforms, this.uniformsHolder);
@@ -185,16 +198,19 @@ export function createToyBuildingMaterial() {
         '#include <common>',
         `#include <common>
         attribute vec2 aMeta;
+        attribute float aFlag;
         varying vec3 vToyPos;
         varying vec3 vToyNormal;
-        varying float vToyWall;`
+        varying float vToyWall;
+        varying float vFlag;`
       )
       .replace(
         '#include <worldpos_vertex>',
         `#include <worldpos_vertex>
         vToyPos = (modelMatrix * vec4(transformed, 1.0)).xyz;
         vToyNormal = normal;
-        vToyWall = aMeta.y;`
+        vToyWall = aMeta.y;
+        vFlag = aFlag;`
       );
 
     shader.fragmentShader = shader.fragmentShader
@@ -203,10 +219,13 @@ export function createToyBuildingMaterial() {
         `#include <common>
         uniform float uFade;
         uniform float uFloor;
+        uniform float uNight;
         varying vec3 vToyPos;
         varying vec3 vToyNormal;
         varying float vToyWall;
-        ${DITHER}`
+        varying float vFlag;
+        ${DITHER}
+        ${HASH}`
       )
       .replace(
         '#include <clipping_planes_fragment>',
@@ -217,10 +236,32 @@ export function createToyBuildingMaterial() {
         '#include <color_fragment>',
         `#include <color_fragment>
         {
+          ${FLAG_DECODE}
           float band = fract(vToyPos.y / uFloor);
           float isWall = vToyWall * (1.0 - abs(normalize(vToyNormal).y));
-          float glass = step(0.35, band) * (1.0 - step(0.75, band)) * step(0.5, isWall);
+          float glass = step(0.35, band) * (1.0 - step(0.75, band)) * step(0.5, isWall) * (1.0 - suppress);
           diffuseColor.rgb = mix(diffuseColor.rgb, vec3(0.16, 0.30, 0.48), glass * 0.9);
+
+          // Night: the same bands become lit windows, at a rate that depends on
+          // what the building is. Homes glow warm and mostly-on, shops go bright
+          // but thin out, hospitals and stations stay on, offices go dark.
+          if (uNight > 0.001) {
+            float share = profile < 0.5 ? 0.62
+                        : profile < 1.5 ? 0.34
+                        : profile < 2.5 ? 0.86
+                        : 0.06;
+            vec3 tint = profile < 0.5 ? vec3(1.0, 0.76, 0.46)
+                      : profile < 1.5 ? vec3(1.0, 0.84, 0.58)
+                      : profile < 2.5 ? vec3(0.94, 0.96, 1.0)
+                      : vec3(0.86, 0.9, 1.0);
+            float cellId = floor(vToyPos.y / uFloor) * 31.0
+                         + floor((vToyPos.x + vToyPos.z) / 2.6) * 7.0;
+            float lit = step(hash13(vec3(cellId, floor(vToyPos.x), floor(vToyPos.z))), share);
+            totalEmissiveRadiance += tint * glass * lit * uNight * 1.5;
+            // A glow prop is its own lamp: it does not wait for a window band.
+            totalEmissiveRadiance += diffuseColor.rgb * glowProp * uNight * 1.35;
+            diffuseColor.rgb *= mix(1.0, 0.72, uNight);
+          }
         }`
       );
   };

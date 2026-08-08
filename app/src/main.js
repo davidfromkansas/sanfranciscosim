@@ -24,6 +24,10 @@ import { createCameraRig } from './camera.js';
 import { createSigns } from './signs.js';
 import { createToyPost } from './toypost.js';
 import { QUALITY, createLoader, createUI } from './ui.js';
+import { createContext } from './context.js';
+import { createFocusOverlay } from './focus.js';
+import { createContextCard, createSearch } from './cards.js';
+import { createConcierge } from './concierge.js';
 
 const canvas = document.getElementById('view');
 const loader = createLoader();
@@ -50,6 +54,7 @@ async function boot() {
   const piers = createPiers(scene, data);
   loader.set(0.9);
 
+  const context = await createContext(data);
   const city = createCity(scene, data);
   const agents = createAgents(scene, data, city);
   const signs = createSigns(scene, data);
@@ -116,9 +121,22 @@ async function boot() {
   ui.setQuality(qualityKey);
   applyQuality(qualityKey);
 
-  // Number keys fly to presets, H goes home.
+  // Number keys fly to presets, H goes home, / opens search.
   window.addEventListener('keydown', (event) => {
     if (event.metaKey || event.ctrlKey || event.altKey) return;
+    const target = event.target;
+    if (target instanceof HTMLInputElement || target instanceof HTMLTextAreaElement) return;
+    if (event.key === '/') {
+      search.focus();
+      event.preventDefault();
+      return;
+    }
+    if (event.key === 'Escape') {
+      card.hide();
+      overlay.clear();
+      focus.entity = null;
+      return;
+    }
     if (event.key === 'h' || event.key === 'H') {
       rig.flyTo(presets[0]);
       ui.setPresetIndex(0);
@@ -162,8 +180,196 @@ async function boot() {
     signs.setVisible(toy);
     post.setEnabled(toy);
     ui.setStyle(toy);
+    if (focus.entity) {
+      overlay.show(focus.entity, {
+        toy,
+        groundY: Math.max(0, data.sampleElevation(focus.entity.x, focus.entity.z)),
+      });
+    }
     await city.setTier(toy ? 'toy' : 'base');
   }
+
+  // ------------------------------------------------------------- context layer
+  // One focus state drives the overlay, the card and what the concierge is told
+  // the user is looking at, plus a three-deep history of what came before.
+
+  const overlay = createFocusOverlay(scene);
+  const focus = { entity: null, history: [] };
+
+  function focusTarget(entity) {
+    const ground = Math.max(0, data.sampleElevation(entity.x, entity.z));
+    if (entity.kind === 'building') {
+      const height = Math.max(6, style === 'toy' ? entity.toyHeight : entity.height);
+      return {
+        x: entity.x,
+        z: entity.z,
+        y: entity.baseY + height / 2,
+        yaw: 210,
+        pitch: style === 'toy' ? 42 : 26,
+        distance: Math.max(rig.diorama ? 180 : 90, height * 2.4 + Math.max(entity.w, entity.d) * 3),
+      };
+    }
+    if (entity.kind === 'landmark' && entity.camera) {
+      return { x: entity.x, z: entity.z, y: ground + (entity.height || 60) / 2, ...entity.camera };
+    }
+    const distance =
+      entity.kind === 'neighborhood' ? 2200 : entity.kind === 'park' ? 900 : entity.kind === 'water' ? 3000 : 500;
+    return { x: entity.x, z: entity.z, yaw: 210, pitch: style === 'toy' ? 42 : 34, distance };
+  }
+
+  // The one fly-to every caller uses: presets, search hits, card buttons and the
+  // concierge's camera intents all land here.
+  function flyTo(target, { duration = 2.2 } = {}) {
+    rig.flyTo(target, duration);
+  }
+
+  function selectEntity(entity, { fly = false } = {}) {
+    if (!entity) return;
+    focus.entity = entity;
+    focus.history = [entity, ...focus.history.filter((e) => e.id !== entity.id)].slice(0, 3);
+    overlay.show(entity, {
+      toy: style === 'toy',
+      groundY: Math.max(0, data.sampleElevation(entity.x, entity.z)),
+    });
+    card.show(entity, {
+      neighborhood: context.neighborhoodAt(entity.x, entity.z),
+      recent: focus.history.slice(1),
+    });
+    if (fly) flyTo(focusTarget(entity));
+  }
+
+  const card = createContextCard({
+    onFly: (entity) => flyTo(focusTarget(entity)),
+    onAsk: (entity) => concierge.ask(`Tell me about ${entity.title}.`),
+    onSelectHistory: (entity) => selectEntity(entity),
+  });
+
+  const search = createSearch({
+    onPick: async (entry) => {
+      if (entry.t === 'building') {
+        const entity = await context.loadBuilding(Number(entry.id.slice(2)), entry.x, entry.z);
+        if (entity) {
+          selectEntity(entity, { fly: true });
+          return;
+        }
+      }
+      const entity = {
+        kind: entry.t === 'view' ? 'landmark' : entry.t,
+        id: entry.id,
+        title: entry.n,
+        name: entry.n,
+        x: entry.x,
+        z: entry.z,
+        source: 'datasf',
+        confidence: 3,
+      };
+      selectEntity(entity, { fly: true });
+    },
+    onEmpty: (query) => concierge.ask(query),
+  });
+
+  search.input.addEventListener('input', async () => {
+    const query = search.input.value.trim();
+    if (!query) {
+      search.close();
+      return;
+    }
+    search.render(await context.search(query), query);
+  });
+
+  const concierge = createConcierge({
+    viewerContext() {
+      const nhood = context.neighborhoodAt(rig.state.pivot.x, rig.state.pivot.z);
+      return {
+        camera: {
+          x: Math.round(rig.state.pivot.x),
+          z: Math.round(rig.state.pivot.z),
+          distance: Math.round(rig.state.distance),
+          yaw: Math.round((rig.state.yaw * 180) / Math.PI),
+        },
+        style,
+        neighborhood: nhood?.name || null,
+        focus: focus.entity
+          ? {
+              kind: focus.entity.kind,
+              id: focus.entity.id,
+              title: focus.entity.title,
+              cat: focus.entity.cat ?? null,
+              x: Math.round(focus.entity.x),
+              z: Math.round(focus.entity.z),
+            }
+          : null,
+      };
+    },
+    // Intents are data, never scene access: the client decides what each one is
+    // allowed to move.
+    async applyIntent(intent) {
+      if (intent.type === 'set_camera') {
+        flyTo({
+          x: clampCoord(intent.x, data.manifest.extent.minX, data.manifest.extent.maxX),
+          z: clampCoord(intent.z, data.manifest.extent.minZ, data.manifest.extent.maxZ),
+          yaw: Number.isFinite(intent.yaw) ? intent.yaw : 210,
+          pitch: Math.min(80, Math.max(8, Number.isFinite(intent.pitch) ? intent.pitch : 32)),
+          distance: Math.min(12000, Math.max(80, Number.isFinite(intent.distance) ? intent.distance : 700)),
+        });
+        return;
+      }
+      if (intent.type === 'focus_entity' || intent.type === 'highlight') {
+        if (typeof intent.id === 'string' && intent.id.startsWith('b:')) {
+          const entity = await context.loadBuilding(Number(intent.id.slice(2)), intent.x, intent.z);
+          if (entity) {
+            selectEntity(entity, { fly: intent.type === 'focus_entity' });
+            return;
+          }
+        }
+        if (Number.isFinite(intent.x) && Number.isFinite(intent.z)) {
+          selectEntity(
+            {
+              kind: intent.kind || 'landmark',
+              id: intent.id || `point:${intent.x}_${intent.z}`,
+              title: intent.title || 'Selected place',
+              x: intent.x,
+              z: intent.z,
+              source: intent.source || 'osm',
+              confidence: 2,
+            },
+            { fly: intent.type === 'focus_entity' }
+          );
+        }
+      }
+    },
+  });
+
+  // Click to inspect: a press that neither travels nor lingers is a pick, so
+  // grab-panning the ground never opens a card.
+  const pickRay = new Raycaster();
+  const pickPointer = new Vector2();
+  const groundPoint = new Vector3();
+  let press = null;
+
+  canvas.addEventListener('pointerdown', (event) => {
+    if (event.button !== 0) return;
+    press = { x: event.clientX, y: event.clientY, at: performance.now() };
+  });
+
+  canvas.addEventListener('pointerup', async (event) => {
+    if (event.button !== 0 || !press) return;
+    const moved = Math.hypot(event.clientX - press.x, event.clientY - press.y);
+    const held = performance.now() - press.at;
+    press = null;
+    if (moved > 6 || held > 400) return;
+    const rect = canvas.getBoundingClientRect();
+    pickPointer.set(
+      ((event.clientX - rect.left) / rect.width) * 2 - 1,
+      -((event.clientY - rect.top) / rect.height) * 2 + 1
+    );
+    pickRay.setFromCamera(pickPointer, camera);
+    const hasGround = rig.screenToGround(pickPointer.x, pickPointer.y, groundPoint);
+    const entity = await context.pick(pickRay.ray.origin, pickRay.ray.direction, hasGround ? groundPoint : null, {
+      toy: style === 'toy',
+    });
+    if (entity) selectEntity(entity);
+  });
 
   city.preload(rig.state.pivot.clone());
 
@@ -205,6 +411,21 @@ async function boot() {
     get style() {
       return style;
     },
+    context,
+    // Pick whatever is under a normalised screen point, the same way a click does.
+    async pickEntity(nx = 0, ny = 0) {
+      pickPointer.set(nx, ny);
+      pickRay.setFromCamera(pickPointer, camera);
+      const hasGround = rig.screenToGround(nx, ny, groundPoint);
+      return context.pick(pickRay.ray.origin, pickRay.ray.direction, hasGround ? groundPoint : null, {
+        toy: style === 'toy',
+      });
+    },
+    select: selectEntity,
+    search: (query) => context.search(query),
+    get focus() {
+      return focus.entity;
+    },
   };
 
   const pivotWorld = new Vector3();
@@ -232,6 +453,8 @@ async function boot() {
 
     rig.update(dt);
     pivotWorld.copy(rig.state.pivot);
+    context.prefetch(pivotWorld);
+    overlay.update(dt);
     city.update(dt, pivotWorld, camera.position, quality);
     agents.update(dt, pivotWorld, camera.position);
     landmarks.update();
@@ -240,6 +463,7 @@ async function boot() {
     // frame rate; the simulation clamp would slow them to a crawl below 20 fps.
     env.updateClouds(Math.min(1, elapsed));
     env.updateShadow(pivotWorld, rig.state.distance);
+    env.updateNightSky(camera);
 
     signs.update(rig.state.distance, rig.state.yaw);
     // Tilt-shift + grade in diorama mode; a straight canvas render otherwise.
@@ -284,6 +508,11 @@ async function boot() {
   }
 
   requestAnimationFrame(frame);
+}
+
+function clampCoord(value, min, max) {
+  if (!Number.isFinite(value)) return (min + max) / 2;
+  return Math.min(max, Math.max(min, value));
 }
 
 function toCameraTarget(preset, data) {
