@@ -199,7 +199,9 @@ async function boot() {
     agents.update(dt, pivotWorld, camera.position);
     landmarks.update();
     water.update(camera.position);
-    env.updateClouds(dt);
+    // Clouds drift on wall time so the sky moves at the same rate whatever the
+    // frame rate; the simulation clamp would slow them to a crawl below 20 fps.
+    env.updateClouds(Math.min(1, elapsed));
     env.updateShadow(pivotWorld, rig.state.distance);
 
     renderer.render(scene, camera);
