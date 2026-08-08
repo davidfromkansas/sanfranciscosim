@@ -5,7 +5,7 @@
   "installCommand": "echo skip",
   "rewrites": [{ "source": "/favicon.ico", "destination": "/favicon.svg" }],
   "functions": {
-    "api/agent.js": {
+    "api/agent.mjs": {
       "includeFiles": "api/_data/**",
       "maxDuration": 60
     }

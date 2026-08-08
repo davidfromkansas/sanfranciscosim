@@ -4,7 +4,7 @@
 // panel: the city itself never needs a key, and no key ever reaches the browser.
 
 import { readFile } from 'node:fs/promises';
-import { createTools, runTurn, sanitizeContext, sanitizeMessages } from './_lib/agent-core.js';
+import { createTools, runTurn, sanitizeContext, sanitizeMessages } from './_lib/agent-core.mjs';
 
 const WINDOW_MINUTE = 60 * 1000;
 const WINDOW_DAY = 24 * 60 * 60 * 1000;
