@@ -1,0 +1,10 @@
+node_modules/
+dist/
+.vercel/
+.DS_Store
+
+# Raw downloads (hundreds of MB) and intermediate bakes: regenerate with
+# `npm run all` in pipeline/. The published copies under app/public/tiles/ are
+# committed so the static deploy needs no build-time data fetch.
+pipeline/data/
+pipeline/out/
