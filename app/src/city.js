@@ -404,6 +404,7 @@ export function createCity(scene, data) {
       trees.visible = false;
       scene.add(trees);
       g.trees = trees;
+      g.treeCount = count;
       stats.trees += count;
     }
 
@@ -423,6 +424,7 @@ export function createCity(scene, data) {
       lamps.name = `lamps-${g.key}`;
       scene.add(lamps);
       g.lamps = lamps;
+      g.lampCount = count;
       stats.lamps += count;
     }
 
@@ -487,12 +489,18 @@ export function createCity(scene, data) {
 
   function disposeGround(g) {
     if (g.groundMesh) stats.groundGroups--;
+    stats.trees -= g.treeCount || 0;
+    stats.lamps -= g.lampCount || 0;
+    g.treeCount = 0;
+    g.lampCount = 0;
     for (const key of ['groundMesh', 'trees', 'lamps']) {
       const obj = g[key];
       if (!obj) continue;
       scene.remove(obj);
-      // Geometry is per-group for the ground mesh, shared for trees and lamps.
+      // Geometry is per-group for the ground mesh, shared for trees and lamps;
+      // the instanced meshes still own their per-instance matrix buffers.
       if (key === 'groundMesh') obj.geometry.dispose();
+      else obj.dispose();
       g[key] = null;
     }
     g.groundRequested = false;
