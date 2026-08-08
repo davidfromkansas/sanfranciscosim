@@ -1,0 +1,660 @@
+// The city is inhabited: ferries and container ships crossing the Bay, traffic
+// on the real street centrelines, cable cars on the three surviving lines,
+// pedestrians when you are down at street level, gulls over the water and flags
+// snapping on the landmarks. All instanced; the whole system is ~12 draw calls.
+
+import {
+  BoxGeometry,
+  BufferAttribute,
+  Color,
+  ConeGeometry,
+  CylinderGeometry,
+  DoubleSide,
+  DynamicDrawUsage,
+  Group,
+  InstancedMesh,
+  Mesh,
+  MeshBasicMaterial,
+  MeshLambertMaterial,
+  Object3D,
+  PlaneGeometry,
+  ShaderMaterial,
+  Vector3,
+} from 'three';
+import { mergeGeometries } from 'three/addons/utils/BufferGeometryUtils.js';
+import { shared } from './env.js';
+
+const CAR_COUNT = 720;
+const PED_COUNT = 420;
+const BIRD_COUNT = 90;
+const CAR_RANGE = 2200;
+const PED_RANGE = 420;
+
+// Ferry / container-ship routes across the Bay, in lon/lat.
+const SHIP_ROUTES = [
+  {
+    name: 'Sausalito ferry',
+    kind: 'ferry',
+    points: [
+      [-122.3934, 37.7952],
+      [-122.4025, 37.8095],
+      [-122.4213, 37.8305],
+      [-122.4547, 37.8443],
+    ],
+  },
+  {
+    name: 'Alcatraz cruise',
+    kind: 'ferry',
+    points: [
+      [-122.4162, 37.8093],
+      [-122.4207, 37.8203],
+      [-122.4231, 37.8264],
+      [-122.4141, 37.8171],
+      [-122.4162, 37.8093],
+    ],
+  },
+  {
+    name: 'Oakland container run',
+    kind: 'container',
+    points: [
+      [-122.4855, 37.8261],
+      [-122.4501, 37.8206],
+      [-122.4053, 37.8218],
+      [-122.3603, 37.8171],
+    ],
+  },
+  {
+    name: 'Golden Gate outbound',
+    kind: 'container',
+    points: [
+      [-122.3854, 37.7808],
+      [-122.4204, 37.8085],
+      [-122.4767, 37.8206],
+      [-122.5265, 37.8281],
+    ],
+  },
+  {
+    name: 'Bay sail',
+    kind: 'sail',
+    points: [
+      [-122.4392, 37.8112],
+      [-122.4197, 37.8221],
+      [-122.3961, 37.8168],
+      [-122.4104, 37.8047],
+      [-122.4392, 37.8112],
+    ],
+  },
+  {
+    name: 'Ocean sail',
+    kind: 'sail',
+    points: [
+      [-122.5121, 37.7503],
+      [-122.5093, 37.7724],
+      [-122.5162, 37.7921],
+      [-122.5138, 37.7681],
+      [-122.5121, 37.7503],
+    ],
+  },
+];
+
+// The three surviving cable car lines.
+const CABLE_LINES = [
+  {
+    name: 'Powell-Hyde',
+    points: [
+      [-122.4083, 37.7847],
+      [-122.4098, 37.7889],
+      [-122.4113, 37.7938],
+      [-122.4157, 37.7955],
+      [-122.4193, 37.7975],
+      [-122.4205, 37.8022],
+      [-122.4207, 37.8062],
+    ],
+  },
+  {
+    name: 'Powell-Mason',
+    points: [
+      [-122.4083, 37.7847],
+      [-122.4098, 37.7889],
+      [-122.4113, 37.7938],
+      [-122.4098, 37.7985],
+      [-122.4114, 37.8043],
+      [-122.4137, 37.8072],
+    ],
+  },
+  {
+    name: 'California St',
+    points: [
+      [-122.3944, 37.7935],
+      [-122.4022, 37.7924],
+      [-122.4116, 37.7919],
+      [-122.4213, 37.7914],
+      [-122.4295, 37.7908],
+    ],
+  },
+];
+
+function polylineLengths(points) {
+  const cumulative = new Float32Array(points.length / 3);
+  let total = 0;
+  for (let i = 1; i < cumulative.length; i++) {
+    total += Math.hypot(
+      points[i * 3] - points[(i - 1) * 3],
+      points[i * 3 + 2] - points[(i - 1) * 3 + 2]
+    );
+    cumulative[i] = total;
+  }
+  return { cumulative, total };
+}
+
+function samplePolyline(points, cumulative, total, distance, out, tangent) {
+  const d = Math.max(0, Math.min(total, distance));
+  let i = 1;
+  while (i < cumulative.length - 1 && cumulative[i] < d) i++;
+  const d0 = cumulative[i - 1];
+  const d1 = cumulative[i];
+  const t = d1 - d0 > 1e-4 ? (d - d0) / (d1 - d0) : 0;
+  const ax = points[(i - 1) * 3];
+  const ay = points[(i - 1) * 3 + 1];
+  const az = points[(i - 1) * 3 + 2];
+  const bx = points[i * 3];
+  const by = points[i * 3 + 1];
+  const bz = points[i * 3 + 2];
+  out.set(ax + (bx - ax) * t, ay + (by - ay) * t, az + (bz - az) * t);
+  if (tangent) tangent.set(bx - ax, by - ay, bz - az).normalize();
+}
+
+function carArchetype() {
+  const parts = [];
+  const body = new BoxGeometry(1.85, 1.15, 4.4);
+  body.translate(0, 0.75, 0);
+  parts.push(body);
+  const cabin = new BoxGeometry(1.7, 0.75, 2.2);
+  cabin.translate(0, 1.6, -0.2);
+  parts.push(cabin);
+  const merged = mergeGeometries(parts, false);
+  for (const p of parts) p.dispose();
+  merged.deleteAttribute('uv');
+  return merged;
+}
+
+function shipArchetype(kind) {
+  const parts = [];
+  if (kind === 'sail') {
+    const hull = new BoxGeometry(3.4, 1.6, 11);
+    hull.translate(0, 0.6, 0);
+    parts.push(hull);
+    const sail = new ConeGeometry(3.6, 13, 3);
+    sail.translate(0, 7.4, -0.6);
+    parts.push(sail);
+  } else if (kind === 'ferry') {
+    const hull = new BoxGeometry(9, 3.4, 34);
+    hull.translate(0, 1.6, 0);
+    parts.push(hull);
+    const deck = new BoxGeometry(8, 3, 20);
+    deck.translate(0, 4.6, -1);
+    parts.push(deck);
+    const bridge = new BoxGeometry(6, 2.4, 7);
+    bridge.translate(0, 7.3, -6);
+    parts.push(bridge);
+    const funnel = new CylinderGeometry(0.8, 0.9, 3.4, 8);
+    funnel.translate(0, 9.6, -6);
+    parts.push(funnel);
+  } else {
+    const hull = new BoxGeometry(16, 8, 108);
+    hull.translate(0, 3.6, 0);
+    parts.push(hull);
+    const containers = new BoxGeometry(15, 11, 78);
+    containers.translate(0, 12.8, 6);
+    parts.push(containers);
+    const house = new BoxGeometry(14, 12, 14);
+    house.translate(0, 13.6, -42);
+    parts.push(house);
+  }
+  const merged = mergeGeometries(parts, false);
+  for (const p of parts) p.dispose();
+  merged.deleteAttribute('uv');
+  return merged;
+}
+
+function cableCarArchetype() {
+  const parts = [];
+  const body = new BoxGeometry(2.6, 2.6, 9.2);
+  body.translate(0, 1.9, 0);
+  parts.push(body);
+  const roof = new BoxGeometry(3.0, 0.4, 9.8);
+  roof.translate(0, 3.3, 0);
+  parts.push(roof);
+  const merged = mergeGeometries(parts, false);
+  for (const p of parts) p.dispose();
+  merged.deleteAttribute('uv');
+  return merged;
+}
+
+const FLAG_VERT = /* glsl */ `
+  uniform float uTime;
+  varying vec2 vUv;
+  varying float vShade;
+  void main() {
+    vUv = uv;
+    vec3 p = position;
+    // Wave amplitude grows toward the free edge of the flag.
+    float k = uv.x;
+    p.z += sin(uv.x * 9.0 - uTime * 6.0) * 0.42 * k;
+    p.y += sin(uv.x * 6.0 - uTime * 4.4) * 0.12 * k;
+    vShade = 0.75 + 0.25 * cos(uv.x * 9.0 - uTime * 6.0);
+    gl_Position = projectionMatrix * modelViewMatrix * vec4(p, 1.0);
+  }
+`;
+
+const FLAG_FRAG = /* glsl */ `
+  uniform vec3 uColorA;
+  uniform vec3 uColorB;
+  varying vec2 vUv;
+  varying float vShade;
+  void main() {
+    vec3 col = mix(uColorA, uColorB, step(0.5, fract(vUv.y * 3.0)));
+    gl_FragColor = vec4(col * vShade, 1.0);
+  }
+`;
+
+export function createAgents(scene, data, city) {
+  const { project, sampleElevation, manifest } = data;
+  const group = new Group();
+  group.name = 'agents';
+  scene.add(group);
+
+  const dummy = new Object3D();
+  const position = new Vector3();
+  const tangent = new Vector3();
+
+  // ------------------------------------------------------------------ ships ---
+  const ships = [];
+  for (const route of SHIP_ROUTES) {
+    const points = new Float32Array(route.points.length * 3);
+    route.points.forEach(([lon, lat], i) => {
+      const [x, z] = project(lon, lat);
+      points[i * 3] = x;
+      points[i * 3 + 1] = 0;
+      points[i * 3 + 2] = z;
+    });
+    const { cumulative, total } = polylineLengths(points);
+    const count = route.kind === 'sail' ? 5 : route.kind === 'ferry' ? 2 : 2;
+    const mesh = new InstancedMesh(
+      shipArchetype(route.kind),
+      new MeshLambertMaterial({
+        color: route.kind === 'container' ? '#7d5f52' : route.kind === 'ferry' ? '#e8e3d6' : '#f2f0e8',
+      }),
+      count
+    );
+    mesh.instanceMatrix.setUsage(DynamicDrawUsage);
+    mesh.castShadow = false;
+    mesh.frustumCulled = false;
+    group.add(mesh);
+    const speed = route.kind === 'container' ? 7.5 : route.kind === 'ferry' ? 11 : 5;
+    const instances = [];
+    for (let i = 0; i < count; i++) {
+      instances.push({ d: (total / count) * i, dir: 1, bob: Math.random() * 6.28 });
+    }
+    // Wake: a stretched translucent quad trailing each hull.
+    const wake = new InstancedMesh(
+      new PlaneGeometry(1, 1),
+      new MeshBasicMaterial({ color: '#dfeaf0', transparent: true, opacity: 0.28, depthWrite: false }),
+      count
+    );
+    wake.instanceMatrix.setUsage(DynamicDrawUsage);
+    wake.frustumCulled = false;
+    wake.renderOrder = 3;
+    group.add(wake);
+    ships.push({ route, points, cumulative, total, mesh, wake, instances, speed });
+  }
+
+  // ---------------------------------------------------------------- traffic ---
+  const carMesh = new InstancedMesh(
+    carArchetype(),
+    new MeshLambertMaterial({ vertexColors: false }),
+    CAR_COUNT
+  );
+  carMesh.instanceMatrix.setUsage(DynamicDrawUsage);
+  carMesh.castShadow = false;
+  carMesh.frustumCulled = false;
+  carMesh.count = 0;
+  const carColors = new Float32Array(CAR_COUNT * 3);
+  const paint = new Color();
+  const carPalette = ['#d8d5cf', '#2f3338', '#8c9096', '#7d2f2a', '#26415c', '#c9a227', '#3d5a45'];
+  for (let i = 0; i < CAR_COUNT; i++) {
+    paint.set(carPalette[i % carPalette.length]);
+    carColors[i * 3] = paint.r;
+    carColors[i * 3 + 1] = paint.g;
+    carColors[i * 3 + 2] = paint.b;
+  }
+  carMesh.instanceColor = new BufferAttribute(carColors, 3);
+  carMesh.instanceColor.setUsage(DynamicDrawUsage);
+  group.add(carMesh);
+
+  // Headlight/taillight glow, only alive after dusk.
+  const lightMesh = new InstancedMesh(
+    new PlaneGeometry(2.6, 1.4),
+    new MeshBasicMaterial({ color: '#fff2cf', transparent: true, opacity: 0, depthWrite: false }),
+    CAR_COUNT
+  );
+  lightMesh.instanceMatrix.setUsage(DynamicDrawUsage);
+  lightMesh.frustumCulled = false;
+  lightMesh.count = 0;
+  group.add(lightMesh);
+
+  const cars = [];
+  let cityPaths = [];
+  city.onPaths((paths) => {
+    cityPaths = paths;
+  });
+
+  function nearbyPaths(pivot) {
+    const list = [];
+    for (const path of cityPaths) {
+      if (!path.meta) path.meta = polylineLengths(path.points);
+      const dx = path.points[0] - pivot.x;
+      const dz = path.points[2] - pivot.z;
+      if (dx * dx + dz * dz < CAR_RANGE * CAR_RANGE) list.push(path);
+    }
+    return list;
+  }
+
+  let carRefresh = 0;
+
+  // ------------------------------------------------------------- cable cars ---
+  const cableCars = [];
+  const cableMesh = new InstancedMesh(
+    cableCarArchetype(),
+    new MeshLambertMaterial({ color: '#8f2f24' }),
+    CABLE_LINES.length * 3
+  );
+  cableMesh.instanceMatrix.setUsage(DynamicDrawUsage);
+  cableMesh.frustumCulled = false;
+  group.add(cableMesh);
+  for (const line of CABLE_LINES) {
+    const points = new Float32Array(line.points.length * 3);
+    line.points.forEach(([lon, lat], i) => {
+      const [x, z] = project(lon, lat);
+      points[i * 3] = x;
+      points[i * 3 + 1] = Math.max(0, sampleElevation(x, z)) + 1.4;
+      points[i * 3 + 2] = z;
+    });
+    const { cumulative, total } = polylineLengths(points);
+    for (let i = 0; i < 3; i++) {
+      cableCars.push({ points, cumulative, total, d: (total / 3) * i, dir: i % 2 ? -1 : 1 });
+    }
+  }
+
+  // ------------------------------------------------------------ pedestrians ---
+  const pedGeometry = mergeGeometries(
+    [
+      (() => {
+        const g = new CylinderGeometry(0.22, 0.22, 1.2, 5);
+        g.translate(0, 0.6, 0);
+        return g;
+      })(),
+      (() => {
+        const g = new BoxGeometry(0.34, 0.42, 0.28);
+        g.translate(0, 1.42, 0);
+        return g;
+      })(),
+    ],
+    false
+  );
+  pedGeometry.deleteAttribute('uv');
+  const pedMesh = new InstancedMesh(pedGeometry, new MeshLambertMaterial({ color: '#3c4550' }), PED_COUNT);
+  pedMesh.instanceMatrix.setUsage(DynamicDrawUsage);
+  pedMesh.frustumCulled = false;
+  pedMesh.count = 0;
+  group.add(pedMesh);
+  const peds = [];
+
+  // ------------------------------------------------------------------ birds ---
+  const birdGeometry = new ConeGeometry(0.5, 2.2, 3);
+  birdGeometry.rotateX(Math.PI / 2);
+  const birdMesh = new InstancedMesh(
+    birdGeometry,
+    new MeshBasicMaterial({ color: '#f4f2ea' }),
+    BIRD_COUNT
+  );
+  birdMesh.instanceMatrix.setUsage(DynamicDrawUsage);
+  birdMesh.frustumCulled = false;
+  group.add(birdMesh);
+  const flocks = [];
+  const flockAnchors = [
+    [-122.4098, 37.8087],
+    [-122.4783, 37.8199],
+    [-122.5107, 37.7621],
+    [-122.3893, 37.7786],
+    [-122.4405, 37.8066],
+  ];
+  for (let f = 0; f < flockAnchors.length; f++) {
+    const [x, z] = project(flockAnchors[f][0], flockAnchors[f][1]);
+    flocks.push({ x, z, radius: 90 + f * 40, height: 55 + f * 18, phase: f * 1.7 });
+  }
+
+  // ------------------------------------------------------------------ flags ---
+  const flags = [];
+  const flagSpots = [
+    { id: 'cityHall', height: 99, colors: ['#c8332c', '#f0ece2'] },
+    { id: 'ferryBuilding', height: 76, colors: ['#25406b', '#f0ece2'] },
+    { id: 'oraclePark', height: 52, colors: ['#e07a1f', '#2b2b2b'] },
+    { id: 'fishermansWharf', height: 20, colors: ['#c8332c', '#f0ece2'] },
+    { id: 'paintedLadies', height: 20, colors: ['#2f6b4f', '#f0ece2'] },
+  ];
+  for (const spot of flagSpots) {
+    const landmark = manifest.landmarks.find((l) => l.id === spot.id);
+    if (!landmark) continue;
+    const [x, z] = project(landmark.lon, landmark.lat);
+    const base = Math.max(0, sampleElevation(x, z));
+    const pole = new Mesh(
+      new CylinderGeometry(0.22, 0.26, 12, 6),
+      new MeshLambertMaterial({ color: '#c9c3b6' })
+    );
+    pole.position.set(x, base + spot.height + 6, z);
+    group.add(pole);
+    const material = new ShaderMaterial({
+      uniforms: {
+        uTime: shared.uTime,
+        uColorA: { value: new Color(spot.colors[0]) },
+        uColorB: { value: new Color(spot.colors[1]) },
+      },
+      vertexShader: FLAG_VERT,
+      fragmentShader: FLAG_FRAG,
+      side: DoubleSide,
+    });
+    const flag = new Mesh(new PlaneGeometry(4.4, 2.8, 12, 3), material);
+    flag.position.set(x + 2.3, base + spot.height + 10.4, z);
+    group.add(flag);
+    flags.push(flag);
+  }
+
+  function update(dt, pivot, cameraPos) {
+    const night = shared.uNight.value;
+
+    // Ships.
+    for (const ship of ships) {
+      const closed =
+        Math.abs(ship.points[0] - ship.points[ship.points.length - 3]) < 1 &&
+        Math.abs(ship.points[2] - ship.points[ship.points.length - 1]) < 1;
+      for (let i = 0; i < ship.instances.length; i++) {
+        const inst = ship.instances[i];
+        inst.d += ship.speed * dt * inst.dir;
+        if (closed) {
+          if (inst.d > ship.total) inst.d -= ship.total;
+          if (inst.d < 0) inst.d += ship.total;
+        } else if (inst.d > ship.total || inst.d < 0) {
+          inst.dir *= -1;
+          inst.d = Math.min(ship.total, Math.max(0, inst.d));
+        }
+        samplePolyline(ship.points, ship.cumulative, ship.total, inst.d, position, tangent);
+        inst.bob += dt * 1.6;
+        dummy.position.set(position.x, 0.3 + Math.sin(inst.bob) * 0.35, position.z);
+        dummy.rotation.set(Math.sin(inst.bob * 0.7) * 0.02, Math.atan2(tangent.x, tangent.z), Math.cos(inst.bob) * 0.02);
+        dummy.scale.setScalar(1);
+        dummy.updateMatrix();
+        ship.mesh.setMatrixAt(i, dummy.matrix);
+
+        const wakeLength = ship.route.kind === 'container' ? 220 : ship.route.kind === 'ferry' ? 90 : 34;
+        dummy.position.set(
+          position.x - tangent.x * wakeLength * 0.5 * inst.dir,
+          0.25,
+          position.z - tangent.z * wakeLength * 0.5 * inst.dir
+        );
+        dummy.rotation.set(-Math.PI / 2, 0, -Math.atan2(tangent.x, tangent.z));
+        dummy.scale.set(ship.route.kind === 'container' ? 22 : 10, wakeLength, 1);
+        dummy.updateMatrix();
+        ship.wake.setMatrixAt(i, dummy.matrix);
+      }
+      ship.mesh.instanceMatrix.needsUpdate = true;
+      ship.wake.instanceMatrix.needsUpdate = true;
+    }
+
+    // Traffic: re-seed the pool onto nearby real centrelines as you move.
+    carRefresh -= dt;
+    if (carRefresh <= 0 && cityPaths.length) {
+      carRefresh = 1.5;
+      const candidates = nearbyPaths(pivot);
+      if (candidates.length) {
+        for (let i = 0; i < CAR_COUNT; i++) {
+          const existing = cars[i];
+          const stillClose =
+            existing &&
+            Math.hypot(existing.path.points[0] - pivot.x, existing.path.points[2] - pivot.z) < CAR_RANGE * 1.3;
+          if (stillClose) continue;
+          const path = candidates[Math.floor(Math.random() * candidates.length)];
+          cars[i] = {
+            path,
+            d: Math.random() * path.meta.total,
+            dir: Math.random() < 0.5 ? -1 : 1,
+            lane: Math.random() < 0.5 ? -1 : 1,
+            speed: path.speed * (0.75 + Math.random() * 0.5),
+          };
+        }
+      }
+    }
+
+    let visibleCars = 0;
+    for (let i = 0; i < cars.length; i++) {
+      const car = cars[i];
+      if (!car) continue;
+      const { cumulative, total } = car.path.meta;
+      if (total < 30) continue;
+      car.d += car.speed * dt * car.dir;
+      if (car.d > total) car.d -= total;
+      if (car.d < 0) car.d += total;
+      samplePolyline(car.path.points, cumulative, total, car.d, position, tangent);
+      if (position.distanceTo(cameraPos) > CAR_RANGE * 1.6) continue;
+      const offset = (car.path.width / 4) * car.lane * car.dir;
+      dummy.position.set(position.x + tangent.z * offset, position.y + 0.2, position.z - tangent.x * offset);
+      dummy.rotation.set(0, Math.atan2(tangent.x * car.dir, tangent.z * car.dir), 0);
+      dummy.scale.setScalar(1);
+      dummy.updateMatrix();
+      carMesh.setMatrixAt(visibleCars, dummy.matrix);
+      carMesh.instanceColor.array[visibleCars * 3] = carColors[i * 3];
+      carMesh.instanceColor.array[visibleCars * 3 + 1] = carColors[i * 3 + 1];
+      carMesh.instanceColor.array[visibleCars * 3 + 2] = carColors[i * 3 + 2];
+      if (night > 0.15) {
+        dummy.position.y += 0.55;
+        dummy.position.x += tangent.x * 2.4 * car.dir;
+        dummy.position.z += tangent.z * 2.4 * car.dir;
+        dummy.rotation.x = -Math.PI / 2;
+        dummy.updateMatrix();
+        lightMesh.setMatrixAt(visibleCars, dummy.matrix);
+      }
+      visibleCars++;
+    }
+    carMesh.count = visibleCars;
+    carMesh.instanceMatrix.needsUpdate = true;
+    carMesh.instanceColor.needsUpdate = true;
+    lightMesh.count = night > 0.15 ? visibleCars : 0;
+    lightMesh.instanceMatrix.needsUpdate = true;
+    lightMesh.material.opacity = Math.min(0.8, night);
+
+    // Cable cars.
+    for (let i = 0; i < cableCars.length; i++) {
+      const car = cableCars[i];
+      car.d += 4.2 * dt * car.dir;
+      if (car.d > car.total || car.d < 0) {
+        car.dir *= -1;
+        car.d = Math.min(car.total, Math.max(0, car.d));
+      }
+      samplePolyline(car.points, car.cumulative, car.total, car.d, position, tangent);
+      dummy.position.copy(position);
+      dummy.rotation.set(0, Math.atan2(tangent.x, tangent.z), 0);
+      dummy.scale.setScalar(1);
+      dummy.updateMatrix();
+      cableMesh.setMatrixAt(i, dummy.matrix);
+    }
+    cableMesh.instanceMatrix.needsUpdate = true;
+
+    // Pedestrians: only worth spawning when the camera is down in the streets.
+    if (cameraPos.y - pivot.y < 900 && cityPaths.length) {
+      if (peds.length === 0) {
+        for (let i = 0; i < PED_COUNT; i++) peds.push(null);
+      }
+      const candidates = [];
+      for (const path of cityPaths) {
+        if (!path.meta) path.meta = polylineLengths(path.points);
+        if (Math.hypot(path.points[0] - pivot.x, path.points[2] - pivot.z) < PED_RANGE * 2) candidates.push(path);
+      }
+      let visible = 0;
+      for (let i = 0; i < PED_COUNT && candidates.length; i++) {
+        let ped = peds[i];
+        if (!ped || Math.hypot(ped.x - pivot.x, ped.z - pivot.z) > PED_RANGE * 2.2) {
+          const path = candidates[Math.floor(Math.random() * candidates.length)];
+          const d = Math.random() * path.meta.total;
+          samplePolyline(path.points, path.meta.cumulative, path.meta.total, d, position, tangent);
+          const side = Math.random() < 0.5 ? -1 : 1;
+          ped = {
+            x: position.x + tangent.z * (path.width / 2 + 1.9) * side,
+            y: position.y,
+            z: position.z - tangent.x * (path.width / 2 + 1.9) * side,
+            vx: tangent.x * (Math.random() < 0.5 ? -1 : 1) * 1.3,
+            vz: tangent.z * (Math.random() < 0.5 ? -1 : 1) * 1.3,
+            t: Math.random() * 6.28,
+          };
+          peds[i] = ped;
+        }
+        ped.x += ped.vx * dt;
+        ped.z += ped.vz * dt;
+        ped.t += dt * 6;
+        if (Math.hypot(ped.x - cameraPos.x, ped.z - cameraPos.z) > PED_RANGE * 1.6) continue;
+        dummy.position.set(ped.x, ped.y + Math.abs(Math.sin(ped.t)) * 0.06, ped.z);
+        dummy.rotation.set(0, Math.atan2(ped.vx, ped.vz), 0);
+        dummy.scale.set(1, 0.94 + Math.abs(Math.sin(ped.t)) * 0.08, 1);
+        dummy.updateMatrix();
+        pedMesh.setMatrixAt(visible, dummy.matrix);
+        visible++;
+      }
+      pedMesh.count = visible;
+      pedMesh.instanceMatrix.needsUpdate = true;
+    } else {
+      pedMesh.count = 0;
+    }
+
+    // Gulls.
+    const time = shared.uTime.value;
+    for (let i = 0; i < BIRD_COUNT; i++) {
+      const flock = flocks[i % flocks.length];
+      const k = Math.floor(i / flocks.length);
+      const a = time * 0.35 + flock.phase + k * 0.7;
+      const r = flock.radius * (0.65 + ((k * 37) % 10) / 22);
+      const x = flock.x + Math.cos(a) * r;
+      const z = flock.z + Math.sin(a * 1.1) * r;
+      const y = flock.height + Math.sin(a * 2.3 + k) * 12;
+      dummy.position.set(x, y, z);
+      dummy.rotation.set(Math.sin(a * 3) * 0.2, -a + Math.PI / 2, Math.sin(a * 4 + k) * 0.35);
+      dummy.scale.setScalar(1);
+      dummy.updateMatrix();
+      birdMesh.setMatrixAt(i, dummy.matrix);
+    }
+    birdMesh.instanceMatrix.needsUpdate = true;
+    birdMesh.visible = night < 0.7;
+
+    for (const flag of flags) flag.visible = true;
+  }
+
+  return { group, update, get carCount() { return carMesh.count; } };
+}

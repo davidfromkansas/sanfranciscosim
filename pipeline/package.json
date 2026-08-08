@@ -1,0 +1,20 @@
+{
+  "name": "sf-3d-pipeline",
+  "private": true,
+  "type": "module",
+  "version": "1.0.0",
+  "description": "Offline geodata pipeline that bakes San Francisco open data into binary tiles for the Three.js runtime",
+  "scripts": {
+    "download": "node download.mjs",
+    "terrain": "node terrain.mjs",
+    "buildings": "node buildings.mjs",
+    "streets": "node streets.mjs",
+    "landcover": "node landcover.mjs",
+    "validate": "node validate.mjs",
+    "all": "npm run download && npm run terrain && npm run buildings && npm run streets && npm run landcover && npm run validate"
+  },
+  "dependencies": {
+    "earcut": "2.2.4",
+    "pngjs": "7.0.0"
+  }
+}

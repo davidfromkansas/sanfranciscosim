@@ -1,0 +1,131 @@
+// HUD: view presets, the golden-hour -> dusk slider, quality tiers, and the
+// debug overlay. Deliberately unobtrusive — the city is the interface.
+
+export const QUALITY = {
+  ultra: { label: 'Ultra', pixelRatio: 2, shadow: 4096, nearScale: 1.35, treeScale: 1.3, windows: 1 },
+  high: { label: 'High', pixelRatio: 1.5, shadow: 3072, nearScale: 1, treeScale: 1, windows: 1 },
+  medium: { label: 'Medium', pixelRatio: 1, shadow: 2048, nearScale: 0.75, treeScale: 0.7, windows: 1 },
+  low: { label: 'Low', pixelRatio: 0.85, shadow: 0, nearScale: 0.5, treeScale: 0.45, windows: 0 },
+};
+
+export function createUI({ presets, onPreset, onTime, onQuality, onAuto }) {
+  const hud = document.getElementById('hud');
+  const debug = document.getElementById('debug');
+
+  const viewPanel = document.createElement('div');
+  viewPanel.className = 'panel';
+  const viewLabel = document.createElement('label');
+  viewLabel.textContent = 'View';
+  const select = document.createElement('select');
+  presets.forEach((preset, i) => {
+    const option = document.createElement('option');
+    option.value = String(i);
+    option.textContent = preset.key ? `${preset.key} · ${preset.name}` : preset.name;
+    select.appendChild(option);
+  });
+  select.addEventListener('change', () => onPreset(Number(select.value)));
+  viewPanel.append(viewLabel, select);
+
+  const timePanel = document.createElement('div');
+  timePanel.className = 'panel';
+  const timeLabel = document.createElement('label');
+  timeLabel.textContent = 'Golden hour → dusk';
+  const slider = document.createElement('input');
+  slider.type = 'range';
+  slider.min = '0';
+  slider.max = '1000';
+  slider.value = '0';
+  slider.addEventListener('input', () => {
+    auto.checked = false;
+    onAuto(false);
+    onTime(Number(slider.value) / 1000);
+  });
+  const auto = document.createElement('input');
+  auto.type = 'checkbox';
+  auto.checked = true;
+  auto.title = 'Let time run';
+  auto.addEventListener('change', () => onAuto(auto.checked));
+  timePanel.append(timeLabel, slider, auto);
+
+  const qualityPanel = document.createElement('div');
+  qualityPanel.className = 'panel';
+  const qualityLabel = document.createElement('label');
+  qualityLabel.textContent = 'Quality';
+  const qualitySelect = document.createElement('select');
+  for (const [key, value] of Object.entries(QUALITY)) {
+    const option = document.createElement('option');
+    option.value = key;
+    option.textContent = value.label;
+    qualitySelect.appendChild(option);
+  }
+  qualitySelect.addEventListener('change', () => onQuality(qualitySelect.value));
+  const debugToggle = document.createElement('button');
+  debugToggle.textContent = 'stats';
+  debugToggle.title = 'Toggle the performance overlay (F3)';
+  debugToggle.addEventListener('click', () => {
+    debug.hidden = !debug.hidden;
+  });
+  qualityPanel.append(qualityLabel, qualitySelect, debugToggle);
+
+  const help = document.createElement('div');
+  help.className = 'panel';
+  help.style.maxWidth = '260px';
+  help.style.display = 'block';
+  help.innerHTML =
+    '<label>Controls</label><div style="margin-top:4px;line-height:1.5;color:rgba(255,255,255,.78)">' +
+    'WASD / arrows pan · Q E rotate · wheel zooms to cursor · right-drag orbits · left-drag grabs the ground · ' +
+    'screen edges scroll · Shift boosts · 0–9 fly to landmarks · H home' +
+    '</div>';
+
+  hud.append(viewPanel, timePanel, qualityPanel, help);
+
+  window.addEventListener('keydown', (event) => {
+    if (event.code === 'F3' || event.key === '`') {
+      debug.hidden = !debug.hidden;
+      event.preventDefault();
+    }
+  });
+
+  return {
+    setPresetIndex(i) {
+      select.value = String(i);
+    },
+    setTime(t) {
+      slider.value = String(Math.round(t * 1000));
+    },
+    setQuality(key) {
+      qualitySelect.value = key;
+    },
+    get autoTime() {
+      return auto.checked;
+    },
+    setAuto(value) {
+      auto.checked = value;
+    },
+    setDebug(text) {
+      if (!debug.hidden) debug.textContent = text;
+    },
+    get debugVisible() {
+      return !debug.hidden;
+    },
+  };
+}
+
+export function createLoader() {
+  const loader = document.getElementById('loader');
+  const bar = loader.querySelector('i');
+  let done = false;
+  return {
+    set(fraction) {
+      if (done) return;
+      bar.style.width = `${Math.round(Math.min(1, fraction) * 100)}%`;
+    },
+    finish() {
+      if (done) return;
+      done = true;
+      bar.style.width = '100%';
+      loader.classList.add('done');
+      setTimeout(() => loader.remove(), 900);
+    },
+  };
+}
