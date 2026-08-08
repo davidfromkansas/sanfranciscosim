@@ -34,6 +34,54 @@ export function createCameraRig(camera, domElement, sampleElevation, extent) {
   let animation = null;
   let pitchLocked = false;
 
+  // Diorama mode: the money shot is locked. Pitch never moves, the yaw only
+  // visits eight 45-degree headings, and zoom rides in and out along that fixed
+  // angle. Pan, wheel zoom, edge scroll and WASD all keep working.
+  const DIORAMA = { pitch: 42 * DEG, step: 45 * DEG, min: 150, max: 8000, dragPx: 60 };
+  let diorama = false;
+  let dioramaSaved = null;
+  let yawStep = null;
+  let dragYaw = 0;
+
+  function stepYaw(direction) {
+    const from = state.yaw;
+    const target = yawStep ? yawStep.to : Math.round(from / DIORAMA.step) * DIORAMA.step;
+    yawStep = { from, to: target + direction * DIORAMA.step, start: performance.now(), duration: 0.5 };
+  }
+
+  function setDiorama(on) {
+    if (on === diorama) return;
+    if (on) {
+      dioramaSaved = {
+        yaw: state.yaw,
+        pitch: state.pitch,
+        distance: state.distance,
+        minDistance: state.minDistance,
+        maxDistance: state.maxDistance,
+        pitchLocked,
+      };
+      diorama = true;
+      yawStep = null;
+      dragYaw = 0;
+      state.yaw = Math.round(state.yaw / DIORAMA.step) * DIORAMA.step;
+      state.pitch = DIORAMA.pitch;
+      state.minDistance = DIORAMA.min;
+      state.maxDistance = DIORAMA.max;
+      state.distance = Math.min(DIORAMA.max, Math.max(DIORAMA.min, state.distance));
+      pitchLocked = true;
+    } else {
+      diorama = false;
+      yawStep = null;
+      state.yaw = dioramaSaved.yaw;
+      state.pitch = dioramaSaved.pitch;
+      state.distance = dioramaSaved.distance;
+      state.minDistance = dioramaSaved.minDistance;
+      state.maxDistance = dioramaSaved.maxDistance;
+      pitchLocked = dioramaSaved.pitchLocked;
+    }
+    apply();
+  }
+
   // Pitch is a function of zoom: sky-high views look almost straight down,
   // street-level views sit just above the horizon.
   function pitchForDistance(d) {
@@ -121,6 +169,11 @@ export function createCameraRig(camera, domElement, sampleElevation, extent) {
     if (event.metaKey || event.ctrlKey) return;
     keys.add(event.code);
     if (event.code === 'ShiftLeft' || event.code === 'ShiftRight') state.boost = 3.4;
+    // Diorama yaw is discrete: one heading per keypress, not a continuous spin.
+    if (diorama && !event.repeat) {
+      if (event.code === 'KeyQ') stepYaw(1);
+      if (event.code === 'KeyE') stepYaw(-1);
+    }
   }
 
   function onKeyUp(event) {
@@ -166,6 +219,15 @@ export function createCameraRig(camera, domElement, sampleElevation, extent) {
     lastY = event.clientY;
 
     if (dragMode === 'rotate') {
+      if (diorama) {
+        // Right-drag advances one heading per 60 px of travel.
+        dragYaw += dx;
+        while (Math.abs(dragYaw) >= DIORAMA.dragPx) {
+          stepYaw(dragYaw > 0 ? -1 : 1);
+          dragYaw -= Math.sign(dragYaw) * DIORAMA.dragPx;
+        }
+        return;
+      }
       state.yaw -= dx * 0.005;
       state.pitch = Math.min(86 * DEG, Math.max(6 * DEG, state.pitch + dy * 0.004));
       pitchLocked = true;
@@ -289,11 +351,27 @@ export function createCameraRig(camera, domElement, sampleElevation, extent) {
     state.pivot.addScaledVector(state.velocity, dt);
     clampPivot();
 
-    let yawInput = 0;
-    if (keys.has('KeyQ')) yawInput += 1;
-    if (keys.has('KeyE')) yawInput -= 1;
-    state.yawVelocity += (yawInput * 1.5 - state.yawVelocity) * Math.min(1, dt * 8);
-    state.yaw += state.yawVelocity * dt;
+    if (diorama) {
+      state.pitch = DIORAMA.pitch;
+      if (yawStep) {
+        const t = Math.min(1, (performance.now() - yawStep.start) / (yawStep.duration * 1000));
+        const e = t * t * (3 - 2 * t);
+        // Shortest path: the target is normalised against the current heading, so
+        // a step across 0/360 never unwinds the long way round.
+        const to = normaliseYaw(yawStep.from, yawStep.to);
+        state.yaw = yawStep.from + (to - yawStep.from) * e;
+        if (t >= 1) {
+          state.yaw = to;
+          yawStep = null;
+        }
+      }
+    } else {
+      let yawInput = 0;
+      if (keys.has('KeyQ')) yawInput += 1;
+      if (keys.has('KeyE')) yawInput -= 1;
+      state.yawVelocity += (yawInput * 1.5 - state.yawVelocity) * Math.min(1, dt * 8);
+      state.yaw += state.yawVelocity * dt;
+    }
 
     let zoomInput = 0;
     if (keys.has('KeyR') || keys.has('PageUp')) zoomInput -= 1;
@@ -349,5 +427,18 @@ export function createCameraRig(camera, domElement, sampleElevation, extent) {
     window.removeEventListener('keyup', onKeyUp);
   }
 
-  return { state, update, flyTo, set, dispose, screenToGround, pointer, keys };
+  return {
+    state,
+    update,
+    flyTo,
+    set,
+    setDiorama,
+    get diorama() {
+      return diorama;
+    },
+    dispose,
+    screenToGround,
+    pointer,
+    keys,
+  };
 }

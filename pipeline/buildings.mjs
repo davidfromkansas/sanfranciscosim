@@ -340,6 +340,25 @@ for (const key of sortedKeys) {
   });
 }
 
+// Cleaned intermediate: the toy bake re-derives its own chunky geometry from
+// exactly these footprints, so neither bake re-downloads or re-cleans anything.
+const round2 = (v) => Math.round(v * 100) / 100;
+await writeFile(
+  new URL('footprints.json', OUT),
+  JSON.stringify({
+    cellSize: CELL_SIZE,
+    grid: GRID,
+    palette: PALETTE,
+    buildings: buildings.map((b) => [
+      b.ring.map(round2),
+      round2(b.height),
+      round2(b.baseY),
+      b.seed,
+      b.palette,
+    ]),
+  })
+);
+
 const tallest = buildings.reduce((a, b) => (b.height > a.height ? b : a));
 const stats = {
   total: buildings.length,

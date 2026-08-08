@@ -9,3 +9,4 @@ dist/
 pipeline/data/
 pipeline/out/
 .vercel
+.env*

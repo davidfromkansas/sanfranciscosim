@@ -74,10 +74,17 @@ export function createUI({ presets, onPreset, onTime, onQuality, onAuto }) {
   help.innerHTML =
     '<label>Controls</label><div style="margin-top:4px;line-height:1.5;color:rgba(255,255,255,.78)">' +
     'WASD / arrows pan · Q E rotate · wheel zooms to cursor · right-drag orbits · left-drag grabs the ground · ' +
-    'screen edges scroll · Shift boosts · 0–9 fly to landmarks · H home' +
+    'screen edges scroll · Shift boosts · 0–9 fly to landmarks · H home · M toy diorama' +
     '</div>';
 
-  hud.append(viewPanel, timePanel, qualityPanel, help);
+  const styleBadge = document.createElement('div');
+  styleBadge.className = 'panel';
+  styleBadge.hidden = true;
+  styleBadge.innerHTML =
+    '<label>Diorama mode</label><div style="margin-top:4px;color:rgba(255,255,255,.78)">' +
+    'Locked 42° view · Q E step 45° · M returns to the real city</div>';
+
+  hud.append(viewPanel, timePanel, qualityPanel, help, styleBadge);
 
   window.addEventListener('keydown', (event) => {
     if (event.code === 'F3' || event.key === '`') {
@@ -95,6 +102,9 @@ export function createUI({ presets, onPreset, onTime, onQuality, onAuto }) {
     },
     setQuality(key) {
       qualitySelect.value = key;
+    },
+    setStyle(toy) {
+      styleBadge.hidden = !toy;
     },
     get autoTime() {
       return auto.checked;

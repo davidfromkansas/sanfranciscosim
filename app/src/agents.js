@@ -12,6 +12,7 @@ import {
   DoubleSide,
   DynamicDrawUsage,
   Group,
+  IcosahedronGeometry,
   InstancedMesh,
   Mesh,
   MeshBasicMaterial,
@@ -96,6 +97,28 @@ const SHIP_ROUTES = [
     ],
   },
 ];
+
+// Toy-mode extras: construction sites, balloon launch points and the
+// helicopter's downtown orbit. Invented placements, deliberately playful.
+const CRANE_SITES = [
+  [-122.3971, 37.7842],
+  [-122.4032, 37.7885],
+  [-122.4113, 37.7776],
+  [-122.3925, 37.7745],
+  [-122.4192, 37.7659],
+  [-122.4271, 37.7845],
+  [-122.4478, 37.7833],
+  [-122.3888, 37.7688],
+];
+const BALLOON_SITES = [
+  [-122.4712, 37.7694],
+  [-122.4451, 37.7712],
+  [-122.4232, 37.7601],
+  [-122.4098, 37.8062],
+  [-122.4835, 37.7521],
+  [-122.4552, 37.8018],
+];
+const HELI_CENTER = [-122.4014, 37.7893];
 
 // The three surviving cable car lines.
 const CABLE_LINES = [
@@ -211,6 +234,48 @@ function shipArchetype(kind) {
     house.translate(0, 13.6, -42);
     parts.push(house);
   }
+  const merged = mergeGeometries(parts, false);
+  for (const p of parts) p.dispose();
+  merged.deleteAttribute('uv');
+  return merged;
+}
+
+// Toy archetypes, all merged into single instanced draw calls.
+function craneArchetype() {
+  const parts = [];
+  const mast = new BoxGeometry(2.2, 58, 2.2);
+  mast.translate(0, 29, 0);
+  parts.push(mast);
+  const jib = new BoxGeometry(46, 1.6, 1.6);
+  jib.translate(13, 58, 0);
+  parts.push(jib);
+  const counter = new BoxGeometry(7, 3.4, 3.4);
+  counter.translate(-11, 57.5, 0);
+  parts.push(counter);
+  const cab = new BoxGeometry(3.2, 3.2, 3.2);
+  cab.translate(0, 54, 0);
+  parts.push(cab);
+  const hook = new BoxGeometry(0.4, 14, 0.4);
+  hook.translate(26, 50, 0);
+  parts.push(hook);
+  const merged = mergeGeometries(parts, false);
+  for (const p of parts) p.dispose();
+  merged.deleteAttribute('uv');
+  return merged;
+}
+
+function balloonArchetype() {
+  const parts = [];
+  const envelope = new IcosahedronGeometry(9, 2);
+  envelope.scale(1, 1.25, 1);
+  envelope.translate(0, 11, 0);
+  parts.push(envelope);
+  const tether = new CylinderGeometry(0.16, 0.16, 5, 4);
+  tether.translate(0, 1.6, 0);
+  parts.push(tether);
+  const basket = new BoxGeometry(3, 2.4, 3);
+  basket.translate(0, -1.2, 0);
+  parts.push(basket);
   const merged = mergeGeometries(parts, false);
   for (const p of parts) p.dispose();
   merged.deleteAttribute('uv');
@@ -470,6 +535,140 @@ export function createAgents(scene, data, city) {
     flags.push(flag);
   }
 
+  // ------------------------------------------------------------- toy extras ---
+  // Created once and parked invisible: the diorama toggle must not allocate.
+  const toyGroup = new Group();
+  toyGroup.name = 'toy-life';
+  toyGroup.visible = false;
+  group.add(toyGroup);
+
+  const craneCount = 8;
+  const craneMesh = new InstancedMesh(
+    craneArchetype(),
+    new MeshLambertMaterial({ color: '#e2b23c' }),
+    craneCount
+  );
+  craneMesh.frustumCulled = false;
+  toyGroup.add(craneMesh);
+  CRANE_SITES.slice(0, craneCount).forEach(([lon, lat], i) => {
+    const [x, z] = project(lon, lat);
+    dummy.position.set(x, Math.max(0, sampleElevation(x, z)), z);
+    dummy.rotation.set(0, (i * 2.399) % (Math.PI * 2), 0);
+    dummy.scale.setScalar(0.8 + (i % 3) * 0.15);
+    dummy.updateMatrix();
+    craneMesh.setMatrixAt(i, dummy.matrix);
+  });
+  craneMesh.instanceMatrix.needsUpdate = true;
+
+  const balloonCount = BALLOON_SITES.length;
+  const balloonMesh = new InstancedMesh(
+    balloonArchetype(),
+    new MeshLambertMaterial({ vertexColors: true }),
+    balloonCount
+  );
+  balloonMesh.instanceMatrix.setUsage(DynamicDrawUsage);
+  balloonMesh.frustumCulled = false;
+  const balloonColors = new Float32Array(balloonCount * 3);
+  const balloonPalette = ['#e8735a', '#d9a441', '#3fa8a0', '#6db3d9', '#e2557f', '#8fd0a8'];
+  for (let i = 0; i < balloonCount; i++) {
+    paint.set(balloonPalette[i % balloonPalette.length]);
+    balloonColors[i * 3] = paint.r;
+    balloonColors[i * 3 + 1] = paint.g;
+    balloonColors[i * 3 + 2] = paint.b;
+  }
+  balloonMesh.instanceColor = new BufferAttribute(balloonColors, 3);
+  toyGroup.add(balloonMesh);
+  const balloons = BALLOON_SITES.map(([lon, lat], i) => {
+    const [x, z] = project(lon, lat);
+    return {
+      x,
+      z,
+      ground: Math.max(0, sampleElevation(x, z)),
+      height: 150 + i * 45,
+      radius: 90 + i * 30,
+      phase: i * 1.31,
+    };
+  });
+
+  const heliBody = mergeGeometries(
+    [
+      (() => {
+        const g = new IcosahedronGeometry(3.2, 1);
+        g.scale(1, 0.85, 1.5);
+        return g;
+      })(),
+      (() => {
+        const g = new BoxGeometry(0.7, 0.7, 7);
+        g.translate(0, 1.2, -6);
+        return g;
+      })(),
+      (() => {
+        const g = new BoxGeometry(0.5, 2.6, 0.5);
+        g.translate(0, 2.2, -9);
+        return g;
+      })(),
+    ],
+    false
+  );
+  heliBody.deleteAttribute('uv');
+  const helicopter = new Group();
+  const heliHull = new Mesh(heliBody, new MeshLambertMaterial({ color: '#e2554f' }));
+  helicopter.add(heliHull);
+  const heliRotor = new Mesh(
+    new BoxGeometry(18, 0.2, 0.9),
+    new MeshLambertMaterial({ color: '#4a4a52' })
+  );
+  heliRotor.position.y = 3.4;
+  helicopter.add(heliRotor);
+  toyGroup.add(helicopter);
+  const [heliX, heliZ] = project(HELI_CENTER[0], HELI_CENTER[1]);
+
+  // Cars and pedestrians are restyled in place: same pools, toy scale and paint.
+  const CAR_PALETTES = {
+    base: carPalette,
+    toy: ['#e8735a', '#f2c14e', '#3fa8a0', '#6db3d9', '#e2557f', '#8fd0a8', '#f4f0e6'],
+  };
+  let carScale = 1;
+  let pedScale = 1;
+  let toy = false;
+
+  function paintCars(list) {
+    for (let i = 0; i < CAR_COUNT; i++) {
+      paint.set(list[i % list.length]);
+      carColors[i * 3] = paint.r;
+      carColors[i * 3 + 1] = paint.g;
+      carColors[i * 3 + 2] = paint.b;
+    }
+  }
+
+  const shipStyle = {
+    base: ships.map((s) => ({ color: s.mesh.material.color.getHex(), scale: [1, 1, 1] })),
+  };
+
+  function setToy(on) {
+    toy = on;
+    toyGroup.visible = on;
+    carScale = on ? 1.6 : 1;
+    pedScale = on ? 1.3 : 1;
+    paintCars(on ? CAR_PALETTES.toy : CAR_PALETTES.base);
+    lightMesh.material.color.set(on ? '#ffffff' : '#fff2cf');
+    cableMesh.material.color.set(on ? '#d63b2c' : '#8f2f24');
+    pedMesh.material.color.set(on ? '#4a5a72' : '#3c4550');
+    // Fat toy tugboats: the same hulls, stubbier and brightly painted.
+    ships.forEach((ship, i) => {
+      ship.toyScale = on ? [1.6, 1.35, 0.62] : null;
+      ship.mesh.material.color.set(
+        on
+          ? ship.route.kind === 'container'
+            ? '#e8735a'
+            : ship.route.kind === 'ferry'
+              ? '#f4f0e6'
+              : '#ffffff'
+          : shipStyle.base[i].color
+      );
+    });
+  }
+
   function update(dt, pivot, cameraPos) {
     const night = shared.uNight.value;
 
@@ -492,7 +691,8 @@ export function createAgents(scene, data, city) {
         inst.bob += dt * 1.6;
         dummy.position.set(position.x, 0.3 + Math.sin(inst.bob) * 0.35, position.z);
         dummy.rotation.set(Math.sin(inst.bob * 0.7) * 0.02, Math.atan2(tangent.x, tangent.z), Math.cos(inst.bob) * 0.02);
-        dummy.scale.setScalar(1);
+        if (ship.toyScale) dummy.scale.set(...ship.toyScale);
+        else dummy.scale.setScalar(1);
         dummy.updateMatrix();
         ship.mesh.setMatrixAt(i, dummy.matrix);
 
@@ -549,13 +749,13 @@ export function createAgents(scene, data, city) {
       const offset = (car.path.width / 4) * car.lane * car.dir;
       dummy.position.set(position.x + tangent.z * offset, position.y + 0.2, position.z - tangent.x * offset);
       dummy.rotation.set(0, Math.atan2(tangent.x * car.dir, tangent.z * car.dir), 0);
-      dummy.scale.setScalar(1);
+      dummy.scale.setScalar(carScale);
       dummy.updateMatrix();
       carMesh.setMatrixAt(visibleCars, dummy.matrix);
       carMesh.instanceColor.array[visibleCars * 3] = carColors[i * 3];
       carMesh.instanceColor.array[visibleCars * 3 + 1] = carColors[i * 3 + 1];
       carMesh.instanceColor.array[visibleCars * 3 + 2] = carColors[i * 3 + 2];
-      if (night > 0.15) {
+      if (night > 0.15 || toy) {
         dummy.position.y += 0.55;
         dummy.position.x += tangent.x * 2.4 * car.dir;
         dummy.position.z += tangent.z * 2.4 * car.dir;
@@ -568,9 +768,9 @@ export function createAgents(scene, data, city) {
     carMesh.count = visibleCars;
     carMesh.instanceMatrix.needsUpdate = true;
     carMesh.instanceColor.needsUpdate = true;
-    lightMesh.count = night > 0.15 ? visibleCars : 0;
+    lightMesh.count = night > 0.15 || toy ? visibleCars : 0;
     lightMesh.instanceMatrix.needsUpdate = true;
-    lightMesh.material.opacity = Math.min(0.8, night);
+    lightMesh.material.opacity = toy ? Math.max(0.5, Math.min(0.85, night)) : Math.min(0.8, night);
 
     // Cable cars.
     for (let i = 0; i < cableCars.length; i++) {
@@ -623,7 +823,7 @@ export function createAgents(scene, data, city) {
         if (Math.hypot(ped.x - cameraPos.x, ped.z - cameraPos.z) > PED_RANGE * 1.6) continue;
         dummy.position.set(ped.x, ped.y + Math.abs(Math.sin(ped.t)) * 0.06, ped.z);
         dummy.rotation.set(0, Math.atan2(ped.vx, ped.vz), 0);
-        dummy.scale.set(1, 0.94 + Math.abs(Math.sin(ped.t)) * 0.08, 1);
+        dummy.scale.set(pedScale, pedScale * (0.94 + Math.abs(Math.sin(ped.t)) * 0.08), pedScale);
         dummy.updateMatrix();
         pedMesh.setMatrixAt(visible, dummy.matrix);
         visible++;
@@ -654,7 +854,30 @@ export function createAgents(scene, data, city) {
     birdMesh.visible = night < 0.7;
 
     for (const flag of flags) flag.visible = true;
+
+    // Toy extras: balloons drift on lazy circles, the helicopter orbits downtown.
+    if (toy) {
+      for (let i = 0; i < balloons.length; i++) {
+        const b = balloons[i];
+        const a = time * 0.05 + b.phase;
+        dummy.position.set(
+          b.x + Math.cos(a) * b.radius,
+          b.ground + b.height + Math.sin(time * 0.3 + b.phase) * 6,
+          b.z + Math.sin(a * 1.2) * b.radius
+        );
+        dummy.rotation.set(0, a, Math.sin(time * 0.4 + b.phase) * 0.05);
+        dummy.scale.setScalar(1);
+        dummy.updateMatrix();
+        balloonMesh.setMatrixAt(i, dummy.matrix);
+      }
+      balloonMesh.instanceMatrix.needsUpdate = true;
+
+      const a = time * 0.12;
+      helicopter.position.set(heliX + Math.cos(a) * 620, 250, heliZ + Math.sin(a) * 620);
+      helicopter.rotation.y = -a;
+      heliRotor.rotation.y += dt * 34;
+    }
   }
 
-  return { group, update, get carCount() { return carMesh.count; } };
+  return { group, update, setToy, get carCount() { return carMesh.count; } };
 }

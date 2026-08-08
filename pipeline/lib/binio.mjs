@@ -14,7 +14,10 @@ function alignTo(n, a) {
 // Buildings: per-building footprint ring + roof triangulation + base/top
 // elevations. Walls and roof geometry are generated in the runtime worker,
 // which keeps the payload ~15x smaller than baking triangles.
-export function writeBuildingsBlob(cell) {
+//
+// Version 2 (the toy tier) appends two byte arrays: `flags` (bit 0 pitched roof,
+// bit 1 rooftop garnish) and `roofPalette`.
+export function writeBuildingsBlob(cell, { version = 1 } = {}) {
   const count = cell.buildings.length;
   let vertexTotal = 0;
   let indexTotal = 0;
@@ -41,6 +44,14 @@ export function writeBuildingsBlob(cell) {
   off += count;
   const seedAt = off;
   off += count;
+  let flagsAt = 0;
+  let roofPaletteAt = 0;
+  if (version >= 2) {
+    flagsAt = off;
+    off += count;
+    roofPaletteAt = off;
+    off += count;
+  }
   off = alignTo(off, 2);
   const vertsAt = off;
   off += 4 * vertexTotal;
@@ -50,7 +61,7 @@ export function writeBuildingsBlob(cell) {
   const buf = Buffer.alloc(off);
   const dv = new DataView(buf.buffer, buf.byteOffset, buf.byteLength);
   dv.setUint32(0, MAGIC_BUILDINGS, true);
-  dv.setUint16(4, 1, true);
+  dv.setUint16(4, version, true);
   dv.setUint16(6, 0, true);
   dv.setUint32(8, count, true);
   dv.setUint32(12, vertexTotal, true);
@@ -67,6 +78,9 @@ export function writeBuildingsBlob(cell) {
   const topY = new Int16Array(buf.buffer, buf.byteOffset + topYAt, count);
   const palette = new Uint8Array(buf.buffer, buf.byteOffset + paletteAt, count);
   const seed = new Uint8Array(buf.buffer, buf.byteOffset + seedAt, count);
+  const flags = version >= 2 ? new Uint8Array(buf.buffer, buf.byteOffset + flagsAt, count) : null;
+  const roofPalette =
+    version >= 2 ? new Uint8Array(buf.buffer, buf.byteOffset + roofPaletteAt, count) : null;
   const verts = new Int16Array(buf.buffer, buf.byteOffset + vertsAt, vertexTotal * 2);
   const indices = new Uint16Array(buf.buffer, buf.byteOffset + indicesAt, indexTotal);
 
@@ -82,6 +96,10 @@ export function writeBuildingsBlob(cell) {
     topY[i] = Math.round(b.topY * 10);
     palette[i] = b.palette;
     seed[i] = b.seed;
+    if (flags) {
+      flags[i] = b.flags || 0;
+      roofPalette[i] = b.roofPalette || 0;
+    }
     for (let k = 0; k < n; k++) {
       verts[(v + k) * 2] = Math.round((b.ring[k * 2] - cell.originX) / QUANT);
       verts[(v + k) * 2 + 1] = Math.round((b.ring[k * 2 + 1] - cell.originZ) / QUANT);

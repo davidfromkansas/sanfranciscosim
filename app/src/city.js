@@ -14,6 +14,7 @@ import {
   ConeGeometry,
   CylinderGeometry,
   DynamicDrawUsage,
+  IcosahedronGeometry,
   InstancedMesh,
   Matrix4,
   Mesh,
@@ -27,6 +28,7 @@ import {
   createBuildingMaterial,
   createFarBuildingMaterial,
   createGroundMaterial,
+  createToyBuildingMaterial,
   createTreeMaterial,
 } from './materials.js';
 import { shared } from './env.js';
@@ -130,6 +132,40 @@ function treeArchetype() {
   return merged;
 }
 
+// Toy trees: a lollipop. Low-detail icosahedron canopy on a stubby trunk, in
+// saturated model-railway greens.
+function toyTreeArchetype() {
+  const parts = [];
+  const trunk = new CylinderGeometry(0.55, 0.7, 3.4, 6, 1);
+  trunk.translate(0, 1.7, 0);
+  const trunkColors = new Float32Array(trunk.attributes.position.count * 3);
+  for (let i = 0; i < trunk.attributes.position.count; i++) {
+    trunkColors[i * 3] = 0.42;
+    trunkColors[i * 3 + 1] = 0.28;
+    trunkColors[i * 3 + 2] = 0.18;
+  }
+  trunk.setAttribute('color', new BufferAttribute(trunkColors, 3));
+  parts.push(trunk);
+
+  const canopy = new IcosahedronGeometry(4.2, 1);
+  canopy.scale(1, 0.92, 1);
+  canopy.translate(0, 7.2, 0);
+  const canopyColors = new Float32Array(canopy.attributes.position.count * 3);
+  const pos = canopy.attributes.position;
+  for (let i = 0; i < pos.count; i++) {
+    const shade = 0.86 + (pos.getY(i) / 14) * 0.28;
+    canopyColors[i * 3] = 0.24 * shade;
+    canopyColors[i * 3 + 1] = 0.62 * shade;
+    canopyColors[i * 3 + 2] = 0.27 * shade;
+  }
+  canopy.setAttribute('color', new BufferAttribute(canopyColors, 3));
+  parts.push(canopy);
+
+  const merged = mergeGeometries(parts, false);
+  for (const part of parts) part.dispose();
+  return merged;
+}
+
 export function createCity(scene, data) {
   const { manifest, indexes } = data;
   const extent = manifest.extent;
@@ -148,7 +184,20 @@ export function createCity(scene, data) {
   const treeMaterial = createTreeMaterial();
   const lampMaterial = new MeshBasicMaterial({ color: new Color(1.0, 0.82, 0.55), transparent: true, opacity: 0 });
   const treeGeometry = treeArchetype();
+  const toyTreeGeometry = toyTreeArchetype();
   const lampGeometry = new SphereGeometry(0.9, 6, 4);
+
+  // Diorama tier. `toy` holds the lazily fetched toy index (palette + street
+  // classes); the cell grid, hysteresis and bookkeeping are shared with the base
+  // tier — only the URLs, the worker job and the materials change.
+  let tier = 'base';
+  let toy = null;
+  let toyPalette = null;
+  const TIERS = {
+    base: { buildings: 'buildings', streets: 'streets', landcover: 'landcover' },
+    toy: { buildings: 'toy', streets: 'toystreets', landcover: 'toyland' },
+  };
+  const kinds = () => TIERS[tier];
 
   function group(key) {
     let g = groups.get(key);
@@ -296,9 +345,12 @@ export function createCity(scene, data) {
     if (g.groundRequested) return;
     g.groundRequested = true;
     if (g.streetCells.length === 0 && g.landcoverCells.length === 0) return;
+    const toyTier = tier === 'toy';
     const [streets, landcover] = await Promise.all([
-      Promise.all(g.streetCells.map(async (cell) => ({ buffer: await blob('streets', cell.key) }))),
-      Promise.all(g.landcoverCells.map(async (cell) => ({ buffer: await blob('landcover', cell.key) }))),
+      Promise.all(g.streetCells.map(async (cell) => ({ buffer: await blob(kinds().streets, cell.key) }))),
+      Promise.all(
+        g.landcoverCells.map(async (cell) => ({ buffer: await blob(kinds().landcover, cell.key) }))
+      ),
     ]);
     const result = await pool.run({
       type: 'ground',
@@ -307,7 +359,7 @@ export function createCity(scene, data) {
       originZ: g.originZ,
       streets,
       landcover,
-      streetClasses: manifest.streetClasses,
+      streetClasses: toyTier ? toy.streetClasses : manifest.streetClasses,
       landKinds: manifest.landKinds,
     });
 
@@ -327,7 +379,7 @@ export function createCity(scene, data) {
 
     if (result.trees.length > 0) {
       const count = result.trees.length / 4;
-      const trees = new InstancedMesh(treeGeometry, treeMaterial, count);
+      const trees = new InstancedMesh(toyTier ? toyTreeGeometry : treeGeometry, treeMaterial, count);
       const matrix = new Matrix4();
       const dummy = new Object3D();
       for (let i = 0; i < count; i++) {
@@ -382,13 +434,16 @@ export function createCity(scene, data) {
   async function buildNearChunk(c) {
     if (c.requested || c.cells.length === 0) return;
     c.requested = true;
-    const blobs = await Promise.all(c.cells.map(async (cell) => ({ buffer: await blob('buildings', cell.key) })));
+    const toyTier = tier === 'toy';
+    const blobs = await Promise.all(
+      c.cells.map(async (cell) => ({ buffer: await blob(kinds().buildings, cell.key) }))
+    );
     const result = await pool.run({
-      type: 'near',
+      type: toyTier ? 'toy' : 'near',
       key: c.key,
       originX: c.originX,
       originZ: c.originZ,
-      palette,
+      palette: toyTier ? toyPalette : palette,
       blobs,
     });
     if (!c.active) {
@@ -401,7 +456,9 @@ export function createCity(scene, data) {
     geometry.setAttribute('aMeta', new BufferAttribute(result.meta, 2));
     geometry.setAttribute('aLocalY', new BufferAttribute(result.localY, 1));
     geometry.computeBoundingSphere();
-    const material = createBuildingMaterial({ windows: quality.windows });
+    const material = toyTier
+      ? createToyBuildingMaterial()
+      : createBuildingMaterial({ windows: quality.windows });
     material.uniformsHolder.uFade.value = 0;
     const mesh = new Mesh(geometry, material);
     mesh.position.set(c.originX, 0, c.originZ);
@@ -425,6 +482,56 @@ export function createCity(scene, data) {
     }
     c.fade = 0;
     c.requested = false;
+  }
+
+  function disposeGround(g) {
+    if (g.groundMesh) stats.groundGroups--;
+    for (const key of ['groundMesh', 'trees', 'lamps']) {
+      const obj = g[key];
+      if (!obj) continue;
+      scene.remove(obj);
+      // Geometry is per-group for the ground mesh, shared for trees and lamps.
+      if (key === 'groundMesh') obj.geometry.dispose();
+      g[key] = null;
+    }
+    g.groundRequested = false;
+  }
+
+  // Style toggle. Both tiers use the same cells, the same hysteresis and the same
+  // eviction path: switching just drops the loaded geometry and lets the normal
+  // streaming loop refetch it from the other tier's URLs.
+  async function setTier(name) {
+    if (name === tier) return;
+    if (name === 'toy' && !toy) {
+      const res = await fetch(tileUrl('toy.json'));
+      if (!res.ok) throw new Error(`toy index: ${res.status}`);
+      toy = await res.json();
+      toyPalette = toy.palette.map((p) => p.color.map((c) => Math.round(c * 255)));
+    }
+    const previous = kinds();
+    tier = name;
+
+    for (const c of chunks.values()) {
+      c.active = false; // the normal hysteresis re-enters them from the new tier
+      disposeChunk(c);
+    }
+    const reload = [];
+    for (const g of groups.values()) {
+      if (g.groundRequested) reload.push(g);
+      disposeGround(g);
+    }
+    paths.length = 0;
+    onPathsReady(paths);
+
+    // Drop the outgoing tier's blobs so repeated toggles do not grow the cache.
+    for (const id of [...blobCache.keys()]) {
+      const kind = id.slice(0, id.indexOf(':'));
+      if (kind === previous.streets || kind === previous.landcover || kind === previous.buildings) {
+        blobCache.delete(id);
+      }
+    }
+
+    for (const g of reload) buildGround(g).catch((err) => console.warn('ground reload failed', g.key, err));
   }
 
   // Load order: nearest to the hero pivot first, so the city fills in from the
@@ -496,6 +603,10 @@ export function createCity(scene, data) {
   return {
     update,
     preload,
+    setTier,
+    get tier() {
+      return tier;
+    },
     stats,
     paths,
     onPaths(cb) {
@@ -508,7 +619,9 @@ export function createCity(scene, data) {
     setQuality(q) {
       quality.windows = q.windows;
       for (const c of chunks.values()) {
-        if (c.material) c.material.uniformsHolder.uWindows.value = q.windows;
+        // The toy tier has no procedural window grid to turn down.
+        const windows = c.material?.uniformsHolder.uWindows;
+        if (windows) windows.value = q.windows;
       }
     },
   };
