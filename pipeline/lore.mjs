@@ -340,6 +340,7 @@ const subHist = new Map();
 const needsCheck = {};
 let disagreeOsmFsq = 0;
 let comparableOsmFsq = 0;
+const disagreePairs = new Map();
 let towerBlocked = 0;
 
 // A business licence at a dwelling is a home office, not an office building:
@@ -375,7 +376,14 @@ for (const b of buildings) {
   const fsqCats = new Set(usable.filter((c) => c.source === 'overture' && c.exact).map((c) => c.cat));
   if (osmCats.size && fsqCats.size && [...osmCats].some((c) => c >= 5)) {
     comparableOsmFsq++;
-    if (![...osmCats].some((c) => fsqCats.has(c))) disagreeOsmFsq++;
+    if (![...osmCats].some((c) => fsqCats.has(c))) {
+      disagreeOsmFsq++;
+      // Keep the actual pairs: a headline disagreement rate says nothing about
+      // whether the two sources are contradicting each other or simply
+      // describing two different tenants of the same address.
+      const pair = `${[...osmCats].map((c) => CATS[c]).join('|')} vs ${[...fsqCats].map((c) => CATS[c]).join('|')}`;
+      disagreePairs.set(pair, (disagreePairs.get(pair) || 0) + 1);
+    }
   }
 
   usable.sort((a, c) => a.priority - c.priority || (c.weight || 0) - (a.weight || 0));
@@ -491,6 +499,9 @@ console.log(
     comparableOsmFsq ? ((100 * disagreeOsmFsq) / comparableOsmFsq).toFixed(1) : '0'
   }% (${disagreeOsmFsq}/${comparableOsmFsq}); tower rule blocked ${towerBlocked} POI opinions`
 );
+for (const [pair, n] of [...disagreePairs.entries()].sort((a, b) => b[1] - a[1]).slice(0, 12)) {
+  console.log(`  ${pair} \u00d7 ${n}`);
+}
 
 // ---------------------------------------------------------------- sanity gates
 const gates = [];
