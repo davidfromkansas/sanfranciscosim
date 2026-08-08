@@ -463,6 +463,7 @@ async function boot() {
     // frame rate; the simulation clamp would slow them to a crawl below 20 fps.
     env.updateClouds(Math.min(1, elapsed));
     env.updateShadow(pivotWorld, rig.state.distance);
+    env.updateNightSky(camera);
 
     signs.update(rig.state.distance, rig.state.yaw);
     // Tilt-shift + grade in diorama mode; a straight canvas render otherwise.

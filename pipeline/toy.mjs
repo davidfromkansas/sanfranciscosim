@@ -2,7 +2,7 @@
 // from the base pipeline's already-cleaned footprints (out/footprints.json) —
 // nothing is downloaded or re-cleaned here.
 //
-//   out/toy/{cx}_{cz}.bin         version 2 building records (+ rooftop garnish)
+//   out/toy/{cx}_{cz}.bin         version 3 building records (+ garnish, lore)
 //   out/toystreets/{cx}_{cz}.bin  charcoal roads plus white edge ribbons
 //   out/toyland/{cx}_{cz}.bin     base landcover with 1.5x park trees + roof trees
 //   out/toy.json                  indexes, stats and validation numbers
@@ -35,6 +35,8 @@ import {
 } from './lib/toy.mjs';
 import { writeBuildingsBlob, writeLandcoverBlob, writeStreetsBlob } from './lib/binio.mjs';
 import { readLandcoverBlob, readStreetsBlob } from './lib/blobread.mjs';
+import { CATS, NIGHT_PROFILE, SUPPRESS_BANDS } from './taxonomy.mjs';
+import { countProps } from './props.mjs';
 
 const OUT = new URL('./out/', import.meta.url);
 const TOY_OUT = new URL('./out/toy/', import.meta.url);
@@ -49,6 +51,21 @@ const MIN_HEIGHT = 7;
 const MAX_HEIGHT = 200;
 const MAX_HELIPADS = 6;
 const TREE_MULTIPLIER = 1.5;
+const STREET_REACH = 25; // a prop only faces a street this close (§2.4)
+const MAX_VEHICLES = 4000;
+const TOWER_FLOORS = 6;
+
+// PROP.* bits, packed into bits 3..7 of the record flag byte.
+const PROP_STREET = 1;
+const PROP_VEHICLE = 2;
+const PROP_TOWER = 4;
+const PROP_CORNER = 8;
+const PROP_HELIPAD = 16;
+const PROP_SHIFT = 3;
+
+// Categories that may park one vehicle at the kerb, in the order they get to
+// claim from the citywide ration.
+const VEHICLE_CATS = new Set(['fire_station', 'police', 'hospital', 'warehouse'].map((c) => CATS.indexOf(c)));
 
 // Named dev cells: one downtown block and one Sunset block.
 const TEST_CELLS = {
@@ -110,11 +127,114 @@ function cellFor(x, z) {
 
 // Emit one record: ring is triangulated for its roof/top face here so the
 // runtime worker only extrudes.
-function emit(cell, ring, baseY, topY, palette, seed, flags = 0, roofPalette = 0) {
+function emit(cell, ring, baseY, topY, palette, seed, flags = 0, roofPalette = 0, lore = null) {
   const oriented = orientRing(ring);
   const indices = earcut(oriented);
   if (indices.length < 3) return;
-  cell.buildings.push({ ring: oriented, indices, baseY, topY, palette, seed, flags, roofPalette });
+  cell.buildings.push({
+    ring: oriented,
+    indices,
+    baseY,
+    topY,
+    palette,
+    seed,
+    flags,
+    roofPalette,
+    cat: lore ? lore.cat : 0,
+    yaw: lore ? lore.yaw : 0,
+    night: lore ? lore.night : 12,
+  });
+}
+
+// ---------------------------------------------------------------- street frame
+// Props only make sense facing a street, so every building is matched to the
+// nearest street centreline within 25 m. That segment's heading becomes the
+// building's local `u` axis and decides which face is the front.
+const STREET_GRID = 60;
+const streetGrid = new Map();
+const streetKey = (x, z) => `${Math.floor(x / STREET_GRID)}_${Math.floor(z / STREET_GRID)}`;
+
+for (const file of (await readdir(new URL('streets/', OUT))).filter((f) => f.endsWith('.bin'))) {
+  const blob = await readStreetsBlob(new URL(`streets/${file}`, OUT));
+  for (const line of blob.lines) {
+    for (let i = 0; i + 5 < line.pts.length; i += 3) {
+      const x0 = line.pts[i];
+      const z0 = line.pts[i + 2];
+      const x1 = line.pts[i + 3];
+      const z1 = line.pts[i + 5];
+      const seg = [x0, z0, x1, z1];
+      const steps = Math.max(1, Math.ceil(Math.hypot(x1 - x0, z1 - z0) / STREET_GRID));
+      for (let s = 0; s <= steps; s++) {
+        const key = streetKey(x0 + ((x1 - x0) * s) / steps, z0 + ((z1 - z0) * s) / steps);
+        let bucket = streetGrid.get(key);
+        if (!bucket) streetGrid.set(key, (bucket = []));
+        bucket.push(seg);
+      }
+    }
+  }
+}
+
+function nearestStreet(x, z) {
+  let best = null;
+  let bestD = Infinity;
+  const gx = Math.floor(x / STREET_GRID);
+  const gz = Math.floor(z / STREET_GRID);
+  for (let dx = -1; dx <= 1; dx++) {
+    for (let dz = -1; dz <= 1; dz++) {
+      const bucket = streetGrid.get(`${gx + dx}_${gz + dz}`);
+      if (!bucket) continue;
+      for (const [x0, z0, x1, z1] of bucket) {
+        const ex = x1 - x0;
+        const ez = z1 - z0;
+        const len2 = ex * ex + ez * ez || 1;
+        const t = Math.max(0, Math.min(1, ((x - x0) * ex + (z - z0) * ez) / len2));
+        const px = x0 + ex * t;
+        const pz = z0 + ez * t;
+        const d = Math.hypot(x - px, z - pz);
+        if (d < bestD) {
+          bestD = d;
+          best = { px, pz, ex, ez, d };
+        }
+      }
+    }
+  }
+  return best && best.d <= STREET_REACH ? best : null;
+}
+
+// The local frame: `u` runs along the street (or the footprint's long axis when
+// there is no street), and `v` points away from it, into the block.
+function loreFrame(ring, cx, cz) {
+  const street = nearestStreet(cx, cz);
+  let ux;
+  let uz;
+  if (street) {
+    const len = Math.hypot(street.ex, street.ez) || 1;
+    ux = street.ex / len;
+    uz = street.ez / len;
+    // Flip so that +v points away from the kerb: recipes build on the -v face.
+    const toStreetV = -uz * (street.px - cx) + ux * (street.pz - cz);
+    if (toStreetV > 0) {
+      ux = -ux;
+      uz = -uz;
+    }
+  } else {
+    let longest = 0;
+    ux = 1;
+    uz = 0;
+    for (let k = 0; k + 3 < ring.length; k += 2) {
+      const dx = ring[k + 2] - ring[k];
+      const dz = ring[k + 3] - ring[k + 1];
+      const len = Math.hypot(dx, dz);
+      if (len > longest) {
+        longest = len;
+        ux = dx / len;
+        uz = dz / len;
+      }
+    }
+  }
+  let angle = Math.atan2(uz, ux);
+  if (angle < 0) angle += Math.PI * 2;
+  return { yaw: Math.round((angle / (Math.PI * 2)) * 256) & 255, street: Boolean(street) };
 }
 
 const roofTrees = [];
@@ -192,7 +312,20 @@ function addHelipad(cell, cx, cz, roofY, seed) {
   helipads++;
 }
 
+// The identity join from stage 1: the toy bake reads it so a fire station gets
+// bay doors and a church gets a steeple. Missing means `misc`, which is exactly
+// the generic toy building the diorama shipped with.
+const lore = JSON.parse(await readFile(new URL('lore.json', OUT), 'utf8'));
+
+let vehicles = 0;
+let propBuildings = 0;
+let propTrianglesTotal = 0;
+let propTrianglesMax = 0;
+const catCounts = new Array(CATS.length).fill(0);
+
+let buildingId = -1;
 for (const [ringIn, height, baseY, seed] of source.buildings) {
+  buildingId++;
   let ring = simplifyRing(ringIn, SIMPLIFY);
   if (ring.length / 2 < 3) ring = ringIn;
   let area = Math.abs(ringArea(ring));
@@ -214,22 +347,74 @@ for (const [ringIn, height, baseY, seed] of source.buildings) {
   else if (rnd(seed, 1 + Math.round(cx)) < 0.7) palette = TOY_BASE[Math.floor(rnd(seed, 2) * TOY_BASE.length)];
   else palette = TOY_ACCENT[Math.floor(rnd(seed, 3) * TOY_ACCENT.length)];
 
+  // ---------------------------------------------------------------- identity
+  const rec = lore[buildingId] || { cat: 0 };
+  const cat = rec.cat || 0;
+  catCounts[cat]++;
+  const frame = loreFrame(ring, cx, cz);
+  let props = 0;
+  if (frame.street) props |= PROP_STREET;
+  if (floors >= TOWER_FLOORS) props |= PROP_TOWER;
+  // Corner lots read differently, and a few categories earn scarce extras: one
+  // vehicle each until the citywide ration runs out, a helipad on big hospitals.
+  if (frame.street && rnd(seed, 61) > 0.72) props |= PROP_CORNER;
+  if (VEHICLE_CATS.has(cat) && frame.street && vehicles < MAX_VEHICLES) {
+    props |= PROP_VEHICLE;
+    vehicles++;
+  }
+  if (cat === CATS.indexOf('hospital') && area > 1200) props |= PROP_HELIPAD;
+  const night = NIGHT_PROFILE[cat] * 4 + (SUPPRESS_BANDS.has(cat) ? 1 : 0);
+  const loreRec = { cat, yaw: frame.yaw, night, props };
+  const flagBits = (props << PROP_SHIFT) & 0xf8;
+
   if (pitched) {
     // Row houses: an OBB mass with walls to (floors - 1) * 3.5 and a ridge prism
     // generated in the worker from the four corners.
     const box = obbRing(ring);
     const wallH = Math.max(TOY_FLOOR, (floors - 1) * TOY_FLOOR);
     const roofPalette = TOY_ROOFS[Math.floor(rnd(seed, 4) * TOY_ROOFS.length)];
-    emit(cell, box, baseY, baseY + wallH, palette, seed, TOY_FLAG_PITCHED, roofPalette);
+    emit(cell, box, baseY, baseY + wallH, palette, seed, TOY_FLAG_PITCHED | flagBits, roofPalette, loreRec);
     pitchedCount++;
     tallestToy = Math.max(tallestToy, wallH + TOY_ROOF_RISE);
+    measureProps(box, cx, cz, baseY, baseY + wallH + TOY_ROOF_RISE, loreRec, seed);
   } else {
     const top = baseY + toyHeight;
-    emit(cell, ring, baseY, top, palette, seed);
+    emit(cell, ring, baseY, top, palette, seed, flagBits, 0, loreRec);
     tallestToy = Math.max(tallestToy, toyHeight);
     addGarnish(cell, obbFrame(ring), top, seed + Math.round(cx));
     if (floors > 30 && helipads < MAX_HELIPADS) addHelipad(cell, cx, cz, top, seed);
+    measureProps(ring, cx, cz, baseY, top, loreRec, seed);
   }
+}
+
+// The props themselves are generated in the tile worker, so the budget is
+// audited here by running the identical recipes through a counting emitter.
+function measureProps(ring, cx, cz, base, top, loreRec, seed) {
+  const angle = (loreRec.yaw / 256) * Math.PI * 2;
+  const ux = Math.cos(angle);
+  const uz = Math.sin(angle);
+  let hu = 0;
+  let hv = 0;
+  for (let k = 0; k + 1 < ring.length; k += 2) {
+    const dx = ring[k] - cx;
+    const dz = ring[k + 1] - cz;
+    hu = Math.max(hu, Math.abs(dx * ux + dz * uz));
+    hv = Math.max(hv, Math.abs(-dx * uz + dz * ux));
+  }
+  const triangles = countProps({
+    cat: loreRec.cat,
+    props: loreRec.props,
+    sub: null,
+    hu,
+    hv,
+    base,
+    top,
+    seed,
+  });
+  if (triangles === 0) return;
+  propBuildings++;
+  propTrianglesTotal += triangles;
+  propTrianglesMax = Math.max(propTrianglesMax, triangles);
 }
 
 await rm(TOY_OUT, { recursive: true, force: true });
@@ -240,7 +425,7 @@ const toyIndex = [];
 for (const key of [...cells.keys()].sort()) {
   const cell = cells.get(key);
   if (cell.buildings.length === 0) continue;
-  const blob = writeBuildingsBlob(cell, { version: 2 });
+  const blob = writeBuildingsBlob(cell, { version: 3 });
   await writeFile(new URL(`${key}.bin`, TOY_OUT), blob);
   toyBytes += blob.length;
   toyRecords += cell.buildings.length;
@@ -257,6 +442,11 @@ for (const key of [...cells.keys()].sort()) {
 console.log(
   `toy buildings: ${toyRecords} records in ${toyIndex.length} cells, ${(toyBytes / 1e6).toFixed(1)} MB ` +
     `(${pitchedCount} pitched, ${garnishCount} garnish, ${helipads} helipads, tallest ${tallestToy.toFixed(0)} m)`
+);
+console.log(
+  `lore props: ${propBuildings} buildings, avg ${(propTrianglesTotal / Math.max(1, propBuildings)).toFixed(1)} tris ` +
+    `(cap ${propTrianglesMax}), ${vehicles} vehicles, ` +
+    `${catCounts.map((n, i) => `${CATS[i]} ${n}`).filter((_, i) => catCounts[i] > 0).length} categories present`
 );
 
 // -------------------------------------------------------------------- streets ---

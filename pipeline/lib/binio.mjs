@@ -17,6 +17,12 @@ function alignTo(n, a) {
 //
 // Version 2 (the toy tier) appends two byte arrays: `flags` (bit 0 pitched roof,
 // bit 1 rooftop garnish) and `roofPalette`.
+//
+// Version 3 (the lore tier) appends three more: `cat` (taxonomy index), `yaw`
+// (the street heading this building faces, 0-255 over a full turn) and `night`
+// (the profile*4 + glow*2 + suppressBands flag byte). Those three bytes per
+// building are what let the worker build category props and light the city at
+// night without a per-building runtime table.
 export function writeBuildingsBlob(cell, { version = 1 } = {}) {
   const count = cell.buildings.length;
   let vertexTotal = 0;
@@ -52,6 +58,17 @@ export function writeBuildingsBlob(cell, { version = 1 } = {}) {
     roofPaletteAt = off;
     off += count;
   }
+  let catAt = 0;
+  let yawAt = 0;
+  let nightAt = 0;
+  if (version >= 3) {
+    catAt = off;
+    off += count;
+    yawAt = off;
+    off += count;
+    nightAt = off;
+    off += count;
+  }
   off = alignTo(off, 2);
   const vertsAt = off;
   off += 4 * vertexTotal;
@@ -81,6 +98,9 @@ export function writeBuildingsBlob(cell, { version = 1 } = {}) {
   const flags = version >= 2 ? new Uint8Array(buf.buffer, buf.byteOffset + flagsAt, count) : null;
   const roofPalette =
     version >= 2 ? new Uint8Array(buf.buffer, buf.byteOffset + roofPaletteAt, count) : null;
+  const cat = version >= 3 ? new Uint8Array(buf.buffer, buf.byteOffset + catAt, count) : null;
+  const yaw = version >= 3 ? new Uint8Array(buf.buffer, buf.byteOffset + yawAt, count) : null;
+  const night = version >= 3 ? new Uint8Array(buf.buffer, buf.byteOffset + nightAt, count) : null;
   const verts = new Int16Array(buf.buffer, buf.byteOffset + vertsAt, vertexTotal * 2);
   const indices = new Uint16Array(buf.buffer, buf.byteOffset + indicesAt, indexTotal);
 
@@ -99,6 +119,11 @@ export function writeBuildingsBlob(cell, { version = 1 } = {}) {
     if (flags) {
       flags[i] = b.flags || 0;
       roofPalette[i] = b.roofPalette || 0;
+    }
+    if (cat) {
+      cat[i] = b.cat || 0;
+      yaw[i] = b.yaw || 0;
+      night[i] = b.night || 0;
     }
     for (let k = 0; k < n; k++) {
       verts[(v + k) * 2] = Math.round((b.ring[k * 2] - cell.originX) / QUANT);

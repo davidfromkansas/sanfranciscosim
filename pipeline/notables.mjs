@@ -46,10 +46,12 @@ for (let id = 0; id < fp.buildings.length; id++) {
   const height = fp.buildings[id][1];
   const area = Math.abs(ringArea(ring));
   let landmark = null;
+  let landmarkDistance = Infinity;
   for (const a of anchors) {
-    if (Math.hypot(a.x - x, a.z - z) <= LANDMARK_RADIUS) {
+    const d = Math.hypot(a.x - x, a.z - z);
+    if (d <= LANDMARK_RADIUS && d < landmarkDistance) {
       landmark = a;
-      break;
+      landmarkDistance = d;
     }
   }
   const named = Boolean(rec.name) && (rec.source === 'datasf' || rec.source === 'osm' || rec.source === 'manual');
@@ -65,6 +67,7 @@ for (let id = 0; id < fp.buildings.length; id++) {
     height,
     area,
     landmark,
+    landmarkDistance,
     named,
     tagged,
     civic,
@@ -92,17 +95,32 @@ for (const r of rest) {
 const ordered = [...picked].sort((a, b) => evidence(b) - evidence(a) || b.score - a.score || a.id - b.id);
 const tierA = new Set(ordered.slice(0, TIER_A).map((r) => r.id));
 
+// A landmark's name belongs to one footprint, not to every building inside its
+// 100 m radius: the closest footprint takes the name and its neighbours stay
+// unnamed rather than becoming five more "Coit Tower"s.
+const landmarkOwner = new Map();
+for (const r of picked) {
+  if (!r.landmark) continue;
+  const held = landmarkOwner.get(r.landmark.id);
+  if (!held || r.landmarkDistance < held.landmarkDistance) landmarkOwner.set(r.landmark.id, r);
+}
+
 const notables = picked
   .map((r) => {
+    const ownsLandmark = r.landmark && landmarkOwner.get(r.landmark.id) === r;
+    // With no recorded name the entry keeps a descriptive label — what the data
+    // does say — and is flagged so nothing presents it as this building's name.
+    const name = r.rec.name || (ownsLandmark ? r.landmark.name : null);
     const entry = {
       id: r.id,
-      name: r.rec.name || r.landmark?.name || `${LABELS[r.rec.sub] || CATS[r.rec.cat]} at ${Math.round(r.x)}, ${Math.round(r.z)}`,
+      name: name || `Unnamed ${(LABELS[r.rec.sub] || CATS[r.rec.cat]).toLowerCase()}`,
       cat: r.rec.cat,
       tier: tierA.has(r.id) ? 'A' : 'B',
     };
+    if (!name) entry.needs_review = true;
     if (r.rec.sub) entry.sub = r.rec.sub;
     if (r.rec.wikidata) entry.wikidata = r.rec.wikidata;
-    if (r.landmark) entry.landmark = r.landmark.id;
+    if (ownsLandmark) entry.landmark = r.landmark.id;
     entry.srcUrl = r.rec.wikidata
       ? `https://www.wikidata.org/wiki/${r.rec.wikidata}`
       : r.rec.source === 'osm'
@@ -110,7 +128,6 @@ const notables = picked
         : r.rec.source === 'datasf'
           ? 'https://data.sfgov.org/City-Infrastructure/City-Facilities/nc68-ngbr'
           : 'https://docs.overturemaps.org/guides/places/';
-    if (!r.rec.name) entry.needs_review = true;
     return entry;
   })
   .sort((a, b) => a.id - b.id);

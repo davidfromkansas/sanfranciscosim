@@ -272,8 +272,10 @@ for (const v of views) pushSearch({ n: v.name, t: 'view', id: v.id, x: v.x, z: v
 for (const n of neighborhoods) pushSearch({ n: n.name, t: 'neighborhood', id: n.id, x: n.x, z: n.z });
 for (const p of parks) pushSearch({ n: p.name, t: 'park', id: p.id, x: p.x, z: p.z });
 for (const s of streets) pushSearch({ n: s.name, t: 'street', id: `street:${s.name}`, x: s.x, z: s.z });
+// Every notable is searchable, including the ones with no factual name: those
+// carry a descriptive "Unnamed <category>" label from the notables bake rather
+// than a borrowed landmark name, so nothing here is invented.
 for (const n of notables) {
-  if (n.needs_review) continue;
   const [ring, height, baseY] = fp.buildings[n.id];
   const box = obbBox(ring);
   pushSearch({
@@ -425,7 +427,11 @@ check(
   `${cellIndexOut.reduce((a, c) => a + c.buildings, 0)} / ${Object.keys(lore).length}`
 );
 check('41 analysis neighbourhoods', neighborhoods.length === 41, `${neighborhoods.length}`);
-check('search index covers every notable', search.filter((s) => s.t === 'building').length === notables.filter((n) => !n.needs_review).length, `${search.filter((s) => s.t === 'building').length}`);
+check(
+  'search index covers every notable',
+  search.filter((s) => s.t === 'building').length === notables.length,
+  `${search.filter((s) => s.t === 'building').length} / ${notables.length}`
+);
 console.log(
   `\ncontext: ${cellIndexOut.length} sidecars, ${(sidecarBytes / 1e6).toFixed(1)} MB total, avg ${(
     sidecarBytes /
