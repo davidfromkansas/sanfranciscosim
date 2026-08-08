@@ -3,7 +3,8 @@
 // the baked landuse raster (which is what makes Golden Gate Park read as a dark
 // green rectangle from the hero view without loading any park geometry).
 
-import { BufferAttribute, BufferGeometry, Mesh, MeshLambertMaterial } from 'three';
+import { BufferAttribute, BufferGeometry, Mesh } from 'three';
+import { createCloudShadedMaterial } from './materials.js';
 
 const SEGMENTS = 512; // per quadrant -> 1024 across the city, ~15 m spacing
 const MASK = 512; // bathymetry mask resolution over the whole extent
@@ -164,7 +165,7 @@ export function createTerrain(data) {
       geometry.setIndex(new BufferAttribute(indices, 1));
       geometry.computeBoundingSphere();
 
-      const mesh = new Mesh(geometry, new MeshLambertMaterial({ vertexColors: true }));
+      const mesh = new Mesh(geometry, createCloudShadedMaterial());
       mesh.receiveShadow = true;
       mesh.name = `terrain-${qx}-${qz}`;
       meshes.push(mesh);

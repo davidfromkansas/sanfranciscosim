@@ -115,6 +115,18 @@ out geom;`,
   way["aeroway"~"^(runway|taxiway|apron)$"](${BB});
 );
 out geom;`,
+  // Highway structures: the bridge/layer tags are the only public source that
+  // says which freeway sections ride a viaduct, and the two bespoke bridges are
+  // built from these centrelines instead of hand-picked coordinates.
+  'osm_structures.json': `[out:json][timeout:600];
+(
+  way["highway"]["name"="Golden Gate Bridge"](${BB});
+  way["highway"~"^(motorway|trunk)$"]["bridge"]["ref"~"I 80"](${BB});
+  way["highway"~"^(motorway|motorway_link|trunk|trunk_link)$"]["bridge"](${BB});
+  way["man_made"="tower"]["bridge:support"](${BB});
+  way["man_made"="tower"]["tower:type"="bridge"](${BB});
+);
+out geom;`,
 };
 
 async function overpass() {

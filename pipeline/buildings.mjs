@@ -6,7 +6,7 @@
 // DataSF height refresh predates the whole post-2015 SoMa skyline, so Overture
 // both corrects rebuilt parcels and supplies footprints DataSF never saw.
 
-import { mkdir, writeFile, readFile } from 'node:fs/promises';
+import { mkdir, rm, writeFile, readFile } from 'node:fs/promises';
 import { existsSync, createReadStream } from 'node:fs';
 import { createInterface } from 'node:readline';
 import earcut from 'earcut';
@@ -42,11 +42,14 @@ const exclusions = LANDMARKS.map((l) => {
   return { x, z, r2: l.exclude * l.exclude, id: l.id };
 });
 
-function excluded(x, z) {
+// A footprint is excluded when any part of it reaches into a bespoke landmark's
+// zone, not just when its centroid does, so nothing pokes through the models.
+function excluded(ring, cx, cz) {
   for (const e of exclusions) {
-    const dx = x - e.x;
-    const dz = z - e.z;
-    if (dx * dx + dz * dz < e.r2) return true;
+    if ((cx - e.x) ** 2 + (cz - e.z) ** 2 < e.r2) return true;
+    for (let i = 0; i < ring.length; i += 2) {
+      if ((ring[i] - e.x) ** 2 + (ring[i + 1] - e.z) ** 2 < e.r2) return true;
+    }
   }
   return false;
 }
@@ -76,12 +79,15 @@ function num(v) {
   return Number.isFinite(n) ? n : NaN;
 }
 
+// DataSF gives LiDAR statistics of the roof surface above ground: hgt_median_m
+// is the eave-ish median, hgt_maxcm the ridge. A flat box at the median alone
+// makes every pitched-roof row house too squat, so use the midpoint of the two.
 function datasfHeight(p) {
   const median = num(p.hgt_median_m);
-  if (median > 2.5) return Math.min(median, MAX_HEIGHT);
+  const max = num(p.hgt_maxcm) / 100;
+  if (median > 2.5) return Math.min(max > median ? (median + max) / 2 : median, MAX_HEIGHT);
   const mean = num(p.hgt_meancm) / 100;
   if (mean > 2.5) return Math.min(mean, MAX_HEIGHT);
-  const max = num(p.hgt_maxcm) / 100;
   if (max > 3) return Math.min(max * 0.8, MAX_HEIGHT);
   return 8;
 }
@@ -159,7 +165,7 @@ function addBuilding(ringIn, height, seedSource) {
   ring = orientRing(ring);
 
   const [cx, cz] = ringCentroid(ring);
-  if (excluded(cx, cz)) return null;
+  if (excluded(ring, cx, cz)) return null;
   const cell = cellIndex(cx, cz);
   if (!cell) return null;
 
@@ -171,7 +177,7 @@ function addBuilding(ringIn, height, seedSource) {
     if (e < minGround) minGround = e;
   }
   const ground = sampleElevation(cx, cz);
-  const baseY = Math.max(-3, minGround - 1.5);
+  const baseY = Math.max(-3, minGround - 0.4);
   const topY = Math.max(baseY + 3, ground + height);
 
   const indices = earcut(ring);
@@ -296,6 +302,8 @@ if (existsSync(overturePath)) {
 }
 
 // ------------------------------------------------------------------- grouping
+// Stale cells from an earlier bake would linger and desync the index.
+await rm(CELLS_OUT, { recursive: true, force: true });
 await mkdir(CELLS_OUT, { recursive: true });
 const cells = new Map();
 for (const b of buildings) {

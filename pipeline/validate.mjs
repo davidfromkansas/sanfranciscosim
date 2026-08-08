@@ -23,6 +23,8 @@ function check(label, ok, detail) {
 const buildings = JSON.parse(await readFile(new URL('buildings.json', OUT), 'utf8'));
 const streets = JSON.parse(await readFile(new URL('streets.json', OUT), 'utf8'));
 const landcover = JSON.parse(await readFile(new URL('landcover.json', OUT), 'utf8'));
+const bridges = JSON.parse(await readFile(new URL('bridges.json', OUT), 'utf8'));
+const piers = JSON.parse(await readFile(new URL('piers.json', OUT), 'utf8'));
 const { desc: terrain, sampleElevation } = await loadHeightmap();
 
 // --- buildings -------------------------------------------------------------
@@ -72,6 +74,26 @@ const twin = sampleElevation(tx, tz);
 check('Twin Peaks elevation > 200 m', twin > 200, `${twin.toFixed(1)} m`);
 const [ox, oz] = project(-122.5094, 37.7597); // Ocean Beach
 check('Ocean Beach elevation < 15 m', sampleElevation(ox, oz) < 15, `${sampleElevation(ox, oz).toFixed(1)} m`);
+
+// --- bridges and viaducts --------------------------------------------------
+// Both bespoke bridges must be built from real OSM geometry, and their decks
+// must meet the land (or the viaduct) at the abutments rather than stopping in
+// mid-air over the water.
+for (const [id, spec] of Object.entries(bridges)) {
+  const ends = [spec.nodes[0], spec.nodes[spec.nodes.length - 1]];
+  for (const [i, node] of ends.entries()) {
+    const [x, z] = project(node[0], node[1]);
+    const ground = sampleElevation(x, z);
+    const clearance = node[2] - ground;
+    check(
+      `${id} abutment ${i === 0 ? 'A' : 'B'} sits on land`,
+      ground > 0 && clearance >= 0 && clearance <= 25,
+      `deck ${node[2].toFixed(1)} m over ground ${ground.toFixed(1)} m`
+    );
+  }
+  check(`${id} deck nodes from OSM centreline`, spec.nodes.length >= 20, `${spec.nodes.length} nodes, ${spec.towers.length} towers`);
+}
+check('elevated freeway sections carry piers', piers.piers.length > 50, `${piers.piers.length} piers every ${piers.spacing} m`);
 
 // --- landcover -------------------------------------------------------------
 check(
@@ -127,6 +149,8 @@ const manifest = {
   landKinds: LAND_KINDS,
   landuse: landcover.raster,
   landmarks: LANDMARKS,
+  bridges,
+  piers: piers.piers,
   parks: NAMED_PARKS,
   viewPresets: VIEW_PRESETS,
   stats: {

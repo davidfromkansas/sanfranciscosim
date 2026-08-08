@@ -2,18 +2,109 @@
 // terrain. The runtime turns them into road ribbons and reuses the same
 // polylines as traffic paths.
 
-import { mkdir, writeFile, readFile } from 'node:fs/promises';
+import { mkdir, rm, writeFile, readFile } from 'node:fs/promises';
 import { CELL_SIZE, GRID, cellIndex, cellOrigin, insideBBox, project } from './lib/geo.mjs';
 import { densify, polylineLength } from './lib/poly.mjs';
 import { loadHeightmap } from './lib/heightmap.mjs';
 import { writeStreetsBlob } from './lib/binio.mjs';
 import { CLASS_BY_CODE, STREET_CLASSES } from './lib/classes.mjs';
+import { deckHeightForLayer, loadStructures } from './lib/structures.mjs';
 
 const DATA = new URL('./data/', import.meta.url);
 const OUT = new URL('./out/', import.meta.url);
 const CELLS_OUT = new URL('./out/streets/', import.meta.url);
 
 const { sampleElevation } = await loadHeightmap();
+const structures = await loadStructures();
+console.log(`${structures.elevatedWays} bridge-tagged OSM highway ways for elevated decks`);
+
+const FREEWAY = STREET_CLASSES.findIndex((c) => c.id === 'freeway');
+const RAMP = STREET_CLASSES.findIndex((c) => c.id === 'ramp');
+const PIER_SPACING = 32;
+const piers = [];
+
+// The two bespoke bridges carry the roadway across the water themselves, so the
+// DataSF ribbon that follows the same centreline rides on their deck instead of
+// hovering over the bay on its own piers.
+const DECK_CORRIDOR = 45;
+const DECK_SURFACE = 1.5;
+const bridgeSpec = JSON.parse(await readFile(new URL('bridges.json', OUT), 'utf8'));
+const deckLines = [];
+for (const spec of Object.values(bridgeSpec)) {
+  for (const nodes of [spec.nodes, spec.east?.nodes]) {
+    if (!nodes) continue;
+    deckLines.push(
+      nodes.map(([lon, lat, y]) => {
+        const [x, z] = project(lon, lat);
+        return [x, z, y];
+      })
+    );
+  }
+}
+
+// Deck surface height at (x, z) if it is inside a bespoke bridge corridor.
+function deckSurfaceAt(x, z) {
+  let best = null;
+  let bestD = DECK_CORRIDOR;
+  for (const line of deckLines) {
+    for (let i = 1; i < line.length; i++) {
+      const [ax, az, ay] = line[i - 1];
+      const [bx, bz, by] = line[i];
+      const dx = bx - ax;
+      const dz = bz - az;
+      const l2 = dx * dx + dz * dz || 1;
+      const t = Math.min(1, Math.max(0, ((x - ax) * dx + (z - az) * dz) / l2));
+      const d = Math.hypot(x - (ax + dx * t), z - (az + dz * t));
+      if (d < bestD) {
+        bestD = d;
+        best = ay + (by - ay) * t + DECK_SURFACE;
+      }
+    }
+  }
+  return best;
+}
+
+// Deck offset above ground for every point of a freeway/ramp polyline: the OSM
+// bridge tag decides where it is elevated, then the profile is blurred so the
+// deck ramps up and down instead of stepping.
+function deckOffsets(pts) {
+  const n = pts.length / 2;
+  const raw = new Float64Array(n);
+  const onBridge = new Uint8Array(n);
+  let any = false;
+  for (let i = 0; i < n; i++) {
+    const x = pts[i * 2];
+    const z = pts[i * 2 + 1];
+    const deck = deckSurfaceAt(x, z);
+    if (deck !== null) {
+      raw[i] = deck - sampleElevation(x, z);
+      onBridge[i] = 1;
+      any = true;
+      continue;
+    }
+    const layer = structures.elevatedLayer(x, z);
+    if (layer) {
+      raw[i] = deckHeightForLayer(layer);
+      any = true;
+    }
+  }
+  if (!any) return null;
+  let cur = raw;
+  for (let pass = 0; pass < 4; pass++) {
+    const next = new Float64Array(n);
+    for (let i = 0; i < n; i++) {
+      const a = cur[Math.max(0, i - 1)];
+      const b = cur[i];
+      const c = cur[Math.min(n - 1, i + 1)];
+      next[i] = a * 0.25 + b * 0.5 + c * 0.25;
+    }
+    cur = next;
+  }
+  // Points on a bespoke deck must match it exactly, so restore them after the
+  // smoothing pass.
+  for (let i = 0; i < n; i++) if (onBridge[i]) cur[i] = raw[i];
+  return { offsets: cur, onBridge };
+}
 
 const geo = JSON.parse(await readFile(new URL('streets_datasf.geojson', DATA), 'utf8'));
 console.log(`${geo.features.length} raw street features`);
@@ -67,6 +158,24 @@ for (const f of geo.features) {
 
     // Sample terrain every ~10 m so ribbons follow the hills.
     const pts = densify(projected, 10);
+    const deck = klass === FREEWAY || klass === RAMP ? deckOffsets(pts) : null;
+    const elevated = deck?.offsets ?? null;
+
+    // Support columns under every elevated stretch (the bespoke bridges bring
+    // their own towers and columns).
+    if (elevated) {
+      let sinceLast = PIER_SPACING;
+      for (let i = 0; i < pts.length; i += 2) {
+        const x = pts[i];
+        const z = pts[i + 1];
+        if (i > 0) sinceLast += Math.hypot(x - pts[i - 2], z - pts[i - 1]);
+        const offset = elevated[i / 2];
+        if (deck.onBridge[i / 2] || offset < 4 || sinceLast < PIER_SPACING) continue;
+        sinceLast = 0;
+        const ground = sampleElevation(x, z);
+        piers.push([Math.round(x * 10) / 10, Math.round(z * 10) / 10, Math.round(ground * 10) / 10, Math.round((ground + offset) * 10) / 10]);
+      }
+    }
 
     // Split the polyline at cell boundaries, duplicating the crossing vertex so
     // ribbons stay continuous across cells.
@@ -93,7 +202,7 @@ for (const f of geo.features) {
         }
       }
       current.pts.push(x, z);
-      current.y.push(sampleElevation(x, z) + 0.15);
+      current.y.push(sampleElevation(x, z) + 0.15 + (elevated ? elevated[i / 2] : 0));
     }
     kept++;
   }
@@ -104,6 +213,8 @@ for (const cell of cells.values()) {
   cell.lines = cell.lines.filter((l) => l.pts.length >= 4);
 }
 
+// Stale cells from an earlier bake would linger and desync the index.
+await rm(CELLS_OUT, { recursive: true, force: true });
 await mkdir(CELLS_OUT, { recursive: true });
 let bytes = 0;
 const index = [];
@@ -124,6 +235,8 @@ for (const key of [...cells.keys()].sort()) {
   });
 }
 
+await writeFile(new URL('piers.json', OUT), JSON.stringify({ spacing: PIER_SPACING, piers }));
+
 const spotChecks = ['MARKET ST', 'LOMBARD ST', 'COLUMBUS AVE', 'THE EMBARCADERO', 'GREAT HWY'];
 const stats = {
   segments: kept,
@@ -131,6 +244,7 @@ const stats = {
   totalLengthKm: Math.round(totalLength / 1000),
   cells: index.length,
   bytes,
+  piers: piers.length,
   spotChecks: Object.fromEntries(spotChecks.map((n) => [n, nameHits.get(n) || 0])),
 };
 
@@ -143,3 +257,4 @@ console.log(
   `baked ${kept} segments (${stats.totalLengthKm} km) into ${index.length} cells, ${(bytes / 1e6).toFixed(1)} MB`
 );
 console.log('spot checks:', stats.spotChecks);
+console.log(`${piers.length} viaduct piers`);
