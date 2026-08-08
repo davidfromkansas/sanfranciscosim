@@ -189,12 +189,31 @@ export function createEnvironment(scene) {
   nightSky.visible = false;
   scene.add(nightSky);
 
+  // A radial falloff, not a flat panel: an additive quad with a constant colour
+  // reads as a rectangle in the sky, which is exactly what a halo must not do.
   const halo = new Mesh(
     new PlaneGeometry(4200, 4200),
-    new MeshBasicMaterial({
-      color: 0xdfe6f6,
+    new ShaderMaterial({
+      uniforms: { uOpacity: { value: 0 }, uColor: { value: new Color(0xdfe6f6) } },
+      vertexShader: /* glsl */ `
+        varying vec2 vUv;
+        void main() {
+          vUv = uv;
+          gl_Position = projectionMatrix * modelViewMatrix * vec4(position, 1.0);
+        }
+      `,
+      fragmentShader: /* glsl */ `
+        uniform float uOpacity;
+        uniform vec3 uColor;
+        varying vec2 vUv;
+        void main() {
+          float r = length(vUv - 0.5) * 2.0;
+          // Bright close to the moon, gone well before the quad's edge.
+          float glow = pow(clamp(1.0 - r, 0.0, 1.0), 2.6);
+          gl_FragColor = vec4(uColor * glow, glow * uOpacity);
+        }
+      `,
       transparent: true,
-      opacity: 0,
       blending: AdditiveBlending,
       depthWrite: false,
       depthTest: false,
@@ -283,7 +302,7 @@ export function createEnvironment(scene) {
     halo.visible = nightSky.visible;
     stars.visible = nightSky.visible;
     nightSky.material.opacity = lift;
-    halo.material.opacity = lift * 0.28;
+    halo.material.uniforms.uOpacity.value = lift * 0.85;
     stars.material.opacity = lift * 0.9;
     skyUniforms.uHorizonNight.value.copy(state.toy ? TOY_NIGHT.horizon : NIGHT.horizon);
     skyUniforms.uZenithNight.value.copy(state.toy ? TOY_NIGHT.zenith : NIGHT.zenith);

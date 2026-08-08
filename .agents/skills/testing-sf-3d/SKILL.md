@@ -172,3 +172,48 @@ redeploy, a browser that visited before keeps the old manifest and silently rend
 (`xdotool key ctrl+shift+r`) before verifying deployed data changes, and check
 `performance.getEntriesByType('resource')` for the manifest's `transferSize`/`encodedBodySize` to tell a cache
 hit from a fresh fetch. Worth flagging as a product bug, not just a test workaround.
+
+## Testing the lore / context layer (context cards, search, toy props, night sky)
+
+Runtime handles: `SF.context`, `SF.pickEntity(nx,ny)`, `SF.select(e)`, `SF.focus`, `SF.search(q)`,
+`SF.setTime(t)`, `SF.setStyle('toy'|'base')`. Note `SF.env` is **not** exposed — reach the night-sky kit
+by traversing the scene instead (see below).
+
+### Keyboard focus steals the single-letter shortcuts
+After typing in the search box (`/`), the input keeps focus, so `M`/`Q`/`E`/`F3` go to the input and
+nothing happens (`SF.style` stays unchanged). Click the canvas once (or press Escape) before sending
+single-letter keys. Verify with `SF.style` rather than assuming the keypress landed.
+
+### The time slider is easiest to drive with the keyboard
+`input[type=range]` (0..1000). Click it once, then `xdotool key End` for full night and `Home` for
+day — clicking the track only jumps part-way and dragging is flaky. Clicking it also unchecks "auto".
+
+### Verifying toy props (app/src/props.js) without a GPU-quality screenshot
+The 42° locked diorama pitch plus 150 m zoom clamp means street-level props (retail awnings, fire-station
+bay doors) are often occluded by the mass or a neighbour, and golden-hour shading leaves the street face
+dark. Corroborate numerically, then hunt for a view:
+- Every toy mesh carries `aFlag` (`flag = profile*4 + glowProp*2 + suppressBands`). **Bit 0 is
+  `suppressBands`, not "is a prop"** — do not report it as a prop count.
+- Prop recipes use exact literal colours, and the merged geometry stores them unconverted in the `color`
+  attribute, so you can find a specific prop by colour match (±2): fire-station bay door `188,62,52`,
+  its apron plate `118,116,114`, gas canopy `236,232,222` / lit slab `255,250,236`, pumps `214,74,66`,
+  retail awning is one of `214,90,74 / 64,132,132 / 226,176,70 / 92,106,168`, blade sign `250,248,244`.
+  Walk the scene, apply `matrixWorld` manually, filter to the target's `SF.focus.x/z`, and check the world
+  Y range against the recipe (e.g. apron at `base+0.06`, bay doors `base+0.2..4.4`) to prove the prop is
+  *attached* at grade/roof rather than floating.
+- Cluster the matches on a ~60 m grid to find *other* instances of the same category, then convert to
+  lon/lat (`lon = -122.4375 + x/87995.768`, `lat = 37.77 - z/110540`) and fly there. Wide-street districts
+  (SoMa) give a far more legible screenshot than dense hills (Nob Hill).
+- Project the matched vertices with `SF.camera` to get the exact pixel box, then crop the root screenshot
+  to it — otherwise a 4 m prop is invisible in a 1600 px frame.
+
+### Night sky kit
+`createEnvironment` must export `updateNightSky` (the frame loop calls it every frame); if it is missing
+the whole render loop throws and the canvas goes black — a good smoke test after any env.js change.
+The objects are unnamed, so identify them by shape: moon = `Mesh` with `IcosahedronGeometry`,
+halo = `PlaneGeometry` 4200×4200 additive, stars = `Points` with 2000 positions. All three appear only
+once `night > 0.25` and ride with the camera.
+The moon sits ~19° above the horizon at azimuth ≈ (+x, −z); base FOV is 52°, so use `pitch <= 4` and
+`yaw ≈ 314` to bring it into frame — in toy mode the 42° pitch lock makes it unreachable.
+Known issue to re-check: the halo plane has no radial falloff, so it reads as a hard-edged quad around
+the moon rather than a soft glow.
