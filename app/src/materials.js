@@ -31,6 +31,7 @@ const DITHER = /* glsl */ `
 const CLOUDS = /* glsl */ `
   uniform float uCloudCover;
   uniform vec2 uCloudDrift;
+  uniform float uToy;
 
   float cloudNoise(vec2 p) {
     vec2 i = floor(p);
@@ -47,11 +48,16 @@ const CLOUDS = /* glsl */ `
     vec2 p = world * 0.00055 + uCloudDrift;
     float n = cloudNoise(p) * 0.65 + cloudNoise(p * 2.3 + 11.0) * 0.35;
     float shade = smoothstep(0.42, 0.72, n);
-    return 1.0 - shade * uCloudCover;
+    // The diorama is lit like a model on a table: no weather on the tabletop.
+    return 1.0 - shade * uCloudCover * (1.0 - uToy);
   }
 `;
 
-const CLOUD_UNIFORMS = () => ({ uCloudCover: shared.uCloudCover, uCloudDrift: shared.uCloudDrift });
+const CLOUD_UNIFORMS = () => ({
+  uCloudCover: shared.uCloudCover,
+  uCloudDrift: shared.uCloudDrift,
+  uToy: shared.uToy,
+});
 
 const HASH = /* glsl */ `
   float hash13(vec3 p) {
@@ -164,6 +170,64 @@ export function createBuildingMaterial({ windows = 1 } = {}) {
   return material;
 }
 
+// Toy tier: flat Lambert over the baked toy colours, with horizontal blue-glass
+// window bands keyed to absolute world height so every 3.5 m floor lines up
+// across the whole city. Rooftop garnish is flagged aMeta.y = 0 so HVAC boxes
+// and solar panels never grow window bands.
+export function createToyBuildingMaterial() {
+  const material = new MeshLambertMaterial({ vertexColors: true, dithering: true });
+  material.uniformsHolder = { uFade: { value: 1 }, uFloor: { value: 3.5 } };
+
+  material.onBeforeCompile = function patchToy(shader) {
+    Object.assign(shader.uniforms, this.uniformsHolder);
+    shader.vertexShader = shader.vertexShader
+      .replace(
+        '#include <common>',
+        `#include <common>
+        attribute vec2 aMeta;
+        varying vec3 vToyPos;
+        varying vec3 vToyNormal;
+        varying float vToyWall;`
+      )
+      .replace(
+        '#include <worldpos_vertex>',
+        `#include <worldpos_vertex>
+        vToyPos = (modelMatrix * vec4(transformed, 1.0)).xyz;
+        vToyNormal = normal;
+        vToyWall = aMeta.y;`
+      );
+
+    shader.fragmentShader = shader.fragmentShader
+      .replace(
+        '#include <common>',
+        `#include <common>
+        uniform float uFade;
+        uniform float uFloor;
+        varying vec3 vToyPos;
+        varying vec3 vToyNormal;
+        varying float vToyWall;
+        ${DITHER}`
+      )
+      .replace(
+        '#include <clipping_planes_fragment>',
+        `#include <clipping_planes_fragment>
+        if (uFade < 0.999 && ditherThreshold(gl_FragCoord.xy) > uFade) discard;`
+      )
+      .replace(
+        '#include <color_fragment>',
+        `#include <color_fragment>
+        {
+          float band = fract(vToyPos.y / uFloor);
+          float isWall = vToyWall * (1.0 - abs(normalize(vToyNormal).y));
+          float glass = step(0.35, band) * (1.0 - step(0.75, band)) * step(0.5, isWall);
+          diffuseColor.rgb = mix(diffuseColor.rgb, vec3(0.16, 0.30, 0.48), glass * 0.9);
+        }`
+      );
+  };
+
+  return material;
+}
+
 // Far tier: one merged prism mesh per 2 km super-cell, with a per-quadrant fade
 // so a 1 km near chunk can take over exactly its own quarter.
 export function createFarBuildingMaterial() {
@@ -171,6 +235,7 @@ export function createFarBuildingMaterial() {
   material.uniformsHolder = {
     uQuadFade: { value: new Vector4(1, 1, 1, 1) },
     uNight: shared.uNight,
+    uToy: shared.uToy,
   };
 
   material.onBeforeCompile = function patchFar(shader) {
@@ -195,6 +260,7 @@ export function createFarBuildingMaterial() {
         '#include <common>',
         `#include <common>
         uniform float uNight;
+        uniform float uToy;
         varying float vFade;
         ${DITHER}`
       )
@@ -207,7 +273,10 @@ export function createFarBuildingMaterial() {
         '#include <color_fragment>',
         `#include <color_fragment>
         // Distant blocks pick up a warm glow at dusk instead of resolving windows.
-        totalEmissiveRadiance += vec3(1.0, 0.72, 0.42) * uNight * 0.075;`
+        totalEmissiveRadiance += vec3(1.0, 0.72, 0.42) * uNight * 0.075 * (1.0 - uToy);
+        // In toy mode the far tier is not re-baked: it just goes bright and flat
+        // so it reads as more of the same model, out of focus.
+        diffuseColor.rgb = mix(diffuseColor.rgb, pow(diffuseColor.rgb, vec3(0.72)) * 1.1 + 0.06, uToy);`
       );
   };
 

@@ -21,6 +21,8 @@ import { createLandmarks } from './landmarks.js';
 import { createPiers } from './piers.js';
 import { createAgents } from './agents.js';
 import { createCameraRig } from './camera.js';
+import { createSigns } from './signs.js';
+import { createToyPost } from './toypost.js';
 import { QUALITY, createLoader, createUI } from './ui.js';
 
 const canvas = document.getElementById('view');
@@ -50,6 +52,8 @@ async function boot() {
 
   const city = createCity(scene, data);
   const agents = createAgents(scene, data, city);
+  const signs = createSigns(scene, data);
+  const post = createToyPost(renderer);
 
   const presets = [
     ...data.manifest.viewPresets.map((preset) => ({
@@ -86,6 +90,7 @@ async function boot() {
     city.setQuality(quality);
     water.setGlitter(key === 'low' ? 0.6 : 1);
     renderer.setSize(window.innerWidth, window.innerHeight, false);
+    post.setSize();
   }
 
   let autoTime = true;
@@ -119,6 +124,12 @@ async function boot() {
       ui.setPresetIndex(0);
       return;
     }
+    if (event.key === 'm' || event.key === 'M') {
+      setStyle(style === 'toy' ? 'base' : 'toy').catch((err) =>
+        console.warn('style switch failed', err)
+      );
+      return;
+    }
     const index = presets.findIndex((preset) => preset.key && preset.key === event.key);
     if (index >= 0) {
       rig.flyTo(presets[index]);
@@ -130,7 +141,29 @@ async function boot() {
     camera.aspect = window.innerWidth / window.innerHeight;
     camera.updateProjectionMatrix();
     renderer.setSize(window.innerWidth, window.innerHeight, false);
+    post.setSize();
   });
+
+  // Diorama mode. One switch drives every subsystem: tiles, materials, lights,
+  // fog, camera rig, lens and the toy-only life. Leaving restores the exact
+  // camera and the normal city, both via the ordinary streaming paths.
+  const NORMAL_FOV = camera.fov;
+  let style = 'base';
+
+  async function setStyle(next) {
+    if (next === style) return;
+    style = next;
+    const toy = next === 'toy';
+    camera.fov = toy ? 18 : NORMAL_FOV;
+    camera.updateProjectionMatrix();
+    rig.setDiorama(toy);
+    env.setToy(toy);
+    agents.setToy(toy);
+    signs.setVisible(toy);
+    post.setEnabled(toy);
+    ui.setStyle(toy);
+    await city.setTier(toy ? 'toy' : 'base');
+  }
 
   city.preload(rig.state.pivot.clone());
 
@@ -168,6 +201,10 @@ async function boot() {
       env.setTime(t);
       ui.setTime(t);
     },
+    setStyle,
+    get style() {
+      return style;
+    },
   };
 
   const pivotWorld = new Vector3();
@@ -204,7 +241,9 @@ async function boot() {
     env.updateClouds(Math.min(1, elapsed));
     env.updateShadow(pivotWorld, rig.state.distance);
 
-    renderer.render(scene, camera);
+    signs.update(rig.state.distance, rig.state.yaw);
+    // Tilt-shift + grade in diorama mode; a straight canvas render otherwise.
+    post.render(scene, camera);
 
     frames++;
     fpsAccumulator += elapsed;
@@ -236,6 +275,7 @@ async function boot() {
           `altitude   ${(camera.position.y - rig.state.pivot.y).toFixed(0)} m`,
           `zoom       ${rig.state.distance.toFixed(0)} m`,
           `time       ${(timeOfDay * 100).toFixed(0)}%`,
+          `style      ${style}`,
         ].join('\n')
       );
     }

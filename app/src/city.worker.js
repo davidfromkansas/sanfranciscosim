@@ -5,6 +5,7 @@
 
 function readBuildings(buffer) {
   const dv = new DataView(buffer);
+  const version = dv.getUint16(4, true);
   const count = dv.getUint32(8, true);
   const vertexTotal = dv.getUint32(12, true);
   const indexTotal = dv.getUint32(16, true);
@@ -29,12 +30,24 @@ function readBuildings(buffer) {
   off += count;
   const seed = new Uint8Array(buffer, off, count);
   off += count;
+  // Version 2 (toy tier) carries a per-record flag byte and a roof colour.
+  let flags = null;
+  let roofPalette = null;
+  if (version >= 2) {
+    flags = new Uint8Array(buffer, off, count);
+    off += count;
+    roofPalette = new Uint8Array(buffer, off, count);
+    off += count;
+  }
   off = Math.ceil(off / 2) * 2;
   const verts = new Int16Array(buffer, off, vertexTotal * 2);
   off += 4 * vertexTotal;
   const indices = new Uint16Array(buffer, off, indexTotal);
 
   return {
+    version,
+    flags,
+    roofPalette,
     count,
     originX,
     originZ,
@@ -209,6 +222,232 @@ function buildNear(blobs, originX, originZ, palette) {
         indices[ix++] = roofStart + d.indices[io + k];
         indices[ix++] = roofStart + d.indices[io + k + 2];
         indices[ix++] = roofStart + d.indices[io + k + 1];
+      }
+    }
+  }
+
+  return {
+    positions: positions.subarray(0, v * 3),
+    normals: normals.subarray(0, v * 3),
+    colors: colors.subarray(0, v * 3),
+    meta: meta.subarray(0, v * 2),
+    localY: localY.subarray(0, v),
+    indices: indices.subarray(0, ix),
+    buildingCount,
+  };
+}
+
+// ---------------------------------------------------------------- toy tier ---
+// The diorama tier. Same streaming path as the near tier, but the records are
+// the toy bake's chunky masses: storefront darkening is a real geometry band at
+// 3.5 m, small houses carry a ridge prism, and rooftop garnish rides along as
+// extra records flagged so the window-band shader leaves it alone.
+const TOY_FLAG_PITCHED = 1;
+const TOY_FLAG_GARNISH = 2;
+const TOY_FLOOR = 3.5;
+const TOY_ROOF_RISE = 2.5;
+
+function buildToy(blobs, originX, originZ, palette) {
+  let vertexEstimate = 0;
+  const parsed = blobs.map((b) => {
+    const d = readBuildings(b.buffer);
+    for (let i = 0; i < d.count; i++) vertexEstimate += d.vertCount[i] * 9 + d.idxCount[i] + 24;
+    return d;
+  });
+
+  const positions = new Float32Array(vertexEstimate * 3);
+  const normals = new Float32Array(vertexEstimate * 3);
+  const colors = new Uint8Array(vertexEstimate * 3);
+  const meta = new Uint8Array(vertexEstimate * 2);
+  const localY = new Uint16Array(vertexEstimate);
+  const indices = new Uint32Array(vertexEstimate * 2);
+  let v = 0;
+  let ix = 0;
+  let buildingCount = 0;
+
+  // One flat-shaded polygon. `ref` orients the face: the winding is flipped if
+  // the computed normal points the wrong way, so nothing is inside-out.
+  function face(points, ref, col, isWall, seed, base) {
+    let nx = 0;
+    let ny = 0;
+    let nz = 0;
+    {
+      const [p0, p1, p2] = points;
+      const ax = p1[0] - p0[0];
+      const ay = p1[1] - p0[1];
+      const az = p1[2] - p0[2];
+      const bx = p2[0] - p0[0];
+      const by = p2[1] - p0[1];
+      const bz = p2[2] - p0[2];
+      nx = ay * bz - az * by;
+      ny = az * bx - ax * bz;
+      nz = ax * by - ay * bx;
+    }
+    const len = Math.hypot(nx, ny, nz);
+    if (len < 1e-9) return;
+    nx /= len;
+    ny /= len;
+    nz /= len;
+    let ordered = points;
+    if (nx * ref[0] + ny * ref[1] + nz * ref[2] < 0) {
+      ordered = [...points].reverse();
+      nx = -nx;
+      ny = -ny;
+      nz = -nz;
+    }
+    const start = v;
+    for (const p of ordered) {
+      positions[v * 3] = p[0];
+      positions[v * 3 + 1] = p[1];
+      positions[v * 3 + 2] = p[2];
+      normals[v * 3] = nx;
+      normals[v * 3 + 1] = ny;
+      normals[v * 3 + 2] = nz;
+      colors[v * 3] = col[0];
+      colors[v * 3 + 1] = col[1];
+      colors[v * 3 + 2] = col[2];
+      meta[v * 2] = seed;
+      meta[v * 2 + 1] = isWall ? 1 : 0;
+      localY[v] = Math.min(65535, Math.round(Math.max(0, p[1] - base) * 10));
+      v++;
+    }
+    for (let k = 2; k < ordered.length; k++) {
+      indices[ix++] = start;
+      indices[ix++] = start + k - 1;
+      indices[ix++] = start + k;
+    }
+  }
+
+  for (const d of parsed) {
+    for (let b = 0; b < d.count; b++) {
+      const n = d.vertCount[b];
+      if (n < 3) continue;
+      const vo = d.vertOffset[b];
+      const base = d.baseY[b] * 0.1;
+      const top = d.topY[b] * 0.1;
+      const flags = d.flags ? d.flags[b] : 0;
+      const garnish = (flags & TOY_FLAG_GARNISH) !== 0;
+      const pitched = (flags & TOY_FLAG_PITCHED) !== 0;
+      const pal = palette[d.palette[b]] || palette[0];
+      const seed = d.seed[b];
+      if (!garnish) buildingCount++;
+
+      const ring = new Float64Array(n * 2);
+      let cx = 0;
+      let cz = 0;
+      for (let k = 0; k < n; k++) {
+        ring[k * 2] = d.originX + d.verts[(vo + k) * 2] * d.quant - originX;
+        ring[k * 2 + 1] = d.originZ + d.verts[(vo + k) * 2 + 1] * d.quant - originZ;
+        cx += ring[k * 2];
+        cz += ring[k * 2 + 1];
+      }
+      cx /= n;
+      cz /= n;
+
+      // Storefront band: the bottom 3.5 m of every wall is a separate strip of
+      // geometry, darkened at bake-time intent (x0.82) instead of in a shader.
+      const dark = [
+        Math.round(pal[0] * 0.82),
+        Math.round(pal[1] * 0.82),
+        Math.round(pal[2] * 0.82),
+      ];
+      const bandTop = garnish ? base : Math.min(top, base + TOY_FLOOR);
+
+      for (let e = 0; e < n; e++) {
+        const x0 = ring[e * 2];
+        const z0 = ring[e * 2 + 1];
+        const x1 = ring[((e + 1) % n) * 2];
+        const z1 = ring[((e + 1) % n) * 2 + 1];
+        if (Math.hypot(x1 - x0, z1 - z0) < 0.05) continue;
+        const ref = [(x0 + x1) / 2 - cx, 0, (z0 + z1) / 2 - cz];
+        if (bandTop > base + 0.01) {
+          face(
+            [
+              [x0, base, z0],
+              [x1, base, z1],
+              [x1, bandTop, z1],
+              [x0, bandTop, z0],
+            ],
+            ref,
+            dark,
+            true,
+            seed,
+            base
+          );
+        }
+        if (top > bandTop + 0.01) {
+          face(
+            [
+              [x0, bandTop, z0],
+              [x1, bandTop, z1],
+              [x1, top, z1],
+              [x0, top, z0],
+            ],
+            ref,
+            pal,
+            !garnish,
+            seed,
+            base
+          );
+        }
+      }
+
+      if (pitched && n === 4) {
+        // A.2 ridge prism along the OBB's long axis.
+        const c = [];
+        for (let k = 0; k < 4; k++) c.push([ring[k * 2], top, ring[k * 2 + 1]]);
+        const e0 = Math.hypot(c[1][0] - c[0][0], c[1][2] - c[0][2]);
+        const e1 = Math.hypot(c[2][0] - c[1][0], c[2][2] - c[1][2]);
+        // Rotate the corner order so c0 -> c1 is always the long axis.
+        const q = e0 >= e1 ? c : [c[1], c[2], c[3], c[0]];
+        const shortLen = Math.min(e0, e1);
+        const lx = q[1][0] - q[0][0];
+        const lz = q[1][2] - q[0][2];
+        const ll = Math.hypot(lx, lz) || 1;
+        const inset = shortLen * 0.1;
+        const ridgeY = top + TOY_ROOF_RISE;
+        const mid = (a, bb) => [(a[0] + bb[0]) / 2, ridgeY, (a[2] + bb[2]) / 2];
+        const rA = mid(q[3], q[0]);
+        const rB = mid(q[1], q[2]);
+        rA[0] += (lx / ll) * inset;
+        rA[2] += (lz / ll) * inset;
+        rB[0] -= (lx / ll) * inset;
+        rB[2] -= (lz / ll) * inset;
+        const roofPal = palette[d.roofPalette ? d.roofPalette[b] : 0] || pal;
+        const up = [0, 1, 0];
+        face([q[0], q[1], rB, rA], up, roofPal, false, seed, base);
+        face([q[2], q[3], rA, rB], up, roofPal, false, seed, base);
+        face([q[1], q[2], rB], [q[1][0] - cx, 0, q[1][2] - cz], roofPal, false, seed, base);
+        face([q[3], q[0], rA], [q[3][0] - cx, 0, q[3][2] - cz], roofPal, false, seed, base);
+      } else {
+        // Flat roof: the baked triangulation, one flat face colour.
+        const roofStart = v;
+        const roofCol = [
+          Math.min(255, Math.round(pal[0] * 0.94 + 8)),
+          Math.min(255, Math.round(pal[1] * 0.94 + 8)),
+          Math.min(255, Math.round(pal[2] * 0.94 + 8)),
+        ];
+        for (let k = 0; k < n; k++) {
+          positions[v * 3] = ring[k * 2];
+          positions[v * 3 + 1] = top;
+          positions[v * 3 + 2] = ring[k * 2 + 1];
+          normals[v * 3] = 0;
+          normals[v * 3 + 1] = 1;
+          normals[v * 3 + 2] = 0;
+          colors[v * 3] = roofCol[0];
+          colors[v * 3 + 1] = roofCol[1];
+          colors[v * 3 + 2] = roofCol[2];
+          meta[v * 2] = seed;
+          meta[v * 2 + 1] = 0;
+          localY[v] = Math.min(65535, Math.round((top - base) * 10));
+          v++;
+        }
+        const io = d.idxOffset[b];
+        for (let k = 0; k < d.idxCount[b]; k += 3) {
+          indices[ix++] = roofStart + d.indices[io + k];
+          indices[ix++] = roofStart + d.indices[io + k + 2];
+          indices[ix++] = roofStart + d.indices[io + k + 1];
+        }
       }
     }
   }
@@ -514,9 +753,12 @@ function buildGround(streetBlobs, landcoverBlobs, originX, originZ, streetClasse
 self.onmessage = (event) => {
   const msg = event.data;
   try {
-    if (msg.type === 'near') {
-      const out = buildNear(msg.blobs, msg.originX, msg.originZ, msg.palette);
-      self.postMessage({ id: msg.id, type: 'near', key: msg.key, ...out }, [
+    if (msg.type === 'near' || msg.type === 'toy') {
+      const out =
+        msg.type === 'toy'
+          ? buildToy(msg.blobs, msg.originX, msg.originZ, msg.palette)
+          : buildNear(msg.blobs, msg.originX, msg.originZ, msg.palette);
+      self.postMessage({ id: msg.id, type: msg.type, key: msg.key, ...out }, [
         out.positions.buffer,
         out.normals.buffer,
         out.colors.buffer,

@@ -99,3 +99,76 @@ both ends), the camera has no building collision (only a terrain floor clamp, so
 it inside meshes), grab-pan slips tens of metres, freeway decks float without piers while some freeways are
 flat on the ground, and cloud shadows are absent. Memory does **not** leak (geometries/heap plateau).
 These may still be open; probe them first before assuming regressions elsewhere.
+
+## Measuring geometry numerically (bridges, freeways, piers)
+
+The reliable recipe for "does structure X sit at the right height above the ground?" is a near-top-down
+pick, comparing hit heights:
+
+```js
+SF.goTo(lon, lat, 600, 0, 88);            // or SF.rig.set({x, z, distance:600, yaw:0, pitch:88})
+await new Promise(r => setTimeout(r, 3000)); // tiles must stream in first
+SF.pick(0, 0).map(h => h.name + '@' + h.point[1]);
+```
+Hit names identify the layer: `terrain-*` (base terrain), `ground-*`/`near-*`/`far-*` (street ribbons at
+different LODs), `water`, `viaductPiers`, `goldenGateBridge`/`bayBridge` (bespoke decks). A `water` hit with
+no `terrain-*` hit means the structure ends over open water.
+
+Do not trust `manifest.piers.length` or `SF.piers.count` alone — an `InstancedMesh` would report the same
+count with zero-scale or buried instances. Read the actual matrices instead:
+
+```js
+const m = SF.piers.mesh, M = new (Object.getPrototypeOf(m.matrixWorld).constructor)();
+m.getMatrixAt(i, M); const e = M.elements;
+const x = e[12], z = e[14], height = e[5], groundY = e[13] - height / 2;
+```
+Then pick at each `(x, z)` and confirm the street ribbon lands at `groundY + height` and the terrain at
+`groundY`. Also take one low oblique shot (`distance` 220–300, `pitch` 6–10°) so the columns are proven in
+pixels, not just in numbers.
+
+## Real-input coordinate calibration (do this before any xdotool test)
+
+The page origin is offset from the X11 screen origin (on a 1600×1122 window it was **+87 px in y**, and the
+bottom of the page including the attribution is off-screen). Never assume page coords == screen coords:
+
+```js
+window.__last = null;
+addEventListener('pointermove', e => { window.__last = {cx:e.clientX, cy:e.clientY, sy:e.screenY}; }, true);
+```
+then `xdotool mousemove 800 400` and read `__last` — the delta is your offset. Also avoid parking the cursor
+within ~22 px of a window edge during wheel/drag tests: **edge scrolling** kicks in and confounds the result.
+
+## Testing zoom-to-cursor and grab-pan quantitatively
+
+- Zoom-to-cursor toward a landmark: build the landmark's **world bounding-box centre** (its group origin is
+  not its geometry centre), project it with `SF.camera` to get the pixel, `xdotool mousemove` there, wheel in
+  with `xdotool click 4`, then measure `hypot(pivot.x - target.x, pivot.z - target.z)`. Re-aim the cursor
+  every 2 clicks — the target moves on screen as the camera closes, and a fixed cursor legitimately aims at
+  whatever is under it now. Expect asymptotic convergence (each step roughly halves the distance); the target
+  can drift off-screen before you reach a tight threshold.
+- Grab-pan retention: pick the ground point under the press pixel, do a held drag with
+  `xdotool mousedown 1` / `mousemove_relative` / `mouseup 1`, then pick at the release pixel and compare the
+  two world points. Test both a single step and a multi-step drag — accumulation errors only show in the latter.
+
+## Frame-rate-dependent effects are unmeasurable under SwiftShader
+
+The render loop clamps simulation `dt` to 0.05 s. Anything advanced by that clamped `dt` (e.g. cloud drift in
+`env.js updateClouds`) progresses at real speed only above 20 fps; at the 0.3–1.0 fps this environment
+delivers, ~20 s of wall clock yields under 1 s of simulated motion. A two-screenshot diff will therefore show
+near-zero change even when the feature works. To distinguish "absent" from "too slow here":
+- prove the effect **exists** by toggling its uniform and diffing (materials expose `material.uniformsHolder`,
+  which holds live references to the shared uniforms, e.g. `uCloudCover`, `uCloudDrift`, `uNight`);
+- prove the **response** through a user-facing path (`SF.setTime(1)` drops `uCloudCover` to 0.32 × 0.15 = 0.048);
+- label the motion check UNTESTED rather than FAIL, and note the clamped-dt coupling as a real (if minor) bug.
+
+The debug overlay's fps is rounded to an integer, so sub-1 fps shows as `0` or `1`; compare it against
+`SF.renderer.info.render.frame` deltas over ~10 s rather than expecting a decimal.
+
+## Deployment caching gotcha
+
+`/tiles/manifest.json` is served `public, max-age=31536000, immutable` under a **non-hashed** name. After a
+redeploy, a browser that visited before keeps the old manifest and silently renders old data (e.g.
+`SF.piers.count === 0` with the previous bridge geometry). Always hard-reload
+(`xdotool key ctrl+shift+r`) before verifying deployed data changes, and check
+`performance.getEntriesByType('resource')` for the manifest's `transferSize`/`encodedBodySize` to tell a cache
+hit from a fresh fetch. Worth flagging as a product bug, not just a test workaround.

@@ -12,7 +12,8 @@
     "streets": "node streets.mjs",
     "landcover": "node landcover.mjs",
     "validate": "node validate.mjs",
-    "all": "npm run download && npm run terrain && npm run bridges && npm run buildings && npm run streets && npm run landcover && npm run validate"
+    "toy": "node toy.mjs",
+    "all": "npm run download && npm run terrain && npm run bridges && npm run buildings && npm run streets && npm run landcover && npm run validate && npm run toy"
   },
   "dependencies": {
     "earcut": "2.2.4",

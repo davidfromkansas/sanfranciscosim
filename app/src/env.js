@@ -28,6 +28,8 @@ export const shared = {
   // every frame by the prevailing westerly.
   uCloudCover: { value: 0.32 },
   uCloudDrift: { value: new Vector2(0, 0) },
+  // 1 in diorama mode: materials go bright and flat and drop the weather.
+  uToy: { value: 0 },
 };
 
 const CLOUD_WIND = [0.0042, 0.0016];
@@ -98,6 +100,15 @@ const NIGHT = {
   fog: new Color(0.09, 0.1, 0.15),
 };
 
+// Toy mode key/fill: #fff2df sun at 2.4, #bfd9f2 over #d8cfc0 sky fill at 1.1.
+const TOY = {
+  sun: new Color(1.0, 0.949, 0.874),
+  sunIntensity: 2.4,
+  hemiSky: new Color(0.749, 0.851, 0.949),
+  hemiGround: new Color(0.847, 0.812, 0.753),
+  hemiIntensity: 1.1,
+};
+
 export function createEnvironment(scene) {
   const skyUniforms = {
     uSunDir: shared.uSunDir,
@@ -140,7 +151,8 @@ export function createEnvironment(scene) {
   const hemi = new HemisphereLight(DAY.hemiSky.clone(), DAY.hemiGround.clone(), DAY.hemiIntensity);
   scene.add(hemi);
 
-  scene.fog = new FogExp2(DAY.fog.clone().getHex(), 0.000019);
+  const FOG_DENSITY = 0.000019;
+  scene.fog = new FogExp2(DAY.fog.clone().getHex(), FOG_DENSITY);
 
   const state = { time: 0, shadowsEnabled: true };
 
@@ -165,6 +177,14 @@ export function createEnvironment(scene) {
     hemi.color.copy(DAY.hemiSky).lerp(NIGHT.hemiSky, night);
     hemi.groundColor.copy(DAY.hemiGround).lerp(NIGHT.hemiGround, night);
     hemi.intensity = DAY.hemiIntensity + (NIGHT.hemiIntensity - DAY.hemiIntensity) * night;
+
+    if (state.toy) {
+      sun.color.copy(TOY.sun);
+      sun.intensity = TOY.sunIntensity;
+      hemi.color.copy(TOY.hemiSky);
+      hemi.groundColor.copy(TOY.hemiGround);
+      hemi.intensity = TOY.hemiIntensity;
+    }
 
     shared.uSunColor.value.copy(sun.color);
     shared.uSkyColor.value.copy(hemi.color);
@@ -208,6 +228,19 @@ export function createEnvironment(scene) {
     }
   }
 
+  // Diorama lighting: a bright tabletop key light, soft sky fill and no fog, so
+  // the model reads as a physical object rather than an atmosphere. The fog is
+  // switched off by density, not by nulling scene.fog: everything that reads
+  // scene.fog (water's fog uniforms, every material's compiled fog chunk) keeps
+  // working, and no shader is recompiled on the toggle.
+  function setToy(on) {
+    shared.uToy.value = on ? 1 : 0;
+    scene.fog.density = on ? 0 : FOG_DENSITY;
+    sun.shadow.radius = on ? 3 : 1;
+    state.toy = on;
+    setTime(state.time);
+  }
+
   setTime(0);
-  return { sky, sun, hemi, setTime, updateClouds, updateShadow, setShadowQuality, state };
+  return { sky, sun, hemi, setTime, setToy, updateClouds, updateShadow, setShadowQuality, state };
 }

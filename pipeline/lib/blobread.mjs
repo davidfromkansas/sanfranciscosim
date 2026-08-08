@@ -103,7 +103,9 @@ export async function readStreetsBlob(path) {
   return { originX, originZ, lines, bytes: buf.length };
 }
 
-export async function readLandcoverBlob(path) {
+// `full` also returns the draped triangles themselves, which the toy bake
+// rewrites with a denser tree scatter.
+export async function readLandcoverBlob(path, { full = false } = {}) {
   const buf = await readFile(path);
   const dv = new DataView(buf.buffer, buf.byteOffset, buf.byteLength);
   if (dv.getUint32(0, true) !== MAGIC_LANDCOVER) throw new Error(`bad magic in ${path}`);
@@ -116,14 +118,23 @@ export async function readLandcoverBlob(path) {
   const quant = dv.getFloat32(28, true);
 
   let off = 32;
-  off += 4 * vertexTotal; // xz
-  off += 2 * vertexTotal; // y
-  off += vertexTotal; // kind
+  const xz = new Int16Array(buf.buffer, buf.byteOffset + off, vertexTotal * 2);
+  off += 4 * vertexTotal;
+  const y = new Int16Array(buf.buffer, buf.byteOffset + off, vertexTotal);
+  off += 2 * vertexTotal;
+  const kind = new Uint8Array(buf.buffer, buf.byteOffset + off, vertexTotal);
+  off += vertexTotal;
   off = alignTo(off, 4);
+  const indices =
+    indexWidth === 2
+      ? new Uint16Array(buf.buffer, buf.byteOffset + off, indexTotal)
+      : new Uint32Array(buf.buffer, buf.byteOffset + off, indexTotal);
   off += indexWidth * indexTotal;
   const treeXZ = new Int16Array(buf.buffer, buf.byteOffset + off, treeTotal * 2);
   off += 4 * treeTotal;
   const treeY = new Int16Array(buf.buffer, buf.byteOffset + off, treeTotal);
+  off += 2 * treeTotal;
+  const treeVariant = new Uint8Array(buf.buffer, buf.byteOffset + off, treeTotal);
 
   const trees = new Float64Array(treeTotal * 3);
   for (let i = 0; i < treeTotal; i++) {
@@ -131,5 +142,25 @@ export async function readLandcoverBlob(path) {
     trees[i * 3 + 1] = treeY[i] / 10;
     trees[i * 3 + 2] = originZ + treeXZ[i * 2 + 1] * quant;
   }
-  return { trees, treeTotal, triangles: indexTotal / 3, bytes: buf.length };
+  const out = {
+    trees,
+    treeVariant,
+    treeTotal,
+    triangles: indexTotal / 3,
+    bytes: buf.length,
+    originX,
+    originZ,
+  };
+  if (full) {
+    const verts = new Float64Array(vertexTotal * 3);
+    for (let i = 0; i < vertexTotal; i++) {
+      verts[i * 3] = originX + xz[i * 2] * quant;
+      verts[i * 3 + 1] = y[i] / 10;
+      verts[i * 3 + 2] = originZ + xz[i * 2 + 1] * quant;
+    }
+    out.verts = verts;
+    out.kinds = kind;
+    out.indices = indices;
+  }
+  return out;
 }
