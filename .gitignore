@@ -8,3 +8,4 @@ dist/
 # committed so the static deploy needs no build-time data fetch.
 pipeline/data/
 pipeline/out/
+.vercel

@@ -226,20 +226,32 @@ export function createCity(scene, data) {
   stats.cellsTotal =
     indexes.buildings.cells.length + indexes.streets.cells.length + indexes.landcover.cells.length;
 
-  const inflight = new Set();
+  const inflight = new Map();
   async function blob(kind, cellKey) {
     const id = `${kind}:${cellKey}`;
     const cached = blobCache.get(id);
     if (cached) return cached;
-    while (inflight.size > 28) await new Promise((r) => setTimeout(r, 8));
-    inflight.add(id);
-    try {
+    const existing = inflight.get(id);
+    if (existing) return existing;
+
+    while (inflight.size >= 28) await new Promise((resolve) => setTimeout(resolve, 8));
+    // A matching request may have started while this one waited for capacity.
+    const afterWait = blobCache.get(id);
+    if (afterWait) return afterWait;
+    const concurrent = inflight.get(id);
+    if (concurrent) return concurrent;
+
+    const request = (async () => {
       const res = await fetch(tileUrl(`${kind}/${cellKey}.bin`));
       if (!res.ok) throw new Error(`${id}: ${res.status}`);
       const buffer = await res.arrayBuffer();
       blobCache.set(id, buffer);
       stats.cellsLoaded++;
       return buffer;
+    })();
+    inflight.set(id, request);
+    try {
+      return await request;
     } finally {
       inflight.delete(id);
     }
