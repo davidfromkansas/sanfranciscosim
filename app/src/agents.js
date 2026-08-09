@@ -22,8 +22,11 @@ import {
   ShaderMaterial,
   Vector3,
 } from 'three';
+import { GLTFLoader } from 'three/addons/loaders/GLTFLoader.js';
 import { mergeGeometries } from 'three/addons/utils/BufferGeometryUtils.js';
 import { shared } from './env.js';
+
+const ASSETS = `${import.meta.env.BASE_URL}sf-assets/`;
 
 const CAR_COUNT = 720;
 const PED_COUNT = 420;
@@ -410,6 +413,88 @@ export function createAgents(scene, data, city) {
   lightMesh.count = 0;
   group.add(lightMesh);
 
+  // The hand-made vehicle fleet: one merged instanced mesh per type, all
+  // sharing one material. Until it loads (or if it never does) the procedural
+  // carMesh above keeps traffic on the streets.
+  const fleet = [];
+  const fleetMaterial = new MeshLambertMaterial({ vertexColors: true });
+  let fleetCursors = new Int32Array(0);
+
+  function mergeVehicle(root) {
+    root.updateMatrixWorld(true);
+    const parts = [];
+    root.traverse((object) => {
+      if (!object.isMesh) return;
+      const geometry = object.geometry.clone();
+      geometry.applyMatrix4(object.matrixWorld);
+      geometry.deleteAttribute('uv');
+      geometry.deleteAttribute('uv1');
+      if (!geometry.attributes.normal) geometry.computeVertexNormals();
+      const count = geometry.attributes.position.count;
+      const colors = new Float32Array(count * 3);
+      const color = object.material?.color;
+      for (let i = 0; i < count; i++) {
+        colors[i * 3] = color ? color.r : 1;
+        colors[i * 3 + 1] = color ? color.g : 1;
+        colors[i * 3 + 2] = color ? color.b : 1;
+      }
+      geometry.setAttribute('color', new BufferAttribute(colors, 3));
+      parts.push(geometry);
+    });
+    const merged = parts.length ? mergeGeometries(parts, false) : null;
+    for (const p of parts) p.dispose();
+    if (!merged) return null;
+    // Models face -Z; the yaw math points +Z down the direction of travel.
+    merged.rotateY(Math.PI);
+    return merged;
+  }
+
+  async function loadVehicles() {
+    let entries;
+    try {
+      const res = await fetch(`${ASSETS}vehicles_manifest.json`);
+      if (!res.ok) throw new Error(`manifest ${res.status}`);
+      entries = (await res.json()).vehicles;
+      if (!Array.isArray(entries) || !entries.length) throw new Error('manifest has no vehicles');
+    } catch (error) {
+      console.warn(`sf-assets: no vehicle fleet (${error.message}) — keeping procedural cars`);
+      return;
+    }
+
+    const loader = new GLTFLoader();
+    let loaded;
+    try {
+      loaded = await Promise.all(
+        entries.map(async (entry) => ({
+          entry,
+          geometry: mergeVehicle((await loader.loadAsync(`${ASSETS}${entry.file}`)).scene),
+        }))
+      );
+    } catch (error) {
+      console.warn(`sf-assets: vehicle fleet failed to load (${error.message}) — keeping procedural cars`);
+      return;
+    }
+    if (loaded.some((item) => !item.geometry)) {
+      console.warn('sf-assets: a vehicle model had no geometry — keeping procedural cars');
+      return;
+    }
+
+    const capacity = Math.ceil(CAR_COUNT / loaded.length);
+    for (const { entry, geometry } of loaded) {
+      const mesh = new InstancedMesh(geometry, fleetMaterial, capacity);
+      mesh.name = `vehicle-${entry.id}`;
+      mesh.instanceMatrix.setUsage(DynamicDrawUsage);
+      mesh.castShadow = false;
+      mesh.frustumCulled = false;
+      mesh.count = 0;
+      group.add(mesh);
+      fleet.push(mesh);
+    }
+    fleetCursors = new Int32Array(fleet.length);
+    carMesh.count = 0;
+    carMesh.visible = false;
+  }
+
   const cars = [];
   let cityPaths = [];
   city.onPaths((paths) => {
@@ -635,6 +720,8 @@ export function createAgents(scene, data, city) {
   let toy = false;
 
   function paintCars(list) {
+    // Fleet colours are baked into the models; only the fallback pool is tinted.
+    if (fleet.length) return;
     for (let i = 0; i < CAR_COUNT; i++) {
       paint.set(list[i % list.length]);
       carColors[i * 3] = paint.r;
@@ -738,6 +825,7 @@ export function createAgents(scene, data, city) {
     }
 
     let visibleCars = 0;
+    fleetCursors.fill(0);
     for (let i = 0; i < cars.length; i++) {
       const car = cars[i];
       if (!car) continue;
@@ -753,10 +841,19 @@ export function createAgents(scene, data, city) {
       dummy.rotation.set(0, Math.atan2(tangent.x * car.dir, tangent.z * car.dir), 0);
       dummy.scale.setScalar(carScale);
       dummy.updateMatrix();
-      carMesh.setMatrixAt(visibleCars, dummy.matrix);
-      carMesh.instanceColor.array[visibleCars * 3] = carColors[i * 3];
-      carMesh.instanceColor.array[visibleCars * 3 + 1] = carColors[i * 3 + 1];
-      carMesh.instanceColor.array[visibleCars * 3 + 2] = carColors[i * 3 + 2];
+      if (fleet.length) {
+        // Slot i always drives the same vehicle type, so every type is on the
+        // road with the same frequency.
+        const type = i % fleet.length;
+        const mesh = fleet[type];
+        if (fleetCursors[type] >= mesh.instanceMatrix.count) continue;
+        mesh.setMatrixAt(fleetCursors[type]++, dummy.matrix);
+      } else {
+        carMesh.setMatrixAt(visibleCars, dummy.matrix);
+        carMesh.instanceColor.array[visibleCars * 3] = carColors[i * 3];
+        carMesh.instanceColor.array[visibleCars * 3 + 1] = carColors[i * 3 + 1];
+        carMesh.instanceColor.array[visibleCars * 3 + 2] = carColors[i * 3 + 2];
+      }
       if (night > 0.15 || toy) {
         dummy.position.y += 0.55;
         dummy.position.x += tangent.x * 2.4 * car.dir;
@@ -767,9 +864,16 @@ export function createAgents(scene, data, city) {
       }
       visibleCars++;
     }
-    carMesh.count = visibleCars;
-    carMesh.instanceMatrix.needsUpdate = true;
-    carMesh.instanceColor.needsUpdate = true;
+    if (fleet.length) {
+      for (let t = 0; t < fleet.length; t++) {
+        fleet[t].count = fleetCursors[t];
+        fleet[t].instanceMatrix.needsUpdate = true;
+      }
+    } else {
+      carMesh.count = visibleCars;
+      carMesh.instanceMatrix.needsUpdate = true;
+      carMesh.instanceColor.needsUpdate = true;
+    }
     lightMesh.count = night > 0.15 || toy ? visibleCars : 0;
     lightMesh.instanceMatrix.needsUpdate = true;
     lightMesh.material.opacity = toy ? Math.max(0.5, Math.min(0.85, night)) : Math.min(0.8, night);
@@ -881,5 +985,17 @@ export function createAgents(scene, data, city) {
     }
   }
 
-  return { group, update, setToy, get carCount() { return carMesh.count; } };
+  loadVehicles();
+
+  return {
+    group,
+    update,
+    setToy,
+    get carCount() {
+      if (!fleet.length) return carMesh.count;
+      let total = 0;
+      for (const mesh of fleet) total += mesh.count;
+      return total;
+    },
+  };
 }
