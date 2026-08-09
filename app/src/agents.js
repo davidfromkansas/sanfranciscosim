@@ -501,13 +501,46 @@ export function createAgents(scene, data, city) {
     cityPaths = paths;
   });
 
+  // DataSF's street grid stops at the county line in the middle of the strait,
+  // so the baked street ribbons only cover the first fifth of the Golden Gate.
+  // A bespoke bridge therefore carries its own traffic path: one unbroken run
+  // of the baked deck centreline, so a car seeded anywhere on it drives the
+  // full span shore to shore instead of looping inside an approach stub.
+  const deckSpeed = manifest.streetClasses?.[0]?.speed ?? 28;
+  const deckPaths = [];
+  for (const spec of Object.values(manifest.bridges || {})) {
+    for (const deck of [spec, spec.east]) {
+      if (!deck?.nodes || deck.nodes.length < 2) continue;
+      const flat = new Float32Array(deck.nodes.length * 3);
+      deck.nodes.forEach(([lon, lat, y], i) => {
+        const [x, z] = project(lon, lat);
+        flat[i * 3] = x;
+        flat[i * 3 + 1] = y + 0.35;
+        flat[i * 3 + 2] = z;
+      });
+      deckPaths.push({ points: flat, klass: 0, width: deck.deckWidth ?? 24, speed: deckSpeed, deck: true });
+    }
+  }
+
+  // Street paths are short enough to test by their first vertex; a deck spans
+  // kilometres, so it counts as nearby whenever any of its nodes is in range.
+  function pathNear(path, pivot, range) {
+    const stride = path.deck ? 3 : path.points.length;
+    for (let i = 0; i < path.points.length; i += stride) {
+      const dx = path.points[i] - pivot.x;
+      const dz = path.points[i + 2] - pivot.z;
+      if (dx * dx + dz * dz < range * range) return true;
+    }
+    return false;
+  }
+
   function nearbyPaths(pivot) {
     const list = [];
-    for (const path of cityPaths) {
-      if (!path.meta) path.meta = polylineLengths(path.points);
-      const dx = path.points[0] - pivot.x;
-      const dz = path.points[2] - pivot.z;
-      if (dx * dx + dz * dz < CAR_RANGE * CAR_RANGE) list.push(path);
+    for (const source of [cityPaths, deckPaths]) {
+      for (const path of source) {
+        if (!path.meta) path.meta = polylineLengths(path.points);
+        if (pathNear(path, pivot, CAR_RANGE)) list.push(path);
+      }
     }
     return list;
   }
@@ -802,17 +835,22 @@ export function createAgents(scene, data, city) {
 
     // Traffic: re-seed the pool onto nearby real centrelines as you move.
     carRefresh -= dt;
-    if (carRefresh <= 0 && cityPaths.length) {
+    if (carRefresh <= 0 && (cityPaths.length || deckPaths.length)) {
       carRefresh = 1.5;
       const candidates = nearbyPaths(pivot);
+      // A bridge is one path among hundreds of city blocks, so a plain random
+      // draw would leave the deck nearly empty; every sixth slot is reserved
+      // for it, which keeps the whole span carrying traffic.
+      const decks = candidates.filter((path) => path.deck);
       if (candidates.length) {
         for (let i = 0; i < CAR_COUNT; i++) {
           const existing = cars[i];
+          const wantsDeck = decks.length > 0 && i % 6 === 0;
           const stillClose =
-            existing &&
-            Math.hypot(existing.path.points[0] - pivot.x, existing.path.points[2] - pivot.z) < CAR_RANGE * 1.3;
+            existing && pathNear(existing.path, pivot, CAR_RANGE * 1.3) && (!wantsDeck || existing.path.deck);
           if (stillClose) continue;
-          const path = candidates[Math.floor(Math.random() * candidates.length)];
+          const pool = wantsDeck ? decks : candidates;
+          const path = pool[Math.floor(Math.random() * pool.length)];
           cars[i] = {
             path,
             d: Math.random() * path.meta.total,
