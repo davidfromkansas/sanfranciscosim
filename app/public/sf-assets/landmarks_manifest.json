@@ -1,0 +1,20 @@
+[
+  {
+    "id": "coit-tower",
+    "file": "coit-tower.glb",
+    "anchor": [
+      -122.4058,
+      37.8024
+    ],
+    "targetHeightM": 64,
+    "cat": 16,
+    "name": "Coit Tower",
+    "estimated": false,
+    "dims": [
+      17.5,
+      19.74,
+      65.2
+    ],
+    "tris": 1132
+  }
+]
