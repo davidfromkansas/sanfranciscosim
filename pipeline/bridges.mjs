@@ -20,6 +20,13 @@ const structures = await loadStructures();
 
 // Published clearances above mean high water at midspan.
 const GOLDEN_GATE_CLEARANCE = 67;
+// The Golden Gate roadway never comes down to the ground inside the mapped
+// centreline: it is 75 m at the towers (746 ft tower less the published 500 ft
+// above roadway), dips to the 220 ft clearance at midspan, and leaves the span
+// on the Fort Point steel arch (200 ft high) to the south and the Lime Point
+// approach to the north. Baking it level at the published clearance instead of
+// draping it onto the shore terrain is what lets the streets meet the deck.
+const GOLDEN_GATE_LEVEL = true;
 const BAY_WEST_CLEARANCE = 67;
 const BAY_EAST_CLEARANCE = 57;
 const TOWER_CORRIDOR = 120;
@@ -85,12 +92,14 @@ function abutmentHeight(pts, endIndex, inwardIndex) {
 }
 
 // Deck profile: linear between the two abutment heights plus a sine arch so
-// midspan lands on the published clearance.
-function deckProfile(pts, clearance) {
+// midspan lands on the published clearance. A level deck keeps both abutments
+// at the clearance (never below the ground they sit on), which flattens the
+// arch out to nothing.
+function deckProfile(pts, clearance, level = false) {
   const s = arcLengths(pts);
   const total = s[s.length - 1] || 1;
-  const yStart = abutmentHeight(pts, 0, 1);
-  const yEnd = abutmentHeight(pts, pts.length - 1, pts.length - 2);
+  const ends = [abutmentHeight(pts, 0, 1), abutmentHeight(pts, pts.length - 1, pts.length - 2)];
+  const [yStart, yEnd] = level ? ends.map((y) => Math.max(clearance, y)) : ends;
   const arch = Math.max(0, clearance - (yStart + yEnd) / 2);
   return pts.map((p, i) => {
     const t = s[i] / total;
@@ -178,7 +187,7 @@ function towersOn(pts) {
 // ----------------------------------------------------------- Golden Gate ----
 if (structures.goldenGate.length < 4) throw new Error('no Golden Gate centreline in osm_structures.json');
 const ggPts = toMeters(structures.goldenGate);
-const ggNodes = meetApproaches(deckProfile(ggPts, GOLDEN_GATE_CLEARANCE));
+const ggNodes = meetApproaches(deckProfile(ggPts, GOLDEN_GATE_CLEARANCE, GOLDEN_GATE_LEVEL));
 const ggTowers = towersOn(ggPts);
 if (ggTowers.length !== 2) throw new Error(`expected 2 Golden Gate towers in OSM, found ${ggTowers.length}`);
 const goldenGate = {
