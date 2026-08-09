@@ -420,6 +420,60 @@ export function createAgents(scene, data, city) {
   const fleetMaterial = new MeshLambertMaterial({ vertexColors: true });
   let fleetCursors = new Int32Array(0);
 
+  // Signed volume of a closed part; negative means the shell is inside-out, so
+  // backface culling would eat the surfaces the camera should see.
+  function signedVolume(geometry) {
+    const position = geometry.attributes.position;
+    const index = geometry.index;
+    const count = index ? index.count : position.count;
+    let volume = 0;
+    for (let t = 0; t < count; t += 3) {
+      const a = index ? index.getX(t) : t;
+      const b = index ? index.getX(t + 1) : t + 1;
+      const c = index ? index.getX(t + 2) : t + 2;
+      const ax = position.getX(a);
+      const ay = position.getY(a);
+      const az = position.getZ(a);
+      const bx = position.getX(b);
+      const by = position.getY(b);
+      const bz = position.getZ(b);
+      const cx = position.getX(c);
+      const cy = position.getY(c);
+      const cz = position.getZ(c);
+      volume += (ax * (by * cz - bz * cy) - ay * (bx * cz - bz * cx) + az * (bx * cy - by * cx)) / 6;
+    }
+    return volume;
+  }
+
+  function reverseGeometry(geometry) {
+    const index = geometry.index;
+    if (index) {
+      for (let t = 0; t < index.count; t += 3) {
+        const a = index.getX(t);
+        index.setX(t, index.getX(t + 2));
+        index.setX(t + 2, a);
+      }
+      index.needsUpdate = true;
+    } else {
+      const position = geometry.attributes.position;
+      for (let t = 0; t < position.count; t += 3) {
+        for (const attribute of Object.values(geometry.attributes)) {
+          for (let k = 0; k < attribute.itemSize; k++) {
+            const a = attribute.array[t * attribute.itemSize + k];
+            attribute.array[t * attribute.itemSize + k] = attribute.array[(t + 2) * attribute.itemSize + k];
+            attribute.array[(t + 2) * attribute.itemSize + k] = a;
+          }
+          attribute.needsUpdate = true;
+        }
+      }
+    }
+    const normal = geometry.attributes.normal;
+    for (let i = 0; i < normal.count; i++) {
+      normal.setXYZ(i, -normal.getX(i), -normal.getY(i), -normal.getZ(i));
+    }
+    normal.needsUpdate = true;
+  }
+
   function mergeVehicle(root) {
     root.updateMatrixWorld(true);
     const parts = [];
@@ -430,6 +484,7 @@ export function createAgents(scene, data, city) {
       geometry.deleteAttribute('uv');
       geometry.deleteAttribute('uv1');
       if (!geometry.attributes.normal) geometry.computeVertexNormals();
+      if (signedVolume(geometry) < 0) reverseGeometry(geometry);
       const count = geometry.attributes.position.count;
       const colors = new Float32Array(count * 3);
       const color = object.material?.color;
