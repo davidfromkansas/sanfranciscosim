@@ -33,6 +33,10 @@ import {
 } from './materials.js';
 import { shared } from './env.js';
 import { tileUrl } from './data.js';
+import { catalogForWorker } from './kitplan.js';
+import { createKitLoader, loadKitIndex } from './kitassets.js';
+import { createKitFleet } from './kitfleet.js';
+import { landmarkExclusions, loadKitZones } from './kitzones.js';
 
 const GROUP = 2000;
 const CHUNK = 1000;
@@ -176,7 +180,19 @@ export function createCity(scene, data) {
   const blobCache = new Map(); // `${kind}:${cellKey}` -> ArrayBuffer
   const groups = new Map();
   const chunks = new Map();
-  const stats = { cellsLoaded: 0, cellsTotal: 0, nearChunks: 0, farGroups: 0, groundGroups: 0, trees: 0, lamps: 0 };
+  const stats = {
+    cellsLoaded: 0,
+    cellsTotal: 0,
+    nearChunks: 0,
+    farGroups: 0,
+    groundGroups: 0,
+    trees: 0,
+    lamps: 0,
+    kitInstances: 0,
+    kitPieceTypes: 0,
+    kitPlaced: 0,
+    kitConsidered: 0,
+  };
   const paths = [];
   let onPathsReady = () => {};
 
@@ -199,6 +215,61 @@ export function createCity(scene, data) {
     toy: { buildings: 'toy', streets: 'toystreets', landcover: 'toyland' },
   };
   const kinds = () => TIERS[tier];
+
+  // --------------------------------------------------------------- the kit ---
+  // The hand-made building kit rides on the diorama tier: the worker plans which
+  // footprints a piece fits, this side batches them, and every footprint it does
+  // not claim is still extruded procedurally by the same worker pass. If the kit
+  // index, the zone raster or a piece fails to load, `kit.enabled` stays false
+  // and the city is exactly the procedural one, with one warning.
+  const kit = {
+    enabled: false,
+    catalog: null,
+    loader: null,
+    fleet: null,
+    zones: null,
+    exclusions: null,
+    disabled: new Set(),
+    warned: false,
+  };
+  const kitGroup = new Object3D();
+  kitGroup.name = 'kit-fleet';
+  scene.add(kitGroup);
+
+  const kitReady = (async () => {
+    try {
+      const [catalog, zones] = await Promise.all([loadKitIndex(), loadKitZones(extent)]);
+      kit.catalog = catalog;
+      kit.zones = zones;
+      kit.exclusions = landmarkExclusions(manifest, data.project);
+      kit.loader = createKitLoader(catalog, {
+        onWarn: (message) => console.warn(`[kit] ${message}`),
+      });
+      kit.fleet = createKitFleet(kitGroup, catalog, kit.loader);
+      kit.enabled = true;
+    } catch (error) {
+      console.warn(`[kit] unavailable, using procedural buildings only: ${error.message}`);
+    }
+  })();
+
+  // Street cells covering a chunk plus a margin: the planner needs the kerb a
+  // footprint fronts, including the one just over the chunk edge.
+  const streetCellIndex = new Map(indexes.streets.cells.map((cell) => [cell.key, cell]));
+  function streetCellsFor(c) {
+    const grid = manifest.grid;
+    const size = indexes.streets.cellSize;
+    const out = [];
+    const x0 = Math.floor((c.originX - 80 - grid.originX) / size);
+    const x1 = Math.floor((c.originX + CHUNK + 80 - grid.originX) / size);
+    const z0 = Math.floor((c.originZ - 80 - grid.originZ) / size);
+    const z1 = Math.floor((c.originZ + CHUNK + 80 - grid.originZ) / size);
+    for (let cz = z0; cz <= z1; cz++) {
+      for (let cx = x0; cx <= x1; cx++) {
+        if (streetCellIndex.has(`${cx}_${cz}`)) out.push(`${cx}_${cz}`);
+      }
+    }
+    return out;
+  }
 
   function group(key) {
     let g = groups.get(key);
@@ -242,6 +313,7 @@ export function createCity(scene, data) {
         cells: [],
         mesh: null,
         material: null,
+        hasKit: false,
         fade: 0,
         active: false,
         requested: false,
@@ -434,13 +506,21 @@ export function createCity(scene, data) {
     }
   }
 
-  async function buildNearChunk(c) {
-    if (c.requested || c.cells.length === 0) return;
-    c.requested = true;
-    const toyTier = tier === 'toy';
-    const blobs = await Promise.all(
-      c.cells.map(async (cell) => ({ buffer: await blob(kinds().buildings, cell.key) }))
-    );
+  // One planning + batching round for a chunk. Returns null when the kit could
+  // not be honoured, so the caller retries with the offending pieces disabled
+  // and the lots go back to procedural masses rather than leaving a hole.
+  async function runNearJob(c, toyTier, blobs, useKit) {
+    const kitJob =
+      useKit && toyTier && kit.enabled
+        ? {
+            kit: catalogForWorker(kit.catalog, kit.disabled),
+            zones: kit.zones,
+            exclusions: kit.exclusions,
+            streets: await Promise.all(
+              streetCellsFor(c).map(async (key) => ({ buffer: await blob(kinds().streets, key) }))
+            ),
+          }
+        : null;
     const result = await pool.run({
       type: toyTier ? 'toy' : 'near',
       key: c.key,
@@ -448,10 +528,49 @@ export function createCity(scene, data) {
       originZ: c.originZ,
       palette: toyTier ? toyPalette : palette,
       blobs,
+      kit: kitJob,
     });
+    if (!result.kit || result.kit.length === 0) return { result, kit: false };
+
+    // Merge every piece this chunk asked for before anything is shown, so the
+    // batch and the procedural mesh always appear in the same frame.
+    const broken = await kit.loader.ensure(result.kitPieces);
+    if (broken.length) {
+      for (const index of broken) kit.disabled.add(index);
+      return null;
+    }
+    if (!kit.fleet.canFit(result.kit.length / 8)) {
+      if (!kit.warned) {
+        console.warn('[kit] instance budget reached, remaining chunks stay procedural');
+        kit.warned = true;
+      }
+      return null;
+    }
+    return { result, kit: true };
+  }
+
+  async function buildNearChunk(c) {
+    if (c.requested || c.cells.length === 0) return;
+    c.requested = true;
+    const toyTier = tier === 'toy';
+    if (toyTier) await kitReady;
+    const blobs = await Promise.all(
+      c.cells.map(async (cell) => ({ buffer: await blob(kinds().buildings, cell.key) }))
+    );
+    let attempt = await runNearJob(c, toyTier, blobs, true);
+    if (!attempt) attempt = await runNearJob(c, toyTier, blobs, true);
+    if (!attempt) attempt = await runNearJob(c, toyTier, blobs, false);
+    const { result } = attempt;
     if (!c.active) {
       c.requested = false;
       return;
+    }
+    if (attempt.kit) {
+      c.hasKit = kit.fleet.add(c.key, result.kit, 0);
+      stats.kitInstances = kit.fleet.count;
+      stats.kitPieceTypes = kit.fleet.pieceTypes;
+      stats.kitPlaced += result.kitPlaced;
+      stats.kitConsidered += result.kitConsidered;
     }
     if (result.positions.length === 0) return;
     const geometry = new BufferGeometry();
@@ -477,6 +596,8 @@ export function createCity(scene, data) {
   }
 
   function disposeChunk(c) {
+    if (kit.fleet && kit.fleet.remove(c.key)) stats.kitInstances = kit.fleet.count;
+    c.hasKit = false;
     if (c.mesh) {
       scene.remove(c.mesh);
       c.mesh.geometry.dispose();
@@ -525,6 +646,12 @@ export function createCity(scene, data) {
     for (const c of chunks.values()) {
       c.active = false; // the normal hysteresis re-enters them from the new tier
       disposeChunk(c);
+    }
+    if (kit.fleet) {
+      kit.fleet.clear();
+      stats.kitInstances = 0;
+      stats.kitPlaced = 0;
+      stats.kitConsidered = 0;
     }
     const reload = [];
     for (const g of groups.values()) {
@@ -589,16 +716,17 @@ export function createCity(scene, data) {
         buildNearChunk(c).catch((err) => console.warn('near chunk failed', c.key, err));
       } else if (dropNear && c.active) {
         c.active = false;
-        if (c.mesh) c.fade = Math.min(c.fade, 1);
+        if (c.mesh || c.hasKit) c.fade = Math.min(c.fade, 1);
       }
 
-      const target = c.active && c.mesh ? 1 : 0;
+      const target = c.active && (c.mesh || c.hasKit) ? 1 : 0;
       if (c.fade !== target) {
         const step = FADE_SPEED * dt;
         c.fade = target > c.fade ? Math.min(target, c.fade + step) : Math.max(target, c.fade - step);
         if (c.material) c.material.uniformsHolder.uFade.value = c.fade;
+        if (kit.fleet) kit.fleet.setFade(c.key, c.fade);
       }
-      if (!c.active && c.fade <= 0 && c.mesh) disposeChunk(c);
+      if (!c.active && c.fade <= 0 && (c.mesh || c.hasKit)) disposeChunk(c);
 
       // The far tier's matching quadrant is the inverse of the near fade.
       if (c.group) c.group.quadFade[c.quadrant] = 1 - c.fade;

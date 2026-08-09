@@ -4,142 +4,14 @@
 // thread.
 
 import { emitProps, makeCtx } from './props.js';
+import { readBuildings, readLandcover, readStreets } from './tilebin.js';
+import { planKit } from './kitplan.js';
 
 // Night lighting profile per category (0 residential, 1 commercial, 2 always-on,
 // 3 dark), mirrored from pipeline/taxonomy.mjs. The bake already folds this into
 // each record's night byte; the table is here only so props inherit the same
 // profile as the building they sit on.
 const NIGHT_PROFILE_OF = (nightByte) => Math.floor((nightByte + 0.5) / 4);
-
-function readBuildings(buffer) {
-  const dv = new DataView(buffer);
-  const version = dv.getUint16(4, true);
-  const count = dv.getUint32(8, true);
-  const vertexTotal = dv.getUint32(12, true);
-  const indexTotal = dv.getUint32(16, true);
-  const originX = dv.getFloat32(20, true);
-  const originZ = dv.getFloat32(24, true);
-  const quant = dv.getFloat32(28, true);
-
-  let off = 32;
-  const vertOffset = new Uint32Array(buffer, off, count);
-  off += 4 * count;
-  const idxOffset = new Uint32Array(buffer, off, count);
-  off += 4 * count;
-  const vertCount = new Uint16Array(buffer, off, count);
-  off += 2 * count;
-  const idxCount = new Uint16Array(buffer, off, count);
-  off += 2 * count;
-  const baseY = new Int16Array(buffer, off, count);
-  off += 2 * count;
-  const topY = new Int16Array(buffer, off, count);
-  off += 2 * count;
-  const palette = new Uint8Array(buffer, off, count);
-  off += count;
-  const seed = new Uint8Array(buffer, off, count);
-  off += count;
-  // Version 2 (toy tier) carries a per-record flag byte and a roof colour.
-  let flags = null;
-  let roofPalette = null;
-  if (version >= 2) {
-    flags = new Uint8Array(buffer, off, count);
-    off += count;
-    roofPalette = new Uint8Array(buffer, off, count);
-    off += count;
-  }
-  // Version 3 adds the lore bytes: category, street heading and night flag.
-  let cat = null;
-  let yaw = null;
-  let night = null;
-  if (version >= 3) {
-    cat = new Uint8Array(buffer, off, count);
-    off += count;
-    yaw = new Uint8Array(buffer, off, count);
-    off += count;
-    night = new Uint8Array(buffer, off, count);
-    off += count;
-  }
-  off = Math.ceil(off / 2) * 2;
-  const verts = new Int16Array(buffer, off, vertexTotal * 2);
-  off += 4 * vertexTotal;
-  const indices = new Uint16Array(buffer, off, indexTotal);
-
-  return {
-    version,
-    flags,
-    roofPalette,
-    cat,
-    yaw,
-    night,
-    count,
-    originX,
-    originZ,
-    quant,
-    vertOffset,
-    idxOffset,
-    vertCount,
-    idxCount,
-    baseY,
-    topY,
-    palette,
-    seed,
-    verts,
-    indices,
-  };
-}
-
-function readStreets(buffer) {
-  const dv = new DataView(buffer);
-  const count = dv.getUint32(8, true);
-  const pointTotal = dv.getUint32(12, true);
-  const originX = dv.getFloat32(20, true);
-  const originZ = dv.getFloat32(24, true);
-  const quant = dv.getFloat32(28, true);
-  let off = 32;
-  const ptOffset = new Uint32Array(buffer, off, count);
-  off += 4 * count;
-  const ptCount = new Uint16Array(buffer, off, count);
-  off += 2 * count;
-  const klass = new Uint8Array(buffer, off, count);
-  off += count;
-  const flags = new Uint8Array(buffer, off, count);
-  off += count;
-  off = Math.ceil(off / 2) * 2;
-  const xz = new Int16Array(buffer, off, pointTotal * 2);
-  off += 4 * pointTotal;
-  const y = new Int16Array(buffer, off, pointTotal);
-  return { count, originX, originZ, quant, ptOffset, ptCount, klass, flags, xz, y };
-}
-
-function readLandcover(buffer) {
-  const dv = new DataView(buffer);
-  const indexWidth = dv.getUint16(6, true) || 4;
-  const vertexTotal = dv.getUint32(8, true);
-  const indexTotal = dv.getUint32(12, true);
-  const treeTotal = dv.getUint32(16, true);
-  const originX = dv.getFloat32(20, true);
-  const originZ = dv.getFloat32(24, true);
-  const quant = dv.getFloat32(28, true);
-  let off = 32;
-  const xz = new Int16Array(buffer, off, vertexTotal * 2);
-  off += 4 * vertexTotal;
-  const y = new Int16Array(buffer, off, vertexTotal);
-  off += 2 * vertexTotal;
-  const kind = new Uint8Array(buffer, off, vertexTotal);
-  off += vertexTotal;
-  off = Math.ceil(off / 4) * 4;
-  const indices =
-    indexWidth === 2
-      ? new Uint16Array(buffer, off, indexTotal)
-      : new Uint32Array(buffer, off, indexTotal);
-  off += indexWidth * indexTotal;
-  const treeXZ = new Int16Array(buffer, off, treeTotal * 2);
-  off += 4 * treeTotal;
-  const treeY = new Int16Array(buffer, off, treeTotal);
-  off += 2 * treeTotal;
-  const treeVar = new Uint8Array(buffer, off, treeTotal);
-  return { vertexTotal, indexTotal, treeTotal, originX, originZ, quant, xz, y, kind, indices, treeXZ, treeY, treeVar };
-}
 
 // --------------------------------------------------------------- near tier ---
 // Full footprint extrusion: one quad per footprint edge plus the baked roof
@@ -271,7 +143,7 @@ const TOY_PROP_MASK = 0xf8; // bits 3..7 of the record flag byte carry PROP.*
 const TOY_FLOOR = 3.5;
 const TOY_ROOF_RISE = 2.5;
 
-function buildToy(blobs, originX, originZ, palette) {
+function buildToy(blobs, originX, originZ, palette, kitJob = null) {
   let vertexEstimate = 0;
   const parsed = blobs.map((b) => {
     const d = readBuildings(b.buffer);
@@ -280,6 +152,21 @@ function buildToy(blobs, originX, originZ, palette) {
     for (let i = 0; i < d.count; i++) vertexEstimate += d.vertCount[i] * 9 + d.idxCount[i] + 420;
     return d;
   });
+
+  // Kit first: every footprint a hand-made piece can stand on drops out of the
+  // procedural extrusion below. Everything the kit cannot fit — and everything
+  // in this chunk if the kit is unavailable — is still extruded exactly as
+  // before, which is what keeps the two tiers seamless.
+  const plan = kitJob ? planKit({ parsed, originX, originZ, ...kitJob }) : null;
+  const kitFilled = plan ? plan.filled : null;
+  const kitBoxes = plan ? plan.boxes : null;
+  const insideKit = (x, z) => {
+    if (!kitBoxes) return false;
+    for (let i = 0; i < kitBoxes.length; i += 4) {
+      if (x >= kitBoxes[i] && x <= kitBoxes[i + 2] && z >= kitBoxes[i + 1] && z <= kitBoxes[i + 3]) return true;
+    }
+    return false;
+  };
 
   const positions = new Float32Array(vertexEstimate * 3);
   const normals = new Float32Array(vertexEstimate * 3);
@@ -349,10 +236,12 @@ function buildToy(blobs, originX, originZ, palette) {
     }
   }
 
-  for (const d of parsed) {
+  for (let bi = 0; bi < parsed.length; bi++) {
+    const d = parsed[bi];
     for (let b = 0; b < d.count; b++) {
       const n = d.vertCount[b];
       if (n < 3) continue;
+      if (kitFilled && kitFilled[bi][b]) continue;
       const vo = d.vertOffset[b];
       const base = d.baseY[b] * 0.1;
       const top = d.topY[b] * 0.1;
@@ -377,6 +266,10 @@ function buildToy(blobs, originX, originZ, palette) {
       }
       cx /= n;
       cz /= n;
+
+      // Rooftop garnish belongs to a mass that no longer exists once its lot is
+      // kit-filled, so it goes with it rather than floating over the piece.
+      if (garnish && insideKit(cx, cz)) continue;
 
       // Storefront band: the bottom 3.5 m of every wall is a separate strip of
       // geometry, darkened at bake-time intent (x0.82) instead of in a shader.
@@ -539,6 +432,10 @@ function buildToy(blobs, originX, originZ, palette) {
     indices: indices.subarray(0, ix),
     buildingCount,
     propTriangles,
+    kit: plan ? plan.instances : null,
+    kitPieces: plan ? plan.used : null,
+    kitPlaced: plan ? plan.placed : 0,
+    kitConsidered: plan ? plan.considered : 0,
   };
 }
 
@@ -835,7 +732,7 @@ self.onmessage = (event) => {
     if (msg.type === 'near' || msg.type === 'toy') {
       const out =
         msg.type === 'toy'
-          ? buildToy(msg.blobs, msg.originX, msg.originZ, msg.palette)
+          ? buildToy(msg.blobs, msg.originX, msg.originZ, msg.palette, msg.kit || null)
           : buildNear(msg.blobs, msg.originX, msg.originZ, msg.palette);
       const transfer = [
         out.positions.buffer,
@@ -846,6 +743,7 @@ self.onmessage = (event) => {
         out.indices.buffer,
       ];
       if (out.flag) transfer.push(out.flag.buffer);
+      if (out.kit) transfer.push(out.kit.buffer);
       self.postMessage({ id: msg.id, type: msg.type, key: msg.key, ...out }, transfer);
     } else if (msg.type === 'far') {
       const out = buildFar(msg.blobs, msg.originX, msg.originZ, msg.palette, msg.groupSize);
