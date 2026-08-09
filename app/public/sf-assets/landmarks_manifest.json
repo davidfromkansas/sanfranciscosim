@@ -1,20 +1,13 @@
 [
   {
-    "id": "coit-tower",
-    "file": "coit-tower.glb",
-    "anchor": [
-      -122.4058,
-      37.8024
-    ],
-    "targetHeightM": 64,
-    "cat": 16,
-    "name": "Coit Tower",
+    "id": "golden-gate-bridge",
+    "file": "golden-gate-bridge.glb",
+    "anchor": [-122.4783, 37.8199],
+    "targetHeightM": 227,
+    "cat": 0,
+    "name": "Golden Gate Bridge",
     "estimated": false,
-    "dims": [
-      17.5,
-      19.74,
-      65.2
-    ],
-    "tris": 1132
+    "dims": [2078, 36.2, 231.6],
+    "tris": 14472
   }
 ]
