@@ -1,8 +1,8 @@
 # PILOT: Integrate ONE hand-made landmark GLB (Golden Gate Bridge) — end-to-end test
 
-The repo now contains `app/public/sf-assets/landmarks/golden-gate-bridge.glb` (1.1 MB, 14,472 triangles, authored from 718 source objects) and `app/public/sf-assets/landmarks_manifest.json` (one entry). This is a deliberate single-asset pilot of the full asset pipeline: ~300 more GLBs (a 200-piece building kit + ~300 unique landmarks) follow ONLY after this works end to end. Build the integration exactly as specified so the full pack later drops in with zero code changes.
+The repo now contains `app/public/sf-assets/landmarks/golden-gate-bridge.glb` (~1.3 MB, 18,384 triangles, authored from ~790 source objects) and `app/public/sf-assets/landmarks_manifest.json` (one entry). This is a deliberate single-asset pilot of the full asset pipeline: ~300 more GLBs (a 200-piece building kit + ~300 unique landmarks) follow ONLY after this works end to end. Build the integration exactly as specified so the full pack later drops in with zero code changes.
 
-**Asset contract (guaranteed by the authoring side; the loader may assume it):** GLB in real meters, origin at base-center (z=0 is water level for this asset; towers rise 227 m, deck at 67 m), long span axis along the model's X, flat-color materials only (no textures, no transparency), materials named `Toy_*`; any material name ending `_Glow` marks night-glow surfaces — this asset has amber deck light strips and red tower beacons as `_Glow`. Assets may contain MANY objects/materials — merging is the loader's job.
+**Asset contract (guaranteed by the authoring side; the loader may assume it):** GLB in real meters, origin at base-center (z=0 is water level for this asset; towers rise 227 m, deck at 67 m), long span axis along the model's X (the manifest's `southEnd: "+X"` marks the San Francisco end — it carries the Fort Point arch and must land on the SF shore), flat-color materials only (no textures, no transparency), materials named `Toy_*`; any material name ending `_Glow` marks night-glow surfaces — this asset has amber deck light strips and red tower beacons as `_Glow`. Assets may contain MANY objects/materials — merging is the loader's job.
 
 ## Build this
 
@@ -14,11 +14,11 @@ The repo now contains `app/public/sf-assets/landmarks/golden-gate-bridge.glb` (1
 
 ## QA (on the deployed site — include PASS/FAIL for each in your summary)
 
-- [ ] Hero view: the new bridge spans the real Golden Gate strait — two art-deco stepped towers, continuous swooping main cables with suspenders, deck truss, anchorage blocks at both shores; International Orange; correctly oriented along the real alignment.
+- [ ] Hero view: the new bridge spans the real Golden Gate strait — two art-deco stepped towers, continuous swooping main cables with suspenders, deck truss, anchorage blocks at both shores, approach viaducts on columns beyond each anchorage, and the Fort Point brick fort with its steel arch under the south approach; International Orange; correctly oriented along the real alignment.
 - [ ] Approach roads flow onto the deck with no gap or kink (screenshot both ends); numeric gap check logged.
 - [ ] Bridge preset frames the new model; clicking it opens the existing card; no procedural buildings intersect the anchorages.
 - [ ] Night: deck light strips + red tower beacons glow; day look otherwise unchanged.
-- [ ] Merge log printed: 718 source objects / N materials → 2 draw calls; total draw calls and fps unchanged vs before (± noise).
+- [ ] Merge log printed: ~790 source objects / N materials → 2 draw calls; total draw calls and fps unchanged vs before (± noise).
 - [ ] Delete the GLB locally → code-built bridge returns with one warning; restore → GLB returns.
 - [ ] `vercel deploy --prod`; production URL first line of the summary.
 

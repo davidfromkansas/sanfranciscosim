@@ -2,12 +2,20 @@
   {
     "id": "golden-gate-bridge",
     "file": "golden-gate-bridge.glb",
-    "anchor": [-122.4783, 37.8199],
+    "anchor": [
+      -122.4783,
+      37.8199
+    ],
     "targetHeightM": 227,
     "cat": 0,
     "name": "Golden Gate Bridge",
     "estimated": false,
-    "dims": [2078, 36.2, 231.6],
-    "tris": 14472
+    "dims": [
+      2400,
+      36.2,
+      233.2
+    ],
+    "tris": 18384,
+    "southEnd": "+X"
   }
 ]
