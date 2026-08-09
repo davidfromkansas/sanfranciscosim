@@ -501,13 +501,51 @@ export function createAgents(scene, data, city) {
     cityPaths = paths;
   });
 
+  // DataSF's street grid stops at the county line in the middle of the strait,
+  // so the baked ribbons only cover the first fifth of the Golden Gate. Traffic
+  // on a bespoke bridge therefore runs on its own deck centreline, cut into
+  // segments short enough that the range check below still finds the far half
+  // of the span when the camera is out over the water.
+  const DECK_SEGMENT = 250;
+  const deckSpeed = manifest.streetClasses?.[0]?.speed ?? 28;
+  const deckPaths = [];
+  for (const spec of Object.values(manifest.bridges || {})) {
+    for (const deck of [spec, spec.east]) {
+      if (!deck?.nodes || deck.nodes.length < 2) continue;
+      const points = deck.nodes.map(([lon, lat, y]) => {
+        const [x, z] = project(lon, lat);
+        return [x, y + 0.35, z];
+      });
+      let run = [points[0]];
+      let length = 0;
+      const flush = () => {
+        if (run.length < 2) return;
+        const flat = new Float32Array(run.length * 3);
+        run.forEach((p, i) => flat.set(p, i * 3));
+        deckPaths.push({ points: flat, klass: 0, width: deck.deckWidth ?? 24, speed: deckSpeed });
+      };
+      for (let i = 1; i < points.length; i++) {
+        length += Math.hypot(points[i][0] - points[i - 1][0], points[i][2] - points[i - 1][2]);
+        run.push(points[i]);
+        if (length >= DECK_SEGMENT) {
+          flush();
+          run = [points[i]];
+          length = 0;
+        }
+      }
+      flush();
+    }
+  }
+
   function nearbyPaths(pivot) {
     const list = [];
-    for (const path of cityPaths) {
-      if (!path.meta) path.meta = polylineLengths(path.points);
-      const dx = path.points[0] - pivot.x;
-      const dz = path.points[2] - pivot.z;
-      if (dx * dx + dz * dz < CAR_RANGE * CAR_RANGE) list.push(path);
+    for (const source of [cityPaths, deckPaths]) {
+      for (const path of source) {
+        if (!path.meta) path.meta = polylineLengths(path.points);
+        const dx = path.points[0] - pivot.x;
+        const dz = path.points[2] - pivot.z;
+        if (dx * dx + dz * dz < CAR_RANGE * CAR_RANGE) list.push(path);
+      }
     }
     return list;
   }
@@ -802,7 +840,7 @@ export function createAgents(scene, data, city) {
 
     // Traffic: re-seed the pool onto nearby real centrelines as you move.
     carRefresh -= dt;
-    if (carRefresh <= 0 && cityPaths.length) {
+    if (carRefresh <= 0 && (cityPaths.length || deckPaths.length)) {
       carRefresh = 1.5;
       const candidates = nearbyPaths(pivot);
       if (candidates.length) {
