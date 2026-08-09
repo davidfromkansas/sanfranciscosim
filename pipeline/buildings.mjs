@@ -42,6 +42,44 @@ const exclusions = LANDMARKS.map((l) => {
   return { x, z, r2: l.exclude * l.exclude, id: l.id };
 });
 
+// A bridge is a kilometres-long structure, so a circle around its anchor only
+// clears midspan: the towers, anchorages, approach viaducts and the shore
+// structures they stand on are all far outside it. Every bespoke deck therefore
+// also carries a corridor along its whole baked centreline.
+const DECK_CORRIDOR = 40;
+const deckLines = [];
+for (const spec of Object.values(JSON.parse(await readFile(new URL('bridges.json', OUT), 'utf8')))) {
+  for (const nodes of [spec.nodes, spec.east?.nodes]) {
+    if (!nodes) continue;
+    const pts = nodes.map(([lon, lat]) => project(lon, lat));
+    const xs = pts.map((p) => p[0]);
+    const zs = pts.map((p) => p[1]);
+    deckLines.push({
+      pts,
+      minX: Math.min(...xs) - DECK_CORRIDOR,
+      maxX: Math.max(...xs) + DECK_CORRIDOR,
+      minZ: Math.min(...zs) - DECK_CORRIDOR,
+      maxZ: Math.max(...zs) + DECK_CORRIDOR,
+    });
+  }
+}
+
+function insideDeckCorridor(x, z) {
+  for (const { pts: line, minX, maxX, minZ, maxZ } of deckLines) {
+    if (x < minX || x > maxX || z < minZ || z > maxZ) continue;
+    for (let i = 1; i < line.length; i++) {
+      const [ax, az] = line[i - 1];
+      const [bx, bz] = line[i];
+      const dx = bx - ax;
+      const dz = bz - az;
+      const l2 = dx * dx + dz * dz || 1;
+      const t = Math.min(1, Math.max(0, ((x - ax) * dx + (z - az) * dz) / l2));
+      if ((x - (ax + dx * t)) ** 2 + (z - (az + dz * t)) ** 2 < DECK_CORRIDOR * DECK_CORRIDOR) return true;
+    }
+  }
+  return false;
+}
+
 // A footprint is excluded when any part of it reaches into a bespoke landmark's
 // zone, not just when its centroid does, so nothing pokes through the models.
 function excluded(ring, cx, cz) {
@@ -50,6 +88,10 @@ function excluded(ring, cx, cz) {
     for (let i = 0; i < ring.length; i += 2) {
       if ((ring[i] - e.x) ** 2 + (ring[i + 1] - e.z) ** 2 < e.r2) return true;
     }
+  }
+  if (insideDeckCorridor(cx, cz)) return true;
+  for (let i = 0; i < ring.length; i += 2) {
+    if (insideDeckCorridor(ring[i], ring[i + 1])) return true;
   }
   return false;
 }

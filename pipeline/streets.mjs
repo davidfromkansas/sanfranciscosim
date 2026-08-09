@@ -28,6 +28,7 @@ const piers = [];
 // hovering over the bay on its own piers.
 const DECK_CORRIDOR = 45;
 const DECK_SURFACE = 1.5;
+const DECK_BLEND_PASSES = 20;
 const bridgeSpec = JSON.parse(await readFile(new URL('bridges.json', OUT), 'utf8'));
 const deckLines = [];
 for (const spec of Object.values(bridgeSpec)) {
@@ -89,10 +90,19 @@ function deckOffsets(pts) {
     }
   }
   if (!any) return null;
+  // Points on a bespoke deck must match it exactly, so they are pinned through
+  // the smoothing rather than restored after it: that way the height of a deck
+  // the approach has to reach diffuses outward instead of leaving a step where
+  // the corridor ends. Samples are 10 m apart, so the passes set how long the
+  // approach viaduct has to climb.
   let cur = raw;
-  for (let pass = 0; pass < 4; pass++) {
+  for (let pass = 0; pass < DECK_BLEND_PASSES; pass++) {
     const next = new Float64Array(n);
     for (let i = 0; i < n; i++) {
+      if (onBridge[i]) {
+        next[i] = raw[i];
+        continue;
+      }
       const a = cur[Math.max(0, i - 1)];
       const b = cur[i];
       const c = cur[Math.min(n - 1, i + 1)];
@@ -100,9 +110,6 @@ function deckOffsets(pts) {
     }
     cur = next;
   }
-  // Points on a bespoke deck must match it exactly, so restore them after the
-  // smoothing pass.
-  for (let i = 0; i < n; i++) if (onBridge[i]) cur[i] = raw[i];
   return { offsets: cur, onBridge };
 }
 

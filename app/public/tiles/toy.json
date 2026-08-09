@@ -244,17 +244,17 @@
   }
  ],
  "stats": {
-  "baseBuildings": 174845,
-  "records": 230980,
-  "pitched": 149411,
-  "garnish": 56135,
+  "baseBuildings": 174823,
+  "records": 230905,
+  "pitched": 149408,
+  "garnish": 56082,
   "helipads": 6,
   "tallest": 200,
-  "trees": 289745,
+  "trees": 289738,
   "bytes": {
-   "buildings": 12239132,
+   "buildings": 12234872,
    "streets": 4837968,
-   "landcover": 11931520
+   "landcover": 11931468
   }
  },
  "cells": [
@@ -3396,8 +3396,8 @@
    "cz": 11,
    "originX": 4000,
    "originZ": -2500,
-   "buildings": 91,
-   "bytes": 5574
+   "buildings": 100,
+   "bytes": 5972
   },
   {
    "key": "24_12",
@@ -3405,8 +3405,8 @@
    "cz": 12,
    "originX": 4000,
    "originZ": -2000,
-   "buildings": 146,
-   "bytes": 9478
+   "buildings": 101,
+   "bytes": 6984
   },
   {
    "key": "24_13",
@@ -3567,8 +3567,8 @@
    "cz": 11,
    "originX": 4500,
    "originZ": -2500,
-   "buildings": 18,
-   "bytes": 980
+   "buildings": 3,
+   "bytes": 216
   },
   {
    "key": "25_13",
@@ -3931,15 +3931,6 @@
    "bytes": 520
   },
   {
-   "key": "27_8",
-   "cx": 27,
-   "cz": 8,
-   "originX": 5500,
-   "originZ": -4000,
-   "buildings": 1,
-   "bytes": 84
-  },
-  {
    "key": "28_2",
    "cx": 28,
    "cz": 2,
@@ -4026,8 +4017,8 @@
    "cz": 6,
    "originX": 6000,
    "originZ": -5000,
-   "buildings": 42,
-   "bytes": 2484
+   "buildings": 40,
+   "bytes": 2362
   },
   {
    "key": "28_7",
@@ -4075,22 +4066,13 @@
    "bytes": 692
   },
   {
-   "key": "29_5",
-   "cx": 29,
-   "cz": 5,
-   "originX": 6500,
-   "originZ": -5500,
-   "buildings": 3,
-   "bytes": 186
-  },
-  {
    "key": "29_6",
    "cx": 29,
    "cz": 6,
    "originX": 6500,
    "originZ": -5000,
-   "buildings": 12,
-   "bytes": 1454
+   "buildings": 9,
+   "bytes": 1292
   },
   {
    "key": "29_7",
@@ -5520,8 +5502,8 @@
    "cz": 7,
    "originX": -3500,
    "originZ": -4500,
-   "buildings": 71,
-   "bytes": 4144
+   "buildings": 56,
+   "bytes": 3298
   },
   {
    "key": "9_8",
@@ -13420,8 +13402,8 @@
    "originX": 4000,
    "originZ": -2000,
    "triangles": 380,
-   "trees": 95,
-   "bytes": 5664
+   "trees": 88,
+   "bytes": 5612
   },
   {
    "key": "24_13",
