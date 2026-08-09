@@ -10,7 +10,8 @@ The repo now contains `app/public/sf-assets/landmarks/golden-gate-bridge.glb` (~
 2. **Placement — bridge-specific:** scale uniformly so tower height = `targetHeightM` (measure the merged bounds height; never trust the file). Align the model's span axis (X) along the REAL bridge centerline (the OSM-snapped Golden Gate Bridge polyline already in the pipeline data): center at the polyline midpoint, yaw from the polyline bearing. Ground at water level (y = 0), NOT terrain-sampled. If the scaled span doesn't reach both real anchorage points, stretch along the span axis ONLY (non-uniform X scale is allowed for bridges alone) until deck ends meet the shorelines.
 3. **Replace:** remove/hide the existing code-built Golden Gate Bridge entirely (towers, cables, deck — no double-render, no leftovers). The existing approach roads must connect to the new deck height (~67 m scaled) within 2 m vertical / 5 m horizontal — reuse the approach-ramp logic. The bridge keeps its existing camera preset, pick zone, and context card.
 4. **Fallback:** if the GLB is missing/fails/violates the contract, log ONE warning and keep the code-built bridge. The app must behave exactly as today with the `sf-assets` folder deleted.
-5. **Works in every mode:** diorama (default) and golden, day and night. At night the `_Glow` deck strips and tower beacons ignite with the existing dusk system. The far tier must not double-draw the old bridge.
+5. **Works day and night in diorama mode.** At night the `_Glow` deck strips and tower beacons ignite with the existing dusk system. The far tier must not double-draw the old bridge.
+6. **Diorama becomes the DEFAULT AND ONLY mode (do this in the same change):** the app boots straight into diorama mode on every load — toy tiles, locked diorama camera, amber backdrop, lightbox lighting — with no flash of any other look. Remove ALL user-facing access to the realistic/golden-hour style: the `M` toggle no longer switches styles (retire it or repurpose the help text), and the `?style=golden` URL parameter is ignored. `DEFAULT_STYLE` is hardcoded; golden-mode code may be deleted or left dormant, but it must be unreachable by users and must not ship extra weight to the client if easily avoidable. NOTE: this is about visual STYLE only — the procedural-geometry fallback (item 4) is unrelated and must keep working.
 
 ## QA (on the deployed site — include PASS/FAIL for each in your summary)
 
@@ -18,6 +19,7 @@ The repo now contains `app/public/sf-assets/landmarks/golden-gate-bridge.glb` (~
 - [ ] Approach roads flow onto the deck with no gap or kink (screenshot both ends); numeric gap check logged.
 - [ ] Bridge preset frames the new model; clicking it opens the existing card; no procedural buildings intersect the anchorages.
 - [ ] Night: deck light strips + red tower beacons glow; day look otherwise unchanged.
+- [ ] Diorama-only: a cold, cache-cleared load boots into diorama mode as the FIRST frame; pressing `M` no longer reaches the realistic city; `?style=golden` is ignored; no golden-mode flash at any point.
 - [ ] Merge log printed: ~790 source objects / N materials → 2 draw calls; total draw calls and fps unchanged vs before (± noise).
 - [ ] Delete the GLB locally → code-built bridge returns with one warning; restore → GLB returns.
 - [ ] `vercel deploy --prod`; production URL first line of the summary.
