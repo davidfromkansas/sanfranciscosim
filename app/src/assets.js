@@ -128,6 +128,23 @@ function placeBridge(group, box, entry, spec, data) {
     }
     return nodes[nodes.length - 1].clone();
   };
+  // Arc length of the point on the centreline closest to a world position.
+  const arcOf = (p) => {
+    let best = Infinity;
+    let arc = 0;
+    for (let i = 1; i < nodes.length; i++) {
+      const dx = nodes[i].x - nodes[i - 1].x;
+      const dz = nodes[i].z - nodes[i - 1].z;
+      const lengthSq = dx * dx + dz * dz || 1;
+      const t = Math.min(1, Math.max(0, ((p.x - nodes[i - 1].x) * dx + (p.z - nodes[i - 1].z) * dz) / lengthSq));
+      const distance = Math.hypot(nodes[i - 1].x + dx * t - p.x, nodes[i - 1].z + dz * t - p.z);
+      if (distance < best) {
+        best = distance;
+        arc = lengths[i - 1] + Math.hypot(dx, dz) * t;
+      }
+    }
+    return arc;
+  };
 
   // Tower tops in model space: the vertices within 2% of the model's ceiling.
   const position = group.children[0].geometry.attributes.position;
@@ -140,52 +157,47 @@ function placeBridge(group, box, entry, spec, data) {
     towerMax = Math.max(towerMax, position.getX(i));
   }
 
-  // The suspended span is the part of the centreline that is actually straight,
-  // so its two towers define the alignment. The full polyline curves onto the
-  // approach roads at both ends and would twist the model by a couple of
-  // degrees. Fall back to the polyline chord if the bake has no towers.
+  // The model is centred on the real towers along the route, then both of its
+  // deck ends are pinned onto the baked centreline itself. Aligning to the
+  // towers alone leaves the ends metres off the road, because the centreline
+  // curves where it runs onto the approach viaducts — and a road that does not
+  // meet the deck is worse than a tower a few metres out.
   const towers = (spec.towers || []).map((t) => {
     const [x, z] = data.project(t[0], t[1]);
     return new Vector3(x, 0, z);
   });
-  const head = nodes[0];
-  const tail = nodes[nodes.length - 1];
   const usable = towers.length === 2 && towerMax - towerMin > 1;
-  // `southEnd: "+X"` means the model's +X carries the San Francisco end, so the
-  // axis runs from Marin toward San Francisco — the first baked node.
-  if (usable && Math.hypot(towers[1].x - head.x, towers[1].z - head.z) < Math.hypot(towers[0].x - head.x, towers[0].z - head.z)) {
-    towers.reverse();
+  // Arc runs from the first baked node, which is the San Francisco end, so the
+  // south tower is the one with the smaller arc.
+  if (usable && arcOf(towers[0]) > arcOf(towers[1])) towers.reverse();
+  const towerSpacing = usable ? Math.hypot(towers[0].x - towers[1].x, towers[0].z - towers[1].z) : 0;
+  // `southEnd: "+X"` means the model's +X carries the San Francisco end, and
+  // arc length is measured from the first baked node, which is that same end.
+  const centerArc = usable ? (arcOf(towers[0]) + arcOf(towers[1])) / 2 : total / 2;
+  const modelLength = box.max.x - box.min.x;
+  const towerCenter = (towerMin + towerMax) / 2;
+
+  // Non-uniform X is allowed for bridges alone. Start from the scale that would
+  // put the two model towers on the two OSM towers, then settle on the scale at
+  // which the deck ends land on the centreline: the chord they subtend is
+  // slightly shorter than the arc between them.
+  let span = usable ? towerSpacing / (towerMax - towerMin) : uniform;
+  let south = pointAt(centerArc);
+  let north = south;
+  for (let pass = 0; pass < 6; pass++) {
+    south = pointAt(centerArc - (box.max.x - towerCenter) * span);
+    north = pointAt(centerArc + (towerCenter - box.min.x) * span);
+    span = Math.hypot(south.x - north.x, south.z - north.z) / modelLength;
   }
-  const from = usable ? towers[1] : tail;
-  const to = usable ? towers[0] : head;
-  const len = Math.hypot(to.x - from.x, to.z - from.z) || 1;
-  const dirX = (to.x - from.x) / len;
-  const dirZ = (to.z - from.z) / len;
+
+  const chord = Math.hypot(south.x - north.x, south.z - north.z) || 1;
+  const dirX = (south.x - north.x) / chord;
+  const dirZ = (south.z - north.z) / chord;
   const yaw = Math.atan2(-dirZ, dirX);
+  const originX = south.x - dirX * box.max.x * span;
+  const originZ = south.z - dirZ * box.max.x * span;
 
-  // Non-uniform X is allowed for bridges alone: the span stretches so the two
-  // model towers land exactly on the two OSM towers.
-  const spanScale = usable ? len / (towerMax - towerMin) : uniform;
-  const center = usable ? from.clone().lerp(to, 0.5) : pointAt(total / 2);
-  const centerAlong = -((towerMin + towerMax) / 2) * spanScale;
-  const originX = center.x + dirX * centerAlong;
-  const originZ = center.z + dirZ * centerAlong;
-
-  // The deck also has to carry past both shorelines; if the fitted span stops
-  // short of dry land, stretch further along X only.
-  const shoreline = (sign) => {
-    for (let d = 0; d < total; d += 5) {
-      if (data.sampleElevation(originX + dirX * sign * d, originZ + dirZ * sign * d) > 0.5) return d;
-    }
-    return 0;
-  };
-  const short = Math.max(
-    shoreline(1) / Math.max(1, box.max.x * spanScale),
-    shoreline(-1) / Math.max(1, -box.min.x * spanScale)
-  );
-  const finalSpan = short > 1 ? spanScale * short : spanScale;
-
-  group.scale.set(finalSpan, uniform, uniform);
+  group.scale.set(span, uniform, uniform);
   group.rotation.y = yaw;
   // Water level, never terrain-sampled: this bridge crosses the strait.
   group.position.set(originX, 0, originZ);
@@ -194,7 +206,7 @@ function placeBridge(group, box, entry, spec, data) {
   // there instead of guessing.
   const deckTop = deckTopY(position, box) * uniform;
   const ends = [box.max.x, box.min.x].map((x) => {
-    const d = x * finalSpan;
+    const d = x * span;
     return {
       x: originX + dirX * d,
       z: originZ + dirZ * d,
@@ -205,18 +217,18 @@ function placeBridge(group, box, entry, spec, data) {
   });
 
   const residual = usable
-    ? [towerMin, towerMax]
-        .map((x, i) => {
-          const d = x * finalSpan;
-          return Math.hypot(originX + dirX * d - towers[1 - i].x, originZ + dirZ * d - towers[1 - i].z);
+    ? Math.max(
+        ...[towerMax, towerMin].map((x, i) => {
+          const d = x * span;
+          return Math.hypot(originX + dirX * d - towers[i].x, originZ + dirZ * d - towers[i].z);
         })
-        .reduce((a, b) => Math.max(a, b), 0)
+      )
     : null;
 
   return {
     ends,
     log:
-      `span x${finalSpan.toFixed(4)} (uniform x${uniform.toFixed(4)}), yaw ${((yaw * 180) / Math.PI).toFixed(2)}°, ` +
+      `span x${span.toFixed(4)} (uniform x${uniform.toFixed(4)}), yaw ${((yaw * 180) / Math.PI).toFixed(2)}°, ` +
       `towers ${residual === null ? 'n/a' : `${residual.toFixed(2)} m`} off the OSM pair, ` +
       `tower top ${(box.max.y * uniform).toFixed(1)} m, deck top ${deckTop.toFixed(1)} m`,
   };
