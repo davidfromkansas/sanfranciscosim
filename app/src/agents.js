@@ -25,6 +25,7 @@ import {
 import { GLTFLoader } from 'three/addons/loaders/GLTFLoader.js';
 import { mergeGeometries } from 'three/addons/utils/BufferGeometryUtils.js';
 import { shared } from './env.js';
+import { DECK_HALF_THICKNESS } from './landmarks.js';
 
 const ASSETS = `${import.meta.env.BASE_URL}sf-assets/`;
 
@@ -32,6 +33,9 @@ const CAR_COUNT = 720;
 const PED_COUNT = 420;
 const BIRD_COUNT = 90;
 const CAR_RANGE = 2200;
+// Vehicle geometry is base-origin, and the renderer lifts every car this far
+// off its path so street cars clear the road ribbon.
+const CAR_LIFT = 0.2;
 const PED_RANGE = 420;
 
 // Ferry / container-ship routes across the Bay, in lon/lat.
@@ -561,19 +565,67 @@ export function createAgents(scene, data, city) {
   // A bespoke bridge therefore carries its own traffic path: one unbroken run
   // of the baked deck centreline, so a car seeded anywhere on it drives the
   // full span shore to shore instead of looping inside an approach stub.
+  // A baked node's y is the deck centre, so the roadway a car stands on is
+  // DECK_HALF_THICKNESS above it — the same surface `deckRibbon` builds.
+  // Deck paths carry the surface directly, so the renderer's lift is taken
+  // back out: wheels touch the roadway instead of hovering over it.
   const deckSpeed = manifest.streetClasses?.[0]?.speed ?? 28;
+  const CAR_CLEARANCE = 0.05 - CAR_LIFT;
   const deckPaths = [];
-  for (const spec of Object.values(manifest.bridges || {})) {
+  for (const [id, spec] of Object.entries(manifest.bridges || {})) {
     for (const deck of [spec, spec.east]) {
       if (!deck?.nodes || deck.nodes.length < 2) continue;
       const flat = new Float32Array(deck.nodes.length * 3);
       deck.nodes.forEach(([lon, lat, y], i) => {
         const [x, z] = project(lon, lat);
         flat[i * 3] = x;
-        flat[i * 3 + 1] = y + 0.35;
+        flat[i * 3 + 1] = y + DECK_HALF_THICKNESS + CAR_CLEARANCE;
         flat[i * 3 + 2] = z;
       });
-      deckPaths.push({ points: flat, klass: 0, width: deck.deckWidth ?? 24, speed: deckSpeed, deck: true });
+      deckPaths.push({
+        id,
+        points: flat,
+        baked: Float32Array.from(deck.nodes, ([, , y]) => y + DECK_HALF_THICKNESS + CAR_CLEARANCE),
+        klass: 0,
+        width: deck.deckWidth ?? 24,
+        speed: deckSpeed,
+        deck: true,
+      });
+    }
+  }
+
+  // An asset deck is a measured surface of its own, so once a GLB takes a
+  // bridge over, its cars ride that surface: flat across the span the asset
+  // covers, then down each approach ramp on the same grade `useBridgeAsset`
+  // builds — from the asset deck to the abutment the streets already meet.
+  function useBridgeDeckTop(id, ends) {
+    const path = deckPaths.find((p) => p.id === id);
+    const usable = (ends || []).filter((end) => Number.isFinite(end?.y));
+    if (!path || !usable.length) return;
+    const n = path.points.length / 3;
+    const nodeAt = (i) => [path.points[i * 3], path.points[i * 3 + 2]];
+
+    // The span itself is the asset's own flat deck.
+    const surface = usable[0].y + CAR_CLEARANCE;
+    for (let i = 0; i < n; i++) path.points[i * 3 + 1] = surface;
+
+    // Each ramp grades from the abutment the streets meet up to that deck.
+    for (const end of usable) {
+      const anchor = end.toward === 'south' ? 0 : n - 1;
+      const step = anchor === 0 ? 1 : -1;
+      const [ax, az] = nodeAt(anchor);
+      const abutment = path.baked[anchor];
+      const ramp = [];
+      for (let i = anchor; i >= 0 && i < n; i += step) {
+        const [x, z] = nodeAt(i);
+        if (Math.hypot(x - ax, z - az) >= Math.hypot(x - end.x, z - end.z)) break;
+        ramp.push({ i, run: Math.hypot(x - ax, z - az) });
+      }
+      const run = ramp.length ? ramp[ramp.length - 1].run : 0;
+      if (!run) continue;
+      for (const node of ramp) {
+        path.points[node.i * 3 + 1] = abutment + (surface - abutment) * Math.min(1, node.run / run);
+      }
     }
   }
 
@@ -930,7 +982,7 @@ export function createAgents(scene, data, city) {
       samplePolyline(car.path.points, cumulative, total, car.d, position, tangent);
       if (position.distanceTo(cameraPos) > CAR_RANGE * 1.6) continue;
       const offset = (car.path.width / 4) * car.lane * car.dir;
-      dummy.position.set(position.x + tangent.z * offset, position.y + 0.2, position.z - tangent.x * offset);
+      dummy.position.set(position.x + tangent.z * offset, position.y + CAR_LIFT, position.z - tangent.x * offset);
       dummy.rotation.set(0, Math.atan2(tangent.x * car.dir, tangent.z * car.dir), 0);
       dummy.scale.setScalar(carScale);
       dummy.updateMatrix();
@@ -1084,6 +1136,7 @@ export function createAgents(scene, data, city) {
     group,
     update,
     setToy,
+    useBridgeDeckTop,
     get carCount() {
       if (!fleet.length) return carMesh.count;
       let total = 0;

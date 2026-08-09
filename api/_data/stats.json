@@ -1,6 +1,6 @@
 {
- "generated": "2026-08-09T04:42:06.539Z",
- "buildings": 174839,
+ "generated": "2026-08-09T06:10:52.262Z",
+ "buildings": 174838,
  "cells": 596,
  "categories": [
   {
@@ -21,7 +21,7 @@
    "cat": 2,
    "id": "apartments",
    "label": "Apartments",
-   "count": 14024,
+   "count": 14023,
    "night": 0
   },
   {
@@ -654,7 +654,7 @@
   }
  ],
  "sources": {
-  "landuse": 140757,
+  "landuse": 140756,
   "business": 10190,
   "heuristic": 7282,
   "datasf": 1295,
@@ -662,7 +662,7 @@
   "osm": 8641
  },
  "confidence": [
-  148039,
+  148038,
   15318,
   4513,
   6969

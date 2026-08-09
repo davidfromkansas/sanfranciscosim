@@ -48,20 +48,37 @@ const exclusions = LANDMARKS.map((l) => {
 // also carries a corridor along its whole baked centreline. Only what would
 // actually hit the deck is cleared: the approaches run high over Rincon Hill
 // and Folsom, and the blocks underneath them are real city that has to stay.
+// Near the shore a hand-made bridge is more than its deck, though: the Golden
+// Gate's arch and approach steelwork come down to the ground and the deck
+// height says nothing about them, so the end of an asset bridge is cleared
+// outright.
 const DECK_CORRIDOR = 40;
 const DECK_CLEARANCE = 4;
+const DECK_END_ZONE = 400;
+const assetIds = new Set(
+  await readFile(new URL('../app/public/sf-assets/landmarks_manifest.json', import.meta.url), 'utf8')
+    .then((raw) => JSON.parse(raw).map((entry) => entry.id))
+    .catch(() => [])
+);
+const kebab = (id) => id.replace(/([a-z0-9])([A-Z])/g, '$1-$2').toLowerCase();
 const deckLines = [];
-for (const spec of Object.values(JSON.parse(await readFile(new URL('bridges.json', OUT), 'utf8')))) {
+for (const [id, spec] of Object.entries(JSON.parse(await readFile(new URL('bridges.json', OUT), 'utf8')))) {
   for (const nodes of [spec.nodes, spec.east?.nodes]) {
     if (!nodes) continue;
     const pts = nodes.map(([lon, lat, y]) => {
       const [x, z] = project(lon, lat);
       return [x, z, y];
     });
+    const arc = [0];
+    for (let i = 1; i < pts.length; i++) {
+      arc.push(arc[i - 1] + Math.hypot(pts[i][0] - pts[i - 1][0], pts[i][1] - pts[i - 1][1]));
+    }
     const xs = pts.map((p) => p[0]);
     const zs = pts.map((p) => p[1]);
     deckLines.push({
       pts,
+      arc,
+      asset: assetIds.has(kebab(id)),
       minX: Math.min(...xs) - DECK_CORRIDOR,
       maxX: Math.max(...xs) + DECK_CORRIDOR,
       minZ: Math.min(...zs) - DECK_CORRIDOR,
@@ -70,12 +87,13 @@ for (const spec of Object.values(JSON.parse(await readFile(new URL('bridges.json
   }
 }
 
-// Deck height over a point inside the corridor, or Infinity when the point is
-// clear of every deck.
+// Deck height over a point inside a corridor: 0 in an asset bridge's end zone,
+// where the structure reaches the ground, and Infinity clear of every deck.
 function deckHeightOver(x, z) {
   let best = Infinity;
-  for (const { pts: line, minX, maxX, minZ, maxZ } of deckLines) {
+  for (const { pts: line, arc, asset, minX, maxX, minZ, maxZ } of deckLines) {
     if (x < minX || x > maxX || z < minZ || z > maxZ) continue;
+    const span = arc[arc.length - 1];
     for (let i = 1; i < line.length; i++) {
       const [ax, az, ay] = line[i - 1];
       const [bx, bz, by] = line[i];
@@ -83,9 +101,10 @@ function deckHeightOver(x, z) {
       const dz = bz - az;
       const l2 = dx * dx + dz * dz || 1;
       const t = Math.min(1, Math.max(0, ((x - ax) * dx + (z - az) * dz) / l2));
-      if ((x - (ax + dx * t)) ** 2 + (z - (az + dz * t)) ** 2 < DECK_CORRIDOR * DECK_CORRIDOR) {
-        best = Math.min(best, ay + (by - ay) * t);
-      }
+      if ((x - (ax + dx * t)) ** 2 + (z - (az + dz * t)) ** 2 >= DECK_CORRIDOR * DECK_CORRIDOR) continue;
+      const along = arc[i - 1] + (arc[i] - arc[i - 1]) * t;
+      const fromEnd = Math.min(along, span - along);
+      best = Math.min(best, asset && fromEnd < DECK_END_ZONE ? 0 : ay + (by - ay) * t);
     }
   }
   return best;
