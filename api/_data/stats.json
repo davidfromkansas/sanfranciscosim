@@ -1,6 +1,6 @@
 {
- "generated": "2026-08-09T03:59:09.051Z",
- "buildings": 174823,
+ "generated": "2026-08-09T04:42:06.539Z",
+ "buildings": 174839,
  "cells": 596,
  "categories": [
   {
@@ -14,28 +14,28 @@
    "cat": 1,
    "id": "house",
    "label": "House",
-   "count": 124541,
+   "count": 124543,
    "night": 0
   },
   {
    "cat": 2,
    "id": "apartments",
    "label": "Apartments",
-   "count": 14021,
+   "count": 14024,
    "night": 0
   },
   {
    "cat": 3,
    "id": "office",
    "label": "Office",
-   "count": 2760,
+   "count": 2762,
    "night": 3
   },
   {
    "cat": 4,
    "id": "retail",
    "label": "Retail",
-   "count": 8044,
+   "count": 8045,
    "night": 1
   },
   {
@@ -56,7 +56,7 @@
    "cat": 7,
    "id": "hotel",
    "label": "Hotel",
-   "count": 1462,
+   "count": 1463,
    "night": 0
   },
   {
@@ -140,7 +140,7 @@
    "cat": 19,
    "id": "industrial",
    "label": "Industrial",
-   "count": 2029,
+   "count": 2031,
    "night": 3
   },
   {
@@ -161,14 +161,14 @@
    "cat": 22,
    "id": "supermarket",
    "label": "Supermarket",
-   "count": 344,
+   "count": 345,
    "night": 1
   },
   {
    "cat": 23,
    "id": "parking_garage",
    "label": "Parking garage",
-   "count": 1856,
+   "count": 1858,
    "night": 3
   },
   {
@@ -182,7 +182,7 @@
    "cat": 25,
    "id": "transit_station",
    "label": "Transit station",
-   "count": 310,
+   "count": 312,
    "night": 2
   }
  ],
@@ -210,7 +210,7 @@
   {
    "sub": "hotel",
    "label": "Hotel",
-   "count": 1307
+   "count": 1308
   },
   {
    "sub": "salon",
@@ -230,7 +230,7 @@
   {
    "sub": "parking_garage",
    "label": "Parking garage",
-   "count": 905
+   "count": 907
   },
   {
    "sub": "community_center",
@@ -290,7 +290,7 @@
   {
    "sub": "corner_store",
    "label": "Corner store",
-   "count": 281
+   "count": 282
   },
   {
    "sub": "muni_station",
@@ -355,12 +355,12 @@
   {
    "sub": "tech_hq",
    "label": "Tech office",
-   "count": 131
+   "count": 132
   },
   {
    "sub": "supermarket",
    "label": "Supermarket",
-   "count": 126
+   "count": 127
   },
   {
    "sub": "pizzeria",
@@ -443,14 +443,14 @@
    "count": 56
   },
   {
+   "sub": "ferry_terminal",
+   "label": "Ferry terminal",
+   "count": 53
+  },
+  {
    "sub": "post_office",
    "label": "Post office",
    "count": 52
-  },
-  {
-   "sub": "ferry_terminal",
-   "label": "Ferry terminal",
-   "count": 51
   },
   {
    "sub": "medical_center",
@@ -654,18 +654,18 @@
   }
  ],
  "sources": {
-  "landuse": 140751,
+  "landuse": 140757,
   "business": 10190,
-  "heuristic": 7280,
-  "datasf": 1293,
-  "overture": 6670,
-  "osm": 8639
+  "heuristic": 7282,
+  "datasf": 1295,
+  "overture": 6674,
+  "osm": 8641
  },
  "confidence": [
-  148031,
-  15315,
-  4509,
-  6968
+  148039,
+  15318,
+  4513,
+  6969
  ],
  "streets": {
   "named": 2509,
