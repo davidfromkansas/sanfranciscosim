@@ -1,5 +1,5 @@
 // Bootstrap: load the baked city, build the scene, and open on the hero frame —
-// the whole of San Francisco at golden hour, no title card, no fade-in.
+// the whole of San Francisco as a diorama, no title card, no fade-in.
 
 import {
   ACESFilmicToneMapping,
@@ -18,6 +18,7 @@ import { createTerrain } from './terrain.js';
 import { createWater } from './water.js';
 import { createCity } from './city.js';
 import { createLandmarks } from './landmarks.js';
+import { createAssets } from './assets.js';
 import { createPiers } from './piers.js';
 import { createAgents } from './agents.js';
 import { createCameraRig } from './camera.js';
@@ -56,6 +57,24 @@ async function boot() {
 
   const context = await createContext(data);
   const city = createCity(scene, data);
+  // Hand-made landmark GLBs; loaded after the first paint, so the city is on
+  // screen before a single byte of asset is fetched.
+  const assets = createAssets(scene, data, {
+    onPlaced(landmarkId, placement) {
+      const gaps = landmarks.useBridgeAsset(landmarkId, placement);
+      if (gaps) {
+        for (const gap of gaps) {
+          console.log(
+            `sf-assets: ${landmarkId} ${gap.end} approach — deck joint ` +
+              `${gap.deck.horizontal.toFixed(2)} m horizontal / ${gap.deck.vertical.toFixed(2)} m vertical, ` +
+              `road joint ${gap.road.horizontal.toFixed(2)} m / ${gap.road.vertical.toFixed(2)} m, ` +
+              `ramp ${gap.rampLength.toFixed(0)} m from ${gap.deckTop.toFixed(1)} m deck to ` +
+              `${gap.abutment.toFixed(1)} m abutment`
+          );
+        }
+      }
+    },
+  });
   const agents = createAgents(scene, data, city);
   const signs = createSigns(scene, data);
   const post = createToyPost(renderer);
@@ -98,6 +117,33 @@ async function boot() {
     post.setSize();
   }
 
+  // Visual style. The diorama is the only one the app ships: it is applied
+  // before the first frame and there is no key, control or URL parameter that
+  // leaves it. The realistic golden-hour tier below it still exists — the tile
+  // bake, the materials and the camera rig all keep both paths — but nothing
+  // user-facing can select it, so `?style=golden` and friends are simply not
+  // read.
+  const DEFAULT_STYLE = 'toy';
+  const NORMAL_FOV = camera.fov;
+  let style = 'base';
+
+  // One switch drives every subsystem: tiles, materials, lights, fog, camera
+  // rig, lens and the toy-only life.
+  async function setStyle(next) {
+    if (next === style) return;
+    style = next;
+    const toy = next === 'toy';
+    camera.fov = toy ? 18 : NORMAL_FOV;
+    camera.updateProjectionMatrix();
+    rig.setDiorama(toy);
+    env.setToy(toy);
+    agents.setToy(toy);
+    signs.setVisible(toy);
+    post.setEnabled(toy);
+    ui.setStyle(toy);
+    await city.setTier(toy ? 'toy' : 'base');
+  }
+
   let autoTime = true;
   let timeOfDay = 0;
 
@@ -121,6 +167,11 @@ async function boot() {
   ui.setQuality(qualityKey);
   applyQuality(qualityKey);
 
+  // Diorama is the only style this app ships. It is applied here, before the
+  // first frame is ever requested, so there is no realistic-city flash and no
+  // URL parameter or key can reach the golden-hour look.
+  await setStyle(DEFAULT_STYLE);
+
   // Number keys fly to presets, H goes home, / opens search.
   window.addEventListener('keydown', (event) => {
     if (event.metaKey || event.ctrlKey || event.altKey) return;
@@ -142,12 +193,6 @@ async function boot() {
       ui.setPresetIndex(0);
       return;
     }
-    if (event.key === 'm' || event.key === 'M') {
-      setStyle(style === 'toy' ? 'base' : 'toy').catch((err) =>
-        console.warn('style switch failed', err)
-      );
-      return;
-    }
     const index = presets.findIndex((preset) => preset.key && preset.key === event.key);
     if (index >= 0) {
       rig.flyTo(presets[index]);
@@ -162,32 +207,6 @@ async function boot() {
     post.setSize();
   });
 
-  // Diorama mode. One switch drives every subsystem: tiles, materials, lights,
-  // fog, camera rig, lens and the toy-only life. Leaving restores the exact
-  // camera and the normal city, both via the ordinary streaming paths.
-  const NORMAL_FOV = camera.fov;
-  let style = 'base';
-
-  async function setStyle(next) {
-    if (next === style) return;
-    style = next;
-    const toy = next === 'toy';
-    camera.fov = toy ? 18 : NORMAL_FOV;
-    camera.updateProjectionMatrix();
-    rig.setDiorama(toy);
-    env.setToy(toy);
-    agents.setToy(toy);
-    signs.setVisible(toy);
-    post.setEnabled(toy);
-    ui.setStyle(toy);
-    if (focus.entity) {
-      overlay.show(focus.entity, {
-        toy,
-        groundY: Math.max(0, data.sampleElevation(focus.entity.x, focus.entity.z)),
-      });
-    }
-    await city.setTier(toy ? 'toy' : 'base');
-  }
 
   // ------------------------------------------------------------- context layer
   // One focus state drives the overlay, the card and what the concierge is told
@@ -373,6 +392,7 @@ async function boot() {
 
   city.preload(rig.state.pivot.clone());
 
+
   // Handle for automated checks and for jumping to arbitrary coordinates.
   window.SF = {
     scene,
@@ -407,7 +427,7 @@ async function boot() {
       env.setTime(t);
       ui.setTime(t);
     },
-    setStyle,
+    assets,
     get style() {
       return style;
     },
@@ -434,6 +454,7 @@ async function boot() {
   let fpsAccumulator = 0;
   let fps = 0;
   let loaderDone = false;
+  let assetsRequested = false;
 
   function frame(now) {
     // Simulation dt is clamped so a stall cannot teleport the city, but the fps
@@ -458,6 +479,7 @@ async function boot() {
     city.update(dt, pivotWorld, camera.position, quality);
     agents.update(dt, pivotWorld, camera.position);
     landmarks.update();
+    assets.update();
     water.update(camera.position);
     // Clouds drift on wall time so the sky moves at the same rate whatever the
     // frame rate; the simulation clamp would slow them to a crawl below 20 fps.
@@ -468,6 +490,12 @@ async function boot() {
     signs.update(rig.state.distance, rig.state.yaw);
     // Tilt-shift + grade in diorama mode; a straight canvas render otherwise.
     post.render(scene, camera);
+
+    // Landmark assets are fetched only once the city is actually on screen.
+    if (!assetsRequested) {
+      assetsRequested = true;
+      assets.load();
+    }
 
     frames++;
     fpsAccumulator += elapsed;
