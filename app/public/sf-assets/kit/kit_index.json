@@ -1,0 +1,2716 @@
+{
+ "version": 2,
+ "note": "Kit v2 COMPLETE (2026-08-08): housing rebuilt as 9 SF typologies (75 pieces) AND all 132 non-residential pieces restyled per the sf-miniature-style bible (welded awnings/signs, 3-facet bays, designed roofs, framed doors, discrete side windows, tower crowns). Ids unchanged from v1 except residential renames in renames_v2. Toy_body remains the tintable material.",
+ "pieces": [
+  {
+   "id": "ital_w7_bay",
+   "file": "ital_w7_bay.glb",
+   "kind": "italianate",
+   "cat": 1,
+   "w": 7.6,
+   "dims": [
+    8.6,
+    13.4,
+    9.85
+   ],
+   "tris": 816
+  },
+  {
+   "id": "ital_w7_flat",
+   "file": "ital_w7_flat.glb",
+   "kind": "italianate",
+   "cat": 1,
+   "w": 7.6,
+   "dims": [
+    8.6,
+    13.4,
+    9.85
+   ],
+   "tris": 748
+  },
+  {
+   "id": "ital_w7_tall",
+   "file": "ital_w7_tall.glb",
+   "kind": "italianate",
+   "cat": 1,
+   "w": 7.6,
+   "dims": [
+    8.6,
+    13.4,
+    13.15
+   ],
+   "tris": 1012
+  },
+  {
+   "id": "ital_w9_bay",
+   "file": "ital_w9_bay.glb",
+   "kind": "italianate",
+   "cat": 1,
+   "w": 9.0,
+   "dims": [
+    10.0,
+    13.4,
+    9.85
+   ],
+   "tris": 828
+  },
+  {
+   "id": "ital_w9_flat",
+   "file": "ital_w9_flat.glb",
+   "kind": "italianate",
+   "cat": 1,
+   "w": 9.0,
+   "dims": [
+    10.0,
+    13.4,
+    9.85
+   ],
+   "tris": 760
+  },
+  {
+   "id": "ital_w9_tall",
+   "file": "ital_w9_tall.glb",
+   "kind": "italianate",
+   "cat": 1,
+   "w": 9.0,
+   "dims": [
+    10.0,
+    13.4,
+    13.15
+   ],
+   "tris": 1024
+  },
+  {
+   "id": "ital_w11_bay",
+   "file": "ital_w11_bay.glb",
+   "kind": "italianate",
+   "cat": 1,
+   "w": 11.0,
+   "dims": [
+    12.0,
+    13.4,
+    9.85
+   ],
+   "tris": 840
+  },
+  {
+   "id": "ital_w11_flat",
+   "file": "ital_w11_flat.glb",
+   "kind": "italianate",
+   "cat": 1,
+   "w": 11.0,
+   "dims": [
+    12.0,
+    13.4,
+    9.85
+   ],
+   "tris": 772
+  },
+  {
+   "id": "ital_w11_tall",
+   "file": "ital_w11_tall.glb",
+   "kind": "italianate",
+   "cat": 1,
+   "w": 11.0,
+   "dims": [
+    12.0,
+    13.4,
+    13.15
+   ],
+   "tris": 1036
+  },
+  {
+   "id": "stick_w7_gable",
+   "file": "stick_w7_gable.glb",
+   "kind": "stick",
+   "cat": 1,
+   "w": 7.6,
+   "dims": [
+    7.8,
+    13.4,
+    10.64
+   ],
+   "tris": 596
+  },
+  {
+   "id": "stick_w7_false",
+   "file": "stick_w7_false.glb",
+   "kind": "stick",
+   "cat": 1,
+   "w": 7.6,
+   "dims": [
+    8.6,
+    13.4,
+    10.22
+   ],
+   "tris": 668
+  },
+  {
+   "id": "stick_w9_gable",
+   "file": "stick_w9_gable.glb",
+   "kind": "stick",
+   "cat": 1,
+   "w": 9.0,
+   "dims": [
+    9.2,
+    13.4,
+    10.88
+   ],
+   "tris": 596
+  },
+  {
+   "id": "stick_w9_false",
+   "file": "stick_w9_false.glb",
+   "kind": "stick",
+   "cat": 1,
+   "w": 9.0,
+   "dims": [
+    10.0,
+    13.4,
+    10.22
+   ],
+   "tris": 680
+  },
+  {
+   "id": "stick_w11_gable",
+   "file": "stick_w11_gable.glb",
+   "kind": "stick",
+   "cat": 1,
+   "w": 11.0,
+   "dims": [
+    11.2,
+    13.4,
+    11.56
+   ],
+   "tris": 596
+  },
+  {
+   "id": "stick_w11_false",
+   "file": "stick_w11_false.glb",
+   "kind": "stick",
+   "cat": 1,
+   "w": 11.0,
+   "dims": [
+    12.0,
+    13.4,
+    10.22
+   ],
+   "tris": 692
+  },
+  {
+   "id": "qa_w9_turret",
+   "file": "qa_w9_turret.glb",
+   "kind": "queenanne",
+   "cat": 1,
+   "w": 9.0,
+   "dims": [
+    10.22,
+    13.56,
+    12.4
+   ],
+   "tris": 672
+  },
+  {
+   "id": "qa_w9_gable",
+   "file": "qa_w9_gable.glb",
+   "kind": "queenanne",
+   "cat": 1,
+   "w": 9.0,
+   "dims": [
+    9.2,
+    13.56,
+    10.53
+   ],
+   "tris": 500
+  },
+  {
+   "id": "qa_w11_turret",
+   "file": "qa_w11_turret.glb",
+   "kind": "queenanne",
+   "cat": 1,
+   "w": 11.0,
+   "dims": [
+    12.22,
+    13.56,
+    12.4
+   ],
+   "tris": 672
+  },
+  {
+   "id": "qa_w11_gable",
+   "file": "qa_w11_gable.glb",
+   "kind": "queenanne",
+   "cat": 1,
+   "w": 11.0,
+   "dims": [
+    11.2,
+    13.56,
+    11.21
+   ],
+   "tris": 500
+  },
+  {
+   "id": "qa_w11_wrap",
+   "file": "qa_w11_wrap.glb",
+   "kind": "queenanne",
+   "cat": 1,
+   "w": 11.0,
+   "dims": [
+    12.22,
+    13.56,
+    12.4
+   ],
+   "tris": 696
+  },
+  {
+   "id": "edw_w7_f2",
+   "file": "edw_w7_f2.glb",
+   "kind": "edwardian",
+   "cat": 1,
+   "w": 7.6,
+   "dims": [
+    8.3,
+    12.59,
+    8.65
+   ],
+   "tris": 600
+  },
+  {
+   "id": "edw_w7_f3",
+   "file": "edw_w7_f3.glb",
+   "kind": "edwardian",
+   "cat": 1,
+   "w": 7.6,
+   "dims": [
+    8.3,
+    12.59,
+    12.05
+   ],
+   "tris": 756
+  },
+  {
+   "id": "edw_w9_f2",
+   "file": "edw_w9_f2.glb",
+   "kind": "edwardian",
+   "cat": 1,
+   "w": 9.0,
+   "dims": [
+    9.7,
+    12.59,
+    8.65
+   ],
+   "tris": 600
+  },
+  {
+   "id": "edw_w9_f3",
+   "file": "edw_w9_f3.glb",
+   "kind": "edwardian",
+   "cat": 1,
+   "w": 9.0,
+   "dims": [
+    9.7,
+    12.59,
+    12.05
+   ],
+   "tris": 756
+  },
+  {
+   "id": "edw_w11_f2",
+   "file": "edw_w11_f2.glb",
+   "kind": "edwardian",
+   "cat": 1,
+   "w": 11.0,
+   "dims": [
+    11.7,
+    12.59,
+    8.65
+   ],
+   "tris": 624
+  },
+  {
+   "id": "edw_w11_f3",
+   "file": "edw_w11_f3.glb",
+   "kind": "edwardian",
+   "cat": 1,
+   "w": 11.0,
+   "dims": [
+    11.7,
+    12.59,
+    12.05
+   ],
+   "tris": 780
+  },
+  {
+   "id": "marina_w7_hip",
+   "file": "marina_w7_hip.glb",
+   "kind": "marina",
+   "cat": 1,
+   "w": 7.6,
+   "dims": [
+    8.5,
+    12.59,
+    11.0
+   ],
+   "tris": 700
+  },
+  {
+   "id": "marina_w7_flat",
+   "file": "marina_w7_flat.glb",
+   "kind": "marina",
+   "cat": 1,
+   "w": 7.6,
+   "dims": [
+    8.1,
+    12.14,
+    10.02
+   ],
+   "tris": 828
+  },
+  {
+   "id": "marina_w9_hip",
+   "file": "marina_w9_hip.glb",
+   "kind": "marina",
+   "cat": 1,
+   "w": 9.0,
+   "dims": [
+    9.9,
+    12.59,
+    11.0
+   ],
+   "tris": 700
+  },
+  {
+   "id": "marina_w9_flat",
+   "file": "marina_w9_flat.glb",
+   "kind": "marina",
+   "cat": 1,
+   "w": 9.0,
+   "dims": [
+    9.5,
+    12.14,
+    10.02
+   ],
+   "tris": 828
+  },
+  {
+   "id": "marina_w11_hip",
+   "file": "marina_w11_hip.glb",
+   "kind": "marina",
+   "cat": 1,
+   "w": 11.0,
+   "dims": [
+    11.9,
+    12.59,
+    11.0
+   ],
+   "tris": 700
+  },
+  {
+   "id": "marina_w11_flat",
+   "file": "marina_w11_flat.glb",
+   "kind": "marina",
+   "cat": 1,
+   "w": 11.0,
+   "dims": [
+    11.5,
+    12.14,
+    10.02
+   ],
+   "tris": 828
+  },
+  {
+   "id": "sunset_w7_plain_bay",
+   "file": "sunset_w7_plain_bay.glb",
+   "kind": "sunset",
+   "cat": 1,
+   "w": 7.6,
+   "dims": [
+    7.8,
+    12.2,
+    7.2
+   ],
+   "tris": 508
+  },
+  {
+   "id": "sunset_w7_plain_pic",
+   "file": "sunset_w7_plain_pic.glb",
+   "kind": "sunset",
+   "cat": 1,
+   "w": 7.6,
+   "dims": [
+    7.8,
+    12.2,
+    7.2
+   ],
+   "tris": 424
+  },
+  {
+   "id": "sunset_w7_stepped_bay",
+   "file": "sunset_w7_stepped_bay.glb",
+   "kind": "sunset",
+   "cat": 1,
+   "w": 7.6,
+   "dims": [
+    7.8,
+    12.2,
+    7.17
+   ],
+   "tris": 552
+  },
+  {
+   "id": "sunset_w7_stepped_pic",
+   "file": "sunset_w7_stepped_pic.glb",
+   "kind": "sunset",
+   "cat": 1,
+   "w": 7.6,
+   "dims": [
+    7.8,
+    12.2,
+    7.17
+   ],
+   "tris": 468
+  },
+  {
+   "id": "sunset_w7_curved_bay",
+   "file": "sunset_w7_curved_bay.glb",
+   "kind": "sunset",
+   "cat": 1,
+   "w": 7.6,
+   "dims": [
+    7.8,
+    12.2,
+    7.2
+   ],
+   "tris": 548
+  },
+  {
+   "id": "sunset_w7_curved_pic",
+   "file": "sunset_w7_curved_pic.glb",
+   "kind": "sunset",
+   "cat": 1,
+   "w": 7.6,
+   "dims": [
+    7.8,
+    12.2,
+    7.2
+   ],
+   "tris": 464
+  },
+  {
+   "id": "sunset_w7_plain_bay_m",
+   "file": "sunset_w7_plain_bay_m.glb",
+   "kind": "sunset",
+   "cat": 1,
+   "w": 7.6,
+   "dims": [
+    7.8,
+    12.2,
+    7.1
+   ],
+   "tris": 508
+  },
+  {
+   "id": "sunset_w7_stepped_pic_m",
+   "file": "sunset_w7_stepped_pic_m.glb",
+   "kind": "sunset",
+   "cat": 1,
+   "w": 7.6,
+   "dims": [
+    7.8,
+    12.2,
+    7.2
+   ],
+   "tris": 468
+  },
+  {
+   "id": "sunset_w9_plain_bay",
+   "file": "sunset_w9_plain_bay.glb",
+   "kind": "sunset",
+   "cat": 1,
+   "w": 9.0,
+   "dims": [
+    9.2,
+    12.2,
+    7.2
+   ],
+   "tris": 508
+  },
+  {
+   "id": "sunset_w9_plain_pic",
+   "file": "sunset_w9_plain_pic.glb",
+   "kind": "sunset",
+   "cat": 1,
+   "w": 9.0,
+   "dims": [
+    9.2,
+    12.2,
+    7.2
+   ],
+   "tris": 424
+  },
+  {
+   "id": "sunset_w9_stepped_bay",
+   "file": "sunset_w9_stepped_bay.glb",
+   "kind": "sunset",
+   "cat": 1,
+   "w": 9.0,
+   "dims": [
+    9.2,
+    12.2,
+    7.2
+   ],
+   "tris": 552
+  },
+  {
+   "id": "sunset_w9_stepped_pic",
+   "file": "sunset_w9_stepped_pic.glb",
+   "kind": "sunset",
+   "cat": 1,
+   "w": 9.0,
+   "dims": [
+    9.2,
+    12.2,
+    7.2
+   ],
+   "tris": 468
+  },
+  {
+   "id": "sunset_w9_curved_bay",
+   "file": "sunset_w9_curved_bay.glb",
+   "kind": "sunset",
+   "cat": 1,
+   "w": 9.0,
+   "dims": [
+    9.2,
+    12.2,
+    7.1
+   ],
+   "tris": 548
+  },
+  {
+   "id": "sunset_w9_curved_pic",
+   "file": "sunset_w9_curved_pic.glb",
+   "kind": "sunset",
+   "cat": 1,
+   "w": 9.0,
+   "dims": [
+    9.2,
+    12.2,
+    7.1
+   ],
+   "tris": 464
+  },
+  {
+   "id": "sunset_w9_plain_bay_m",
+   "file": "sunset_w9_plain_bay_m.glb",
+   "kind": "sunset",
+   "cat": 1,
+   "w": 9.0,
+   "dims": [
+    9.2,
+    12.2,
+    7.2
+   ],
+   "tris": 508
+  },
+  {
+   "id": "sunset_w9_stepped_pic_m",
+   "file": "sunset_w9_stepped_pic_m.glb",
+   "kind": "sunset",
+   "cat": 1,
+   "w": 9.0,
+   "dims": [
+    9.2,
+    12.2,
+    7.17
+   ],
+   "tris": 468
+  },
+  {
+   "id": "sunset_w11_plain_bay",
+   "file": "sunset_w11_plain_bay.glb",
+   "kind": "sunset",
+   "cat": 1,
+   "w": 11.0,
+   "dims": [
+    11.2,
+    12.2,
+    7.1
+   ],
+   "tris": 508
+  },
+  {
+   "id": "sunset_w11_plain_pic",
+   "file": "sunset_w11_plain_pic.glb",
+   "kind": "sunset",
+   "cat": 1,
+   "w": 11.0,
+   "dims": [
+    11.2,
+    12.2,
+    7.1
+   ],
+   "tris": 424
+  },
+  {
+   "id": "sunset_w11_stepped_bay",
+   "file": "sunset_w11_stepped_bay.glb",
+   "kind": "sunset",
+   "cat": 1,
+   "w": 11.0,
+   "dims": [
+    11.2,
+    12.2,
+    7.17
+   ],
+   "tris": 552
+  },
+  {
+   "id": "sunset_w11_stepped_pic",
+   "file": "sunset_w11_stepped_pic.glb",
+   "kind": "sunset",
+   "cat": 1,
+   "w": 11.0,
+   "dims": [
+    11.2,
+    12.2,
+    7.17
+   ],
+   "tris": 468
+  },
+  {
+   "id": "sunset_w11_curved_bay",
+   "file": "sunset_w11_curved_bay.glb",
+   "kind": "sunset",
+   "cat": 1,
+   "w": 11.0,
+   "dims": [
+    11.2,
+    12.2,
+    7.1
+   ],
+   "tris": 548
+  },
+  {
+   "id": "sunset_w11_curved_pic",
+   "file": "sunset_w11_curved_pic.glb",
+   "kind": "sunset",
+   "cat": 1,
+   "w": 11.0,
+   "dims": [
+    11.2,
+    12.2,
+    7.1
+   ],
+   "tris": 464
+  },
+  {
+   "id": "sunset_w11_plain_bay_m",
+   "file": "sunset_w11_plain_bay_m.glb",
+   "kind": "sunset",
+   "cat": 1,
+   "w": 11.0,
+   "dims": [
+    11.2,
+    12.2,
+    7.1
+   ],
+   "tris": 508
+  },
+  {
+   "id": "sunset_w11_stepped_pic_m",
+   "file": "sunset_w11_stepped_pic_m.glb",
+   "kind": "sunset",
+   "cat": 1,
+   "w": 11.0,
+   "dims": [
+    11.2,
+    12.2,
+    7.17
+   ],
+   "tris": 468
+  },
+  {
+   "id": "rich_w7_plain",
+   "file": "rich_w7_plain.glb",
+   "kind": "richmond",
+   "cat": 1,
+   "w": 7.6,
+   "dims": [
+    7.8,
+    12.57,
+    10.4
+   ],
+   "tris": 604
+  },
+  {
+   "id": "rich_w7_stepped",
+   "file": "rich_w7_stepped.glb",
+   "kind": "richmond",
+   "cat": 1,
+   "w": 7.6,
+   "dims": [
+    7.8,
+    12.57,
+    10.4
+   ],
+   "tris": 636
+  },
+  {
+   "id": "rich_w7_tall",
+   "file": "rich_w7_tall.glb",
+   "kind": "richmond",
+   "cat": 1,
+   "w": 7.6,
+   "dims": [
+    7.8,
+    12.57,
+    13.7
+   ],
+   "tris": 712
+  },
+  {
+   "id": "rich_w9_plain",
+   "file": "rich_w9_plain.glb",
+   "kind": "richmond",
+   "cat": 1,
+   "w": 9.0,
+   "dims": [
+    9.2,
+    12.57,
+    10.4
+   ],
+   "tris": 604
+  },
+  {
+   "id": "rich_w9_stepped",
+   "file": "rich_w9_stepped.glb",
+   "kind": "richmond",
+   "cat": 1,
+   "w": 9.0,
+   "dims": [
+    9.2,
+    12.57,
+    10.4
+   ],
+   "tris": 636
+  },
+  {
+   "id": "rich_w9_tall",
+   "file": "rich_w9_tall.glb",
+   "kind": "richmond",
+   "cat": 1,
+   "w": 9.0,
+   "dims": [
+    9.2,
+    12.57,
+    13.7
+   ],
+   "tris": 712
+  },
+  {
+   "id": "rich_w11_plain",
+   "file": "rich_w11_plain.glb",
+   "kind": "richmond",
+   "cat": 1,
+   "w": 11.0,
+   "dims": [
+    11.2,
+    12.57,
+    10.4
+   ],
+   "tris": 604
+  },
+  {
+   "id": "rich_w11_stepped",
+   "file": "rich_w11_stepped.glb",
+   "kind": "richmond",
+   "cat": 1,
+   "w": 11.0,
+   "dims": [
+    11.2,
+    12.57,
+    10.4
+   ],
+   "tris": 636
+  },
+  {
+   "id": "rich_w11_tall",
+   "file": "rich_w11_tall.glb",
+   "kind": "richmond",
+   "cat": 1,
+   "w": 11.0,
+   "dims": [
+    11.2,
+    12.57,
+    13.7
+   ],
+   "tris": 712
+  },
+  {
+   "id": "aptfe_w12_f4",
+   "file": "aptfe_w12_f4.glb",
+   "kind": "aptfe",
+   "cat": 2,
+   "w": 12,
+   "dims": [
+    13.0,
+    14.05,
+    16.2
+   ],
+   "tris": 944
+  },
+  {
+   "id": "aptfe_w12_f6",
+   "file": "aptfe_w12_f6.glb",
+   "kind": "aptfe",
+   "cat": 2,
+   "w": 12,
+   "dims": [
+    13.0,
+    14.05,
+    22.8
+   ],
+   "tris": 1040
+  },
+  {
+   "id": "aptfe_w16_f4",
+   "file": "aptfe_w16_f4.glb",
+   "kind": "aptfe",
+   "cat": 2,
+   "w": 16,
+   "dims": [
+    17.0,
+    14.05,
+    16.2
+   ],
+   "tris": 1112
+  },
+  {
+   "id": "aptfe_w16_f6",
+   "file": "aptfe_w16_f6.glb",
+   "kind": "aptfe",
+   "cat": 2,
+   "w": 16,
+   "dims": [
+    17.0,
+    14.05,
+    22.8
+   ],
+   "tris": 1232
+  },
+  {
+   "id": "aptfe_w20_f6",
+   "file": "aptfe_w20_f6.glb",
+   "kind": "aptfe",
+   "cat": 2,
+   "w": 20,
+   "dims": [
+    21.0,
+    14.05,
+    22.8
+   ],
+   "tris": 1232
+  },
+  {
+   "id": "aptfe_corner_w16_f4",
+   "file": "aptfe_corner_w16_f4.glb",
+   "kind": "aptfe",
+   "cat": 2,
+   "w": 16,
+   "dims": [
+    17.0,
+    14.05,
+    16.2
+   ],
+   "tris": 1040
+  },
+  {
+   "id": "aptfe_corner_w20_f6",
+   "file": "aptfe_corner_w20_f6.glb",
+   "kind": "aptfe",
+   "cat": 2,
+   "w": 20,
+   "dims": [
+    21.0,
+    14.05,
+    22.8
+   ],
+   "tris": 1160
+  },
+  {
+   "id": "liquor_corner",
+   "file": "liquor_corner.glb",
+   "kind": "liquor",
+   "cat": 4,
+   "w": 12,
+   "dims": [
+    13.0,
+    12.99,
+    9.4
+   ],
+   "tris": 668
+  },
+  {
+   "id": "liquor_corner_f3",
+   "file": "liquor_corner_f3.glb",
+   "kind": "liquor",
+   "cat": 4,
+   "w": 12,
+   "dims": [
+    13.0,
+    12.99,
+    12.7
+   ],
+   "tris": 824
+  },
+  {
+   "id": "liquor_corner_l",
+   "file": "liquor_corner_l.glb",
+   "kind": "liquor",
+   "cat": 4,
+   "w": 14,
+   "dims": [
+    15.0,
+    14.99,
+    12.7
+   ],
+   "tris": 824
+  },
+  {
+   "id": "apt_w12_f3_punched",
+   "file": "apt_w12_f3_punched.glb",
+   "kind": "apt",
+   "cat": 2,
+   "w": 12,
+   "dims": [
+    13.0,
+    15.17,
+    13.3
+   ],
+   "tris": 584
+  },
+  {
+   "id": "apt_w12_f3_bays",
+   "file": "apt_w12_f3_bays.glb",
+   "kind": "apt",
+   "cat": 2,
+   "w": 12,
+   "dims": [
+    13.0,
+    15.26,
+    13.3
+   ],
+   "tris": 824
+  },
+  {
+   "id": "apt_w12_f4_punched",
+   "file": "apt_w12_f4_punched.glb",
+   "kind": "apt",
+   "cat": 2,
+   "w": 12,
+   "dims": [
+    13.0,
+    15.17,
+    16.8
+   ],
+   "tris": 704
+  },
+  {
+   "id": "apt_w12_f4_bays",
+   "file": "apt_w12_f4_bays.glb",
+   "kind": "apt",
+   "cat": 2,
+   "w": 12,
+   "dims": [
+    13.0,
+    15.26,
+    16.8
+   ],
+   "tris": 944
+  },
+  {
+   "id": "apt_w12_f6_punched",
+   "file": "apt_w12_f6_punched.glb",
+   "kind": "apt",
+   "cat": 2,
+   "w": 12,
+   "dims": [
+    13.0,
+    15.17,
+    23.8
+   ],
+   "tris": 800
+  },
+  {
+   "id": "apt_w12_f6_bays",
+   "file": "apt_w12_f6_bays.glb",
+   "kind": "apt",
+   "cat": 2,
+   "w": 12,
+   "dims": [
+    13.0,
+    15.26,
+    23.8
+   ],
+   "tris": 1040
+  },
+  {
+   "id": "apt_w16_f3_punched",
+   "file": "apt_w16_f3_punched.glb",
+   "kind": "apt",
+   "cat": 2,
+   "w": 16,
+   "dims": [
+    17.0,
+    15.17,
+    13.3
+   ],
+   "tris": 704
+  },
+  {
+   "id": "apt_w16_f3_bays",
+   "file": "apt_w16_f3_bays.glb",
+   "kind": "apt",
+   "cat": 2,
+   "w": 16,
+   "dims": [
+    17.0,
+    15.26,
+    13.3
+   ],
+   "tris": 1016
+  },
+  {
+   "id": "apt_w16_f4_punched",
+   "file": "apt_w16_f4_punched.glb",
+   "kind": "apt",
+   "cat": 2,
+   "w": 16,
+   "dims": [
+    17.0,
+    15.17,
+    16.8
+   ],
+   "tris": 872
+  },
+  {
+   "id": "apt_w16_f4_bays",
+   "file": "apt_w16_f4_bays.glb",
+   "kind": "apt",
+   "cat": 2,
+   "w": 16,
+   "dims": [
+    17.0,
+    15.26,
+    16.8
+   ],
+   "tris": 1160
+  },
+  {
+   "id": "apt_w16_f6_punched",
+   "file": "apt_w16_f6_punched.glb",
+   "kind": "apt",
+   "cat": 2,
+   "w": 16,
+   "dims": [
+    17.0,
+    15.17,
+    23.8
+   ],
+   "tris": 1064
+  },
+  {
+   "id": "apt_w16_f6_bays",
+   "file": "apt_w16_f6_bays.glb",
+   "kind": "apt",
+   "cat": 2,
+   "w": 16,
+   "dims": [
+    17.0,
+    15.26,
+    23.8
+   ],
+   "tris": 1304
+  },
+  {
+   "id": "apt_w20_f3_punched",
+   "file": "apt_w20_f3_punched.glb",
+   "kind": "apt",
+   "cat": 2,
+   "w": 20,
+   "dims": [
+    21.0,
+    15.17,
+    13.3
+   ],
+   "tris": 752
+  },
+  {
+   "id": "apt_w20_f3_bays",
+   "file": "apt_w20_f3_bays.glb",
+   "kind": "apt",
+   "cat": 2,
+   "w": 20,
+   "dims": [
+    21.0,
+    15.26,
+    13.3
+   ],
+   "tris": 1040
+  },
+  {
+   "id": "apt_w20_f4_punched",
+   "file": "apt_w20_f4_punched.glb",
+   "kind": "apt",
+   "cat": 2,
+   "w": 20,
+   "dims": [
+    21.0,
+    15.17,
+    16.8
+   ],
+   "tris": 944
+  },
+  {
+   "id": "apt_w20_f4_bays",
+   "file": "apt_w20_f4_bays.glb",
+   "kind": "apt",
+   "cat": 2,
+   "w": 20,
+   "dims": [
+    21.0,
+    15.26,
+    16.8
+   ],
+   "tris": 1196
+  },
+  {
+   "id": "apt_w20_f6_punched",
+   "file": "apt_w20_f6_punched.glb",
+   "kind": "apt",
+   "cat": 2,
+   "w": 20,
+   "dims": [
+    21.0,
+    15.17,
+    23.8
+   ],
+   "tris": 1184
+  },
+  {
+   "id": "apt_w20_f6_bays",
+   "file": "apt_w20_f6_bays.glb",
+   "kind": "apt",
+   "cat": 2,
+   "w": 20,
+   "dims": [
+    21.0,
+    15.26,
+    23.8
+   ],
+   "tris": 1364
+  },
+  {
+   "id": "mixed_w10_f3_punched",
+   "file": "mixed_w10_f3_punched.glb",
+   "kind": "mixeduse",
+   "cat": 4,
+   "w": 10,
+   "dims": [
+    11.0,
+    12.91,
+    12.8
+   ],
+   "tris": 488
+  },
+  {
+   "id": "mixed_w10_f3_bays",
+   "file": "mixed_w10_f3_bays.glb",
+   "kind": "mixeduse",
+   "cat": 4,
+   "w": 10,
+   "dims": [
+    11.0,
+    13.09,
+    12.8
+   ],
+   "tris": 824
+  },
+  {
+   "id": "mixed_w10_f5_punched",
+   "file": "mixed_w10_f5_punched.glb",
+   "kind": "mixeduse",
+   "cat": 4,
+   "w": 10,
+   "dims": [
+    11.0,
+    12.91,
+    19.8
+   ],
+   "tris": 536
+  },
+  {
+   "id": "mixed_w10_f5_bays",
+   "file": "mixed_w10_f5_bays.glb",
+   "kind": "mixeduse",
+   "cat": 4,
+   "w": 10,
+   "dims": [
+    11.0,
+    13.09,
+    19.8
+   ],
+   "tris": 992
+  },
+  {
+   "id": "mixed_w14_f3_punched",
+   "file": "mixed_w14_f3_punched.glb",
+   "kind": "mixeduse",
+   "cat": 4,
+   "w": 14,
+   "dims": [
+    15.0,
+    12.91,
+    12.8
+   ],
+   "tris": 560
+  },
+  {
+   "id": "mixed_w14_f3_bays",
+   "file": "mixed_w14_f3_bays.glb",
+   "kind": "mixeduse",
+   "cat": 4,
+   "w": 14,
+   "dims": [
+    15.0,
+    13.09,
+    12.8
+   ],
+   "tris": 848
+  },
+  {
+   "id": "mixed_w14_f5_punched",
+   "file": "mixed_w14_f5_punched.glb",
+   "kind": "mixeduse",
+   "cat": 4,
+   "w": 14,
+   "dims": [
+    15.0,
+    12.91,
+    19.8
+   ],
+   "tris": 656
+  },
+  {
+   "id": "mixed_w14_f5_bays",
+   "file": "mixed_w14_f5_bays.glb",
+   "kind": "mixeduse",
+   "cat": 4,
+   "w": 14,
+   "dims": [
+    15.0,
+    13.09,
+    19.8
+   ],
+   "tris": 1016
+  },
+  {
+   "id": "shop_w8_f1_stripe",
+   "file": "shop_w8_f1_stripe.glb",
+   "kind": "storefront",
+   "cat": 4,
+   "w": 8,
+   "dims": [
+    8.08,
+    12.91,
+    5.3
+   ],
+   "tris": 268
+  },
+  {
+   "id": "shop_w8_f1_solid",
+   "file": "shop_w8_f1_solid.glb",
+   "kind": "storefront",
+   "cat": 4,
+   "w": 8,
+   "dims": [
+    8.08,
+    12.91,
+    5.3
+   ],
+   "tris": 268
+  },
+  {
+   "id": "shop_w8_f2_stripe",
+   "file": "shop_w8_f2_stripe.glb",
+   "kind": "storefront",
+   "cat": 4,
+   "w": 8,
+   "dims": [
+    8.2,
+    12.91,
+    9.1
+   ],
+   "tris": 352
+  },
+  {
+   "id": "shop_w8_f2_solid",
+   "file": "shop_w8_f2_solid.glb",
+   "kind": "storefront",
+   "cat": 4,
+   "w": 8,
+   "dims": [
+    8.2,
+    12.91,
+    9.1
+   ],
+   "tris": 352
+  },
+  {
+   "id": "shop_w12_f1_stripe",
+   "file": "shop_w12_f1_stripe.glb",
+   "kind": "storefront",
+   "cat": 4,
+   "w": 12,
+   "dims": [
+    12.12,
+    12.91,
+    5.3
+   ],
+   "tris": 268
+  },
+  {
+   "id": "shop_w12_f1_solid",
+   "file": "shop_w12_f1_solid.glb",
+   "kind": "storefront",
+   "cat": 4,
+   "w": 12,
+   "dims": [
+    12.12,
+    12.91,
+    5.3
+   ],
+   "tris": 268
+  },
+  {
+   "id": "shop_w12_f2_stripe",
+   "file": "shop_w12_f2_stripe.glb",
+   "kind": "storefront",
+   "cat": 4,
+   "w": 12,
+   "dims": [
+    12.2,
+    12.91,
+    9.1
+   ],
+   "tris": 364
+  },
+  {
+   "id": "shop_w12_f2_solid",
+   "file": "shop_w12_f2_solid.glb",
+   "kind": "storefront",
+   "cat": 4,
+   "w": 12,
+   "dims": [
+    12.2,
+    12.91,
+    9.1
+   ],
+   "tris": 364
+  },
+  {
+   "id": "shop_w16_f1_stripe",
+   "file": "shop_w16_f1_stripe.glb",
+   "kind": "storefront",
+   "cat": 4,
+   "w": 16,
+   "dims": [
+    16.16,
+    12.91,
+    5.3
+   ],
+   "tris": 316
+  },
+  {
+   "id": "shop_w16_f1_solid",
+   "file": "shop_w16_f1_solid.glb",
+   "kind": "storefront",
+   "cat": 4,
+   "w": 16,
+   "dims": [
+    16.16,
+    12.91,
+    5.3
+   ],
+   "tris": 316
+  },
+  {
+   "id": "shop_w16_f2_stripe",
+   "file": "shop_w16_f2_stripe.glb",
+   "kind": "storefront",
+   "cat": 4,
+   "w": 16,
+   "dims": [
+    16.2,
+    12.91,
+    9.1
+   ],
+   "tris": 436
+  },
+  {
+   "id": "shop_w16_f2_solid",
+   "file": "shop_w16_f2_solid.glb",
+   "kind": "storefront",
+   "cat": 4,
+   "w": 16,
+   "dims": [
+    16.2,
+    12.91,
+    9.1
+   ],
+   "tris": 436
+  },
+  {
+   "id": "corner_w10_f2",
+   "file": "corner_w10_f2.glb",
+   "kind": "corner",
+   "cat": 4,
+   "w": 10,
+   "dims": [
+    11.0,
+    10.91,
+    9.9
+   ],
+   "tris": 356
+  },
+  {
+   "id": "corner_w10_f3",
+   "file": "corner_w10_f3.glb",
+   "kind": "corner",
+   "cat": 4,
+   "w": 10,
+   "dims": [
+    11.0,
+    10.91,
+    13.7
+   ],
+   "tris": 428
+  },
+  {
+   "id": "corner_w14_f2",
+   "file": "corner_w14_f2.glb",
+   "kind": "corner",
+   "cat": 4,
+   "w": 14,
+   "dims": [
+    15.0,
+    14.91,
+    9.9
+   ],
+   "tris": 368
+  },
+  {
+   "id": "corner_w14_f3",
+   "file": "corner_w14_f3.glb",
+   "kind": "corner",
+   "cat": 4,
+   "w": 14,
+   "dims": [
+    15.0,
+    14.91,
+    13.7
+   ],
+   "tris": 452
+  },
+  {
+   "id": "church_gothic_s",
+   "file": "church_gothic_s.glb",
+   "kind": "church",
+   "cat": 8,
+   "dims": [
+    12.2,
+    20.2,
+    19.0
+   ],
+   "tris": 162
+  },
+  {
+   "id": "church_gothic_l",
+   "file": "church_gothic_l.glb",
+   "kind": "church",
+   "cat": 8,
+   "dims": [
+    16.47,
+    27.27,
+    25.65
+   ],
+   "tris": 186
+  },
+  {
+   "id": "church_mission_s",
+   "file": "church_mission_s.glb",
+   "kind": "church",
+   "cat": 8,
+   "dims": [
+    12.0,
+    20.45,
+    12.6
+   ],
+   "tris": 212
+  },
+  {
+   "id": "church_mission_l",
+   "file": "church_mission_l.glb",
+   "kind": "church",
+   "cat": 8,
+   "dims": [
+    16.2,
+    27.51,
+    17.01
+   ],
+   "tris": 236
+  },
+  {
+   "id": "church_dome_s",
+   "file": "church_dome_s.glb",
+   "kind": "church",
+   "cat": 8,
+   "dims": [
+    12.0,
+    20.17,
+    11.8
+   ],
+   "tris": 272
+  },
+  {
+   "id": "church_dome_l",
+   "file": "church_dome_l.glb",
+   "kind": "church",
+   "cat": 8,
+   "dims": [
+    16.2,
+    27.17,
+    15.93
+   ],
+   "tris": 296
+  },
+  {
+   "id": "firehouse_s",
+   "file": "firehouse_s.glb",
+   "kind": "firehouse",
+   "cat": 13,
+   "dims": [
+    10.7,
+    14.7,
+    14.1
+   ],
+   "tris": 304
+  },
+  {
+   "id": "firehouse_l",
+   "file": "firehouse_l.glb",
+   "kind": "firehouse",
+   "cat": 13,
+   "dims": [
+    14.7,
+    14.7,
+    15.0
+   ],
+   "tris": 416
+  },
+  {
+   "id": "school_s",
+   "file": "school_s.glb",
+   "kind": "school",
+   "cat": 9,
+   "dims": [
+    18.7,
+    16.44,
+    9.1
+   ],
+   "tris": 372
+  },
+  {
+   "id": "school_l",
+   "file": "school_l.glb",
+   "kind": "school",
+   "cat": 9,
+   "dims": [
+    26.7,
+    16.44,
+    13.1
+   ],
+   "tris": 504
+  },
+  {
+   "id": "library",
+   "file": "library.glb",
+   "kind": "library",
+   "cat": 15,
+   "dims": [
+    21.0,
+    15.6,
+    10.1
+   ],
+   "tris": 472
+  },
+  {
+   "id": "museum",
+   "file": "museum.glb",
+   "kind": "museum",
+   "cat": 16,
+   "dims": [
+    27.0,
+    21.7,
+    13.55
+   ],
+   "tris": 500
+  },
+  {
+   "id": "government",
+   "file": "government.glb",
+   "kind": "government",
+   "cat": 18,
+   "dims": [
+    25.0,
+    20.1,
+    19.0
+   ],
+   "tris": 500
+  },
+  {
+   "id": "hospital",
+   "file": "hospital.glb",
+   "kind": "hospital",
+   "cat": 11,
+   "dims": [
+    24.7,
+    20.7,
+    21.4
+   ],
+   "tris": 588
+  },
+  {
+   "id": "police",
+   "file": "police.glb",
+   "kind": "police",
+   "cat": 14,
+   "dims": [
+    16.7,
+    12.7,
+    12.5
+   ],
+   "tris": 280
+  },
+  {
+   "id": "theater",
+   "file": "theater.glb",
+   "kind": "theater",
+   "cat": 17,
+   "dims": [
+    16.7,
+    25.25,
+    14.0
+   ],
+   "tris": 352
+  },
+  {
+   "id": "hotel_block",
+   "file": "hotel_block.glb",
+   "kind": "hotel",
+   "cat": 7,
+   "dims": [
+    18.7,
+    17.65,
+    28.7
+   ],
+   "tris": 612
+  },
+  {
+   "id": "synagogue",
+   "file": "synagogue.glb",
+   "kind": "synagogue",
+   "cat": 8,
+   "dims": [
+    14.0,
+    16.17,
+    12.5
+   ],
+   "tris": 116
+  },
+  {
+   "id": "pagoda_temple",
+   "file": "pagoda_temple.glb",
+   "kind": "pagoda",
+   "cat": 8,
+   "dims": [
+    12.2,
+    12.2,
+    10.6
+   ],
+   "tris": 150
+  },
+  {
+   "id": "chapel",
+   "file": "chapel.glb",
+   "kind": "chapel",
+   "cat": 8,
+   "dims": [
+    8.0,
+    12.0,
+    9.4
+   ],
+   "tris": 126
+  },
+  {
+   "id": "tower_grid_h60",
+   "file": "tower_grid_h60.glb",
+   "kind": "tower",
+   "cat": 3,
+   "h": 60,
+   "dims": [
+    22.5,
+    22.5,
+    65.7
+   ],
+   "tris": 432
+  },
+  {
+   "id": "tower_grid_h90",
+   "file": "tower_grid_h90.glb",
+   "kind": "tower",
+   "cat": 3,
+   "h": 90,
+   "dims": [
+    22.5,
+    22.5,
+    95.7
+   ],
+   "tris": 528
+  },
+  {
+   "id": "tower_grid_h130",
+   "file": "tower_grid_h130.glb",
+   "kind": "tower",
+   "cat": 3,
+   "h": 130,
+   "dims": [
+    22.5,
+    22.5,
+    135.7
+   ],
+   "tris": 660
+  },
+  {
+   "id": "tower_grid_h180",
+   "file": "tower_grid_h180.glb",
+   "kind": "tower",
+   "cat": 3,
+   "h": 180,
+   "dims": [
+    26.5,
+    26.5,
+    185.7
+   ],
+   "tris": 828
+  },
+  {
+   "id": "tower_slat_h60",
+   "file": "tower_slat_h60.glb",
+   "kind": "tower",
+   "cat": 3,
+   "h": 60,
+   "dims": [
+    23.38,
+    23.98,
+    65.7
+   ],
+   "tris": 560
+  },
+  {
+   "id": "tower_slat_h90",
+   "file": "tower_slat_h90.glb",
+   "kind": "tower",
+   "cat": 3,
+   "h": 90,
+   "dims": [
+    23.38,
+    23.98,
+    95.7
+   ],
+   "tris": 768
+  },
+  {
+   "id": "tower_slat_h130",
+   "file": "tower_slat_h130.glb",
+   "kind": "tower",
+   "cat": 3,
+   "h": 130,
+   "dims": [
+    23.38,
+    23.98,
+    135.7
+   ],
+   "tris": 1080
+  },
+  {
+   "id": "tower_slat_h180",
+   "file": "tower_slat_h180.glb",
+   "kind": "tower",
+   "cat": 3,
+   "h": 180,
+   "dims": [
+    27.63,
+    28.34,
+    185.7
+   ],
+   "tris": 1444
+  },
+  {
+   "id": "tower_deco_h60",
+   "file": "tower_deco_h60.glb",
+   "kind": "tower",
+   "cat": 3,
+   "h": 60,
+   "dims": [
+    22.0,
+    22.34,
+    71.1
+   ],
+   "tris": 1802
+  },
+  {
+   "id": "tower_deco_h90",
+   "file": "tower_deco_h90.glb",
+   "kind": "tower",
+   "cat": 3,
+   "h": 90,
+   "dims": [
+    22.0,
+    22.34,
+    103.8
+   ],
+   "tris": 2522
+  },
+  {
+   "id": "tower_deco_h130",
+   "file": "tower_deco_h130.glb",
+   "kind": "tower",
+   "cat": 3,
+   "h": 130,
+   "dims": [
+    22.0,
+    22.34,
+    147.4
+   ],
+   "tris": 3530
+  },
+  {
+   "id": "tower_deco_h180",
+   "file": "tower_deco_h180.glb",
+   "kind": "tower",
+   "cat": 3,
+   "h": 180,
+   "dims": [
+    26.0,
+    26.34,
+    201.9
+   ],
+   "tris": 6554
+  },
+  {
+   "id": "tower_slab_h60",
+   "file": "tower_slab_h60.glb",
+   "kind": "tower",
+   "cat": 3,
+   "h": 60,
+   "dims": [
+    31.24,
+    12.54,
+    65.7
+   ],
+   "tris": 532
+  },
+  {
+   "id": "tower_slab_h90",
+   "file": "tower_slab_h90.glb",
+   "kind": "tower",
+   "cat": 3,
+   "h": 90,
+   "dims": [
+    31.24,
+    12.54,
+    95.7
+   ],
+   "tris": 724
+  },
+  {
+   "id": "tower_slab_h130",
+   "file": "tower_slab_h130.glb",
+   "kind": "tower",
+   "cat": 3,
+   "h": 130,
+   "dims": [
+    31.24,
+    12.54,
+    135.7
+   ],
+   "tris": 988
+  },
+  {
+   "id": "tower_slab_h180",
+   "file": "tower_slab_h180.glb",
+   "kind": "tower",
+   "cat": 3,
+   "h": 180,
+   "dims": [
+    36.92,
+    14.82,
+    185.7
+   ],
+   "tris": 1300
+  },
+  {
+   "id": "tower_setback_h60",
+   "file": "tower_setback_h60.glb",
+   "kind": "tower",
+   "cat": 3,
+   "h": 60,
+   "dims": [
+    22.4,
+    22.4,
+    65.7
+   ],
+   "tris": 2264
+  },
+  {
+   "id": "tower_setback_h90",
+   "file": "tower_setback_h90.glb",
+   "kind": "tower",
+   "cat": 3,
+   "h": 90,
+   "dims": [
+    22.4,
+    22.4,
+    95.7
+   ],
+   "tris": 3536
+  },
+  {
+   "id": "tower_setback_h130",
+   "file": "tower_setback_h130.glb",
+   "kind": "tower",
+   "cat": 3,
+   "h": 130,
+   "dims": [
+    22.4,
+    22.4,
+    135.7
+   ],
+   "tris": 4880
+  },
+  {
+   "id": "tower_setback_h180",
+   "file": "tower_setback_h180.glb",
+   "kind": "tower",
+   "cat": 3,
+   "h": 180,
+   "dims": [
+    26.4,
+    26.4,
+    185.7
+   ],
+   "tris": 7976
+  },
+  {
+   "id": "warehouse_s",
+   "file": "warehouse_s.glb",
+   "kind": "industrial",
+   "cat": 19,
+   "dims": [
+    16.0,
+    21.7,
+    9.18
+   ],
+   "tris": 208
+  },
+  {
+   "id": "warehouse_m",
+   "file": "warehouse_m.glb",
+   "kind": "industrial",
+   "cat": 19,
+   "dims": [
+    24.0,
+    31.7,
+    9.2
+   ],
+   "tris": 204
+  },
+  {
+   "id": "warehouse_l",
+   "file": "warehouse_l.glb",
+   "kind": "industrial",
+   "cat": 19,
+   "dims": [
+    32.0,
+    41.7,
+    9.2
+   ],
+   "tris": 204
+  },
+  {
+   "id": "sawtooth",
+   "file": "sawtooth.glb",
+   "kind": "industrial",
+   "cat": 19,
+   "dims": [
+    24.0,
+    26.0,
+    8.17
+   ],
+   "tris": 172
+  },
+  {
+   "id": "factory",
+   "file": "factory.glb",
+   "kind": "industrial",
+   "cat": 19,
+   "dims": [
+    22.0,
+    26.17,
+    18.0
+   ],
+   "tris": 284
+  },
+  {
+   "id": "piershed",
+   "file": "piershed.glb",
+   "kind": "industrial",
+   "cat": 19,
+   "dims": [
+    18.0,
+    61.03,
+    10.98
+   ],
+   "tris": 152
+  },
+  {
+   "id": "autoshop",
+   "file": "autoshop.glb",
+   "kind": "industrial",
+   "cat": 19,
+   "dims": [
+    14.0,
+    12.17,
+    5.0
+   ],
+   "tris": 144
+  },
+  {
+   "id": "gas",
+   "file": "gas.glb",
+   "kind": "special",
+   "cat": 0,
+   "dims": [
+    15.6,
+    15.0,
+    7.1
+   ],
+   "tris": 292
+  },
+  {
+   "id": "market_s",
+   "file": "market_s.glb",
+   "kind": "special",
+   "cat": 0,
+   "dims": [
+    18.0,
+    22.2,
+    6.9
+   ],
+   "tris": 208
+  },
+  {
+   "id": "market_l",
+   "file": "market_l.glb",
+   "kind": "special",
+   "cat": 0,
+   "dims": [
+    26.0,
+    22.2,
+    6.9
+   ],
+   "tris": 208
+  },
+  {
+   "id": "parking_s",
+   "file": "parking_s.glb",
+   "kind": "special",
+   "cat": 0,
+   "dims": [
+    20.15,
+    16.17,
+    11.2
+   ],
+   "tris": 116
+  },
+  {
+   "id": "parking_l",
+   "file": "parking_l.glb",
+   "kind": "special",
+   "cat": 0,
+   "dims": [
+    20.15,
+    16.17,
+    16.8
+   ],
+   "tris": 140
+  },
+  {
+   "id": "motel",
+   "file": "motel.glb",
+   "kind": "special",
+   "cat": 0,
+   "dims": [
+    27.0,
+    11.4,
+    10.0
+   ],
+   "tris": 268
+  },
+  {
+   "id": "boathouse",
+   "file": "boathouse.glb",
+   "kind": "special",
+   "cat": 0,
+   "dims": [
+    12.0,
+    16.15,
+    7.48
+   ],
+   "tris": 120
+  },
+  {
+   "id": "strip",
+   "file": "strip.glb",
+   "kind": "special",
+   "cat": 0,
+   "dims": [
+    34.6,
+    15.21,
+    5.4
+   ],
+   "tris": 376
+  },
+  {
+   "id": "gym",
+   "file": "gym.glb",
+   "kind": "special",
+   "cat": 0,
+   "dims": [
+    16.0,
+    14.15,
+    6.0
+   ],
+   "tris": 68
+  },
+  {
+   "id": "taqueria",
+   "file": "taqueria.glb",
+   "kind": "storefront",
+   "cat": 5,
+   "dims": [
+    8.08,
+    12.91,
+    5.3
+   ],
+   "tris": 316
+  },
+  {
+   "id": "laundromat",
+   "file": "laundromat.glb",
+   "kind": "storefront",
+   "cat": 4,
+   "dims": [
+    10.1,
+    12.91,
+    5.3
+   ],
+   "tris": 280
+  },
+  {
+   "id": "bakery",
+   "file": "bakery.glb",
+   "kind": "storefront",
+   "cat": 5,
+   "dims": [
+    8.2,
+    12.91,
+    9.1
+   ],
+   "tris": 412
+  },
+  {
+   "id": "bank_branch",
+   "file": "bank_branch.glb",
+   "kind": "bank",
+   "cat": 4,
+   "dims": [
+    13.0,
+    13.6,
+    8.1
+   ],
+   "tris": 356
+  },
+  {
+   "id": "post_office",
+   "file": "post_office.glb",
+   "kind": "government",
+   "cat": 18,
+   "dims": [
+    16.7,
+    12.7,
+    7.1
+   ],
+   "tris": 196
+  },
+  {
+   "id": "brick_warehouse",
+   "file": "brick_warehouse.glb",
+   "kind": "industrial",
+   "cat": 20,
+   "dims": [
+    20.0,
+    26.25,
+    9.0
+   ],
+   "tris": 188
+  },
+  {
+   "id": "diner",
+   "file": "diner.glb",
+   "kind": "storefront",
+   "cat": 5,
+   "dims": [
+    12.0,
+    8.5,
+    5.6
+   ],
+   "tris": 100
+  },
+  {
+   "id": "cablecar_barn",
+   "file": "cablecar_barn.glb",
+   "kind": "transit",
+   "cat": 25,
+   "dims": [
+    20.6,
+    24.19,
+    11.98
+   ],
+   "tris": 164
+  },
+  {
+   "id": "marina_shed",
+   "file": "marina_shed.glb",
+   "kind": "special",
+   "cat": 0,
+   "dims": [
+    10.0,
+    20.15,
+    7.37
+   ],
+   "tris": 120
+  },
+  {
+   "id": "dojo",
+   "file": "dojo.glb",
+   "kind": "gym",
+   "cat": 24,
+   "dims": [
+    10.0,
+    12.16,
+    6.28
+   ],
+   "tris": 88
+  },
+  {
+   "id": "dispensary",
+   "file": "dispensary.glb",
+   "kind": "storefront",
+   "cat": 4,
+   "dims": [
+    8.08,
+    12.91,
+    5.3
+   ],
+   "tris": 280
+  },
+  {
+   "id": "senior_home",
+   "file": "senior_home.glb",
+   "kind": "apt",
+   "cat": 2,
+   "dims": [
+    21.0,
+    16.47,
+    16.8
+   ],
+   "tris": 988
+  },
+  {
+   "id": "dorm_slab",
+   "file": "dorm_slab.glb",
+   "kind": "apt",
+   "cat": 2,
+   "dims": [
+    26.4,
+    12.4,
+    20.3
+   ],
+   "tris": 1588
+  },
+  {
+   "id": "datacenter",
+   "file": "datacenter.glb",
+   "kind": "office",
+   "cat": 3,
+   "dims": [
+    24.0,
+    19.6,
+    8.9
+   ],
+   "tris": 292
+  },
+  {
+   "id": "tower_grid_h240",
+   "file": "tower_grid_h240.glb",
+   "kind": "tower",
+   "cat": 3,
+   "h": 240,
+   "dims": [
+    26.5,
+    26.5,
+    245.7
+   ],
+   "tris": 1020
+  },
+  {
+   "id": "tower_setback_h240",
+   "file": "tower_setback_h240.glb",
+   "kind": "tower",
+   "cat": 3,
+   "h": 240,
+   "dims": [
+    26.4,
+    26.4,
+    245.7
+   ],
+   "tris": 10280
+  },
+  {
+   "id": "office_f5_punched_w18",
+   "file": "office_f5_punched_w18.glb",
+   "kind": "office",
+   "cat": 3,
+   "w": 18,
+   "dims": [
+    19.3,
+    15.28,
+    21.9
+   ],
+   "tris": 1116
+  },
+  {
+   "id": "office_f5_punched_w24",
+   "file": "office_f5_punched_w24.glb",
+   "kind": "office",
+   "cat": 3,
+   "w": 24,
+   "dims": [
+    25.3,
+    20.07,
+    21.9
+   ],
+   "tris": 1380
+  },
+  {
+   "id": "office_f5_ribbon_w18",
+   "file": "office_f5_ribbon_w18.glb",
+   "kind": "office",
+   "cat": 3,
+   "w": 18,
+   "dims": [
+    24.0,
+    19.4,
+    22.18
+   ],
+   "tris": 420
+  },
+  {
+   "id": "office_f5_ribbon_w24",
+   "file": "office_f5_ribbon_w24.glb",
+   "kind": "office",
+   "cat": 3,
+   "w": 24,
+   "dims": [
+    30.0,
+    24.2,
+    22.18
+   ],
+   "tris": 456
+  },
+  {
+   "id": "office_f5_grid_w18",
+   "file": "office_f5_grid_w18.glb",
+   "kind": "office",
+   "cat": 3,
+   "w": 18,
+   "dims": [
+    18.2,
+    15.4,
+    26.6
+   ],
+   "tris": 1020
+  },
+  {
+   "id": "office_f5_grid_w24",
+   "file": "office_f5_grid_w24.glb",
+   "kind": "office",
+   "cat": 3,
+   "w": 24,
+   "dims": [
+    24.2,
+    20.2,
+    26.6
+   ],
+   "tris": 1272
+  },
+  {
+   "id": "office_f8_punched_w18",
+   "file": "office_f8_punched_w18.glb",
+   "kind": "office",
+   "cat": 3,
+   "w": 18,
+   "dims": [
+    19.3,
+    15.28,
+    33.3
+   ],
+   "tris": 1668
+  },
+  {
+   "id": "office_f8_punched_w24",
+   "file": "office_f8_punched_w24.glb",
+   "kind": "office",
+   "cat": 3,
+   "w": 24,
+   "dims": [
+    25.3,
+    20.07,
+    33.3
+   ],
+   "tris": 2148
+  },
+  {
+   "id": "office_f8_ribbon_w18",
+   "file": "office_f8_ribbon_w18.glb",
+   "kind": "office",
+   "cat": 3,
+   "w": 18,
+   "dims": [
+    24.0,
+    19.4,
+    33.58
+   ],
+   "tris": 456
+  },
+  {
+   "id": "office_f8_ribbon_w24",
+   "file": "office_f8_ribbon_w24.glb",
+   "kind": "office",
+   "cat": 3,
+   "w": 24,
+   "dims": [
+    30.0,
+    24.2,
+    33.58
+   ],
+   "tris": 492
+  },
+  {
+   "id": "office_f8_grid_w18",
+   "file": "office_f8_grid_w18.glb",
+   "kind": "office",
+   "cat": 3,
+   "w": 18,
+   "dims": [
+    18.2,
+    15.4,
+    38.0
+   ],
+   "tris": 1224
+  },
+  {
+   "id": "office_f8_grid_w24",
+   "file": "office_f8_grid_w24.glb",
+   "kind": "office",
+   "cat": 3,
+   "w": 24,
+   "dims": [
+    24.2,
+    20.2,
+    38.0
+   ],
+   "tris": 1584
+  },
+  {
+   "id": "office_f12_punched_w18",
+   "file": "office_f12_punched_w18.glb",
+   "kind": "office",
+   "cat": 3,
+   "w": 18,
+   "dims": [
+    19.3,
+    15.28,
+    48.5
+   ],
+   "tris": 2340
+  },
+  {
+   "id": "office_f12_punched_w24",
+   "file": "office_f12_punched_w24.glb",
+   "kind": "office",
+   "cat": 3,
+   "w": 24,
+   "dims": [
+    25.3,
+    20.07,
+    48.5
+   ],
+   "tris": 3108
+  },
+  {
+   "id": "office_f12_ribbon_w18",
+   "file": "office_f12_ribbon_w18.glb",
+   "kind": "office",
+   "cat": 3,
+   "w": 18,
+   "dims": [
+    24.0,
+    19.4,
+    48.78
+   ],
+   "tris": 504
+  },
+  {
+   "id": "office_f12_ribbon_w24",
+   "file": "office_f12_ribbon_w24.glb",
+   "kind": "office",
+   "cat": 3,
+   "w": 24,
+   "dims": [
+    30.0,
+    24.2,
+    48.78
+   ],
+   "tris": 540
+  },
+  {
+   "id": "office_f12_grid_w18",
+   "file": "office_f12_grid_w18.glb",
+   "kind": "office",
+   "cat": 3,
+   "w": 18,
+   "dims": [
+    18.2,
+    15.4,
+    53.2
+   ],
+   "tris": 1560
+  },
+  {
+   "id": "office_f12_grid_w24",
+   "file": "office_f12_grid_w24.glb",
+   "kind": "office",
+   "cat": 3,
+   "w": 24,
+   "dims": [
+    24.2,
+    20.2,
+    53.2
+   ],
+   "tris": 2064
+  }
+ ],
+ "renames_v2": {
+  "house_w7_flat_b0": "sunset_w7_plain_pic",
+  "house_w7_flat_b1": "sunset_w7_plain_bay",
+  "house_w7_flat_b2": "sunset_w7_stepped_bay",
+  "house_w7_gable_f_b0": "stick_w7_gable",
+  "house_w7_gable_s_b0": "marina_w7_hip",
+  "house_w7_hip_b0": "marina_w7_hip",
+  "house_w7_gable_f_b1": "stick_w7_gable",
+  "house_w7_gable_s_b1": "marina_w7_hip",
+  "house_w7_hip_b1": "marina_w7_hip",
+  "house_w7_gable_f_b2": "stick_w7_gable",
+  "house_w7_gable_s_b2": "marina_w7_hip",
+  "house_w7_hip_b2": "marina_w7_hip",
+  "house_w7_gable_f_b1_gar": "rich_w7_plain",
+  "house_w7_hip_b1_gar": "marina_w7_hip",
+  "house_w7_gable_f_b2_gar": "rich_w7_plain",
+  "house_w7_hip_b2_gar": "marina_w7_hip",
+  "rowflat_w7_garage": "rich_w7_stepped",
+  "rowflat_w7_bigbay": "sunset_w7_curved_bay",
+  "house_w9_flat_b0": "sunset_w9_plain_pic",
+  "house_w9_flat_b1": "sunset_w9_plain_bay",
+  "house_w9_flat_b2": "sunset_w9_stepped_bay",
+  "house_w9_gable_f_b0": "stick_w9_gable",
+  "house_w9_gable_s_b0": "marina_w9_hip",
+  "house_w9_hip_b0": "marina_w9_hip",
+  "house_w9_gable_f_b1": "stick_w9_gable",
+  "house_w9_gable_s_b1": "marina_w9_hip",
+  "house_w9_hip_b1": "marina_w9_hip",
+  "house_w9_gable_f_b2": "stick_w9_gable",
+  "house_w9_gable_s_b2": "marina_w9_hip",
+  "house_w9_hip_b2": "marina_w9_hip",
+  "house_w9_gable_f_b1_gar": "rich_w9_plain",
+  "house_w9_hip_b1_gar": "marina_w9_hip",
+  "house_w9_gable_f_b2_gar": "rich_w9_plain",
+  "house_w9_hip_b2_gar": "marina_w9_hip",
+  "rowflat_w9_garage": "rich_w9_stepped",
+  "rowflat_w9_bigbay": "sunset_w9_curved_bay",
+  "house_w11_flat_b0": "sunset_w11_plain_pic",
+  "house_w11_flat_b1": "sunset_w11_plain_bay",
+  "house_w11_flat_b2": "sunset_w11_stepped_bay",
+  "house_w11_gable_f_b0": "stick_w11_gable",
+  "house_w11_gable_s_b0": "marina_w11_hip",
+  "house_w11_hip_b0": "marina_w11_hip",
+  "house_w11_gable_f_b1": "stick_w11_gable",
+  "house_w11_gable_s_b1": "marina_w11_hip",
+  "house_w11_hip_b1": "marina_w11_hip",
+  "house_w11_gable_f_b2": "stick_w11_gable",
+  "house_w11_gable_s_b2": "marina_w11_hip",
+  "house_w11_hip_b2": "marina_w11_hip",
+  "house_w11_gable_f_b1_gar": "rich_w11_plain",
+  "house_w11_hip_b1_gar": "marina_w11_hip",
+  "house_w11_gable_f_b2_gar": "rich_w11_plain",
+  "house_w11_hip_b2_gar": "marina_w11_hip",
+  "rowflat_w11_garage": "rich_w11_stepped",
+  "rowflat_w11_bigbay": "sunset_w11_curved_bay",
+  "vict_w7_ornate": "ital_w7_bay",
+  "vict_w7_turret": "qa_w9_turret",
+  "vict_w7_mansard": "ital_w7_tall",
+  "vict_w9_ornate": "ital_w9_bay",
+  "vict_w9_turret": "qa_w9_turret",
+  "vict_w9_mansard": "ital_w9_tall",
+  "richmond_special": "rich_w9_plain",
+  "edwardian_3flat": "edw_w9_f3",
+  "marina_duplex": "marina_w9_hip",
+  "apt_w12_f4_fe": "aptfe_w12_f4",
+  "apt_w12_f6_fe": "aptfe_w12_f6",
+  "apt_w16_f4_fe": "aptfe_w16_f4",
+  "apt_w16_f6_fe": "aptfe_w16_f6"
+ }
+}
