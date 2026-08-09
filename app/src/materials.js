@@ -269,6 +269,73 @@ export function createToyBuildingMaterial() {
   return material;
 }
 
+// The hand-made building kit, drawn as one batch.
+//
+// Every kit vertex carries `aKit`: 0 = fixed palette, 1 = `Toy_body`, 2 = glass.
+// The batch's per-instance colour is a straight multiply on everything, so the
+// vertex stage puts the fixed palette back exactly as authored — trim, roofs,
+// doors and awnings never take the lot tint, only the body does. The instance
+// colour's alpha doubles as the chunk's dither fade, matching the procedural
+// tiers' cross-fade instead of popping in.
+export function createKitMaterial() {
+  const material = new MeshLambertMaterial({ vertexColors: true, dithering: true });
+  material.uniformsHolder = { uNight: shared.uNight };
+
+  material.onBeforeCompile = function patchKit(shader) {
+    Object.assign(shader.uniforms, this.uniformsHolder);
+    shader.vertexShader = shader.vertexShader
+      .replace(
+        '#include <common>',
+        `#include <common>
+        attribute float aKit;
+        varying float vKit;
+        varying vec3 vKitPos;`
+      )
+      .replace(
+        '#include <color_vertex>',
+        `#include <color_vertex>
+        #ifdef USE_BATCHING_COLOR
+          vColor.rgb = mix(color.rgb, vColor.rgb, step(0.5, aKit) * step(aKit, 1.5));
+        #endif
+        vKit = aKit;`
+      )
+      .replace(
+        '#include <worldpos_vertex>',
+        `#include <worldpos_vertex>
+        vKitPos = (modelMatrix * vec4(transformed, 1.0)).xyz;`
+      );
+
+    shader.fragmentShader = shader.fragmentShader
+      .replace(
+        '#include <common>',
+        `#include <common>
+        uniform float uNight;
+        varying float vKit;
+        varying vec3 vKitPos;
+        ${DITHER}
+        ${HASH}`
+      )
+      .replace(
+        '#include <clipping_planes_fragment>',
+        `#include <clipping_planes_fragment>
+        if (vColor.a < 0.999 && ditherThreshold(gl_FragCoord.xy) > vColor.a) discard;`
+      )
+      .replace(
+        '#include <color_fragment>',
+        `#include <color_fragment>
+        if (uNight > 0.001) {
+          // Only the glass ignites; doors, awnings and roofs stay dark.
+          float glass = step(1.5, vKit);
+          float lit = step(hash13(floor(vKitPos * vec3(1.4, 0.45, 1.4))), 0.58);
+          totalEmissiveRadiance += vec3(1.0, 0.78, 0.48) * glass * lit * uNight * 1.5;
+          diffuseColor.rgb *= mix(1.0, 0.72, uNight);
+        }`
+      );
+  };
+
+  return material;
+}
+
 // Far tier: one merged prism mesh per 2 km super-cell, with a per-quadrant fade
 // so a 1 km near chunk can take over exactly its own quarter.
 export function createFarBuildingMaterial() {
