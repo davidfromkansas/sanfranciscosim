@@ -45,13 +45,19 @@ const exclusions = LANDMARKS.map((l) => {
 // A bridge is a kilometres-long structure, so a circle around its anchor only
 // clears midspan: the towers, anchorages, approach viaducts and the shore
 // structures they stand on are all far outside it. Every bespoke deck therefore
-// also carries a corridor along its whole baked centreline.
+// also carries a corridor along its whole baked centreline. Only what would
+// actually hit the deck is cleared: the approaches run high over Rincon Hill
+// and Folsom, and the blocks underneath them are real city that has to stay.
 const DECK_CORRIDOR = 40;
+const DECK_CLEARANCE = 4;
 const deckLines = [];
 for (const spec of Object.values(JSON.parse(await readFile(new URL('bridges.json', OUT), 'utf8')))) {
   for (const nodes of [spec.nodes, spec.east?.nodes]) {
     if (!nodes) continue;
-    const pts = nodes.map(([lon, lat]) => project(lon, lat));
+    const pts = nodes.map(([lon, lat, y]) => {
+      const [x, z] = project(lon, lat);
+      return [x, z, y];
+    });
     const xs = pts.map((p) => p[0]);
     const zs = pts.map((p) => p[1]);
     deckLines.push({
@@ -64,36 +70,42 @@ for (const spec of Object.values(JSON.parse(await readFile(new URL('bridges.json
   }
 }
 
-function insideDeckCorridor(x, z) {
+// Deck height over a point inside the corridor, or Infinity when the point is
+// clear of every deck.
+function deckHeightOver(x, z) {
+  let best = Infinity;
   for (const { pts: line, minX, maxX, minZ, maxZ } of deckLines) {
     if (x < minX || x > maxX || z < minZ || z > maxZ) continue;
     for (let i = 1; i < line.length; i++) {
-      const [ax, az] = line[i - 1];
-      const [bx, bz] = line[i];
+      const [ax, az, ay] = line[i - 1];
+      const [bx, bz, by] = line[i];
       const dx = bx - ax;
       const dz = bz - az;
       const l2 = dx * dx + dz * dz || 1;
       const t = Math.min(1, Math.max(0, ((x - ax) * dx + (z - az) * dz) / l2));
-      if ((x - (ax + dx * t)) ** 2 + (z - (az + dz * t)) ** 2 < DECK_CORRIDOR * DECK_CORRIDOR) return true;
+      if ((x - (ax + dx * t)) ** 2 + (z - (az + dz * t)) ** 2 < DECK_CORRIDOR * DECK_CORRIDOR) {
+        best = Math.min(best, ay + (by - ay) * t);
+      }
     }
   }
-  return false;
+  return best;
 }
 
 // A footprint is excluded when any part of it reaches into a bespoke landmark's
 // zone, not just when its centroid does, so nothing pokes through the models.
-function excluded(ring, cx, cz) {
+// Along a bridge it also has to reach the deck to be in the way.
+function excluded(ring, cx, cz, topY) {
   for (const e of exclusions) {
     if ((cx - e.x) ** 2 + (cz - e.z) ** 2 < e.r2) return true;
     for (let i = 0; i < ring.length; i += 2) {
       if ((ring[i] - e.x) ** 2 + (ring[i + 1] - e.z) ** 2 < e.r2) return true;
     }
   }
-  if (insideDeckCorridor(cx, cz)) return true;
+  let deckY = deckHeightOver(cx, cz);
   for (let i = 0; i < ring.length; i += 2) {
-    if (insideDeckCorridor(ring[i], ring[i + 1])) return true;
+    deckY = Math.min(deckY, deckHeightOver(ring[i], ring[i + 1]));
   }
-  return false;
+  return topY > deckY - DECK_CLEARANCE;
 }
 
 function projectRing(coords) {
@@ -207,7 +219,6 @@ function addBuilding(ringIn, height, seedSource) {
   ring = orientRing(ring);
 
   const [cx, cz] = ringCentroid(ring);
-  if (excluded(ring, cx, cz)) return null;
   const cell = cellIndex(cx, cz);
   if (!cell) return null;
 
@@ -221,6 +232,7 @@ function addBuilding(ringIn, height, seedSource) {
   const ground = sampleElevation(cx, cz);
   const baseY = Math.max(-3, minGround - 0.4);
   const topY = Math.max(baseY + 3, ground + height);
+  if (excluded(ring, cx, cz, topY)) return null;
 
   const indices = earcut(ring);
   if (indices.length < 3) return null;
