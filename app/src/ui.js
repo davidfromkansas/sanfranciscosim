@@ -74,7 +74,7 @@ export function createUI({ presets, onPreset, onTime, onQuality, onAuto }) {
   help.innerHTML =
     '<label>Controls</label><div style="margin-top:4px;line-height:1.5;color:rgba(255,255,255,.78)">' +
     'WASD / arrows pan · Q E rotate · wheel zooms to cursor · right-drag orbits · left-drag grabs the ground · ' +
-    'screen edges scroll · Shift boosts · 0–9 fly to landmarks · H home · M toy diorama' +
+    'screen edges scroll · Shift boosts · 0–9 fly to landmarks · H home · / search' +
     '</div>';
 
   const styleBadge = document.createElement('div');
@@ -82,7 +82,7 @@ export function createUI({ presets, onPreset, onTime, onQuality, onAuto }) {
   styleBadge.hidden = true;
   styleBadge.innerHTML =
     '<label>Diorama mode</label><div style="margin-top:4px;color:rgba(255,255,255,.78)">' +
-    'Locked 42° view · Q E step 45° · M returns to the real city</div>';
+    'Locked 42° view · Q E step 45° · click anything for its story</div>';
 
   hud.append(viewPanel, timePanel, qualityPanel, help, styleBadge);
 

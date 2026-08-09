@@ -19,12 +19,30 @@ const ROOF = '#5b4b41';
 const LAMP = '#ffcf8a';
 
 // ---------------------------------------------------------------- bridges ---
-// Shared suspension-bridge builder: deck ribbon draped along a polyline,
-// towers, catenary main cables, vertical suspenders and a night necklace.
-function suspensionBridge(kit, { nodes, towers, deckWidth, towerHeight, deckColor, towerColor, sag }) {
-  const path = nodes.map((n) => new Vector3(n[0], n[1], n[2]));
+// Deck ribbon along a polyline: a slab between consecutive nodes with a low
+// parapet each side and an under-deck truss. Shared by the code-built bridges
+// and by the approach ramps that carry the road onto an asset deck.
+// `y` on each node is the deck centre; the driving surface is 1.3 m above it.
+export const DECK_HALF_THICKNESS = 1.3;
 
-  // Deck: quads between consecutive nodes, with a low parapet on each side.
+// Closest point on a polyline to a ground position, with the polyline's own
+// elevation interpolated there.
+function nearestOnPath(nodes, x, z) {
+  let best = { distance: Infinity, y: 0 };
+  for (let i = 1; i < nodes.length; i++) {
+    const a = nodes[i - 1];
+    const b = nodes[i];
+    const dx = b.x - a.x;
+    const dz = b.z - a.z;
+    const lengthSq = dx * dx + dz * dz || 1;
+    const t = Math.min(1, Math.max(0, ((x - a.x) * dx + (z - a.z) * dz) / lengthSq));
+    const distance = Math.hypot(a.x + dx * t - x, a.z + dz * t - z);
+    if (distance < best.distance) best = { distance, y: a.y + (b.y - a.y) * t };
+  }
+  return best;
+}
+
+function deckRibbon(kit, path, deckWidth, deckColor) {
   for (let i = 0; i < path.length - 1; i++) {
     const a = path[i];
     const b = path[i + 1];
@@ -32,6 +50,7 @@ function suspensionBridge(kit, { nodes, towers, deckWidth, towerHeight, deckColo
     const dx = b.x - a.x;
     const dz = b.z - a.z;
     const len = Math.hypot(dx, dz);
+    if (len < 0.01) continue;
     const yaw = Math.atan2(dx, dz);
     const rise = b.y - a.y;
     kit.box(deckWidth, 2.6, Math.hypot(len, rise), deckColor, {
@@ -62,6 +81,14 @@ function suspensionBridge(kit, { nodes, towers, deckWidth, towerHeight, deckColo
       rotX: -Math.atan2(rise, len),
     });
   }
+}
+
+// Shared suspension-bridge builder: deck ribbon draped along a polyline,
+// towers, catenary main cables, vertical suspenders and a night necklace.
+function suspensionBridge(kit, { nodes, towers, deckWidth, towerHeight, deckColor, towerColor, sag }) {
+  const path = nodes.map((n) => new Vector3(n[0], n[1], n[2]));
+
+  deckRibbon(kit, path, deckWidth, deckColor);
 
   // Towers: two stepped legs braced by cross members.
   for (const tower of towers) {
@@ -716,9 +743,109 @@ export function createLandmarks(scene, data) {
   }
   scene.add(group);
 
+  // A hand-made asset has taken over a bridge: the code-built structure goes
+  // away entirely, and the stretch of baked centreline the asset does not cover
+  // is rebuilt as an approach ramp so the road still meets the deck.
+  function useBridgeAsset(id, placement) {
+    const entry = built.find((b) => b.landmark.id === id);
+    if (!entry) return null;
+    entry.object.visible = false;
+    entry.replaced = true;
+
+    const spec = manifest.bridges?.[id];
+    if (!spec || !placement.ends?.length) return null;
+
+    const nodes = spec.nodes.map(([lon, lat, y]) => {
+      const [x, z] = project(lon, lat);
+      return new Vector3(x, y, z);
+    });
+    const kit = new Kit(161);
+    const gaps = [];
+
+    for (const end of placement.ends) {
+      // The far end of the baked centreline on this side of the deck.
+      const first = nodes[0];
+      const last = nodes[nodes.length - 1];
+      const towardFirst = end.toward === 'south';
+      const anchor = towardFirst ? first : last;
+      const deckY = end.y - DECK_HALF_THICKNESS;
+
+      // Every node beyond the deck end, ordered outward from the asset.
+      const outward = nodes
+        .map((n, i) => ({ n, i }))
+        .filter(({ n }) => {
+          const dEnd = Math.hypot(n.x - end.x, n.z - end.z);
+          const dAnchor = Math.hypot(n.x - anchor.x, n.z - anchor.z);
+          return dAnchor < dEnd;
+        })
+        .sort((a, b) => (towardFirst ? b.i - a.i : a.i - b.i))
+        .map(({ n }) => n);
+
+      const path = [new Vector3(end.x, deckY, end.z), ...outward];
+      if (path.length < 2) continue;
+
+      // Grade from the asset deck down to the abutment the approach roads
+      // already meet, distributed by arc length.
+      let run = 0;
+      const runs = [0];
+      for (let i = 1; i < path.length; i++) {
+        run += Math.hypot(path[i].x - path[i - 1].x, path[i].z - path[i - 1].z);
+        runs.push(run);
+      }
+      const target = anchor.y;
+      for (let i = 1; i < path.length; i++) {
+        path[i] = new Vector3(
+          path[i].x,
+          deckY + (target - deckY) * (run ? runs[i] / run : 1),
+          path[i].z
+        );
+      }
+
+      deckRibbon(kit, path, spec.deckWidth, ORANGE);
+
+      // Columns under the ramp, as on the asset's own approach viaducts.
+      let sinceColumn = 0;
+      for (let i = 1; i < path.length; i++) {
+        sinceColumn += runs[i] - runs[i - 1];
+        if (sinceColumn < 55) continue;
+        sinceColumn = 0;
+        const p = path[i];
+        const groundY = Math.min(p.y - 4, Math.max(-6, sampleElevation(p.x, p.z)));
+        kit.box(4.4, p.y - groundY, 4.4, ORANGE, { x: p.x, y: (p.y + groundY) / 2, z: p.z });
+      }
+
+      // Measured, not assumed. `deck` is the real test: how far the asset's own
+      // deck end has drifted from the baked centreline the roads follow, since
+      // the ramp is then built from that end. `road` is the far joint, where
+      // the ramp lands on the abutment the approach streets already meet.
+      const foot = path[path.length - 1];
+      const near = nearestOnPath(nodes, end.x, end.z);
+      gaps.push({
+        end: end.toward,
+        deck: {
+          horizontal: near.distance,
+          vertical: end.y - DECK_HALF_THICKNESS - near.y,
+        },
+        road: {
+          horizontal: Math.hypot(foot.x - anchor.x, foot.z - anchor.z),
+          vertical: foot.y - anchor.y,
+        },
+        rampLength: run,
+        deckTop: end.y,
+        abutment: anchor.y + DECK_HALF_THICKNESS,
+      });
+    }
+
+    const ramps = kit.finish(`${id}Approaches`);
+    group.add(ramps);
+    built.push({ landmark: entry.landmark, object: ramps, position: entry.position, ramp: true });
+    return gaps;
+  }
+
   return {
     group,
     built,
+    useBridgeAsset,
     update() {
       for (const entry of built) updateLandmarkGlow(entry.object);
     },
