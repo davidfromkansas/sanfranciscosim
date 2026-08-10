@@ -3,11 +3,13 @@
 // nothing is downloaded or re-cleaned here.
 //
 //   out/toy/{cx}_{cz}.bin         version 3 building records (+ garnish, lore)
-//   out/toystreets/{cx}_{cz}.bin  charcoal roads plus white edge ribbons
+//   out/toystreets/{cx}_{cz}.bin  charcoal roads, sidewalk plinths, dashes, zebras
 //   out/toyland/{cx}_{cz}.bin     base landcover with 1.5x park trees + roof trees
 //   out/toy.json                  indexes, stats and validation numbers
 //
-// Dev loop: `node toy.mjs --cells=downtown,sunset` bakes two test cells only.
+// Dev loop: `node toy.mjs --cells=downtown,sunset` bakes two test cells only,
+// and `--only=streets` re-bakes just the street tier (the buildings and
+// landcover tiers, their inputs and their published copies are left alone).
 
 import { copyFile, mkdir, readFile, readdir, rm, writeFile } from 'node:fs/promises';
 import earcut from 'earcut';
@@ -18,8 +20,6 @@ import { STREET_CLASSES } from './lib/classes.mjs';
 import {
   TOY_ACCENT,
   TOY_BASE,
-  TOY_EDGE_INSET,
-  TOY_EDGE_LIFT,
   TOY_FLAG_GARNISH,
   TOY_FLAG_PITCHED,
   TOY_FLOOR,
@@ -35,6 +35,15 @@ import {
 } from './lib/toy.mjs';
 import { writeBuildingsBlob, writeLandcoverBlob, writeStreetsBlob } from './lib/binio.mjs';
 import { readLandcoverBlob, readStreetsBlob } from './lib/blobread.mjs';
+import {
+  collectNodes,
+  crosswalkBars,
+  dashRuns,
+  deckCorridor,
+  nodeIndex,
+  offsetLine,
+  splitRuns,
+} from './lib/streetscape.mjs';
 import { CATS, NIGHT_PROFILE, SUPPRESS_BANDS } from './taxonomy.mjs';
 import { countProps } from './props.mjs';
 
@@ -67,10 +76,13 @@ const PROP_SHIFT = 3;
 // claim from the citywide ration.
 const VEHICLE_CATS = new Set(['fire_station', 'police', 'hospital', 'warehouse'].map((c) => CATS.indexOf(c)));
 
-// Named dev cells: one downtown block and one Sunset block.
+// Named dev cells: one downtown block, one Sunset block, one Mission block and
+// one steep Russian Hill block.
 const TEST_CELLS = {
   downtown: [-122.401, 37.79],
   sunset: [-122.49, 37.753],
+  mission: [-122.4185, 37.7585],
+  russianhill: [-122.4185, 37.8005],
 };
 
 const arg = process.argv.slice(2).find((a) => a.startsWith('--cells='));
@@ -89,6 +101,11 @@ const onlyCells = arg
     )
   : null;
 if (onlyCells) console.log(`dev bake, cells: ${[...onlyCells].join(', ')}`);
+
+// Streets-only mode: the ground bake iterates fast enough for a look-and-see
+// loop, and it needs none of the building inputs.
+const onlyStreets = process.argv.slice(2).includes('--only=streets');
+if (onlyStreets) console.log('streets-only bake: buildings and landcover are left as published');
 
 // Seeded, deterministic and stable per building: the same footprint always gets
 // the same colour, roof and clutter across bakes.
@@ -109,8 +126,10 @@ function orientRing(ring) {
 
 // ------------------------------------------------------------------ buildings ---
 
-const source = JSON.parse(await readFile(new URL('footprints.json', OUT), 'utf8'));
-console.log(`${source.buildings.length} cleaned base footprints`);
+const source = onlyStreets
+  ? { buildings: [] }
+  : JSON.parse(await readFile(new URL('footprints.json', OUT), 'utf8'));
+if (!onlyStreets) console.log(`${source.buildings.length} cleaned base footprints`);
 
 const cells = new Map();
 function cellFor(x, z) {
@@ -154,7 +173,9 @@ const STREET_GRID = 60;
 const streetGrid = new Map();
 const streetKey = (x, z) => `${Math.floor(x / STREET_GRID)}_${Math.floor(z / STREET_GRID)}`;
 
-for (const file of (await readdir(new URL('streets/', OUT))).filter((f) => f.endsWith('.bin'))) {
+for (const file of onlyStreets
+  ? []
+  : (await readdir(new URL('streets/', OUT))).filter((f) => f.endsWith('.bin'))) {
   const blob = await readStreetsBlob(new URL(`streets/${file}`, OUT));
   for (const line of blob.lines) {
     for (let i = 0; i + 5 < line.pts.length; i += 3) {
@@ -315,7 +336,7 @@ function addHelipad(cell, cx, cz, roofY, seed) {
 // The identity join from stage 1: the toy bake reads it so a fire station gets
 // bay doors and a church gets a steeple. Missing means `misc`, which is exactly
 // the generic toy building the diorama shipped with.
-const lore = JSON.parse(await readFile(new URL('lore.json', OUT), 'utf8'));
+const lore = onlyStreets ? [] : JSON.parse(await readFile(new URL('lore.json', OUT), 'utf8'));
 
 let vehicles = 0;
 let propBuildings = 0;
@@ -417,103 +438,142 @@ function measureProps(ring, cx, cz, base, top, loreRec, seed) {
   propTrianglesMax = Math.max(propTrianglesMax, triangles);
 }
 
-await rm(TOY_OUT, { recursive: true, force: true });
-await mkdir(TOY_OUT, { recursive: true });
-let toyBytes = 0;
-let toyRecords = 0;
-const toyIndex = [];
-for (const key of [...cells.keys()].sort()) {
-  const cell = cells.get(key);
-  if (cell.buildings.length === 0) continue;
-  const blob = writeBuildingsBlob(cell, { version: 3 });
-  await writeFile(new URL(`${key}.bin`, TOY_OUT), blob);
-  toyBytes += blob.length;
-  toyRecords += cell.buildings.length;
-  toyIndex.push({
-    key,
-    cx: cell.cx,
-    cz: cell.cz,
-    originX: cell.originX,
-    originZ: cell.originZ,
-    buildings: cell.buildings.length,
-    bytes: blob.length,
-  });
+// The published toy.json: a streets-only bake keeps its building and landcover
+// indexes instead of rewriting them from an empty run.
+const published = JSON.parse(await readFile(new URL('toy.json', OUT), 'utf8').catch(() => 'null')) || null;
+let toyBytes = published ? published.stats.bytes.buildings : 0;
+let toyRecords = published ? published.stats.records : 0;
+let toyIndex = published ? published.cells : [];
+
+if (!onlyStreets) {
+  await rm(TOY_OUT, { recursive: true, force: true });
+  await mkdir(TOY_OUT, { recursive: true });
+  toyBytes = 0;
+  toyRecords = 0;
+  toyIndex = [];
+  for (const key of [...cells.keys()].sort()) {
+    const cell = cells.get(key);
+    if (cell.buildings.length === 0) continue;
+    const blob = writeBuildingsBlob(cell, { version: 3 });
+    await writeFile(new URL(`${key}.bin`, TOY_OUT), blob);
+    toyBytes += blob.length;
+    toyRecords += cell.buildings.length;
+    toyIndex.push({
+      key,
+      cx: cell.cx,
+      cz: cell.cz,
+      originX: cell.originX,
+      originZ: cell.originZ,
+      buildings: cell.buildings.length,
+      bytes: blob.length,
+    });
+  }
+  console.log(
+    `toy buildings: ${toyRecords} records in ${toyIndex.length} cells, ${(toyBytes / 1e6).toFixed(1)} MB ` +
+      `(${pitchedCount} pitched, ${garnishCount} garnish, ${helipads} helipads, tallest ${tallestToy.toFixed(0)} m)`
+  );
+  console.log(
+    `lore props: ${propBuildings} buildings, avg ${(propTrianglesTotal / Math.max(1, propBuildings)).toFixed(1)} tris ` +
+      `(cap ${propTrianglesMax}), ${vehicles} vehicles, ` +
+      `${catCounts.map((n, i) => `${CATS[i]} ${n}`).filter((_, i) => catCounts[i] > 0).length} categories present`
+  );
 }
-console.log(
-  `toy buildings: ${toyRecords} records in ${toyIndex.length} cells, ${(toyBytes / 1e6).toFixed(1)} MB ` +
-    `(${pitchedCount} pitched, ${garnishCount} garnish, ${helipads} helipads, tallest ${tallestToy.toFixed(0)} m)`
-);
-console.log(
-  `lore props: ${propBuildings} buildings, avg ${(propTrianglesTotal / Math.max(1, propBuildings)).toFixed(1)} tris ` +
-    `(cap ${propTrianglesMax}), ${vehicles} vehicles, ` +
-    `${catCounts.map((n, i) => `${CATS[i]} ${n}`).filter((_, i) => catCounts[i] > 0).length} categories present`
-);
 
 // -------------------------------------------------------------------- streets ---
-// The same polylines the base build ribbons, restyled charcoal, plus two white
-// edge ribbons per road offset to ±(w/2 - 0.3) and lifted 0.02 m.
+// The same polylines the base build ribbons, restyled charcoal, plus the
+// streetscape: a kerbed sidewalk plinth either side of every walkable class, a
+// centre-dash line trimmed clear of the junctions, and zebra bars on each
+// approach to an intersection. The white edge ribbons the earlier bake drew are
+// retired — the sidewalks now carry the road's contrast edge.
 
 const TOY_STREET_CLASSES = toyStreetClasses(STREET_CLASSES);
-const EDGE_CLASS = TOY_STREET_CLASSES.length - 1;
+const CLASS_ID = Object.fromEntries(TOY_STREET_CLASSES.map((c, i) => [c.id, i]));
+const ZEBRA_CLASS = CLASS_ID.zebra;
 
-function offsetLine(pts, offset) {
-  const n = pts.length / 3;
-  const out = { pts: [], y: [] };
-  for (let k = 0; k < n; k++) {
-    let tx;
-    let tz;
-    if (k === 0) {
-      tx = pts[3] - pts[0];
-      tz = pts[5] - pts[2];
-    } else if (k === n - 1) {
-      tx = pts[(n - 1) * 3] - pts[(n - 2) * 3];
-      tz = pts[(n - 1) * 3 + 2] - pts[(n - 2) * 3 + 2];
-    } else {
-      tx = pts[(k + 1) * 3] - pts[(k - 1) * 3];
-      tz = pts[(k + 1) * 3 + 2] - pts[(k - 1) * 3 + 2];
-    }
-    const tl = Math.hypot(tx, tz) || 1;
-    out.pts.push(pts[k * 3] + (tz / tl) * offset, pts[k * 3 + 2] - (tx / tl) * offset);
-    out.y.push(pts[k * 3 + 1] + TOY_EDGE_LIFT);
+const bridgeSpec = JSON.parse(await readFile(new URL('bridges.json', OUT), 'utf8'));
+const onDeck = deckCorridor(bridgeSpec, project);
+
+const streetFiles = (await readdir(new URL('streets/', OUT))).filter((f) => f.endsWith('.bin')).sort();
+
+// Junctions are found over the whole city, not per cell: a cell boundary cuts
+// streets in half, and a crossing on the seam has its arms in two files.
+const allLines = [];
+const cellLines = new Map();
+for (const file of streetFiles) {
+  const base = await readStreetsBlob(new URL(`streets/${file}`, OUT));
+  cellLines.set(file.replace(/\.bin$/, ''), base.lines);
+  for (const line of base.lines) allLines.push(line);
+}
+const nodes = collectNodes(allLines.filter((l) => TOY_STREET_CLASSES[l.klass].sidewalk));
+const nearNode = nodeIndex(nodes);
+
+// Zebras are generated per junction and filed under the cell that contains
+// each bar, so a crossing on a cell seam still lands in both tiles.
+const zebrasByCell = new Map();
+let zebraBars = 0;
+for (const node of nodes) {
+  for (const bar of crosswalkBars(node, (klass) => TOY_STREET_CLASSES[klass].width)) {
+    const idx = cellIndex(bar.cx, bar.cz);
+    if (!idx) continue;
+    if (!zebrasByCell.has(idx.key)) zebrasByCell.set(idx.key, []);
+    zebrasByCell.get(idx.key).push({ pts: bar.pts, y: bar.y, klass: ZEBRA_CLASS, flags: 0 });
+    zebraBars++;
   }
-  return out;
 }
 
-const streetFiles = (await readdir(new URL('streets/', OUT))).filter((f) => f.endsWith('.bin'));
 await rm(TOY_STREETS_OUT, { recursive: true, force: true });
 await mkdir(TOY_STREETS_OUT, { recursive: true });
 let toyStreetBytes = 0;
+let sidewalkLines = 0;
+let dashLines = 0;
 const toyStreetIndex = [];
-for (const file of streetFiles.sort()) {
+for (const file of streetFiles) {
   const key = file.replace(/\.bin$/, '');
   if (onlyCells && !onlyCells.has(key)) continue;
   const [cx, cz] = key.split('_').map(Number);
   const [originX, originZ] = cellOrigin(cx, cz);
-  const base = await readStreetsBlob(new URL(`streets/${file}`, OUT));
   const lines = [];
-  for (const line of base.lines) {
+  for (const line of cellLines.get(key)) {
     const n = line.pts.length / 3;
+    const cls = TOY_STREET_CLASSES[line.klass];
     const road = { pts: [], y: [], klass: line.klass, flags: line.flags };
     for (let k = 0; k < n; k++) {
       road.pts.push(line.pts[k * 3], line.pts[k * 3 + 2]);
       road.y.push(line.pts[k * 3 + 1]);
     }
     lines.push(road);
-    const halfW = TOY_STREET_CLASSES[line.klass].width / 2 - TOY_EDGE_INSET;
-    if (n >= 2 && halfW > 0.5) {
-      for (const side of [halfW, -halfW]) {
-        const edge = offsetLine(line.pts, side);
-        lines.push({ ...edge, klass: EDGE_CLASS, flags: line.flags });
+    if (n < 2) continue;
+
+    if (cls.sidewalk) {
+      const offset = cls.width / 2 + cls.sidewalk.width / 2;
+      const klass = CLASS_ID[cls.sidewalk.ribbon];
+      for (const side of [offset, -offset]) {
+        // A plinth would hang in the bay over a bridge deck corridor.
+        for (const run of splitRuns(offsetLine(line.pts, side), (x, z) => !onDeck(x, z))) {
+          lines.push({ ...run, klass, flags: line.flags });
+          sidewalkLines++;
+        }
+      }
+    }
+
+    if (cls.dash) {
+      const klass = CLASS_ID[cls.dash];
+      for (const run of dashRuns(line, nearNode)) {
+        lines.push({ ...run, klass, flags: line.flags });
+        dashLines++;
       }
     }
   }
+  for (const bar of zebrasByCell.get(key) || []) lines.push(bar);
+
   const blob = writeStreetsBlob({ key, cx, cz, originX, originZ, lines });
   await writeFile(new URL(`${key}.bin`, TOY_STREETS_OUT), blob);
   toyStreetBytes += blob.length;
   toyStreetIndex.push({ key, cx, cz, originX, originZ, lines: lines.length, bytes: blob.length });
 }
 console.log(
-  `toy streets: ${toyStreetIndex.length} cells, ${(toyStreetBytes / 1e6).toFixed(1)} MB (roads + white edge ribbons)`
+  `toy streets: ${toyStreetIndex.length} cells, ${(toyStreetBytes / 1e6).toFixed(1)} MB ` +
+    `(${sidewalkLines} sidewalk runs, ${dashLines} dash runs, ${zebraBars} zebra bars at ${nodes.length} junctions)`
 );
 
 // ------------------------------------------------------------------ landcover ---
@@ -528,12 +588,21 @@ for (const [x, y, z] of roofTrees) {
   roofTreesByCell.get(idx.key).push([x, y, z]);
 }
 
-const landFiles = (await readdir(new URL('landcover/', OUT))).filter((f) => f.endsWith('.bin'));
-await rm(TOY_LAND_OUT, { recursive: true, force: true });
-await mkdir(TOY_LAND_OUT, { recursive: true });
-let toyLandBytes = 0;
-let toyTrees = 0;
-const toyLandIndex = [];
+const landFiles = onlyStreets
+  ? []
+  : (await readdir(new URL('landcover/', OUT))).filter((f) => f.endsWith('.bin'));
+if (!onlyStreets) {
+  await rm(TOY_LAND_OUT, { recursive: true, force: true });
+  await mkdir(TOY_LAND_OUT, { recursive: true });
+}
+let toyLandBytes = published ? published.stats.bytes.landcover : 0;
+let toyTrees = published ? published.stats.trees : 0;
+let toyLandIndex = published ? published.landcoverCells : [];
+if (!onlyStreets) {
+  toyLandBytes = 0;
+  toyTrees = 0;
+  toyLandIndex = [];
+}
 for (const file of landFiles.sort()) {
   const key = file.replace(/\.bin$/, '');
   if (onlyCells && !onlyCells.has(key)) continue;
@@ -578,9 +647,23 @@ for (const file of landFiles.sort()) {
     bytes: blob.length,
   });
 }
-console.log(`toy landcover: ${toyLandIndex.length} cells, ${toyTrees} trees, ${(toyLandBytes / 1e6).toFixed(1)} MB`);
+if (!onlyStreets) {
+  console.log(`toy landcover: ${toyLandIndex.length} cells, ${toyTrees} trees, ${(toyLandBytes / 1e6).toFixed(1)} MB`);
+}
 
 // ------------------------------------------------------------------ manifest ---
+// A partial bake amends the published manifest rather than shrinking the city
+// to the handful of cells it touched.
+
+function mergeIndex(previous, baked) {
+  const byKey = new Map(previous.map((entry) => [entry.key, entry]));
+  for (const entry of baked) byKey.set(entry.key, entry);
+  return [...byKey.values()].sort((a, b) => (a.key < b.key ? -1 : 1));
+}
+
+const streetCells =
+  onlyCells && published ? mergeIndex(published.streetCells, toyStreetIndex) : toyStreetIndex;
+const streetBytes = streetCells.reduce((sum, cell) => sum + cell.bytes, 0);
 
 await writeFile(
   new URL('toy.json', OUT),
@@ -592,17 +675,17 @@ await writeFile(
       palette: TOY_PALETTE,
       streetClasses: TOY_STREET_CLASSES,
       stats: {
-        baseBuildings: source.buildings.length,
+        baseBuildings: published && onlyStreets ? published.stats.baseBuildings : source.buildings.length,
         records: toyRecords,
-        pitched: pitchedCount,
-        garnish: garnishCount,
-        helipads,
-        tallest: Math.round(tallestToy),
+        pitched: published && onlyStreets ? published.stats.pitched : pitchedCount,
+        garnish: published && onlyStreets ? published.stats.garnish : garnishCount,
+        helipads: published && onlyStreets ? published.stats.helipads : helipads,
+        tallest: published && onlyStreets ? published.stats.tallest : Math.round(tallestToy),
         trees: toyTrees,
-        bytes: { buildings: toyBytes, streets: toyStreetBytes, landcover: toyLandBytes },
+        bytes: { buildings: toyBytes, streets: streetBytes, landcover: toyLandBytes },
       },
       cells: toyIndex,
-      streetCells: toyStreetIndex,
+      streetCells,
       landcoverCells: toyLandIndex,
     },
     null,
@@ -614,7 +697,9 @@ await writeFile(
 // The toy tier must cover the same city as the near tier, stay under the toy
 // height clamp, and never cost more bytes than the geometry it replaces.
 
-const baseBuildings = JSON.parse(await readFile(new URL('buildings.json', OUT), 'utf8'));
+const baseBuildings = onlyStreets
+  ? null
+  : JSON.parse(await readFile(new URL('buildings.json', OUT), 'utf8'));
 const baseStreets = JSON.parse(await readFile(new URL('streets.json', OUT), 'utf8'));
 const failures = [];
 function check(label, ok, detail) {
@@ -625,23 +710,28 @@ function check(label, ok, detail) {
 if (onlyCells) {
   console.log(`dev bake — skipping the citywide validation gate`);
 } else {
-  const toyBuildings = toyRecords - garnishCount;
-  const drift = Math.abs(toyBuildings - baseBuildings.stats.total) / baseBuildings.stats.total;
+  if (!onlyStreets) {
+    const toyBuildings = toyRecords - garnishCount;
+    const drift = Math.abs(toyBuildings - baseBuildings.stats.total) / baseBuildings.stats.total;
+    check(
+      'toy building count within 1% of the near tier',
+      drift <= 0.01,
+      `${toyBuildings} toy / ${baseBuildings.stats.total} base (${(drift * 100).toFixed(2)}%)`
+    );
+    check('tallest toy building <= 200 m', tallestToy <= MAX_HEIGHT + 0.01, `${tallestToy.toFixed(1)} m`);
+    check(
+      'toy building payload <= near tier',
+      toyBytes <= baseBuildings.stats.bytes,
+      `${(toyBytes / 1e6).toFixed(1)} MB toy / ${(baseBuildings.stats.bytes / 1e6).toFixed(1)} MB base`
+    );
+  }
+  // Roads, two sidewalk runs, a dash centreline and the zebra bars. Six road
+  // ribbons' worth of polyline is 2x what the retired edge-ribbon bake cost,
+  // which is the streetscape's payload budget.
   check(
-    'toy building count within 1% of the near tier',
-    drift <= 0.01,
-    `${toyBuildings} toy / ${baseBuildings.stats.total} base (${(drift * 100).toFixed(2)}%)`
-  );
-  check('tallest toy building <= 200 m', tallestToy <= MAX_HEIGHT + 0.01, `${tallestToy.toFixed(1)} m`);
-  check(
-    'toy building payload <= near tier',
-    toyBytes <= baseBuildings.stats.bytes,
-    `${(toyBytes / 1e6).toFixed(1)} MB toy / ${(baseBuildings.stats.bytes / 1e6).toFixed(1)} MB base`
-  );
-  check(
-    'toy street payload <= base streets x 3 (roads plus two edge ribbons)',
-    toyStreetBytes <= baseStreets.stats.bytes * 3,
-    `${(toyStreetBytes / 1e6).toFixed(1)} MB toy / ${(baseStreets.stats.bytes / 1e6).toFixed(1)} MB base`
+    'toy street payload <= base streets x 6 (roads, sidewalks, dashes, zebras)',
+    streetBytes <= baseStreets.stats.bytes * 6,
+    `${(streetBytes / 1e6).toFixed(1)} MB toy / ${(baseStreets.stats.bytes / 1e6).toFixed(1)} MB base`
   );
   if (failures.length) {
     console.error(`\nTOY VALIDATION FAILED: ${failures.join(', ')}`);
@@ -653,12 +743,14 @@ if (onlyCells) {
 
 const APP_TILES = new URL('../app/public/tiles/', import.meta.url);
 for (const [dir, src] of [
-  ['toy', TOY_OUT],
+  ...(onlyStreets ? [] : [['toy', TOY_OUT]]),
   ['toystreets', TOY_STREETS_OUT],
-  ['toyland', TOY_LAND_OUT],
+  ...(onlyStreets ? [] : [['toyland', TOY_LAND_OUT]]),
 ]) {
   const dst = new URL(`${dir}/`, APP_TILES);
-  await rm(dst, { recursive: true, force: true });
+  // A dev bake overwrites the cells it produced and leaves the rest of the
+  // published city alone.
+  if (!onlyCells) await rm(dst, { recursive: true, force: true });
   await mkdir(dst, { recursive: true });
   for (const f of await readdir(src)) await copyFile(new URL(f, src), new URL(f, dst));
 }

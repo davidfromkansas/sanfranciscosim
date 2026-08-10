@@ -514,7 +514,10 @@ export function createAgents(scene, data, city) {
       const res = await fetch(`${ASSETS}vehicles_manifest.json`);
       if (!res.ok) throw new Error(`manifest ${res.status}`);
       entries = (await res.json()).vehicles;
-      if (!Array.isArray(entries) || !entries.length) throw new Error('manifest has no vehicles');
+      if (!Array.isArray(entries)) throw new Error('manifest has no vehicles');
+      // weight 0 means "not road traffic" — the live ferry is spawned by ferries.js.
+      entries = entries.filter((entry) => (entry.weight ?? 1) > 0);
+      if (!entries.length) throw new Error('manifest has no road vehicles');
     } catch (error) {
       console.warn(`sf-assets: no vehicle fleet (${error.message}) — keeping procedural cars`);
       return;
@@ -1058,10 +1061,15 @@ export function createAgents(scene, data, city) {
           const d = Math.random() * path.meta.total;
           samplePolyline(path.points, path.meta.cumulative, path.meta.total, d, position, tangent);
           const side = Math.random() < 0.5 ? -1 : 1;
+          // Down the middle of the sidewalk, standing on the plinth top where
+          // the street has one. Path points carry the car lift, which the
+          // kerb height replaces rather than stacks on.
+          const walk = path.sidewalk;
+          const out = path.width / 2 + (walk ? walk.width / 2 : 1.9);
           ped = {
-            x: position.x + tangent.z * (path.width / 2 + 1.9) * side,
-            y: position.y,
-            z: position.z - tangent.x * (path.width / 2 + 1.9) * side,
+            x: position.x + tangent.z * out * side,
+            y: position.y - (path.lift || 0) + (walk ? walk.curb : 0),
+            z: position.z - tangent.x * out * side,
             vx: tangent.x * (Math.random() < 0.5 ? -1 : 1) * 1.3,
             vz: tangent.z * (Math.random() < 0.5 ? -1 : 1) * 1.3,
             t: Math.random() * 6.28,
@@ -1137,6 +1145,16 @@ export function createAgents(scene, data, city) {
     update,
     setToy,
     useBridgeDeckTop,
+    // The live-ferry system hides the two looping procedural ferries when real
+    // vessel positions are flowing, and shows them again on any fallback.
+    // Container and sail traffic are untouched.
+    setProceduralFerriesVisible(visible) {
+      for (const ship of ships) {
+        if (ship.route.kind !== 'ferry') continue;
+        ship.mesh.visible = visible;
+        ship.wake.visible = visible;
+      }
+    },
     get carCount() {
       if (!fleet.length) return carMesh.count;
       let total = 0;

@@ -44,7 +44,12 @@ const NEAR_ENTER = 2400;
 const NEAR_EXIT = 3100;
 const TREE_RANGE = 3400;
 const LAMP_RANGE = 2600;
+// Kerb faces, centre dashes and zebras: built per ground group while the camera
+// is near it, dropped again behind. Sub-pixel at this range, so nothing pops.
+const DETAIL_ENTER = 1800;
+const DETAIL_EXIT = 2400;
 const FADE_SPEED = 2.2; // per second
+const STREETS_MAGIC = 0x53465301; // "SFS1", mirrored from pipeline/lib/binio.mjs
 
 class WorkerPool {
   constructor(size) {
@@ -178,6 +183,7 @@ export function createCity(scene, data) {
   const pool = new WorkerPool(Math.max(2, Math.min(6, (navigator.hardwareConcurrency || 4) - 1)));
 
   const blobCache = new Map(); // `${kind}:${cellKey}` -> ArrayBuffer
+  const brokenStreets = new Set(); // warned once per unusable street tile
   const groups = new Map();
   const chunks = new Map();
   const stats = {
@@ -186,6 +192,7 @@ export function createCity(scene, data) {
     nearChunks: 0,
     farGroups: 0,
     groundGroups: 0,
+    groundDetail: 0,
     trees: 0,
     lamps: 0,
     kitInstances: 0,
@@ -414,13 +421,41 @@ export function createCity(scene, data) {
     stats.farGroups++;
   }
 
+  // Street tiles, cell by cell, with the base tier as the safety net: a toy
+  // street tile that is missing or corrupt costs that cell its streetscape and
+  // nothing more — the road keeps its real geometry, and the group is not lost.
+  // A dev server answers a missing tile with index.html at 200, so the blob is
+  // checked for its magic rather than trusted to the fetch status.
+  async function streetBlobs(cells) {
+    const loaded = await Promise.all(
+      cells.map(async (cell) => {
+        const usable = (buf) =>
+          buf && buf.byteLength > 32 && new DataView(buf).getUint32(0, true) === STREETS_MAGIC;
+        // One retry first: a saturated tile server drops a fetch now and then,
+        // and that is not a reason to serve a whole cell from the other tier.
+        let buffer = await blob(kinds().streets, cell.key).catch(() => null);
+        if (!buffer) buffer = await blob(kinds().streets, cell.key).catch(() => null);
+        if (usable(buffer)) return { buffer };
+        const id = `${kinds().streets}:${cell.key}`;
+        if (!brokenStreets.has(id)) {
+          brokenStreets.add(id);
+          console.warn(`street tile ${id} unusable — falling back to base streets`);
+        }
+        if (kinds().streets === TIERS.base.streets) return null;
+        const fallback = await blob(TIERS.base.streets, cell.key).catch(() => null);
+        return fallback ? { buffer: fallback } : null;
+      })
+    );
+    return loaded.filter(Boolean);
+  }
+
   async function buildGround(g) {
     if (g.groundRequested) return;
     g.groundRequested = true;
     if (g.streetCells.length === 0 && g.landcoverCells.length === 0) return;
     const toyTier = tier === 'toy';
     const [streets, landcover] = await Promise.all([
-      Promise.all(g.streetCells.map(async (cell) => ({ buffer: await blob(kinds().streets, cell.key) }))),
+      streetBlobs(g.streetCells),
       Promise.all(
         g.landcoverCells.map(async (cell) => ({ buffer: await blob(kinds().landcover, cell.key) }))
       ),
@@ -506,6 +541,49 @@ export function createCity(scene, data) {
     }
   }
 
+  // Near-tier streetscape for one ground group. Same blobs, same material and
+  // the same one-mesh-per-group shape as the resident ground, so a group in
+  // range costs exactly one extra draw call.
+  async function buildGroundDetail(g) {
+    if (g.detailRequested || g.streetCells.length === 0) return;
+    const streetClasses = tier === 'toy' ? toy.streetClasses : manifest.streetClasses;
+    if (!streetClasses.some((cls) => cls.detail || cls.profile)) return;
+    g.detailRequested = true;
+    const streets = await streetBlobs(g.streetCells);
+    const result = await pool.run({
+      type: 'grounddetail',
+      key: g.key,
+      originX: g.originX,
+      originZ: g.originZ,
+      streets,
+      landcover: [],
+      streetClasses,
+      landKinds: manifest.landKinds,
+    });
+    // The camera may have left while the worker was busy.
+    if (!g.detailRequested || result.positions.length === 0) return;
+    const geometry = new BufferGeometry();
+    makeAttributes(geometry, result);
+    geometry.setAttribute('aKind', new BufferAttribute(result.kinds, 1));
+    geometry.computeBoundingSphere();
+    const mesh = new Mesh(geometry, groundMaterial);
+    mesh.position.set(g.originX, 0, g.originZ);
+    mesh.receiveShadow = true;
+    mesh.name = `streetscape-${g.key}`;
+    scene.add(mesh);
+    g.detailMesh = mesh;
+    stats.groundDetail++;
+  }
+
+  function disposeGroundDetail(g) {
+    g.detailRequested = false;
+    if (!g.detailMesh) return;
+    scene.remove(g.detailMesh);
+    g.detailMesh.geometry.dispose();
+    g.detailMesh = null;
+    stats.groundDetail--;
+  }
+
   // One planning + batching round for a chunk. Returns null when the kit could
   // not be honoured, so the caller retries with the offending pieces disabled
   // and the lots go back to procedural masses rather than leaving a hole.
@@ -516,9 +594,7 @@ export function createCity(scene, data) {
             kit: catalogForWorker(kit.catalog, kit.disabled),
             zones: kit.zones,
             exclusions: kit.exclusions,
-            streets: await Promise.all(
-              streetCellsFor(c).map(async (key) => ({ buffer: await blob(kinds().streets, key) }))
-            ),
+            streets: await streetBlobs(streetCellsFor(c).map((key) => ({ key }))),
           }
         : null;
     const result = await pool.run({
@@ -611,6 +687,7 @@ export function createCity(scene, data) {
   }
 
   function disposeGround(g) {
+    disposeGroundDetail(g);
     if (g.groundMesh) stats.groundGroups--;
     stats.trees -= g.treeCount || 0;
     stats.lamps -= g.lampCount || 0;
@@ -739,6 +816,11 @@ export function createCity(scene, data) {
       const dist = cameraTarget.distanceTo(tmp);
       if (g.trees) g.trees.visible = dist < TREE_RANGE * quality.treeScale;
       if (g.lamps) g.lamps.visible = shared.uNight.value > 0.08 && dist < LAMP_RANGE;
+      if (dist < DETAIL_ENTER && !g.detailRequested) {
+        buildGroundDetail(g).catch((err) => console.warn('streetscape failed', g.key, err));
+      } else if (dist > DETAIL_EXIT && g.detailRequested) {
+        disposeGroundDetail(g);
+      }
     }
     lampMaterial.opacity = Math.min(0.85, shared.uNight.value * 0.95);
   }

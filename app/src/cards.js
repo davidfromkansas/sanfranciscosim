@@ -16,6 +16,7 @@ const GLYPHS = {
   fly: '<path d="M3 12h13M12 6l6 6-6 6"/>',
   chat: '<path d="M4 5h16v11H9l-5 4z"/>',
   view: '<circle cx="12" cy="12" r="3"/><path d="M2 12s4-6 10-6 10 6 10 6-4 6-10 6S2 12 2 12z"/>',
+  vessel: '<path d="M4 14h16l-2 5H6zM12 14V5l6 4-6 2M7 14v-4h5"/>',
 };
 
 const KIND_GLYPH = {
@@ -26,6 +27,7 @@ const KIND_GLYPH = {
   neighborhood: 'neighborhood',
   water: 'water',
   view: 'view',
+  vessel: 'vessel',
 };
 
 const CAT_TONE = [
@@ -48,6 +50,32 @@ function el(tag, className, text) {
   if (className) node.className = className;
   if (text !== undefined) node.textContent = text;
   return node;
+}
+
+// Clock time in the Bay's own timezone, so a viewer anywhere reads the schedule
+// the way the terminals post it.
+const BAY_TIME = new Intl.DateTimeFormat('en-US', {
+  timeZone: 'America/Los_Angeles',
+  hour: 'numeric',
+  minute: '2-digit',
+});
+
+function clock(ms) {
+  return Number.isFinite(ms) ? BAY_TIME.format(new Date(ms)) : null;
+}
+
+// "in 6 min" / "12 min ago": the useful half of a timestamp for a moving boat.
+function relative(ms, now = Date.now()) {
+  if (!Number.isFinite(ms)) return null;
+  const minutes = Math.round((ms - now) / 60000);
+  if (minutes === 0) return 'now';
+  if (minutes > 0) return `in ${minutes} min`;
+  return `${-minutes} min ago`;
+}
+
+function when(ms) {
+  const time = clock(ms);
+  return time ? `${time} (${relative(ms)})` : null;
 }
 
 function chip(text, tone, glyphName) {
@@ -137,6 +165,31 @@ export function createContextCard({ onFly, onAsk, onSelectHistory }) {
       chips.append(chip('Landmark', 'coral', 'landmark'));
       if (entity.height) fact('Height', `${Math.round(entity.height)} m`);
       if (neighborhood) fact('Neighbourhood', neighborhood.name);
+    } else if (entity.kind === 'vessel') {
+      subtitle.textContent = entity.routeName
+        ? `San Francisco Bay Ferry · ${entity.routeName} route`
+        : 'San Francisco Bay Ferry';
+      chips.append(chip(entity.demo ? 'Demo vessel' : 'Live vessel', 'teal', 'vessel'));
+      if (entity.routeName) chips.append(chip(entity.routeName, 'navy'));
+      if (!entity.inService) chips.append(chip('Not in service', 'mustard'));
+      fact('Vessel', entity.title);
+      // A boat still boarding at its origin has a departure time in the future,
+      // so the label follows the clock rather than assuming it has left.
+      const left = entity.origin?.departedAt;
+      const sailed = Number.isFinite(left) && left <= Date.now();
+      fact(sailed ? 'Departed from' : 'Sailing from', entity.origin?.name || 'Not reported');
+      fact(sailed ? 'Departed at' : 'Scheduled departure', when(left) || 'Scheduled time unavailable');
+      const nextStop = entity.next?.name || entity.destination;
+      fact('Next stop', nextStop || 'Not reported');
+      fact('Arriving', when(entity.next?.arrivalAt) || 'Predicted time unavailable');
+      if (entity.next?.scheduledArrivalAt && entity.next.scheduledArrivalAt !== entity.next.arrivalAt) {
+        fact('Scheduled arrival', clock(entity.next.scheduledArrivalAt));
+      }
+      if (entity.destination && entity.destination !== nextStop) {
+        fact('Final destination', entity.destination);
+      }
+      fact('Speed', `${entity.speedKn.toFixed(1)} kn`);
+      fact('Position reported', relative(entity.recordedAt));
     } else if (entity.kind === 'neighborhood') {
       subtitle.textContent = 'Analysis neighbourhood';
       chips.append(chip('Neighbourhood', 'plum', 'neighborhood'));
@@ -144,6 +197,10 @@ export function createContextCard({ onFly, onAsk, onSelectHistory }) {
       subtitle.textContent = 'Open water';
       chips.append(chip('Water', 'teal', 'water'));
     }
+
+    // The concierge only knows the baked city, so it has nothing to say about a
+    // boat that showed up in a live feed thirty seconds ago.
+    askButton.hidden = entity.kind === 'vessel';
 
     const bits = [`Source: ${sourceLabel(entity.source)}`];
     if (entity.kind === 'building') bits.push(confidenceLabel(entity.confidence));

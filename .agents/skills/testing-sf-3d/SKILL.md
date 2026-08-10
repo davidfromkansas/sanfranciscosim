@@ -297,6 +297,41 @@ dark. Corroborate numerically, then hunt for a view:
 - Project the matched vertices with `SF.camera` to get the exact pixel box, then crop the root screenshot
   to it — otherwise a 4 m prop is invisible in a 1600 px frame.
 
+## Testing live-data layers (live ferries, `app/src/ferries.js`)
+
+Runtime handle: `SF.ferries` → `{ live, demo, count, vessels, update, dispose }`; the stats overlay adds a
+`ferries N live|procedural` line. `vessels` returns `{id,label,x,z,yawDeg,speed,inService,index}` per boat —
+that is the cheapest ground truth for position/heading assertions.
+
+- **`?ferries=demo` is the testing entry point**: it skips the network entirely and scripts vessels on 20 s
+  fixes (a looping boat, one that goes stale and is removed, one with no bearing that derives heading from
+  motion and is culled off-scene beyond |x|,|z| > 14.5 km). A full demo cycle needs ~4–5 minutes of watching,
+  so plan one long uninterrupted sample rather than many short ones.
+- Under plain `npm run dev` there is no `/api` (Vite only), so `/api/ferries` 404/502s and the module must
+  fall back to the procedural ferries after **one** console warning. To exercise live→fallback→live without a
+  511 key, add a temporary `server.proxy = { '/api': 'http://127.0.0.1:5199' }` to `app/vite.config.js` and run
+  a throwaway node server on 5199 that returns the normalised payload (`{live, vessels:[{id,label,lat,lon,
+  bearingDeg,speedMps,inService}]}`), toggled by a mode file. **Revert the vite.config edit and kill the stub
+  afterwards** (`git checkout -- app/vite.config.js`).
+- **Sample transitions per-frame, not on a `setInterval`.** A 2 s interval can catch an intermediate state
+  (live instance count not yet zeroed while procedural visibility already flipped) and look like "double
+  ferries"; a `requestAnimationFrame` sampler recording `SF.ferries.count` + procedural mesh `.visible`
+  matches what is actually rendered. Report the rAF result and mention the interval artifact.
+- Heading convention: `+x` = east, `−z` = north, asset front `−Z`, so bearing 0 → `yawDeg 0` (bow `−z`) and
+  bearing 90 → `yawDeg -90` (bow `+x`). Verify numerically by transforming the local front vector `(0,0,-1)`
+  by the instance matrix rotation, then corroborate with a north-up top-down screenshot (wake must trail
+  astern).
+- Draw-call budget: under SwiftShader `renderer.info.render.calls` is per *rendered* frame but the loop can
+  advance two internal frames per rAF — divide sampled calls by the `render.frame` delta, not by rAF count,
+  or the delta looks halved. Compare the same build with the feature idle (stub off, live count 0, procedural
+  hidden via `SF.agents.setProceduralFerriesVisible(false)`) against `?ferries=demo` at the same preset/quality.
+- FPS gates are unjudgeable here; measure `render.frame` deltas over ~60–90 s at preset `7` on the feature
+  branch vs a `main` worktree served on another port (`git worktree add /tmp/sfmain main; npx vite --port 5174`)
+  and report the ratio.
+- Console noise: tile/kit `Failed to fetch` warnings appear routinely in this environment and are unrelated to
+  the feature under test — a "zero warnings" criterion will fail for reasons that are not the PR's fault, so
+  assert on *ferry-specific* log lines and list the rest as pre-existing noise.
+
 ### Night sky kit
 `createEnvironment` must export `updateNightSky` (the frame loop calls it every frame); if it is missing
 the whole render loop throws and the canvas goes black — a good smoke test after any env.js change.
@@ -307,3 +342,29 @@ The moon sits ~19° above the horizon at azimuth ≈ (+x, −z); base FOV is 52�
 `yaw ≈ 314` to bring it into frame — in toy mode the 42° pitch lock makes it unreachable.
 Known issue to re-check: the halo plane has no radial falloff, so it reads as a hard-edged quad around
 the moon rather than a soft glow.
+
+### Deployed (production) checks for the live ferry layer
+
+- Live vs demo on the deployed site: `https://sf-3d.vercel.app` (real feed, needs `FERRY_511_KEY` set on
+  Vercel) and `https://sf-3d.vercel.app/?ferries=demo` (no network, 3 scripted vessels; the Alameda boat is
+  scripted to go stale after ~100 s, so the overlay legitimately drops from `ferries 3 live` to `2 live`).
+- **Verify rendered position against the feed** instead of trusting the picture: `curl -s <host>/api/ferries`
+  for `lat`/`lon`, then project with the repo's one projection (lon0 −122.4375, lat0 37.77:
+  `x=(lon−lon0)·111320·cos(lat0)`, `z=−(lat−lat0)·110540`) and compare with `SF.ferries.vessels` x/z.
+  Agreement within a few metres is the strongest single assertion available.
+- The official SF Bay Ferry vessel tracker page (`sanfranciscobayferry.com/vessel-tracker/`) answers **403**
+  from this VM, so an independent visual cross-check may be impossible; fall back to route/destination
+  plausibility (e.g. an "Alameda Seaplane" boat should be in the estuary, a Vallejo boat north of the Bay
+  Bridge) and say so in the report.
+- Feed reality: most vessels report `bearingDeg: 0` (unknown) and many are out of service tied up at the
+  Alameda yard (~x 12100, z −100). In-service boats beyond |x|,|z| > 14.5 km (Vallejo, Richmond, South SF)
+  are correctly culled, so `SF.ferries.count` is normally well below `vessels.length` — that is not a bug.
+- Proving the procedural pair is hidden without names: collect all `InstancedMesh`es under
+  `SF.agents.group`, call `SF.agents.setProceduralFerriesVisible(true)`, diff `visible`, then restore
+  `false`. Exactly 4 meshes (2 hulls + 2 wakes, colors `f4f0e6`/`dfeaf0`, `count: 2`) should flip.
+- **Do not poke the camera through `SF.goTo` with guessed arguments** — a wrong shape leaves the rig with
+  `altitude NaN` and a black canvas that only a reload fixes. Navigate with the UI (presets `0–9`, wheel
+  zoom, drag) and use `window.SF` read-only.
+- The time slider spans golden hour → dusk → full night (`time 100%`); at full night the Bay is nearly
+  black, so judge "ferries still drawn at night" from the overlay count plus mesh `visible` flags, and take
+  the pretty screenshot near `time 0–10%`.

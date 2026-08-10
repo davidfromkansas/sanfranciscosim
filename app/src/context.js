@@ -49,6 +49,8 @@ const SOURCE_LABELS = {
   business: 'DataSF registered business locations',
   landuse: 'DataSF land use',
   heuristic: 'Inferred from height and footprint',
+  511: 'Live 511.org feed (SF Bay Ferry)',
+  demo: 'Simulated demo vessel',
 };
 
 const CONFIDENCE_LABELS = ['inferred', 'single source', 'two sources agree', 'three or more sources agree'];
