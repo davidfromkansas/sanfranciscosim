@@ -318,3 +318,29 @@ The moon sits ~19° above the horizon at azimuth ≈ (+x, −z); base FOV is 52�
 `yaw ≈ 314` to bring it into frame — in toy mode the 42° pitch lock makes it unreachable.
 Known issue to re-check: the halo plane has no radial falloff, so it reads as a hard-edged quad around
 the moon rather than a soft glow.
+
+### Deployed (production) checks for the live ferry layer
+
+- Live vs demo on the deployed site: `https://sf-3d.vercel.app` (real feed, needs `FERRY_511_KEY` set on
+  Vercel) and `https://sf-3d.vercel.app/?ferries=demo` (no network, 3 scripted vessels; the Alameda boat is
+  scripted to go stale after ~100 s, so the overlay legitimately drops from `ferries 3 live` to `2 live`).
+- **Verify rendered position against the feed** instead of trusting the picture: `curl -s <host>/api/ferries`
+  for `lat`/`lon`, then project with the repo's one projection (lon0 −122.4375, lat0 37.77:
+  `x=(lon−lon0)·111320·cos(lat0)`, `z=−(lat−lat0)·110540`) and compare with `SF.ferries.vessels` x/z.
+  Agreement within a few metres is the strongest single assertion available.
+- The official SF Bay Ferry vessel tracker page (`sanfranciscobayferry.com/vessel-tracker/`) answers **403**
+  from this VM, so an independent visual cross-check may be impossible; fall back to route/destination
+  plausibility (e.g. an "Alameda Seaplane" boat should be in the estuary, a Vallejo boat north of the Bay
+  Bridge) and say so in the report.
+- Feed reality: most vessels report `bearingDeg: 0` (unknown) and many are out of service tied up at the
+  Alameda yard (~x 12100, z −100). In-service boats beyond |x|,|z| > 14.5 km (Vallejo, Richmond, South SF)
+  are correctly culled, so `SF.ferries.count` is normally well below `vessels.length` — that is not a bug.
+- Proving the procedural pair is hidden without names: collect all `InstancedMesh`es under
+  `SF.agents.group`, call `SF.agents.setProceduralFerriesVisible(true)`, diff `visible`, then restore
+  `false`. Exactly 4 meshes (2 hulls + 2 wakes, colors `f4f0e6`/`dfeaf0`, `count: 2`) should flip.
+- **Do not poke the camera through `SF.goTo` with guessed arguments** — a wrong shape leaves the rig with
+  `altitude NaN` and a black canvas that only a reload fixes. Navigate with the UI (presets `0–9`, wheel
+  zoom, drag) and use `window.SF` read-only.
+- The time slider spans golden hour → dusk → full night (`time 100%`); at full night the Bay is nearly
+  black, so judge "ferries still drawn at night" from the overlay count plus mesh `visible` flags, and take
+  the pretty screenshot near `time 0–10%`.
