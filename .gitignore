@@ -10,3 +10,7 @@ pipeline/data/
 pipeline/out/
 .vercel
 .env*
+
+# Blender/Python build litter from artifacts/
+__pycache__/
+*.blend1
