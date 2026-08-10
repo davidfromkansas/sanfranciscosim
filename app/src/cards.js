@@ -173,14 +173,21 @@ export function createContextCard({ onFly, onAsk, onSelectHistory }) {
       if (entity.routeName) chips.append(chip(entity.routeName, 'navy'));
       if (!entity.inService) chips.append(chip('Not in service', 'mustard'));
       fact('Vessel', entity.title);
-      fact('Departed from', entity.origin?.name || 'Not reported');
-      fact('Departed at', when(entity.origin?.departedAt) || 'Scheduled time unavailable');
-      fact('Next stop', entity.next?.name || entity.destination || 'Not reported');
+      // A boat still boarding at its origin has a departure time in the future,
+      // so the label follows the clock rather than assuming it has left.
+      const left = entity.origin?.departedAt;
+      const sailed = Number.isFinite(left) && left <= Date.now();
+      fact(sailed ? 'Departed from' : 'Sailing from', entity.origin?.name || 'Not reported');
+      fact(sailed ? 'Departed at' : 'Scheduled departure', when(left) || 'Scheduled time unavailable');
+      const nextStop = entity.next?.name || entity.destination;
+      fact('Next stop', nextStop || 'Not reported');
       fact('Arriving', when(entity.next?.arrivalAt) || 'Predicted time unavailable');
       if (entity.next?.scheduledArrivalAt && entity.next.scheduledArrivalAt !== entity.next.arrivalAt) {
         fact('Scheduled arrival', clock(entity.next.scheduledArrivalAt));
       }
-      fact('Final destination', entity.destination);
+      if (entity.destination && entity.destination !== nextStop) {
+        fact('Final destination', entity.destination);
+      }
       fact('Speed', `${entity.speedKn.toFixed(1)} kn`);
       fact('Position reported', relative(entity.recordedAt));
     } else if (entity.kind === 'neighborhood') {
