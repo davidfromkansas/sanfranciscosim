@@ -130,6 +130,7 @@ const DEMO_ROUTES = [
     id: 'DEMO:Oakland',
     label: 'Hydrus (demo)',
     routeName: 'Oakland',
+    originName: 'Oakland Ferry Terminal',
     destination: 'San Francisco Ferry Building Gate B',
     bearings: true,
     stopsAfterMs: Infinity,
@@ -143,6 +144,7 @@ const DEMO_ROUTES = [
     id: 'DEMO:Alameda',
     label: 'Pyxis (demo)',
     routeName: 'Alameda Seaplane',
+    originName: 'San Francisco Ferry Building Gate F',
     destination: 'Alameda Seaplane Lagoon',
     bearings: true,
     stopsAfterMs: 100 * 1000,
@@ -156,6 +158,7 @@ const DEMO_ROUTES = [
     id: 'DEMO:Vallejo',
     label: 'Vela (demo)',
     routeName: 'Vallejo',
+    originName: null, // exercises the "unknown origin" card copy
     destination: 'Vallejo Ferry Terminal',
     bearings: false, // heading must be derived from movement
     stopsAfterMs: Infinity,
@@ -168,9 +171,13 @@ const DEMO_ROUTES = [
   },
 ];
 
-// Module-scope scratch: the update loop must not allocate.
+// Module-scope scratch: the update loop and the picker must not allocate.
 const dummy = new Object3D();
 const scratch = new Vector2();
+// Pick radius around a hull's centre, in metres: a little wider than the boat so
+// a click near it from the aerial camera still lands.
+const PICK_RADIUS = 34;
+const MAX_PICK_DISTANCE = 9000;
 
 export function createLiveFerries(scene, data, agents) {
   const params = new URLSearchParams(window.location.search);
@@ -290,6 +297,11 @@ export function createLiveFerries(scene, data, agents) {
           fixGap: POLL_MS / 1000,
           moved: 0,
           inService: vessel.inService,
+          routeName: vessel.routeName ?? null,
+          destination: vessel.destination ?? null,
+          origin: vessel.origin ?? null,
+          next: vessel.next ?? null,
+          recordedAt: vessel.recordedAt ?? now,
           seen: true,
           index: -1,
         };
@@ -311,6 +323,11 @@ export function createLiveFerries(scene, data, agents) {
       state.lastFixAt = now;
       state.inService = vessel.inService;
       state.label = vessel.label;
+      state.routeName = vessel.routeName ?? null;
+      state.destination = vessel.destination ?? null;
+      state.origin = vessel.origin ?? null;
+      state.next = vessel.next ?? null;
+      state.recordedAt = vessel.recordedAt ?? now;
       state.seen = true;
 
       if (usableBearing(vessel.bearingDeg)) {
@@ -374,6 +391,17 @@ export function createLiveFerries(scene, data, agents) {
         destination: route.destination,
         inService: true,
         recordedAt: now,
+        origin: {
+          ref: null,
+          name: route.originName,
+          departedAt: route.originName ? now - 11 * 60 * 1000 : null,
+        },
+        next: {
+          name: route.destination,
+          arrivalAt: now + 7 * 60 * 1000,
+          scheduledArrivalAt: now + 6 * 60 * 1000,
+          departureAt: null,
+        },
       });
     }
     return list;
@@ -461,7 +489,10 @@ export function createLiveFerries(scene, data, agents) {
       const turn = shortestAngle(state.yaw, state.targetYaw);
       state.yaw += Math.sign(turn) * Math.min(Math.abs(turn), HEADING_EASE * dt);
 
-      if (!renderable(state, now)) continue;
+      if (!renderable(state, now)) {
+        state.index = -1;
+        continue;
+      }
       state.index = count;
 
       state.bob += dt * 1.6;
@@ -499,8 +530,62 @@ export function createLiveFerries(scene, data, agents) {
     wakeMesh.instanceMatrix.needsUpdate = true;
   }
 
+  // A drawn vessel as a pickable entity, in the same shape the context cards and
+  // the focus overlay already consume. Times come straight from the feed and stay
+  // null when 511 does not publish them — the card says so rather than guessing.
+  function entityFor(state) {
+    return {
+      kind: 'vessel',
+      id: state.id,
+      title: state.label,
+      name: state.label,
+      x: state.x,
+      z: state.z,
+      routeName: state.routeName,
+      destination: state.destination,
+      origin: state.origin ?? null,
+      next: state.next ?? null,
+      speedKn: state.speed * 1.94384,
+      inService: state.inService,
+      recordedAt: state.recordedAt ?? state.lastFixAt,
+      demo,
+      source: demo ? 'demo' : '511',
+      confidence: 3,
+    };
+  }
+
+  // Nearest drawn hull whose centre lies within PICK_RADIUS of the ray. Sphere
+  // tests against at most CAPACITY boats, so a click costs nothing measurable
+  // and the fleet keeps its single instanced draw call.
+  function pickVessel(origin, direction) {
+    if (!ready) return null;
+    let best = null;
+    const now = Date.now();
+    for (const state of vessels.values()) {
+      if (state.index < 0 || !renderable(state, now)) continue;
+      const px = state.x - origin.x;
+      const py = 6 - origin.y; // roughly the deckhouse, not the waterline
+      const pz = state.z - origin.z;
+      const t = px * direction.x + py * direction.y + pz * direction.z;
+      if (t <= 0 || t > MAX_PICK_DISTANCE) continue;
+      const away = Math.hypot(px - direction.x * t, py - direction.y * t, pz - direction.z * t);
+      if (away > PICK_RADIUS || (best && t >= best.distance)) continue;
+      best = { ...entityFor(state), distance: t };
+    }
+    return best;
+  }
+
+  // A drawn vessel by id, so an open selection can follow it as it sails and
+  // pick up each new fix. Null once the boat is gone from the feed or the scene.
+  function vesselEntity(id) {
+    const state = vessels.get(id);
+    return state && state.index >= 0 ? entityFor(state) : null;
+  }
+
   return {
     update,
+    pickVessel,
+    vesselEntity,
     get live() {
       return live;
     },
