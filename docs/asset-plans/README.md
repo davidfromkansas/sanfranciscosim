@@ -1,0 +1,87 @@
+# Landmark asset plans
+
+One plan per San Francisco landmark queued for the bespoke-GLB pipeline. Each file
+contains **both** halves of the job:
+
+1. **Part 1 — a ready-to-run task prompt.** Copy it into a fresh agent session and
+   it will produce a validated GLB, renders, a reference dossier and a report under
+   `artifacts/<slug>/`, exactly the way `artifacts/salesforce-tower/` was produced.
+2. **Part 2 — the research and design dossier.** Sources, verified facts, the
+   WGS84 anchor and architectural height, orientation, four-side and roof
+   observations, recognition cues, a massing recipe, a palette map, the triangle
+   budget, a draft manifest entry, integration notes and the open risks.
+
+These are plans only. Nothing here has been modelled yet, and no app code,
+manifest or pipeline data has been changed.
+
+## The set
+
+| Landmark | Manifest id | Target height | Runtime status |
+|---|---|---|---|
+| [Transamerica Pyramid](./transamerica-pyramid.md) | `transamerica` | 260 m | replaces procedural |
+| [Ferry Building](./ferry-building.md) | `ferry-building` | 74.7 m | replaces procedural |
+| [Coit Tower](./coit-tower.md) | `coit-tower` | 64 m | replaces procedural |
+| [Palace of Fine Arts](./palace-of-fine-arts.md) | `palace-of-fine-arts` | 49.4 m | replaces procedural |
+| [San Francisco City Hall](./city-hall.md) | `city-hall` | 93.73 m | replaces procedural |
+| [Painted Ladies](./painted-ladies.md) | `painted-ladies` | 12.5 m | replaces procedural |
+| [Sutro Tower](./sutro-tower.md) | `sutro-tower` | 297.8 m | replaces procedural |
+| [Oracle Park](./oracle-park.md) | `oracle-park` | 45 m | replaces procedural |
+| [Grace Cathedral](./grace-cathedral.md) | `grace-cathedral` | 53 m | replaces procedural |
+| [Mission Dolores Basilica](./mission-dolores.md) | `mission-dolores` | 30 m | new landmark |
+| [Columbus Tower (Sentinel Building)](./columbus-tower.md) | `columbus-tower` | 29 m | new landmark |
+| [555 California Street](./555-california.md) | `555-california` | 237 m | new landmark |
+| [One Rincon Hill](./one-rincon-hill.md) | `one-rincon-hill` | 195 m | new landmark |
+| [Cathedral of Saint Mary of the Assumption](./st-marys-cathedral.md) | `st-marys-cathedral` | 58 m | new landmark |
+| [California Academy of Sciences](./cal-academy.md) | `cal-academy` | 11 m | new landmark |
+| [de Young Museum](./de-young.md) | `de-young` | 44 m | new landmark |
+| [Conservatory of Flowers](./conservatory-of-flowers.md) | `conservatory-of-flowers` | 18.3 m | new landmark |
+| [War Memorial Opera House](./war-memorial-opera-house.md) | `opera-house` | 44 m | new landmark |
+| [Fairmont San Francisco](./fairmont-san-francisco.md) | `fairmont` | 99 m | new landmark |
+
+## Shared contract (all 19)
+
+- Style: `docs/styles/miniature-toy.md` (authoritative for artistic decisions)
+- Technical contract: `.agents/skills/sf-asset-check/SKILL.md` (authoritative for the GLB)
+- Repo rules: `AGENTS.md` — in particular rule 3 (never delete the procedural
+  fallback) and rule 5 (real coordinates, real heights; exaggerate in authoring, not
+  in placement)
+- Reference implementation: `artifacts/salesforce-tower/`
+- Binary GLB, real meters, origin at base centre, geometry sitting on z=0, applied
+  transforms, flat `Toy_*` colours from the project palette, `_Glow` only for
+  night-glow surfaces, no textures, no transparency, no cameras/lights/animation,
+  landmark budget <= 27,000 triangles
+
+## Orientation note that applies to every plan
+
+`placeGeneric()` in `app/src/assets.js` scales and positions an asset but never
+rotates it, so each GLB must be authored in **true-world orientation** (Blender
+`+Y` = north, `+X` = east). The asset contract's "front faces `-Y`" rule can only
+be honoured literally for buildings whose real front happens to face south. Where
+the two conflict, real-world orientation wins (AGENTS rule 5) and the deviation is
+recorded in that asset's `REPORT.md`.
+
+## Runtime status column
+
+- **replaces procedural** — the id already exists in `app/src/landmarks.js` and in
+  `pipeline/lib/landmarks.mjs`, so the GLB hides the procedural version on load and
+  the existing exclusion zone already clears the baked city. No pipeline change.
+- **new landmark** — no procedural builder and no registry entry. Integration needs
+  a new entry in `pipeline/lib/landmarks.mjs` (id, lon/lat, height, exclusion
+  radius, optional camera preset) **and a re-bake of the affected tiles**, or the
+  baked procedural building will intersect the new GLB. Each plan's section 2.13
+  spells this out.
+
+## Research method and confidence
+
+Anchors and footprints were measured from OSM geometry pulled directly from the
+OSM API (`/api/0.6/way|relation`), reprojected locally, and reduced to a
+minimum-area oriented bounding box — those numbers are marked as measured. Heights,
+dates, architects and dimensions come from Wikidata claims and Wikipedia infoboxes
+with the source named in each row. Anything visual, derived or unconfirmed is
+labelled *inferred* or *estimated* and is called out again in each plan's section
+2.15. Several OSM `height` tags describe only a low shell (City Hall 30 m, St
+Mary's 18.9 m, Cal Academy 11 m, de Young 13 m) and must never be used as the
+architectural target height.
+
+The executing agent is expected to re-verify height, anchor, footprint and
+orientation before modelling — the dossier is a head start, not a citation.
