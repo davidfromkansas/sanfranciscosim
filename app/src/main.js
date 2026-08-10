@@ -63,6 +63,8 @@ async function boot() {
     onPlaced(landmarkId, placement) {
       const gaps = landmarks.useBridgeAsset(landmarkId, placement);
       if (gaps) {
+        // Traffic follows the asset's own deck, not the baked ribbon it hid.
+        agents.useBridgeDeckTop(landmarkId, placement.ends);
         for (const gap of gaps) {
           console.log(
             `sf-assets: ${landmarkId} ${gap.end} approach — deck joint ` +

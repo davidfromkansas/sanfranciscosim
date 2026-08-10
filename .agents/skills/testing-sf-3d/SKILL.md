@@ -164,6 +164,16 @@ near-zero change even when the feature works. To distinguish "absent" from "too 
 The debug overlay's fps is rounded to an integer, so sub-1 fps shows as `0` or `1`; compare it against
 `SF.renderer.info.render.frame` deltas over ~10 s rather than expecting a decimal.
 
+## Vercel `ERR_ABORTED` tile requests are not 404s
+
+On a cache-cleared production load the tile streamer legitimately cancels in-flight fetches via
+`AbortController` as the camera moves, so CDP `Network.loadingFailed` can report 20+
+`net::ERR_ABORTED` entries for `tiles/**` and the app logs `tile group failed <cell> TypeError: Failed
+to fetch` / `near chunk failed <cell>`. Do **not** report these as missing tiles. Distinguish them by
+also collecting `Network.responseReceived` and counting only `status >= 400`; a clean deploy shows
+`HTTP >= 400 (0)` alongside the aborts, with `window.__errs` empty and `cellsLoaded` still climbing to
+its plateau.
+
 ## Deployment caching gotcha
 
 `/tiles/manifest.json` is served `public, max-age=31536000, immutable` under a **non-hashed** name. After a
@@ -187,6 +197,62 @@ single-letter keys. Verify with `SF.style` rather than assuming the keypress lan
 ### The time slider is easiest to drive with the keyboard
 `input[type=range]` (0..1000). Click it once, then `xdotool key End` for full night and `Home` for
 day — clicking the track only jumps part-way and dragging is flaky. Clicking it also unchecks "auto".
+
+Two things that repeatedly cost time here (re-measure, do not assume the exact number):
+- **X11 clicks need a Y offset relative to page coordinates.** With the 1600×1122 Chrome window used in
+  this environment the browser chrome adds about **+88 px in y**, so `xdotool mousemove <rect.x> <rect.y>`
+  computed from `getBoundingClientRect()` lands above the element and the click silently does nothing
+  (e.g. the "Golden hour → dusk" auto checkbox stays checked and daylight shots drift to dusk mid-run).
+  Calibrate first with a `pointermove` listener (see "Real-input coordinate calibration") or by locating
+  the widget in an `import -window root` screenshot, then add the measured offset to every click.
+- **`Home` does not always reset the time slider.** On some builds only `End` (night) is honoured while
+  `Home` leaves `input[type=range].value` unchanged; verify the value after the keypress and, if it did
+  not move, click near the left end of the slider track instead. Always assert on the slider's `value`
+  (and `input[type=checkbox].checked` for auto-advance) rather than assuming the key landed.
+
+### Probing traffic / agents (app/src/agents.js)
+`SF.agents` only exposes `group`, `update`, `setToy` and `carCount`, so per-car state is not reachable
+from the console. Two ways in:
+- Read world positions out of the vehicle `InstancedMesh`es: `SF.agents.group.children` contains
+  `vehicle-<id>` meshes (one per fleet GLB, `carMesh` is hidden once the fleet loads). Instance `i`'s
+  position is `matrix.elements[12/13/14]` via `mesh.getMatrixAt(i, m)`; `mesh.count` is the live count.
+  Good enough for "are there cars here" and for height-above-deck checks.
+- Individual-car tracking (does a car actually traverse?) needs a temporary one-line instrumentation such
+  as `window.__cars = cars;` inside `createAgents`, then sample `__cars[i].d` / `.path.meta.total` over
+  time. Back the file up, restore it afterwards, and disclose it in the report.
+Height gotcha worth checking on any traffic change: bridge deck cars are placed at
+`manifest.bridges.*.nodes[i][2] + 0.35 + 0.2`, while the procedural deck box in `landmarks.js deckRibbon`
+is centred on the node y with thickness 2.6 (top = node y + 1.3) and the Golden Gate GLB deck is level at
+~67.2 m. So cars can legitimately end up sunk into or floating above a deck — measure the gap with a
+downward raycast at several points along the span before calling it fine.
+
+#### Measuring "do cars sit ON the deck?" correctly
+A naive downward ray from `carY + 60` takes the **first** bridge hit, which is often a tower crossbeam,
+suspender or hanger *above* the deck — that produced spurious gaps of −25 m and −15 m. Two fixes:
+- filter the bridge hits to `h.point.y <= carY + 0.4` and take the highest remaining one;
+- confirm what the surface actually is with a **deck cross-section**: take two adjacent manifest nodes,
+  compute the perpendicular `(-dz, dx)/L`, and raycast down at lateral offsets −16…+16 m, reporting
+  `hitY - nodeY`. If the top surface is a constant `nodeY + 1.3` across the whole `deckWidth`, that is
+  the procedural `deckRibbon` roadway, so cars placed at `nodeY + 0.55` are genuinely embedded 0.75 m.
+Also read the vehicle geometry's bounding box (`mesh.geometry.boundingBox.min.y ≈ 0`) to establish that
+the models are **base-origin** — without that, a 0.75 m offset cannot be called "sunk" vs "centred".
+Visually a 0.75 m sink on a ~1.9 m car reads as "missing wheels / bottom flush with the road", not as an
+obvious hole, so the numbers matter more than the screenshot here.
+
+#### Whole-span coverage without trusting the code
+Project every `vehicle-*` instance onto the manifest deck polyline, keep those within ~20 m of the
+centreline, and bucket by arc length into thirds. Cars are only simulated within `CAR_RANGE * 1.6` of the
+camera, so frame the **whole** span (`SF.goTo(<mid lon>, <mid lat>, 3000, 150, 42)`) before counting, or
+the far third will read empty for purely environmental reasons.
+For the best visual proof of on-deck traffic, aim at the deck's own mid node rather than a hand-picked
+lon/lat: `nodes[Math.floor(nodes.length/2)]` at `distance 600–800` — hand-guessed coordinates frequently
+frame open water beside the span.
+
+#### Probe pitfall: reset your own globals after every reload
+If a probe selects its target deck from a `window.__deck` global, a page reload clears it and the probe
+silently measures the default deck (e.g. the Bay Bridge east span while the camera is at the Golden
+Gate), reporting a false `onDeck: 0`. Re-set such globals immediately after each navigation/reload and
+echo the deck name in the probe's own output so a mismatch is visible.
 
 ### Verifying toy props (app/src/props.js) without a GPU-quality screenshot
 The 42° locked diorama pitch plus 150 m zoom clamp means street-level props (retail awnings, fire-station
