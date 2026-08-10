@@ -432,9 +432,13 @@ export function createGroundMaterial() {
       .replace(
         '#include <color_fragment>',
         `#include <color_fragment>
-        float asphalt = step(63.5, vKind);
+        // 64 asphalt, 65 sidewalk, 66 paint: only the roadway picks up the
+        // warm sodium sheen at night, and the paint stays crisp on top of it.
+        float asphalt = step(63.5, vKind) * step(vKind, 64.5);
+        float marking = step(65.5, vKind);
         diffuseColor.rgb *= cloudShadow(vGroundWorld);
-        totalEmissiveRadiance += vec3(1.0, 0.72, 0.42) * asphalt * uNight * 0.06;`
+        totalEmissiveRadiance += vec3(1.0, 0.72, 0.42) * asphalt * uNight * 0.06;
+        totalEmissiveRadiance += vec3(0.85, 0.86, 0.82) * marking * uNight * 0.1;`
       );
   };
 

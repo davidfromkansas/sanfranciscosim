@@ -1058,10 +1058,15 @@ export function createAgents(scene, data, city) {
           const d = Math.random() * path.meta.total;
           samplePolyline(path.points, path.meta.cumulative, path.meta.total, d, position, tangent);
           const side = Math.random() < 0.5 ? -1 : 1;
+          // Down the middle of the sidewalk, standing on the plinth top where
+          // the street has one. Path points carry the car lift, which the
+          // kerb height replaces rather than stacks on.
+          const walk = path.sidewalk;
+          const out = path.width / 2 + (walk ? walk.width / 2 : 1.9);
           ped = {
-            x: position.x + tangent.z * (path.width / 2 + 1.9) * side,
-            y: position.y,
-            z: position.z - tangent.x * (path.width / 2 + 1.9) * side,
+            x: position.x + tangent.z * out * side,
+            y: position.y - (path.lift || 0) + (walk ? walk.curb : 0),
+            z: position.z - tangent.x * out * side,
             vx: tangent.x * (Math.random() < 0.5 ? -1 : 1) * 1.3,
             vz: tangent.z * (Math.random() < 0.5 ? -1 : 1) * 1.3,
             t: Math.random() * 6.28,
