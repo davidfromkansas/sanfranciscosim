@@ -47,15 +47,100 @@ export const TOY_FLAG_GARNISH = 2;
 export const TOY_FLOOR = 3.5;
 export const TOY_ROOF_RISE = 2.5;
 
-// Toy streets: the base widths and lane data, restyled charcoal, plus the white
-// edge ribbon class the bake emits alongside every road.
+// Toy streets: the base widths and lane data, restyled charcoal, plus the
+// streetscape ribbon classes the bake emits alongside every road — raised
+// sidewalk plinths, centre dashes and crosswalk zebras.
+//
+// Geometry the classes imply, and which the runtime reads back out of
+// manifest.json rather than hardcoding:
+//   `sidewalk` on a road class — that class carries kerbed sidewalks: which
+//     ribbon class they are baked as, how wide, and how high the kerb is (the
+//     runtime also uses `curb` to stand pedestrians on the plinth top).
+//   `dash` on a road class — the ribbon class its centre dashes are baked as.
+//   `dash` on a ribbon class — the dash/gap rhythm in metres. The bake emits
+//     one trimmed centreline per road and the ribbon builder chops it, which
+//     costs one polyline instead of one per dash.
+//   `lift` on a ribbon class — how far above the road surface it sits. Too
+//     small to survive the blob's decimetre y quantisation, so it is applied at
+//     ribbon-build time.
+//   `profile: 'curb'` — build an L-section (top strip plus kerb faces), not a
+//     flat strip.
+//   `detail: true` — near tier only; the far tier keeps plain charcoal.
+export const TOY_CURB_H = 0.35;
+export const TOY_SIDEWALK_W = 3;
+export const TOY_SIDEWALK_W_WIDE = 4; // major/arterial
+export const TOY_MARK_LIFT = 0.03; // must stay under agents.js CAR_LIFT (0.2)
+export const TOY_DASH_W = 0.5;
+export const TOY_ZEBRA_W = 0.8;
+
+const SIDEWALK_IDS = new Set(['major', 'arterial', 'collector', 'residential']);
+const WIDE_SIDEWALK_IDS = new Set(['major', 'arterial']);
+const DASH_IDS = new Set(['freeway', 'major', 'arterial', 'collector', 'residential']);
+const BIG_DASH_IDS = new Set(['freeway', 'major']);
+
 export function toyStreetClasses(base) {
-  const road = base.map((c) => ({ ...c, color: hex('#3c3c40') }));
-  road.push({ id: 'edge', width: 0.4, color: hex('#e8e8e4'), lanes: 0, speed: 0 });
+  const road = base.map((c) => ({
+    ...c,
+    color: hex('#3c3c40'),
+    ...(SIDEWALK_IDS.has(c.id)
+      ? {
+          sidewalk: {
+            ribbon: WIDE_SIDEWALK_IDS.has(c.id) ? 'sidewalk_wide' : 'sidewalk',
+            width: WIDE_SIDEWALK_IDS.has(c.id) ? TOY_SIDEWALK_W_WIDE : TOY_SIDEWALK_W,
+            curb: TOY_CURB_H,
+          },
+        }
+      : null),
+    ...(DASH_IDS.has(c.id) ? { dash: BIG_DASH_IDS.has(c.id) ? 'dash_major' : 'dash' } : null),
+  }));
+  const stone = hex('#d9d2c2');
+  const paint = hex('#f0ece0');
+  road.push({
+    id: 'sidewalk',
+    width: TOY_SIDEWALK_W,
+    color: stone,
+    lanes: 0,
+    speed: 0,
+    profile: 'curb',
+    lift: TOY_CURB_H,
+  });
+  road.push({
+    id: 'sidewalk_wide',
+    width: TOY_SIDEWALK_W_WIDE,
+    color: stone,
+    lanes: 0,
+    speed: 0,
+    profile: 'curb',
+    lift: TOY_CURB_H,
+  });
+  road.push({
+    id: 'dash',
+    width: TOY_DASH_W,
+    color: paint,
+    lanes: 0,
+    speed: 0,
+    lift: TOY_MARK_LIFT,
+    detail: true,
+    dash: { length: 3, gap: 6 },
+  });
+  road.push({
+    id: 'dash_major',
+    width: TOY_DASH_W * 1.5,
+    color: paint,
+    lanes: 0,
+    speed: 0,
+    lift: TOY_MARK_LIFT,
+    detail: true,
+    dash: { length: 4.5, gap: 9 },
+  });
+  road.push({
+    id: 'zebra',
+    width: TOY_ZEBRA_W,
+    color: paint,
+    lanes: 0,
+    speed: 0,
+    lift: TOY_MARK_LIFT,
+    detail: true,
+  });
   return road;
 }
-
-export const TOY_EDGE_CLASS = (base) => base.length; // index of the pushed edge class
-export const TOY_EDGE_WIDTH = 0.4;
-export const TOY_EDGE_INSET = 0.3; // from the kerb, toward the centerline
-export const TOY_EDGE_LIFT = 0.02;

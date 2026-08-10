@@ -544,7 +544,74 @@ function buildFar(blobs, originX, originZ, palette, groupSize) {
 // ------------------------------------------------------------------ ground ---
 // Street ribbons + landcover polygons merged into one indexed, vertex-coloured
 // mesh per super-cell: the whole city's ground detail in ~64 draw calls.
-function buildGround(streetBlobs, landcoverBlobs, originX, originZ, streetClasses, landKinds) {
+//
+// Two passes over the same street blobs:
+//   `detail: false` — the resident tier. Roads, sidewalk tops and landcover.
+//   `detail: true`  — the near tier, built and dropped as the camera moves.
+//     Kerb faces, centre dashes and crosswalk zebras: the things worth a
+//     draw call within a few hundred metres and worth nothing beyond that.
+// The sidewalk's pale top stays in the resident tier deliberately — it carries
+// the road's contrast at any distance, so unloading the near tier can't pop the
+// overall tone of a neighbourhood.
+const PATH_LIFT = 0.35;
+const KIND_ASPHALT = 64;
+const KIND_SIDEWALK = 65;
+const KIND_MARKING = 66;
+
+// Chop a baked centre-dash line into its dashes. The bake ships one trimmed
+// polyline per street and the rhythm rides on the class, which keeps a dashed
+// street the price of one ribbon in the tile.
+function chopDashes(px, py, pz, n, rhythm) {
+  const cycle = rhythm.length + rhythm.gap;
+  const dashes = [];
+  let travelled = 0;
+  let dash = null;
+  const point = (x, y, z) => {
+    if (!dash) dashes.push((dash = { px: [], py: [], pz: [] }));
+    dash.px.push(x);
+    dash.py.push(y);
+    dash.pz.push(z);
+  };
+  for (let k = 0; k < n - 1; k++) {
+    const segLen = Math.hypot(px[k + 1] - px[k], pz[k + 1] - pz[k]);
+    if (segLen < 1e-4) continue;
+    let s = 0;
+    while (s < segLen) {
+      const phase = (travelled + s) % cycle;
+      const painting = phase < rhythm.length;
+      const until = Math.min(segLen, s + (painting ? rhythm.length - phase : cycle - phase));
+      if (painting) {
+        const at = (d) => {
+          const t = d / segLen;
+          point(
+            px[k] + (px[k + 1] - px[k]) * t,
+            py[k] + (py[k + 1] - py[k]) * t,
+            pz[k] + (pz[k + 1] - pz[k]) * t
+          );
+        };
+        // A dash carried over a vertex already has its start point.
+        if (!dash || s > 0) at(s);
+        at(until);
+        // Ending inside this segment closes the dash; ending on the vertex
+        // lets it carry on into the next one.
+        if (until < segLen) dash = null;
+      }
+      s = until;
+    }
+    travelled += segLen;
+  }
+  return dashes.filter((d) => d.px.length >= 2);
+}
+
+function buildGround(
+  streetBlobs,
+  landcoverBlobs,
+  originX,
+  originZ,
+  streetClasses,
+  landKinds,
+  detail = false
+) {
   const positions = [];
   const colors = [];
   const kinds = [];
@@ -558,13 +625,86 @@ function buildGround(streetBlobs, landcoverBlobs, originX, originZ, streetClasse
     return s - Math.floor(s);
   };
 
+  // Averaged tangent at a vertex: mitres the join so a bend has no gap.
+  const tangent = (px, pz, k, n, out) => {
+    let tx;
+    let tz;
+    if (k === 0) {
+      tx = px[1] - px[0];
+      tz = pz[1] - pz[0];
+    } else if (k === n - 1) {
+      tx = px[n - 1] - px[n - 2];
+      tz = pz[n - 1] - pz[n - 2];
+    } else {
+      tx = px[k + 1] - px[k - 1];
+      tz = pz[k + 1] - pz[k - 1];
+    }
+    const tl = Math.hypot(tx, tz) || 1;
+    out[0] = tx / tl;
+    out[1] = tz / tl;
+  };
+
+  const t2 = [0, 0];
+
+  // Flat strip of half-width `halfW` centred on a polyline, lifted by `lift`.
+  const strip = (px, py, pz, n, halfW, lift, rgb, kind) => {
+    const startVertex = positions.length / 3;
+    for (let k = 0; k < n; k++) {
+      tangent(px, pz, k, n, t2);
+      const nx = t2[1];
+      const nz = -t2[0];
+      positions.push(px[k] + nx * halfW, py[k] + lift, pz[k] + nz * halfW);
+      colors.push(rgb[0], rgb[1], rgb[2]);
+      kinds.push(kind);
+      positions.push(px[k] - nx * halfW, py[k] + lift, pz[k] - nz * halfW);
+      colors.push(rgb[0], rgb[1], rgb[2]);
+      kinds.push(kind);
+    }
+    for (let k = 0; k < n - 1; k++) {
+      const a = startVertex + k * 2;
+      indices.push(a, a + 1, a + 2, a + 1, a + 3, a + 2);
+    }
+  };
+
+  // The two vertical faces of a sidewalk plinth. Each face keeps its own
+  // vertices so the normals stay flat and the kerb reads as a hard edge.
+  const kerbFaces = (px, py, pz, n, halfW, height, rgb) => {
+    for (const side of [1, -1]) {
+      const startVertex = positions.length / 3;
+      for (let k = 0; k < n; k++) {
+        tangent(px, pz, k, n, t2);
+        const nx = t2[1] * side * halfW;
+        const nz = -t2[0] * side * halfW;
+        positions.push(px[k] + nx, py[k], pz[k] + nz);
+        colors.push(rgb[0], rgb[1], rgb[2]);
+        kinds.push(KIND_SIDEWALK);
+        positions.push(px[k] + nx, py[k] + height, pz[k] + nz);
+        colors.push(rgb[0], rgb[1], rgb[2]);
+        kinds.push(KIND_SIDEWALK);
+      }
+      for (let k = 0; k < n - 1; k++) {
+        const low = startVertex + k * 2;
+        const high = low + 1;
+        if (side > 0) {
+          indices.push(low, high + 2, low + 2, low, high, high + 2);
+        } else {
+          indices.push(low, low + 2, high + 2, low, high + 2, high);
+        }
+      }
+    }
+  };
+
   for (const blob of streetBlobs) {
     const d = readStreets(blob.buffer);
     for (let l = 0; l < d.count; l++) {
       const n = d.ptCount[l];
       if (n < 2) continue;
-      const po = d.ptOffset[l];
       const cls = streetClasses[d.klass[l]] || streetClasses[6];
+      const isRoad = !cls.profile && !cls.detail;
+      // A resident-tier build skips the near-tier ribbons and vice versa; the
+      // sidewalk contributes to both (top strip below, kerb faces near).
+      if (detail !== Boolean(cls.detail) && !cls.profile) continue;
+      const po = d.ptOffset[l];
       const halfW = cls.width / 2;
       const px = new Float64Array(n);
       const py = new Float64Array(n);
@@ -575,75 +715,68 @@ function buildGround(streetBlobs, landcoverBlobs, originX, originZ, streetClasse
         py[k] = d.y[po + k] * 0.1;
       }
 
-      // Street lamps every ~42 m along the kerb, alternating sides.
-      let travelled = 0;
-      let side = l % 2 === 0 ? 1 : -1;
-      for (let k = 0; k < n; k++) {
-        if (k > 0) travelled += Math.hypot(px[k] - px[k - 1], pz[k] - pz[k - 1]);
-        if (travelled < 42 && !(k === 0 && l % 3 === 0)) continue;
-        travelled = 0;
-        side = -side;
-        let tx = k === n - 1 ? px[k] - px[k - 1] : px[k + 1] - px[k];
-        let tz = k === n - 1 ? pz[k] - pz[k - 1] : pz[k + 1] - pz[k];
-        const tl = Math.hypot(tx, tz) || 1;
-        tx /= tl;
-        tz /= tl;
-        lamps.push(
-          px[k] + tz * side * (halfW + 1.6) + originX,
-          py[k] + 6.5,
-          pz[k] - tx * side * (halfW + 1.6) + originZ
-        );
-      }
-
-      const tone = 0.94 + jitter(l * 3.7 + d.originX) * 0.12;
-      const r = Math.round(cls.color[0] * 255 * tone);
-      const g = Math.round(cls.color[1] * 255 * tone);
-      const b = Math.round(cls.color[2] * 255 * tone);
-      const startVertex = positions.length / 3;
-
-      for (let k = 0; k < n; k++) {
-        // Averaged tangent gives a mitred join with no gap inside a polyline.
-        let tx;
-        let tz;
-        if (k === 0) {
-          tx = px[1] - px[0];
-          tz = pz[1] - pz[0];
-        } else if (k === n - 1) {
-          tx = px[n - 1] - px[n - 2];
-          tz = pz[n - 1] - pz[n - 2];
-        } else {
-          tx = px[k + 1] - px[k - 1];
-          tz = pz[k + 1] - pz[k - 1];
+      // Street lamps every ~42 m, standing on the sidewalk where there is one.
+      if (isRoad && !detail) {
+        const curb = cls.sidewalk ? cls.sidewalk.curb : 0;
+        const reach = cls.sidewalk ? halfW + cls.sidewalk.width / 2 : halfW + 1.6;
+        let travelled = 0;
+        let side = l % 2 === 0 ? 1 : -1;
+        for (let k = 0; k < n; k++) {
+          if (k > 0) travelled += Math.hypot(px[k] - px[k - 1], pz[k] - pz[k - 1]);
+          if (travelled < 42 && !(k === 0 && l % 3 === 0)) continue;
+          travelled = 0;
+          side = -side;
+          tangent(px, pz, k, n, t2);
+          lamps.push(
+            px[k] + t2[1] * side * reach + originX,
+            py[k] + curb + 6.5,
+            pz[k] - t2[0] * side * reach + originZ
+          );
         }
-        const tl = Math.hypot(tx, tz) || 1;
-        const nx = tz / tl;
-        const nz = -tx / tl;
-        positions.push(px[k] + nx * halfW, py[k], pz[k] + nz * halfW);
-        colors.push(r, g, b);
-        kinds.push(64); // asphalt
-        positions.push(px[k] - nx * halfW, py[k], pz[k] - nz * halfW);
-        colors.push(r, g, b);
-        kinds.push(64);
       }
-      for (let k = 0; k < n - 1; k++) {
-        const a = startVertex + k * 2;
-        indices.push(a, a + 1, a + 2, a + 1, a + 3, a + 2);
+
+      const tone = isRoad ? 0.94 + jitter(l * 3.7 + d.originX) * 0.12 : 1;
+      const rgb = [
+        Math.round(Math.min(255, cls.color[0] * 255 * tone)),
+        Math.round(Math.min(255, cls.color[1] * 255 * tone)),
+        Math.round(Math.min(255, cls.color[2] * 255 * tone)),
+      ];
+
+      if (cls.profile === 'curb') {
+        if (detail) kerbFaces(px, py, pz, n, halfW, cls.lift, rgb);
+        else strip(px, py, pz, n, halfW, cls.lift, rgb, KIND_SIDEWALK);
+      } else if (cls.detail && cls.dash) {
+        for (const dash of chopDashes(px, py, pz, n, cls.dash)) {
+          strip(dash.px, dash.py, dash.pz, dash.px.length, halfW, cls.lift, rgb, KIND_MARKING);
+        }
+      } else {
+        strip(px, py, pz, n, halfW, cls.lift || 0, rgb, cls.detail ? KIND_MARKING : KIND_ASPHALT);
       }
 
       // Freeways/majors/arterials double as traffic paths.
-      if (d.klass[l] <= 2 && n >= 2) {
+      if (isRoad && d.klass[l] <= 2) {
         const path = new Float32Array(n * 3);
         for (let k = 0; k < n; k++) {
           path[k * 3] = px[k] + originX;
-          path[k * 3 + 1] = py[k] + 0.35;
+          path[k * 3 + 1] = py[k] + PATH_LIFT;
           path[k * 3 + 2] = pz[k] + originZ;
         }
-        paths.push({ points: path, klass: d.klass[l], width: cls.width, speed: cls.speed });
+        paths.push({
+          points: path,
+          klass: d.klass[l],
+          width: cls.width,
+          speed: cls.speed,
+          lift: PATH_LIFT,
+          // Pedestrians on this street walk on the plinth top, not the asphalt.
+          sidewalk: cls.sidewalk || null,
+        });
       }
     }
   }
 
-  for (const blob of landcoverBlobs) {
+  // The near tier is markings and kerbs only; the ground it sits on is already
+  // resident.
+  for (const blob of detail ? [] : landcoverBlobs) {
     const d = readLandcover(blob.buffer);
     const base = positions.length / 3;
     for (let i = 0; i < d.vertexTotal; i++) {
@@ -754,16 +887,17 @@ self.onmessage = (event) => {
         out.quads.buffer,
         out.indices.buffer,
       ]);
-    } else if (msg.type === 'ground') {
+    } else if (msg.type === 'ground' || msg.type === 'grounddetail') {
       const out = buildGround(
         msg.streets,
         msg.landcover,
         msg.originX,
         msg.originZ,
         msg.streetClasses,
-        msg.landKinds
+        msg.landKinds,
+        msg.type === 'grounddetail'
       );
-      self.postMessage({ id: msg.id, type: 'ground', key: msg.key, ...out }, [
+      self.postMessage({ id: msg.id, type: msg.type, key: msg.key, ...out }, [
         out.positions.buffer,
         out.normals.buffer,
         out.colors.buffer,
