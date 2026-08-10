@@ -510,7 +510,10 @@ export function createAgents(scene, data, city) {
       const res = await fetch(`${ASSETS}vehicles_manifest.json`);
       if (!res.ok) throw new Error(`manifest ${res.status}`);
       entries = (await res.json()).vehicles;
-      if (!Array.isArray(entries) || !entries.length) throw new Error('manifest has no vehicles');
+      if (!Array.isArray(entries)) throw new Error('manifest has no vehicles');
+      // weight 0 means "not road traffic" — the live ferry is spawned by ferries.js.
+      entries = entries.filter((entry) => (entry.weight ?? 1) > 0);
+      if (!entries.length) throw new Error('manifest has no road vehicles');
     } catch (error) {
       console.warn(`sf-assets: no vehicle fleet (${error.message}) — keeping procedural cars`);
       return;
@@ -1084,6 +1087,16 @@ export function createAgents(scene, data, city) {
     group,
     update,
     setToy,
+    // The live-ferry system hides the two looping procedural ferries when real
+    // vessel positions are flowing, and shows them again on any fallback.
+    // Container and sail traffic are untouched.
+    setProceduralFerriesVisible(visible) {
+      for (const ship of ships) {
+        if (ship.route.kind !== 'ferry') continue;
+        ship.mesh.visible = visible;
+        ship.wake.visible = visible;
+      }
+    },
     get carCount() {
       if (!fleet.length) return carMesh.count;
       let total = 0;

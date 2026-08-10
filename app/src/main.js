@@ -21,6 +21,7 @@ import { createLandmarks } from './landmarks.js';
 import { createAssets } from './assets.js';
 import { createPiers } from './piers.js';
 import { createAgents } from './agents.js';
+import { createLiveFerries } from './ferries.js';
 import { createCameraRig } from './camera.js';
 import { createSigns } from './signs.js';
 import { createToyPost } from './toypost.js';
@@ -76,6 +77,8 @@ async function boot() {
     },
   });
   const agents = createAgents(scene, data, city);
+  // Real WETA vessels from /api/ferries; falls back to the procedural ferries.
+  const ferries = createLiveFerries(scene, data, agents);
   const signs = createSigns(scene, data);
   const post = createToyPost(renderer);
 
@@ -401,6 +404,7 @@ async function boot() {
     rig,
     city,
     agents,
+    ferries,
     landmarks,
     piers,
     presets,
@@ -478,6 +482,7 @@ async function boot() {
     overlay.update(dt);
     city.update(dt, pivotWorld, camera.position, quality);
     agents.update(dt, pivotWorld, camera.position);
+    ferries.update(dt);
     landmarks.update();
     assets.update();
     water.update(camera.position);
@@ -524,6 +529,7 @@ async function boot() {
           `far groups ${city.stats.farGroups}  near ${city.stats.nearChunks}`,
           `trees      ${city.stats.trees}  lamps ${city.stats.lamps}`,
           `cars       ${agents.carCount}`,
+          `ferries    ${ferries.count}${ferries.live ? ' live' : ' procedural'}`,
           `altitude   ${(camera.position.y - rig.state.pivot.y).toFixed(0)} m`,
           `zoom       ${rig.state.distance.toFixed(0)} m`,
           `time       ${(timeOfDay * 100).toFixed(0)}%`,
