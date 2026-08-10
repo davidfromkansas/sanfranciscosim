@@ -13,7 +13,18 @@ A data-accurate 3D San Francisco in Three.js, rendered as a **toy diorama** (min
 - `pipeline/` — offline Node scripts that download open data and bake the binary tiles the app streams. Re-run only when data or formats change.
 - `docs/styles/` — the canonical style bibles (see `docs/styles/README.md`); `.agents/skills/` — agent procedures (asset intake, testing, style pointer).
 - `vercel.json` — build config (`cd app && npm install && npm run build`, output `app/dist`).
-- `PILOT-ASSET-PROMPT.md` — the currently active integration task (single-asset pilot). If present, it is the top-priority spec.
+- `*-PROMPT.md` files at the root — integration task specs. `KIT-INTEGRATION-PROMPT.md` (building kit v2) is the currently active one; `PILOT-ASSET-PROMPT.md` (Golden Gate pilot) is complete and kept as the loader's reference spec.
+
+## Skills & docs — which to read for which task
+
+Reusable knowledge lives in two places; read the right one BEFORE starting, don't rediscover it:
+
+- **Touching visuals, authoring/reviewing/conforming any 3D asset** → `docs/styles/miniature-toy.md` (the canonical style bible, in full) plus `docs/styles/README.md` (style index + where the style is implemented in code).
+- **Intaking/validating a GLB** (new landmark, kit piece, vehicle) → `.agents/skills/sf-asset-check/SKILL.md`: the contract checklist, the Blender inspection script, conform workflow, leak-proof export, manifest-entry format. Follow it step by step.
+- **Testing the app** (locally or deployed) → `.agents/skills/testing-sf-3d/SKILL.md`: dev commands, key bindings, the `window.SF` debug API, measurement recipes, and environment gotchas.
+- `.agents/skills/sf-miniature-style/SKILL.md` is only a pointer to `docs/styles/` for skill auto-discovery.
+
+Rules for maintaining these: they are the single source of truth — update them (reviewed commits) when the style or contract evolves; never fork their content into prompts or other docs, cite the file instead. Copies under `~/.claude/skills/` on David's machine are thin stubs pointing here.
 
 ## Iron rules (do not violate; they override any older text you find)
 
@@ -34,7 +45,7 @@ A data-accurate 3D San Francisco in Three.js, rendered as a **toy diorama** (min
 
 Contract (guaranteed by the authoring side): GLB, real meters, origin base-center sitting on z=0 (water level for bridges/islands), front faces −Y, flat-color materials only (no textures/transparency), materials named `Toy_*`, `*_Glow` suffix = night-glow surfaces, `Toy_body` = per-instance-tintable (kit pieces only). Assets may contain many objects — the LOADER merges each to ≤ 2 draw calls (bake material colors → vertex colors, one Lambert vertexColors material + one glow set). Scale by `targetHeightM / measuredHeight` from the manifest (`app/public/sf-assets/landmarks_manifest.json`) — never trust the file's scale. Landmarks replace code-built versions where ids match, inherit presets/pick/exclusion zones, and fall back per rule 3.
 
-Current state: a single-asset PILOT (Golden Gate Bridge) proves this loader end-to-end — see `PILOT-ASSET-PROMPT.md`. After it passes, a full pack (~200-piece tintable building kit + ~300 unique landmarks) arrives as files + manifest entries with zero code changes, plus kit instancing per its own handoff prompt.
+Current state: the Golden Gate Bridge pilot (`PILOT-ASSET-PROMPT.md`) passed — the manifest-driven loader is live, and the 14-vehicle GLB fleet is integrated. The 207-piece building kit v2 is committed at `app/public/sf-assets/kit/` awaiting integration per `KIT-INTEGRATION-PROMPT.md`; ~300 unique landmarks follow as files + manifest entries with zero code changes.
 
 ## Art direction (for anyone touching visuals)
 
