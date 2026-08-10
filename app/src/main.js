@@ -21,6 +21,7 @@ import { createLandmarks } from './landmarks.js';
 import { createAssets } from './assets.js';
 import { createPiers } from './piers.js';
 import { createAgents } from './agents.js';
+import { createLiveFerries } from './ferries.js';
 import { createCameraRig } from './camera.js';
 import { createSigns } from './signs.js';
 import { createToyPost } from './toypost.js';
@@ -78,6 +79,8 @@ async function boot() {
     },
   });
   const agents = createAgents(scene, data, city);
+  // Real WETA vessels from /api/ferries; falls back to the procedural ferries.
+  const ferries = createLiveFerries(scene, data, agents);
   const signs = createSigns(scene, data);
   const post = createToyPost(renderer);
 
@@ -233,6 +236,9 @@ async function boot() {
     if (entity.kind === 'landmark' && entity.camera) {
       return { x: entity.x, z: entity.z, y: ground + (entity.height || 60) / 2, ...entity.camera };
     }
+    if (entity.kind === 'vessel') {
+      return { x: entity.x, z: entity.z, y: 20, yaw: 210, pitch: style === 'toy' ? 30 : 22, distance: 300 };
+    }
     const distance =
       entity.kind === 'neighborhood' ? 2200 : entity.kind === 'park' ? 900 : entity.kind === 'water' ? 3000 : 500;
     return { x: entity.x, z: entity.z, yaw: 210, pitch: style === 'toy' ? 42 : 34, distance };
@@ -368,6 +374,35 @@ async function boot() {
   const groundPoint = new Vector3();
   let press = null;
 
+  // A selected ferry keeps sailing, so the highlight follows it every frame and
+  // the card re-reads the feed a few times a minute instead of freezing the
+  // arrival time it was opened with.
+  let vesselCardAge = 0;
+  function trackVessel(dt) {
+    const selected = focus.entity;
+    if (selected?.kind !== 'vessel') return;
+    const fresh = ferries.vesselEntity(selected.id);
+    if (!fresh) return;
+    focus.entity = fresh;
+    overlay.show(fresh, { toy: style === 'toy', groundY: 0 });
+    vesselCardAge += dt;
+    if (vesselCardAge < 5) return;
+    vesselCardAge = 0;
+    if (card.entity?.id === fresh.id) card.show(fresh, { recent: focus.history.slice(1) });
+  }
+
+  // Live ferries win over the city behind them: they are small, they move, and
+  // the water pick underneath is the least interesting answer on screen.
+  async function pickAt(nx, ny, hasGround) {
+    pickPointer.set(nx, ny);
+    pickRay.setFromCamera(pickPointer, camera);
+    const vessel = ferries.pickVessel(pickRay.ray.origin, pickRay.ray.direction);
+    if (vessel) return vessel;
+    return context.pick(pickRay.ray.origin, pickRay.ray.direction, hasGround ? groundPoint : null, {
+      toy: style === 'toy',
+    });
+  }
+
   canvas.addEventListener('pointerdown', (event) => {
     if (event.button !== 0) return;
     press = { x: event.clientX, y: event.clientY, at: performance.now() };
@@ -386,9 +421,7 @@ async function boot() {
     );
     pickRay.setFromCamera(pickPointer, camera);
     const hasGround = rig.screenToGround(pickPointer.x, pickPointer.y, groundPoint);
-    const entity = await context.pick(pickRay.ray.origin, pickRay.ray.direction, hasGround ? groundPoint : null, {
-      toy: style === 'toy',
-    });
+    const entity = await pickAt(pickPointer.x, pickPointer.y, hasGround);
     if (entity) selectEntity(entity);
   });
 
@@ -403,6 +436,7 @@ async function boot() {
     rig,
     city,
     agents,
+    ferries,
     landmarks,
     piers,
     presets,
@@ -438,10 +472,7 @@ async function boot() {
     async pickEntity(nx = 0, ny = 0) {
       pickPointer.set(nx, ny);
       pickRay.setFromCamera(pickPointer, camera);
-      const hasGround = rig.screenToGround(nx, ny, groundPoint);
-      return context.pick(pickRay.ray.origin, pickRay.ray.direction, hasGround ? groundPoint : null, {
-        toy: style === 'toy',
-      });
+      return pickAt(nx, ny, rig.screenToGround(nx, ny, groundPoint));
     },
     select: selectEntity,
     search: (query) => context.search(query),
@@ -480,6 +511,8 @@ async function boot() {
     overlay.update(dt);
     city.update(dt, pivotWorld, camera.position, quality);
     agents.update(dt, pivotWorld, camera.position);
+    ferries.update(dt);
+    trackVessel(dt);
     landmarks.update();
     assets.update();
     water.update(camera.position);
@@ -526,6 +559,7 @@ async function boot() {
           `far groups ${city.stats.farGroups}  near ${city.stats.nearChunks}`,
           `trees      ${city.stats.trees}  lamps ${city.stats.lamps}`,
           `cars       ${agents.carCount}`,
+          `ferries    ${ferries.count}${ferries.live ? ' live' : ' procedural'}`,
           `altitude   ${(camera.position.y - rig.state.pivot.y).toFixed(0)} m`,
           `zoom       ${rig.state.distance.toFixed(0)} m`,
           `time       ${(timeOfDay * 100).toFixed(0)}%`,

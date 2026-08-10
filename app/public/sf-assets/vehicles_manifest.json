@@ -15,6 +15,17 @@
     { "id": "taxi",             "file": "vehicles/taxi.glb",             "kind": "taxi",    "dims": [2.56, 2.20, 5.02],  "tris": 9688, "weight": 1 },
     { "id": "waymo",            "file": "vehicles/waymo.glb",            "kind": "waymo",   "dims": [2.68, 2.84, 5.40],  "tris": 6056, "weight": 1 },
     { "id": "commuter-bus",     "file": "vehicles/commuter-bus.glb",     "kind": "bus",     "dims": [3.24, 3.75, 10.77], "tris": 4888, "weight": 1 },
-    { "id": "delivery-truck",   "file": "vehicles/delivery-truck.glb",   "kind": "truck",   "dims": [2.78, 3.49, 7.37],  "tris": 6088, "weight": 1 }
+    { "id": "delivery-truck",   "file": "vehicles/delivery-truck.glb",   "kind": "truck",   "dims": [2.78, 3.49, 7.37],  "tris": 6088, "weight": 1 },
+    {
+      "id": "sf-bay-ferry",
+      "file": "vehicles/SF_Bay_Ferry.glb",
+      "kind": "ferry",
+      "dims": [11.94, 14.70, 41.70],
+      "targetLengthM": 41.7,
+      "front": "-Z",
+      "tris": 27224,
+      "weight": 0,
+      "notes": "Live-data vessel; spawned by ferries.js from /api/ferries, not by road traffic. weight 0 keeps it out of the road spawner. Keel sits at y=-1.89 on purpose so the hull draws a draft at the y=0 waterline."
+    }
   ]
 }
