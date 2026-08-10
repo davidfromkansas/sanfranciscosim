@@ -11,6 +11,7 @@ A data-accurate 3D San Francisco in Three.js, rendered as a **toy diorama** (min
 - `app/` — Vite + three.js frontend. Static assets in `app/public/` (`tiles/` = baked city geometry, `sf-assets/` = hand-made GLB landmarks + manifest, `fonts/`).
 - `api/` — zero-dependency Vercel functions (`agent.mjs` = the "concierge" LLM endpoint via Vercel AI Gateway).
 - `pipeline/` — offline Node scripts that download open data and bake the binary tiles the app streams. Re-run only when data or formats change.
+- `docs/styles/` — the canonical style bibles (see `docs/styles/README.md`); `.agents/skills/` — agent procedures (asset intake, testing, style pointer).
 - `vercel.json` — build config (`cd app && npm install && npm run build`, output `app/dist`).
 - `PILOT-ASSET-PROMPT.md` — the currently active integration task (single-asset pilot). If present, it is the top-priority spec.
 
@@ -37,7 +38,7 @@ Current state: a single-asset PILOT (Golden Gate Bridge) proves this loader end-
 
 ## Art direction (for anyone touching visuals)
 
-The look is a premium handcrafted miniature: chunky beveled massing, flat clean materials, dark blue-gray graphical windows, restrained neutral architecture with saturated accents, designed rooftops (the camera looks down), semantic exaggeration of identity features, manicured landscaping, small clusters of life. NOT photorealism, NOT generic low-poly, NOT voxel art. SF exception: painted residential rows keep their tinted facades. Asset authoring happens in Blender on David's machine (not in this repo); if you are asked to judge visuals, judge from the high three-quarter aerial camera first.
+The full, canonical style bible is `docs/styles/miniature-toy.md` — read it before authoring or judging any visual work; this paragraph is only the condensed version. The look is a premium handcrafted miniature: chunky beveled massing, flat clean materials, dark blue-gray graphical windows, restrained neutral architecture with saturated accents, designed rooftops (the camera looks down), semantic exaggeration of identity features, manicured landscaping, small clusters of life. NOT photorealism, NOT generic low-poly, NOT voxel art. SF exception: painted residential rows keep their tinted facades. Asset authoring happens in Blender on David's machine (not in this repo); if you are asked to judge visuals, judge from the high three-quarter aerial camera first.
 
 ## The concierge (api/agent.mjs)
 
