@@ -60,6 +60,14 @@ function bearingToYaw(bearingDeg) {
   return -(bearingDeg * Math.PI) / 180;
 }
 
+// The SB feed sends Bearing 0 for every vessel it has no heading for — docked
+// boats and, at times, boats under way — so an exact 0 is treated as unknown
+// and the heading is derived from movement instead. A genuinely north-bound
+// boat loses nothing: its motion vector points north too.
+function usableBearing(bearingDeg) {
+  return bearingDeg != null && bearingDeg !== 0;
+}
+
 // Heading from a movement vector in scene space, same convention as above.
 function motionToYaw(dx, dz) {
   return Math.atan2(-dx, -dz);
@@ -274,8 +282,8 @@ export function createLiveFerries(scene, data, agents) {
           targetZ: z,
           prevX: x,
           prevZ: z,
-          yaw: vessel.bearingDeg == null ? 0 : bearingToYaw(vessel.bearingDeg),
-          targetYaw: vessel.bearingDeg == null ? 0 : bearingToYaw(vessel.bearingDeg),
+          yaw: usableBearing(vessel.bearingDeg) ? bearingToYaw(vessel.bearingDeg) : 0,
+          targetYaw: usableBearing(vessel.bearingDeg) ? bearingToYaw(vessel.bearingDeg) : 0,
           speed: 0,
           bob: Math.random() * 6.28,
           lastFixAt: now,
@@ -305,7 +313,7 @@ export function createLiveFerries(scene, data, agents) {
       state.label = vessel.label;
       state.seen = true;
 
-      if (vessel.bearingDeg != null) {
+      if (usableBearing(vessel.bearingDeg)) {
         state.targetYaw = bearingToYaw(vessel.bearingDeg);
       } else if (state.speed > IDLE_SPEED) {
         state.targetYaw = motionToYaw(dx, dz);
