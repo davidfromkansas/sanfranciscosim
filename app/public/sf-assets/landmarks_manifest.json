@@ -17,5 +17,23 @@
     ],
     "tris": 23832,
     "southEnd": "+X"
+  },
+  {
+    "id": "salesforce-tower",
+    "file": "salesforce-tower.glb",
+    "anchor": [
+      -122.3969270512,
+      37.7897756184
+    ],
+    "targetHeightM": 326,
+    "cat": 16,
+    "name": "Salesforce Tower",
+    "estimated": false,
+    "dims": [
+      73.3818,
+      73.5321,
+      326
+    ],
+    "tris": 18412
   }
 ]

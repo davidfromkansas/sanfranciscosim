@@ -371,26 +371,29 @@ def build():
             width=0.25,
         )
 
-    # --- entrance and identity on the Mission Street (north-west) face -----
-    p, nrm = fp(0.5 / 8 + 0.25)  # centre of the north-west flat
+    # --- entrance and identity on the canonical front (-Y) face ------------
+    # The tower's nearly symmetric shell retains the measured SoMa yaw; only
+    # the entrance cue chooses the point whose outward normal is closest to -Y.
+    candidates = [fp(i / 720) for i in range(720)]
+    p, nrm = min(candidates, key=lambda item: item[1][1])
     ang = math.atan2(nrm[1], nrm[0])
     bevel(
-        box("entrance", p[0] + nrm[0] * 1.0, p[1] + nrm[1] * 1.0, 0.0, 9.0, 14.0, 3.0,
+        box("entrance", p[0] - nrm[0] * 0.3, p[1] - nrm[1] * 0.3, 0.0, 9.0, 3.0, 14.0,
             glass, yaw=ang),
         width=0.25,
     )
     bevel(
-        box("entrance_canopy", p[0] + nrm[0] * 3.4, p[1] + nrm[1] * 3.4, 9.0, 10.0,
-            17.0, 8.0, trim, yaw=ang),
+        box("entrance_canopy", p[0] + nrm[0] * 0.8, p[1] + nrm[1] * 0.8, 9.0, 10.0,
+            5.0, 17.0, trim, yaw=ang),
         width=0.3,
     )
     # The blue cloud wordmark by the doors: the one-second identity cue at
     # ground level, semantically enlarged (style bible s.8 / s.9).
-    sx, sy = p[0] + nrm[0] * 2.6, p[1] + nrm[1] * 2.6
+    sx, sy = p[0] + nrm[0] * 0.8, p[1] + nrm[1] * 0.8
     tx, ty = -nrm[1], nrm[0]
     for k, (dx, w, h) in enumerate(((-2.2, 3.2, 2.2), (0.3, 4.4, 3.0), (2.6, 2.6, 1.8))):
         bevel(
-            box(f"sign_cloud_{k}", sx + tx * dx, sy + ty * dx, 10.6, 10.6 + h, w, 1.0,
+            box(f"sign_cloud_{k}", sx + tx * dx, sy + ty * dx, 10.6, 10.6 + h, 1.0, w,
                 sky, yaw=ang),
             width=0.45,
         )

@@ -32,7 +32,7 @@ The overall-height conflict is mostly definitional. CTBUH and the architect publ
 
 ## Orientation
 
-OpenStreetMap geometry places the tower on the SoMa grid. The mapped facade axes are about **45.9° / 135.9° clockwise from true north**. The model therefore rotates its rounded-square plan **44.13° around +Z**, with Blender `+Y` treated as true north and `+X` as east. The distinctive principal entrance is represented on the **north-west / Mission Street** side. Because this is a nearly four-way symmetric tapering tower, front-direction recognition comes from the enlarged entrance/cloud-sign cue, which faces Blender `-Y` by asset convention after the local entrance placement.
+OpenStreetMap geometry places the tower on the SoMa grid. The mapped facade axes are about **45.9° / 135.9° clockwise from true north**. The model therefore rotates its rounded-square plan **44.13° around +Z**, with Blender `+Y` treated as true north and `+X` as east. Because the tower is nearly four-way symmetric and the asset contract requires one canonical front, the simplified entrance/cloud-sign cue is placed on Blender **`-Y`**. This preserves the measured shell orientation while making front direction mechanically unambiguous; it should not be used as a survey of the real entrance's exact face position.
 
 ## Directional observations
 
@@ -62,7 +62,7 @@ OpenStreetMap geometry places the tower on the SoMa grid. The mapped facade axes
 
 - The west / downtown-canyon view confirms the same rounded-square plan and continuous taper.
 - A few broader pale vertical zones are visible in photos, but they are secondary to the horizontal floor/sunshade rhythm and are omitted at city scale.
-- The Mission Street entrance belongs to this north-west quadrant and gets the asset's one asymmetric identity treatment.
+- The north-west / Mission Street quadrant informs the ground-level massing research; the miniature moves its one abstract entrance cue to canonical `-Y` to satisfy the asset front contract.
 
 ### Top / crown
 
@@ -112,6 +112,6 @@ OpenStreetMap geometry places the tower on the SoMa grid. The mapped facade axes
 ## Uncertainties and decisions
 
 - Public sources provide consistent overall height but do not expose a simple surveyed shaft cross-section. The footprint comes from OSM and the changing corner radius/taper comes from multi-direction photography.
-- The exact face that should map to a single canonical "front" is ambiguous because the tower is nearly symmetric. The model uses the Mission Street entrance quadrant as the identity/front side and documents true-north render cameras independently.
+- The exact face that should map to a single canonical "front" is ambiguous because the tower is nearly symmetric. The measured shell keeps its true-north orientation, while the simplified identity entrance is deliberately placed on Blender `-Y` to satisfy the technical contract; true-north review cameras remain independent.
 - The topper is variously described as nine crown floors and as an LED artwork spanning six floors. The model reserves the upper six-floor-equivalent zone for glow while treating the larger upper enclosure as the architectural crown.
 - The real roof photo shows more plant complexity than is legible in SF-SIM. The chosen roof is intentionally a designed abstraction, not a plan reproduction.

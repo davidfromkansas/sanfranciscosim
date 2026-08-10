@@ -9,12 +9,12 @@
   "triangle_budget": 27000,
   "dimensions_m": [
     73.3818,
-    73.3818,
+    73.5321,
     326.0
   ],
   "bbox_min_m": [
     -36.6909,
-    -36.6909,
+    -36.8412,
     0.0
   ],
   "bbox_max_m": [
@@ -25,7 +25,7 @@
   "min_z_m": 0.0,
   "xy_center_offset_m": [
     0.0,
-    0.0
+    -0.0752
   ],
   "materials": [
     "Toy_glass",
@@ -107,8 +107,10 @@
   "negative_scales": false,
   "degenerate_triangle_count": 0,
   "invalid_or_nonunit_loop_normal_count": 0,
+  "normal_ray_cast_first_hits": 22500,
+  "normal_ray_cast_flipped_visible_faces": 0,
   "normal_orientation_status": "PASS",
-  "normal_orientation_method": "All source meshes run bmesh.ops.recalc_face_normals before export; reimported loop normals are finite/unit; four controlled elevations and the top/aerial renders were visually inspected for inverted surfaces.",
+  "normal_orientation_method": "All source meshes run bmesh.ops.recalc_face_normals before export; reimported loop normals must be finite/unit; 22,500 deterministic visibility rays test the first visible face of the open-shell model.",
   "unexpected_geometry_or_objects": [],
   "material_contract_violations": [],
   "object_details": [

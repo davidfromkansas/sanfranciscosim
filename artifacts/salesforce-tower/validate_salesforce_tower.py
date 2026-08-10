@@ -114,6 +114,34 @@ def main():
 
     dims = mx - mn
     center = Vector(((mn.x + mx.x) / 2, (mn.y + mx.y) / 2, (mn.z + mx.z) / 2))
+
+    # Visibility-based outward-normal test for this intentionally open-shell
+    # asset. Signed-volume/manifold tests cannot judge the crown hoops. Cast a
+    # deterministic sphere of rays toward nine targets through the tower; a
+    # visible outward face must oppose the incoming ray direction.
+    ray_hits = 0
+    ray_flipped = 0
+    golden = math.pi * (3.0 - math.sqrt(5.0))
+    targets = [
+        Vector((center.x + dx * dims.x, center.y + dy * dims.y, mn.z + fz * dims.z))
+        for dx, dy in ((0.0, 0.0), (-0.18, -0.18), (0.18, 0.18))
+        for fz in (0.18, 0.52, 0.86)
+    ]
+    for target in targets:
+        for i in range(2500):
+            y = 1.0 - 2.0 * (i + 0.5) / 2500
+            r = math.sqrt(max(0.0, 1.0 - y * y))
+            a = golden * i
+            outward = Vector((math.cos(a) * r, math.sin(a) * r, y))
+            direction = -outward
+            hit, _, normal, _, _, _ = bpy.context.scene.ray_cast(
+                dg, target + outward * 1000.0, direction, distance=1400.0
+            )
+            if hit:
+                ray_hits += 1
+                if normal.dot(direction) > 1e-5:
+                    ray_flipped += 1
+
     results = {
         "asset": os.path.basename(glb),
         "validator": "Blender " + bpy.app.version_string,
@@ -142,8 +170,10 @@ def main():
         "negative_scales": negative_scale,
         "degenerate_triangle_count": degenerate,
         "invalid_or_nonunit_loop_normal_count": invalid_normal_count,
-        "normal_orientation_status": "PASS",
-        "normal_orientation_method": "All source meshes run bmesh.ops.recalc_face_normals before export; reimported loop normals are finite/unit; four controlled elevations and the top/aerial renders were visually inspected for inverted surfaces.",
+        "normal_ray_cast_first_hits": ray_hits,
+        "normal_ray_cast_flipped_visible_faces": ray_flipped,
+        "normal_orientation_status": "PASS" if invalid_normal_count == 0 and ray_hits > 0 and ray_flipped == 0 else "FAIL",
+        "normal_orientation_method": "All source meshes run bmesh.ops.recalc_face_normals before export; reimported loop normals must be finite/unit; 22,500 deterministic visibility rays test the first visible face of the open-shell model.",
         "unexpected_geometry_or_objects": unexpected,
         "material_contract_violations": sorted(off_contract),
         "object_details": sorted(object_rows, key=lambda x: x["name"]),
@@ -160,7 +190,7 @@ def main():
         "no_animation_skin_or_constraints": animations == 0 and results["armature_count"] == 0 and results["constraint_count"] == 0,
         "transforms_applied": scales_applied,
         "no_negative_scales": not negative_scale,
-        "normals_outward": invalid_normal_count == 0,
+        "normals_outward": invalid_normal_count == 0 and ray_hits > 0 and ray_flipped == 0,
         "no_degenerate_geometry": degenerate == 0,
         "no_unexpected_objects": not unexpected,
     }
