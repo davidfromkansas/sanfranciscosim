@@ -119,8 +119,11 @@ Every tree in San Francisco is therefore the same lollipop. Proposal:
 
 1. Add archetypes for `broadleaf` (the current one), `cypress` (dark, columnar),
    `eucalyptus` (tall, thin, grey-green) and `palm` (bare trunk, small sparse
-   crown). Four `InstancedMesh` sets per ground group instead of one — still a
-   fixed, small number of draw calls.
+   crown). These are **Blender-authored GLBs**, not more procedural geometry —
+   see [§E8](#e8--the-flora-kit-authored-archetypes) and
+   [`../../asset-plans/flora-kit.md`](../../asset-plans/flora-kit.md), which also
+   fixes the draw-call shape (one shared pool per species city-wide, not one per
+   cell).
 2. Re-encode the tree record's fourth byte as `species * 4 + sizeVariant`, so
    `variant & 3` reproduces today's behaviour exactly and `variant >> 2` selects
    the archetype. Old blobs decode as species 0 without a version bump.
@@ -198,6 +201,32 @@ because it is the value you cannot get right on paper. Presets are consumed by
 `pipeline/validate.mjs` and `pipeline/context.mjs`, so adding one means a
 re-bake.
 
+### §E8 — The flora kit (authored archetypes)
+
+§E3's archetypes come from an authored asset kit, planned in full at
+[`../../asset-plans/flora-kit.md`](../../asset-plans/flora-kit.md). Summary of
+what that plan settles, because it constrains every park:
+
+- **8 pieces** — 4 tree species plus `shrub_low`, `rock_outcrop` and two optional
+  props — built by a deterministic Blender script under `artifacts/flora-kit/`,
+  shipped to `app/public/sf-assets/flora/` with a `flora_index.json` mirroring
+  `streetkit_index.json`, and loaded by a near-copy of `app/src/streetkit.js`.
+- **Triangle ceilings are tight and non-negotiable: 160–200 per tree.** Measured
+  from the committed tiles, the worst cell (`12_18`) holds 4,350 trees; today's
+  procedural lollipop is ~104 triangles, so that cell already draws ~452k tree
+  triangles. A 500–1,000 triangle "nice" tree is 2–4M triangles in one cell and
+  will not hold 60 fps. The gate is no more than 2× today's worst cell.
+- **One `InstancedMesh` pair per species shared city-wide**, the way
+  `createStreetKitFleet()` already does it — *not* one per species per cell,
+  which would quadruple the tree layer's draw calls across the near tier.
+- **Canopy colour on `Toy_body`** (the per-instance tintable material, legal for
+  kit pieces) so one cypress geometry can be dry grey-green in the western
+  Sunset and dark green in the Presidio.
+- `toyTreeArchetype()` stays in the source as the rule-3 fallback.
+
+The kit can land before any park work: with `scatterTrees()` still writing
+species 0, nothing visibly changes, which makes it a safe first commit.
+
 ### Order of work
 
 The engine items are ordered by value:
@@ -205,8 +234,9 @@ The engine items are ordered by value:
 1. **§E4 + §E2** — forest cover and the missing classes. Biggest visible change
    in the whole set, and it is a data/classification fix rather than new
    rendering.
-2. **§E3** — tree species. Second biggest, and it is what makes the Presidio,
-   Golden Gate Park, Buena Vista and Dolores look like different places.
+2. **§E8 then §E3** — the flora kit, then tree species. Second biggest, and it is
+   what makes the Presidio, Golden Gate Park, Buena Vista and Dolores look like
+   different places. §E8 is a safe no-op swap on its own, so it can land first.
 3. **§E5** — paths. Makes the small parks (Washington Square, Alamo Square,
    Yerba Buena) legible at all.
 4. **§E6** — drape resolution. Fixes silhouettes on the steep parks; the most
@@ -247,18 +277,42 @@ landmark plans before authoring):
 | Saints Peter and Paul Church | Washington Square | `-122.410252, 37.80156` | OSM `height=23` is the body, not the spires |
 | MLK Jr. Memorial waterfall | Yerba Buena Gardens | `-122.402253, 37.784531` | small |
 
+## Where to start
+
+**Start with [the Presidio](presidio.md).** It is the most demanding park in the
+set, which is the point: at 381 ha it exercises the forest reclassification
+(§E4), the missing `wetland` branch (§E2), cypress and eucalyptus (§E3/§E8), the
+70% bluff grades (§E6) and the Golden Gate Bridge seam all at once. Whatever the
+engine cannot do, the Presidio will find.
+
+The trade-off, stated plainly: it is also the slowest park to a first visible
+result, and it needs several hero GLBs that have no asset plan yet (Tunnel Tops,
+Officers' Club, Fort Point) — none of which block Layer A. If you want a quick
+proof of the species work instead, [Buena Vista Park](buena-vista-park.md) is
+the cheapest: its ground data is already correct, so it isolates §E8/§E3.
+
+A sensible sequence either way:
+
+1. [`../asset-plans/flora-kit.md`](../../asset-plans/flora-kit.md) — §E8, a no-op
+   swap that changes nothing visually and de-risks everything after it.
+2. §E4 + §E2 + §E3 driven by the Presidio.
+3. The remaining parks, which are then mostly data entry.
+
 ## How to use a plan
 
 1. Open the park's file and read Part 2 first so you know what is measured and
    what is a design decision.
-2. Copy the fenced block in Part 1 into a fresh session.
+2. Copy the fenced block in Part 1 into a fresh session — or just point the
+   session at the file: *"read `docs/plans/parks/README.md` and
+   `docs/plans/parks/presidio.md` in full, then execute the plan."*
 3. Do the shared engine work from this file before or alongside the first park
    that needs it — do not re-implement it per park.
 4. Ship hero GLBs through `docs/asset-plans/INTEGRATION-PROMPT.md` as usual.
 
 ## Related
 
-- [`../asset-plans/README.md`](../asset-plans/README.md) — the 19 landmark plans
-- [`../asset-plans/INTEGRATION-PROMPT.md`](../asset-plans/INTEGRATION-PROMPT.md) — the reusable GLB integration prompt
-- [`../styles/miniature-toy.md`](../styles/miniature-toy.md) — the art gate
+- [`../asset-plans/README.md`](../../asset-plans/README.md) — the 19 landmark plans
+- [`../asset-plans/flora-kit.md`](../../asset-plans/flora-kit.md) — the authored tree/prop kit (§E8)
+- [`../asset-plans/INTEGRATION-PROMPT.md`](../../asset-plans/INTEGRATION-PROMPT.md) — the reusable GLB integration prompt
+- [`../styles/miniature-toy.md`](../../styles/miniature-toy.md) — the art gate
 - `.agents/skills/sf-asset-check/SKILL.md` — the GLB contract

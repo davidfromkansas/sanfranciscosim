@@ -27,6 +27,12 @@ plans reference the landmark plans here (de Young, Cal Academy, Conservatory,
 Painted Ladies, Mission Dolores Basilica, Palace of Fine Arts) rather than
 duplicating them.
 
+[**flora-kit.md**](./flora-kit.md) is the one plan here that is not a landmark:
+an authored Blender kit of tree species and landscape props to replace the single
+procedural lollipop that all 289,741 of the city's baked trees currently share.
+It follows the street-furniture kit's architecture rather than the landmark
+route, and the park plans depend on it (§E8 of the parks README).
+
 ## The set
 
 | Landmark | Manifest id | Target height | Runtime status |
