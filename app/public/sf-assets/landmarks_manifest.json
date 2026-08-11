@@ -125,5 +125,23 @@
       19.3
     ],
     "tris": 22384
+  },
+  {
+    "id": "palace-of-fine-arts",
+    "file": "palace-of-fine-arts.glb",
+    "anchor": [
+      -122.4484012,
+      37.8029215
+    ],
+    "targetHeightM": 49.4,
+    "cat": 0,
+    "name": "Palace of Fine Arts",
+    "estimated": false,
+    "dims": [
+      173.9495,
+      258.3858,
+      49.4
+    ],
+    "tris": 21736
   }
 ]
