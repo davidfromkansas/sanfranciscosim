@@ -23,8 +23,13 @@ Design (see REFERENCE.md for the source behind every number):
 * the chevron truss colonnade at the ground: raked chunky legs lying in the
   plane of the sloping facade over a recessed glass lobby;
 * a crown designed for the app's downward camera - louvre band, parapet, metal
-  hip roof, plant and the window-washing rig - and the metal spire whose glazed
-  "crown jewel" and red aviation light are the only _Glow surfaces.
+  hip roof, plant and the window-washing rig - and the metal spire with its
+  glazed "crown jewel" and red aviation light.
+
+Night state: the app splits every _Glow material into a second, unlit mesh and
+fades it in on the dusk curve, so the night look is authored here as geometry.
+Lit office panes sit just proud of their glass, floor by floor; the lobby, the
+slot above the colonnade and the crown collar carry their own glow shells.
 """
 
 import math
@@ -56,6 +61,7 @@ WIN_WIDE = 1.8
 WIN_DEEP = 0.45
 FLOOR_H = 3.66  # 48 occupied floors between H_BAND and the mechanical band
 SPANDREL = 1.2  # pale precast panel between two stacked panes
+LIT_OUT = 0.05  # a lit pane sits this far proud of its glass, still recessed
 
 WING_Z0 = 120.0  # 29th floor
 WING_Z1 = 186.0  # just below the 49th
@@ -322,7 +328,27 @@ def floor_rows(z0, z1):
     return rows
 
 
-def build_facade(face, trim, glass):
+def _hash(*parts):
+    """Deterministic 32-bit hash; Python's own is salted per process."""
+    h = 2166136261
+    for p in parts:
+        h = ((h ^ (p & 0xFFFFFFFF)) * 16777619) & 0xFFFFFFFF
+        h ^= h >> 15
+    return h
+
+
+def lit_window(face, col, floor):
+    """Is this pane lit at night?
+
+    Offices are lit floor by floor, so the rate is shared by all four faces and
+    runs from a nearly dark floor to a nearly full one; inside a floor the panes
+    are picked independently, which is what gives the facade its scatter.
+    """
+    rate = 12 + _hash(floor, 7717) % 62
+    return _hash(face, col, floor) % 100 < rate
+
+
+def build_facade(face, trim, glass, lit):
     """One pyramid face: recessed vertical window channels between flat piers.
 
     The face is cut into horizontal bands at every channel-termination height;
@@ -386,11 +412,19 @@ def build_facade(face, trim, glass):
                 # The channel is tiled into individual panes: at every floor
                 # line a pale spandrel panel crosses it, so the face reads as a
                 # window grid rather than one continuous stripe.
+                col = round(((ua + ub) / 2) / WIN_PITCH + (WIN_COLS - 1) / 2)
                 for za, zb, mat in floor_rows(z0, z1):
                     p0, p1 = V(ua, za, out), V(ub, za, out)
                     p2, p3 = V(ub, zb, out), V(ua, zb, out)
                     faces.append((p0, p1, p2, p3))
                     fmats.append(mat)
+                    floor = round(((za + zb) / 2 - H_BAND) / FLOOR_H)
+                    if mat == 1 and lit_window(face, col, floor):
+                        out_l = out + LIT_OUT
+                        l0, l1 = V(ua, za, out_l), V(ub, za, out_l)
+                        l2, l3 = V(ub, zb, out_l), V(ua, zb, out_l)
+                        faces.append((l0, l1, l2, l3))
+                        fmats.append(2)
                 g0, g1 = V(ua, z0, out), V(ub, z0, out)
                 g2, g3 = V(ub, z1, out), V(ua, z1, out)
                 # jambs
@@ -417,7 +451,12 @@ def build_facade(face, trim, glass):
                 fmats.append(0)
 
     return new_mesh(
-        f"facade_{FACE_NAME[face]}", verts, faces, [trim, glass], fmats, recalc=False
+        f"facade_{FACE_NAME[face]}",
+        verts,
+        faces,
+        [trim, glass, lit],
+        fmats,
+        recalc=False,
     )
 
 
@@ -538,7 +577,7 @@ def build_spire(steel, glow, red_glow):
     )
 
 
-def build_ground(trim, glass, stone, roofd):
+def build_ground(trim, glass, stone, roofd, glow):
     """Chevron truss colonnade in the plane of the sloping facade."""
     for face in range(4):
         nrm = face_normal(face)
@@ -582,6 +621,7 @@ def build_ground(trim, glass, stone, roofd):
             bevel(obj, width=0.18, segments=2)
     ring_band("base_band", H_LEGS - 0.4, H_BAND, -0.2, 0.35, trim)
     ring_band("base_slit", H_LEGS + 0.9, H_LEGS + 2.6, -0.55, -0.15, glass)
+    ring_band("base_slit_light", H_LEGS + 1.0, H_LEGS + 2.5, -0.14, -0.12, glow)
     # recessed lobby box + its roof slab, glimpsed through the chevrons
     lob = 0.62
     rings = [
@@ -589,6 +629,17 @@ def build_ground(trim, glass, stone, roofd):
         (H_LOBBY, [(x * lob, y * lob) for x, y in outline(0.0)]),
     ]
     loft("lobby_glass", rings, [glass], cap_bottom=True)
+    # The lobby is lit all round at night: a shell a centimetre outside the
+    # glass, stopping short of the sill and the roof slab so the frame stays dark.
+    lit = lob * 1.004
+    loft(
+        "lobby_light",
+        [
+            (0.8, [(x * lit, y * lit) for x, y in outline(0.0)]),
+            (H_LOBBY - 0.8, [(x * lit, y * lit) for x, y in outline(0.0)]),
+        ],
+        [glow],
+    )
     pts = [(x * lob * 1.04, y * lob * 1.04) for x, y in outline(0.0)]
     new_mesh(
         "lobby_roof",
@@ -617,6 +668,10 @@ def build_ground(trim, glass, stone, roofd):
             6.0, 15.0, stone, yaw=ang),
         width=0.28,
     )
+    # Left unbevelled on purpose: a bevel wider than half its 0.12 m thickness
+    # collapses the side faces into degenerate triangles.
+    box("entrance_light", nrm[0] * (r + 0.95), nrm[1] * (r + 0.95), 0.3, 5.9,
+        0.12, 11.2, glow, yaw=ang)
     for s in (-6.6, 6.6):
         bevel(
             box("entrance_pier", nrm[0] * (r + 5.0) + tan[0] * s,
@@ -651,12 +706,15 @@ def build():
     red_glow = material("Toy_red_Glow")
 
     for face in range(4):
-        build_facade(face, trim, glass)
+        build_facade(face, trim, glass, glow)
     build_chamfers(trim)
     build_wings(trim, roofd)
     build_crown(trim, steel, roofd)
+    # The crown is floodlit in reality; a slim lit cornice under the parapet
+    # reads the same way from the app's aerial camera without a light source.
+    ring_band("crown_light", H_CROWN - 2.4, H_CROWN - 1.0, 0.0, 0.14, glow)
     build_spire(steel, glow, red_glow)
-    build_ground(trim, glass, stone, roofd)
+    build_ground(trim, glass, stone, roofd, glow)
     return scene
 
 
