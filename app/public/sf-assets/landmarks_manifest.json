@@ -109,6 +109,24 @@
     "tris": 20808
   },
   {
+    "id": "conservatory-of-flowers",
+    "file": "conservatory-of-flowers.glb",
+    "anchor": [
+      -122.4602321,
+      37.7725965
+    ],
+    "targetHeightM": 18.3,
+    "cat": 16,
+    "name": "Conservatory of Flowers",
+    "estimated": false,
+    "dims": [
+      78.799,
+      30.9373,
+      18.3
+    ],
+    "tris": 13814
+  },
+  {
     "id": "cal-academy",
     "file": "cal-academy.glb",
     "anchor": [
