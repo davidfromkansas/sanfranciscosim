@@ -217,6 +217,42 @@
     "tris": 13380
   },
   {
+    "id": "grace-cathedral",
+    "file": "grace-cathedral.glb",
+    "anchor": [
+      -122.4134339,
+      37.7918333
+    ],
+    "targetHeightM": 75.3,
+    "cat": 8,
+    "name": "Grace Cathedral",
+    "estimated": false,
+    "dims": [
+      109.0939,
+      48.1688,
+      75.3
+    ],
+    "tris": 10814
+  },
+  {
+    "id": "mission-dolores",
+    "file": "mission-dolores.glb",
+    "anchor": [
+      -122.4269098,
+      37.7643109
+    ],
+    "targetHeightM": 41,
+    "cat": 8,
+    "name": "Mission Dolores Basilica",
+    "estimated": true,
+    "dims": [
+      67.21,
+      45.4823,
+      41.0
+    ],
+    "tris": 8386
+  },
+  {
     "id": "columbus-tower",
     "file": "columbus-tower.glb",
     "anchor": [
