@@ -132,6 +132,15 @@ export const LANDMARKS = [
     camera: { distance: 500, yaw: 110, pitch: 16 },
   },
   {
+    id: 'fairmont',
+    name: 'Fairmont San Francisco',
+    lon: -122.4100666,
+    lat: 37.7924244,
+    height: 99.06,
+    exclude: 80,
+    camera: { distance: 520, yaw: 110, pitch: 18 },
+  },
+  {
     id: 'stIgnatius',
     name: 'St. Ignatius Church',
     lon: -122.4506,
