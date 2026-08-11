@@ -67,6 +67,7 @@ PALETTE_HEX = {
     "Toy_sky": "6db3d9",
     "Toy_white_Glow": "f7f4ec",
     "Toy_red_Glow": "c4453c",
+    "Toy_sand_Glow": "ece4d4",  # warm office light, matches the baked city's windows
 }
 
 
@@ -149,7 +150,13 @@ def arc_sampler(loop):
 # -------------------------------------------------------------- mesh helpers
 
 
-def new_mesh(name, verts, faces, materials, face_mats=None):
+def hash01(n):
+    """Deterministic 0..1 from a number, so the lit pattern is stable per build."""
+    x = math.sin(n * 12.9898) * 43758.5453
+    return x - math.floor(x)
+
+
+def new_mesh(name, verts, faces, materials, face_mats=None, recalc=True):
     mesh = bpy.data.meshes.new(name)
     mesh.from_pydata([Vector(v) for v in verts], [], faces)
     for m in materials:
@@ -160,11 +167,12 @@ def new_mesh(name, verts, faces, materials, face_mats=None):
     mesh.validate()
     obj = bpy.data.objects.new(name, mesh)
     bpy.context.collection.objects.link(obj)
-    bm = bmesh.new()
-    bm.from_mesh(mesh)
-    bmesh.ops.recalc_face_normals(bm, faces=bm.faces)
-    bm.to_mesh(mesh)
-    bm.free()
+    if recalc:
+        bm = bmesh.new()
+        bm.from_mesh(mesh)
+        bmesh.ops.recalc_face_normals(bm, faces=bm.faces)
+        bm.to_mesh(mesh)
+        bm.free()
     mesh.shade_flat()
     return obj
 
@@ -236,6 +244,64 @@ def ring_band(name, z0, z1, inner_off, outer_off, mat, scale0=1.0, scale1=1.0):
             j = (i + 1) % n
             faces.append((a0 + i, a0 + j, b0 + j, b0 + i))
     return new_mesh(name, verts, faces, [mat])
+
+
+# ---------------------------------------------------------------- night skin
+#
+# The app splits a landmark by material name: `_Glow` faces become a separate
+# MeshBasicMaterial buffer whose opacity is driven by `uNight` (0.12 by day,
+# ~1 at night). A glow face is therefore nearly transparent in daylight, so the
+# lit surfaces here are added ON TOP of the solid body rather than carved out of
+# it — the daylight silhouette is untouched and only the panes ignite.
+
+
+def _wall(name, rings, mat, recalc=False):
+    """Outward-facing single-thickness sheet through a list of (z, loop)."""
+    n = len(rings[0][1])
+    verts = []
+    for z, loop in rings:
+        verts.extend([(x, y, z) for x, y in loop])
+    faces = []
+    for r in range(len(rings) - 1):
+        for i in range(n):
+            j = (i + 1) % n
+            faces.append((r * n + i, r * n + j, (r + 1) * n + j, (r + 1) * n + i))
+    return new_mesh(name, verts, faces, [mat], recalc=recalc)
+
+
+def lit_bays(name, bands, mat, density, seed=0.0, out=0.06, margin=1.2):
+    """Scattered lit window panes over the glass bays.
+
+    `bands` is a list of (z_bottom, z_top) glass bays; each bay is divided by the
+    48-point plan outline into individual panes, and a deterministic hash decides
+    which of them are lit. This is what makes the tower read like an occupied
+    office building at night instead of a dark column.
+    """
+    verts, faces = [], []
+    for bi, (z0, z1) in enumerate(bands):
+        if z1 - z0 < 2 * margin + 0.6:
+            continue
+        za, zb = z0 + margin, z1 - margin
+        lo = outline(za, GLASS_IN + out)
+        hi = outline(zb, GLASS_IN + out)
+        n = len(lo)
+        for i in range(n):
+            if hash01(seed + bi * 131.7 + i * 7.13) > density:
+                continue
+            j = (i + 1) % n
+            k = len(verts)
+            verts.extend(
+                [
+                    (lo[i][0], lo[i][1], za),
+                    (lo[j][0], lo[j][1], za),
+                    (hi[j][0], hi[j][1], zb),
+                    (hi[i][0], hi[i][1], zb),
+                ]
+            )
+            faces.append((k, k + 1, k + 2, k + 3))
+    if not faces:
+        raise RuntimeError(f"{name}: no lit panes")
+    return new_mesh(name, verts, faces, [mat], recalc=False)
 
 
 def disc(name, z, offset, mat, scale=1.0):
@@ -317,31 +383,40 @@ def build():
     sky = material("Toy_sky")
     glow = material("Toy_white_Glow")
     red_glow = material("Toy_red_Glow")
+    lit = material("Toy_sand_Glow")
 
     # --- shaft: glass shell ribbed by the horizontal sunshade rhythm -------
     # Each band contributes four rings (glass -> rib underside -> rib face ->
     # rib top -> back to glass), so the ribs are real relief, not painted on.
     z0 = H_LOBBY + H_CANOPY
     rings, rows = [], []
+    office_bays, led_bays = [], []
     z = z0
     rings.append((z, outline(z, GLASS_IN)))
     while z + BAND_PITCH < H_ROOF - 1.0:
         zb = z + BAND_PITCH - BAND_H
         led_here = zb >= H_LED
-        rib = 2 if led_here else 0
+        (led_bays if led_here else office_bays).append((z, zb))
         rings.append((zb, outline(zb, GLASS_IN)))
-        rows.append(2 if led_here else 1)  # glass bay (lit at the top)
+        rows.append(1)  # glass bay
         rings.append((zb + 0.2, outline(zb + 0.2, BAND_OUT)))
-        rows.append(rib)  # underside of the rib
+        rows.append(0)  # underside of the rib
         rings.append((zb + BAND_H, outline(zb + BAND_H, BAND_OUT)))
-        rows.append(rib)  # rib face
+        rows.append(0)  # rib face
         z = zb + BAND_H
         rings.append((z + 0.2, outline(z + 0.2, GLASS_IN)))
-        rows.append(rib)  # top return
+        rows.append(0)  # top return
         z += 0.2
     rings.append((H_ROOF, outline(H_ROOF, GLASS_IN)))
-    rows.append(2)
-    loft("shaft", rings, [trim, glass, glow], rows)
+    rows.append(1)
+    led_bays.append((z, H_ROOF))
+    loft("shaft", rings, [trim, glass], rows)
+
+    # Night skin. Office floors are sparsely and irregularly lit; the upper LED
+    # floors are dense and cool, so the top of the shaft brightens into the
+    # crown instead of stopping at it.
+    lit_bays("windows_office", office_bays, lit, density=0.26, seed=3.1)
+    lit_bays("windows_led", led_bays, glow, density=0.72, seed=11.7, margin=0.7)
 
     # --- lobby: recessed glass box, chunky piers and an overhanging canopy --
     lobby_rings = [
@@ -349,6 +424,12 @@ def build():
         (H_LOBBY, outline(H_LOBBY, -1.9)),
     ]
     loft("lobby_glass", lobby_rings, [glass], cap_bottom=True)
+    # The two-storey lobby is a lantern at night; a full ring, not scattered.
+    _wall(
+        "lobby_light",
+        [(2.2, outline(2.2, -1.84)), (H_LOBBY - 1.4, outline(H_LOBBY - 1.4, -1.84))],
+        lit,
+    )
     ring_band("lobby_sill", 0.0, 1.4, -2.6, 0.35, stone)
     ring_band("canopy", H_LOBBY, H_LOBBY + H_CANOPY, -2.6, 2.4, trim)
 
@@ -418,6 +499,8 @@ def build():
     # --- crown: hollow perforated topper, open hoops closing to a tip ------
     # Broad hooped screens begin below the occupied roof, as the real tower's
     # upper LED floors sit behind the facade rather than below a separate cap.
+    # The hoops are solid trim so the crown keeps its daylight silhouette; the
+    # light is a separate skin over them, which is the part that ignites.
     span = H_ARCH - H_LED
     for i in range(CROWN_HOOPS):
         zb = H_LED + span * i / CROWN_HOOPS
@@ -428,9 +511,23 @@ def build():
             zt,
             GLASS_IN - 0.9,
             BAND_OUT,
-            glow,
+            trim,
             scale0=crown_scale(zb),
             scale1=crown_scale(zt),
+        )
+        _wall(
+            f"crown_light_{i}",
+            [
+                (zb + 0.15, [
+                    (x * crown_scale(zb), y * crown_scale(zb))
+                    for x, y in outline(zb + 0.15, BAND_OUT + 0.05)
+                ]),
+                (zt - 0.15, [
+                    (x * crown_scale(zt), y * crown_scale(zt))
+                    for x, y in outline(zt - 0.15, BAND_OUT + 0.05)
+                ]),
+            ],
+            glow,
         )
     cylinder("mast", 0.0, 0.0, H_ROOF, H_ARCH - 1.0, 0.6, steel, seg=8)
     cylinder("beacon", 0.0, 0.0, H_ARCH - 1.0, H_ARCH, 0.9, red_glow, seg=8)

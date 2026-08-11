@@ -31,6 +31,9 @@ PALETTE_HEX = {
     "Toy_ink": "3a3530",
     "Toy_glass": "2a4d73",
     "Toy_white_Glow": "f7f4ec",
+    "Toy_mustard_Glow": "d9a441",
+    "Toy_cream_Glow": "f2ede3",
+    "Toy_gold_Glow": "caa64a",
     "Toy_roofd": "45454a",
     "Toy_steel": "9aa0a6",
     "Toy_gold": "caa64a",
@@ -206,6 +209,19 @@ def facade_rect(name, cx, cy, z0, z1, sx, sy, mat):
     return box(name, cx, cy, z0, z1, sx, sy, mat, bevel=False)
 
 
+def lit_arch(name, center_u, side, z0, width, height, mat, horizontal_axis="x", segments=8):
+    """A smaller arch of glow material floating just outside its dark opening.
+
+    The loader buckets `_Glow` materials into a second mesh that ignites with
+    dusk, so the window itself stays dark geometry and this plane is the light
+    inside it: inset far enough to leave a reveal, offset outward so it never
+    z-fights the opening it sits in.
+    """
+    out = 0.06 if side > 0 else -0.06
+    return facade_arch(name, center_u, side + out, z0 + height * 0.06,
+                       width * 0.8, height * 0.85, 0.0, mat, horizontal_axis, segments)
+
+
 def vertical_disc(name, face, z, radius, mat, segments=20, offset=0.0):
     """Clock disc on one tower side in the local coordinate frame."""
     verts = []
@@ -297,6 +313,9 @@ def build():
     ink = material("Toy_ink")
     glass = material("Toy_glass")
     glow = material("Toy_white_Glow")
+    lamp = material("Toy_mustard_Glow")  # warm interior light behind an opening
+    soft = material("Toy_cream_Glow")  # cooler daylight-lamp wash on roof glazing
+    spill = material("Toy_gold_Glow")  # floodlight spill caught by a cornice
     roofd = material("Toy_roofd")
     steel = material("Toy_steel")
     gold = material("Toy_gold")
@@ -319,6 +338,7 @@ def build():
     for side_name, y in (("west", -WIDTH / 2 - 1.58), ("east", WIDTH / 2 + 1.58)):
         for i, x in enumerate((-9.0, 0.0, 9.0)):
             facade_arch(f"central_{side_name}_arch_{i}", x, y, 1.0, 7.2, 12.6, 0.0, glass, "x", 10)
+            lit_arch(f"central_{side_name}_arch_lit_{i}", x, y, 1.0, 7.2, 12.6, lamp, "x", 10)
         # Giant paired pilasters frame the central arch group.
         for i, x in enumerate((-14.0, -12.2, 12.2, 14.0)):
             box(f"central_{side_name}_column_{i}", x, y + (0.28 if y < 0 else -0.28), 0.8, 15.8,
@@ -331,16 +351,20 @@ def build():
             for i in range(14):
                 x = lo + (hi - lo) * (i + 0.5) / 14
                 facade_arch(f"{side_name}_upper_{wing}_{i}", x, y, 7.75, 4.35, 5.45, 0, glass, "x", 8)
+                lit_arch(f"{side_name}_upper_lit_{wing}_{i}", x, y, 7.75, 4.35, 5.45, lamp, "x", 8)
             for i in range(12):
                 x = lo + (hi - lo) * (i + 0.5) / 12
                 facade_arch(f"{side_name}_ground_{wing}_{i}", x, y, 1.05, 4.5, 4.85, 0, ink, "x", 8)
+                lit_arch(f"{side_name}_ground_lit_{wing}_{i}", x, y, 1.05, 4.5, 4.85, lamp, "x", 8)
 
     # End elevations: designed gables with one large and two small arch fields.
     for sign, end_name in ((-1, "northwest"), (1, "southeast")):
         x = sign * (LENGTH / 2 + 0.13)
         facade_arch(f"{end_name}_center_arch", 0, x, 2.0, 12.5, 12.0, 0, glass, "y", 10)
+        lit_arch(f"{end_name}_center_arch_lit", 0, x, 2.0, 12.5, 12.0, lamp, "y", 10)
         for i, y in enumerate((-18.0, 18.0)):
             facade_arch(f"{end_name}_side_arch_{i}", y, x, 1.2, 8.0, 8.5, 0, glass, "y", 10)
+            lit_arch(f"{end_name}_side_arch_lit_{i}", y, x, 1.2, 8.0, 8.5, lamp, "y", 10)
         # Triangular gable plane above the end pavilion.
         verts = [world(x, -WIDTH / 2 - 0.5, 16.4), world(x, WIDTH / 2 + 0.5, 16.4), world(x, 0, 23.0)]
         new_mesh(f"{end_name}_gable", verts, [(0, 1, 2) if sign > 0 else (2, 1, 0)], [sand], recalc=False)
@@ -354,6 +378,8 @@ def build():
             x = lo + (hi - lo) * (i + 0.5) / 7
             facade_arch(f"clerestory_w_{wing}_{i}", x, -4.31, 19.0, 5.0, 3.9, 0, glass, "x", 8)
             facade_arch(f"clerestory_e_{wing}_{i}", x, 4.31, 19.0, 5.0, 3.9, 0, glass, "x", 8)
+            lit_arch(f"clerestory_w_lit_{wing}_{i}", x, -4.31, 19.0, 5.0, 3.9, soft, "x", 8)
+            lit_arch(f"clerestory_e_lit_{wing}_{i}", x, 4.31, 19.0, 5.0, 3.9, soft, "x", 8)
 
     # Skylight bands break up the roof slopes for the app's downward camera.
     roof_hy = (WIDTH - 3.5) / 2
@@ -363,8 +389,12 @@ def build():
             x = lo + (hi - lo) * (i + 0.5) / 6
             for y in (-15.5, 15.5):
                 z = ROOF_RIDGE - (ROOF_RIDGE - ROOF_EAVE) * abs(y) / roof_hy
-                box(f"skylight_{wing}_{i}_{'e' if y > 0 else 'w'}", x, y, z - 0.35, z + 0.5,
+                tag = "e" if y > 0 else "w"
+                box(f"skylight_{wing}_{i}_{tag}", x, y, z - 0.35, z + 0.5,
                     6.4, 2.6, glass, bevel=True, bevel_width=0.10)
+                # The nave lamps read through the glazing from the aerial camera.
+                box(f"skylight_lit_{wing}_{i}_{tag}", x, y, z + 0.5, z + 0.56,
+                    5.5, 1.9, soft, bevel=False)
 
     # Four tidy roof plant clusters; no scattered miniature noise.
     plant_specs = [(-69, 8, 9, 6, 2.5), (-48, -8, 7, 5, 3.0), (48, 9, 10, 6, 2.2), (70, -7, 8, 5, 3.2)]
@@ -390,15 +420,26 @@ def build():
         for i, y in enumerate((-4.8, -2.4, 0, 2.4, 4.8)):
             box(f"frieze_{face}_{i}", x, y, 51.5, 53.0, 0.14, 1.25, ink, bevel=False)
 
+    # Floodlight spill: thin bands tucked under the overhangs that catch the
+    # uplighting, so the miniature keeps its cornice lines after dark.
+    box("cornice_spill_body", 0, 0, 13.55, 13.85, LENGTH + 1.95, WIDTH + 1.95, spill, bevel=False)
+    box("cornice_spill_central", 0, -0.55, 15.7, 16.0, 31.9, WIDTH + 3.15, spill, bevel=False)
+    box("cornice_spill_clock", 0, 0, 49.2, 49.5, 16.1, 16.1, spill, bevel=False)
+
     # Giralda-derived layered crown: square belvederes, setbacks, circular lantern.
     square_belvedere("belvedere_lower", 53.0, 59.0, 6.0, 0.72, sand, trim)
+    # Lit chamber read between the piers of each belvedere.
+    box("belvedere_lower_lit", 0, 0, 53.9, 58.2, 11.2, 11.2, lamp, bevel=False)
     box("crown_step_1", 0, 0, 59.0, 60.5, 13.0, 13.0, trim, bevel=True, bevel_width=0.13)
     box("crown_step_2", 0, 0, 60.5, 62.0, 10.8, 10.8, sand, bevel=True, bevel_width=0.12)
     square_belvedere("belvedere_upper", 62.0, 67.0, 4.5, 0.64, sand, trim)
+    box("belvedere_upper_lit", 0, 0, 62.9, 66.2, 8.2, 8.2, lamp, bevel=False)
     cylinder("lantern_floor", 0, 0, 67.0, 68.0, 5.2, trim, 16, True)
     for i in range(10):
         a = 2 * math.pi * i / 10
         cylinder(f"lantern_pier_{i}", 4.15 * math.cos(a), 4.15 * math.sin(a), 68.0, 71.1, 0.34, sand, 8)
+    # The lantern is the beacon: the brightest thing on the building at night.
+    cylinder("lantern_beacon", 0, 0, 68.1, 70.9, 3.7, glow, 12)
     cylinder("lantern_cap", 0, 0, 71.0, 71.8, 5.0, trim, 16, True)
 
     # Low faceted dome and recognizable flagpole.

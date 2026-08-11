@@ -75,6 +75,55 @@ def setup_world(span):
     floor.data.materials.append(mat)
 
 
+def show_glow(visible):
+    """The runtime holds the `_Glow` mesh at 12% opacity while the sun is up, so
+    it is all but invisible by day. Blender has no equivalent knob here; hiding
+    the mesh is the honest approximation for the daylight review renders."""
+    for obj in bpy.data.objects:
+        if obj.type == "MESH" and "Glow" in obj.name:
+            obj.hide_render = not visible
+
+
+def ignite_glow_materials():
+    """Stand in for the app's dusk ramp. The GLB itself carries no emission —
+    `updateLandmarkGlow` fades the `_Glow` mesh in — so the night review render
+    has to light those materials the same way the runtime does."""
+    for mat in bpy.data.materials:
+        if not mat.name.endswith("_Glow") or not mat.use_nodes:
+            continue
+        bsdf = mat.node_tree.nodes.get("Principled BSDF")
+        if not bsdf:
+            continue
+        bsdf.inputs["Emission Color"].default_value = bsdf.inputs["Base Color"].default_value
+        bsdf.inputs["Emission Strength"].default_value = 9.0
+
+
+def setup_night(span):
+    """Moonlit tabletop: the studio drops to a cold low key so the only warm
+    light in frame comes off the model's own night surfaces."""
+    scene = bpy.context.scene
+    scene.view_settings.exposure = 0.0
+    bg = scene.world.node_tree.nodes["Background"]
+    bg.inputs[0].default_value = (0.035, 0.049, 0.086, 1.0)
+    bg.inputs[1].default_value = 0.55
+    for obj in bpy.data.objects:
+        light = obj.data if obj.type == "LIGHT" else None
+        if not light:
+            continue
+        if light.type == "SUN":
+            light.energy = 0.22
+            light.color = (0.62, 0.72, 1.0)
+        else:
+            light.energy *= 0.045
+            light.color = (0.66, 0.75, 1.0)
+    floor = bpy.data.objects.get("studio_floor")
+    if floor and floor.data.materials:
+        bsdf = floor.data.materials[0].node_tree.nodes["Principled BSDF"]
+        bsdf.inputs["Base Color"].default_value = (0.055, 0.062, 0.086, 1.0)
+    show_glow(True)
+    ignite_glow_materials()
+
+
 def render(path, camera, resolution):
     scene = bpy.context.scene
     scene.camera = camera
@@ -98,6 +147,7 @@ def main():
     center = Vector(((mn.x + mx.x) / 2, (mn.y + mx.y) / 2, (mn.z + mx.z) / 2))
     span = max(dims.x, dims.y)
     setup_world(span)
+    show_glow(False)
 
     aspect = ELEV_RES[0] / ELEV_RES[1]
     ortho_scale = max(span * 1.18, dims.z * aspect * 1.25)
@@ -121,6 +171,17 @@ def main():
                               center.z + radius * math.sin(pitch)))
     aim(aerial, Vector((center.x, center.y, 25.0)))
     render(os.path.join(out, "city-hall-aerial.png"), aerial, AER_RES)
+
+    # Same camera after dusk, with the `_Glow` materials lit as the app lights
+    # them — the only way to review the night state of the asset offline.
+    setup_night(span)
+    render(os.path.join(out, "city-hall-night.png"), aerial, AER_RES)
+    east = make_camera("cam_night_east"); east.data.type = "PERSP"; east.data.lens = 80
+    pitch = math.radians(17); radius = span * 2.6
+    east.location = Vector((center.x + radius * math.cos(pitch), center.y - radius * 0.16,
+                            center.z + radius * math.sin(pitch)))
+    aim(east, Vector((center.x, center.y, 30.0)))
+    render(os.path.join(out, "city-hall-night-east.png"), east, AER_RES)
 
 
 if __name__ == "__main__":

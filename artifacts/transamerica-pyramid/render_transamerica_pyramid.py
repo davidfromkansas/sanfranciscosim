@@ -104,6 +104,52 @@ def add_lights(height):
     return plane
 
 
+def glow_materials():
+    for mat in bpy.data.materials:
+        if mat.use_nodes and "_Glow" in mat.name:
+            bsdf = mat.node_tree.nodes.get("Principled BSDF")
+            if bsdf:
+                yield mat, bsdf
+
+
+def to_day():
+    """Match what the app draws by day: the glow set at 12% opacity.
+
+    `app/src/assets.js` puts every `*_Glow` surface in its own transparent mesh
+    whose opacity is `0.12 + uNight * 0.95` (`updateLandmarkGlow` in kit.js), so
+    an unlit pane is a faint tint over its dark glass, not a pale panel. Cycles
+    renders it opaque unless the same 0.12 is applied here.
+    """
+    for mat, bsdf in glow_materials():
+        bsdf.inputs["Alpha"].default_value = 0.12
+        mat.blend_method = "BLEND"
+
+
+def to_night():
+    """Emulate the app's dusk pass so the review render shows the night state.
+
+    The exported GLB carries emission strength 0 on purpose - the app ramps the
+    same glow mesh to full opacity as `uNight` goes to 1. Here the equivalent is
+    full alpha plus emission on those materials only, under a moonlit key, so
+    what this image shows is exactly the glow set.
+    """
+    scene = bpy.context.scene
+    bg = scene.world.node_tree.nodes["Background"]
+    bg.inputs[0].default_value = (0.021, 0.031, 0.062, 1.0)
+    bg.inputs[1].default_value = 0.55
+    for ob in bpy.data.objects:
+        if ob.type == "LIGHT":
+            ob.data.energy *= 0.06
+            ob.data.color = (0.62, 0.72, 1.0)
+    for mat, bsdf in glow_materials():
+        bsdf.inputs["Alpha"].default_value = 1.0
+        mat.blend_method = "OPAQUE"
+        bsdf.inputs["Emission Color"].default_value = bsdf.inputs[
+            "Base Color"
+        ].default_value
+        bsdf.inputs["Emission Strength"].default_value = 9.0
+
+
 def make_camera(name):
     cam = bpy.data.cameras.new(name)
     cam.clip_start = 1.0
@@ -148,6 +194,7 @@ def main():
     center = Vector(((mn.x + mx.x) / 2, (mn.y + mx.y) / 2, (mn.z + mx.z) / 2))
     setup_world()
     add_lights(height)
+    to_day()
 
     # --- four elevations: one rig, identical everything but azimuth ---------
     ortho_scale = height * 1.06
@@ -187,6 +234,15 @@ def main():
     )
     aim(aer, Vector((center.x, center.y, center.z * 0.92)))
     render_to(os.path.join(out, f"{prefix}-aerial.png"), aer, AER_RES)
+
+    # --- the same geometry after dusk, from the same two rigs ---------------
+    to_night()
+    render_to(os.path.join(out, f"{prefix}-night.png"), aer, AER_RES)
+    render_to(
+        os.path.join(out, f"{prefix}-night-east.png"),
+        bpy.data.objects["cam_east"],
+        RES,
+    )
 
 
 if __name__ == "__main__":
