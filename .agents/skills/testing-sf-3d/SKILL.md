@@ -364,6 +364,7 @@ The moon sits ~19° above the horizon at azimuth ≈ (+x, −z); base FOV is 52�
 Known issue to re-check: the halo plane has no radial falloff, so it reads as a hard-edged quad around
 the moon rather than a soft glow.
 
+
 ### Deployed (production) checks for the live ferry layer
 
 - Live vs demo on the deployed site: `https://sf-3d.vercel.app` (real feed, needs `FERRY_511_KEY` set on
@@ -389,3 +390,59 @@ the moon rather than a soft glow.
 - The time slider spans golden hour → dusk → full night (`time 100%`); at full night the Bay is nearly
   black, so judge "ferries still drawn at night" from the overlay count plus mesh `visible` flags, and take
   the pretty screenshot near `time 0–10%`.
+### Streetscape (Layer 1) QA recipes — sidewalks, dashes, zebras, kerbs
+
+The baked toy street tiles encode surface type in the `aKind` vertex attribute of the merged
+ground meshes: **64 = asphalt, 65 = sidewalk (tops AND kerb faces), 66 = paint (dashes/zebras)**.
+Two mesh families carry them and both must be walked:
+- `ground-<gx>_<gz>` — always-resident tier: asphalt + sidewalk TOPS + landcover.
+- `streetscape-<gx>_<gz>` — the LOD "detail" tier: kerb faces + centre dashes + zebra bars.
+  Built per 2000 m ground group within `DETAIL_ENTER` and disposed past `DETAIL_EXIT`
+  (1800 / 2400 m in `app/src/city.js`). **The threshold is measured from the camera *pivot* to the
+  group centre, not from the camera distance** — zooming out to 3000 m does NOT drop detail; only
+  panning does. Test the LOD by moving the pivot several km and re-reading
+  `SF.city.stats.groundDetail` plus the set of `streetscape-*` names *after* the scene settles
+  (10-20 s under SwiftShader) — reading immediately after `SF.goTo` shows the stale set.
+
+Useful probes (paste into the console):
+- Kind histogram in a region: traverse `SF.scene`, filter `o.isMesh && /^(ground|streetscape)-/`,
+  read `o.geometry.getAttribute('aKind')` and `position`, and add `o.position.x/z` to get world
+  coords (group meshes are placed at their group origin).
+- Street metadata at runtime: `SF.city.paths` is an array of `{points: Float32Array (flat xyz),
+  klass, width, lift, sidewalk:{ribbon,width,curb}, meta}`. `points` is **flat**, not an array of
+  objects, and there is no `class` field — use `klass` (0 = no-sidewalk classes incl.
+  freeway/ramp/other, 1/2 = sidewalk-bearing). `pa.sidewalk == null` is the fastest proof that a
+  class gets no plinth.
+- Pedestrian placement: peds are an **unnamed** `InstancedMesh` (~407 live of PED_COUNT 420,
+  colour `4a5a72`). Match each instance to its nearest `SF.city.paths` point and compare
+  `pedY - (pathY - path.lift)`: expect ≈ +0.35 on `klass` 1/2 and ≈ 0.0 on `klass` 0. Do this
+  instead of picking against ground geometry — surface picks return NaN on non-finite vertices
+  and produce large outliers.
+
+Bridge-deck / freeway exclusion checks: build the deck polyline from
+`manifest.json → bridges.<id>.nodes` (`[lon, lat, deckY]`) using the standard projection, and test
+geometry against the polyline **segments** (not per-node bounding boxes). Restrict to a stretch
+that is unambiguously over open water — the Bay Bridge polyline passes over Yerba Buena Island and
+the SoMa approach, where ordinary hillside/surface streets fall inside a naive corridor test and
+produce false positives. Cross-check both directions: geometry-level (`aKind === 65` inside the
+corridor) *and* path-level (`paths` running along the deck with `sidewalk != null`); they can
+disagree, and the geometry is what the user sees.
+
+Draw-call budget: the overlay field is useless (last pass only). Use
+`SF.renderer.info.autoReset = false; SF.renderer.info.reset()`, wait ~40 s, then
+`calls / (render.frame - f0)`. Typical healthy values at street level here are ~40 calls/frame
+against the 300 budget. Cadence on this box is ~1.3-2 fps (SwiftShader) — always state that
+explicitly; it says nothing about the 60 fps laptop target.
+
+Deployed fallback drill: Vercel returns a real **404** (`text/plain`, NOT_FOUND) for a missing
+tile — no SPA rewrite. A console-only `fetch` patch is not enough because `blobCache` never
+evicts, so an already-loaded tile is never re-requested. Install the patch **before** load over
+CDP with `Page.addScriptToEvaluateOnNewDocument` + `Page.reload({ignoreCache:true})`, returning a
+garbage `ArrayBuffer` for the target `tiles/toystreets/<cell>.bin`; also wrap `console.warn` and
+`window.onerror` in the same preload so the warnings survive the reload. Expect exactly one
+`street tile toystreets:<cell> unusable — falling back to base streets`, zero uncaught errors, and
+the broken cell still full of `aKind === 64` asphalt with almost no 65/66.
+
+#### Devin Secrets Needed
+None — the app is static and requires no keys for QA.
+

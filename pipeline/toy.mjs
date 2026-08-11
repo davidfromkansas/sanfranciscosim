@@ -671,6 +671,9 @@ await writeFile(
     {
       cellSize: CELL_SIZE,
       grid: GRID,
+      // The app's tile cache key is the newest bake stamp across the tiers, so a
+      // streets-only re-bake still invalidates the tiles it just rewrote.
+      generated: new Date().toISOString(),
       dev: onlyCells ? [...onlyCells] : null,
       palette: TOY_PALETTE,
       streetClasses: TOY_STREET_CLASSES,
