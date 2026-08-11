@@ -443,6 +443,50 @@ garbage `ArrayBuffer` for the target `tiles/toystreets/<cell>.bin`; also wrap `c
 `street tile toystreets:<cell> unusable — falling back to base streets`, zero uncaught errors, and
 the broken cell still full of `aKind === 64` asphalt with almost no 65/66.
 
+## QA'ing a new landmark GLB (Case A, e.g. `coit-tower`) — worked recipe
+
+Everything below was measured on the local dev server; it generalises to any manifest-only landmark.
+
+- **The `browser_console` tool can go "Could not connect to Chrome via CDP" mid-session** even though the
+  page is alive. Do not conclude the tab died — check `curl -s http://127.0.0.1:29229/json/list` first, and
+  keep a tiny local CDP client as the fallback (Python `websockets` is installed; `pip`'s `websocket`
+  module is not):
+  ```python
+  ws = [p for p in json.load(urllib.request.urlopen('http://127.0.0.1:29229/json/list'))
+        if p['type']=='page' and p['url'].startswith('http://localhost:5173')][0]['webSocketDebuggerUrl']
+  # then Runtime.evaluate with awaitPromise:true, returnByValue:true
+  ```
+- **Capturing the `sf-assets: … merged N objects / M materials -> 2 draw calls …` line** requires listening
+  during load: over the same socket send `Runtime.enable` + `Log.enable`, then
+  `Page.reload {ignoreCache:true}`, and print `Runtime.consoleAPICalled`. This is also the only reliable way
+  to prove the fallback drill logs **exactly one** `… — keeping the code-built landmark` warning.
+- **The procedural twin is hidden by `landmarks.useBridgeAsset(camelId)`** even for non-bridges (it sets
+  `visible=false` and returns null). Assert it numerically by traversing the `landmarks` group and reading
+  `<camelId>.visible === false`, and visually by toggling `SF.assets.placed.get(id).model.visible=false` —
+  the site must go to bare ground (proves there is no baked block hiding under the GLB).
+- **Seating/scale numbers to assert:** `model.position.y === Math.max(0, sampleElevation)`, merged body
+  geometry local bbox `min.y === 0`, `max.y === targetHeightM`, and the log's `uniform xS` with S ≈ 1.0000.
+- **Glow-group auditing without eyeballing:** union-find the `_Glow` child's triangles into connected
+  components, then report each component's height band, bearing `((atan2(x, -z))+360)%360` and radius. For
+  Coit this gave 27 components in 4 bands (1 door lamp at 346°, 1 loggia shell, 24 pier slots, 1 lantern) —
+  a cheap way to prove "only the intended surfaces light up" and to verify authored orientation
+  (the loader never rotates, so a bearing check *is* an orientation check).
+- **`SF.pickEntity(nx, ny)` returns a Promise** (`await` it; a sync read looks like `{}`) and it resolves
+  against the *ground* under the ray. Clicking high up a tall landmark therefore returns whatever street or
+  park is behind it; click near the base to get `landmark:<camelId>`. Not a regression — do not report it as one.
+- **Camera bearing from `SF.goTo(lon, lat, dist, yaw, pitch)` is `bearing = (180 − yaw) mod 360`**, i.e. yaw
+  194 puts the camera due north (346°) of the target. Verify with
+  `atan2(cam.x − pivot.x, −(cam.z − pivot.z))`. Trees around hilltop landmarks routinely occlude a
+  ground-level facade; find a clear viewpoint by a bounding-sphere occlusion sweep over candidate
+  bearing/pitch/distance triples before spending screenshots.
+- **A vertical wall reading much darker than surrounding roofs is normal**, not a broken asset: with a high
+  sun a Lambert wall gets a grazing N·L. Confirm by sampling merged vertex colours (they should match the
+  glTF `baseColorFactor`s) and by comparing pixel means of the wall against a neighbouring building wall,
+  not against roofs. Also note a vertex histogram gap in the middle of a tower is just a cylinder with no
+  loop cuts — count triangles spanning the gap instead.
+- Observed budget headroom with the landmark loaded: **peak 94 draw calls** at the Coit close view and 88
+  downtown at street level, at ~1.5–3 rendered fps (SwiftShader; quote cadence, never the overlay fps).
+
 #### Devin Secrets Needed
 None — the app is static and requires no keys for QA.
 
