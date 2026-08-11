@@ -291,6 +291,7 @@ function placeGeneric(group, box, entry, data) {
   const scale = entry.targetHeightM / size.y;
   const [x, z] = data.project(entry.anchor[0], entry.anchor[1]);
   group.scale.setScalar(scale);
+  if (entry.yawDeg !== undefined) group.rotation.y = (entry.yawDeg * Math.PI) / 180;
   group.position.set(x, Math.max(0, data.sampleElevation(x, z)), z);
   return { ends: [], log: `uniform x${scale.toFixed(4)} at ${x.toFixed(0)}, ${z.toFixed(0)}` };
 }
