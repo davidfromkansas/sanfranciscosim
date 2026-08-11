@@ -11,6 +11,8 @@
 import { readdir } from 'node:fs/promises';
 import { CELL_SIZE, GRID } from './geo.mjs';
 import { STREET_CLASSES } from './classes.mjs';
+import { LANDMARKS } from './landmarks.mjs';
+import { project } from './geo.mjs';
 import { readBuildingsBlob, readStreetsBlob } from './blobread.mjs';
 
 export const BLOCK_RES = 2.5; // grid resolution in meters
@@ -160,10 +162,29 @@ export async function loadTreeBlockers({ sampleElevation, out = new URL('../out/
   const inBuilding = (x, z) => (cellFlags(x, z) & BIT_BUILDING) !== 0;
   const inStreet = (x, z) => (cellFlags(x, z) & BIT_STREET) !== 0;
   const inWater = (x, z) => sampleElevation(x, z) < WATER_ELEVATION;
-  const blocked = (x, z) => cellFlags(x, z) !== 0 || inWater(x, z);
+
+  // Bespoke landmark grounds (e.g. the Palace of Fine Arts rotunda) are
+  // hand-modelled and have their own trees, if any. The base tree scatter would
+  // poke through the model, so landmarks can opt in to a clear zone matching
+  // their existing exclusion radius.
+  const treeClearCircles = LANDMARKS.filter((l) => l.clearTrees).map((l) => {
+    const [x, z] = project(l.lon, l.lat);
+    return { x, z, r: l.exclude, id: l.id };
+  });
+  const inLandmarkClear = (x, z) => {
+    for (const c of treeClearCircles) {
+      const dx = x - c.x;
+      const dz = z - c.z;
+      if (dx * dx + dz * dz <= c.r * c.r) return true;
+    }
+    return false;
+  };
+
+  const blocked = (x, z) => cellFlags(x, z) !== 0 || inWater(x, z) || inLandmarkClear(x, z);
 
   return {
     blocked,
+    inLandmarkClear,
     onBuilding,
     inBuilding,
     inStreet,

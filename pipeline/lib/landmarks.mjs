@@ -77,6 +77,7 @@ export const LANDMARKS = [
     lon: -122.4484,
     lat: 37.8029,
     exclude: 170,
+    clearTrees: true, // the rotunda grounds are hand-modelled; scatter conflicts
     key: '8',
     camera: { distance: 700, yaw: 330, pitch: 16 },
   },
