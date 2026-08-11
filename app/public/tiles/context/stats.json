@@ -1,76 +1,76 @@
 {
- "generated": "2026-08-11T20:14:14.149Z",
- "buildings": 171472,
+ "generated": "2026-08-11T22:06:38.110Z",
+ "buildings": 171461,
  "cells": 547,
  "categories": [
   {
    "cat": 0,
    "id": "misc",
    "label": "Building",
-   "count": 10155,
+   "count": 10154,
    "night": 3
   },
   {
    "cat": 1,
    "id": "house",
    "label": "House",
-   "count": 122104,
+   "count": 122101,
    "night": 0
   },
   {
    "cat": 2,
    "id": "apartments",
    "label": "Apartments",
-   "count": 13935,
+   "count": 13950,
    "night": 0
   },
   {
    "cat": 3,
    "id": "office",
    "label": "Office",
-   "count": 2728,
+   "count": 2729,
    "night": 3
   },
   {
    "cat": 4,
    "id": "retail",
    "label": "Retail",
-   "count": 7945,
+   "count": 7932,
    "night": 1
   },
   {
    "cat": 5,
    "id": "restaurant_cafe",
    "label": "Restaurant / Café",
-   "count": 2818,
+   "count": 2828,
    "night": 1
   },
   {
    "cat": 6,
    "id": "bar",
    "label": "Bar",
-   "count": 522,
+   "count": 520,
    "night": 1
   },
   {
    "cat": 7,
    "id": "hotel",
    "label": "Hotel",
-   "count": 1452,
+   "count": 1447,
    "night": 0
   },
   {
    "cat": 8,
    "id": "worship",
    "label": "Place of worship",
-   "count": 622,
+   "count": 626,
    "night": 3
   },
   {
    "cat": 9,
    "id": "school",
    "label": "School",
-   "count": 1037,
+   "count": 1025,
    "night": 3
   },
   {
@@ -84,14 +84,14 @@
    "cat": 11,
    "id": "hospital",
    "label": "Hospital",
-   "count": 113,
+   "count": 111,
    "night": 2
   },
   {
    "cat": 12,
    "id": "clinic",
    "label": "Clinic",
-   "count": 1368,
+   "count": 1373,
    "night": 2
   },
   {
@@ -119,42 +119,42 @@
    "cat": 16,
    "id": "museum",
    "label": "Museum",
-   "count": 226,
+   "count": 228,
    "night": 1
   },
   {
    "cat": 17,
    "id": "theater_cinema",
    "label": "Theater / Cinema",
-   "count": 274,
+   "count": 278,
    "night": 1
   },
   {
    "cat": 18,
    "id": "government",
    "label": "Government",
-   "count": 424,
+   "count": 422,
    "night": 2
   },
   {
    "cat": 19,
    "id": "industrial",
    "label": "Industrial",
-   "count": 1987,
+   "count": 1991,
    "night": 3
   },
   {
    "cat": 20,
    "id": "warehouse",
    "label": "Warehouse",
-   "count": 210,
+   "count": 209,
    "night": 3
   },
   {
    "cat": 21,
    "id": "gas_station",
    "label": "Gas station",
-   "count": 113,
+   "count": 115,
    "night": 1
   },
   {
@@ -168,21 +168,21 @@
    "cat": 23,
    "id": "parking_garage",
    "label": "Parking garage",
-   "count": 1768,
+   "count": 1754,
    "night": 3
   },
   {
    "cat": 24,
    "id": "gym",
    "label": "Gym",
-   "count": 400,
+   "count": 395,
    "night": 1
   },
   {
    "cat": 25,
    "id": "transit_station",
    "label": "Transit station",
-   "count": 309,
+   "count": 311,
    "night": 2
   }
  ],
@@ -190,102 +190,102 @@
   {
    "sub": "apartments",
    "label": "Apartments",
-   "count": 5316
+   "count": 5326
   },
   {
    "sub": "shop",
    "label": "Shop",
-   "count": 2133
+   "count": 2121
   },
   {
    "sub": "office",
    "label": "Office",
-   "count": 1877
+   "count": 1876
   },
   {
    "sub": "restaurant",
    "label": "Restaurant",
-   "count": 1816
+   "count": 1825
   },
   {
    "sub": "hotel",
    "label": "Hotel",
-   "count": 1298
+   "count": 1296
   },
   {
    "sub": "salon",
    "label": "Salon",
-   "count": 1023
+   "count": 1018
   },
   {
    "sub": "clinic",
    "label": "Clinic",
-   "count": 951
+   "count": 950
   },
   {
    "sub": "parking_garage",
    "label": "Parking garage",
-   "count": 851
+   "count": 835
   },
   {
    "sub": "house",
    "label": "House",
-   "count": 745
+   "count": 755
   },
   {
    "sub": "factory",
    "label": "Factory",
-   "count": 684
+   "count": 683
   },
   {
    "sub": "community_center",
    "label": "Community center",
-   "count": 683
+   "count": 676
   },
   {
    "sub": "church",
    "label": "Church",
-   "count": 559
+   "count": 563
   },
   {
    "sub": "cafe",
    "label": "Café",
-   "count": 520
+   "count": 526
   },
   {
    "sub": "preschool",
    "label": "Preschool",
-   "count": 464
+   "count": 459
   },
   {
    "sub": "auto_repair",
    "label": "Auto repair",
-   "count": 452
+   "count": 448
   },
   {
    "sub": "elementary_school",
    "label": "Elementary school",
-   "count": 430
+   "count": 423
   },
   {
    "sub": "bar",
    "label": "Bar",
-   "count": 417
-  },
-  {
-   "sub": "civic_office",
-   "label": "Civic office",
-   "count": 352
+   "count": 416
   },
   {
    "sub": "trade_school",
    "label": "Trade school",
+   "count": 352
+  },
+  {
+   "sub": "civic_office",
+   "label": "Civic office",
    "count": 351
   },
   {
    "sub": "gym",
    "label": "Gym",
-   "count": 301
+   "count": 297
   },
   {
    "sub": "corner_store",
@@ -295,47 +295,47 @@
   {
    "sub": "muni_station",
    "label": "Muni station",
-   "count": 228
+   "count": 230
   },
   {
    "sub": "hardware_store",
    "label": "Hardware store",
-   "count": 225
+   "count": 226
   },
   {
    "sub": "theater",
    "label": "Theater",
-   "count": 223
+   "count": 225
   },
   {
    "sub": "grocery",
    "label": "Grocery store",
-   "count": 215
+   "count": 216
   },
   {
    "sub": "laundromat",
    "label": "Laundromat",
-   "count": 194
+   "count": 197
   },
   {
    "sub": "dental",
    "label": "Dental office",
-   "count": 193
+   "count": 194
   },
   {
    "sub": "bank",
    "label": "Bank",
-   "count": 187
+   "count": 186
   },
   {
    "sub": "taqueria",
    "label": "Taquería",
-   "count": 176
+   "count": 173
   },
   {
    "sub": "gallery",
    "label": "Gallery",
-   "count": 169
+   "count": 170
   },
   {
    "sub": "bakery",
@@ -350,47 +350,47 @@
   {
    "sub": "pet_store",
    "label": "Pet store",
-   "count": 135
+   "count": 136
   },
   {
    "sub": "tech_hq",
    "label": "Tech office",
-   "count": 132
+   "count": 133
   },
   {
    "sub": "supermarket",
    "label": "Supermarket",
-   "count": 127
+   "count": 126
   },
   {
    "sub": "pizzeria",
    "label": "Pizzeria",
-   "count": 122
+   "count": 123
   },
   {
    "sub": "dry_cleaner",
    "label": "Dry cleaner",
-   "count": 112
+   "count": 111
   },
   {
    "sub": "florist",
    "label": "Florist",
-   "count": 107
+   "count": 105
   },
   {
    "sub": "university",
    "label": "University",
-   "count": 104
+   "count": 103
   },
   {
    "sub": "pharmacy",
    "label": "Pharmacy",
-   "count": 101
+   "count": 103
   },
   {
    "sub": "gas_station",
    "label": "Gas station",
-   "count": 99
+   "count": 101
   },
   {
    "sub": "middle_school",
@@ -400,17 +400,17 @@
   {
    "sub": "car_dealer",
    "label": "Car dealership",
-   "count": 79
+   "count": 80
   },
   {
    "sub": "distribution",
    "label": "Distribution center",
-   "count": 78
+   "count": 77
   },
   {
    "sub": "hospital",
    "label": "Hospital",
-   "count": 64
+   "count": 63
   },
   {
    "sub": "high_school",
@@ -433,11 +433,6 @@
    "count": 56
   },
   {
-   "sub": "post_office",
-   "label": "Post office",
-   "count": 52
-  },
-  {
    "sub": "ferry_terminal",
    "label": "Ferry terminal",
    "count": 51
@@ -445,7 +440,12 @@
   {
    "sub": "museum",
    "label": "Museum",
-   "count": 50
+   "count": 51
+  },
+  {
+   "sub": "post_office",
+   "label": "Post office",
+   "count": 51
   },
   {
    "sub": "self_storage",
@@ -455,7 +455,12 @@
   {
    "sub": "medical_center",
    "label": "Medical center",
-   "count": 49
+   "count": 48
+  },
+  {
+   "sub": "dispensary",
+   "label": "Dispensary",
+   "count": 48
   },
   {
    "sub": "library",
@@ -468,18 +473,13 @@
    "count": 47
   },
   {
-   "sub": "dispensary",
-   "label": "Dispensary",
-   "count": 47
+   "sub": "workshop",
+   "label": "Workshop",
+   "count": 45
   },
   {
    "sub": "thrift_store",
    "label": "Thrift store",
-   "count": 47
-  },
-  {
-   "sub": "workshop",
-   "label": "Workshop",
    "count": 45
   },
   {
@@ -490,7 +490,7 @@
   {
    "sub": "martial_arts",
    "label": "Martial arts studio",
-   "count": 42
+   "count": 41
   },
   {
    "sub": "college",
@@ -498,14 +498,14 @@
    "count": 40
   },
   {
-   "sub": "event_venue",
-   "label": "Event venue",
-   "count": 40
-  },
-  {
    "sub": "temple",
    "label": "Temple",
    "count": 40
+  },
+  {
+   "sub": "event_venue",
+   "label": "Event venue",
+   "count": 39
   },
   {
    "sub": "motel",
@@ -525,7 +525,7 @@
   {
    "sub": "hostel",
    "label": "Hostel",
-   "count": 34
+   "count": 33
   },
   {
    "sub": "wine_bar",
@@ -538,19 +538,19 @@
    "count": 30
   },
   {
-   "sub": "ice_cream",
-   "label": "Ice cream shop",
+   "sub": "concert_hall",
+   "label": "Concert hall",
    "count": 30
   },
   {
-   "sub": "concert_hall",
-   "label": "Concert hall",
-   "count": 29
+   "sub": "ice_cream",
+   "label": "Ice cream shop",
+   "count": 28
   },
   {
    "sub": "brewery",
    "label": "Brewery",
-   "count": 27
+   "count": 26
   },
   {
    "sub": "inn",
@@ -558,19 +558,19 @@
    "count": 24
   },
   {
+   "sub": "cinema",
+   "label": "Cinema",
+   "count": 23
+  },
+  {
    "sub": "police_station",
    "label": "Police station",
    "count": 22
   },
   {
-   "sub": "cinema",
-   "label": "Cinema",
-   "count": 22
-  },
-  {
    "sub": "coworking",
    "label": "Coworking space",
-   "count": 17
+   "count": 18
   },
   {
    "sub": "consulate",
@@ -608,11 +608,6 @@
    "count": 4
   },
   {
-   "sub": "food_hall",
-   "label": "Food hall",
-   "count": 3
-  },
-  {
    "sub": "science_center",
    "label": "Science center",
    "count": 3
@@ -620,6 +615,11 @@
   {
    "sub": "marina",
    "label": "Marina",
+   "count": 2
+  },
+  {
+   "sub": "food_hall",
+   "label": "Food hall",
    "count": 2
   },
   {
@@ -649,18 +649,18 @@
   }
  ],
  "sources": {
-  "landuse": 140196,
-  "business": 10183,
-  "heuristic": 4947,
+  "landuse": 140206,
+  "business": 10210,
+  "heuristic": 4951,
   "datasf": 1254,
-  "overture": 6585,
-  "osm": 8307
+  "overture": 6654,
+  "osm": 8186
  },
  "confidence": [
-  145143,
-  15230,
-  4178,
-  6921
+  145157,
+  15284,
+  4137,
+  6883
  ],
  "streets": {
   "named": 2509,

@@ -199,6 +199,42 @@
     "tris": 2201
   },
   {
+    "id": "fairmont",
+    "file": "fairmont-san-francisco.glb",
+    "anchor": [
+      -122.4100666,
+      37.7924244
+    ],
+    "targetHeightM": 99.06,
+    "cat": 7,
+    "name": "Fairmont San Francisco",
+    "estimated": false,
+    "dims": [
+      124.7346,
+      98.395,
+      99.06
+    ],
+    "tris": 13380
+  },
+  {
+    "id": "grace-cathedral",
+    "file": "grace-cathedral.glb",
+    "anchor": [
+      -122.4134339,
+      37.7918333
+    ],
+    "targetHeightM": 75.3,
+    "cat": 8,
+    "name": "Grace Cathedral",
+    "estimated": false,
+    "dims": [
+      109.0939,
+      48.1688,
+      75.3
+    ],
+    "tris": 10814
+  },
+  {
     "id": "mission-dolores",
     "file": "mission-dolores.glb",
     "anchor": [
