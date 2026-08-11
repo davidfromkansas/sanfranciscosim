@@ -334,8 +334,8 @@ const FLAG_FRAG = /* glsl */ `
 
 // The Stars and Stripes, drawn procedurally so it stays a flat-colour toy
 // surface: 13 stripes red at top and bottom, a canton over the upper seven,
-// and a dot grid standing in for the star field at diorama scale. `u` runs
-// from the hoist, mirrored on the reverse so the canton stays by the mast.
+// and a dot grid standing in for the star field at diorama scale. `uv.x` is
+// 0 at the hoist, so the canton sits by the mast from either side.
 const FLAG_FRAG_US = /* glsl */ `
   uniform vec3 uColorA;
   uniform vec3 uColorB;
@@ -344,11 +344,10 @@ const FLAG_FRAG_US = /* glsl */ `
   varying float vShade;
   const float CANTON = 0.46153846; // the flag's upper seven stripes
   void main() {
-    float u = gl_FrontFacing ? vUv.x : 1.0 - vUv.x;
     vec3 col = mix(uColorA, uColorB, step(0.5, fract(vUv.y * 6.5)));
-    if (u < 0.4 && vUv.y > CANTON) {
+    if (vUv.x < 0.4 && vUv.y > CANTON) {
       col = uColorC;
-      vec2 s = vec2(u / 0.4 * 5.5, (vUv.y - CANTON) / (1.0 - CANTON) * 4.5);
+      vec2 s = vec2(vUv.x / 0.4 * 5.5, (vUv.y - CANTON) / (1.0 - CANTON) * 4.5);
       vec2 f = fract(s) - 0.5;
       float star = 1.0 - smoothstep(0.15, 0.25, length(f));
       col = mix(col, uColorB, star);
