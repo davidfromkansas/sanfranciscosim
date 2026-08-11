@@ -253,6 +253,6 @@ export const VIEW_PRESETS = [
     name: 'Presidio Main Post',
     lon: -122.462,
     lat: 37.799,
-    camera: { distance: 1400, yaw: 45, pitch: 24 },
+    camera: { distance: 5000, yaw: 45, pitch: 24 },
   },
 ];
