@@ -256,7 +256,7 @@ export function createCity(scene, data) {
     try {
       const loaded = await loadStreetKit();
       streetkit.fleet = createStreetKitFleet(scene, loaded, data.sampleElevation);
-      streetkit.hints = createStreetHints(manifest);
+      streetkit.hints = createStreetHints(manifest, data.contextCells);
       streetkit.exclusions = landmarkExclusions(manifest, data.project);
     } catch (error) {
       streetkit.warned = true;
@@ -294,6 +294,28 @@ export function createCity(scene, data) {
     for (let cz = z0; cz <= z1; cz++) {
       for (let cx = x0; cx <= x1; cx++) {
         if (streetCellIndex.has(`${cx}_${cz}`)) out.push(`${cx}_${cz}`);
+      }
+    }
+    return out;
+  }
+
+  // The ring of street cells just outside a group. Their centrelines complete
+  // the junctions that sit on the group's seam; nothing is ever placed on them.
+  function haloCellsFor(g) {
+    const grid = manifest.grid;
+    const size = indexes.streets.cellSize;
+    const own = new Set(g.streetCells.map((cell) => cell.key));
+    const x0 = Math.floor((g.originX - grid.originX) / size) - 1;
+    const x1 = Math.floor((g.originX + GROUP - grid.originX) / size);
+    const z0 = Math.floor((g.originZ - grid.originZ) / size) - 1;
+    const z1 = Math.floor((g.originZ + GROUP - grid.originZ) / size);
+    const out = [];
+    for (let cz = z0; cz <= z1; cz++) {
+      for (let cx = x0; cx <= x1; cx++) {
+        const key = `${cx}_${cz}`;
+        if (own.has(key)) continue;
+        const cell = streetCellIndex.get(key);
+        if (cell) out.push(cell);
       }
     }
     return out;
@@ -577,8 +599,17 @@ export function createCity(scene, data) {
     if (tier === 'toy') {
       await streetkitReady;
       if (streetkit.fleet) {
-        const hints = await streetkit.hints(g.originX, g.originZ, g.originX + GROUP, g.originZ + GROUP);
-        plan = { ...hints, exclusions: streetkit.exclusions, limit: GROUP_LIMIT };
+        const [hints, halo] = await Promise.all([
+          streetkit.hints(g.originX, g.originZ, g.originX + GROUP, g.originZ + GROUP),
+          streetBlobs(haloCellsFor(g)),
+        ]);
+        plan = {
+          ...hints,
+          halo,
+          bounds: [g.originX, g.originZ, g.originX + GROUP, g.originZ + GROUP],
+          exclusions: streetkit.exclusions,
+          limit: GROUP_LIMIT,
+        };
       }
     }
     const result = await pool.run({

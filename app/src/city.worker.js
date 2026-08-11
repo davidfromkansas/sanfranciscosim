@@ -608,9 +608,7 @@ function chopDashes(px, py, pz, n, rhythm) {
 // than folded into the ribbon loop: the planner wants whole world-space
 // polylines, the ribbon builder wants group-local ones, and decoding a polyline
 // twice is cheaper than entangling the two.
-function planFurniture(streetBlobs, streetClasses, plan) {
-  const roads = [];
-  const sidewalks = [];
+function readPlanLines(streetBlobs, streetClasses, roads, sidewalks) {
   for (const blob of streetBlobs) {
     const d = readStreets(blob.buffer);
     for (let l = 0; l < d.count; l++) {
@@ -618,6 +616,7 @@ function planFurniture(streetBlobs, streetClasses, plan) {
       if (n < 2) continue;
       const cls = streetClasses[d.klass[l]] || streetClasses[6];
       const isSidewalk = cls.profile === 'curb';
+      if (isSidewalk && !sidewalks) continue;
       if (!isSidewalk && (cls.detail || !cls.sidewalk)) continue;
       const po = d.ptOffset[l];
       const px = new Float64Array(n);
@@ -632,10 +631,22 @@ function planFurniture(streetBlobs, streetClasses, plan) {
       else roads.push({ px, py, pz, n, klass: d.klass[l], width: cls.width, sidewalk: cls.sidewalk });
     }
   }
+}
+
+function planFurniture(streetBlobs, streetClasses, plan) {
+  const roads = [];
+  const sidewalks = [];
+  readPlanLines(streetBlobs, streetClasses, roads, sidewalks);
   if (!roads.length || !sidewalks.length) return new Float32Array(0);
+  // Centrelines from the ring of cells around the group: junction arms only, so
+  // no sidewalk ribbons and nothing to place along.
+  const haloRoads = [];
+  if (plan.halo && plan.halo.length) readPlanLines(plan.halo, streetClasses, haloRoads, null);
   return planStreetFurniture({
     roads,
     sidewalks,
+    haloRoads,
+    bounds: plan.bounds,
     market: plan.market,
     commercial: plan.commercial,
     exclusions: plan.exclusions,

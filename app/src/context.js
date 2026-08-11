@@ -116,6 +116,11 @@ export async function createContext(data) {
   function loadCell(key) {
     const cached = cellData.get(key);
     if (cached && performance.now() - cached.at < TTL_MS) return Promise.resolve(cached.value);
+    // A cell the bake never wrote has nothing to say; asking for it is a 404.
+    if (!data.contextCells.has(key)) {
+      cellData.set(key, { at: performance.now(), value: null });
+      return Promise.resolve(null);
+    }
     let promise = cellPromises.get(key);
     if (promise) return promise;
     promise = fetch(tileUrl(`ctx/${key}.json`))

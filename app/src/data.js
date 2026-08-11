@@ -25,10 +25,14 @@ export async function loadCore(onProgress = () => {}) {
   onProgress(0.1);
   const [terrainBuf, landuseBuf] = await Promise.all([bin('terrain.bin'), bin('landuse.bin')]);
   onProgress(0.45);
-  const [buildings, streets, landcover] = await Promise.all([
+  const [buildings, streets, landcover, context] = await Promise.all([
     json('buildings.json'),
     json('streets.json'),
     json('landcover.json'),
+    // Only ~600 of the 1024 grid cells have a context sidecar; the rest are
+    // water or empty. Everyone who streams `ctx/<cell>.json` consults this set
+    // first, so an empty cell costs no request and logs no 404.
+    json('context.json'),
   ]);
   onProgress(0.6);
 
@@ -76,7 +80,8 @@ export async function loadCore(onProgress = () => {}) {
 
   return {
     manifest,
-    indexes: { buildings, streets, landcover },
+    indexes: { buildings, streets, landcover, context },
+    contextCells: new Set(context.cells.map((cell) => cell.key)),
     height,
     landuse,
     sampleElevation,

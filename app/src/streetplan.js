@@ -36,7 +36,14 @@ export const ANCHOR_STRIDE = 5; // piece, x, y, z, yaw
 const LAMP_SPACING = 40;
 const LAMP_INSET = 0.8; // from the kerb edge, per plan §2.2
 const SHELTER_SPACING = 250;
-const NODE_CLEAR = 9; // keep furniture out of the crosswalk/intersection box
+const NODE_CLEAR = 9; // keep furniture off the corner itself
+// Mirrors the bake (pipeline/lib/streetscape.mjs): a zebra band starts this far
+// past the intersection box and runs this far up the approach. The planner has
+// no access to the baked markings, so it reconstructs where they landed and
+// treats the painted rectangle as ground no piece may stand on.
+const ZEBRA_SETBACK = 1.2;
+const ZEBRA_BAND = 5 * 0.8 + 4 * 0.9;
+const CROSSING_REACH = 30; // beyond this no zebra can reach, whatever the class
 const SIDEWALK_PROOF = 5; // a baked sidewalk vertex must be this close
 const CLUSTER_STEP = 20;
 const CLUSTER_SPAN = 40; // ≤2 special pieces per 40 m of frontage
@@ -126,7 +133,7 @@ function lineLength(line) {
 // Intersection nodes from shared endpoints, mirroring the bake's rule: two arms
 // that leave in opposite directions are one street crossing a cell boundary,
 // not a junction.
-function collectNodes(roads) {
+export function junctionNodes(roads) {
   const buckets = new Map();
   const nodes = [];
   const at = (x, z) => {
@@ -139,7 +146,7 @@ function collectNodes(roads) {
         }
       }
     }
-    const node = { x, z, arms: [] };
+    const node = { x, z, arms: [], boxHalf: 0 };
     nodes.push(node);
     const key = `${gx}_${gz}`;
     if (!buckets.has(key)) buckets.set(key, []);
@@ -156,7 +163,9 @@ function collectNodes(roads) {
       const dz = pz[i] - pz[e];
       const len = Math.hypot(dx, dz);
       if (len < 1e-3) continue;
-      at(px[e], pz[e]).arms.push({ line, dirX: dx / len, dirZ: dz / len });
+      const node = at(px[e], pz[e]);
+      node.arms.push({ line, dirX: dx / len, dirZ: dz / len });
+      node.boxHalf = Math.max(node.boxHalf, (line.width || 0) / 2);
     }
   }
 
@@ -177,6 +186,10 @@ function collectNodes(roads) {
  * @param {object} job
  * @param {Array} job.roads      road centrelines: {px, py, pz, n, klass, width, sidewalk}
  * @param {Array} job.sidewalks  baked sidewalk ribbon centrelines: {px, py, pz, n}
+ * @param {Array} job.haloRoads  centrelines from the ring of cells around the
+ *   group, used only to complete junctions that straddle its edge — nothing is
+ *   ever placed along them
+ * @param {Array} job.bounds     [minX, minZ, maxX, maxZ] this group owns
  * @param {Float32Array} job.market      Market St segments [x0,z0,x1,z1,…]
  * @param {Float32Array} job.commercial  shopfront points [x,z,…]
  * @param {Float32Array} job.exclusions  landmark discs [x,z,r,…]
@@ -184,7 +197,22 @@ function collectNodes(roads) {
  * @returns {Float32Array} anchors, ANCHOR_STRIDE floats each
  */
 export function planStreetFurniture(job) {
-  const { roads, sidewalks, market, commercial, exclusions, limit = 4000 } = job;
+  const {
+    roads,
+    sidewalks,
+    haloRoads = [],
+    bounds = null,
+    market,
+    commercial,
+    exclusions,
+    limit = 4000,
+  } = job;
+  // A junction is only whole once every arm is in hand, and a group's blobs stop
+  // at its edge: without the neighbours' centrelines a crossing on the seam
+  // looks like a dead end, and the crosswalk box it should have protected goes
+  // unguarded. The halo is for reading junctions only — see `owns` below.
+  const owns = (x, z) =>
+    !bounds || (x >= bounds[0] && x < bounds[2] && z >= bounds[1] && z < bounds[3]);
   const out = [];
 
   // Layer 1 is the authority on where a sidewalk exists: a road whose ribbon was
@@ -232,18 +260,44 @@ export function planStreetFurniture(job) {
     return false;
   };
 
-  const nodes = collectNodes(roads);
+  const nodes = junctionNodes(haloRoads.length ? roads.concat(haloRoads) : roads);
   const nodeGrid = grid(32);
   for (const node of nodes) nodeGrid.add(node.x, node.z, node);
   const nearNode = (x, z, radius) =>
     nodeGrid.near(x, z, radius, (node) => Math.hypot(node.x - x, node.z - z) <= radius);
 
+  // Inside the intersection box, or inside the painted band of one of its
+  // crossings. The band is a rectangle across the roadway, so a piece standing
+  // on the footway beside it is clear and a piece in the parking lane is not.
+  const onCrossing = (x, z) =>
+    nodeGrid.near(x, z, CROSSING_REACH, (node) => {
+      const dx = x - node.x;
+      const dz = z - node.z;
+      const near = node.boxHalf + ZEBRA_SETBACK;
+      if (dx * dx + dz * dz <= near * near) return true;
+      for (const arm of node.arms) {
+        const along = dx * arm.dirX + dz * arm.dirZ;
+        if (along < near || along > near + ZEBRA_BAND) continue;
+        const across = Math.abs(dx * arm.dirZ - dz * arm.dirX);
+        if (across <= arm.line.width / 2) return true;
+      }
+      return false;
+    });
+
   // Everything funnels through here, so one rule set covers every piece: on a
   // real sidewalk, clear of the crosswalk box, clear of the landmarks.
-  function place(piece, x, y, z, yaw, { needSidewalk = true, clear = NODE_CLEAR } = {}) {
+  function place(
+    piece,
+    x,
+    y,
+    z,
+    yaw,
+    { needSidewalk = true, clear = NODE_CLEAR, crossing = true } = {}
+  ) {
     if (out.length / ANCHOR_STRIDE >= limit) return false;
     if (needSidewalk && !onSidewalk(x, z)) return false;
     if (clear > 0 && nearNode(x, z, clear)) return false;
+    if (crossing && onCrossing(x, z)) return false;
     if (excluded(x, z)) return false;
     out.push(piece, x, y, z, yaw);
     return true;
@@ -260,6 +314,9 @@ export function planStreetFurniture(job) {
   // Both crossing streets have to be arterial or better, one head per corner,
   // each facing the traffic it stops.
   for (const node of nodes) {
+    // Seam junctions are read by both groups but owned by one, so a signalled
+    // crossing gets one set of heads rather than two stacked sets.
+    if (!owns(node.x, node.z)) continue;
     const arms = [];
     for (const arm of node.arms) {
       if (arm.line.klass > 2 || !arm.line.sidewalk) continue;
@@ -277,7 +334,10 @@ export function planStreetFurniture(job) {
         const x = node.x + a.dirX * alongA * sa + b.dirX * alongB * sb;
         const z = node.z + a.dirZ * alongA * sa + b.dirZ * alongB * sb;
         const y = nodeElevation(node) + (a.line.sidewalk ? a.line.sidewalk.curb : 0);
-        if (place(P.traffic_signal, x, y, z, facing(-a.dirX * sa, -a.dirZ * sa), { clear: 0 })) heads++;
+        // A signal head belongs on the corner it controls: the crossing test is
+        // the one rule it is exempt from.
+        const opts = { clear: 0, crossing: false };
+        if (place(P.traffic_signal, x, y, z, facing(-a.dirX * sa, -a.dirZ * sa), opts)) heads++;
       }
     }
   }
@@ -332,7 +392,7 @@ export function planStreetFurniture(job) {
         const nx = tz * side;
         const nz = -tx * side;
         const reachH = halfW + Math.min(0.9, sw.width * 0.32);
-        place(P.hydrant, x + nx * reachH, y + sw.curb, z + nz * reachH, facing(-nx, -nz), { clear: 7 });
+        place(P.hydrant, x + nx * reachH, y + sw.curb, z + nz * reachH, facing(-nx, -nz));
       });
     }
 
@@ -416,8 +476,8 @@ export function planStreetFurniture(job) {
       const pz = z + nz * off;
       const yaw = facing(-nx, -nz);
       const y0 = y + sw.curb;
-      if (roll < 0.26) place(P.trashcan, px, y0, pz, yaw, { clear: 7 });
-      else if (roll < 0.36 && road.klass <= 3) place(P.mailbox, px, y0, pz, yaw, { clear: 7 });
+      if (roll < 0.26) place(P.trashcan, px, y0, pz, yaw);
+      else if (roll < 0.36 && road.klass <= 3) place(P.mailbox, px, y0, pz, yaw);
       else if (roll < 0.5 && sw.width >= 4) {
         // Benches and planters read as a designed pair on the wide footways.
         const along = 1.6;
