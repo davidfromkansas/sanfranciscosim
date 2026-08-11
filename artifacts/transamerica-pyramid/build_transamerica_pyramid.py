@@ -54,6 +54,8 @@ WIN_COLS = 15  # window channels per face (abstracting ~22 real columns)
 WIN_PITCH = 2.9
 WIN_WIDE = 1.8
 WIN_DEEP = 0.45
+FLOOR_H = 3.66  # 48 occupied floors between H_BAND and the mechanical band
+SPANDREL = 1.2  # pale precast panel between two stacked panes
 
 WING_Z0 = 120.0  # 29th floor
 WING_Z1 = 186.0  # just below the 49th
@@ -291,6 +293,35 @@ def window_columns(face):
     return cols
 
 
+def floor_rows(z0, z1):
+    """Split [z0, z1] into (za, zb, material) panes and spandrels on the grid.
+
+    Material 1 is glass, 0 is the trim-coloured spandrel band centred on each
+    floor line. Rows shorter than 12 cm are dropped so the export stays clean.
+    """
+    cuts = [z0]
+    k = math.ceil((z0 - H_BAND) / FLOOR_H)
+    while True:
+        line = H_BAND + k * FLOOR_H
+        lo, hi = line - SPANDREL / 2, line + SPANDREL / 2
+        if lo >= z1:
+            break
+        if lo > z0:
+            cuts.append(lo)
+        if hi < z1:
+            cuts.append(hi)
+        k += 1
+    cuts.append(z1)
+    rows = []
+    for a, b in zip(cuts, cuts[1:]):
+        if b - a < 0.12:
+            continue
+        mid = (a + b) / 2.0
+        on_line = abs((mid - H_BAND) / FLOOR_H - round((mid - H_BAND) / FLOOR_H))
+        rows.append((a, b, 0 if on_line * FLOOR_H < SPANDREL / 2 else 1))
+    return rows
+
+
 def build_facade(face, trim, glass):
     """One pyramid face: recessed vertical window channels between flat piers.
 
@@ -352,11 +383,16 @@ def build_facade(face, trim, glass):
                 fmats.append(0)
             else:
                 out = -WIN_DEEP
-                # recessed glass
+                # The channel is tiled into individual panes: at every floor
+                # line a pale spandrel panel crosses it, so the face reads as a
+                # window grid rather than one continuous stripe.
+                for za, zb, mat in floor_rows(z0, z1):
+                    p0, p1 = V(ua, za, out), V(ub, za, out)
+                    p2, p3 = V(ub, zb, out), V(ua, zb, out)
+                    faces.append((p0, p1, p2, p3))
+                    fmats.append(mat)
                 g0, g1 = V(ua, z0, out), V(ub, z0, out)
                 g2, g3 = V(ub, z1, out), V(ua, z1, out)
-                faces.append((g0, g1, g2, g3))
-                fmats.append(1)
                 # jambs
                 s0, s1 = V(ua, z0, 0.0), V(ua, z1, 0.0)
                 faces.append((s0, s1, g3, g0))

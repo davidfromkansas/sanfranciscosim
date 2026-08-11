@@ -22,10 +22,10 @@ were rendered from that re-imported GLB, not from the authoring scene.
 
 | Check | Result | Re-imported result |
 |---|---:|---|
-| Binary GLB, self-contained | PASS | One 456 KB `.glb`; no external dependencies |
+| Binary GLB, self-contained | PASS | One 743 KB `.glb`; no external dependencies |
 | Real metre dimensions | PASS | 60.8376 × 60.8376 × 260.0000 m axis-aligned bounding box; 53.3 m shell width across its rotated faces |
 | Origin/base | PASS | bbox min `[-30.4188, -30.4188, 0.0000]`; XY centre `[0.0000, 0.0000]` |
-| Triangle budget | PASS | 8,142 / 24,000 triangles |
+| Triangle budget | PASS | 14,026 / 24,000 triangles |
 | Applied transforms | PASS | all 70 mesh objects at zero location/rotation, scale 1 |
 | Negative scales | PASS | none |
 | Normals | PASS | finite/unit loop normals; 12/12 targeted exterior pier probes hit outward faces, 0 flipped |
@@ -43,7 +43,7 @@ facade piers from outside and all pass.
 ## Geometry and materials
 
 - Objects: 70 mesh objects
-- Triangles: 8,142
+- Triangles: 14,026
 - Dimensions: `[60.8376, 60.8376, 260.0]` m
 - Bbox min/max: `[-30.4188, -30.4188, 0.0]` / `[30.4188, 30.4188, 260.0]`
 - Minimum Z: `0.0` m
@@ -60,8 +60,9 @@ app's night pass.
 The model follows the §22 miniature conversion sequence:
 
 - massing is one confident 260 m, four-sided pyramid plus the narrower spire;
-- thirteen-to-fifteen readable vertical channels replace hundreds of individual
-  windows while preserving the triangular cutoff pattern and wide blank corners;
+- fifteen recessed window channels per face are tiled into individual panes by a
+  pale precast spandrel on every 3.66 m floor line, giving a real window grid
+  while preserving the triangular cutoff pattern and wide blank corners;
 - the east and west wings retain their verified floor-29-to-crown extents and
   vertical outer faces, making them triangular in profile;
 - five chunky chevron bays per face ground the tower over a recessed lobby;
@@ -108,7 +109,7 @@ confirmed as 260 m by CTBUH, OSM, Wikidata and multiple institutional sources.
     60.8376,
     260.0
   ],
-  "tris": 8142
+  "tris": 14026
 }
 ```
 
