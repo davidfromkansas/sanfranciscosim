@@ -6,7 +6,7 @@
   "cols": 32,
   "rows": 32
  },
- "generated": "2026-08-11T20:14:13.035Z",
+ "generated": "2026-08-11T22:09:11.791Z",
  "dev": null,
  "palette": [
   {
@@ -332,17 +332,17 @@
   }
  ],
  "stats": {
-  "baseBuildings": 171472,
-  "records": 226563,
-  "pitched": 146501,
-  "garnish": 55091,
+  "baseBuildings": 171450,
+  "records": 226531,
+  "pitched": 146491,
+  "garnish": 55081,
   "helipads": 6,
   "tallest": 200,
-  "trees": 282254,
+  "trees": 282252,
   "bytes": {
-   "buildings": 11997880,
+   "buildings": 11996058,
    "streets": 8576096,
-   "landcover": 11879096
+   "landcover": 11879080
   }
  },
  "cells": [
@@ -1900,8 +1900,8 @@
    "cz": 17,
    "originX": 500,
    "originZ": 500,
-   "buildings": 627,
-   "bytes": 33940
+   "buildings": 595,
+   "bytes": 32118
   },
   {
    "key": "17_18",
@@ -11423,8 +11423,8 @@
    "originX": 500,
    "originZ": 500,
    "triangles": 307,
-   "trees": 88,
-   "bytes": 5028
+   "trees": 86,
+   "bytes": 5012
   },
   {
    "key": "17_18",
