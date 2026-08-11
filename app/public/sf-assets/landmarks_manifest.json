@@ -53,5 +53,23 @@
       74.7
     ],
     "tris": 12392
+  },
+  {
+    "id": "transamerica",
+    "file": "transamerica-pyramid.glb",
+    "anchor": [
+      -122.4027858,
+      37.7951663
+    ],
+    "targetHeightM": 260,
+    "cat": 3,
+    "name": "Transamerica Pyramid",
+    "estimated": false,
+    "dims": [
+      60.8376,
+      60.8376,
+      260
+    ],
+    "tris": 14026
   }
 ]
