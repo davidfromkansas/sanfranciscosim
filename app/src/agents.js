@@ -756,7 +756,6 @@ export function createAgents(scene, data, city) {
   // ------------------------------------------------------------------ flags ---
   const flags = [];
   const flagSpots = [
-    { id: 'cityHall', height: 99, colors: ['#c8332c', '#f0ece2'] },
     // Anchor and mast foot come from the Ferry Building GLB, not the landmark
     // registry: the asset stands on its surveyed centre ~20 m east of the
     // registry point, and its pole steps out of the crown dome at 73.5 m.
