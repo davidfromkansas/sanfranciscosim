@@ -22,6 +22,14 @@ code, tile data, GLB or app code has been changed by this plan.
 
 **In one sentence:** a 381 ha forested headland in the city's north-west corner, dark with cypress and eucalyptus, dotted with white red-roofed military buildings, and physically continuous with the Golden Gate Bridge approach.
 
+> **This is the recommended first park.** It exercises nearly every shared engine
+> item at once — the forest reclassification (§E4), the missing `wetland` branch
+> (§E2), cypress and eucalyptus (§E3/§E8), 70% bluff grades (§E6) and the bridge
+> seam — so whatever the engine cannot yet do, the Presidio will find. The
+> trade-off is that it is also the slowest park to a first visible result. Land
+> the flora kit ([`../../asset-plans/flora-kit.md`](../../asset-plans/flora-kit.md))
+> first: it changes nothing visually on its own and de-risks everything after it.
+
 ---
 
 ## Part 1 — Task prompt (copy this into a fresh session)
