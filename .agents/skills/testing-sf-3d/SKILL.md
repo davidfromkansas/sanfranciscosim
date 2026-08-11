@@ -487,6 +487,46 @@ Everything below was measured on the local dev server; it generalises to any man
 - Observed budget headroom with the landmark loaded: **peak 94 draw calls** at the Coit close view and 88
   downtown at street level, at ~1.5–3 rendered fps (SwiftShader; quote cadence, never the overlay fps).
 
+### Layer 2 — GLB street furniture kit (`streetkit`)
+
+- Live pieces are `InstancedMesh` pairs under the scene object `streetkit`, named
+  `streetkit-<id>` (body) and `streetkit-<id>-glow`. `SF.city.stats.furniture` counts instances,
+  `.furnitureDraws` counts the kit's visible draw calls (expect ≤ 20 at street level, 16-18 typical).
+  Furniture rides the same near-tier as ground detail, so it is 0 at the hero view — fly to street
+  level (d ≈ 200) and wait 30-60 s before reading anything.
+- World position of instance *i*: `mesh.instanceMatrix.array[i*16 + 12/13/14]` (x/y/z). Geometry
+  bounding boxes of the procedural `lamps-<gx>_<gz>` groups are degenerate — decode their instance
+  matrices instead of trusting `boundingBox`.
+- **There is no `SF.data`** and no `sampleElevation` on the debug API. To judge "floating/sunk",
+  traverse meshes that have a `aKind` attribute (`ground-*`), keep vertices with `aKind === 65`
+  (sidewalk top), add the mesh's world offset, and compare each piece's y to the nearest sidewalk
+  vertex within ~6 m. Healthy: median |Δ| ≈ 0.0 m; ±0.5 m outliers on steep blocks are slope over
+  the 2-3 m horizontal gap, not a defect.
+- **Crossing/intersection safety** (`app/src/streetplan.js`): reconstruct `junctionNodes()` in the
+  console from `SF.city.paths` — bucket endpoints on a 4 m grid, merge within 1.5 m, take the arm
+  direction from point index 3 (not 1), and keep a node only if some arm pair has `|dot| < 0.9`.
+  Then replicate `onCrossing`: inside `boxHalf + 1.2` of the node, or `along` within
+  `[boxHalf+1.2, boxHalf+1.2+7.6]` of an arm with `|across| <= arm.width/2`. Traffic signals are
+  exempt (`crossing: false`) and legitimately stand inside the box. **Caveat:** `SF.city.paths`
+  only contains `klass <= 2` roads, so the runtime sweep covers arterial-grade junctions only —
+  say so, and corroborate all classes offline with
+  `node pipeline/probe-streetkit.mjs <cell> [--halo=<neighbours>]`.
+- Signals: cluster by nearest reconstructed junction node, not by a fixed radius. A 12 m radius
+  chains adjacent corners of neighbouring downtown junctions into fake clusters of 6-7; per-node
+  assignment gives the real ≤ 4 heads. Also scan for near-coincident duplicates (pairs < 1 m apart)
+  — group-seam double placement shows up there and nowhere else.
+- Context pieces: `sl_pathofgold` must be ≤ 22 m from a Market centreline segment. The segments are
+  easiest to read offline from `app/public/tiles/ctx/*.json` (`s[].n === 'MARKET ST'`, flat `p`
+  array) — dump the live instance coords from the console and score them in Node.
+- Context cells: `tiles/context.json` lists the ~600 cells that actually have a `ctx/<cell>.json`
+  sidecar; both `context.js` and `streetkit.js` consult it before fetching. If you see
+  `tiles/ctx/*.json` 404s again, that index is the thing that broke. Prove absence of 404s with the
+  DevTools Network panel filter `status-code:404` after a cache-busted cold load — it reports
+  "0 / N requests", which is much stronger evidence than reading the console.
+- Prod alias flips: other sessions deploy to the same Vercel project. Check
+  `curl -s https://sf-3d.vercel.app/ | grep -o 'index-[A-Za-z0-9_-]*\.js'` before AND after each
+  measurement block, and fall back to the immutable per-deployment URL if it changes.
+
 #### Devin Secrets Needed
 None — the app is static and requires no keys for QA.
 
