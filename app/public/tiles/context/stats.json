@@ -1,13 +1,13 @@
 {
- "generated": "2026-08-11T22:45:48.856Z",
- "buildings": 171461,
+ "generated": "2026-08-11T22:52:27.141Z",
+ "buildings": 171458,
  "cells": 547,
  "categories": [
   {
    "cat": 0,
    "id": "misc",
    "label": "Building",
-   "count": 10155,
+   "count": 10153,
    "night": 3
   },
   {
@@ -63,7 +63,7 @@
    "cat": 8,
    "id": "worship",
    "label": "Place of worship",
-   "count": 622,
+   "count": 621,
    "night": 3
   },
   {
@@ -245,7 +245,7 @@
   {
    "sub": "church",
    "label": "Church",
-   "count": 559
+   "count": 558
   },
   {
    "sub": "cafe",
@@ -649,17 +649,17 @@
   }
  ],
  "sources": {
-  "landuse": 140189,
+  "landuse": 140187,
   "business": 10183,
   "heuristic": 4946,
   "datasf": 1254,
   "overture": 6585,
-  "osm": 8304
+  "osm": 8303
  },
  "confidence": [
-  145135,
+  145133,
   15230,
-  4178,
+  4177,
   6918
  ],
  "streets": {
