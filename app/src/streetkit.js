@@ -41,7 +41,7 @@ const MAX_SLOPE = 0.4; // m of terrain relief across a piece's footprint
 const SHOP_CATEGORIES = new Set([4, 5, 6, 7, 15, 16, 17, 22, 24]);
 // Worst case per group, so a dense downtown group cannot blow the instance
 // budget on its own.
-const GROUP_LIMIT = 1500;
+const GROUP_LIMIT = 2400;
 const CAPACITY = {
   sl_standard: 3000,
   sl_pathofgold: 400,

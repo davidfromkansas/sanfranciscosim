@@ -307,7 +307,8 @@ export function planStreetFurniture(job) {
     });
   }
 
-  // Everything else, in a second pass over the same roads: the lamp rhythm is
+  // Then the pieces that carry meaning: hydrants, shelters and the shopfront
+  // clusters. The lamp rhythm is
   // what a viewer reads as "this street is finished", so it is laid down for
   // every road before any street gets its clutter.
   for (const road of roads) {
@@ -351,27 +352,6 @@ export function planStreetFurniture(job) {
       });
     }
 
-    // ------------------------------------- everyday street-corner pieces ---
-    walk(road, 60, 22 + hash(road.px[0], road.pz[0], 53) * 40, (x, y, z, tx, tz) => {
-      const roll = hash(x, z, 59);
-      const side = hash(x, z, 61) < 0.5 ? 1 : -1;
-      const nx = tz * side;
-      const nz = -tx * side;
-      const off = halfW + Math.min(1.0, sw.width * 0.34);
-      const px = x + nx * off;
-      const pz = z + nz * off;
-      const yaw = facing(-nx, -nz);
-      const y0 = y + sw.curb;
-      if (roll < 0.26) place(P.trashcan, px, y0, pz, yaw, { clear: 7 });
-      else if (roll < 0.36 && road.klass <= 3) place(P.mailbox, px, y0, pz, yaw, { clear: 7 });
-      else if (roll < 0.5 && sw.width >= 4) {
-        // Benches and planters read as a designed pair on the wide footways.
-        const along = 1.6;
-        place(P.bench, px + tx * along, y0, pz + tz * along, yaw);
-        place(P.planter, px - tx * along, y0, pz - tz * along, yaw);
-      }
-    });
-
     // ------------------------------------------- commercial frontage ---
     // Clusters, not scatter: a stretch that scores as a shopping street gets a
     // small designed group, then 40 m of quiet before the next one.
@@ -393,13 +373,13 @@ export function planStreetFurniture(job) {
       const y0 = y + sw.curb;
       const roll = hash(x, z, 73);
       let placed = 0;
-      if (sw.width >= 4 && roll < 0.34) {
+      if (roll < 0.34) {
         placed += place(P.cafe_set, cx + tx * 2.2, y0, cz + tz * 2.2, yaw) ? 1 : 0;
         placed += place(P.newsboxes, cx - tx * 3.4, y0, cz - tz * 3.4, yaw) ? 1 : 0;
       } else if (sw.width >= 4 && roll < 0.52) {
         placed += place(P.market_stall, cx, y0, cz, yaw) ? 1 : 0;
         placed += place(P.bikerack, cx - tx * 4.2, y0, cz - tz * 4.2, yaw) ? 1 : 0;
-      } else if (roll < 0.68 && shopScore(cx, cz) >= 5) {
+      } else if (roll < 0.68 && shopScore(cx, cz) >= 4) {
         placed += place(P.bikerack, cx, y0, cz, yaw) ? 1 : 0;
         placed += place(P.newsboxes, cx - tx * 3.2, y0, cz - tz * 3.2, yaw) ? 1 : 0;
       } else if (roll >= 0.74 && road.klass >= 3) {
@@ -415,6 +395,37 @@ export function planStreetFurniture(job) {
       }
       if (placed) cooldown = CLUSTER_SPAN + (placed > 1 ? CLUSTER_SPAN : 0);
     });
+  }
+
+  // Last, the everyday clutter. It is the least meaningful furniture on the
+  // street, so it is also the first thing a group at its instance cap drops.
+  for (const road of roads) {
+    const sw = road.sidewalk;
+    if (!sw) continue;
+    const halfW = road.width / 2;
+    if (lineLength(road) < 12) continue;
+
+    // ------------------------------------- everyday street-corner pieces ---
+    walk(road, 60, 22 + hash(road.px[0], road.pz[0], 53) * 40, (x, y, z, tx, tz) => {
+      const roll = hash(x, z, 59);
+      const side = hash(x, z, 61) < 0.5 ? 1 : -1;
+      const nx = tz * side;
+      const nz = -tx * side;
+      const off = halfW + Math.min(1.0, sw.width * 0.34);
+      const px = x + nx * off;
+      const pz = z + nz * off;
+      const yaw = facing(-nx, -nz);
+      const y0 = y + sw.curb;
+      if (roll < 0.26) place(P.trashcan, px, y0, pz, yaw, { clear: 7 });
+      else if (roll < 0.36 && road.klass <= 3) place(P.mailbox, px, y0, pz, yaw, { clear: 7 });
+      else if (roll < 0.5 && sw.width >= 4) {
+        // Benches and planters read as a designed pair on the wide footways.
+        const along = 1.6;
+        place(P.bench, px + tx * along, y0, pz + tz * along, yaw);
+        place(P.planter, px - tx * along, y0, pz - tz * along, yaw);
+      }
+    });
+
   }
 
   return new Float32Array(out);
