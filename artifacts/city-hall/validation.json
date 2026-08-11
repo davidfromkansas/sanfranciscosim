@@ -3,9 +3,9 @@
   "validator": "Blender 4.5.3 LTS",
   "fresh_isolated_scene": true,
   "reimported_final_glb": true,
-  "object_count": 8,
-  "mesh_object_count": 8,
-  "triangle_count": 17440,
+  "object_count": 10,
+  "mesh_object_count": 10,
+  "triangle_count": 20808,
   "triangle_budget": 27000,
   "dimensions_m": [
     122.9836,
@@ -31,11 +31,13 @@
     "Toy_cream",
     "Toy_glass",
     "Toy_gold",
+    "Toy_gold_Glow",
     "Toy_roofc",
     "Toy_roofd",
     "Toy_sand",
     "Toy_stone",
-    "Toy_trim"
+    "Toy_trim",
+    "Toy_white_Glow"
   ],
   "material_details": [
     {
@@ -63,6 +65,15 @@
       "alpha": 1.0,
       "roughness": 0.84,
       "glow": false,
+      "exported_emission_strength": 0.0
+    },
+    {
+      "name": "Toy_gold_Glow",
+      "contract_compliant": true,
+      "image_texture_nodes": [],
+      "alpha": 1.0,
+      "roughness": 0.84,
+      "glow": true,
       "exported_emission_strength": 0.0
     },
     {
@@ -109,6 +120,15 @@
       "roughness": 0.84,
       "glow": false,
       "exported_emission_strength": 0.0
+    },
+    {
+      "name": "Toy_white_Glow",
+      "contract_compliant": true,
+      "image_texture_nodes": [],
+      "alpha": 1.0,
+      "roughness": 0.84,
+      "glow": true,
+      "exported_emission_strength": 0.0
     }
   ],
   "image_texture_count": 0,
@@ -123,7 +143,7 @@
   "negative_scales": false,
   "degenerate_triangle_count": 0,
   "invalid_or_nonunit_loop_normal_count": 0,
-  "normal_ray_cast_first_hits": 4866,
+  "normal_ray_cast_first_hits": 4868,
   "normal_ray_cast_flipped_visible_faces": 0,
   "normal_ray_cast_flipped_by_object": {},
   "normal_ray_cast_tolerance": 37,
@@ -175,6 +195,25 @@
     {
       "name": "CityHall_gold",
       "triangles": 2520,
+      "location": [
+        0.0,
+        0.0,
+        0.0
+      ],
+      "rotation_euler": [
+        0.0,
+        0.0,
+        0.0
+      ],
+      "scale": [
+        1.0,
+        1.0,
+        1.0
+      ]
+    },
+    {
+      "name": "CityHall_gold_Glow",
+      "triangles": 3324,
       "location": [
         0.0,
         0.0,
@@ -270,6 +309,25 @@
     {
       "name": "CityHall_trim",
       "triangles": 6920,
+      "location": [
+        0.0,
+        0.0,
+        0.0
+      ],
+      "rotation_euler": [
+        0.0,
+        0.0,
+        0.0
+      ],
+      "scale": [
+        1.0,
+        1.0,
+        1.0
+      ]
+    },
+    {
+      "name": "CityHall_white_Glow",
+      "triangles": 44,
       "location": [
         0.0,
         0.0,

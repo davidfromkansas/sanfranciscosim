@@ -43,6 +43,11 @@ PALETTE = {
     "Toy_roofd": (0.0595, 0.0595, 0.0685),
     "Toy_roofc": (0.2470, 0.3916, 0.3813),
     "Toy_gold": (0.5906, 0.3813, 0.0685),
+    # Night surfaces. The loader splits every `_Glow` material into a second,
+    # unlit mesh whose opacity is driven by the city's `uNight` ramp, so these
+    # sit at 12% by day and ignite once the sun is 10 degrees under.
+    "Toy_gold_Glow": (1.0000, 0.6585, 0.2503),
+    "Toy_white_Glow": (0.9300, 0.9047, 0.8389),
 }
 MATS = {}
 
@@ -57,6 +62,9 @@ def material(name):
     bsdf.inputs["Base Color"].default_value = (*rgb, 1.0)
     bsdf.inputs["Roughness"].default_value = 0.84
     bsdf.inputs["Metallic"].default_value = 0.2 if name == "Toy_gold" else 0.0
+    if name.endswith("_Glow"):
+        bsdf.inputs["Emission Color"].default_value = (*rgb, 1.0)
+        bsdf.inputs["Emission Strength"].default_value = 0.0
     mat.diffuse_color = (*[c ** (1 / 2.2) for c in rgb], 1.0)
     mat.roughness = 0.84
     MATS[name] = mat
@@ -146,6 +154,24 @@ def add_column(name, loc, height, radius, capital=True):
         add_box(name + "_capital", (loc[0], loc[1], loc[2] + height - 0.5), (radius * 2.9, radius * 2.9, 1.0), "Toy_trim")
 
 
+# ----------------------------------------------------------------------------- night
+
+
+def lit_pane_x(name, x_face, sign, y, z, width, height):
+    """Warm pane standing just proud of an east/west window's glass."""
+    add_box(name, (x_face + sign * 0.62, y, z), (0.42, width, height), "Toy_gold_Glow")
+
+
+def lit_pane_y(name, x, y_face, sign, z, width, height):
+    add_box(name, (x, y_face + sign * 0.62, z), (width, 0.42, height), "Toy_gold_Glow")
+
+
+def occupied(i):
+    """Deterministic dark-room pattern: a fully lit facade reads as a lantern,
+    not as a building people work in."""
+    return i % 5 != 3
+
+
 # --------------------------------------------------------------------------- massing
 
 
@@ -224,6 +250,9 @@ def add_long_facade(side, sign):
         add_box(f"{side}_order_sill_{i}", (x_wall + face, yw, 11.5), (1.0, 4.4, 0.5), "Toy_trim")
         add_box(f"{side}_base_window_{i}", (x_wall + 1.6 * face, yw, 4.6), (0.9, 2.8, 3.4), "Toy_glass")
         add_box(f"{side}_attic_window_{i}", (x_wall + face, yw, 29.2), (0.8, 2.6, 1.9), "Toy_glass")
+        if occupied(i):
+            lit_pane_x(f"{side}_order_lit_{i}", x_wall, sign, yw, 17.4, 2.2, 7.9)
+            lit_pane_x(f"{side}_base_lit_{i}", x_wall, sign, yw, 4.6, 1.8, 2.3)
 
     # Corner pavilion faces get their own bay group and a small crowning pediment.
     for sy in (-1, 1):
@@ -232,6 +261,7 @@ def add_long_facade(side, sign):
             y = sy * (HY - 7.0) + dy
             add_box(f"{side}_pav_window_{sy}_{k}", (px, y, 17.4), (0.9, 3.2, 10.4), "Toy_glass")
             add_box(f"{side}_pav_base_window_{sy}_{k}", (px + 0.6 * sign, y, 4.6), (0.9, 2.6, 3.4), "Toy_glass")
+            lit_pane_x(f"{side}_pav_lit_{sy}_{k}", px, sign, y, 17.4, 2.1, 7.4)
             add_box(f"{side}_pav_column_{sy}_{k}", (px + 0.5 * sign, y - 3.0, (BASE_TOP + ORDER_TOP) / 2),
                     (1.6, 1.6, ORDER_TOP - BASE_TOP), "Toy_trim")
         add_pediment(f"{side}_pav_pediment_{sy}", (sign * (HX - 6.0), sy * (HY - 7.0), ENTAB_TOP + 1.7),
@@ -251,6 +281,8 @@ def add_portico(side, sign, half_width, projection, columns, portal_span):
     for i, y in enumerate(portal_span):
         add_box(f"{side}_portal_{i}", (front, y, 4.6), (1.0, 4.6, 6.4), "Toy_glass")
         add_box(f"{side}_portal_arch_{i}", (front - sign * 0.1, y, 8.1), (1.3, 5.4, 0.9), "Toy_gold")
+        # The ceremonial doors are the brightest thing at street level.
+        lit_pane_x(f"{side}_portal_lit_{i}", front, sign, y, 4.4, 3.2, 4.6)
 
     # Antae (solid end piers) frame the colonnade; wall behind is recessed.
     for sy in (-1, 1):
@@ -269,6 +301,7 @@ def add_portico(side, sign, half_width, projection, columns, portal_span):
     # Tall glazed bays on the recessed wall, read between the columns.
     for i, y in enumerate(portal_span):
         add_box(f"{side}_tall_window_{i}", (sign * (HX + 0.35), y, 17.6), (0.9, 4.8, 12.4), "Toy_glass")
+        lit_pane_x(f"{side}_tall_lit_{i}", sign * (HX + 0.35), sign, y, 17.6, 3.4, 9.2)
     add_box(f"{side}_gold_frieze", (sign * (HX + 0.35), 0, 24.6), (0.9, 2 * half_width - 8.0, 0.9), "Toy_gold")
 
 
@@ -287,6 +320,9 @@ def add_short_facade(side, sign):
         add_box(f"{side}_order_sill_{i}", (xw, y_wall + face, 11.5), (4.4, 1.0, 0.5), "Toy_trim")
         add_box(f"{side}_base_window_{i}", (xw, y_wall + 1.6 * face, 4.6), (2.8, 0.9, 3.4), "Toy_glass")
         add_box(f"{side}_attic_window_{i}", (xw, y_wall + face, 29.2), (2.6, 0.8, 1.9), "Toy_glass")
+        if occupied(i):
+            lit_pane_y(f"{side}_order_lit_{i}", xw, y_wall, sign, 17.4, 2.2, 7.9)
+            lit_pane_y(f"{side}_base_lit_{i}", xw, y_wall, sign, 4.6, 1.8, 2.3)
 
     py = sign * (HY + 2.6)
     add_box(f"{side}_center_mass", (0, sign * (HY + 1.3), (0.6 + ENTAB_TOP) / 2), (30.0, 2.6, ENTAB_TOP - 0.6), "Toy_cream", 0.35)
@@ -295,6 +331,8 @@ def add_short_facade(side, sign):
     for i, x in enumerate((-7.4, 0.0, 7.4)):
         add_box(f"{side}_center_window_{i}", (x, py - sign * 1.4, 17.4), (3.8, 1.0, 11.0), "Toy_glass")
         add_box(f"{side}_center_door_{i}", (x, py - sign * 1.4, 4.9), (3.4, 1.0, 5.6), "Toy_glass")
+        lit_pane_y(f"{side}_center_lit_{i}", x, py - sign * 1.4, sign, 17.4, 2.6, 8.0)
+        lit_pane_y(f"{side}_center_door_lit_{i}", x, py - sign * 1.4, sign, 4.9, 2.3, 4.0)
     add_box(f"{side}_center_entablature", (0, py - sign * 1.0, (ORDER_TOP + ENTAB_TOP) / 2 + 0.3),
             (31.0, 3.4, ENTAB_TOP - ORDER_TOP + 1.4), "Toy_trim", 0.22)
     add_pediment(f"{side}_center_pediment", (0, py - sign * 1.2, ENTAB_TOP + 1.2), 31.0, 4.4, 5.4, False)
@@ -346,6 +384,14 @@ def add_dome():
         window.rotation_euler.z = a
         bpy.ops.object.transform_apply(location=False, rotation=False, scale=True)
         finish_object(window, "Toy_glass")
+        # The rotunda burns behind the drum colonnade all night.
+        bpy.ops.mesh.primitive_cube_add(location=(17.1 * math.cos(a), 17.1 * math.sin(a), 53.4))
+        lit = bpy.context.object
+        lit.name = f"drum_window_lit_{i}"
+        lit.dimensions = (0.5, 3.0, 6.8)
+        lit.rotation_euler.z = a
+        bpy.ops.object.transform_apply(location=False, rotation=False, scale=True)
+        finish_object(lit, "Toy_gold_Glow")
         for offset in (-1, 1):
             ca = a + offset * math.pi / 16 * 0.62
             add_cylinder(f"drum_column_{i}_{offset}", (17.1 * math.cos(ca), 17.1 * math.sin(ca), 53.4),
@@ -385,10 +431,31 @@ def add_dome():
         bpy.context.collection.objects.link(obj)
         curve.materials.append(material("Toy_gold"))
         obj.rotation_euler.z = ROT
+
+        # A second, fractionally fatter rib in the night material sheathes the
+        # gilded one: by day it is a 12% wash over the gold, after dusk it is
+        # the floodlit gilding itself, so the dome keeps its shape against a
+        # dark sky instead of reading as a black hole.
+        halo = bpy.data.curves.new(f"dome_rib_lit_{i}_curve", "CURVE")
+        halo.dimensions = "3D"
+        halo.resolution_u = 1
+        halo.bevel_depth = 0.33
+        halo.bevel_resolution = 0
+        spline = halo.splines.new("POLY")
+        spline.points.add(len(profile) - 1)
+        for point, (radius, z) in zip(spline.points, profile):
+            point.co = ((radius + 0.12) * math.cos(a), (radius + 0.12) * math.sin(a), z, 1.0)
+        lit = bpy.data.objects.new(f"dome_rib_lit_{i}", halo)
+        bpy.context.collection.objects.link(lit)
+        halo.materials.append(material("Toy_gold_Glow"))
+        lit.rotation_euler.z = ROT
     add_cylinder("dome_gold_ring", (0, 0, 63.4), 16.3, 1.2, "Toy_gold", 32)
+    add_cylinder("dome_gold_ring_lit", (0, 0, 63.4), 16.42, 1.34, "Toy_gold_Glow", 32)
     for i in range(8):
         a = 2 * math.pi * i / 8 + math.pi / 8
         add_sphere(f"dome_medallion_{i}", (13.9 * math.cos(a), 13.9 * math.sin(a), 71.0), (1.0, 1.0, 1.3), "Toy_gold")
+        add_sphere(f"dome_medallion_lit_{i}", (13.9 * math.cos(a), 13.9 * math.sin(a), 71.0),
+                   (1.12, 1.12, 1.44), "Toy_gold_Glow")
 
     # Tiered open lantern with a dark spire cap and gold finial.
     add_cylinder("lantern_balcony", (0, 0, 82.3), 4.6, 1.1, "Toy_gold", 16, 0.12)
@@ -397,6 +464,8 @@ def add_dome():
         a = 2 * math.pi * i / 8
         add_cylinder(f"lantern_column_{i}", (3.1 * math.cos(a), 3.1 * math.sin(a), 86.4), 0.34, 5.6, "Toy_gold", 6)
     add_cylinder("lantern_core", (0, 0, 86.4), 2.1, 5.4, "Toy_glass", 12)
+    # The lantern is the beacon: the one cool-white light on the whole model.
+    add_cylinder("lantern_core_lit", (0, 0, 86.4), 2.22, 5.0, "Toy_white_Glow", 12)
     add_cylinder("lantern_cornice", (0, 0, 89.5), 3.9, 0.9, "Toy_gold", 16, 0.12)
     add_frustum("lantern_spire", (0, 0, 91.2), (4.4, 4.4), (0.9, 0.9), 2.6, "Toy_roofd", 0.15)
     add_cylinder("finial", (0, 0, 92.9), 0.22, 1.4, "Toy_gold", 6)
