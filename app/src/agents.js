@@ -769,7 +769,6 @@ export function createAgents(scene, data, city) {
     },
     { id: 'oraclePark', height: 52, colors: ['#e07a1f', '#2b2b2b'] },
     { id: 'fishermansWharf', height: 20, colors: ['#c8332c', '#f0ece2'] },
-    { id: 'paintedLadies', height: 20, colors: ['#2f6b4f', '#f0ece2'] },
   ];
   const US_COLORS = ['#b22234', '#f0ece2', '#25406b'];
   for (const spot of flagSpots) {
