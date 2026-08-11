@@ -17,6 +17,7 @@ import {
 import { ringArea, ringBBox, ringCentroid } from './lib/poly.mjs';
 import { loadHeightmap } from './lib/heightmap.mjs';
 import { writeLandcoverBlob } from './lib/binio.mjs';
+import { loadTreeBlockers } from './lib/treeblockers.mjs';
 import { NAMED_PARKS } from './lib/landmarks.mjs';
 import { LAND_KINDS } from './lib/classes.mjs';
 
@@ -30,6 +31,13 @@ const TREE_AREA_TREES = 90;
 const TREE_AREA_PARK = 200;
 
 const { sampleElevation } = await loadHeightmap();
+// Trees may not stand in a building, on a roadway or in water; OSM landcover
+// polygons contain all three.
+const { blocked: treeBlocked, stats: blockerStats } = await loadTreeBlockers({ sampleElevation });
+console.log(
+  `tree blockers: ${blockerStats.footprints} footprints, ${blockerStats.segments} street segments ` +
+    `on a ${blockerStats.res} m grid (${blockerStats.cols}x${blockerStats.rows})`
+);
 
 function classify(tags) {
   if (!tags) return null;
@@ -265,6 +273,7 @@ function scatterTrees(kind, outer, holes, area, seedBase) {
       }
     }
     if (inHole) continue;
+    if (treeBlocked(x, z)) continue;
     const cell = cellFor(x, z);
     if (!cell) continue;
     cell.trees.push(x, sampleElevation(x, z), z, Math.floor(hash01(seedBase + i * 7) * 3));
