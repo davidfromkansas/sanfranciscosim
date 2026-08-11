@@ -17,6 +17,7 @@ ELEV_RES = (1600, 900)
 AER_RES = (1600, 1200)
 TOP_RES = (1400, 1400)
 BG = (0.86, 0.80, 0.69, 1.0)
+NIGHT_BG = (0.05, 0.07, 0.12, 1.0)
 # Cameras face the building's own elevations. Each azimuth is the measured
 # compass bearing of that facade's outward normal (REFERENCE.md orientation).
 VIEWS = [("north", 323.6), ("east", 53.6), ("south", 143.6), ("west", 233.6)]
@@ -24,6 +25,24 @@ VIEWS = [("north", 323.6), ("east", 53.6), ("south", 143.6), ("west", 233.6)]
 
 def clear():
     bpy.ops.wm.read_factory_settings(use_empty=True)
+
+
+def glow_objects():
+    return [o for o in bpy.data.objects
+            if o.type == "MESH" and any(m and m.name.endswith("_Glow") for m in o.data.materials)]
+
+
+def set_glow(objects, lit):
+    """Match the app: `_Glow` surfaces are dark by day and emissive after dusk."""
+    for obj in objects:
+        obj.hide_render = not lit
+    for mat in bpy.data.materials:
+        if not mat.name.endswith("_Glow") or not mat.use_nodes:
+            continue
+        bsdf = mat.node_tree.nodes.get("Principled BSDF")
+        if bsdf:
+            bsdf.inputs["Emission Color"].default_value = bsdf.inputs["Base Color"].default_value
+            bsdf.inputs["Emission Strength"].default_value = 4.0 if lit else 0.0
 
 
 def import_glb(path):
@@ -104,6 +123,8 @@ def main():
     dims = mx - mn; span = max(dims.x, dims.y); height = dims.z
     center = Vector(((mn.x + mx.x) / 2, (mn.y + mx.y) / 2, (mn.z + mx.z) / 2))
     add_lights(span)
+    glows = glow_objects()
+    set_glow(glows, False)
 
     # Shared true-direction elevation rig. Scale accommodates the widest projection.
     aspect = ELEV_RES[0] / ELEV_RES[1]
@@ -128,6 +149,18 @@ def main():
                            center.z + radius * math.sin(pitch)))
     aim(aer, Vector((center.x, center.y, 18.0)))
     render(os.path.join(out, "ferry-building-aerial.png"), aer, AER_RES)
+
+    # Night state: same cameras, glow set alight, studio dimmed to moonlight.
+    set_glow(glows, True)
+    bg = bpy.context.scene.world.node_tree.nodes["Background"]
+    bg.inputs[0].default_value = NIGHT_BG
+    bg.inputs[1].default_value = 0.12
+    for name in ("key", "fill", "rim"):
+        light = bpy.data.objects[name].data
+        light.energy *= 0.06
+        light.color = (0.55, 0.68, 1.0)
+    render(os.path.join(out, "ferry-building-night-aerial.png"), aer, AER_RES)
+    render(os.path.join(out, "ferry-building-night-west.png"), bpy.data.objects["cam_west"], ELEV_RES)
 
 
 if __name__ == "__main__":
