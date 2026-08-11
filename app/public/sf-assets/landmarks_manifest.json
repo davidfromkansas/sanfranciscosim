@@ -216,5 +216,23 @@
     ],
     "tris": 7074,
     "yawDeg": 180
+  },
+  {
+    "id": "fairmont",
+    "file": "fairmont-san-francisco.glb",
+    "anchor": [
+      -122.4100666,
+      37.7924244
+    ],
+    "targetHeightM": 99.06,
+    "cat": 7,
+    "name": "Fairmont San Francisco",
+    "estimated": false,
+    "dims": [
+      124.7346,
+      98.395,
+      99.06
+    ],
+    "tris": 13380
   }
 ]
