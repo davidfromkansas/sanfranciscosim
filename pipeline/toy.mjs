@@ -35,6 +35,8 @@ import {
 } from './lib/toy.mjs';
 import { writeBuildingsBlob, writeLandcoverBlob, writeStreetsBlob } from './lib/binio.mjs';
 import { readLandcoverBlob, readStreetsBlob } from './lib/blobread.mjs';
+import { loadHeightmap } from './lib/heightmap.mjs';
+import { loadTreeBlockers } from './lib/treeblockers.mjs';
 import {
   collectNodes,
   crosswalkBars,
@@ -63,6 +65,8 @@ const TREE_MULTIPLIER = 1.5;
 const STREET_REACH = 25; // a prop only faces a street this close (§2.4)
 const MAX_VEHICLES = 4000;
 const TOWER_FLOORS = 6;
+const GARDEN_TREE_FLOORS = 4; // rooftop-garden trees need a real terrace under them
+const ROOF_TREE_VARIANT = 3; // the base scatter only rolls 0-2; 3 renders shrub-scale
 
 // PROP.* bits, packed into bits 3..7 of the record flag byte.
 const PROP_STREET = 1;
@@ -258,6 +262,16 @@ function loreFrame(ring, cx, cz) {
   return { yaw: Math.round((angle / (Math.PI * 2)) * 256) & 255, street: Boolean(street) };
 }
 
+// Placement veto shared with the landcover scatter: it keeps the densified
+// duplicates out of roads, buildings and water, and keeps rooftop-garden trees
+// on the roof they belong to (an OBB corner patch can overhang the footprint).
+let treeBlocked = () => false;
+let onBuilding = () => true;
+if (!onlyStreets) {
+  const { sampleElevation } = await loadHeightmap();
+  ({ blocked: treeBlocked, onBuilding } = await loadTreeBlockers({ sampleElevation, out: OUT }));
+}
+
 const roofTrees = [];
 let helipads = 0;
 let pitchedCount = 0;
@@ -265,7 +279,7 @@ let garnishCount = 0;
 let tallestToy = 0;
 
 // Garnish is axis-aligned to the roof's own OBB (A.3), inset from the edge.
-function addGarnish(cell, frame, roofY, seed) {
+function addGarnish(cell, frame, roofY, seed, floors) {
   const lenU = frame.maxU - frame.minU;
   const lenV = frame.maxV - frame.minV;
   if (lenU < 6 || lenV < 6) return;
@@ -294,14 +308,16 @@ function addGarnish(cell, frame, roofY, seed) {
     const pv = Math.min(v1, cv + (v1 - v0) * 0.63);
     emit(cell, frameRect(frame, cu, pu, cv, pv), roofY, roofY + 0.3, TOY_GARDEN, seed, TOY_FLAG_GARNISH);
     garnishCount++;
-    const trees = 2 + Math.floor(rnd(seed, 15) * 3);
+    // Only real rooftop terraces get planted: a tree on a garage reads as a
+    // canopy growing through the roof.
+    const trees = floors >= GARDEN_TREE_FLOORS ? 2 + Math.floor(rnd(seed, 15) * 3) : 0;
     for (let i = 0; i < trees; i++) {
       const [x, z] = fromFrame(
         frame,
         cu + rnd(seed, 40 + i) * (pu - cu),
         cv + rnd(seed, 50 + i) * (pv - cv)
       );
-      roofTrees.push([x, roofY + 0.3, z]);
+      if (onBuilding(x, z)) roofTrees.push([x, roofY + 0.3, z]);
     }
   } else if (roll < 0.65) {
     // Solar: a grid of 2 x 1 m panels over roughly half the roof.
@@ -402,7 +418,7 @@ for (const [ringIn, height, baseY, seed] of source.buildings) {
     const top = baseY + toyHeight;
     emit(cell, ring, baseY, top, palette, seed, flagBits, 0, loreRec);
     tallestToy = Math.max(tallestToy, toyHeight);
-    addGarnish(cell, obbFrame(ring), top, seed + Math.round(cx));
+    addGarnish(cell, obbFrame(ring), top, seed + Math.round(cx), floors);
     if (floors > 30 && helipads < MAX_HELIPADS) addHelipad(cell, cx, cz, top, seed);
     measureProps(ring, cx, cz, baseY, top, loreRec, seed);
   }
@@ -619,10 +635,12 @@ for (const file of landFiles.sort()) {
     // Extra half-density pass: a seeded 6 m nudge off every other tree.
     if (hash01(i * 2654435761 + cx * 977 + cz) < TREE_MULTIPLIER - 1) {
       const a = hash01(i * 40503 + 7) * Math.PI * 2;
-      trees.push(x + Math.cos(a) * 6, y, z + Math.sin(a) * 6, base.treeVariant[i]);
+      const nx = x + Math.cos(a) * 6;
+      const nz = z + Math.sin(a) * 6;
+      if (!treeBlocked(nx, nz)) trees.push(nx, y, nz, base.treeVariant[i]);
     }
   }
-  for (const [x, y, z] of roofTreesByCell.get(key) || []) trees.push(x, y, z, 2);
+  for (const [x, y, z] of roofTreesByCell.get(key) || []) trees.push(x, y, z, ROOF_TREE_VARIANT);
 
   const blob = writeLandcoverBlob({
     key,

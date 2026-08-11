@@ -11,6 +11,7 @@ import { loadHeightmap } from './lib/heightmap.mjs';
 import { LANDMARKS, NAMED_PARKS } from './lib/landmarks.mjs';
 import { STREET_CLASSES } from './lib/classes.mjs';
 import { readBuildingsBlob, readLandcoverBlob, readStreetsBlob } from './lib/blobread.mjs';
+import { loadTreeBlockers } from './lib/treeblockers.mjs';
 import { ringArea, ringCentroid, polylineLength } from './lib/poly.mjs';
 
 const OUT = new URL('./out/', import.meta.url);
@@ -328,7 +329,41 @@ floating.sort((a, b) => b.depth - a.depth);
 check('1.7', 'zero buildings floating in open water (pier zones allowed)', floating.length === 0, floating.length ? `${floating.length} buildings >30 m offshore, worst ${floating[0].depth} m at ${floating[0].lon},${floating[0].lat} (cell ${floating[0].cell})` : `${piers.length} pier vertices allowlisted, 0 offenders`);
 
 const floatingTrees = treeSamples.filter(([x, , z]) => waterDepthFromShore(x, z) > 30).length;
-note('1.7b', 'tree scatter sampled in open water', `${floatingTrees} of ${treeSamples.length} sampled trees >30 m offshore`);
+check('1.7b', 'zero sampled trees in open water', floatingTrees === 0, `${floatingTrees} of ${treeSamples.length} sampled trees >30 m offshore`);
+
+// ------------------------------------------- 1.10 tree placement cleanup ----
+// The same veto oracle the bake used, re-derived here: a ground tree may not
+// stand inside a footprint or on a roadway, and a variant-3 roof tree must sit
+// on a building.
+const { inBuilding, inStreet } = await loadTreeBlockers({ sampleElevation, out: OUT });
+
+const toyLandDir = new URL('toyland/', OUT);
+const toyLandFiles = existsSync(toyLandDir)
+  ? (await readdir(toyLandDir)).filter((f) => f.endsWith('.bin')).sort()
+  : [];
+let groundSamples = 0;
+let roofSamples = 0;
+let groundInBuilding = 0;
+let groundInStreet = 0;
+let roofOffBuilding = 0;
+for (const file of toyLandFiles) {
+  const blob = await readLandcoverBlob(new URL(`toyland/${file}`, OUT));
+  for (let i = 0; i < blob.treeTotal; i += 200) {
+    const x = blob.trees[i * 3];
+    const z = blob.trees[i * 3 + 2];
+    if (blob.treeVariant[i] === 3) {
+      roofSamples++;
+      if (!inBuilding(x, z)) roofOffBuilding++;
+    } else {
+      groundSamples++;
+      if (inBuilding(x, z)) groundInBuilding++;
+      if (inStreet(x, z)) groundInStreet++;
+    }
+  }
+}
+check('1.10a', 'zero sampled ground trees inside a building footprint', groundInBuilding === 0, `${groundInBuilding} of ${groundSamples} sampled toyland ground trees in the occupancy grid`);
+check('1.10b', 'zero sampled ground trees inside a street corridor', groundInStreet === 0, `${groundInStreet} of ${groundSamples} sampled toyland ground trees on a roadway`);
+check('1.10c', 'every sampled roof tree stands on a building', roofOffBuilding === 0, `${roofOffBuilding} of ${roofSamples} sampled variant-3 trees off a footprint`);
 
 const waterStreets = streetLines.filter((l) => {
   let n = 0;

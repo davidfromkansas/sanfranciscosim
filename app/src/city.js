@@ -539,8 +539,13 @@ export function createCity(scene, data) {
         const z = result.trees[i * 4 + 2];
         const variant = result.trees[i * 4 + 3];
         dummy.position.set(x, y, z);
-        const s = 0.62 + variant * 0.26 + ((x * 7.3 + z * 3.1) % 1) * 0.35;
-        dummy.scale.set(s, s * (0.85 + variant * 0.2), s);
+        // Variant 3 is a rooftop-garden tree: shrub-scale so it reads as
+        // planting, not a lollipop standing on the roof.
+        const s =
+          variant === 3
+            ? 0.34 + ((x * 7.3 + z * 3.1) % 1) * 0.12
+            : 0.62 + variant * 0.26 + ((x * 7.3 + z * 3.1) % 1) * 0.35;
+        dummy.scale.set(s, variant === 3 ? s : s * (0.85 + variant * 0.2), s);
         dummy.rotation.y = ((x * 13.7 + z * 5.3) % 1) * Math.PI * 2;
         dummy.updateMatrix();
         matrix.copy(dummy.matrix);
