@@ -186,7 +186,7 @@ draft entry in `REPORT.md`. Do not edit the production manifest in this task.
 }
 ```
 
-Do not edit `app/public/sf-assets/landmarks_manifest.json`, `pipeline/lib/landmarks.mjs`, or any app code in this task. Integration is a separate, explicitly requested job — see the integration notes in `docs/asset-plans/columbus-tower.md`.
+Do not edit `app/public/sf-assets/landmarks_manifest.json`, `pipeline/lib/landmarks.mjs`, or any app code in this task. Integration is a separate, explicitly requested job — run `docs/asset-plans/INTEGRATION-PROMPT.md` for that, together with the integration notes in `docs/asset-plans/columbus-tower.md`.
 ````
 
 ---

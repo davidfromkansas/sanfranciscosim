@@ -14,6 +14,12 @@ contains **both** halves of the job:
 These are plans only. Nothing here has been modelled yet, and no app code,
 manifest or pipeline data has been changed.
 
+[**INTEGRATION-PROMPT.md**](./INTEGRATION-PROMPT.md) is the other end of the
+pipeline: a reusable, runnable prompt that takes a finished GLB from
+`artifacts/<slug>/` into the live scene (re-validation, manifest entry, registry +
+re-bake for new landmarks, fallback drill, deployed QA), plus reference notes on how
+the loader places assets and what to do when one misbehaves.
+
 ## The set
 
 | Landmark | Manifest id | Target height | Runtime status |
