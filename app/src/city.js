@@ -51,6 +51,7 @@ const DETAIL_ENTER = 1800;
 const DETAIL_EXIT = 2400;
 const FADE_SPEED = 2.2; // per second
 const STREETS_MAGIC = 0x53465301; // "SFS1", mirrored from pipeline/lib/binio.mjs
+const LANDCOVER_MAGIC = 0x4c465301; // "SFL1"
 
 class WorkerPool {
   constructor(size) {
@@ -185,6 +186,7 @@ export function createCity(scene, data) {
 
   const blobCache = new Map(); // `${kind}:${cellKey}` -> ArrayBuffer
   const brokenStreets = new Set(); // warned once per unusable street tile
+  const brokenLandcover = new Set(); // warned once per unusable landcover tile
   const groups = new Map();
   const chunks = new Map();
   const stats = {
@@ -492,6 +494,29 @@ export function createCity(scene, data) {
     return loaded.filter(Boolean);
   }
 
+  // Same guarantee for landcover: a renamed/missing diorama tile falls back to
+  // the base-tier landcover with one warning, no hole.
+  async function landcoverBlobs(cells) {
+    const loaded = await Promise.all(
+      cells.map(async (cell) => {
+        const usable = (buf) =>
+          buf && buf.byteLength > 32 && new DataView(buf).getUint32(0, true) === LANDCOVER_MAGIC;
+        let buffer = await blob(kinds().landcover, cell.key).catch(() => null);
+        if (!buffer) buffer = await blob(kinds().landcover, cell.key).catch(() => null);
+        if (usable(buffer)) return { buffer };
+        const id = `${kinds().landcover}:${cell.key}`;
+        if (!brokenLandcover.has(id)) {
+          brokenLandcover.add(id);
+          console.warn(`landcover tile ${id} unusable — falling back to base landcover`);
+        }
+        if (kinds().landcover === TIERS.base.landcover) return null;
+        const fallback = await blob(TIERS.base.landcover, cell.key).catch(() => null);
+        return fallback ? { buffer: fallback } : null;
+      })
+    );
+    return loaded.filter(Boolean);
+  }
+
   async function buildGround(g) {
     if (g.groundRequested) return;
     g.groundRequested = true;
@@ -499,9 +524,7 @@ export function createCity(scene, data) {
     const toyTier = tier === 'toy';
     const [streets, landcover] = await Promise.all([
       streetBlobs(g.streetCells),
-      Promise.all(
-        g.landcoverCells.map(async (cell) => ({ buffer: await blob(kinds().landcover, cell.key) }))
-      ),
+      landcoverBlobs(g.landcoverCells),
     ]);
     const result = await pool.run({
       type: 'ground',
