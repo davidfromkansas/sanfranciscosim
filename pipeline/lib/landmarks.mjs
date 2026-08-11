@@ -139,6 +139,15 @@ export const LANDMARKS = [
     camera: { distance: 260, yaw: 170, pitch: 16 },
   },
   {
+    id: 'calAcademy',
+    name: 'California Academy of Sciences',
+    lon: -122.4662432,
+    lat: 37.7698424,
+    height: 19.3,
+    exclude: 120,
+    camera: { distance: 700, yaw: 225, pitch: 20 },
+  },
+  {
     id: 'fishermansWharf',
     name: "Pier 39 / Fisherman's Wharf",
     lon: -122.4098,

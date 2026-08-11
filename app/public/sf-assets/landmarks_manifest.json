@@ -34,7 +34,7 @@
       73.5321,
       326
     ],
-    "tris": 18412
+    "tris": 20086
   },
   {
     "id": "ferry-building",
@@ -125,5 +125,23 @@
       18.3
     ],
     "tris": 13814
+  },
+  {
+    "id": "cal-academy",
+    "file": "cal-academy.glb",
+    "anchor": [
+      -122.4662432,
+      37.7698424
+    ],
+    "targetHeightM": 19.3,
+    "cat": 16,
+    "name": "California Academy of Sciences",
+    "estimated": false,
+    "dims": [
+      212.5214,
+      207.7346,
+      19.3
+    ],
+    "tris": 22384
   }
 ]
