@@ -48,11 +48,13 @@ All listed photographs are hosted on Wikimedia Commons and were inspected but ar
 Blender coordinates are authored as **+X east, +Y true north, +Z up**. No app-side yaw is expected.
 
 - OSM outer-footprint long axis: **44.9° clockwise from true north**.
-- Independent measurement from the mapped baseball pitch and satellite imagery puts the home-plate-to-center-field axis at approximately **76° clockwise from true north** (east-northeast).
+- Independent measurement on Esri World Imagery (home-plate circle to pitcher's mound, cross-checked against the 339 ft left-field pole, which measures 104 m at bearing 40.7°) puts the home-plate-to-center-field axis at approximately **85.5° clockwise from true north** (just north of due east). An earlier coarser pitch-polygon reading suggested about 76°; the mound-line measurement is the more precise and is what the asset uses.
 - The bowl therefore opens broadly east toward the Bay. The lowest right-field/Portwalk edge lies east to southeast; the tall three-tier grandstand wraps the west and north-west street sides.
 - Willie Mays Plaza/main ceremonial entrance is at the north-west/Second-and-King corner.
 
-The Clem diagram's coarse “ESE” center-field label differs from the measured ENE bearing. The mapped pitch, satellite imagery and the real street/water relationship are more spatially precise, so the model uses the measured approximately 76° bearing.
+The Clem diagram's coarse “ESE” center-field label differs from the measured bearing. The mound-line satellite measurement and the real street/water relationship are more spatially precise, so the model uses the measured approximately 85.5° bearing.
+
+Everything in the asset — field graphic, diamond, fence, bowl, decks, outer shell, gate and scoreboard — is generated in one home-plate-centred field frame rotated to that bearing, so the parts cannot drift out of alignment with each other.
 
 ## Observations by side
 
@@ -102,6 +104,8 @@ Day appearance is dominated by warm red brick, matte dark-green steel/seating, p
 
 - Tens of thousands of seats become smooth stepped green seating bands with broad pale aisles.
 - Complex concourses and ramps become a few thick ring volumes and visible green support bays.
+- The surveyed footprint's service notches and left-field spike are box-filtered into a smooth chunky silhouette; the brick shell steps down from 24 m on the street sides to an 18.5 m outfield arcade, the real silhouette move that opens the bowl to the Bay.
+- The scoreboard stands on a solid brick pedestal growing out of the centre-field concourse block, and the Willie Mays Plaza gate towers are a thickening of the shell wall itself, so neither reads as a detached prop.
 - Street facades use large arched/window recess rhythms rather than literal brick/window grids.
 - The five principal Portwalk view arches are enlarged for aerial readability; smaller secondary openings are omitted to keep the east edge clean.
 - The scoreboard is slightly reduced from its current literal 46.7 × 21.6 m face but remains intentionally oversized as a recognition cue.
@@ -112,6 +116,6 @@ Day appearance is dominated by warm red brick, matte dark-green steel/seating, p
 
 - **Height:** OSM/project manifest says 45 m; the official tallest light standard is 178 ft / 54.3 m. These likely use different datums/definitions. The export tops at 45 m so app height scaling does not enlarge the already huge footprint.
 - **Right-field wall:** official historical material says 25 ft while current summaries and the symbolic Willie Mays value say 24 ft. Use 24 ft / 7.32 m as explicitly requested.
-- **Field bearing:** a coarse independent diagram labels center field ESE; map/satellite measurement gives about 76° (ENE). Use the measured map/satellite heading.
+- **Field bearing:** a coarse independent diagram labels center field ESE; the precise mound-line satellite measurement gives about 85.5°. Use the measured satellite heading.
 - **Waterfront material:** sources describe the Portwalk elevation as pale concrete while the famous field wall is brick. The asset distinguishes these: pale arcade shell, brick right-field wall/piers, green steel.
 - **Anchor:** requested placement anchor differs approximately 32 m from the mapped outer polygon centroid. Keep the requested anchor for compatibility, and document rather than silently replace it.

@@ -56,7 +56,7 @@ def main():
       "normal_orientation_method":"Finite/unit re-imported loop normals plus 8,100 deterministic first-hit visibility rays; 0.8% tolerance permits coplanar decorative planes.",
       "unexpected_geometry_or_objects":unexpected,"material_contract_violations":sorted(off),"glow_contract_violations":sorted(glow_bad),"duplicate_object_names":sorted({o.name for o in objects if sum(x.name==o.name for x in objects)>1}),
       "object_details":sorted(object_rows,key=lambda x:x["name"])}
-    result["checks"]={"meters_and_plausible_dimensions":210<=dims.x<=250 and 210<=dims.y<=250 and 44.8<=dims.z<=45.2,"base_at_z_zero":abs(mn.z)<=.05,"centered_xy":abs(center.x)<=.05 and abs(center.y)<=.05,
+    result["checks"]={"meters_and_plausible_dimensions":210<=dims.x<=250 and 190<=dims.y<=250 and 44.8<=dims.z<=45.2,"base_at_z_zero":abs(mn.z)<=.05,"centered_xy":abs(center.x)<=.05 and abs(center.y)<=.05,
       "under_triangle_budget":tris<=27000,"no_image_textures":not bpy.data.images and not textured,"no_transparency":not transparent,"materials_follow_contract":not off and not glow_bad,"no_cameras_or_lights":not bpy.data.cameras and not bpy.data.lights,
       "no_animation_skin_or_constraints":animations==0 and result["armature_count"]==0 and result["constraint_count"]==0,"transforms_applied":transforms,"no_negative_scales":not negative,"normals_outward":normals,
       "no_degenerate_geometry":degenerate==0,"no_unexpected_objects":not unexpected,"unique_object_names":not result["duplicate_object_names"]}

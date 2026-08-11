@@ -38,7 +38,17 @@ The model follows `docs/styles/miniature-toy.md` §22:
 4. The scoreboard, five arches, aisles and light arrays are semantically enlarged for the high aerial camera.
 5. Facades use broad brick pier/window and arcade rhythms.
 6. The top view is intentionally designed around the field graphic, dark seating horseshoe, pale aisle rhythm, canopy and open Bay side.
-7. A final simplification pass removed most bevel-generated topology and brought the asset to 9,295 triangles.
+7. A final simplification pass removed most bevel-generated topology; the asset totals 14,604 triangles.
+
+### Revision after visual review
+
+A reviewer found the first delivery disconnected: the field read as misaligned against the bowl, the scoreboard floated, and the plaza gate stood apart from the shell. The model was rebuilt against fresh Esri World Imagery and photo references:
+
+- Every part — field graphic, diamond, fence, bowl, decks, shell, gate, scoreboard — is now generated in one home-plate-centred field frame at the re-measured 85.5° bearing, so nothing can drift out of alignment.
+- The bowl is three constant-depth terraces lofted between the field boundary and the smoothed surveyed footprint, with pale fascias and rake-hugging aisles.
+- The scoreboard stands on a solid brick pedestal growing out of the centre-field concourse block.
+- The Willie Mays Plaza gate towers, lintel, sign, clock and portal are a thickening of the shell wall itself at the shell radius.
+- The brick shell steps from 24 m on the street sides down to an 18.5 m outfield arcade, opening the bowl to the Bay, with an arched glazing rhythm on the surveyed silhouette.
 
 ## Orientation decision
 
@@ -46,26 +56,26 @@ Real placement overrides the generic “front faces -Y” shorthand because this
 
 - Blender **+Y = true north, +X = east, +Z = up**.
 - Independent OSM minimum-area footprint measurement: long axis **44.9° / 224.9° clockwise from true north**.
-- Mapped pitch plus satellite measurement: home plate toward center field **approximately 76° clockwise from true north**.
-- The model's local field axis is baked at that 76° true-world bearing. The tall horseshoe wraps the west/north street sides; the low right-field/Portwalk edge opens east toward the Bay.
+- Mound-line satellite measurement (cross-checked against the 339 ft left-field pole): home plate toward center field **approximately 85.5° clockwise from true north**.
+- The model's local field axis is baked at that 85.5° true-world bearing. The tall horseshoe wraps the west/north street sides; the low right-field/Portwalk edge opens east toward the Bay.
 - Willie Mays Plaza identity block is authored at the north-west/Second-and-King side.
 - `placeGeneric` only scales and positions, so no loader rotation is expected.
 
-The exported axis-aligned bounds are **222.48 × 229.91 m**. They are a true-world rotated envelope, comparable to the independently measured OSM axis-aligned envelope of approximately 245.2 × 244.2 m. The OSM footprint's own oriented bound is 212.2 × 191.2 m.
+The exported axis-aligned bounds are **233.80 × 203.59 m**. They are a true-world rotated envelope of the box-filtered surveyed footprint, comparable to the OSM oriented bound of 212.2 × 191.2 m.
 
 ## Contract results
 
 | Rule | Result | Evidence |
 |---|---|---|
 | Binary GLB, self-contained | PASS | `oracle-park.glb`; no external dependencies |
-| Real-world meters | PASS | 222.48 × 229.91 × 45.0 m re-imported bounds |
+| Real-world meters | PASS | 233.80 × 203.59 × 45.0 m re-imported bounds |
 | Origin / base at z≈0 | PASS | bbox min Z 0.0 m; XY center [0.0, 0.0] m |
-| True-world orientation | PASS | +Y north, +X east; 76° home-to-center bearing baked in |
-| Triangle budget | PASS | 9,295 / 27,000 triangles |
-| Applied transforms | PASS | all 164 imported mesh objects at location 0, rotation 0, scale 1 |
+| True-world orientation | PASS | +Y north, +X east; 85.5° home-to-center bearing baked in |
+| Triangle budget | PASS | 14,604 / 27,000 triangles |
+| Applied transforms | PASS | all 295 imported mesh objects at location 0, rotation 0, scale 1 |
 | Negative scales | PASS | none |
-| Normals outward | PASS | 0 invalid/non-unit loop normals; 1 flipped first hit within deterministic ray tolerance (coplanar decorative plane) |
-| Unexpected/leaked geometry | PASS | 164 mesh objects only; no context, plinth, floor, cameras or lights |
+| Normals outward | PASS | 0 invalid/non-unit loop normals; 0 flipped visible first hits |
+| Unexpected/leaked geometry | PASS | 295 mesh objects only; no context, plinth, floor, cameras or lights |
 | Image textures | PASS | 0 images and 0 image texture nodes |
 | Transparency | PASS | all material alpha 1.0 |
 | Flat `Toy_*` materials | PASS | `Toy_brick`, `Toy_glass`, `Toy_gold`, `Toy_ink`, `Toy_mint`, `Toy_roofd`, `Toy_rust`, `Toy_steel`, `Toy_trim`, `Toy_verdigris`, `Toy_white_Glow`; no `Toy_body` |
@@ -84,7 +94,7 @@ The exported axis-aligned bounds are **222.48 × 229.91 m**. They are a true-wor
 | Green steel details | Upper structural ring, arcade elements, scoreboard supports and light masts |
 | Arched waterfront facade | Five enlarged right-field view arches set into the low Portwalk arcade |
 | Recognizable light towers | Five owner-verified standards, each with paired masts and glow face |
-| Giant scoreboard | Elevated center-field slab with oversized glow face |
+| Giant scoreboard | Glow-faced board on a solid brick pedestal rising from the center-field concourse |
 | Right-field arcade and wall | 7.32 m brick wall, top walk, pale arcade and five principal arches |
 | Waterfront / McCovey Cove relationship | Low porous east edge authored at true heading; water/context intentionally excluded from GLB |
 
@@ -107,11 +117,11 @@ The requested architectural/manifest height is **45 m** from the OSM tag. Giants
   "name": "Oracle Park",
   "estimated": false,
   "dims": [
-    222.4833,
-    229.9117,
+    233.8009,
+    203.5874,
     45.0
   ],
-  "tris": 9295
+  "tris": 14604
 }
 ```
 
