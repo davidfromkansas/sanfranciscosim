@@ -67,6 +67,15 @@ function classify(tags) {
   return null;
 }
 
+function stableSeed(type, id, ringIndex) {
+  let hash = 2166136261;
+  for (const char of `${type}:${id}:${ringIndex}`) {
+    hash ^= char.charCodeAt(0);
+    hash = Math.imul(hash, 16777619);
+  }
+  return hash >>> 0;
+}
+
 function ringFromGeometry(geometry) {
   const ring = [];
   for (const p of geometry) {
@@ -75,6 +84,10 @@ function ringFromGeometry(geometry) {
     ring.push(x, z);
   }
   return ring;
+}
+
+function isBattery(tags) {
+  return /^battery\b/i.test(tags?.name || '') || tags?.defensive_works === 'battery';
 }
 
 // Overpass relations arrive as unordered member way fragments; stitch them into
@@ -164,15 +177,16 @@ function triangulateDraped(outer, holes, maxEdge) {
     const ca = Math.hypot(ax - cx, az - cz);
     const longest = Math.max(ab, bc, ca);
     if (longest > maxEdge) {
-      const mab = [(ax + bx) / 2, (az + bz) / 2];
-      const mbc = [(bx + cx) / 2, (bz + cz) / 2];
-      const mca = [(cx + ax) / 2, (cz + az) / 2];
-      tris.push(
-        [ax, az, mab[0], mab[1], mca[0], mca[1]],
-        [mab[0], mab[1], bx, bz, mbc[0], mbc[1]],
-        [mca[0], mca[1], mbc[0], mbc[1], cx, cz],
-        [mab[0], mab[1], mbc[0], mbc[1], mca[0], mca[1]]
-      );
+      if (longest === ab) {
+        const m = [(ax + bx) / 2, (az + bz) / 2];
+        tris.push([ax, az, m[0], m[1], cx, cz], [m[0], m[1], bx, bz, cx, cz]);
+      } else if (longest === bc) {
+        const m = [(bx + cx) / 2, (bz + cz) / 2];
+        tris.push([bx, bz, m[0], m[1], ax, az], [m[0], m[1], cx, cz, ax, az]);
+      } else {
+        const m = [(cx + ax) / 2, (cz + az) / 2];
+        tris.push([cx, cz, m[0], m[1], bx, bz], [m[0], m[1], ax, az, bx, bz]);
+      }
       continue;
     }
     out.push(t);
@@ -231,7 +245,7 @@ function rasterizeTriangle(kind, tri) {
   }
 }
 
-function addTriangle(kind, tri, waterLevel) {
+function addTriangle(kind, tri, waterLevel, lift = 0) {
   const cx = (tri[0] + tri[2] + tri[4]) / 3;
   const cz = (tri[1] + tri[3] + tri[5]) / 3;
   const cell = cellFor(cx, cz);
@@ -245,7 +259,7 @@ function addTriangle(kind, tri, waterLevel) {
     const key = `${kind}:${Math.round(x * 20)}:${Math.round(z * 20)}`;
     let index = cell.weld.get(key);
     if (index === undefined) {
-      const y = kind === KIND.water ? waterLevel : sampleElevation(x, z) + 0.06;
+      const y = kind === KIND.water ? waterLevel : sampleElevation(x, z) + 0.06 + lift;
       index = cell.verts.length / 3;
       cell.verts.push(x, y, z);
       cell.kinds.push(kind);
@@ -336,13 +350,19 @@ function recordParkMatch(outer, holes) {
 
 const raw = JSON.parse(await readFile(new URL('osm_landcover.json', DATA), 'utf8'));
 console.log(`${raw.elements.length} OSM landcover elements`);
+let featureSource = null;
+try {
+  featureSource = JSON.parse(await readFile(new URL('osm_features.json', DATA), 'utf8'));
+} catch {
+  console.warn('osm_features.json missing — skipping battery platforms');
+}
 
 let polygons = 0;
 let triangles = 0;
 let trees = 0;
 const areaByKind = new Array(LAND_KINDS.length).fill(0);
 
-function handlePolygon(kind, outerRing, holeRings, seedBase, cover = null) {
+function handlePolygon(kind, outerRing, holeRings, seedBase, cover = null, lift = 0) {
   if (outerRing.length / 2 < 3) return;
   const area = Math.abs(ringArea(outerRing));
   if (area < 60) return;
@@ -359,7 +379,7 @@ function handlePolygon(kind, outerRing, holeRings, seedBase, cover = null) {
   }
 
   // Water surfaces are flat, so they never need the terrain-following subdivision.
-  const maxEdge = cover ? 180 : kind === KIND.water ? 400 : MAX_EDGE;
+  const maxEdge = kind === KIND.water ? 400 : MAX_EDGE;
   let tris = triangulateDraped(outerRing, holeRings, maxEdge);
   const expectedArea =
     Math.abs(ringArea(outerRing)) - holeRings.reduce((sum, hole) => sum + Math.abs(ringArea(hole)), 0);
@@ -373,11 +393,11 @@ function handlePolygon(kind, outerRing, holeRings, seedBase, cover = null) {
     );
   }, 0);
   if (holeRings.length && Math.abs(actualArea - expectedArea) > Math.max(1, expectedArea * 1e-4)) {
-    console.warn(`invalid cover holes for ${seedBase}; dropping holes`);
+    console.warn(`invalid cover holes for ${seedBase}: expected ${expectedArea}, actual ${actualArea}; dropping holes`);
     tris = triangulateDraped(outerRing, [], maxEdge);
     holeRings = [];
   }
-  for (const t of tris) addTriangle(kind, t, waterLevel);
+  for (const t of tris) addTriangle(kind, t, waterLevel, lift);
   triangles += tris.length;
   polygons++;
   areaByKind[kind] += area;
@@ -398,11 +418,12 @@ function coverForElement(outers) {
 }
 
 const records = [];
-let seedCounter = 1;
-for (const el of raw.elements) {
+const elements = raw.elements
+  .slice()
+  .sort((a, b) => a.type.localeCompare(b.type) || Number(a.id) - Number(b.id));
+for (const el of elements) {
   const kind = classify(el.tags);
   if (kind === null) continue;
-  seedCounter += 9176;
   let outers = [];
   let innerRings = [];
   if (el.type === 'way' && Array.isArray(el.geometry)) {
@@ -413,9 +434,8 @@ for (const el of raw.elements) {
     innerRings = rings.filter((r) => r.role === 'inner').map((r) => ringFromGeometry(r.pts));
   }
   const cover = coverForElement(outers);
-  let ringSeed = seedCounter;
-  for (const outer of outers) {
-    if (el.type === 'relation') ringSeed += 313;
+  for (let ringIndex = 0; ringIndex < outers.length; ringIndex++) {
+    const outer = outers[ringIndex];
     if (outer.length / 2 < 3) continue;
     const bbox = ringBBox(outer);
     const holes = innerRings.filter((h) => {
@@ -433,13 +453,34 @@ for (const el of raw.elements) {
       bbox,
       centroid: ringCentroid(outer),
       cover,
-      seed: ringSeed,
+      seed: stableSeed(el.type, el.id, ringIndex),
     });
   }
-  if (el.type === 'relation') seedCounter = ringSeed;
+}
+
+const batteryNodes = [];
+const batteries = [];
+for (const el of featureSource?.elements || []) {
+  if (!isBattery(el.tags)) continue;
+  if (el.type !== 'way' || !Array.isArray(el.geometry)) {
+    batteryNodes.push(el.tags?.name || `${el.type}/${el.id}`);
+    continue;
+  }
+  const outer = ringFromGeometry(el.geometry);
+  if (outer.length / 2 < 3) continue;
+  batteries.push({
+    id: el.id,
+    name: el.tags?.name || `Battery ${el.id}`,
+    outer,
+    bbox: ringBBox(outer),
+    centroid: ringCentroid(outer),
+    seed: stableSeed(el.type, el.id, 0),
+  });
 }
 
 let overrideHoles = 0;
+const acceptedBatteries = new Set();
+const skippedBatteries = [];
 for (const record of records) {
   let holes = record.holes.slice();
   let cover = null;
@@ -447,17 +488,47 @@ for (const record of records) {
     cover = record.cover;
     record.kind = KIND[cover.base];
     const accepted = [];
+    for (const battery of batteries) {
+      if (!pointInRing(battery.centroid[0], battery.centroid[1], record.outer)) continue;
+      let fullyInside = true;
+      for (let i = 0; i < battery.outer.length; i += 2) {
+        if (!pointInRing(battery.outer[i], battery.outer[i + 1], record.outer)) {
+          fullyInside = false;
+          break;
+        }
+      }
+      if (!fullyInside) continue;
+      const overlaps = accepted.some(
+        (bbox) =>
+          battery.bbox[0] <= bbox[2] &&
+          battery.bbox[2] >= bbox[0] &&
+          battery.bbox[1] <= bbox[3] &&
+          battery.bbox[3] >= bbox[1]
+      );
+      if (overlaps) continue;
+      accepted.push(battery.bbox);
+      holes.push(battery.outer);
+      acceptedBatteries.add(battery);
+    }
     for (const candidate of records) {
       if (candidate === record || candidate.kind === record.kind || candidate.area < MIN_OVERRIDE_HOLE_AREA) {
         continue;
       }
       if (!pointInRing(candidate.centroid[0], candidate.centroid[1], record.outer)) continue;
+      let fullyInside = true;
+      for (let i = 0; i < candidate.outer.length; i += 2) {
+        if (!pointInRing(candidate.outer[i], candidate.outer[i + 1], record.outer)) {
+          fullyInside = false;
+          break;
+        }
+      }
+      if (!fullyInside) continue;
       const overlaps = accepted.some(
         (bbox) =>
-          candidate.bbox[0] < bbox[2] &&
-          candidate.bbox[2] > bbox[0] &&
-          candidate.bbox[1] < bbox[3] &&
-          candidate.bbox[3] > bbox[1]
+          candidate.bbox[0] <= bbox[2] &&
+          candidate.bbox[2] >= bbox[0] &&
+          candidate.bbox[1] <= bbox[3] &&
+          candidate.bbox[3] >= bbox[1]
       );
       if (overlaps) continue;
       accepted.push(candidate.bbox);
@@ -468,7 +539,19 @@ for (const record of records) {
   record.parkHoles = holes;
   handlePolygon(record.kind, record.outer, holes, record.seed, cover);
 }
+for (const battery of batteries) {
+  if (!acceptedBatteries.has(battery)) {
+    skippedBatteries.push(battery.name);
+    continue;
+  }
+  handlePolygon(KIND.rock, battery.outer, [], battery.seed, null, 0.12);
+}
 console.log(`park cover overrides: ${records.filter((record) => record.cover).length} polygons, ${overrideHoles} holes`);
+console.log(
+  `battery platforms: ${acceptedBatteries.size} baked (${[...acceptedBatteries].map((b) => b.name).join(', ') || 'none'}); ` +
+    `${batteryNodes.length} node-only skipped (${batteryNodes.join(', ') || 'none'}); ` +
+    `${skippedBatteries.length} geometry skipped outside cover (${skippedBatteries.join(', ') || 'none'})`
+);
 
 // Stale cells from an earlier bake would linger and desync the index.
 await rm(CELLS_OUT, { recursive: true, force: true });

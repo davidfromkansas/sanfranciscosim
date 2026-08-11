@@ -15,6 +15,7 @@ import {
   CylinderGeometry,
   DynamicDrawUsage,
   IcosahedronGeometry,
+  InstancedBufferAttribute,
   InstancedMesh,
   Matrix4,
   Mesh,
@@ -54,9 +55,9 @@ const STREETS_MAGIC = 0x53465301; // "SFS1", mirrored from pipeline/lib/binio.mj
 const LANDCOVER_MAGIC = 0x4c465301; // "SFL1"
 const TREE_SPECIES = [
   { scale: [1, 1, 1], tint: [1, 1, 1] },
-  { scale: [0.72, 1.35, 0.72], tint: [0.92, 0.9, 0.96] },
-  { scale: [0.66, 1.55, 0.66], tint: [1.04, 1.08, 1] },
-  { scale: [0.82, 1.2, 0.82], tint: [1.12, 1.08, 0.9] },
+  { scale: [0.72, 1.35, 0.72], tint: [0.78, 0.5, 0.78] },
+  { scale: [0.66, 1.55, 0.66], tint: [1.15, 0.7, 1] },
+  { scale: [0.82, 1.2, 0.82], tint: [1.35, 0.9, 1.05] },
 ];
 
 class WorkerPool {
@@ -591,7 +592,7 @@ export function createCity(scene, data) {
         instanceColors[i * 3 + 2] = profile.tint[2];
       }
       trees.instanceMatrix.needsUpdate = true;
-      trees.instanceColor = new BufferAttribute(instanceColors, 3);
+      trees.instanceColor = new InstancedBufferAttribute(instanceColors, 3);
       trees.instanceColor.needsUpdate = true;
       trees.castShadow = false;
       trees.receiveShadow = false;
