@@ -6,7 +6,7 @@
   "cols": 32,
   "rows": 32
  },
- "generated": "2026-08-11T22:45:29.853Z",
+ "generated": "2026-08-11T23:31:17.734Z",
  "dev": null,
  "palette": [
   {
@@ -332,15 +332,15 @@
   }
  ],
  "stats": {
-  "baseBuildings": 171458,
-  "records": 226513,
+  "baseBuildings": 171457,
+  "records": 226512,
   "pitched": 146501,
   "garnish": 55055,
   "helipads": 6,
   "tallest": 200,
   "trees": 282258,
   "bytes": {
-   "buildings": 11994908,
+   "buildings": 11994798,
    "streets": 8576096,
    "landcover": 11879124
   }
@@ -2089,8 +2089,8 @@
    "cz": 14,
    "originX": 1000,
    "originZ": -1000,
-   "buildings": 560,
-   "bytes": 31842
+   "buildings": 559,
+   "bytes": 31732
   },
   {
    "key": "18_15",
