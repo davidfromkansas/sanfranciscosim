@@ -197,5 +197,23 @@
       43.9
     ],
     "tris": 2201
+  },
+  {
+    "id": "mission-dolores",
+    "file": "mission-dolores.glb",
+    "anchor": [
+      -122.4269098,
+      37.7643109
+    ],
+    "targetHeightM": 41,
+    "cat": 8,
+    "name": "Mission Dolores Basilica",
+    "estimated": true,
+    "dims": [
+      67.21,
+      45.4823,
+      41.0
+    ],
+    "tris": 8386
   }
 ]
