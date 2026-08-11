@@ -7,7 +7,7 @@
   "rows": 32
  },
  "stats": {
-  "sidecarBytes": 18037566,
+  "sidecarBytes": 18037216,
   "cells": 547
  },
  "cells": [
@@ -49,7 +49,7 @@
    "originZ": -1500,
    "buildings": 544,
    "streets": 19,
-   "bytes": 63665
+   "bytes": 63641
   },
   {
    "key": "10_14",
@@ -289,7 +289,7 @@
    "originZ": -1500,
    "buildings": 511,
    "streets": 26,
-   "bytes": 61718
+   "bytes": 61710
   },
   {
    "key": "11_14",
@@ -319,7 +319,7 @@
    "originZ": 0,
    "buildings": 110,
    "streets": 16,
-   "bytes": 13657
+   "bytes": 13649
   },
   {
    "key": "11_17",
@@ -779,7 +779,7 @@
    "originZ": 0,
    "buildings": 486,
    "streets": 26,
-   "bytes": 56364
+   "bytes": 56356
   },
   {
    "key": "13_17",
@@ -979,7 +979,7 @@
    "originZ": -2000,
    "buildings": 409,
    "streets": 26,
-   "bytes": 45458
+   "bytes": 45450
   },
   {
    "key": "14_13",
@@ -1019,7 +1019,7 @@
    "originZ": 0,
    "buildings": 595,
    "streets": 28,
-   "bytes": 64732
+   "bytes": 64724
   },
   {
    "key": "14_17",
@@ -1219,7 +1219,7 @@
    "originZ": -2000,
    "buildings": 375,
    "streets": 35,
-   "bytes": 46472
+   "bytes": 46464
   },
   {
    "key": "15_13",
@@ -1429,7 +1429,7 @@
    "originZ": -3500,
    "buildings": 533,
    "streets": 40,
-   "bytes": 62323
+   "bytes": 62315
   },
   {
    "key": "16_10",
@@ -1439,7 +1439,7 @@
    "originZ": -3000,
    "buildings": 435,
    "streets": 26,
-   "bytes": 47972
+   "bytes": 47964
   },
   {
    "key": "16_11",
@@ -1499,7 +1499,7 @@
    "originZ": 0,
    "buildings": 504,
    "streets": 29,
-   "bytes": 54509
+   "bytes": 54485
   },
   {
    "key": "16_17",
@@ -1509,7 +1509,7 @@
    "originZ": 500,
    "buildings": 559,
    "streets": 33,
-   "bytes": 61874
+   "bytes": 61866
   },
   {
    "key": "16_18",
@@ -1719,7 +1719,7 @@
    "originZ": -1000,
    "buildings": 426,
    "streets": 48,
-   "bytes": 48882
+   "bytes": 48874
   },
   {
    "key": "17_15",
@@ -1739,7 +1739,7 @@
    "originZ": 0,
    "buildings": 395,
    "streets": 53,
-   "bytes": 48110
+   "bytes": 48094
   },
   {
    "key": "17_17",
@@ -1747,9 +1747,9 @@
    "cz": 17,
    "originX": 500,
    "originZ": 500,
-   "buildings": 430,
+   "buildings": 427,
    "streets": 36,
-   "bytes": 47351
+   "bytes": 47305
   },
   {
    "key": "17_18",
@@ -1779,7 +1779,7 @@
    "originZ": 2000,
    "buildings": 711,
    "streets": 33,
-   "bytes": 74573
+   "bytes": 74565
   },
   {
    "key": "17_21",
@@ -1909,7 +1909,7 @@
    "originZ": -3500,
    "buildings": 592,
    "streets": 31,
-   "bytes": 69533
+   "bytes": 69525
   },
   {
    "key": "18_10",
@@ -1919,7 +1919,7 @@
    "originZ": -3000,
    "buildings": 332,
    "streets": 30,
-   "bytes": 44103
+   "bytes": 44095
   },
   {
    "key": "18_11",
@@ -2029,7 +2029,7 @@
    "originZ": 2500,
    "buildings": 630,
    "streets": 35,
-   "bytes": 65843
+   "bytes": 65835
   },
   {
    "key": "18_22",
@@ -2209,7 +2209,7 @@
    "originZ": -500,
    "buildings": 211,
    "streets": 52,
-   "bytes": 30981
+   "bytes": 30973
   },
   {
    "key": "19_16",
@@ -2249,7 +2249,7 @@
    "originZ": 1500,
    "buildings": 472,
    "streets": 28,
-   "bytes": 56450
+   "bytes": 56434
   },
   {
    "key": "19_20",
@@ -2259,7 +2259,7 @@
    "originZ": 2000,
    "buildings": 528,
    "streets": 44,
-   "bytes": 60202
+   "bytes": 60194
   },
   {
    "key": "19_21",
@@ -2269,7 +2269,7 @@
    "originZ": 2500,
    "buildings": 700,
    "streets": 46,
-   "bytes": 72388
+   "bytes": 72380
   },
   {
    "key": "19_22",
@@ -2459,7 +2459,7 @@
    "originZ": -500,
    "buildings": 295,
    "streets": 35,
-   "bytes": 39884
+   "bytes": 39876
   },
   {
    "key": "20_16",
@@ -2629,7 +2629,7 @@
    "originZ": -4000,
    "buildings": 489,
    "streets": 59,
-   "bytes": 59375
+   "bytes": 59367
   },
   {
    "key": "20_9",
@@ -2789,7 +2789,7 @@
    "originZ": 4000,
    "buildings": 609,
    "streets": 45,
-   "bytes": 61824
+   "bytes": 61808
   },
   {
    "key": "21_25",
@@ -2879,7 +2879,7 @@
    "originZ": -3500,
    "buildings": 690,
    "streets": 114,
-   "bytes": 88669
+   "bytes": 88645
   },
   {
    "key": "22_10",
@@ -2979,7 +2979,7 @@
    "originZ": 1500,
    "buildings": 475,
    "streets": 42,
-   "bytes": 47803
+   "bytes": 47795
   },
   {
    "key": "22_20",
@@ -3419,7 +3419,7 @@
    "originZ": 1000,
    "buildings": 176,
    "streets": 25,
-   "bytes": 21935
+   "bytes": 21927
   },
   {
    "key": "24_19",
@@ -5079,7 +5079,7 @@
    "originZ": 500,
    "buildings": 631,
    "streets": 28,
-   "bytes": 66461
+   "bytes": 66453
   },
   {
    "key": "8_18",
@@ -5099,7 +5099,7 @@
    "originZ": 1500,
    "buildings": 641,
    "streets": 25,
-   "bytes": 64594
+   "bytes": 64586
   },
   {
    "key": "8_20",
