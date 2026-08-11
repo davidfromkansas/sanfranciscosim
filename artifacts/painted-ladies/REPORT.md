@@ -56,7 +56,7 @@ This correction is deliberate and documented in `REFERENCE.md`; following the pl
 | Image textures | PASS | 0 images, 0 texture nodes |
 | Transparency | PASS | all material alpha 1.0 |
 | Flat `Toy_*` materials, no `Toy_body` | PASS | 16 approved flat-colour materials; see list below |
-| `_Glow` use | PASS | `Toy_gold_Glow` appears only on six tiny entry lamps; exported emission strength is 0 for daytime |
+| `_Glow` use | PASS | `Toy_gold_Glow` appears only on the six entry lamps and the 18 lit front window panes; exported emission strength is 0 for daytime |
 | Cameras / lights | PASS | 0 / 0 |
 | Animations / armatures / constraints | PASS | 0 / 0 / 0 |
 | Degenerate geometry | PASS | 0 degenerate triangles |
@@ -64,8 +64,8 @@ This correction is deliberate and documented in `REFERENCE.md`; following the pl
 
 ## Geometry and materials
 
-- Object count: **430 mesh objects**
-- Triangle count: **15,744**
+- Object count: **448 mesh objects**
+- Triangle count: **15,960**
 - Axis-aligned dimensions: **[25.3658, 44.2368, 16.51] m**
 - Bounding box min / max: **[-12.6829, -22.1184, 0.0]** / **[12.6829, 22.1184, 16.51] m**
 - Minimum Z: **0.0 m** — XY centre offset: **[0.0, 0.0] m**
@@ -91,6 +91,10 @@ The style-bible §22 reduction removed muntins, shingles, spindlework, carved br
 
 The four cardinal elevations share orthographic projection, scale, framing, exposure and one warm tabletop rig. The aerial uses a 105 mm camera at 38° down from the park/front side. The top render clearly shows six parallel ridge systems, address-specific lower rear roofs and the chimney rhythm.
 
+## Night lighting revision
+
+The first export lit only six 0.24 m entry lamps, tucked under the door hoods. Runtime QA of the integrated asset found zero warm pixels at `night 1.00` — the lamps were both occluded and far below the resolvable size at the app's 150 m minimum camera distance. The revision enlarges each lamp to 0.56 m, moves it clear of the hood, warms `Toy_gold_Glow` from `caa64a` to `ffd489`, and adds an 18-pane set of lit front windows (both bay storeys plus the entry window on each house) sitting 0.04 m proud of the glass. Those panes are pure `_Glow`, so the loader keeps them at low opacity by day and fades them up at dusk; the daytime silhouette and material contract are unchanged.
+
 ## Draft manifest entry (not applied)
 
 The loader scales an entire asset by its total bounding-box height. Because this GLB contains a real 2.9 m grade step and chimneys, using the plan's `targetHeightM: 12.5` would shrink every individual 12.5 m ridge to about 9.5 m. The technically correct no-rescale draft therefore uses the validated total envelope height **16.51 m** while retaining 12.5 m as the architectural ridge height.
@@ -108,7 +112,7 @@ The loader scales an entire asset by its total bounding-box height. Because this
   "name": "Painted Ladies",
   "estimated": false,
   "dims": [25.3658, 44.2368, 16.51],
-  "tris": 15744
+  "tris": 15960
 }
 ```
 

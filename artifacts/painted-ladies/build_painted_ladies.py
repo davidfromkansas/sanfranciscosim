@@ -71,7 +71,7 @@ PALETTE_HEX = {
     "Toy_brick": "c96f4a",
     "Toy_gold": "caa64a",
     "Toy_red": "c4453c",
-    "Toy_gold_Glow": "caa64a",
+    "Toy_gold_Glow": "ffd489",  # lamp/window light: read at night from 150 m out
 }
 
 
@@ -203,9 +203,12 @@ def rear_plate(name, xr, yc, zc, width, height, depth, mat):
                zc - height / 2, zc + height / 2, mat)
 
 
-def window_front(name, xf, yc, zc, width, height, trim, glass):
+def window_front(name, xf, yc, zc, width, height, trim, glass, glow=None):
     plate(name + "_trim", xf - 0.09, yc, zc, width + 0.34, height + 0.34, 0.11, trim)
     plate(name + "_glass", xf - 0.13, yc, zc, width, height, 0.06, glass)
+    if glow is not None:
+        # Lit pane just proud of the glass; the loader fades it in at dusk.
+        plate(name + "_lit", xf - 0.17, yc, zc, width * 0.62, height * 0.66, 0.045, glow)
 
 
 def window_rear(name, xr, yc, zc, width, height, trim, glass):
@@ -331,7 +334,7 @@ def build_house(index, number, facade_name, roof_name, gable_delta, chimney_extr
         prism_z(f"{tag}_bay_band_{int(z_band * 10)}", wide, z_band - thick / 2, z_band + thick / 2,
                 trim, bevel=True, bevel_width=0.06)
     for j, zc in enumerate((base_top + 2.00, f1_top + 2.00)):
-        window_front(f"{tag}_bay_win_{j}", -bay_out, bay_c, zc, 1.58, 2.25, trim, glass)
+        window_front(f"{tag}_bay_win_{j}", -bay_out, bay_c, zc, 1.58, 2.25, trim, glass, glow)
         cant_window(f"{tag}_bay_cant_s{j}", plan[0], plan[1], zc, 1.95, trim, glass)
         cant_window(f"{tag}_bay_cant_n{j}", plan[2], plan[3], zc, 1.95, trim, glass)
     for j, yy in enumerate((bay_c - bay_hw + 0.24, bay_c + bay_hw - 0.24)):
@@ -345,14 +348,14 @@ def build_house(index, number, facade_name, roof_name, gable_delta, chimney_extr
         base_top + 0.05, base_top + 2.28, ink)
     box(f"{tag}_transom", -0.18, 0.16, ent_c - 0.50, ent_c + 0.50,
         base_top + 2.32, base_top + 2.54, glass)
-    box(f"{tag}_lamp", -0.40, -0.22, ent_c - 0.14, ent_c + 0.14,
-        base_top + 2.70, base_top + 2.94, glow)
+    box(f"{tag}_lamp", -0.74, -0.46, ent_c - 0.27, ent_c + 0.27,
+        base_top + 2.36, base_top + 2.92, glow)
     box(f"{tag}_hood", -1.15, 0.0, ent_c - 1.05, ent_c + 1.05,
         base_top + 2.98, base_top + 3.32, trim, bevel=True, bevel_width=0.07)
     box(f"{tag}_balcony", -1.05, -0.02, ent_c - 0.98, ent_c + 0.98,
         base_top + 3.32, base_top + 3.92, trim, bevel=True, bevel_width=0.07)
     for j, zc in enumerate((f1_top + 1.95,)):
-        window_front(f"{tag}_ent_win_{j}", 0.0, ent_c, zc, 1.05, 1.95, trim, glass)
+        window_front(f"{tag}_ent_win_{j}", 0.0, ent_c, zc, 1.05, 1.95, trim, glass, glow)
 
     # Stoop: eight chunky risers out to the sidewalk, solid balustrades.
     risers = 8

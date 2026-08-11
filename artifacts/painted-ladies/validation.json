@@ -3,9 +3,9 @@
   "validator": "Blender 4.5.3 LTS",
   "fresh_isolated_scene": true,
   "reimported_final_glb": true,
-  "object_count": 430,
-  "mesh_object_count": 430,
-  "triangle_count": 15744,
+  "object_count": 448,
+  "mesh_object_count": 448,
+  "triangle_count": 15960,
   "triangle_budget": 27000,
   "dimensions_m": [
     25.3658,
@@ -557,6 +557,25 @@
       ]
     },
     {
+      "name": "h0_710_bay_win_0_lit",
+      "triangles": 12,
+      "location": [
+        0.0,
+        0.0,
+        0.0
+      ],
+      "rotation_euler": [
+        0.0,
+        0.0,
+        0.0
+      ],
+      "scale": [
+        1.0,
+        1.0,
+        1.0
+      ]
+    },
+    {
       "name": "h0_710_bay_win_0_trim",
       "triangles": 12,
       "location": [
@@ -577,6 +596,25 @@
     },
     {
       "name": "h0_710_bay_win_1_glass",
+      "triangles": 12,
+      "location": [
+        0.0,
+        0.0,
+        0.0
+      ],
+      "rotation_euler": [
+        0.0,
+        0.0,
+        0.0
+      ],
+      "scale": [
+        1.0,
+        1.0,
+        1.0
+      ]
+    },
+    {
+      "name": "h0_710_bay_win_1_lit",
       "triangles": 12,
       "location": [
         0.0,
@@ -881,6 +919,25 @@
     },
     {
       "name": "h0_710_ent_win_0_glass",
+      "triangles": 12,
+      "location": [
+        0.0,
+        0.0,
+        0.0
+      ],
+      "rotation_euler": [
+        0.0,
+        0.0,
+        0.0
+      ],
+      "scale": [
+        1.0,
+        1.0,
+        1.0
+      ]
+    },
+    {
+      "name": "h0_710_ent_win_0_lit",
       "triangles": 12,
       "location": [
         0.0,
@@ -2020,6 +2077,25 @@
       ]
     },
     {
+      "name": "h1_712_bay_win_0_lit",
+      "triangles": 12,
+      "location": [
+        0.0,
+        0.0,
+        0.0
+      ],
+      "rotation_euler": [
+        0.0,
+        0.0,
+        0.0
+      ],
+      "scale": [
+        1.0,
+        1.0,
+        1.0
+      ]
+    },
+    {
       "name": "h1_712_bay_win_0_trim",
       "triangles": 12,
       "location": [
@@ -2040,6 +2116,25 @@
     },
     {
       "name": "h1_712_bay_win_1_glass",
+      "triangles": 12,
+      "location": [
+        0.0,
+        0.0,
+        0.0
+      ],
+      "rotation_euler": [
+        0.0,
+        0.0,
+        0.0
+      ],
+      "scale": [
+        1.0,
+        1.0,
+        1.0
+      ]
+    },
+    {
+      "name": "h1_712_bay_win_1_lit",
       "triangles": 12,
       "location": [
         0.0,
@@ -2344,6 +2439,25 @@
     },
     {
       "name": "h1_712_ent_win_0_glass",
+      "triangles": 12,
+      "location": [
+        0.0,
+        0.0,
+        0.0
+      ],
+      "rotation_euler": [
+        0.0,
+        0.0,
+        0.0
+      ],
+      "scale": [
+        1.0,
+        1.0,
+        1.0
+      ]
+    },
+    {
+      "name": "h1_712_ent_win_0_lit",
       "triangles": 12,
       "location": [
         0.0,
@@ -3331,6 +3445,25 @@
       ]
     },
     {
+      "name": "h2_714_bay_win_0_lit",
+      "triangles": 12,
+      "location": [
+        0.0,
+        0.0,
+        0.0
+      ],
+      "rotation_euler": [
+        0.0,
+        0.0,
+        0.0
+      ],
+      "scale": [
+        1.0,
+        1.0,
+        1.0
+      ]
+    },
+    {
       "name": "h2_714_bay_win_0_trim",
       "triangles": 12,
       "location": [
@@ -3351,6 +3484,25 @@
     },
     {
       "name": "h2_714_bay_win_1_glass",
+      "triangles": 12,
+      "location": [
+        0.0,
+        0.0,
+        0.0
+      ],
+      "rotation_euler": [
+        0.0,
+        0.0,
+        0.0
+      ],
+      "scale": [
+        1.0,
+        1.0,
+        1.0
+      ]
+    },
+    {
+      "name": "h2_714_bay_win_1_lit",
       "triangles": 12,
       "location": [
         0.0,
@@ -3655,6 +3807,25 @@
     },
     {
       "name": "h2_714_ent_win_0_glass",
+      "triangles": 12,
+      "location": [
+        0.0,
+        0.0,
+        0.0
+      ],
+      "rotation_euler": [
+        0.0,
+        0.0,
+        0.0
+      ],
+      "scale": [
+        1.0,
+        1.0,
+        1.0
+      ]
+    },
+    {
+      "name": "h2_714_ent_win_0_lit",
       "triangles": 12,
       "location": [
         0.0,
@@ -4642,6 +4813,25 @@
       ]
     },
     {
+      "name": "h3_716_bay_win_0_lit",
+      "triangles": 12,
+      "location": [
+        0.0,
+        0.0,
+        0.0
+      ],
+      "rotation_euler": [
+        0.0,
+        0.0,
+        0.0
+      ],
+      "scale": [
+        1.0,
+        1.0,
+        1.0
+      ]
+    },
+    {
       "name": "h3_716_bay_win_0_trim",
       "triangles": 12,
       "location": [
@@ -4662,6 +4852,25 @@
     },
     {
       "name": "h3_716_bay_win_1_glass",
+      "triangles": 12,
+      "location": [
+        0.0,
+        0.0,
+        0.0
+      ],
+      "rotation_euler": [
+        0.0,
+        0.0,
+        0.0
+      ],
+      "scale": [
+        1.0,
+        1.0,
+        1.0
+      ]
+    },
+    {
+      "name": "h3_716_bay_win_1_lit",
       "triangles": 12,
       "location": [
         0.0,
@@ -4966,6 +5175,25 @@
     },
     {
       "name": "h3_716_ent_win_0_glass",
+      "triangles": 12,
+      "location": [
+        0.0,
+        0.0,
+        0.0
+      ],
+      "rotation_euler": [
+        0.0,
+        0.0,
+        0.0
+      ],
+      "scale": [
+        1.0,
+        1.0,
+        1.0
+      ]
+    },
+    {
+      "name": "h3_716_ent_win_0_lit",
       "triangles": 12,
       "location": [
         0.0,
@@ -5953,6 +6181,25 @@
       ]
     },
     {
+      "name": "h4_718_bay_win_0_lit",
+      "triangles": 12,
+      "location": [
+        0.0,
+        0.0,
+        0.0
+      ],
+      "rotation_euler": [
+        0.0,
+        0.0,
+        0.0
+      ],
+      "scale": [
+        1.0,
+        1.0,
+        1.0
+      ]
+    },
+    {
       "name": "h4_718_bay_win_0_trim",
       "triangles": 12,
       "location": [
@@ -5973,6 +6220,25 @@
     },
     {
       "name": "h4_718_bay_win_1_glass",
+      "triangles": 12,
+      "location": [
+        0.0,
+        0.0,
+        0.0
+      ],
+      "rotation_euler": [
+        0.0,
+        0.0,
+        0.0
+      ],
+      "scale": [
+        1.0,
+        1.0,
+        1.0
+      ]
+    },
+    {
+      "name": "h4_718_bay_win_1_lit",
       "triangles": 12,
       "location": [
         0.0,
@@ -6277,6 +6543,25 @@
     },
     {
       "name": "h4_718_ent_win_0_glass",
+      "triangles": 12,
+      "location": [
+        0.0,
+        0.0,
+        0.0
+      ],
+      "rotation_euler": [
+        0.0,
+        0.0,
+        0.0
+      ],
+      "scale": [
+        1.0,
+        1.0,
+        1.0
+      ]
+    },
+    {
+      "name": "h4_718_ent_win_0_lit",
       "triangles": 12,
       "location": [
         0.0,
@@ -7264,6 +7549,25 @@
       ]
     },
     {
+      "name": "h5_720_bay_win_0_lit",
+      "triangles": 12,
+      "location": [
+        0.0,
+        0.0,
+        0.0
+      ],
+      "rotation_euler": [
+        0.0,
+        0.0,
+        0.0
+      ],
+      "scale": [
+        1.0,
+        1.0,
+        1.0
+      ]
+    },
+    {
       "name": "h5_720_bay_win_0_trim",
       "triangles": 12,
       "location": [
@@ -7284,6 +7588,25 @@
     },
     {
       "name": "h5_720_bay_win_1_glass",
+      "triangles": 12,
+      "location": [
+        0.0,
+        0.0,
+        0.0
+      ],
+      "rotation_euler": [
+        0.0,
+        0.0,
+        0.0
+      ],
+      "scale": [
+        1.0,
+        1.0,
+        1.0
+      ]
+    },
+    {
+      "name": "h5_720_bay_win_1_lit",
       "triangles": 12,
       "location": [
         0.0,
@@ -7588,6 +7911,25 @@
     },
     {
       "name": "h5_720_ent_win_0_glass",
+      "triangles": 12,
+      "location": [
+        0.0,
+        0.0,
+        0.0
+      ],
+      "rotation_euler": [
+        0.0,
+        0.0,
+        0.0
+      ],
+      "scale": [
+        1.0,
+        1.0,
+        1.0
+      ]
+    },
+    {
+      "name": "h5_720_ent_win_0_lit",
       "triangles": 12,
       "location": [
         0.0,
