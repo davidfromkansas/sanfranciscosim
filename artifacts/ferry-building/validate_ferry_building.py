@@ -50,7 +50,8 @@ def main():
         ev.to_mesh_clear()
 
     mat_rows = []; textured = []; transparent = []; off_contract = []; glow_violations = []
-    allowed = {"Toy_sand", "Toy_trim", "Toy_ink", "Toy_glass", "Toy_white_Glow", "Toy_roofd", "Toy_steel", "Toy_gold"}
+    allowed_glow = {"Toy_white_Glow", "Toy_mustard_Glow", "Toy_cream_Glow", "Toy_gold_Glow"}
+    allowed = {"Toy_sand", "Toy_trim", "Toy_ink", "Toy_glass", "Toy_roofd", "Toy_steel", "Toy_gold"} | allowed_glow
     for mat in bpy.data.materials:
         tex = []; alpha = 1.0; roughness = None; emission = 0.0
         if mat.use_nodes:
@@ -63,7 +64,7 @@ def main():
         if tex: textured.append(mat.name)
         if alpha < 0.999: transparent.append(mat.name)
         if mat.name not in allowed or not mat.name.startswith("Toy_") or mat.name == "Toy_body": off_contract.append(mat.name)
-        if mat.name.endswith("_Glow") and mat.name != "Toy_white_Glow": glow_violations.append(mat.name)
+        if mat.name.endswith("_Glow") and mat.name not in allowed_glow: glow_violations.append(mat.name)
         mat_rows.append({"name": mat.name, "image_texture_nodes": tex, "alpha": round(alpha, 4),
                          "roughness": round(roughness, 4) if roughness is not None else None,
                          "glow": mat.name.endswith("_Glow"), "exported_emission_strength": round(emission, 4)})
