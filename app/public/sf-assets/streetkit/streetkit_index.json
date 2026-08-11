@@ -1,0 +1,267 @@
+{
+ "version": 1,
+ "note": "Streetscape furniture kit (layer 2). Built by artifacts/streetkit/build_streetkit.py; every piece is metres, base-centre origin at z=0, front -Y = the roadway side.",
+ "pieces": [
+  {
+   "id": "sl_standard",
+   "file": "sl_standard.glb",
+   "dims": [
+    0.62,
+    4.025,
+    8.69
+   ],
+   "tris": 148,
+   "materials": [
+    "Toy_gold_Glow",
+    "Toy_ink",
+    "Toy_steel"
+   ],
+   "glow": [
+    "Toy_gold_Glow"
+   ]
+  },
+  {
+   "id": "sl_pathofgold",
+   "file": "sl_pathofgold.glb",
+   "dims": [
+    3.097,
+    0.797,
+    6.61
+   ],
+   "tris": 264,
+   "materials": [
+    "Toy_gold",
+    "Toy_gold_Glow",
+    "Toy_ink",
+    "Toy_verdigris"
+   ],
+   "glow": [
+    "Toy_gold_Glow"
+   ]
+  },
+  {
+   "id": "sl_residential",
+   "file": "sl_residential.glb",
+   "dims": [
+    0.6,
+    0.6,
+    5.545
+   ],
+   "tris": 170,
+   "materials": [
+    "Toy_gold_Glow",
+    "Toy_ink"
+   ],
+   "glow": [
+    "Toy_gold_Glow"
+   ]
+  },
+  {
+   "id": "traffic_signal",
+   "file": "traffic_signal.glb",
+   "dims": [
+    0.7,
+    4.12,
+    6.38
+   ],
+   "tris": 256,
+   "materials": [
+    "Toy_ink",
+    "Toy_mint_Glow",
+    "Toy_mustard_Glow",
+    "Toy_red_Glow",
+    "Toy_white_Glow"
+   ],
+   "glow": [
+    "Toy_mint_Glow",
+    "Toy_mustard_Glow",
+    "Toy_red_Glow",
+    "Toy_white_Glow"
+   ]
+  },
+  {
+   "id": "hydrant",
+   "file": "hydrant.glb",
+   "dims": [
+    0.56,
+    0.56,
+    0.96
+   ],
+   "tris": 194,
+   "materials": [
+    "Toy_coral",
+    "Toy_ink",
+    "Toy_mustard"
+   ],
+   "glow": []
+  },
+  {
+   "id": "mailbox",
+   "file": "mailbox.glb",
+   "dims": [
+    0.62,
+    0.615,
+    1.26
+   ],
+   "tris": 136,
+   "materials": [
+    "Toy_ink",
+    "Toy_navy",
+    "Toy_steel"
+   ],
+   "glow": []
+  },
+  {
+   "id": "muni_shelter",
+   "file": "muni_shelter.glb",
+   "dims": [
+    4.4,
+    1.795,
+    2.76
+   ],
+   "tris": 208,
+   "materials": [
+    "Toy_glass",
+    "Toy_steel",
+    "Toy_stone",
+    "Toy_white_Glow"
+   ],
+   "glow": [
+    "Toy_white_Glow"
+   ]
+  },
+  {
+   "id": "bench",
+   "file": "bench.glb",
+   "dims": [
+    1.87,
+    0.53,
+    0.94
+   ],
+   "tris": 136,
+   "materials": [
+    "Toy_ink",
+    "Toy_rust"
+   ],
+   "glow": []
+  },
+  {
+   "id": "trashcan",
+   "file": "trashcan.glb",
+   "dims": [
+    0.68,
+    0.647,
+    1.084
+   ],
+   "tris": 110,
+   "materials": [
+    "Toy_ink",
+    "Toy_steel"
+   ],
+   "glow": []
+  },
+  {
+   "id": "newsboxes",
+   "file": "newsboxes.glb",
+   "dims": [
+    1.62,
+    0.45,
+    1.2
+   ],
+   "tris": 240,
+   "materials": [
+    "Toy_glass",
+    "Toy_ink",
+    "Toy_mustard",
+    "Toy_red",
+    "Toy_teal"
+   ],
+   "glow": []
+  },
+  {
+   "id": "planter",
+   "file": "planter.glb",
+   "dims": [
+    1.0,
+    1.0,
+    1.31
+   ],
+   "tris": 88,
+   "materials": [
+    "Toy_mint",
+    "Toy_rust",
+    "Toy_stone"
+   ],
+   "glow": []
+  },
+  {
+   "id": "bikerack",
+   "file": "bikerack.glb",
+   "dims": [
+    2.3,
+    0.686,
+    0.87
+   ],
+   "tris": 176,
+   "materials": [
+    "Toy_steel",
+    "Toy_stone"
+   ],
+   "glow": []
+  },
+  {
+   "id": "cafe_set",
+   "file": "cafe_set.glb",
+   "dims": [
+    1.9,
+    2.02,
+    2.4
+   ],
+   "tris": 268,
+   "materials": [
+    "Toy_coral",
+    "Toy_ink",
+    "Toy_teal",
+    "Toy_trim"
+   ],
+   "glow": []
+  },
+  {
+   "id": "market_stall",
+   "file": "market_stall.glb",
+   "dims": [
+    3.0,
+    1.9,
+    2.42
+   ],
+   "tris": 320,
+   "materials": [
+    "Toy_coral",
+    "Toy_ink",
+    "Toy_mint",
+    "Toy_mustard",
+    "Toy_red",
+    "Toy_stone",
+    "Toy_trim"
+   ],
+   "glow": []
+  },
+  {
+   "id": "parklet",
+   "file": "parklet.glb",
+   "dims": [
+    6.0,
+    2.1,
+    1.66
+   ],
+   "tris": 248,
+   "materials": [
+    "Toy_ink",
+    "Toy_mint",
+    "Toy_rust",
+    "Toy_teal"
+   ],
+   "glow": []
+  }
+ ]
+}
