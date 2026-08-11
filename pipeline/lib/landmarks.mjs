@@ -174,6 +174,15 @@ export const LANDMARKS = [
     exclude: 260,
     camera: { distance: 900, yaw: 180, pitch: 20 },
   },
+  {
+    id: 'missionDolores',
+    name: 'Mission Dolores Basilica',
+    lon: -122.4269098,
+    lat: 37.7643109,
+    height: 41,
+    exclude: 45,
+    camera: { distance: 500, yaw: 90, pitch: 16 },
+  },
 ];
 
 // Parks/green spaces the landcover bake must match at least one source polygon
