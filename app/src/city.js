@@ -37,6 +37,7 @@ import { catalogForWorker } from './kitplan.js';
 import { createKitLoader, loadKitIndex } from './kitassets.js';
 import { createKitFleet } from './kitfleet.js';
 import { landmarkExclusions, loadKitZones } from './kitzones.js';
+import { GROUP_LIMIT, createStreetHints, createStreetKitFleet, loadStreetKit } from './streetkit.js';
 
 const GROUP = 2000;
 const CHUNK = 1000;
@@ -199,6 +200,8 @@ export function createCity(scene, data) {
     kitPieceTypes: 0,
     kitPlaced: 0,
     kitConsidered: 0,
+    furniture: 0,
+    furnitureDraws: 0,
   };
   const paths = [];
   let onPathsReady = () => {};
@@ -242,6 +245,24 @@ export function createCity(scene, data) {
   const kitGroup = new Object3D();
   kitGroup.name = 'kit-fleet';
   scene.add(kitGroup);
+
+  // ------------------------------------------------------- the street kit ---
+  // Layer 2 furniture. Lives on the near tier only: it is built with the kerb
+  // and marking detail for a ground group and dropped with it. If anything in
+  // the kit fails to load, `streetkit.fleet` stays null and the streets are the
+  // layer 1 streets, with one warning.
+  const streetkit = { fleet: null, hints: null, exclusions: null, warned: false };
+  const streetkitReady = (async () => {
+    try {
+      const loaded = await loadStreetKit();
+      streetkit.fleet = createStreetKitFleet(scene, loaded, data.sampleElevation);
+      streetkit.hints = createStreetHints(manifest);
+      streetkit.exclusions = landmarkExclusions(manifest, data.project);
+    } catch (error) {
+      streetkit.warned = true;
+      console.warn(`[streetkit] unavailable, streets stay bare: ${error.message}`);
+    }
+  })();
 
   const kitReady = (async () => {
     try {
@@ -550,6 +571,16 @@ export function createCity(scene, data) {
     if (!streetClasses.some((cls) => cls.detail || cls.profile)) return;
     g.detailRequested = true;
     const streets = await streetBlobs(g.streetCells);
+    // Market Street and the shopfronts come from the context layer; the worker
+    // only ever sees geometry, so the hints ride along with the job.
+    let plan = null;
+    if (tier === 'toy') {
+      await streetkitReady;
+      if (streetkit.fleet) {
+        const hints = await streetkit.hints(g.originX, g.originZ, g.originX + GROUP, g.originZ + GROUP);
+        plan = { ...hints, exclusions: streetkit.exclusions, limit: GROUP_LIMIT };
+      }
+    }
     const result = await pool.run({
       type: 'grounddetail',
       key: g.key,
@@ -559,9 +590,16 @@ export function createCity(scene, data) {
       landcover: [],
       streetClasses,
       landKinds: manifest.landKinds,
+      plan,
     });
     // The camera may have left while the worker was busy.
-    if (!g.detailRequested || result.positions.length === 0) return;
+    if (!g.detailRequested) return;
+    if (plan && result.furniture && result.furniture.length) {
+      g.furniture = streetkit.fleet.add(g.key, result.furniture) > 0;
+      stats.furniture = streetkit.fleet.instances;
+      stats.furnitureDraws = streetkit.fleet.drawCalls;
+    }
+    if (result.positions.length === 0) return;
     const geometry = new BufferGeometry();
     makeAttributes(geometry, result);
     geometry.setAttribute('aKind', new BufferAttribute(result.kinds, 1));
@@ -577,6 +615,12 @@ export function createCity(scene, data) {
 
   function disposeGroundDetail(g) {
     g.detailRequested = false;
+    if (g.furniture) {
+      streetkit.fleet.remove(g.key);
+      g.furniture = false;
+      stats.furniture = streetkit.fleet.instances;
+      stats.furnitureDraws = streetkit.fleet.drawCalls;
+    }
     if (!g.detailMesh) return;
     scene.remove(g.detailMesh);
     g.detailMesh.geometry.dispose();
@@ -730,6 +774,11 @@ export function createCity(scene, data) {
       stats.kitPlaced = 0;
       stats.kitConsidered = 0;
     }
+    if (streetkit.fleet) {
+      streetkit.fleet.clear();
+      stats.furniture = 0;
+      stats.furnitureDraws = 0;
+    }
     const reload = [];
     for (const g of groups.values()) {
       if (g.groundRequested) reload.push(g);
@@ -815,7 +864,12 @@ export function createCity(scene, data) {
       tmp.y = cameraTarget.y;
       const dist = cameraTarget.distanceTo(tmp);
       if (g.trees) g.trees.visible = dist < TREE_RANGE * quality.treeScale;
-      if (g.lamps) g.lamps.visible = shared.uNight.value > 0.08 && dist < LAMP_RANGE;
+      // The procedural glow sphere is the stand-in for a lamp this group has no
+      // kit lamps for. Where kit lamps stand, they are the lamp — two glows in
+      // one place read as a bloom bug.
+      if (g.lamps) {
+        g.lamps.visible = shared.uNight.value > 0.08 && dist < LAMP_RANGE && !g.furniture;
+      }
       if (dist < DETAIL_ENTER && !g.detailRequested) {
         buildGroundDetail(g).catch((err) => console.warn('streetscape failed', g.key, err));
       } else if (dist > DETAIL_EXIT && g.detailRequested) {
@@ -823,6 +877,7 @@ export function createCity(scene, data) {
       }
     }
     lampMaterial.opacity = Math.min(0.85, shared.uNight.value * 0.95);
+    if (streetkit.fleet) streetkit.fleet.update();
   }
 
   return {

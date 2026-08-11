@@ -71,5 +71,23 @@
       260
     ],
     "tris": 14026
+  },
+  {
+    "id": "painted-ladies",
+    "file": "painted-ladies.glb",
+    "anchor": [
+      -122.43274,
+      37.776228
+    ],
+    "targetHeightM": 16.51,
+    "cat": 1,
+    "name": "Painted Ladies",
+    "estimated": false,
+    "dims": [
+      25.3658,
+      44.2368,
+      16.51
+    ],
+    "tris": 15744
   }
 ]

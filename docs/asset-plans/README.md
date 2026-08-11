@@ -20,6 +20,13 @@ pipeline: a reusable, runnable prompt that takes a finished GLB from
 re-bake for new landmarks, fallback drill, deployed QA), plus reference notes on how
 the loader places assets and what to do when one misbehaves.
 
+Parks are planned separately in [**`../plans/parks/`**](../plans/parks/README.md),
+because a park is not a single GLB — it is landcover, terrain drape, tree
+placement and paths from the pipeline, with a few hero assets inside it. Those
+plans reference the landmark plans here (de Young, Cal Academy, Conservatory,
+Painted Ladies, Mission Dolores Basilica, Palace of Fine Arts) rather than
+duplicating them.
+
 ## The set
 
 | Landmark | Manifest id | Target height | Runtime status |

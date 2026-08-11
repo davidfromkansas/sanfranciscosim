@@ -1,0 +1,1270 @@
+{
+ "pieces": [
+  {
+   "id": "sl_standard",
+   "tris": 148,
+   "dims": [
+    0.62,
+    4.025,
+    8.69
+   ],
+   "materials": [
+    "Toy_gold_Glow",
+    "Toy_ink",
+    "Toy_steel"
+   ],
+   "glow": [
+    "Toy_gold_Glow"
+   ],
+   "checks": [
+    {
+     "name": "units_metres",
+     "pass": true,
+     "detail": "max dim 8.69 m"
+    },
+    {
+     "name": "origin_on_ground",
+     "pass": true,
+     "detail": "min z 0.0000"
+    },
+    {
+     "name": "origin_centred",
+     "pass": true,
+     "detail": "centre (0.0000, 0.0000)"
+    },
+    {
+     "name": "tri_budget",
+     "pass": true,
+     "detail": "148 / 300"
+    },
+    {
+     "name": "materials_toy",
+     "pass": true,
+     "detail": "Toy_gold_Glow,Toy_ink,Toy_steel"
+    },
+    {
+     "name": "no_textures",
+     "pass": true,
+     "detail": "none"
+    },
+    {
+     "name": "opaque",
+     "pass": true,
+     "detail": "none"
+    },
+    {
+     "name": "roughness",
+     "pass": true,
+     "detail": "0.85-0.85"
+    },
+    {
+     "name": "glow_only_where_lit",
+     "pass": true,
+     "detail": "Toy_gold_Glow"
+    },
+    {
+     "name": "no_cameras_lights",
+     "pass": true,
+     "detail": "none"
+    },
+    {
+     "name": "no_animation",
+     "pass": true,
+     "detail": "0 actions"
+    },
+    {
+     "name": "no_skinning",
+     "pass": true,
+     "detail": "no vertex groups"
+    },
+    {
+     "name": "index_agrees",
+     "pass": true,
+     "detail": "index [0.62, 4.025, 8.69] / 148"
+    }
+   ],
+   "pass": true
+  },
+  {
+   "id": "sl_pathofgold",
+   "tris": 264,
+   "dims": [
+    3.097,
+    0.797,
+    6.61
+   ],
+   "materials": [
+    "Toy_gold",
+    "Toy_gold_Glow",
+    "Toy_ink",
+    "Toy_verdigris"
+   ],
+   "glow": [
+    "Toy_gold_Glow"
+   ],
+   "checks": [
+    {
+     "name": "units_metres",
+     "pass": true,
+     "detail": "max dim 6.61 m"
+    },
+    {
+     "name": "origin_on_ground",
+     "pass": true,
+     "detail": "min z 0.0000"
+    },
+    {
+     "name": "origin_centred",
+     "pass": true,
+     "detail": "centre (0.0000, 0.0000)"
+    },
+    {
+     "name": "tri_budget",
+     "pass": true,
+     "detail": "264 / 300"
+    },
+    {
+     "name": "materials_toy",
+     "pass": true,
+     "detail": "Toy_gold,Toy_gold_Glow,Toy_ink,Toy_verdigris"
+    },
+    {
+     "name": "no_textures",
+     "pass": true,
+     "detail": "none"
+    },
+    {
+     "name": "opaque",
+     "pass": true,
+     "detail": "none"
+    },
+    {
+     "name": "roughness",
+     "pass": true,
+     "detail": "0.85-0.85"
+    },
+    {
+     "name": "glow_only_where_lit",
+     "pass": true,
+     "detail": "Toy_gold_Glow"
+    },
+    {
+     "name": "no_cameras_lights",
+     "pass": true,
+     "detail": "none"
+    },
+    {
+     "name": "no_animation",
+     "pass": true,
+     "detail": "0 actions"
+    },
+    {
+     "name": "no_skinning",
+     "pass": true,
+     "detail": "no vertex groups"
+    },
+    {
+     "name": "index_agrees",
+     "pass": true,
+     "detail": "index [3.097, 0.797, 6.61] / 264"
+    }
+   ],
+   "pass": true
+  },
+  {
+   "id": "sl_residential",
+   "tris": 170,
+   "dims": [
+    0.6,
+    0.6,
+    5.545
+   ],
+   "materials": [
+    "Toy_gold_Glow",
+    "Toy_ink"
+   ],
+   "glow": [
+    "Toy_gold_Glow"
+   ],
+   "checks": [
+    {
+     "name": "units_metres",
+     "pass": true,
+     "detail": "max dim 5.55 m"
+    },
+    {
+     "name": "origin_on_ground",
+     "pass": true,
+     "detail": "min z 0.0000"
+    },
+    {
+     "name": "origin_centred",
+     "pass": true,
+     "detail": "centre (0.0000, 0.0000)"
+    },
+    {
+     "name": "tri_budget",
+     "pass": true,
+     "detail": "170 / 300"
+    },
+    {
+     "name": "materials_toy",
+     "pass": true,
+     "detail": "Toy_gold_Glow,Toy_ink"
+    },
+    {
+     "name": "no_textures",
+     "pass": true,
+     "detail": "none"
+    },
+    {
+     "name": "opaque",
+     "pass": true,
+     "detail": "none"
+    },
+    {
+     "name": "roughness",
+     "pass": true,
+     "detail": "0.85-0.85"
+    },
+    {
+     "name": "glow_only_where_lit",
+     "pass": true,
+     "detail": "Toy_gold_Glow"
+    },
+    {
+     "name": "no_cameras_lights",
+     "pass": true,
+     "detail": "none"
+    },
+    {
+     "name": "no_animation",
+     "pass": true,
+     "detail": "0 actions"
+    },
+    {
+     "name": "no_skinning",
+     "pass": true,
+     "detail": "no vertex groups"
+    },
+    {
+     "name": "index_agrees",
+     "pass": true,
+     "detail": "index [0.6, 0.6, 5.545] / 170"
+    }
+   ],
+   "pass": true
+  },
+  {
+   "id": "traffic_signal",
+   "tris": 256,
+   "dims": [
+    0.7,
+    4.12,
+    6.38
+   ],
+   "materials": [
+    "Toy_ink",
+    "Toy_mint_Glow",
+    "Toy_mustard_Glow",
+    "Toy_red_Glow",
+    "Toy_white_Glow"
+   ],
+   "glow": [
+    "Toy_mint_Glow",
+    "Toy_mustard_Glow",
+    "Toy_red_Glow",
+    "Toy_white_Glow"
+   ],
+   "checks": [
+    {
+     "name": "units_metres",
+     "pass": true,
+     "detail": "max dim 6.38 m"
+    },
+    {
+     "name": "origin_on_ground",
+     "pass": true,
+     "detail": "min z 0.0000"
+    },
+    {
+     "name": "origin_centred",
+     "pass": true,
+     "detail": "centre (0.0000, 0.0000)"
+    },
+    {
+     "name": "tri_budget",
+     "pass": true,
+     "detail": "256 / 300"
+    },
+    {
+     "name": "materials_toy",
+     "pass": true,
+     "detail": "Toy_ink,Toy_mint_Glow,Toy_mustard_Glow,Toy_red_Glow,Toy_white_Glow"
+    },
+    {
+     "name": "no_textures",
+     "pass": true,
+     "detail": "none"
+    },
+    {
+     "name": "opaque",
+     "pass": true,
+     "detail": "none"
+    },
+    {
+     "name": "roughness",
+     "pass": true,
+     "detail": "0.85-0.85"
+    },
+    {
+     "name": "glow_only_where_lit",
+     "pass": true,
+     "detail": "Toy_mint_Glow,Toy_mustard_Glow,Toy_red_Glow,Toy_white_Glow"
+    },
+    {
+     "name": "no_cameras_lights",
+     "pass": true,
+     "detail": "none"
+    },
+    {
+     "name": "no_animation",
+     "pass": true,
+     "detail": "0 actions"
+    },
+    {
+     "name": "no_skinning",
+     "pass": true,
+     "detail": "no vertex groups"
+    },
+    {
+     "name": "index_agrees",
+     "pass": true,
+     "detail": "index [0.7, 4.12, 6.38] / 256"
+    }
+   ],
+   "pass": true
+  },
+  {
+   "id": "hydrant",
+   "tris": 194,
+   "dims": [
+    0.56,
+    0.56,
+    0.96
+   ],
+   "materials": [
+    "Toy_coral",
+    "Toy_ink",
+    "Toy_mustard"
+   ],
+   "glow": [],
+   "checks": [
+    {
+     "name": "units_metres",
+     "pass": true,
+     "detail": "max dim 0.96 m"
+    },
+    {
+     "name": "origin_on_ground",
+     "pass": true,
+     "detail": "min z 0.0000"
+    },
+    {
+     "name": "origin_centred",
+     "pass": true,
+     "detail": "centre (0.0000, 0.0000)"
+    },
+    {
+     "name": "tri_budget",
+     "pass": true,
+     "detail": "194 / 300"
+    },
+    {
+     "name": "materials_toy",
+     "pass": true,
+     "detail": "Toy_coral,Toy_ink,Toy_mustard"
+    },
+    {
+     "name": "no_textures",
+     "pass": true,
+     "detail": "none"
+    },
+    {
+     "name": "opaque",
+     "pass": true,
+     "detail": "none"
+    },
+    {
+     "name": "roughness",
+     "pass": true,
+     "detail": "0.85-0.85"
+    },
+    {
+     "name": "glow_only_where_lit",
+     "pass": true,
+     "detail": "none"
+    },
+    {
+     "name": "no_cameras_lights",
+     "pass": true,
+     "detail": "none"
+    },
+    {
+     "name": "no_animation",
+     "pass": true,
+     "detail": "0 actions"
+    },
+    {
+     "name": "no_skinning",
+     "pass": true,
+     "detail": "no vertex groups"
+    },
+    {
+     "name": "index_agrees",
+     "pass": true,
+     "detail": "index [0.56, 0.56, 0.96] / 194"
+    }
+   ],
+   "pass": true
+  },
+  {
+   "id": "mailbox",
+   "tris": 136,
+   "dims": [
+    0.62,
+    0.615,
+    1.26
+   ],
+   "materials": [
+    "Toy_ink",
+    "Toy_navy",
+    "Toy_steel"
+   ],
+   "glow": [],
+   "checks": [
+    {
+     "name": "units_metres",
+     "pass": true,
+     "detail": "max dim 1.26 m"
+    },
+    {
+     "name": "origin_on_ground",
+     "pass": true,
+     "detail": "min z 0.0000"
+    },
+    {
+     "name": "origin_centred",
+     "pass": true,
+     "detail": "centre (0.0000, 0.0000)"
+    },
+    {
+     "name": "tri_budget",
+     "pass": true,
+     "detail": "136 / 300"
+    },
+    {
+     "name": "materials_toy",
+     "pass": true,
+     "detail": "Toy_ink,Toy_navy,Toy_steel"
+    },
+    {
+     "name": "no_textures",
+     "pass": true,
+     "detail": "none"
+    },
+    {
+     "name": "opaque",
+     "pass": true,
+     "detail": "none"
+    },
+    {
+     "name": "roughness",
+     "pass": true,
+     "detail": "0.85-0.85"
+    },
+    {
+     "name": "glow_only_where_lit",
+     "pass": true,
+     "detail": "none"
+    },
+    {
+     "name": "no_cameras_lights",
+     "pass": true,
+     "detail": "none"
+    },
+    {
+     "name": "no_animation",
+     "pass": true,
+     "detail": "0 actions"
+    },
+    {
+     "name": "no_skinning",
+     "pass": true,
+     "detail": "no vertex groups"
+    },
+    {
+     "name": "index_agrees",
+     "pass": true,
+     "detail": "index [0.62, 0.615, 1.26] / 136"
+    }
+   ],
+   "pass": true
+  },
+  {
+   "id": "muni_shelter",
+   "tris": 208,
+   "dims": [
+    4.4,
+    1.795,
+    2.76
+   ],
+   "materials": [
+    "Toy_glass",
+    "Toy_steel",
+    "Toy_stone",
+    "Toy_white_Glow"
+   ],
+   "glow": [
+    "Toy_white_Glow"
+   ],
+   "checks": [
+    {
+     "name": "units_metres",
+     "pass": true,
+     "detail": "max dim 4.40 m"
+    },
+    {
+     "name": "origin_on_ground",
+     "pass": true,
+     "detail": "min z 0.0000"
+    },
+    {
+     "name": "origin_centred",
+     "pass": true,
+     "detail": "centre (0.0000, 0.0000)"
+    },
+    {
+     "name": "tri_budget",
+     "pass": true,
+     "detail": "208 / 500"
+    },
+    {
+     "name": "materials_toy",
+     "pass": true,
+     "detail": "Toy_glass,Toy_steel,Toy_stone,Toy_white_Glow"
+    },
+    {
+     "name": "no_textures",
+     "pass": true,
+     "detail": "none"
+    },
+    {
+     "name": "opaque",
+     "pass": true,
+     "detail": "none"
+    },
+    {
+     "name": "roughness",
+     "pass": true,
+     "detail": "0.85-0.85"
+    },
+    {
+     "name": "glow_only_where_lit",
+     "pass": true,
+     "detail": "Toy_white_Glow"
+    },
+    {
+     "name": "no_cameras_lights",
+     "pass": true,
+     "detail": "none"
+    },
+    {
+     "name": "no_animation",
+     "pass": true,
+     "detail": "0 actions"
+    },
+    {
+     "name": "no_skinning",
+     "pass": true,
+     "detail": "no vertex groups"
+    },
+    {
+     "name": "index_agrees",
+     "pass": true,
+     "detail": "index [4.4, 1.795, 2.76] / 208"
+    }
+   ],
+   "pass": true
+  },
+  {
+   "id": "bench",
+   "tris": 136,
+   "dims": [
+    1.87,
+    0.53,
+    0.94
+   ],
+   "materials": [
+    "Toy_ink",
+    "Toy_rust"
+   ],
+   "glow": [],
+   "checks": [
+    {
+     "name": "units_metres",
+     "pass": true,
+     "detail": "max dim 1.87 m"
+    },
+    {
+     "name": "origin_on_ground",
+     "pass": true,
+     "detail": "min z 0.0000"
+    },
+    {
+     "name": "origin_centred",
+     "pass": true,
+     "detail": "centre (0.0000, 0.0000)"
+    },
+    {
+     "name": "tri_budget",
+     "pass": true,
+     "detail": "136 / 300"
+    },
+    {
+     "name": "materials_toy",
+     "pass": true,
+     "detail": "Toy_ink,Toy_rust"
+    },
+    {
+     "name": "no_textures",
+     "pass": true,
+     "detail": "none"
+    },
+    {
+     "name": "opaque",
+     "pass": true,
+     "detail": "none"
+    },
+    {
+     "name": "roughness",
+     "pass": true,
+     "detail": "0.85-0.85"
+    },
+    {
+     "name": "glow_only_where_lit",
+     "pass": true,
+     "detail": "none"
+    },
+    {
+     "name": "no_cameras_lights",
+     "pass": true,
+     "detail": "none"
+    },
+    {
+     "name": "no_animation",
+     "pass": true,
+     "detail": "0 actions"
+    },
+    {
+     "name": "no_skinning",
+     "pass": true,
+     "detail": "no vertex groups"
+    },
+    {
+     "name": "index_agrees",
+     "pass": true,
+     "detail": "index [1.87, 0.53, 0.94] / 136"
+    }
+   ],
+   "pass": true
+  },
+  {
+   "id": "trashcan",
+   "tris": 110,
+   "dims": [
+    0.68,
+    0.647,
+    1.084
+   ],
+   "materials": [
+    "Toy_ink",
+    "Toy_steel"
+   ],
+   "glow": [],
+   "checks": [
+    {
+     "name": "units_metres",
+     "pass": true,
+     "detail": "max dim 1.08 m"
+    },
+    {
+     "name": "origin_on_ground",
+     "pass": true,
+     "detail": "min z 0.0000"
+    },
+    {
+     "name": "origin_centred",
+     "pass": true,
+     "detail": "centre (0.0000, 0.0000)"
+    },
+    {
+     "name": "tri_budget",
+     "pass": true,
+     "detail": "110 / 300"
+    },
+    {
+     "name": "materials_toy",
+     "pass": true,
+     "detail": "Toy_ink,Toy_steel"
+    },
+    {
+     "name": "no_textures",
+     "pass": true,
+     "detail": "none"
+    },
+    {
+     "name": "opaque",
+     "pass": true,
+     "detail": "none"
+    },
+    {
+     "name": "roughness",
+     "pass": true,
+     "detail": "0.85-0.85"
+    },
+    {
+     "name": "glow_only_where_lit",
+     "pass": true,
+     "detail": "none"
+    },
+    {
+     "name": "no_cameras_lights",
+     "pass": true,
+     "detail": "none"
+    },
+    {
+     "name": "no_animation",
+     "pass": true,
+     "detail": "0 actions"
+    },
+    {
+     "name": "no_skinning",
+     "pass": true,
+     "detail": "no vertex groups"
+    },
+    {
+     "name": "index_agrees",
+     "pass": true,
+     "detail": "index [0.68, 0.647, 1.084] / 110"
+    }
+   ],
+   "pass": true
+  },
+  {
+   "id": "newsboxes",
+   "tris": 240,
+   "dims": [
+    1.62,
+    0.45,
+    1.2
+   ],
+   "materials": [
+    "Toy_glass",
+    "Toy_ink",
+    "Toy_mustard",
+    "Toy_red",
+    "Toy_teal"
+   ],
+   "glow": [],
+   "checks": [
+    {
+     "name": "units_metres",
+     "pass": true,
+     "detail": "max dim 1.62 m"
+    },
+    {
+     "name": "origin_on_ground",
+     "pass": true,
+     "detail": "min z 0.0000"
+    },
+    {
+     "name": "origin_centred",
+     "pass": true,
+     "detail": "centre (0.0000, 0.0000)"
+    },
+    {
+     "name": "tri_budget",
+     "pass": true,
+     "detail": "240 / 300"
+    },
+    {
+     "name": "materials_toy",
+     "pass": true,
+     "detail": "Toy_glass,Toy_ink,Toy_mustard,Toy_red,Toy_teal"
+    },
+    {
+     "name": "no_textures",
+     "pass": true,
+     "detail": "none"
+    },
+    {
+     "name": "opaque",
+     "pass": true,
+     "detail": "none"
+    },
+    {
+     "name": "roughness",
+     "pass": true,
+     "detail": "0.85-0.85"
+    },
+    {
+     "name": "glow_only_where_lit",
+     "pass": true,
+     "detail": "none"
+    },
+    {
+     "name": "no_cameras_lights",
+     "pass": true,
+     "detail": "none"
+    },
+    {
+     "name": "no_animation",
+     "pass": true,
+     "detail": "0 actions"
+    },
+    {
+     "name": "no_skinning",
+     "pass": true,
+     "detail": "no vertex groups"
+    },
+    {
+     "name": "index_agrees",
+     "pass": true,
+     "detail": "index [1.62, 0.45, 1.2] / 240"
+    }
+   ],
+   "pass": true
+  },
+  {
+   "id": "planter",
+   "tris": 88,
+   "dims": [
+    1.0,
+    1.0,
+    1.31
+   ],
+   "materials": [
+    "Toy_mint",
+    "Toy_rust",
+    "Toy_stone"
+   ],
+   "glow": [],
+   "checks": [
+    {
+     "name": "units_metres",
+     "pass": true,
+     "detail": "max dim 1.31 m"
+    },
+    {
+     "name": "origin_on_ground",
+     "pass": true,
+     "detail": "min z 0.0000"
+    },
+    {
+     "name": "origin_centred",
+     "pass": true,
+     "detail": "centre (0.0000, 0.0000)"
+    },
+    {
+     "name": "tri_budget",
+     "pass": true,
+     "detail": "88 / 300"
+    },
+    {
+     "name": "materials_toy",
+     "pass": true,
+     "detail": "Toy_mint,Toy_rust,Toy_stone"
+    },
+    {
+     "name": "no_textures",
+     "pass": true,
+     "detail": "none"
+    },
+    {
+     "name": "opaque",
+     "pass": true,
+     "detail": "none"
+    },
+    {
+     "name": "roughness",
+     "pass": true,
+     "detail": "0.85-0.85"
+    },
+    {
+     "name": "glow_only_where_lit",
+     "pass": true,
+     "detail": "none"
+    },
+    {
+     "name": "no_cameras_lights",
+     "pass": true,
+     "detail": "none"
+    },
+    {
+     "name": "no_animation",
+     "pass": true,
+     "detail": "0 actions"
+    },
+    {
+     "name": "no_skinning",
+     "pass": true,
+     "detail": "no vertex groups"
+    },
+    {
+     "name": "index_agrees",
+     "pass": true,
+     "detail": "index [1.0, 1.0, 1.31] / 88"
+    }
+   ],
+   "pass": true
+  },
+  {
+   "id": "bikerack",
+   "tris": 176,
+   "dims": [
+    2.3,
+    0.686,
+    0.87
+   ],
+   "materials": [
+    "Toy_steel",
+    "Toy_stone"
+   ],
+   "glow": [],
+   "checks": [
+    {
+     "name": "units_metres",
+     "pass": true,
+     "detail": "max dim 2.30 m"
+    },
+    {
+     "name": "origin_on_ground",
+     "pass": true,
+     "detail": "min z 0.0000"
+    },
+    {
+     "name": "origin_centred",
+     "pass": true,
+     "detail": "centre (0.0000, 0.0000)"
+    },
+    {
+     "name": "tri_budget",
+     "pass": true,
+     "detail": "176 / 300"
+    },
+    {
+     "name": "materials_toy",
+     "pass": true,
+     "detail": "Toy_steel,Toy_stone"
+    },
+    {
+     "name": "no_textures",
+     "pass": true,
+     "detail": "none"
+    },
+    {
+     "name": "opaque",
+     "pass": true,
+     "detail": "none"
+    },
+    {
+     "name": "roughness",
+     "pass": true,
+     "detail": "0.85-0.85"
+    },
+    {
+     "name": "glow_only_where_lit",
+     "pass": true,
+     "detail": "none"
+    },
+    {
+     "name": "no_cameras_lights",
+     "pass": true,
+     "detail": "none"
+    },
+    {
+     "name": "no_animation",
+     "pass": true,
+     "detail": "0 actions"
+    },
+    {
+     "name": "no_skinning",
+     "pass": true,
+     "detail": "no vertex groups"
+    },
+    {
+     "name": "index_agrees",
+     "pass": true,
+     "detail": "index [2.3, 0.686, 0.87] / 176"
+    }
+   ],
+   "pass": true
+  },
+  {
+   "id": "cafe_set",
+   "tris": 268,
+   "dims": [
+    1.9,
+    2.02,
+    2.4
+   ],
+   "materials": [
+    "Toy_coral",
+    "Toy_ink",
+    "Toy_teal",
+    "Toy_trim"
+   ],
+   "glow": [],
+   "checks": [
+    {
+     "name": "units_metres",
+     "pass": true,
+     "detail": "max dim 2.40 m"
+    },
+    {
+     "name": "origin_on_ground",
+     "pass": true,
+     "detail": "min z 0.0000"
+    },
+    {
+     "name": "origin_centred",
+     "pass": true,
+     "detail": "centre (0.0000, 0.0000)"
+    },
+    {
+     "name": "tri_budget",
+     "pass": true,
+     "detail": "268 / 300"
+    },
+    {
+     "name": "materials_toy",
+     "pass": true,
+     "detail": "Toy_coral,Toy_ink,Toy_teal,Toy_trim"
+    },
+    {
+     "name": "no_textures",
+     "pass": true,
+     "detail": "none"
+    },
+    {
+     "name": "opaque",
+     "pass": true,
+     "detail": "none"
+    },
+    {
+     "name": "roughness",
+     "pass": true,
+     "detail": "0.85-0.85"
+    },
+    {
+     "name": "glow_only_where_lit",
+     "pass": true,
+     "detail": "none"
+    },
+    {
+     "name": "no_cameras_lights",
+     "pass": true,
+     "detail": "none"
+    },
+    {
+     "name": "no_animation",
+     "pass": true,
+     "detail": "0 actions"
+    },
+    {
+     "name": "no_skinning",
+     "pass": true,
+     "detail": "no vertex groups"
+    },
+    {
+     "name": "index_agrees",
+     "pass": true,
+     "detail": "index [1.9, 2.02, 2.4] / 268"
+    }
+   ],
+   "pass": true
+  },
+  {
+   "id": "market_stall",
+   "tris": 320,
+   "dims": [
+    3.0,
+    1.9,
+    2.42
+   ],
+   "materials": [
+    "Toy_coral",
+    "Toy_ink",
+    "Toy_mint",
+    "Toy_mustard",
+    "Toy_red",
+    "Toy_stone",
+    "Toy_trim"
+   ],
+   "glow": [],
+   "checks": [
+    {
+     "name": "units_metres",
+     "pass": true,
+     "detail": "max dim 3.00 m"
+    },
+    {
+     "name": "origin_on_ground",
+     "pass": true,
+     "detail": "min z 0.0000"
+    },
+    {
+     "name": "origin_centred",
+     "pass": true,
+     "detail": "centre (0.0000, 0.0000)"
+    },
+    {
+     "name": "tri_budget",
+     "pass": true,
+     "detail": "320 / 500"
+    },
+    {
+     "name": "materials_toy",
+     "pass": true,
+     "detail": "Toy_coral,Toy_ink,Toy_mint,Toy_mustard,Toy_red,Toy_stone,Toy_trim"
+    },
+    {
+     "name": "no_textures",
+     "pass": true,
+     "detail": "none"
+    },
+    {
+     "name": "opaque",
+     "pass": true,
+     "detail": "none"
+    },
+    {
+     "name": "roughness",
+     "pass": true,
+     "detail": "0.85-0.85"
+    },
+    {
+     "name": "glow_only_where_lit",
+     "pass": true,
+     "detail": "none"
+    },
+    {
+     "name": "no_cameras_lights",
+     "pass": true,
+     "detail": "none"
+    },
+    {
+     "name": "no_animation",
+     "pass": true,
+     "detail": "0 actions"
+    },
+    {
+     "name": "no_skinning",
+     "pass": true,
+     "detail": "no vertex groups"
+    },
+    {
+     "name": "index_agrees",
+     "pass": true,
+     "detail": "index [3.0, 1.9, 2.42] / 320"
+    }
+   ],
+   "pass": true
+  },
+  {
+   "id": "parklet",
+   "tris": 248,
+   "dims": [
+    6.0,
+    2.1,
+    1.66
+   ],
+   "materials": [
+    "Toy_ink",
+    "Toy_mint",
+    "Toy_rust",
+    "Toy_teal"
+   ],
+   "glow": [],
+   "checks": [
+    {
+     "name": "units_metres",
+     "pass": true,
+     "detail": "max dim 6.00 m"
+    },
+    {
+     "name": "origin_on_ground",
+     "pass": true,
+     "detail": "min z 0.0000"
+    },
+    {
+     "name": "origin_centred",
+     "pass": true,
+     "detail": "centre (0.0000, 0.0000)"
+    },
+    {
+     "name": "tri_budget",
+     "pass": true,
+     "detail": "248 / 500"
+    },
+    {
+     "name": "materials_toy",
+     "pass": true,
+     "detail": "Toy_ink,Toy_mint,Toy_rust,Toy_teal"
+    },
+    {
+     "name": "no_textures",
+     "pass": true,
+     "detail": "none"
+    },
+    {
+     "name": "opaque",
+     "pass": true,
+     "detail": "none"
+    },
+    {
+     "name": "roughness",
+     "pass": true,
+     "detail": "0.85-0.85"
+    },
+    {
+     "name": "glow_only_where_lit",
+     "pass": true,
+     "detail": "none"
+    },
+    {
+     "name": "no_cameras_lights",
+     "pass": true,
+     "detail": "none"
+    },
+    {
+     "name": "no_animation",
+     "pass": true,
+     "detail": "0 actions"
+    },
+    {
+     "name": "no_skinning",
+     "pass": true,
+     "detail": "no vertex groups"
+    },
+    {
+     "name": "index_agrees",
+     "pass": true,
+     "detail": "index [6.0, 2.1, 1.66] / 248"
+    }
+   ],
+   "pass": true
+  }
+ ]
+}
