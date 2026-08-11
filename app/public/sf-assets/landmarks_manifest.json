@@ -197,5 +197,23 @@
       43.9
     ],
     "tris": 2201
+  },
+  {
+    "id": "555-california",
+    "file": "555-california.glb",
+    "anchor": [
+      -122.4037741,
+      37.7921047
+    ],
+    "targetHeightM": 237.4,
+    "cat": 3,
+    "name": "555 California Street",
+    "estimated": false,
+    "dims": [
+      86.1678,
+      60.8921,
+      237.4
+    ],
+    "tris": 10412
   }
 ]

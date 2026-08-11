@@ -1,6 +1,6 @@
 {
- "generated": "2026-08-11T20:14:14.149Z",
- "buildings": 171472,
+ "generated": "2026-08-11T22:34:35.130Z",
+ "buildings": 171463,
  "cells": 547,
  "categories": [
   {
@@ -14,7 +14,7 @@
    "cat": 1,
    "id": "house",
    "label": "House",
-   "count": 122104,
+   "count": 122103,
    "night": 0
   },
   {
@@ -28,35 +28,35 @@
    "cat": 3,
    "id": "office",
    "label": "Office",
-   "count": 2728,
+   "count": 2727,
    "night": 3
   },
   {
    "cat": 4,
    "id": "retail",
    "label": "Retail",
-   "count": 7945,
+   "count": 7944,
    "night": 1
   },
   {
    "cat": 5,
    "id": "restaurant_cafe",
    "label": "Restaurant / Café",
-   "count": 2818,
+   "count": 2817,
    "night": 1
   },
   {
    "cat": 6,
    "id": "bar",
    "label": "Bar",
-   "count": 522,
+   "count": 521,
    "night": 1
   },
   {
    "cat": 7,
    "id": "hotel",
    "label": "Hotel",
-   "count": 1452,
+   "count": 1450,
    "night": 0
   },
   {
@@ -168,7 +168,7 @@
    "cat": 23,
    "id": "parking_garage",
    "label": "Parking garage",
-   "count": 1768,
+   "count": 1766,
    "night": 3
   },
   {
@@ -205,17 +205,17 @@
   {
    "sub": "restaurant",
    "label": "Restaurant",
-   "count": 1816
+   "count": 1812
   },
   {
    "sub": "hotel",
    "label": "Hotel",
-   "count": 1298
+   "count": 1296
   },
   {
    "sub": "salon",
    "label": "Salon",
-   "count": 1023
+   "count": 1022
   },
   {
    "sub": "clinic",
@@ -225,7 +225,7 @@
   {
    "sub": "parking_garage",
    "label": "Parking garage",
-   "count": 851
+   "count": 850
   },
   {
    "sub": "house",
@@ -250,7 +250,7 @@
   {
    "sub": "cafe",
    "label": "Café",
-   "count": 520
+   "count": 521
   },
   {
    "sub": "preschool",
@@ -270,7 +270,7 @@
   {
    "sub": "bar",
    "label": "Bar",
-   "count": 417
+   "count": 416
   },
   {
    "sub": "civic_office",
@@ -365,7 +365,7 @@
   {
    "sub": "pizzeria",
    "label": "Pizzeria",
-   "count": 122
+   "count": 123
   },
   {
    "sub": "dry_cleaner",
@@ -528,6 +528,11 @@
    "count": 34
   },
   {
+   "sub": "ice_cream",
+   "label": "Ice cream shop",
+   "count": 31
+  },
+  {
    "sub": "wine_bar",
    "label": "Wine bar",
    "count": 31
@@ -535,11 +540,6 @@
   {
    "sub": "bart_station",
    "label": "BART station",
-   "count": 30
-  },
-  {
-   "sub": "ice_cream",
-   "label": "Ice cream shop",
    "count": 30
   },
   {
@@ -649,18 +649,18 @@
   }
  ],
  "sources": {
-  "landuse": 140196,
+  "landuse": 140194,
   "business": 10183,
-  "heuristic": 4947,
+  "heuristic": 4946,
   "datasf": 1254,
-  "overture": 6585,
-  "osm": 8307
+  "overture": 6583,
+  "osm": 8303
  },
  "confidence": [
-  145143,
-  15230,
+  145140,
+  15228,
   4178,
-  6921
+  6917
  ],
  "streets": {
   "named": 2509,

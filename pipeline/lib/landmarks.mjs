@@ -44,6 +44,15 @@ export const LANDMARKS = [
     camera: { distance: 800, yaw: 60, pitch: 20 },
   },
   {
+    id: '555California',
+    name: '555 California Street',
+    lon: -122.4037741,
+    lat: 37.7921047,
+    height: 237.4,
+    exclude: 70,
+    camera: { distance: 800, yaw: 40, pitch: 18 },
+  },
+  {
     id: 'coitTower',
     name: 'Coit Tower',
     lon: -122.4058,
