@@ -3,9 +3,9 @@
   "validator": "Blender 4.5.3 LTS",
   "fresh_isolated_scene": true,
   "reimported_final_glb": true,
-  "object_count": 70,
-  "mesh_object_count": 70,
-  "triangle_count": 14026,
+  "object_count": 74,
+  "mesh_object_count": 74,
+  "triangle_count": 15666,
   "triangle_budget": 24000,
   "dimensions_m": [
     60.8376,
@@ -100,12 +100,12 @@
   "degenerate_triangle_count": 0,
   "invalid_or_nonunit_loop_normal_count": 0,
   "normal_ray_cast_first_hits": 18203,
-  "normal_ray_cast_flipped_visible_faces": 831,
+  "normal_ray_cast_flipped_visible_faces": 795,
   "normal_ray_cast_flipped_by_object": {
-    "facade_east": 151,
-    "facade_north": 251,
-    "facade_south": 267,
-    "facade_west": 162
+    "facade_east": 143,
+    "facade_north": 231,
+    "facade_south": 262,
+    "facade_west": 159
   },
   "normal_targeted_exterior_hits": 12,
   "normal_targeted_exterior_flipped": 0,
@@ -136,6 +136,26 @@
     },
     {
       "name": "base_slit",
+      "triangles": 64,
+      "degenerate_triangles": 0,
+      "location": [
+        0.0,
+        0.0,
+        0.0
+      ],
+      "rotation_euler": [
+        0.0,
+        0.0,
+        0.0
+      ],
+      "scale": [
+        1.0,
+        1.0,
+        1.0
+      ]
+    },
+    {
+      "name": "base_slit_light",
       "triangles": 64,
       "degenerate_triangles": 0,
       "location": [
@@ -255,6 +275,26 @@
       ]
     },
     {
+      "name": "crown_light",
+      "triangles": 64,
+      "degenerate_triangles": 0,
+      "location": [
+        0.0,
+        0.0,
+        0.0
+      ],
+      "rotation_euler": [
+        0.0,
+        0.0,
+        0.0
+      ],
+      "scale": [
+        1.0,
+        1.0,
+        1.0
+      ]
+    },
+    {
       "name": "crown_roof",
       "triangles": 16,
       "degenerate_triangles": 0,
@@ -315,6 +355,26 @@
       ]
     },
     {
+      "name": "entrance_light",
+      "triangles": 12,
+      "degenerate_triangles": 0,
+      "location": [
+        0.0,
+        0.0,
+        0.0
+      ],
+      "rotation_euler": [
+        0.0,
+        0.0,
+        0.0
+      ],
+      "scale": [
+        1.0,
+        1.0,
+        1.0
+      ]
+    },
+    {
       "name": "entrance_pier",
       "triangles": 108,
       "degenerate_triangles": 0,
@@ -356,7 +416,7 @@
     },
     {
       "name": "facade_east",
-      "triangles": 1918,
+      "triangles": 2258,
       "degenerate_triangles": 0,
       "location": [
         0.0,
@@ -376,7 +436,7 @@
     },
     {
       "name": "facade_north",
-      "triangles": 2166,
+      "triangles": 2596,
       "degenerate_triangles": 0,
       "location": [
         0.0,
@@ -396,7 +456,7 @@
     },
     {
       "name": "facade_south",
-      "triangles": 2166,
+      "triangles": 2548,
       "degenerate_triangles": 0,
       "location": [
         0.0,
@@ -416,7 +476,7 @@
     },
     {
       "name": "facade_west",
-      "triangles": 1918,
+      "triangles": 2250,
       "degenerate_triangles": 0,
       "location": [
         0.0,
@@ -1237,6 +1297,26 @@
     {
       "name": "lobby_glass",
       "triangles": 22,
+      "degenerate_triangles": 0,
+      "location": [
+        0.0,
+        0.0,
+        0.0
+      ],
+      "rotation_euler": [
+        0.0,
+        0.0,
+        0.0
+      ],
+      "scale": [
+        1.0,
+        1.0,
+        1.0
+      ]
+    },
+    {
+      "name": "lobby_light",
+      "triangles": 16,
       "degenerate_triangles": 0,
       "location": [
         0.0,
