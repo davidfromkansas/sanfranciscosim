@@ -332,6 +332,30 @@ const FLAG_FRAG = /* glsl */ `
   }
 `;
 
+// The Stars and Stripes, drawn procedurally so it stays a flat-colour toy
+// surface: 13 stripes red at top and bottom, a canton over the upper seven,
+// and a dot grid standing in for the star field at diorama scale. `uv.x` is
+// 0 at the hoist, so the canton sits by the mast from either side.
+const FLAG_FRAG_US = /* glsl */ `
+  uniform vec3 uColorA;
+  uniform vec3 uColorB;
+  uniform vec3 uColorC;
+  varying vec2 vUv;
+  varying float vShade;
+  const float CANTON = 0.46153846; // the flag's upper seven stripes
+  void main() {
+    vec3 col = mix(uColorA, uColorB, step(0.5, fract(vUv.y * 6.5)));
+    if (vUv.x < 0.4 && vUv.y > CANTON) {
+      col = uColorC;
+      vec2 s = vec2(vUv.x / 0.4 * 5.5, (vUv.y - CANTON) / (1.0 - CANTON) * 4.5);
+      vec2 f = fract(s) - 0.5;
+      float star = 1.0 - smoothstep(0.15, 0.25, length(f));
+      col = mix(col, uColorB, star);
+    }
+    gl_FragColor = vec4(col * vShade, 1.0);
+  }
+`;
+
 export function createAgents(scene, data, city) {
   const { project, sampleElevation, manifest } = data;
   const group = new Group();
@@ -733,34 +757,49 @@ export function createAgents(scene, data, city) {
   const flags = [];
   const flagSpots = [
     { id: 'cityHall', height: 99, colors: ['#c8332c', '#f0ece2'] },
-    { id: 'ferryBuilding', height: 76, colors: ['#25406b', '#f0ece2'] },
+    // Anchor and mast foot come from the Ferry Building GLB, not the landmark
+    // registry: the asset stands on its surveyed centre ~20 m east of the
+    // registry point, and its pole steps out of the crown dome at 73.5 m.
+    {
+      id: 'ferryBuilding',
+      anchor: [-122.3933697, 37.7955227],
+      height: 73.2,
+      pole: 10,
+      us: true,
+    },
     { id: 'oraclePark', height: 52, colors: ['#e07a1f', '#2b2b2b'] },
     { id: 'fishermansWharf', height: 20, colors: ['#c8332c', '#f0ece2'] },
     { id: 'paintedLadies', height: 20, colors: ['#2f6b4f', '#f0ece2'] },
   ];
+  const US_COLORS = ['#b22234', '#f0ece2', '#25406b'];
   for (const spot of flagSpots) {
     const landmark = manifest.landmarks.find((l) => l.id === spot.id);
     if (!landmark) continue;
-    const [x, z] = project(landmark.lon, landmark.lat);
+    const anchor = spot.anchor || [landmark.lon, landmark.lat];
+    const [x, z] = project(anchor[0], anchor[1]);
     const base = Math.max(0, sampleElevation(x, z));
+    const poleHeight = spot.pole || 12;
+    const colors = spot.us ? US_COLORS : spot.colors;
     const pole = new Mesh(
-      new CylinderGeometry(0.22, 0.26, 12, 6),
+      new CylinderGeometry(0.22, 0.26, poleHeight, 6),
       new MeshLambertMaterial({ color: '#c9c3b6' })
     );
-    pole.position.set(x, base + spot.height + 6, z);
+    pole.position.set(x, base + spot.height + poleHeight / 2, z);
     group.add(pole);
     const material = new ShaderMaterial({
       uniforms: {
         uTime: shared.uTime,
-        uColorA: { value: new Color(spot.colors[0]) },
-        uColorB: { value: new Color(spot.colors[1]) },
+        uColorA: { value: new Color(colors[0]) },
+        uColorB: { value: new Color(colors[1]) },
+        uColorC: { value: new Color(colors[2] || colors[0]) },
       },
       vertexShader: FLAG_VERT,
-      fragmentShader: FLAG_FRAG,
+      fragmentShader: spot.us ? FLAG_FRAG_US : FLAG_FRAG,
       side: DoubleSide,
     });
     const flag = new Mesh(new PlaneGeometry(4.4, 2.8, 12, 3), material);
-    flag.position.set(x + 2.3, base + spot.height + 10.4, z);
+    // Hoist edge inside the mast, head just under the truck.
+    flag.position.set(x + 2.3, base + spot.height + poleHeight - 1.6, z);
     group.add(flag);
     flags.push(flag);
   }
