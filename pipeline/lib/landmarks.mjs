@@ -171,7 +171,7 @@ export const LANDMARKS = [
     lon: -122.4269098,
     lat: 37.7643109,
     height: 41,
-    exclude: 70,
+    exclude: 45,
     camera: { distance: 500, yaw: 90, pitch: 16 },
   },
 ];
