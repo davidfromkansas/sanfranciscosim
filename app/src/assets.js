@@ -33,6 +33,27 @@ function camelId(id) {
   return id.replace(/-([a-z])/g, (_, c) => c.toUpperCase());
 }
 
+function floatAttribute(attribute) {
+  if (!attribute || attribute.array instanceof Float32Array) return attribute;
+  const values = new Float32Array(attribute.count * attribute.itemSize);
+  for (let i = 0; i < attribute.count; i++) {
+    for (let j = 0; j < attribute.itemSize; j++) {
+      values[i * attribute.itemSize + j] = attribute.getComponent(i, j);
+    }
+  }
+  return new BufferAttribute(values, attribute.itemSize, false);
+}
+
+function prepareGeometryForTransforms(geometry) {
+  for (const name of ['position', 'normal', 'tangent']) {
+    const attribute = geometry.getAttribute(name);
+    if (attribute && !(attribute.array instanceof Float32Array)) {
+      geometry.setAttribute(name, floatAttribute(attribute));
+    }
+  }
+  return geometry;
+}
+
 // Every mesh in the default scene, flattened with its world matrix already
 // applied, split by whether its material glows.
 function collect(root) {
@@ -58,6 +79,7 @@ function collect(root) {
     materials.add(material.name);
 
     const geometry = object.geometry.clone();
+    prepareGeometryForTransforms(geometry);
     geometry.applyMatrix4(object.matrixWorld);
     geometry.deleteAttribute('uv');
     geometry.deleteAttribute('uv1');
