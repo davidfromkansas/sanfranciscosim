@@ -1,6 +1,6 @@
 {
- "generated": "2026-08-11T21:42:13.354Z",
- "buildings": 171472,
+ "generated": "2026-08-11T22:45:48.856Z",
+ "buildings": 171461,
  "cells": 547,
  "categories": [
   {
@@ -14,14 +14,14 @@
    "cat": 1,
    "id": "house",
    "label": "House",
-   "count": 122103,
+   "count": 122101,
    "night": 0
   },
   {
    "cat": 2,
    "id": "apartments",
    "label": "Apartments",
-   "count": 13935,
+   "count": 13932,
    "night": 0
   },
   {
@@ -42,7 +42,7 @@
    "cat": 5,
    "id": "restaurant_cafe",
    "label": "Restaurant / Café",
-   "count": 2820,
+   "count": 2819,
    "night": 1
   },
   {
@@ -56,7 +56,7 @@
    "cat": 7,
    "id": "hotel",
    "label": "Hotel",
-   "count": 1452,
+   "count": 1449,
    "night": 0
   },
   {
@@ -168,7 +168,7 @@
    "cat": 23,
    "id": "parking_garage",
    "label": "Parking garage",
-   "count": 1768,
+   "count": 1765,
    "night": 3
   },
   {
@@ -182,7 +182,7 @@
    "cat": 25,
    "id": "transit_station",
    "label": "Transit station",
-   "count": 309,
+   "count": 310,
    "night": 2
   }
  ],
@@ -210,7 +210,7 @@
   {
    "sub": "hotel",
    "label": "Hotel",
-   "count": 1298
+   "count": 1297
   },
   {
    "sub": "salon",
@@ -225,7 +225,7 @@
   {
    "sub": "parking_garage",
    "label": "Parking garage",
-   "count": 851
+   "count": 848
   },
   {
    "sub": "house",
@@ -250,7 +250,7 @@
   {
    "sub": "cafe",
    "label": "Café",
-   "count": 521
+   "count": 520
   },
   {
    "sub": "preschool",
@@ -295,7 +295,7 @@
   {
    "sub": "muni_station",
    "label": "Muni station",
-   "count": 228
+   "count": 229
   },
   {
    "sub": "hardware_store",
@@ -649,18 +649,18 @@
   }
  ],
  "sources": {
-  "landuse": 140196,
+  "landuse": 140189,
   "business": 10183,
   "heuristic": 4946,
   "datasf": 1254,
   "overture": 6585,
-  "osm": 8308
+  "osm": 8304
  },
  "confidence": [
-  145142,
+  145135,
   15230,
-  4180,
-  6920
+  4178,
+  6918
  ],
  "streets": {
   "named": 2509,

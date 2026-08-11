@@ -50,6 +50,29 @@ const CLUSTER_SPAN = 40; // ≤2 special pieces per 40 m of frontage
 const MARKET_REACH = 22;
 const COMMERCIAL_REACH = 32;
 
+// Half a piece's plan footprint, from the measured GLB dimensions. Two pieces
+// whose footprints touch would z-fight (and, on a pair of lamps, glow twice),
+// so a candidate has to clear whatever already stands there.
+const FOOTPRINT = {
+  sl_standard: 0.5,
+  sl_pathofgold: 0.8,
+  sl_residential: 0.5,
+  traffic_signal: 0.5,
+  hydrant: 0.4,
+  mailbox: 0.4,
+  muni_shelter: 2.4,
+  bench: 1.0,
+  trashcan: 0.4,
+  planter: 0.6,
+  newsboxes: 0.9,
+  bikerack: 1.2,
+  cafe_set: 1.2,
+  market_stall: 1.8,
+  parklet: 3.1,
+};
+const RADIUS = PIECES.map((id) => FOOTPRINT[id]);
+const GAP = 0.3; // breathing room between two neighbouring footprints
+
 // Deterministic and position-based: the same metre of street hashes the same
 // way in every session, on every machine, regardless of streaming order.
 function hash(x, z, salt) {
@@ -260,6 +283,19 @@ export function planStreetFurniture(job) {
     return false;
   };
 
+  // Streets are baked per cell, so a centreline that straddles a cell edge can
+  // reach the planner twice, and independent passes can pick the same metre of
+  // kerb. Both end as pieces standing inside each other unless the ground is
+  // claimed as it is used.
+  const taken = grid(8);
+  const claimed = (piece, x, z) => {
+    const r = RADIUS[piece] + GAP;
+    return taken.near(x, z, r + 3.1, (o) => {
+      const reach = r + RADIUS[o.piece];
+      return (o.x - x) * (o.x - x) + (o.z - z) * (o.z - z) < reach * reach;
+    });
+  };
+
   const nodes = junctionNodes(haloRoads.length ? roads.concat(haloRoads) : roads);
   const nodeGrid = grid(32);
   for (const node of nodes) nodeGrid.add(node.x, node.z, node);
@@ -299,7 +335,9 @@ export function planStreetFurniture(job) {
     if (clear > 0 && nearNode(x, z, clear)) return false;
     if (crossing && onCrossing(x, z)) return false;
     if (excluded(x, z)) return false;
+    if (claimed(piece, x, z)) return false;
     out.push(piece, x, y, z, yaw);
+    taken.add(x, z, { piece, x, z });
     return true;
   }
 
