@@ -1,20 +1,20 @@
 {
- "generated": "2026-08-11T06:49:12.291Z",
- "buildings": 171480,
+ "generated": "2026-08-11T13:42:48.659Z",
+ "buildings": 171472,
  "cells": 547,
  "categories": [
   {
    "cat": 0,
    "id": "misc",
    "label": "Building",
-   "count": 10162,
+   "count": 10156,
    "night": 3
   },
   {
    "cat": 1,
    "id": "house",
    "label": "House",
-   "count": 122111,
+   "count": 122110,
    "night": 0
   },
   {
@@ -35,7 +35,7 @@
    "cat": 4,
    "id": "retail",
    "label": "Retail",
-   "count": 7945,
+   "count": 7944,
    "night": 1
   },
   {
@@ -235,7 +235,7 @@
   {
    "sub": "community_center",
    "label": "Community center",
-   "count": 687
+   "count": 684
   },
   {
    "sub": "factory",
@@ -290,7 +290,7 @@
   {
    "sub": "corner_store",
    "label": "Corner store",
-   "count": 280
+   "count": 279
   },
   {
    "sub": "muni_station",
@@ -649,17 +649,17 @@
   }
  ],
  "sources": {
-  "landuse": 140205,
+  "landuse": 140201,
   "business": 10177,
   "heuristic": 4948,
-  "datasf": 1257,
+  "datasf": 1254,
   "overture": 6585,
-  "osm": 8308
+  "osm": 8307
  },
  "confidence": [
-  145153,
+  145149,
   15223,
-  4186,
+  4182,
   6918
  ],
  "streets": {
