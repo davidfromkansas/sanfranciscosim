@@ -1,6 +1,6 @@
 {
- "generated": "2026-08-11T20:14:14.149Z",
- "buildings": 171472,
+ "generated": "2026-08-11T22:22:11.797Z",
+ "buildings": 171466,
  "cells": 547,
  "categories": [
   {
@@ -14,7 +14,7 @@
    "cat": 1,
    "id": "house",
    "label": "House",
-   "count": 122104,
+   "count": 122103,
    "night": 0
   },
   {
@@ -28,14 +28,14 @@
    "cat": 3,
    "id": "office",
    "label": "Office",
-   "count": 2728,
+   "count": 2727,
    "night": 3
   },
   {
    "cat": 4,
    "id": "retail",
    "label": "Retail",
-   "count": 7945,
+   "count": 7943,
    "night": 1
   },
   {
@@ -49,7 +49,7 @@
    "cat": 6,
    "id": "bar",
    "label": "Bar",
-   "count": 522,
+   "count": 521,
    "night": 1
   },
   {
@@ -84,7 +84,7 @@
    "cat": 11,
    "id": "hospital",
    "label": "Hospital",
-   "count": 113,
+   "count": 112,
    "night": 2
   },
   {
@@ -205,7 +205,7 @@
   {
    "sub": "restaurant",
    "label": "Restaurant",
-   "count": 1816
+   "count": 1813
   },
   {
    "sub": "hotel",
@@ -215,7 +215,7 @@
   {
    "sub": "salon",
    "label": "Salon",
-   "count": 1023
+   "count": 1022
   },
   {
    "sub": "clinic",
@@ -250,7 +250,7 @@
   {
    "sub": "cafe",
    "label": "Café",
-   "count": 520
+   "count": 521
   },
   {
    "sub": "preschool",
@@ -270,7 +270,7 @@
   {
    "sub": "bar",
    "label": "Bar",
-   "count": 417
+   "count": 416
   },
   {
    "sub": "civic_office",
@@ -365,7 +365,7 @@
   {
    "sub": "pizzeria",
    "label": "Pizzeria",
-   "count": 122
+   "count": 123
   },
   {
    "sub": "dry_cleaner",
@@ -455,7 +455,7 @@
   {
    "sub": "medical_center",
    "label": "Medical center",
-   "count": 49
+   "count": 48
   },
   {
    "sub": "library",
@@ -528,6 +528,11 @@
    "count": 34
   },
   {
+   "sub": "ice_cream",
+   "label": "Ice cream shop",
+   "count": 31
+  },
+  {
    "sub": "wine_bar",
    "label": "Wine bar",
    "count": 31
@@ -535,11 +540,6 @@
   {
    "sub": "bart_station",
    "label": "BART station",
-   "count": 30
-  },
-  {
-   "sub": "ice_cream",
-   "label": "Ice cream shop",
    "count": 30
   },
   {
@@ -649,18 +649,18 @@
   }
  ],
  "sources": {
-  "landuse": 140196,
+  "landuse": 140194,
   "business": 10183,
-  "heuristic": 4947,
+  "heuristic": 4946,
   "datasf": 1254,
-  "overture": 6585,
+  "overture": 6582,
   "osm": 8307
  },
  "confidence": [
-  145143,
-  15230,
-  4178,
-  6921
+  145140,
+  15227,
+  4180,
+  6919
  ],
  "streets": {
   "named": 2509,

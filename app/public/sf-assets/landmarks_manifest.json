@@ -197,5 +197,23 @@
       43.9
     ],
     "tris": 2201
+  },
+  {
+    "id": "columbus-tower",
+    "file": "columbus-tower.glb",
+    "anchor": [
+      -122.4050266,
+      37.7965554
+    ],
+    "targetHeightM": 29,
+    "cat": 3,
+    "name": "Columbus Tower (Sentinel Building)",
+    "estimated": false,
+    "dims": [
+      19.8831,
+      18.2508,
+      29.0
+    ],
+    "tris": 9360
   }
 ]
