@@ -1,5 +1,6 @@
-// HUD: view presets, the golden-hour -> dusk slider, quality tiers, and the
-// debug overlay. Deliberately unobtrusive — the city is the interface.
+// HUD: view presets, quality tiers and the debug overlay. Deliberately
+// unobtrusive — the city is the interface. Time is not a control: the scene
+// runs on San Francisco's real clock (see sky-clock.js).
 
 export const QUALITY = {
   ultra: { label: 'Ultra', pixelRatio: 2, shadow: 4096, nearScale: 1.35, treeScale: 1.3, windows: 1 },
@@ -8,7 +9,7 @@ export const QUALITY = {
   low: { label: 'Low', pixelRatio: 0.85, shadow: 0, nearScale: 0.5, treeScale: 0.45, windows: 0 },
 };
 
-export function createUI({ presets, onPreset, onTime, onQuality, onAuto }) {
+export function createUI({ presets, onPreset, onQuality }) {
   const hud = document.getElementById('hud');
   const debug = document.getElementById('debug');
 
@@ -25,27 +26,6 @@ export function createUI({ presets, onPreset, onTime, onQuality, onAuto }) {
   });
   select.addEventListener('change', () => onPreset(Number(select.value)));
   viewPanel.append(viewLabel, select);
-
-  const timePanel = document.createElement('div');
-  timePanel.className = 'panel';
-  const timeLabel = document.createElement('label');
-  timeLabel.textContent = 'Golden hour → dusk';
-  const slider = document.createElement('input');
-  slider.type = 'range';
-  slider.min = '0';
-  slider.max = '1000';
-  slider.value = '0';
-  slider.addEventListener('input', () => {
-    auto.checked = false;
-    onAuto(false);
-    onTime(Number(slider.value) / 1000);
-  });
-  const auto = document.createElement('input');
-  auto.type = 'checkbox';
-  auto.checked = true;
-  auto.title = 'Let time run';
-  auto.addEventListener('change', () => onAuto(auto.checked));
-  timePanel.append(timeLabel, slider, auto);
 
   const qualityPanel = document.createElement('div');
   qualityPanel.className = 'panel';
@@ -74,7 +54,8 @@ export function createUI({ presets, onPreset, onTime, onQuality, onAuto }) {
   help.innerHTML =
     '<label>Controls</label><div style="margin-top:4px;line-height:1.5;color:rgba(255,255,255,.78)">' +
     'WASD / arrows pan · Q E rotate · wheel zooms to cursor · right-drag orbits · left-drag grabs the ground · ' +
-    'screen edges scroll · Shift boosts · 0–9 fly to landmarks · H home · / search' +
+    'screen edges scroll · Shift boosts · 0–9 fly to landmarks · H home · / search · ' +
+    'the sky follows San Francisco time' +
     '</div>';
 
   const styleBadge = document.createElement('div');
@@ -84,7 +65,7 @@ export function createUI({ presets, onPreset, onTime, onQuality, onAuto }) {
     '<label>Diorama mode</label><div style="margin-top:4px;color:rgba(255,255,255,.78)">' +
     'Locked 42° view · Q E step 45° · click anything for its story</div>';
 
-  hud.append(viewPanel, timePanel, qualityPanel, help, styleBadge);
+  hud.append(viewPanel, qualityPanel, help, styleBadge);
 
   window.addEventListener('keydown', (event) => {
     if (event.code === 'F3' || event.key === '`') {
@@ -97,20 +78,11 @@ export function createUI({ presets, onPreset, onTime, onQuality, onAuto }) {
     setPresetIndex(i) {
       select.value = String(i);
     },
-    setTime(t) {
-      slider.value = String(Math.round(t * 1000));
-    },
     setQuality(key) {
       qualitySelect.value = key;
     },
     setStyle(toy) {
       styleBadge.hidden = !toy;
-    },
-    get autoTime() {
-      return auto.checked;
-    },
-    setAuto(value) {
-      auto.checked = value;
     },
     setDebug(text) {
       if (!debug.hidden) debug.textContent = text;

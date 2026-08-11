@@ -30,6 +30,8 @@ import { createContext } from './context.js';
 import { createFocusOverlay } from './focus.js';
 import { createContextCard, createSearch } from './cards.js';
 import { createConcierge } from './concierge.js';
+import { createSkyClock } from './sky-clock.js';
+import { localDayStart, moonPosition, skySnapshot, sunPosition } from '../../api/_lib/astro.mjs';
 
 const canvas = document.getElementById('view');
 const loader = createLoader();
@@ -149,24 +151,49 @@ async function boot() {
     await city.setTier(toy ? 'toy' : 'base');
   }
 
-  let autoTime = true;
-  let timeOfDay = 0;
+  // --------------------------------------------------------------------- sky
+  // The scene runs on San Francisco's wall clock: no sweep, no slider. The
+  // astronomy is recomputed once a second from the render loop's own timer.
+  // `clockOverride` freezes that clock for screenshots and QA; `skyBroken`
+  // latches the one-warning fallback if the maths ever throws.
+  let clockOverride = null;
+  let skyBroken = false;
+  let sky = null;
+  let skyAccumulator = 0;
+
+  function tickSky() {
+    if (skyBroken) return;
+    const ms = clockOverride === null ? Date.now() : clockOverride;
+    try {
+      const sunAt = sunPosition(ms);
+      const moonAt = moonPosition(ms);
+      env.setSky({
+        sunEl: sunAt.elevation,
+        sunAz: sunAt.azimuth,
+        moonEl: moonAt.elevation,
+        moonAz: moonAt.azimuth,
+        moonIllum: moonAt.illumination,
+      });
+      sky = skySnapshot(ms);
+    } catch (error) {
+      // Rule 3: degrade to something pleasant, warn once, never a black scene.
+      skyBroken = true;
+      sky = null;
+      console.warn('sky: astronomy unavailable, holding a fixed golden hour', error);
+      env.setTime(0.12);
+    }
+  }
+  tickSky();
+  const skyClock = createSkyClock({ read: () => sky });
 
   const ui = createUI({
     presets,
     onPreset(index) {
       rig.flyTo(presets[index]);
     },
-    onTime(t) {
-      timeOfDay = t;
-      env.setTime(t);
-    },
     onQuality(key) {
       applyQuality(key);
       ui.setQuality(key);
-    },
-    onAuto(value) {
-      autoTime = value;
     },
   });
   ui.setQuality(qualityKey);
@@ -457,11 +484,31 @@ async function boot() {
           point: hit.point.toArray().map((v) => Math.round(v)),
         }));
     },
+    get sky() {
+      return sky;
+    },
+    // null resumes live San Francisco time; a number is epoch ms, a string is
+    // anything Date.parse understands ('2026-08-10T02:00:00-07:00').
+    setClock(value) {
+      if (value === null || value === undefined) clockOverride = null;
+      else {
+        const ms = typeof value === 'number' ? value : Date.parse(value);
+        if (!Number.isFinite(ms)) throw new Error(`SF.setClock: cannot read ${value}`);
+        clockOverride = ms;
+      }
+      skyBroken = false;
+      tickSky();
+      skyClock.update();
+      return sky;
+    },
+    // Deprecated: the old 0 to 1 golden-hour sweep. Kept so older scripts keep
+    // running; it now just freezes the clock around sunset.
     setTime(t) {
-      autoTime = false;
-      timeOfDay = t;
-      env.setTime(t);
-      ui.setTime(t);
+      console.warn('SF.setTime is deprecated — use SF.setClock(msOrIso), or SF.setClock(null) for live time');
+      // Midnight in San Francisco, not in whatever zone the browser is in.
+      const midnight = localDayStart(clockOverride === null ? Date.now() : clockOverride);
+      // t = 0 is the golden hour, t = 1 is a couple of hours after sunset.
+      return this.setClock(midnight + (19 + Math.min(1, Math.max(0, t)) * 2.5) * 3600 * 1000);
     },
     assets,
     get style() {
@@ -497,12 +544,12 @@ async function boot() {
     last = now;
     shared.uTime.value += dt;
 
-    if (autoTime) {
-      // A full golden-hour-to-night sweep takes about three minutes.
-      timeOfDay = Math.min(1, timeOfDay + dt / 180);
-      env.setTime(timeOfDay);
-      ui.setTime(timeOfDay);
-      if (timeOfDay >= 1) autoTime = false;
+    // One astronomy update a second, on this loop's own clock: no second rAF,
+    // and no work at all in the other frames.
+    skyAccumulator += elapsed;
+    if (skyAccumulator >= 1) {
+      skyAccumulator = 0;
+      if (clockOverride === null) tickSky();
     }
 
     rig.update(dt);
@@ -562,7 +609,9 @@ async function boot() {
           `ferries    ${ferries.count}${ferries.live ? ' live' : ' procedural'}`,
           `altitude   ${(camera.position.y - rig.state.pivot.y).toFixed(0)} m`,
           `zoom       ${rig.state.distance.toFixed(0)} m`,
-          `time       ${(timeOfDay * 100).toFixed(0)}%`,
+          `time       ${sky ? sky.localTime : 'fallback'}${clockOverride === null ? '' : ' (held)'}`,
+          `sun        ${sky ? `${sky.sun.elevationDeg.toFixed(0)}° el ${sky.sun.azimuthDeg.toFixed(0)}° az` : '—'}`,
+          `night      ${shared.uNight.value.toFixed(2)}`,
           `style      ${style}`,
         ].join('\n')
       );

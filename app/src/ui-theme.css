@@ -212,6 +212,72 @@
   color: var(--ink);
 }
 
+/* ----------------------------------------------------------- sky clock --- */
+
+#sky-clock {
+  position: fixed;
+  left: 14px;
+  top: 14px;
+  padding: 8px 12px 9px;
+  z-index: 6;
+  pointer-events: none;
+}
+
+.clock-time {
+  display: flex;
+  align-items: center;
+  gap: 7px;
+}
+
+.clock-hm {
+  font-size: 26px;
+  font-weight: 800;
+  line-height: 1.05;
+  letter-spacing: -0.5px;
+  font-variant-numeric: tabular-nums;
+}
+
+.clock-period {
+  padding: 1px 7px;
+  font-size: 10px;
+  letter-spacing: 0.4px;
+}
+
+.clock-date {
+  margin-top: 3px;
+  font-size: 10px;
+  font-weight: 800;
+  letter-spacing: 0.8px;
+  color: var(--ink-soft);
+}
+
+.clock-sky {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  margin-top: 6px;
+  font-size: 11.5px;
+  font-weight: 700;
+}
+
+.sky-glyph {
+  width: 16px;
+  height: 16px;
+  flex: none;
+}
+
+@media (max-width: 480px) {
+  #sky-clock {
+    padding: 6px 10px 7px;
+  }
+  .clock-date {
+    display: none;
+  }
+  .clock-hm {
+    font-size: 21px;
+  }
+}
+
 /* -------------------------------------------------------------- search --- */
 
 #search {

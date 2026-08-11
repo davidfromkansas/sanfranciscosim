@@ -26,14 +26,22 @@ No env vars or secrets are required. **Devin Secrets Needed:** none.
 - Camera (`app/src/camera.js`): WASD/arrows pan, `Q`/`E` rotate, `R`/`F` or PageUp/PageDown zoom,
   wheel zooms toward the cursor, right-drag orbits (pitch+yaw), left-drag grab-pans, screen edges scroll,
   Shift boosts.
-- HUD (`app/src/ui.js`): View select, "Golden hour → dusk" range slider (0–1000) with an auto checkbox,
-  Quality select (Ultra/High/Medium/Low), and a `stats` button; `F3` or backtick also toggles the overlay.
-  Low sets `shadow: 0` and `windows: 0`, so switching to Low must visibly drop shadows and night windows.
-- Time: `env.js setTime(t)` ramps `uNight` from `t = 0.36`, which drives window ignition, lamps and
-  bridge lights. Auto mode sweeps 0→1 in ~180 s, so the scene is still golden-hour for the first ~60 s.
+- HUD (`app/src/ui.js`): View select, Quality select (Ultra/High/Medium/Low), and a `stats` button;
+  `F3` or backtick also toggles the overlay. Low sets `shadow: 0` and `windows: 0`, so switching to Low
+  must visibly drop shadows and night windows. **There is no time slider and no auto checkbox** — they
+  were removed with the fake sweep.
+- Time is real: the scene runs on San Francisco's wall clock (`America/Los_Angeles`). `api/_lib/astro.mjs`
+  computes the sun and moon, `main.js` pushes them into `env.setSky(...)` once a second, and the clock
+  panel in the top-left (`app/src/sky-clock.js`) shows local time, the date and a sun/moon line. So the
+  look of any screenshot depends on when you took it — pin the clock before comparing shots.
+- Lighting bands (`env.js setSky`), by solar elevation: ≥ 25° noon, 25°→8° noon→golden, 8°→−4°
+  golden→dusk, −4°→−10° dusk→night, ≤ −10° night. `uNight` (window ignition, lamps, bridge lights) is
+  exactly 0 by day and exactly 1 at night. At night the moon owns the key light, and the night floor is
+  a hard gate: key intensity ≥ 0.25, hemisphere ≥ 0.42, zenith no darker than `#1a2340`.
 - `window.SF` is exposed for automated checks: `SF.rig.state` (`pivot`, `yaw`, `pitch`, `distance`),
-  `SF.city.stats`, `SF.agents.carCount`, `SF.setTime(t)`, `SF.goTo(lon, lat)`, `SF.pick(nx, ny)`.
-  Prefer real UI interaction for the recording and use `SF.rig.state` only as numeric corroboration.
+  `SF.city.stats`, `SF.agents.carCount`, `SF.sky`, `SF.setClock(...)`, `SF.goTo(lon, lat)`,
+  `SF.pick(nx, ny)`. Prefer real UI interaction for the recording and use `SF.rig.state` only as numeric
+  corroboration.
 
 ## Gotchas in the Devin browser environment
 - Chrome here runs `--use-angle=swiftshader-webgl --disable-gpu` (software rasterizer): expect ~20 fps
@@ -46,9 +54,8 @@ No env vars or secrets are required. **Devin Secrets Needed:** none.
   `xdotool mousemove <x> <y>; xdotool click 4` (zoom in) / `click 5` (zoom out).
 - For held drags (orbit/pan), use `xdotool mousemove X Y mousedown 3 ... mousemove_relative ... mouseup 3`
   and screenshot while the button is still held.
-- Dragging the range slider with xdotool proved unreliable; `browser(action="click", coordinates="x,y")`
-  on the slider track works and fires `input` (which also unchecks the auto checkbox). Slider coordinates
-  in the 1024x768 tool space are roughly x 905 (0%) → 988 (100%) at y 48 when the window is 1600x1122.
+- Time of day is not a widget any more — pin it from the console with `SF.setClock(...)` (see below).
+  The clock panel sits top-left at 1024x768 tool coordinates around (14–120, 14–95).
 - The window manager does not support `_NET_CLIENT_LIST`, so `wmctrl -r :ACTIVE:` fails; Chrome is
   already started maximized at the full screen size, so no manual maximizing is needed.
 - `/favicon.ico` is served by a `vercel.json` rewrite to `/favicon.svg`, so it is 200 with
@@ -158,7 +165,8 @@ delivers, ~20 s of wall clock yields under 1 s of simulated motion. A two-screen
 near-zero change even when the feature works. To distinguish "absent" from "too slow here":
 - prove the effect **exists** by toggling its uniform and diffing (materials expose `material.uniformsHolder`,
   which holds live references to the shared uniforms, e.g. `uCloudCover`, `uCloudDrift`, `uNight`);
-- prove the **response** through a user-facing path (`SF.setTime(1)` drops `uCloudCover` to 0.32 × 0.15 = 0.048);
+- prove the **response** through a user-facing path (pinning the clock to full night with `SF.setClock`
+  drops `uCloudCover` to 0.32 × 0.15 = 0.048);
 - label the motion check UNTESTED rather than FAIL, and note the clamped-dt coupling as a real (if minor) bug.
 
 The debug overlay's fps is rounded to an integer, so sub-1 fps shows as `0` or `1`; compare it against
@@ -186,7 +194,7 @@ hit from a fresh fetch. Worth flagging as a product bug, not just a test workaro
 ## Testing the lore / context layer (context cards, search, toy props, night sky)
 
 Runtime handles: `SF.context`, `SF.pickEntity(nx,ny)`, `SF.select(e)`, `SF.focus`, `SF.search(q)`,
-`SF.setTime(t)`, `SF.setStyle('toy'|'base')`. Note `SF.env` is **not** exposed — reach the night-sky kit
+`SF.setClock(msOrIso|null)`, `SF.sky`, `SF.setStyle('toy'|'base')`. Note `SF.env` is **not** exposed — reach the night-sky kit
 by traversing the scene instead (see below).
 
 ### Keyboard focus steals the single-letter shortcuts
@@ -194,21 +202,39 @@ After typing in the search box (`/`), the input keeps focus, so `M`/`Q`/`E`/`F3`
 nothing happens (`SF.style` stays unchanged). Click the canvas once (or press Escape) before sending
 single-letter keys. Verify with `SF.style` rather than assuming the keypress landed.
 
-### The time slider is easiest to drive with the keyboard
-`input[type=range]` (0..1000). Click it once, then `xdotool key End` for full night and `Home` for
-day — clicking the track only jumps part-way and dragging is flaky. Clicking it also unchecks "auto".
+### Pinning the time of day: `SF.setClock`
+There is no widget to drive. `SF.setClock(value)` freezes the scene's clock and returns the new sky
+snapshot; `SF.setClock(null)` resumes live San Francisco time. `value` is epoch ms or anything
+`Date.parse` reads — always pass an explicit offset, because the browser's own zone is UTC here:
 
-Two things that repeatedly cost time here (re-measure, do not assume the exact number):
-- **X11 clicks need a Y offset relative to page coordinates.** With the 1600×1122 Chrome window used in
-  this environment the browser chrome adds about **+88 px in y**, so `xdotool mousemove <rect.x> <rect.y>`
-  computed from `getBoundingClientRect()` lands above the element and the click silently does nothing
-  (e.g. the "Golden hour → dusk" auto checkbox stays checked and daylight shots drift to dusk mid-run).
-  Calibrate first with a `pointermove` listener (see "Real-input coordinate calibration") or by locating
-  the widget in an `import -window root` screenshot, then add the measured offset to every click.
-- **`Home` does not always reset the time slider.** On some builds only `End` (night) is honoured while
-  `Home` leaves `input[type=range].value` unchanged; verify the value after the keypress and, if it did
-  not move, click near the left end of the slider track instead. Always assert on the slider's `value`
-  (and `input[type=checkbox].checked` for auto-advance) rather than assuming the key landed.
+```js
+SF.setClock('2026-08-10T13:00:00-07:00');   // 1 PM PDT
+SF.sky.sun.elevationDeg, SF.sky.moon.phaseName, SF.sky.isDay;
+SF.setClock(SF.sky.sunsetMs);               // exactly sunset
+SF.setClock(null);                          // back to live
+```
+
+Useful fields on `SF.sky`: `localTime`, `localDate`, `isDay`, `sun.{elevationDeg,azimuthDeg,sunrise,
+sunset,solarNoon}`, `moon.{elevationDeg,azimuthDeg,phaseName,illumination,isUp,moonrise,moonset}`, and
+the raw `sunriseMs` / `sunsetMs` / `moonriseMs` / `moonsetMs`. The debug overlay's `time`, `sun` and
+`night` lines corroborate the same numbers, and `(held)` after the time means the clock is pinned.
+
+The pin sticks: the 1 Hz tick is skipped while an override is set, so a screenshot taken a minute later
+is still the same sky. Screenshot matrices should pin each moment explicitly rather than relying on a
+sweep. Verify the clock panel updates too — it re-renders on its own 1 Hz timer, so it keeps ticking
+even when the render loop is crawling under software GL.
+
+`SF.setTime(t)` still exists but is deprecated: it logs a warning and maps the old 0–1 sweep onto
+7 PM→9:30 PM San Francisco time — the day boundary comes from `localDayStart` in `astro.mjs`, so it does
+not care what zone the browser is in (the Devin browser runs in UTC). Assert on the console warning plus
+`SF.sky.localTime` rather than on the look. Use `setClock`.
+
+One thing that repeatedly costs time here (re-measure, do not assume the exact number):
+**X11 clicks need a Y offset relative to page coordinates.** With the 1600×1122 Chrome window used in
+this environment the browser chrome adds about **+88 px in y**, so `xdotool mousemove <rect.x> <rect.y>`
+computed from `getBoundingClientRect()` lands above the element and the click silently does nothing.
+Calibrate first with a `pointermove` listener (see "Real-input coordinate calibration") or by locating
+the widget in an `import -window root` screenshot, then add the measured offset to every click.
 
 ### Probing traffic / agents (app/src/agents.js)
 `SF.agents` only exposes `group`, `update`, `setToy` and `carCount`, so per-car state is not reachable
@@ -272,6 +298,25 @@ dark. Corroborate numerically, then hunt for a view:
   (SoMa) give a far more legible screenshot than dense hills (Nob Hill).
 - Project the matched vertices with `SF.camera` to get the exact pixel box, then crop the root screenshot
   to it — otherwise a 4 m prop is invisible in a 1600 px frame.
+
+## Measuring draw calls (the stats overlay lies)
+
+The overlay's `draw calls` line reads **1**, always. `app/src/toypost.js` renders the scene into a render
+target and then draws one fullscreen quad; `renderer.info` auto-resets per render, so the number the
+overlay prints is the quad pass, not the city. To check the < 300 budget, wrap the renderer for a few
+seconds and take the peak of the scene pass:
+
+```js
+const r = SF.renderer;
+if (!r.__orig) { r.__orig = r.render.bind(r); window.__peak = 0;
+  r.render = (s, c) => { r.__orig(s, c); const n = r.info.render.calls; if (n > window.__peak) window.__peak = n; }; }
+// wait ~20 s under software GL (only a handful of frames render), then read:
+window.__peak
+```
+
+Observed on the deployed build at street level downtown: 60 peak at 1 PM, 67 at 2 AM — well inside the
+budget. `fps` in the overlay reads 1–2 here and is meaningless: software rasterizer, report it as
+environment-limited rather than as a regression.
 
 ## Testing live-data layers (live ferries, `app/src/ferries.js`)
 

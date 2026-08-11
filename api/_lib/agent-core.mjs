@@ -6,6 +6,8 @@
 // touches the scene: "move the camera" is a validated intent the client applies
 // itself, clamped to the city's own extent.
 
+import { skySnapshot } from './astro.mjs';
+
 const MODEL = 'anthropic/claude-sonnet-5';
 const ENDPOINT = 'https://ai-gateway.vercel.sh/v1/messages';
 const MAX_TOKENS = 1000;
@@ -28,6 +30,10 @@ You can move the viewer: call set_camera, focus_entity or highlight. Prefer
 focus_entity with a real entity id from a tool result. Coordinates are metres in
 the model's own frame (x east, z south of Duboce Triangle), not latitude and
 longitude.
+
+The model's sky is the real one: it runs on San Francisco's wall clock, with the
+sun and moon where they actually are. Call sky_now for anything about the time,
+the light, sunrise or sunset, or the moon. You cannot change the time of day.
 
 Answer in at most four short sentences. No lists unless asked.`;
 
@@ -65,6 +71,12 @@ const TOOLS = [
       properties: { x: { type: 'number' }, z: { type: 'number' }, radius: { type: 'number' } },
       required: ['x', 'z'],
     },
+  },
+  {
+    name: 'sky_now',
+    description:
+      "The sky over San Francisco right now, computed from the wall clock — local time and date, the sun's elevation and azimuth with today's sunrise, sunset and solar noon, and the moon's elevation, azimuth, rise, set, illuminated fraction and phase name. Use it for any question about the time, the light, the sunset or the moon. It is the same sky the viewer is looking at.",
+    input_schema: { type: 'object', properties: {} },
   },
   {
     name: 'city_stats',
@@ -244,6 +256,12 @@ export function createTools(data) {
         parks: nearParks,
         places: nearPlaces.map((p) => `${p.name}${p.category ? ` — ${p.category}` : ''} (${Math.round(p.d)} m)`),
       };
+    },
+
+    // No arguments and no network: the astronomy is computed here, and the
+    // browser runs the very same module to light the scene.
+    sky_now() {
+      return skySnapshot(Date.now());
     },
 
     city_stats() {
