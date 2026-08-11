@@ -3,9 +3,9 @@
   "validator": "Blender 4.5.3 LTS",
   "fresh_isolated_scene": true,
   "reimported_final_glb": true,
-  "object_count": 33,
-  "mesh_object_count": 33,
-  "triangle_count": 18412,
+  "object_count": 42,
+  "mesh_object_count": 42,
+  "triangle_count": 20086,
   "triangle_budget": 27000,
   "dimensions_m": [
     73.3818,
@@ -31,6 +31,7 @@
     "Toy_glass",
     "Toy_red_Glow",
     "Toy_roofd",
+    "Toy_sand_Glow",
     "Toy_sky",
     "Toy_steel",
     "Toy_stone",
@@ -58,6 +59,13 @@
       "alpha": 1.0,
       "roughness": 0.85,
       "glow": false
+    },
+    {
+      "name": "Toy_sand_Glow",
+      "image_texture_nodes": [],
+      "alpha": 1.0,
+      "roughness": 0.85,
+      "glow": true
     },
     {
       "name": "Toy_sky",
@@ -305,6 +313,120 @@
       ]
     },
     {
+      "name": "crown_light_0",
+      "triangles": 96,
+      "location": [
+        0.0,
+        0.0,
+        0.0
+      ],
+      "rotation_euler": [
+        0.0,
+        0.0,
+        0.0
+      ],
+      "scale": [
+        1.0,
+        1.0,
+        1.0
+      ]
+    },
+    {
+      "name": "crown_light_1",
+      "triangles": 96,
+      "location": [
+        0.0,
+        0.0,
+        0.0
+      ],
+      "rotation_euler": [
+        0.0,
+        0.0,
+        0.0
+      ],
+      "scale": [
+        1.0,
+        1.0,
+        1.0
+      ]
+    },
+    {
+      "name": "crown_light_2",
+      "triangles": 96,
+      "location": [
+        0.0,
+        0.0,
+        0.0
+      ],
+      "rotation_euler": [
+        0.0,
+        0.0,
+        0.0
+      ],
+      "scale": [
+        1.0,
+        1.0,
+        1.0
+      ]
+    },
+    {
+      "name": "crown_light_3",
+      "triangles": 96,
+      "location": [
+        0.0,
+        0.0,
+        0.0
+      ],
+      "rotation_euler": [
+        0.0,
+        0.0,
+        0.0
+      ],
+      "scale": [
+        1.0,
+        1.0,
+        1.0
+      ]
+    },
+    {
+      "name": "crown_light_4",
+      "triangles": 96,
+      "location": [
+        0.0,
+        0.0,
+        0.0
+      ],
+      "rotation_euler": [
+        0.0,
+        0.0,
+        0.0
+      ],
+      "scale": [
+        1.0,
+        1.0,
+        1.0
+      ]
+    },
+    {
+      "name": "crown_light_5",
+      "triangles": 96,
+      "location": [
+        0.0,
+        0.0,
+        0.0
+      ],
+      "rotation_euler": [
+        0.0,
+        0.0,
+        0.0
+      ],
+      "scale": [
+        1.0,
+        1.0,
+        1.0
+      ]
+    },
+    {
       "name": "entrance",
       "triangles": 108,
       "location": [
@@ -345,6 +467,25 @@
     {
       "name": "lobby_glass",
       "triangles": 142,
+      "location": [
+        0.0,
+        0.0,
+        0.0
+      ],
+      "rotation_euler": [
+        0.0,
+        0.0,
+        0.0
+      ],
+      "scale": [
+        1.0,
+        1.0,
+        1.0
+      ]
+    },
+    {
+      "name": "lobby_light",
+      "triangles": 96,
       "location": [
         0.0,
         0.0,
@@ -725,6 +866,44 @@
     {
       "name": "sign_cloud_2",
       "triangles": 108,
+      "location": [
+        0.0,
+        0.0,
+        0.0
+      ],
+      "rotation_euler": [
+        0.0,
+        0.0,
+        0.0
+      ],
+      "scale": [
+        1.0,
+        1.0,
+        1.0
+      ]
+    },
+    {
+      "name": "windows_led",
+      "triangles": 270,
+      "location": [
+        0.0,
+        0.0,
+        0.0
+      ],
+      "rotation_euler": [
+        0.0,
+        0.0,
+        0.0
+      ],
+      "scale": [
+        1.0,
+        1.0,
+        1.0
+      ]
+    },
+    {
+      "name": "windows_office",
+      "triangles": 732,
       "location": [
         0.0,
         0.0,
