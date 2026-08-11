@@ -19,18 +19,9 @@ const KIND_COLORS = {
   4: [0.29, 0.43, 0.26], // pitch
   5: [0.42, 0.45, 0.27], // scrub
   6: [0.4, 0.4, 0.41], // paved
+  7: [0.427, 0.478, 0.29], // marsh
+  8: [0.604, 0.561, 0.502], // rock
 };
-
-// Bare urban ground between the buildings: warm grey, drifting sandier towards
-// the ocean side and greyer on the ridges.
-function urbanColor(x, elevation, slope, out) {
-  const west = Math.min(1, Math.max(0, (-x - 2000) / 5000));
-  const rock = Math.min(1, slope * 2.4);
-  const high = Math.min(1, Math.max(0, (elevation - 60) / 180));
-  out[0] = 0.44 + west * 0.16 - high * 0.05 - rock * 0.04;
-  out[1] = 0.41 + west * 0.13 - high * 0.03 - rock * 0.02;
-  out[2] = 0.37 + west * 0.08 + high * 0.02;
-}
 
 // Terrarium gives the Bay and the ocean an elevation of ~0 m, which would leave
 // the water plane hidden inside the terrain. Flood-fill inwards from the edges
@@ -125,16 +116,11 @@ export function createTerrain(data) {
           normals[p + 1] = 1 / len;
           normals[p + 2] = nz / len;
 
-          const slope = Math.hypot(ex / (2 * stepX), ez / (2 * stepZ));
           const kind = submerged ? 3 : sampleLanduse(x, z);
-          const preset = KIND_COLORS[kind];
-          if (preset) {
-            tmp[0] = preset[0];
-            tmp[1] = preset[1];
-            tmp[2] = preset[2];
-          } else {
-            urbanColor(x, ground, slope, tmp);
-          }
+          const preset = KIND_COLORS[kind] || KIND_COLORS[0];
+          tmp[0] = preset[0];
+          tmp[1] = preset[1];
+          tmp[2] = preset[2];
           // Deterministic per-vertex mottling so large flats never look flat.
           const n = Math.sin(x * 0.031 + z * 0.017) * Math.sin(z * 0.043 - x * 0.011);
           const jitter = 1 + n * 0.05;

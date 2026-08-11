@@ -183,6 +183,15 @@ export const NAMED_PARKS = [
   { id: 'lincolnPark', name: 'Lincoln Park', lon: -122.4996, lat: 37.7825 },
 ];
 
+export const PARK_COVER = {
+  presidio: {
+    base: 'trees',
+    treeArea: 180,
+    mode: 'grid',
+    species: { broadleaf: 0.1, cypress: 0.45, eucalyptus: 0.45 },
+  },
+};
+
 // Extra hero/overview camera presets.
 export const VIEW_PRESETS = [
   {

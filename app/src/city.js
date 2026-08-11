@@ -52,6 +52,12 @@ const DETAIL_EXIT = 2400;
 const FADE_SPEED = 2.2; // per second
 const STREETS_MAGIC = 0x53465301; // "SFS1", mirrored from pipeline/lib/binio.mjs
 const LANDCOVER_MAGIC = 0x4c465301; // "SFL1"
+const TREE_SPECIES = [
+  { scale: [1, 1, 1], tint: [1, 1, 1] },
+  { scale: [0.72, 1.35, 0.72], tint: [0.92, 0.9, 0.96] },
+  { scale: [0.66, 1.55, 0.66], tint: [1.04, 1.08, 1] },
+  { scale: [0.82, 1.2, 0.82], tint: [1.12, 1.08, 0.9] },
+];
 
 class WorkerPool {
   constructor(size) {
@@ -556,25 +562,37 @@ export function createCity(scene, data) {
       const trees = new InstancedMesh(toyTier ? toyTreeGeometry : treeGeometry, treeMaterial, count);
       const matrix = new Matrix4();
       const dummy = new Object3D();
+      const instanceColors = new Float32Array(count * 3);
       for (let i = 0; i < count; i++) {
         const x = result.trees[i * 4];
         const y = result.trees[i * 4 + 1];
         const z = result.trees[i * 4 + 2];
         const variant = result.trees[i * 4 + 3];
+        const size = variant & 3;
+        const profile = TREE_SPECIES[variant >> 2] || TREE_SPECIES[0];
         dummy.position.set(x, y, z);
         // Variant 3 is a rooftop-garden tree: shrub-scale so it reads as
         // planting, not a lollipop standing on the roof.
         const s =
-          variant === 3
+          size === 3
             ? 0.34 + ((x * 7.3 + z * 3.1) % 1) * 0.12
-            : 0.62 + variant * 0.26 + ((x * 7.3 + z * 3.1) % 1) * 0.35;
-        dummy.scale.set(s, variant === 3 ? s : s * (0.85 + variant * 0.2), s);
+            : 0.62 + size * 0.26 + ((x * 7.3 + z * 3.1) % 1) * 0.35;
+        dummy.scale.set(
+          s * profile.scale[0],
+          size === 3 ? s : s * (0.85 + size * 0.2) * profile.scale[1],
+          s * profile.scale[2]
+        );
         dummy.rotation.y = ((x * 13.7 + z * 5.3) % 1) * Math.PI * 2;
         dummy.updateMatrix();
         matrix.copy(dummy.matrix);
         trees.setMatrixAt(i, matrix);
+        instanceColors[i * 3] = profile.tint[0];
+        instanceColors[i * 3 + 1] = profile.tint[1];
+        instanceColors[i * 3 + 2] = profile.tint[2];
       }
       trees.instanceMatrix.needsUpdate = true;
+      trees.instanceColor = new BufferAttribute(instanceColors, 3);
+      trees.instanceColor.needsUpdate = true;
       trees.castShadow = false;
       trees.receiveShadow = false;
       trees.frustumCulled = true;

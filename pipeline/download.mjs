@@ -101,8 +101,9 @@ const OVERPASS_QUERIES = {
   relation["leisure"~"^(park|garden|golf_course|nature_reserve)$"](${BB});
   way["landuse"~"^(grass|forest|cemetery|recreation_ground|meadow|village_green)$"](${BB});
   relation["landuse"~"^(grass|forest|cemetery|recreation_ground)$"](${BB});
-  way["natural"~"^(beach|sand|wood|scrub|water|grassland)$"](${BB});
+  way["natural"~"^(beach|sand|wood|scrub|water|grassland|wetland|bare_rock|cliff)$"](${BB});
   relation["natural"~"^(wood|water|beach)$"](${BB});
+  relation["natural"="wetland"](${BB});
 );
 out geom;`,
   'osm_features.json': `[out:json][timeout:600];

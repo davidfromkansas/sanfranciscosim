@@ -18,7 +18,7 @@ import { ringArea, ringBBox, ringCentroid } from './lib/poly.mjs';
 import { loadHeightmap } from './lib/heightmap.mjs';
 import { writeLandcoverBlob } from './lib/binio.mjs';
 import { loadTreeBlockers } from './lib/treeblockers.mjs';
-import { NAMED_PARKS } from './lib/landmarks.mjs';
+import { NAMED_PARKS, PARK_COVER } from './lib/landmarks.mjs';
 import { LAND_KINDS } from './lib/classes.mjs';
 
 const DATA = new URL('./data/', import.meta.url);
@@ -29,6 +29,7 @@ const KIND = Object.fromEntries(LAND_KINDS.map((k, i) => [k.id, i]));
 const MAX_EDGE = 55; // subdivide triangles longer than this so parks follow hills
 const TREE_AREA_TREES = 90;
 const TREE_AREA_PARK = 200;
+const MIN_OVERRIDE_HOLE_AREA = 3000;
 
 const { sampleElevation } = await loadHeightmap();
 // Trees may not stand in a building, on a roadway or in water; OSM landcover
@@ -43,6 +44,8 @@ function classify(tags) {
   if (!tags) return null;
   if (tags.natural === 'water' || tags.waterway || tags.landuse === 'reservoir') return KIND.water;
   if (tags.natural === 'beach' || tags.natural === 'sand') return KIND.sand;
+  if (tags.natural === 'wetland') return KIND.marsh;
+  if (tags.natural === 'bare_rock' || tags.natural === 'cliff') return KIND.rock;
   if (tags.natural === 'wood' || tags.landuse === 'forest') return KIND.trees;
   if (tags.natural === 'scrub' || tags.natural === 'grassland') return KIND.scrub;
   if (tags.aeroway) return KIND.paved;
@@ -252,32 +255,64 @@ function addTriangle(kind, tri, waterLevel) {
   }
 }
 
-function scatterTrees(kind, outer, holes, area, seedBase) {
-  const per = kind === KIND.trees ? TREE_AREA_TREES : TREE_AREA_PARK;
+function pickSpecies(weights, seed) {
+  const entries = Object.entries(weights || { broadleaf: 1 });
+  const total = entries.reduce((sum, [, weight]) => sum + weight, 0);
+  let roll = hash01(seed) * total;
+  for (const [species, weight] of entries) {
+    roll -= weight;
+    if (roll < 0) return species === 'cypress' ? 1 : species === 'eucalyptus' ? 2 : species === 'palm' ? 3 : 0;
+  }
+  return 0;
+}
+
+function treeVariant(species, seed) {
+  return species * 4 + Math.floor(hash01(seed) * 3);
+}
+
+function inTreeArea(x, z, outer, holes) {
+  if (!pointInRing(x, z, outer)) return false;
+  for (const h of holes) if (pointInRing(x, z, h)) return false;
+  return true;
+}
+
+function scatterTrees(kind, outer, holes, area, seedBase, cover = null) {
+  const per = cover?.treeArea || (kind === KIND.trees ? TREE_AREA_TREES : TREE_AREA_PARK);
+  const species = cover?.species || { broadleaf: 1 };
+  const mode = cover?.mode || 'random';
   const target = Math.floor(area / per);
   if (target <= 0) return 0;
   const [minX, minZ, maxX, maxZ] = ringBBox(outer);
-  const w = maxX - minX;
-  const d = maxZ - minZ;
   let placed = 0;
-  const attempts = Math.min(target * 4, 400000);
-  for (let i = 0; i < attempts && placed < target; i++) {
-    const x = minX + hash01(seedBase + i * 2) * w;
-    const z = minZ + hash01(seedBase + i * 2 + 1) * d;
-    if (!pointInRing(x, z, outer)) continue;
-    let inHole = false;
-    for (const h of holes) {
-      if (pointInRing(x, z, h)) {
-        inHole = true;
-        break;
+  const addTree = (x, z, seed) => {
+    if (!inTreeArea(x, z, outer, holes) || treeBlocked(x, z)) return;
+    const cell = cellFor(x, z);
+    if (!cell) return;
+    const kind = pickSpecies(species, seed);
+    cell.trees.push(x, sampleElevation(x, z), z, treeVariant(kind, seed + 1));
+    placed++;
+  };
+  if (mode === 'grid') {
+    const spacing = Math.sqrt(per);
+    const jitter = spacing * 0.3;
+    let row = 0;
+    for (let z = minZ; z <= maxZ && placed < target; z += spacing, row++) {
+      for (let x = minX; x <= maxX && placed < target; x += spacing) {
+        const seed = seedBase + row * 100003 + Math.round((x - minX) / spacing) * 31337;
+        addTree(x + (hash01(seed) - 0.5) * jitter, z + (hash01(seed + 1) - 0.5) * jitter, seed);
       }
     }
-    if (inHole) continue;
-    if (treeBlocked(x, z)) continue;
-    const cell = cellFor(x, z);
-    if (!cell) continue;
-    cell.trees.push(x, sampleElevation(x, z), z, Math.floor(hash01(seedBase + i * 7) * 3));
-    placed++;
+    return placed;
+  }
+  const w = maxX - minX;
+  const d = maxZ - minZ;
+  const attempts = Math.min(target * 4, 400000);
+  for (let i = 0; i < attempts && placed < target; i++) {
+    addTree(
+      minX + hash01(seedBase + i * 2) * w,
+      minZ + hash01(seedBase + i * 2 + 1) * d,
+      seedBase + i * 7
+    );
   }
   return placed;
 }
@@ -307,7 +342,7 @@ let triangles = 0;
 let trees = 0;
 const areaByKind = new Array(LAND_KINDS.length).fill(0);
 
-function handlePolygon(kind, outerRing, holeRings, seedBase) {
+function handlePolygon(kind, outerRing, holeRings, seedBase, cover = null) {
   if (outerRing.length / 2 < 3) return;
   const area = Math.abs(ringArea(outerRing));
   if (area < 60) return;
@@ -324,40 +359,116 @@ function handlePolygon(kind, outerRing, holeRings, seedBase) {
   }
 
   // Water surfaces are flat, so they never need the terrain-following subdivision.
-  const tris = triangulateDraped(outerRing, holeRings, kind === KIND.water ? 400 : MAX_EDGE);
+  const maxEdge = cover ? 180 : kind === KIND.water ? 400 : MAX_EDGE;
+  let tris = triangulateDraped(outerRing, holeRings, maxEdge);
+  const expectedArea =
+    Math.abs(ringArea(outerRing)) - holeRings.reduce((sum, hole) => sum + Math.abs(ringArea(hole)), 0);
+  const actualArea = tris.reduce((sum, tri) => {
+    return (
+      sum +
+      Math.abs(
+        (tri[2] - tri[0]) * (tri[5] - tri[1]) - (tri[4] - tri[0]) * (tri[3] - tri[1])
+      ) /
+        2
+    );
+  }, 0);
+  if (holeRings.length && Math.abs(actualArea - expectedArea) > Math.max(1, expectedArea * 1e-4)) {
+    console.warn(`invalid cover holes for ${seedBase}; dropping holes`);
+    tris = triangulateDraped(outerRing, [], maxEdge);
+    holeRings = [];
+  }
   for (const t of tris) addTriangle(kind, t, waterLevel);
   triangles += tris.length;
   polygons++;
   areaByKind[kind] += area;
 
   if (kind === KIND.trees || kind === KIND.grass) {
-    trees += scatterTrees(kind, outerRing, holeRings, area, seedBase);
+    trees += scatterTrees(kind, outerRing, holeRings, area, seedBase, cover);
   }
 }
 
+function coverForElement(outers) {
+  for (const [id, cover] of Object.entries(PARK_COVER)) {
+    const park = NAMED_PARKS.find((entry) => entry.id === id);
+    if (!park) continue;
+    const [x, z] = project(park.lon, park.lat);
+    if (outers.some((outer) => pointInRing(x, z, outer))) return cover;
+  }
+  return null;
+}
+
+const records = [];
 let seedCounter = 1;
 for (const el of raw.elements) {
   const kind = classify(el.tags);
   if (kind === null) continue;
   seedCounter += 9176;
+  let outers = [];
+  let innerRings = [];
   if (el.type === 'way' && Array.isArray(el.geometry)) {
-    handlePolygon(kind, ringFromGeometry(el.geometry), [], seedCounter);
+    outers = [ringFromGeometry(el.geometry)];
   } else if (el.type === 'relation' && Array.isArray(el.members)) {
     const rings = stitchRings(el.members);
-    const outers = rings.filter((r) => r.role !== 'inner').map((r) => ringFromGeometry(r.pts));
-    const inners = rings.filter((r) => r.role === 'inner').map((r) => ringFromGeometry(r.pts));
-    for (const outer of outers) {
-      if (outer.length / 2 < 3) continue;
-      const bbox = ringBBox(outer);
-      const holes = inners.filter((h) => {
-        if (h.length / 2 < 3) return false;
-        const [hx, hz] = ringCentroid(h);
-        return hx >= bbox[0] && hx <= bbox[2] && hz >= bbox[1] && hz <= bbox[3];
-      });
-      handlePolygon(kind, outer, holes, (seedCounter += 313));
-    }
+    outers = rings.filter((r) => r.role !== 'inner').map((r) => ringFromGeometry(r.pts));
+    innerRings = rings.filter((r) => r.role === 'inner').map((r) => ringFromGeometry(r.pts));
   }
+  const cover = coverForElement(outers);
+  let ringSeed = seedCounter;
+  for (const outer of outers) {
+    if (el.type === 'relation') ringSeed += 313;
+    if (outer.length / 2 < 3) continue;
+    const bbox = ringBBox(outer);
+    const holes = innerRings.filter((h) => {
+      if (h.length / 2 < 3) return false;
+      const [hx, hz] = ringCentroid(h);
+      return hx >= bbox[0] && hx <= bbox[2] && hz >= bbox[1] && hz <= bbox[3];
+    });
+    const area = Math.abs(ringArea(outer));
+    if (area < 60) continue;
+    records.push({
+      kind,
+      outer,
+      holes,
+      area,
+      bbox,
+      centroid: ringCentroid(outer),
+      cover,
+      seed: ringSeed,
+    });
+  }
+  if (el.type === 'relation') seedCounter = ringSeed;
 }
+
+let overrideHoles = 0;
+for (const record of records) {
+  let holes = record.holes.slice();
+  let cover = null;
+  if (record.cover) {
+    cover = record.cover;
+    record.kind = KIND[cover.base];
+    const accepted = [];
+    for (const candidate of records) {
+      if (candidate === record || candidate.kind === record.kind || candidate.area < MIN_OVERRIDE_HOLE_AREA) {
+        continue;
+      }
+      if (!pointInRing(candidate.centroid[0], candidate.centroid[1], record.outer)) continue;
+      const overlaps = accepted.some(
+        (bbox) =>
+          candidate.bbox[0] < bbox[2] &&
+          candidate.bbox[2] > bbox[0] &&
+          candidate.bbox[1] < bbox[3] &&
+          candidate.bbox[3] > bbox[1]
+      );
+      if (overlaps) continue;
+      accepted.push(candidate.bbox);
+      holes.push(candidate.outer);
+    }
+    overrideHoles += accepted.length;
+  }
+  record.parkHoles = holes;
+  handlePolygon(record.kind, record.outer, holes, record.seed, cover);
+}
+console.log(`park cover overrides: ${records.filter((record) => record.cover).length} polygons, ${overrideHoles} holes`);
 
 // Stale cells from an earlier bake would linger and desync the index.
 await rm(CELLS_OUT, { recursive: true, force: true });
