@@ -112,12 +112,13 @@ const NIGHT = {
   fog: new Color(0.09, 0.1, 0.15),
 };
 
-// Toy mode key/fill: #fff2df sun at 2.4, #bfd9f2 over #d8cfc0 sky fill at 1.1.
-// This is the daytime diorama exactly as it shipped, and it is what a high sun
-// still gets.
+// Toy mode key/fill: #fff2df sun over a #bfd9f2/#d8cfc0 sky fill. The key is the
+// diorama's shipped 2.4 lifted by a quarter — every state below carries the same
+// 1.25 on the key only, so the sun and the moon gained a stop of presence
+// without the ambient fill flattening the shading.
 const TOY = {
   sun: new Color(1.0, 0.949, 0.874),
-  sunIntensity: 2.4,
+  sunIntensity: 3.0,
   hemiSky: new Color(0.749, 0.851, 0.949),
   hemiGround: new Color(0.847, 0.812, 0.753),
   hemiIntensity: 1.1,
@@ -126,7 +127,7 @@ const TOY = {
 // Low sun: the key warms and softens, the fill picks up the ground bounce.
 const TOY_GOLDEN = {
   sun: new Color(0xffe3c0),
-  sunIntensity: 2.1,
+  sunIntensity: 2.63,
   hemiSky: new Color(0xc6d6ec),
   hemiGround: new Color(0xd8c3a2),
   hemiIntensity: 1.12,
@@ -138,7 +139,7 @@ const TOY_GOLDEN = {
 // cut rather than a sunset.
 const TOY_DUSK = {
   sun: new Color(0xffb489),
-  sunIntensity: 1.8,
+  sunIntensity: 2.25,
   hemiSky: new Color(0xc0a4bd),
   hemiGround: new Color(0xb5906b),
   hemiIntensity: 1.3,
@@ -152,7 +153,7 @@ const TOY_NIGHT = {
   horizon: new Color(0x2c3a5c),
   zenith: new Color(0x1a2340),
   sun: new Color(0xb8c8e8),
-  sunIntensity: 0.5,
+  sunIntensity: 0.63,
   hemiSky: new Color(0x7688c2),
   hemiGround: new Color(0x7a6a54),
   hemiIntensity: 1.15,
@@ -163,7 +164,7 @@ const STAR_COUNT = 2000;
 // The usability floor. The plan asks for at least 0.25 key and 0.42 hemisphere;
 // on the actual model those left a Quality=Low new-moon street unreadable, so
 // the floor sits well above the minimum. The tilt-shift grade is not the lever.
-const NIGHT_KEY_FLOOR = 0.5;
+const NIGHT_KEY_FLOOR = 0.63;
 const NIGHT_HEMI_FLOOR = TOY_NIGHT.hemiIntensity;
 // A shadow camera pointed at a key light far below the horizon is degenerate.
 const KEY_Y_FLOOR = -0.2;
@@ -450,7 +451,7 @@ export function createEnvironment(scene) {
     // scales with the lit fraction but never falls through the floor: a new
     // moon is not an excuse for an unreadable city.
     if (state.toy && nightfall > 0) {
-      const moonIntensity = NIGHT_KEY_FLOOR + (moonUp ? 0.35 * state.moonIllumination : 0);
+      const moonIntensity = NIGHT_KEY_FLOOR + (moonUp ? 0.44 * state.moonIllumination : 0);
       sun.intensity = Math.max(lerp(sun.intensity, moonIntensity, nightfall), NIGHT_KEY_FLOOR * nightfall);
       hemi.intensity = Math.max(hemi.intensity, NIGHT_HEMI_FLOOR * nightfall);
     }
