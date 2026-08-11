@@ -158,6 +158,15 @@ export const LANDMARKS = [
     camera: { distance: 700, yaw: 135, pitch: 20 },
   },
   {
+    id: 'stMarysCathedral',
+    name: 'Cathedral of Saint Mary of the Assumption',
+    lon: -122.4253877,
+    lat: 37.7842352,
+    height: 78.7,
+    exclude: 90,
+    camera: { distance: 600, yaw: 190, pitch: 18 },
+  },
+  {
     id: 'fishermansWharf',
     name: "Pier 39 / Fisherman's Wharf",
     lon: -122.4098,
