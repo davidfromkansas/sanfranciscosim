@@ -35,5 +35,23 @@
       326
     ],
     "tris": 18412
+  },
+  {
+    "id": "ferry-building",
+    "file": "ferry-building.glb",
+    "anchor": [
+      -122.3933697,
+      37.7955227
+    ],
+    "targetHeightM": 74.7,
+    "cat": 25,
+    "name": "Ferry Building",
+    "estimated": false,
+    "dims": [
+      167.4984,
+      197.8239,
+      74.7
+    ],
+    "tris": 12392
   }
 ]
