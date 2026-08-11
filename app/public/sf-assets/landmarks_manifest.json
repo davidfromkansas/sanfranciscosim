@@ -125,5 +125,23 @@
       19.3
     ],
     "tris": 22384
+  },
+  {
+    "id": "de-young",
+    "file": "de-young.glb",
+    "anchor": [
+      -122.4688156,
+      37.7715
+    ],
+    "targetHeightM": 43.9,
+    "cat": 16,
+    "name": "de Young Museum",
+    "estimated": false,
+    "dims": [
+      151.8662,
+      162.5656,
+      43.9
+    ],
+    "tris": 2201
   }
 ]

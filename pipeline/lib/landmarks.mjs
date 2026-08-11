@@ -139,6 +139,15 @@ export const LANDMARKS = [
     camera: { distance: 700, yaw: 225, pitch: 20 },
   },
   {
+    id: 'deYoung',
+    name: 'de Young Museum',
+    lon: -122.4688156,
+    lat: 37.7715,
+    height: 43.9,
+    exclude: 100,
+    camera: { distance: 700, yaw: 135, pitch: 20 },
+  },
+  {
     id: 'fishermansWharf',
     name: "Pier 39 / Fisherman's Wharf",
     lon: -122.4098,
