@@ -6,7 +6,7 @@
   "cols": 32,
   "rows": 32
  },
- "generated": "2026-08-11T06:04:52.383Z",
+ "generated": "2026-08-11T13:42:47.672Z",
  "dev": null,
  "palette": [
   {
@@ -332,17 +332,17 @@
   }
  ],
  "stats": {
-  "baseBuildings": 171485,
-  "records": 226579,
-  "pitched": 146510,
-  "garnish": 55094,
+  "baseBuildings": 171472,
+  "records": 226563,
+  "pitched": 146501,
+  "garnish": 55091,
   "helipads": 6,
   "tallest": 200,
-  "trees": 289555,
+  "trees": 289144,
   "bytes": {
-   "buildings": 11999126,
+   "buildings": 11997880,
    "streets": 8576096,
-   "landcover": 11930216
+   "landcover": 11877996
   }
  },
  "cells": [
@@ -397,8 +397,8 @@
    "cz": 15,
    "originX": -3000,
    "originZ": -500,
-   "buildings": 198,
-   "bytes": 10540
+   "buildings": 193,
+   "bytes": 10116
   },
   {
    "key": "10_16",
@@ -613,8 +613,8 @@
    "cz": 15,
    "originX": -2500,
    "originZ": -500,
-   "buildings": 155,
-   "bytes": 8488
+   "buildings": 149,
+   "bytes": 7922
   },
   {
    "key": "11_16",
@@ -820,8 +820,8 @@
    "cz": 15,
    "originX": -2000,
    "originZ": -500,
-   "buildings": 33,
-   "bytes": 1836
+   "buildings": 28,
+   "bytes": 1580
   },
   {
    "key": "12_16",
@@ -9762,9 +9762,9 @@
    "cz": 10,
    "originX": -3000,
    "originZ": -3000,
-   "triangles": 3713,
-   "trees": 3173,
-   "bytes": 62860
+   "triangles": 3034,
+   "trees": 3218,
+   "bytes": 56284
   },
   {
    "key": "10_11",
@@ -9772,9 +9772,9 @@
    "cz": 11,
    "originX": -3000,
    "originZ": -2500,
-   "triangles": 6937,
-   "trees": 3030,
-   "bytes": 93820
+   "triangles": 7638,
+   "trees": 2979,
+   "bytes": 100360
   },
   {
    "key": "10_12",
@@ -9783,8 +9783,8 @@
    "originX": -3000,
    "originZ": -2000,
    "triangles": 2644,
-   "trees": 512,
-   "bytes": 30268
+   "trees": 507,
+   "bytes": 30236
   },
   {
    "key": "10_13",
@@ -9803,8 +9803,8 @@
    "originX": -3000,
    "originZ": -1000,
    "triangles": 369,
-   "trees": 54,
-   "bytes": 4244
+   "trees": 56,
+   "bytes": 4260
   },
   {
    "key": "10_15",
@@ -9813,8 +9813,8 @@
    "originX": -3000,
    "originZ": -500,
    "triangles": 7118,
-   "trees": 1867,
-   "bytes": 85276
+   "trees": 1921,
+   "bytes": 85652
   },
   {
    "key": "10_16",
@@ -9822,9 +9822,9 @@
    "cz": 16,
    "originX": -3000,
    "originZ": 0,
-   "triangles": 27139,
-   "trees": 3520,
-   "bytes": 296480
+   "triangles": 27132,
+   "trees": 3433,
+   "bytes": 295772
   },
   {
    "key": "10_17",
@@ -9832,9 +9832,9 @@
    "cz": 17,
    "originX": -3000,
    "originZ": 500,
-   "triangles": 16,
+   "triangles": 24,
    "trees": 28,
-   "bytes": 548
+   "bytes": 708
   },
   {
    "key": "10_18",
@@ -9843,8 +9843,8 @@
    "originX": -3000,
    "originZ": 1000,
    "triangles": 42,
-   "trees": 30,
-   "bytes": 860
+   "trees": 37,
+   "bytes": 908
   },
   {
    "key": "10_19",
@@ -9883,8 +9883,8 @@
    "originX": -3000,
    "originZ": 3500,
    "triangles": 45,
-   "trees": 72,
-   "bytes": 1132
+   "trees": 66,
+   "bytes": 1088
   },
   {
    "key": "10_24",
@@ -9893,8 +9893,8 @@
    "originX": -3000,
    "originZ": 4000,
    "triangles": 155,
-   "trees": 9,
-   "bytes": 2304
+   "trees": 10,
+   "bytes": 2308
   },
   {
    "key": "10_25",
@@ -9923,8 +9923,8 @@
    "originX": -3000,
    "originZ": 5500,
    "triangles": 145,
-   "trees": 168,
-   "bytes": 2956
+   "trees": 170,
+   "bytes": 2968
   },
   {
    "key": "10_28",
@@ -9933,8 +9933,8 @@
    "originX": -3000,
    "originZ": 6000,
    "triangles": 2966,
-   "trees": 530,
-   "bytes": 34828
+   "trees": 571,
+   "bytes": 35116
   },
   {
    "key": "10_29",
@@ -9943,8 +9943,8 @@
    "originX": -3000,
    "originZ": 6500,
    "triangles": 362,
-   "trees": 71,
-   "bytes": 4848
+   "trees": 93,
+   "bytes": 5000
   },
   {
    "key": "10_31",
@@ -9962,9 +9962,9 @@
    "cz": 7,
    "originX": -3000,
    "originZ": -4500,
-   "triangles": 3640,
-   "trees": 645,
-   "bytes": 42440
+   "triangles": 3351,
+   "trees": 515,
+   "bytes": 38384
   },
   {
    "key": "10_8",
@@ -9972,9 +9972,9 @@
    "cz": 8,
    "originX": -3000,
    "originZ": -4000,
-   "triangles": 2327,
-   "trees": 2136,
-   "bytes": 39640
+   "triangles": 2326,
+   "trees": 2102,
+   "bytes": 39372
   },
   {
    "key": "10_9",
@@ -9982,9 +9982,9 @@
    "cz": 9,
    "originX": -3000,
    "originZ": -3500,
-   "triangles": 1173,
-   "trees": 3077,
-   "bytes": 33892
+   "triangles": 1200,
+   "trees": 3211,
+   "bytes": 35104
   },
   {
    "key": "11_10",
@@ -9992,9 +9992,9 @@
    "cz": 10,
    "originX": -2500,
    "originZ": -3000,
-   "triangles": 4075,
-   "trees": 4235,
-   "bytes": 72996
+   "triangles": 3730,
+   "trees": 4312,
+   "bytes": 70056
   },
   {
    "key": "11_11",
@@ -10002,9 +10002,9 @@
    "cz": 11,
    "originX": -2500,
    "originZ": -2500,
-   "triangles": 11153,
-   "trees": 3490,
-   "bytes": 140200
+   "triangles": 11533,
+   "trees": 3450,
+   "bytes": 143776
   },
   {
    "key": "11_12",
@@ -10027,24 +10027,14 @@
    "bytes": 584
   },
   {
-   "key": "11_14",
-   "cx": 11,
-   "cz": 14,
-   "originX": -2500,
-   "originZ": -1000,
-   "triangles": 2,
-   "trees": 16,
-   "bytes": 184
-  },
-  {
    "key": "11_15",
    "cx": 11,
    "cz": 15,
    "originX": -2500,
    "originZ": -500,
    "triangles": 6701,
-   "trees": 1691,
-   "bytes": 78272
+   "trees": 1628,
+   "bytes": 77832
   },
   {
    "key": "11_16",
@@ -10053,8 +10043,8 @@
    "originX": -2500,
    "originZ": 0,
    "triangles": 14049,
-   "trees": 1670,
-   "bytes": 152156
+   "trees": 1679,
+   "bytes": 152220
   },
   {
    "key": "11_17",
@@ -10073,8 +10063,8 @@
    "originX": -2500,
    "originZ": 1000,
    "triangles": 806,
-   "trees": 520,
-   "bytes": 12940
+   "trees": 501,
+   "bytes": 12808
   },
   {
    "key": "11_19",
@@ -10083,8 +10073,8 @@
    "originX": -2500,
    "originZ": 1500,
    "triangles": 1274,
-   "trees": 580,
-   "bytes": 17868
+   "trees": 555,
+   "bytes": 17696
   },
   {
    "key": "11_20",
@@ -10093,8 +10083,8 @@
    "originX": -2500,
    "originZ": 2000,
    "triangles": 149,
-   "trees": 230,
-   "bytes": 3560
+   "trees": 206,
+   "bytes": 3392
   },
   {
    "key": "11_21",
@@ -10113,8 +10103,8 @@
    "originX": -2500,
    "originZ": 3000,
    "triangles": 109,
-   "trees": 81,
-   "bytes": 2064
+   "trees": 76,
+   "bytes": 2028
   },
   {
    "key": "11_23",
@@ -10143,8 +10133,8 @@
    "originX": -2500,
    "originZ": 4500,
    "triangles": 25,
-   "trees": 28,
-   "bytes": 612
+   "trees": 25,
+   "bytes": 592
   },
   {
    "key": "11_27",
@@ -10153,8 +10143,8 @@
    "originX": -2500,
    "originZ": 5500,
    "triangles": 24,
-   "trees": 29,
-   "bytes": 572
+   "trees": 28,
+   "bytes": 564
   },
   {
    "key": "11_28",
@@ -10163,8 +10153,8 @@
    "originX": -2500,
    "originZ": 6000,
    "triangles": 1058,
-   "trees": 218,
-   "bytes": 12916
+   "trees": 171,
+   "bytes": 12588
   },
   {
    "key": "11_29",
@@ -10173,8 +10163,8 @@
    "originX": -2500,
    "originZ": 6500,
    "triangles": 493,
-   "trees": 118,
-   "bytes": 6204
+   "trees": 108,
+   "bytes": 6136
   },
   {
    "key": "11_30",
@@ -10193,8 +10183,8 @@
    "originX": -2500,
    "originZ": 7500,
    "triangles": 31,
-   "trees": 14,
-   "bytes": 528
+   "trees": 17,
+   "bytes": 552
   },
   {
    "key": "11_8",
@@ -10203,8 +10193,8 @@
    "originX": -2500,
    "originZ": -4000,
    "triangles": 14723,
-   "trees": 2334,
-   "bytes": 162740
+   "trees": 2428,
+   "bytes": 163400
   },
   {
    "key": "11_9",
@@ -10213,8 +10203,8 @@
    "originX": -2500,
    "originZ": -3500,
    "triangles": 2270,
-   "trees": 3944,
-   "bytes": 51384
+   "trees": 3888,
+   "bytes": 50992
   },
   {
    "key": "12_10",
@@ -10222,9 +10212,9 @@
    "cz": 10,
    "originX": -2000,
    "originZ": -3000,
-   "triangles": 2914,
-   "trees": 3304,
-   "bytes": 53252
+   "triangles": 2931,
+   "trees": 3325,
+   "bytes": 53512
   },
   {
    "key": "12_11",
@@ -10233,8 +10223,8 @@
    "originX": -2000,
    "originZ": -2500,
    "triangles": 6717,
-   "trees": 2319,
-   "bytes": 84584
+   "trees": 2336,
+   "bytes": 84704
   },
   {
    "key": "12_12",
@@ -10253,8 +10243,8 @@
    "originX": -2000,
    "originZ": -1500,
    "triangles": 148,
-   "trees": 105,
-   "bytes": 2792
+   "trees": 93,
+   "bytes": 2708
   },
   {
    "key": "12_14",
@@ -10263,8 +10253,8 @@
    "originX": -2000,
    "originZ": -1000,
    "triangles": 351,
-   "trees": 163,
-   "bytes": 5312
+   "trees": 181,
+   "bytes": 5440
   },
   {
    "key": "12_15",
@@ -10273,8 +10263,8 @@
    "originX": -2000,
    "originZ": -500,
    "triangles": 5224,
-   "trees": 2002,
-   "bytes": 68124
+   "trees": 2004,
+   "bytes": 68136
   },
   {
    "key": "12_16",
@@ -10282,9 +10272,9 @@
    "cz": 16,
    "originX": -2000,
    "originZ": 0,
-   "triangles": 3905,
-   "trees": 1812,
-   "bytes": 53476
+   "triangles": 3848,
+   "trees": 1892,
+   "bytes": 53388
   },
   {
    "key": "12_17",
@@ -10293,8 +10283,8 @@
    "originX": -2000,
    "originZ": 500,
    "triangles": 1099,
-   "trees": 665,
-   "bytes": 17136
+   "trees": 629,
+   "bytes": 16884
   },
   {
    "key": "12_18",
@@ -10302,9 +10292,9 @@
    "cz": 18,
    "originX": -2000,
    "originZ": 1000,
-   "triangles": 6141,
-   "trees": 4347,
-   "bytes": 93672
+   "triangles": 6142,
+   "trees": 4355,
+   "bytes": 93744
   },
   {
    "key": "12_19",
@@ -10312,9 +10302,9 @@
    "cz": 19,
    "originX": -2000,
    "originZ": 1500,
-   "triangles": 844,
-   "trees": 739,
-   "bytes": 14692
+   "triangles": 846,
+   "trees": 758,
+   "bytes": 14856
   },
   {
    "key": "12_20",
@@ -10323,8 +10313,8 @@
    "originX": -2000,
    "originZ": 2000,
    "triangles": 1619,
-   "trees": 1442,
-   "bytes": 27172
+   "trees": 1459,
+   "bytes": 27292
   },
   {
    "key": "12_21",
@@ -10333,8 +10323,8 @@
    "originX": -2000,
    "originZ": 2500,
    "triangles": 155,
-   "trees": 151,
-   "bytes": 3056
+   "trees": 143,
+   "bytes": 3000
   },
   {
    "key": "12_22",
@@ -10343,8 +10333,8 @@
    "originX": -2000,
    "originZ": 3000,
    "triangles": 1191,
-   "trees": 1664,
-   "bytes": 24372
+   "trees": 1676,
+   "bytes": 24456
   },
   {
    "key": "12_23",
@@ -10353,8 +10343,8 @@
    "originX": -2000,
    "originZ": 3500,
    "triangles": 524,
-   "trees": 442,
-   "bytes": 8788
+   "trees": 451,
+   "bytes": 8852
   },
   {
    "key": "12_24",
@@ -10363,8 +10353,8 @@
    "originX": -2000,
    "originZ": 4000,
    "triangles": 65,
-   "trees": 8,
-   "bytes": 1012
+   "trees": 7,
+   "bytes": 1004
   },
   {
    "key": "12_25",
@@ -10373,8 +10363,8 @@
    "originX": -2000,
    "originZ": 4500,
    "triangles": 338,
-   "trees": 10,
-   "bytes": 4276
+   "trees": 12,
+   "bytes": 4288
   },
   {
    "key": "12_26",
@@ -10383,8 +10373,8 @@
    "originX": -2000,
    "originZ": 5000,
    "triangles": 16,
-   "trees": 3,
-   "bytes": 292
+   "trees": 2,
+   "bytes": 284
   },
   {
    "key": "12_27",
@@ -10393,8 +10383,8 @@
    "originX": -2000,
    "originZ": 5500,
    "triangles": 163,
-   "trees": 176,
-   "bytes": 3128
+   "trees": 173,
+   "bytes": 3108
   },
   {
    "key": "12_28",
@@ -10403,8 +10393,8 @@
    "originX": -2000,
    "originZ": 6000,
    "triangles": 183,
-   "trees": 136,
-   "bytes": 3212
+   "trees": 140,
+   "bytes": 3240
   },
   {
    "key": "12_29",
@@ -10423,8 +10413,8 @@
    "originX": -2000,
    "originZ": 7000,
    "triangles": 150,
-   "trees": 24,
-   "bytes": 1900
+   "trees": 34,
+   "bytes": 1972
   },
   {
    "key": "12_31",
@@ -10433,8 +10423,8 @@
    "originX": -2000,
    "originZ": 7500,
    "triangles": 611,
-   "trees": 163,
-   "bytes": 7872
+   "trees": 151,
+   "bytes": 7788
   },
   {
    "key": "12_7",
@@ -10443,8 +10433,8 @@
    "originX": -2000,
    "originZ": -4500,
    "triangles": 110,
-   "trees": 0,
-   "bytes": 1388
+   "trees": 1,
+   "bytes": 1396
   },
   {
    "key": "12_8",
@@ -10453,8 +10443,8 @@
    "originX": -2000,
    "originZ": -4000,
    "triangles": 10019,
-   "trees": 2317,
-   "bytes": 117944
+   "trees": 2340,
+   "bytes": 118104
   },
   {
    "key": "12_9",
@@ -10463,8 +10453,8 @@
    "originX": -2000,
    "originZ": -3500,
    "triangles": 7591,
-   "trees": 2343,
-   "bytes": 93116
+   "trees": 2296,
+   "bytes": 92788
   },
   {
    "key": "13_10",
@@ -10473,8 +10463,8 @@
    "originX": -1500,
    "originZ": -3000,
    "triangles": 4354,
-   "trees": 3218,
-   "bytes": 67040
+   "trees": 3260,
+   "bytes": 67332
   },
   {
    "key": "13_11",
@@ -10483,8 +10473,8 @@
    "originX": -1500,
    "originZ": -2500,
    "triangles": 3227,
-   "trees": 1278,
-   "bytes": 41964
+   "trees": 1293,
+   "bytes": 42072
   },
   {
    "key": "13_12",
@@ -10513,8 +10503,8 @@
    "originX": -1500,
    "originZ": -500,
    "triangles": 1779,
-   "trees": 450,
-   "bytes": 22076
+   "trees": 459,
+   "bytes": 22140
   },
   {
    "key": "13_16",
@@ -10523,8 +10513,8 @@
    "originX": -1500,
    "originZ": 0,
    "triangles": 382,
-   "trees": 387,
-   "bytes": 7300
+   "trees": 393,
+   "bytes": 7340
   },
   {
    "key": "13_17",
@@ -10532,9 +10522,9 @@
    "cz": 17,
    "originX": -1500,
    "originZ": 500,
-   "triangles": 104,
-   "trees": 200,
-   "bytes": 2780
+   "triangles": 97,
+   "trees": 219,
+   "bytes": 2808
   },
   {
    "key": "13_18",
@@ -10543,8 +10533,8 @@
    "originX": -1500,
    "originZ": 1000,
    "triangles": 696,
-   "trees": 856,
-   "bytes": 13736
+   "trees": 867,
+   "bytes": 13816
   },
   {
    "key": "13_19",
@@ -10553,8 +10543,8 @@
    "originX": -1500,
    "originZ": 1500,
    "triangles": 932,
-   "trees": 560,
-   "bytes": 14656
+   "trees": 602,
+   "bytes": 14952
   },
   {
    "key": "13_20",
@@ -10563,8 +10553,8 @@
    "originX": -1500,
    "originZ": 2000,
    "triangles": 524,
-   "trees": 412,
-   "bytes": 8972
+   "trees": 387,
+   "bytes": 8800
   },
   {
    "key": "13_21",
@@ -10572,9 +10562,9 @@
    "cz": 21,
    "originX": -1500,
    "originZ": 2500,
-   "triangles": 305,
-   "trees": 181,
-   "bytes": 4912
+   "triangles": 297,
+   "trees": 206,
+   "bytes": 5036
   },
   {
    "key": "13_22",
@@ -10583,8 +10573,8 @@
    "originX": -1500,
    "originZ": 3000,
    "triangles": 742,
-   "trees": 992,
-   "bytes": 15412
+   "trees": 985,
+   "bytes": 15364
   },
   {
    "key": "13_23",
@@ -10593,8 +10583,8 @@
    "originX": -1500,
    "originZ": 3500,
    "triangles": 432,
-   "trees": 432,
-   "bytes": 8100
+   "trees": 425,
+   "bytes": 8052
   },
   {
    "key": "13_25",
@@ -10623,8 +10613,8 @@
    "originX": -1500,
    "originZ": 6500,
    "triangles": 49,
-   "trees": 70,
-   "bytes": 1096
+   "trees": 72,
+   "bytes": 1112
   },
   {
    "key": "13_30",
@@ -10633,8 +10623,8 @@
    "originX": -1500,
    "originZ": 7000,
    "triangles": 275,
-   "trees": 69,
-   "bytes": 3820
+   "trees": 56,
+   "bytes": 3728
   },
   {
    "key": "13_31",
@@ -10643,8 +10633,8 @@
    "originX": -1500,
    "originZ": 7500,
    "triangles": 2360,
-   "trees": 502,
-   "bytes": 28092
+   "trees": 456,
+   "bytes": 27768
   },
   {
    "key": "13_7",
@@ -10653,8 +10643,8 @@
    "originX": -1500,
    "originZ": -4500,
    "triangles": 803,
-   "trees": 129,
-   "bytes": 10028
+   "trees": 135,
+   "bytes": 10068
   },
   {
    "key": "13_8",
@@ -10662,9 +10652,9 @@
    "cz": 8,
    "originX": -1500,
    "originZ": -4000,
-   "triangles": 5580,
-   "trees": 1952,
-   "bytes": 72124
+   "triangles": 5568,
+   "trees": 1936,
+   "bytes": 71884
   },
   {
    "key": "13_9",
@@ -10673,8 +10663,8 @@
    "originX": -1500,
    "originZ": -3500,
    "triangles": 7374,
-   "trees": 2274,
-   "bytes": 93824
+   "trees": 2285,
+   "bytes": 93900
   },
   {
    "key": "14_10",
@@ -10683,8 +10673,8 @@
    "originX": -1000,
    "originZ": -3000,
    "triangles": 2260,
-   "trees": 1642,
-   "bytes": 34988
+   "trees": 1497,
+   "bytes": 33972
   },
   {
    "key": "14_11",
@@ -10693,8 +10683,8 @@
    "originX": -1000,
    "originZ": -2500,
    "triangles": 131,
-   "trees": 492,
-   "bytes": 5044
+   "trees": 500,
+   "bytes": 5100
   },
   {
    "key": "14_12",
@@ -10743,8 +10733,8 @@
    "originX": -1000,
    "originZ": 0,
    "triangles": 132,
-   "trees": 230,
-   "bytes": 3236
+   "trees": 228,
+   "bytes": 3220
   },
   {
    "key": "14_17",
@@ -10782,9 +10772,9 @@
    "cz": 20,
    "originX": -1000,
    "originZ": 2000,
-   "triangles": 1141,
-   "trees": 79,
-   "bytes": 13020
+   "triangles": 1190,
+   "trees": 84,
+   "bytes": 13508
   },
   {
    "key": "14_21",
@@ -10792,9 +10782,9 @@
    "cz": 21,
    "originX": -1000,
    "originZ": 2500,
-   "triangles": 1233,
-   "trees": 493,
-   "bytes": 17856
+   "triangles": 1130,
+   "trees": 431,
+   "bytes": 15924
   },
   {
    "key": "14_22",
@@ -10802,9 +10792,9 @@
    "cz": 22,
    "originX": -1000,
    "originZ": 3000,
-   "triangles": 4262,
-   "trees": 618,
-   "bytes": 48860
+   "triangles": 2310,
+   "trees": 590,
+   "bytes": 28716
   },
   {
    "key": "14_23",
@@ -10812,9 +10802,9 @@
    "cz": 23,
    "originX": -1000,
    "originZ": 3500,
-   "triangles": 79,
-   "trees": 24,
-   "bytes": 1320
+   "triangles": 44,
+   "trees": 35,
+   "bytes": 936
   },
   {
    "key": "14_24",
@@ -10863,8 +10853,8 @@
    "originX": -1000,
    "originZ": 7000,
    "triangles": 515,
-   "trees": 259,
-   "bytes": 7800
+   "trees": 265,
+   "bytes": 7844
   },
   {
    "key": "14_31",
@@ -10873,8 +10863,8 @@
    "originX": -1000,
    "originZ": 7500,
    "triangles": 7934,
-   "trees": 1451,
-   "bytes": 89604
+   "trees": 1386,
+   "bytes": 89148
   },
   {
    "key": "14_7",
@@ -10893,8 +10883,8 @@
    "originX": -1000,
    "originZ": -4000,
    "triangles": 978,
-   "trees": 486,
-   "bytes": 14340
+   "trees": 475,
+   "bytes": 14264
   },
   {
    "key": "14_9",
@@ -10903,8 +10893,8 @@
    "originX": -1000,
    "originZ": -3500,
    "triangles": 4362,
-   "trees": 559,
-   "bytes": 50016
+   "trees": 574,
+   "bytes": 50120
   },
   {
    "key": "15_11",
@@ -10912,9 +10902,9 @@
    "cz": 11,
    "originX": -500,
    "originZ": -2500,
-   "triangles": 200,
+   "triangles": 201,
    "trees": 290,
-   "bytes": 4492
+   "bytes": 4496
   },
   {
    "key": "15_12",
@@ -10963,8 +10953,8 @@
    "originX": -500,
    "originZ": 500,
    "triangles": 474,
-   "trees": 341,
-   "bytes": 7576
+   "trees": 343,
+   "bytes": 7592
   },
   {
    "key": "15_18",
@@ -10973,8 +10963,8 @@
    "originX": -500,
    "originZ": 1000,
    "triangles": 247,
-   "trees": 235,
-   "bytes": 4680
+   "trees": 238,
+   "bytes": 4700
   },
   {
    "key": "15_19",
@@ -10992,9 +10982,9 @@
    "cz": 20,
    "originX": -500,
    "originZ": 2000,
-   "triangles": 722,
-   "trees": 121,
-   "bytes": 9036
+   "triangles": 723,
+   "trees": 117,
+   "bytes": 9016
   },
   {
    "key": "15_21",
@@ -11002,9 +10992,9 @@
    "cz": 21,
    "originX": -500,
    "originZ": 2500,
-   "triangles": 427,
-   "trees": 343,
-   "bytes": 7784
+   "triangles": 402,
+   "trees": 344,
+   "bytes": 7424
   },
   {
    "key": "15_22",
@@ -11012,9 +11002,9 @@
    "cz": 22,
    "originX": -500,
    "originZ": 3000,
-   "triangles": 5736,
-   "trees": 1391,
-   "bytes": 68844
+   "triangles": 2854,
+   "trees": 1418,
+   "bytes": 40028
   },
   {
    "key": "15_23",
@@ -11022,9 +11012,9 @@
    "cz": 23,
    "originX": -500,
    "originZ": 3500,
-   "triangles": 2415,
-   "trees": 895,
-   "bytes": 33132
+   "triangles": 1363,
+   "trees": 914,
+   "bytes": 21560
   },
   {
    "key": "15_24",
@@ -11032,9 +11022,9 @@
    "cz": 24,
    "originX": -500,
    "originZ": 4000,
-   "triangles": 45,
-   "trees": 58,
-   "bytes": 1072
+   "triangles": 34,
+   "trees": 40,
+   "bytes": 792
   },
   {
    "key": "15_25",
@@ -11053,8 +11043,8 @@
    "originX": -500,
    "originZ": 5000,
    "triangles": 128,
-   "trees": 20,
-   "bytes": 2132
+   "trees": 16,
+   "bytes": 2104
   },
   {
    "key": "15_27",
@@ -11063,8 +11053,8 @@
    "originX": -500,
    "originZ": 5500,
    "triangles": 50,
-   "trees": 14,
-   "bytes": 824
+   "trees": 16,
+   "bytes": 836
   },
   {
    "key": "15_29",
@@ -11083,8 +11073,8 @@
    "originX": -500,
    "originZ": 7000,
    "triangles": 883,
-   "trees": 447,
-   "bytes": 13216
+   "trees": 514,
+   "bytes": 13684
   },
   {
    "key": "15_31",
@@ -11093,8 +11083,8 @@
    "originX": -500,
    "originZ": 7500,
    "triangles": 7582,
-   "trees": 1197,
-   "bytes": 85932
+   "trees": 1159,
+   "bytes": 85668
   },
   {
    "key": "15_7",
@@ -11103,8 +11093,8 @@
    "originX": -500,
    "originZ": -4500,
    "triangles": 1249,
-   "trees": 169,
-   "bytes": 13852
+   "trees": 173,
+   "bytes": 13880
   },
   {
    "key": "15_8",
@@ -11132,9 +11122,9 @@
    "cz": 11,
    "originX": 0,
    "originZ": -2500,
-   "triangles": 66,
-   "trees": 254,
-   "bytes": 2628
+   "triangles": 65,
+   "trees": 256,
+   "bytes": 2632
   },
   {
    "key": "16_12",
@@ -11143,8 +11133,8 @@
    "originX": 0,
    "originZ": -2000,
    "triangles": 64,
-   "trees": 80,
-   "bytes": 1616
+   "trees": 89,
+   "bytes": 1680
   },
   {
    "key": "16_13",
@@ -11153,8 +11143,8 @@
    "originX": 0,
    "originZ": -1500,
    "triangles": 346,
-   "trees": 231,
-   "bytes": 6132
+   "trees": 218,
+   "bytes": 6040
   },
   {
    "key": "16_14",
@@ -11213,8 +11203,8 @@
    "originX": 0,
    "originZ": 1500,
    "triangles": 1,
-   "trees": 42,
-   "bytes": 356
+   "trees": 47,
+   "bytes": 392
   },
   {
    "key": "16_20",
@@ -11222,9 +11212,9 @@
    "cz": 20,
    "originX": 0,
    "originZ": 2000,
-   "triangles": 42,
-   "trees": 33,
-   "bytes": 964
+   "triangles": 43,
+   "trees": 26,
+   "bytes": 928
   },
   {
    "key": "16_21",
@@ -11233,8 +11223,8 @@
    "originX": 0,
    "originZ": 2500,
    "triangles": 103,
-   "trees": 70,
-   "bytes": 1800
+   "trees": 69,
+   "bytes": 1796
   },
   {
    "key": "16_22",
@@ -11243,8 +11233,8 @@
    "originX": 0,
    "originZ": 3000,
    "triangles": 229,
-   "trees": 301,
-   "bytes": 4744
+   "trees": 303,
+   "bytes": 4756
   },
   {
    "key": "16_23",
@@ -11252,9 +11242,9 @@
    "cz": 23,
    "originX": 0,
    "originZ": 3500,
-   "triangles": 422,
-   "trees": 22,
-   "bytes": 4612
+   "triangles": 117,
+   "trees": 19,
+   "bytes": 1428
   },
   {
    "key": "16_24",
@@ -11283,8 +11273,8 @@
    "originX": 0,
    "originZ": 5000,
    "triangles": 80,
-   "trees": 32,
-   "bytes": 1248
+   "trees": 41,
+   "bytes": 1312
   },
   {
    "key": "16_27",
@@ -11293,8 +11283,8 @@
    "originX": 0,
    "originZ": 5500,
    "triangles": 19,
-   "trees": 28,
-   "bytes": 536
+   "trees": 17,
+   "bytes": 460
   },
   {
    "key": "16_28",
@@ -11303,8 +11293,8 @@
    "originX": 0,
    "originZ": 6000,
    "triangles": 621,
-   "trees": 169,
-   "bytes": 8760
+   "trees": 187,
+   "bytes": 8884
   },
   {
    "key": "16_30",
@@ -11313,8 +11303,8 @@
    "originX": 0,
    "originZ": 7000,
    "triangles": 12154,
-   "trees": 1142,
-   "bytes": 129652
+   "trees": 1094,
+   "bytes": 129316
   },
   {
    "key": "16_31",
@@ -11323,8 +11313,8 @@
    "originX": 0,
    "originZ": 7500,
    "triangles": 8340,
-   "trees": 1369,
-   "bytes": 93340
+   "trees": 1473,
+   "bytes": 94068
   },
   {
    "key": "16_7",
@@ -11333,8 +11323,8 @@
    "originX": 0,
    "originZ": -4500,
    "triangles": 438,
-   "trees": 164,
-   "bytes": 6188
+   "trees": 154,
+   "bytes": 6120
   },
   {
    "key": "16_8",
@@ -11343,8 +11333,8 @@
    "originX": 0,
    "originZ": -4000,
    "triangles": 660,
-   "trees": 399,
-   "bytes": 11004
+   "trees": 418,
+   "bytes": 11136
   },
   {
    "key": "16_9",
@@ -11362,9 +11352,9 @@
    "cz": 11,
    "originX": 500,
    "originZ": -2500,
-   "triangles": 444,
+   "triangles": 404,
    "trees": 466,
-   "bytes": 8216
+   "bytes": 7696
   },
   {
    "key": "17_12",
@@ -11393,8 +11383,8 @@
    "originX": 500,
    "originZ": -1000,
    "triangles": 207,
-   "trees": 110,
-   "bytes": 3544
+   "trees": 100,
+   "bytes": 3476
   },
   {
    "key": "17_15",
@@ -11413,8 +11403,8 @@
    "originX": 500,
    "originZ": 0,
    "triangles": 148,
-   "trees": 86,
-   "bytes": 2568
+   "trees": 91,
+   "bytes": 2604
   },
   {
    "key": "17_17",
@@ -11423,8 +11413,8 @@
    "originX": 500,
    "originZ": 500,
    "triangles": 307,
-   "trees": 106,
-   "bytes": 5152
+   "trees": 105,
+   "bytes": 5148
   },
   {
    "key": "17_18",
@@ -11433,8 +11423,8 @@
    "originX": 500,
    "originZ": 1000,
    "triangles": 959,
-   "trees": 697,
-   "bytes": 16228
+   "trees": 691,
+   "bytes": 16184
   },
   {
    "key": "17_19",
@@ -11463,8 +11453,8 @@
    "originX": 500,
    "originZ": 3000,
    "triangles": 130,
-   "trees": 25,
-   "bytes": 2052
+   "trees": 30,
+   "bytes": 2088
   },
   {
    "key": "17_23",
@@ -11473,8 +11463,8 @@
    "originX": 500,
    "originZ": 3500,
    "triangles": 6,
-   "trees": 19,
-   "bytes": 276
+   "trees": 13,
+   "bytes": 232
   },
   {
    "key": "17_24",
@@ -11493,8 +11483,8 @@
    "originX": 500,
    "originZ": 5500,
    "triangles": 701,
-   "trees": 295,
-   "bytes": 9860
+   "trees": 277,
+   "bytes": 9736
   },
   {
    "key": "17_28",
@@ -11503,8 +11493,8 @@
    "originX": 500,
    "originZ": 6000,
    "triangles": 1948,
-   "trees": 1589,
-   "bytes": 32324
+   "trees": 1580,
+   "bytes": 32260
   },
   {
    "key": "17_30",
@@ -11513,8 +11503,8 @@
    "originX": 500,
    "originZ": 7000,
    "triangles": 11591,
-   "trees": 958,
-   "bytes": 122808
+   "trees": 965,
+   "bytes": 122860
   },
   {
    "key": "17_31",
@@ -11523,8 +11513,8 @@
    "originX": 500,
    "originZ": 7500,
    "triangles": 4052,
-   "trees": 786,
-   "bytes": 45720
+   "trees": 777,
+   "bytes": 45656
   },
   {
    "key": "17_7",
@@ -11533,8 +11523,8 @@
    "originX": 500,
    "originZ": -4500,
    "triangles": 1788,
-   "trees": 1058,
-   "bytes": 26256
+   "trees": 1074,
+   "bytes": 26368
   },
   {
    "key": "17_8",
@@ -11543,8 +11533,8 @@
    "originX": 500,
    "originZ": -4000,
    "triangles": 1995,
-   "trees": 1429,
-   "bytes": 31452
+   "trees": 1417,
+   "bytes": 31368
   },
   {
    "key": "17_9",
@@ -11563,8 +11553,8 @@
    "originX": 1000,
    "originZ": -3000,
    "triangles": 13,
-   "trees": 97,
-   "bytes": 904
+   "trees": 99,
+   "bytes": 916
   },
   {
    "key": "18_11",
@@ -11593,8 +11583,8 @@
    "originX": 1000,
    "originZ": -1500,
    "triangles": 437,
-   "trees": 248,
-   "bytes": 6684
+   "trees": 258,
+   "bytes": 6752
   },
   {
    "key": "18_14",
@@ -11603,8 +11593,8 @@
    "originX": 1000,
    "originZ": -1000,
    "triangles": 101,
-   "trees": 102,
-   "bytes": 2160
+   "trees": 104,
+   "bytes": 2176
   },
   {
    "key": "18_15",
@@ -11643,8 +11633,8 @@
    "originX": 1000,
    "originZ": 1000,
    "triangles": 221,
-   "trees": 155,
-   "bytes": 3944
+   "trees": 159,
+   "bytes": 3972
   },
   {
    "key": "18_19",
@@ -11663,8 +11653,8 @@
    "originX": 1000,
    "originZ": 2000,
    "triangles": 45,
-   "trees": 36,
-   "bytes": 836
+   "trees": 35,
+   "bytes": 828
   },
   {
    "key": "18_21",
@@ -11693,8 +11683,8 @@
    "originX": 1000,
    "originZ": 3500,
    "triangles": 252,
-   "trees": 183,
-   "bytes": 4264
+   "trees": 179,
+   "bytes": 4236
   },
   {
    "key": "18_24",
@@ -11703,8 +11693,8 @@
    "originX": 1000,
    "originZ": 4000,
    "triangles": 79,
-   "trees": 114,
-   "bytes": 1832
+   "trees": 130,
+   "bytes": 1944
   },
   {
    "key": "18_25",
@@ -11733,8 +11723,8 @@
    "originX": 1000,
    "originZ": 5500,
    "triangles": 4924,
-   "trees": 3851,
-   "bytes": 78580
+   "trees": 3855,
+   "bytes": 78608
   },
   {
    "key": "18_28",
@@ -11743,8 +11733,8 @@
    "originX": 1000,
    "originZ": 6000,
    "triangles": 2465,
-   "trees": 2480,
-   "bytes": 43604
+   "trees": 2464,
+   "bytes": 43492
   },
   {
    "key": "18_29",
@@ -11763,8 +11753,8 @@
    "originX": 1000,
    "originZ": -6500,
    "triangles": 1205,
-   "trees": 616,
-   "bytes": 16876
+   "trees": 615,
+   "bytes": 16868
   },
   {
    "key": "18_30",
@@ -11783,8 +11773,8 @@
    "originX": 1000,
    "originZ": 7500,
    "triangles": 1773,
-   "trees": 124,
-   "bytes": 19072
+   "trees": 164,
+   "bytes": 19352
   },
   {
    "key": "18_7",
@@ -11793,8 +11783,8 @@
    "originX": 1000,
    "originZ": -4500,
    "triangles": 1211,
-   "trees": 347,
-   "bytes": 16064
+   "trees": 343,
+   "bytes": 16036
   },
   {
    "key": "18_8",
@@ -11802,9 +11792,9 @@
    "cz": 8,
    "originX": 1000,
    "originZ": -4000,
-   "triangles": 481,
-   "trees": 334,
-   "bytes": 8080
+   "triangles": 475,
+   "trees": 308,
+   "bytes": 7808
   },
   {
    "key": "18_9",
@@ -11812,9 +11802,9 @@
    "cz": 9,
    "originX": 1000,
    "originZ": -3500,
-   "triangles": 53,
-   "trees": 125,
-   "bytes": 1648
+   "triangles": 50,
+   "trees": 135,
+   "bytes": 1644
   },
   {
    "key": "19_10",
@@ -11823,8 +11813,8 @@
    "originX": 1500,
    "originZ": -3000,
    "triangles": 50,
-   "trees": 148,
-   "bytes": 1824
+   "trees": 147,
+   "bytes": 1820
   },
   {
    "key": "19_11",
@@ -11853,8 +11843,8 @@
    "originX": 1500,
    "originZ": -1500,
    "triangles": 223,
-   "trees": 198,
-   "bytes": 4284
+   "trees": 199,
+   "bytes": 4292
   },
   {
    "key": "19_14",
@@ -11863,8 +11853,8 @@
    "originX": 1500,
    "originZ": -1000,
    "triangles": 102,
-   "trees": 88,
-   "bytes": 2052
+   "trees": 92,
+   "bytes": 2080
   },
   {
    "key": "19_15",
@@ -11893,8 +11883,8 @@
    "originX": 1500,
    "originZ": 500,
    "triangles": 130,
-   "trees": 104,
-   "bytes": 2508
+   "trees": 106,
+   "bytes": 2524
   },
   {
    "key": "19_18",
@@ -11933,8 +11923,8 @@
    "originX": 1500,
    "originZ": 3000,
    "triangles": 153,
-   "trees": 157,
-   "bytes": 2864
+   "trees": 153,
+   "bytes": 2836
   },
   {
    "key": "19_23",
@@ -11953,8 +11943,8 @@
    "originX": 1500,
    "originZ": 4000,
    "triangles": 18,
-   "trees": 33,
-   "bytes": 536
+   "trees": 22,
+   "bytes": 460
   },
   {
    "key": "19_25",
@@ -11983,8 +11973,8 @@
    "originX": 1500,
    "originZ": 5500,
    "triangles": 4117,
-   "trees": 4258,
-   "bytes": 73044
+   "trees": 4266,
+   "bytes": 73100
   },
   {
    "key": "19_28",
@@ -11993,8 +11983,8 @@
    "originX": 1500,
    "originZ": 6000,
    "triangles": 3262,
-   "trees": 1668,
-   "bytes": 45652
+   "trees": 1662,
+   "bytes": 45612
   },
   {
    "key": "19_3",
@@ -12003,8 +11993,8 @@
    "originX": 1500,
    "originZ": -6500,
    "triangles": 2,
-   "trees": 0,
-   "bytes": 80
+   "trees": 2,
+   "bytes": 96
   },
   {
    "key": "19_31",
@@ -12033,8 +12023,8 @@
    "originX": 1500,
    "originZ": -4000,
    "triangles": 238,
-   "trees": 142,
-   "bytes": 4320
+   "trees": 154,
+   "bytes": 4404
   },
   {
    "key": "19_9",
@@ -12043,8 +12033,8 @@
    "originX": 1500,
    "originZ": -3500,
    "triangles": 66,
-   "trees": 156,
-   "bytes": 2124
+   "trees": 154,
+   "bytes": 2112
   },
   {
    "key": "1_2",
@@ -12083,8 +12073,8 @@
    "originX": 2000,
    "originZ": -2500,
    "triangles": 176,
-   "trees": 113,
-   "bytes": 3232
+   "trees": 112,
+   "bytes": 3224
   },
   {
    "key": "20_12",
@@ -12117,16 +12107,6 @@
    "bytes": 2356
   },
   {
-   "key": "20_15",
-   "cx": 20,
-   "cz": 15,
-   "originX": 2000,
-   "originZ": -500,
-   "triangles": 4,
-   "trees": 73,
-   "bytes": 612
-  },
-  {
    "key": "20_16",
    "cx": 20,
    "cz": 16,
@@ -12143,8 +12123,8 @@
    "originX": 2000,
    "originZ": 500,
    "triangles": 62,
-   "trees": 118,
-   "bytes": 1660
+   "trees": 116,
+   "bytes": 1644
   },
   {
    "key": "20_18",
@@ -12213,8 +12193,8 @@
    "originX": 2000,
    "originZ": 4000,
    "triangles": 179,
-   "trees": 124,
-   "bytes": 3288
+   "trees": 107,
+   "bytes": 3168
   },
   {
    "key": "20_25",
@@ -12223,8 +12203,8 @@
    "originX": 2000,
    "originZ": 4500,
    "triangles": 396,
-   "trees": 143,
-   "bytes": 5788
+   "trees": 125,
+   "bytes": 5660
   },
   {
    "key": "20_26",
@@ -12233,8 +12213,8 @@
    "originX": 2000,
    "originZ": 5000,
    "triangles": 1595,
-   "trees": 1263,
-   "bytes": 26644
+   "trees": 1248,
+   "bytes": 26540
   },
   {
    "key": "20_27",
@@ -12243,8 +12223,8 @@
    "originX": 2000,
    "originZ": 5500,
    "triangles": 1985,
-   "trees": 1803,
-   "bytes": 33456
+   "trees": 1794,
+   "bytes": 33392
   },
   {
    "key": "20_28",
@@ -12253,8 +12233,8 @@
    "originX": 2000,
    "originZ": 6000,
    "triangles": 28,
-   "trees": 31,
-   "bytes": 696
+   "trees": 24,
+   "bytes": 644
   },
   {
    "key": "20_29",
@@ -12263,8 +12243,8 @@
    "originX": 2000,
    "originZ": 6500,
    "triangles": 165,
-   "trees": 67,
-   "bytes": 2460
+   "trees": 66,
+   "bytes": 2452
   },
   {
    "key": "20_30",
@@ -12293,8 +12273,8 @@
    "originX": 2000,
    "originZ": -4500,
    "triangles": 95,
-   "trees": 20,
-   "bytes": 1416
+   "trees": 22,
+   "bytes": 1428
   },
   {
    "key": "20_8",
@@ -12372,9 +12352,9 @@
    "cz": 15,
    "originX": 2500,
    "originZ": -500,
-   "triangles": 20,
-   "trees": 61,
-   "bytes": 784
+   "triangles": 9,
+   "trees": 52,
+   "bytes": 552
   },
   {
    "key": "21_16",
@@ -12402,9 +12382,9 @@
    "cz": 18,
    "originX": 2500,
    "originZ": 1000,
-   "triangles": 773,
+   "triangles": 758,
    "trees": 79,
-   "bytes": 9020
+   "bytes": 8800
   },
   {
    "key": "21_19",
@@ -12453,8 +12433,8 @@
    "originX": 2500,
    "originZ": 4500,
    "triangles": 49,
-   "trees": 14,
-   "bytes": 1000
+   "trees": 13,
+   "bytes": 996
   },
   {
    "key": "21_26",
@@ -12463,8 +12443,8 @@
    "originX": 2500,
    "originZ": 5000,
    "triangles": 218,
-   "trees": 51,
-   "bytes": 3284
+   "trees": 50,
+   "bytes": 3276
   },
   {
    "key": "21_27",
@@ -12473,8 +12453,8 @@
    "originX": 2500,
    "originZ": 5500,
    "triangles": 277,
-   "trees": 147,
-   "bytes": 4460
+   "trees": 146,
+   "bytes": 4452
   },
   {
    "key": "21_28",
@@ -12483,8 +12463,8 @@
    "originX": 2500,
    "originZ": 6000,
    "triangles": 42,
-   "trees": 59,
-   "bytes": 1032
+   "trees": 66,
+   "bytes": 1080
   },
   {
    "key": "21_29",
@@ -12523,8 +12503,8 @@
    "originX": 2500,
    "originZ": -4000,
    "triangles": 534,
-   "trees": 342,
-   "bytes": 8748
+   "trees": 331,
+   "bytes": 8672
   },
   {
    "key": "21_9",
@@ -12533,8 +12513,8 @@
    "originX": 2500,
    "originZ": -3500,
    "triangles": 25,
-   "trees": 229,
-   "bytes": 2012
+   "trees": 226,
+   "bytes": 1988
   },
   {
    "key": "22_10",
@@ -12552,9 +12532,9 @@
    "cz": 11,
    "originX": 3000,
    "originZ": -2500,
-   "triangles": 150,
-   "trees": 82,
-   "bytes": 2764
+   "triangles": 125,
+   "trees": 70,
+   "bytes": 2324
   },
   {
    "key": "22_12",
@@ -12563,8 +12543,8 @@
    "originX": 3000,
    "originZ": -2000,
    "triangles": 462,
-   "trees": 202,
-   "bytes": 7524
+   "trees": 213,
+   "bytes": 7600
   },
   {
    "key": "22_13",
@@ -12573,8 +12553,8 @@
    "originX": 3000,
    "originZ": -1500,
    "triangles": 290,
-   "trees": 56,
-   "bytes": 4504
+   "trees": 58,
+   "bytes": 4520
   },
   {
    "key": "22_14",
@@ -12593,8 +12573,8 @@
    "originX": 3000,
    "originZ": -500,
    "triangles": 346,
-   "trees": 82,
-   "bytes": 4668
+   "trees": 81,
+   "bytes": 4660
   },
   {
    "key": "22_16",
@@ -12623,8 +12603,8 @@
    "originX": 3000,
    "originZ": 1000,
    "triangles": 25,
-   "trees": 45,
-   "bytes": 768
+   "trees": 41,
+   "bytes": 740
   },
   {
    "key": "22_19",
@@ -12643,8 +12623,8 @@
    "originX": 3000,
    "originZ": 3500,
    "triangles": 106,
-   "trees": 24,
-   "bytes": 1608
+   "trees": 13,
+   "bytes": 1532
   },
   {
    "key": "22_24",
@@ -12663,8 +12643,8 @@
    "originX": 3000,
    "originZ": 5000,
    "triangles": 80,
-   "trees": 33,
-   "bytes": 1412
+   "trees": 34,
+   "bytes": 1420
   },
   {
    "key": "22_29",
@@ -12692,9 +12672,9 @@
    "cz": 8,
    "originX": 3000,
    "originZ": -4000,
-   "triangles": 218,
-   "trees": 98,
-   "bytes": 3344
+   "triangles": 217,
+   "trees": 101,
+   "bytes": 3356
   },
   {
    "key": "22_9",
@@ -12703,8 +12683,8 @@
    "originX": 3000,
    "originZ": -3500,
    "triangles": 116,
-   "trees": 228,
-   "bytes": 2992
+   "trees": 245,
+   "bytes": 3112
   },
   {
    "key": "23_10",
@@ -12713,8 +12693,8 @@
    "originX": 3500,
    "originZ": -3000,
    "triangles": 816,
-   "trees": 312,
-   "bytes": 12656
+   "trees": 313,
+   "bytes": 12664
   },
   {
    "key": "23_11",
@@ -12723,8 +12703,8 @@
    "originX": 3500,
    "originZ": -2500,
    "triangles": 945,
-   "trees": 189,
-   "bytes": 12040
+   "trees": 193,
+   "bytes": 12068
   },
   {
    "key": "23_12",
@@ -12733,8 +12713,8 @@
    "originX": 3500,
    "originZ": -2000,
    "triangles": 169,
-   "trees": 65,
-   "bytes": 2956
+   "trees": 72,
+   "bytes": 3004
   },
   {
    "key": "23_13",
@@ -12753,8 +12733,8 @@
    "originX": 3500,
    "originZ": -1000,
    "triangles": 167,
-   "trees": 32,
-   "bytes": 2380
+   "trees": 34,
+   "bytes": 2392
   },
   {
    "key": "23_15",
@@ -12762,9 +12742,9 @@
    "cz": 15,
    "originX": 3500,
    "originZ": -500,
-   "triangles": 2134,
-   "trees": 259,
-   "bytes": 24336
+   "triangles": 2126,
+   "trees": 275,
+   "bytes": 24328
   },
   {
    "key": "23_16",
@@ -12773,8 +12753,8 @@
    "originX": 3500,
    "originZ": 0,
    "triangles": 62,
-   "trees": 89,
-   "bytes": 1448
+   "trees": 78,
+   "bytes": 1372
   },
   {
    "key": "23_17",
@@ -12783,8 +12763,8 @@
    "originX": 3500,
    "originZ": 500,
    "triangles": 177,
-   "trees": 58,
-   "bytes": 2544
+   "trees": 65,
+   "bytes": 2596
   },
   {
    "key": "23_18",
@@ -12793,8 +12773,8 @@
    "originX": 3500,
    "originZ": 1000,
    "triangles": 191,
-   "trees": 155,
-   "bytes": 3492
+   "trees": 161,
+   "bytes": 3536
   },
   {
    "key": "23_19",
@@ -12813,8 +12793,8 @@
    "originX": 3500,
    "originZ": 2000,
    "triangles": 19,
-   "trees": 13,
-   "bytes": 444
+   "trees": 12,
+   "bytes": 436
   },
   {
    "key": "23_21",
@@ -12833,8 +12813,8 @@
    "originX": 3500,
    "originZ": 3500,
    "triangles": 174,
-   "trees": 114,
-   "bytes": 2856
+   "trees": 112,
+   "bytes": 2840
   },
   {
    "key": "23_24",
@@ -12843,8 +12823,8 @@
    "originX": 3500,
    "originZ": 4000,
    "triangles": 123,
-   "trees": 31,
-   "bytes": 2004
+   "trees": 29,
+   "bytes": 1992
   },
   {
    "key": "23_25",
@@ -12853,8 +12833,8 @@
    "originX": 3500,
    "originZ": 4500,
    "triangles": 86,
-   "trees": 129,
-   "bytes": 1956
+   "trees": 128,
+   "bytes": 1948
   },
   {
    "key": "23_27",
@@ -12863,8 +12843,8 @@
    "originX": 3500,
    "originZ": 5500,
    "triangles": 479,
-   "trees": 676,
-   "bytes": 9916
+   "trees": 652,
+   "bytes": 9748
   },
   {
    "key": "23_28",
@@ -12873,8 +12853,8 @@
    "originX": 3500,
    "originZ": 6000,
    "triangles": 1545,
-   "trees": 1014,
-   "bytes": 22836
+   "trees": 1060,
+   "bytes": 23160
   },
   {
    "key": "23_29",
@@ -12913,8 +12893,8 @@
    "originX": 4000,
    "originZ": -2500,
    "triangles": 696,
-   "trees": 138,
-   "bytes": 8732
+   "trees": 143,
+   "bytes": 8768
   },
   {
    "key": "24_12",
@@ -12943,8 +12923,8 @@
    "originX": 4000,
    "originZ": -1000,
    "triangles": 683,
-   "trees": 197,
-   "bytes": 9440
+   "trees": 209,
+   "bytes": 9524
   },
   {
    "key": "24_15",
@@ -12953,8 +12933,8 @@
    "originX": 4000,
    "originZ": -500,
    "triangles": 695,
-   "trees": 184,
-   "bytes": 9120
+   "trees": 175,
+   "bytes": 9056
   },
   {
    "key": "24_16",
@@ -12963,8 +12943,8 @@
    "originX": 4000,
    "originZ": 0,
    "triangles": 213,
-   "trees": 156,
-   "bytes": 3932
+   "trees": 167,
+   "bytes": 4008
   },
   {
    "key": "24_17",
@@ -12973,8 +12953,8 @@
    "originX": 4000,
    "originZ": 500,
    "triangles": 539,
-   "trees": 376,
-   "bytes": 8884
+   "trees": 378,
+   "bytes": 8896
   },
   {
    "key": "24_18",
@@ -13013,8 +12993,8 @@
    "originX": 4000,
    "originZ": 2500,
    "triangles": 517,
-   "trees": 70,
-   "bytes": 7348
+   "trees": 67,
+   "bytes": 7328
   },
   {
    "key": "24_22",
@@ -13023,8 +13003,8 @@
    "originX": 4000,
    "originZ": 3000,
    "triangles": 457,
-   "trees": 47,
-   "bytes": 6408
+   "trees": 50,
+   "bytes": 6428
   },
   {
    "key": "24_24",
@@ -13033,8 +13013,8 @@
    "originX": 4000,
    "originZ": 4000,
    "triangles": 42,
-   "trees": 12,
-   "bytes": 684
+   "trees": 10,
+   "bytes": 672
   },
   {
    "key": "24_25",
@@ -13043,8 +13023,8 @@
    "originX": 4000,
    "originZ": 4500,
    "triangles": 1,
-   "trees": 32,
-   "bytes": 288
+   "trees": 35,
+   "bytes": 308
   },
   {
    "key": "24_26",
@@ -13053,8 +13033,8 @@
    "originX": 4000,
    "originZ": 5000,
    "triangles": 46,
-   "trees": 80,
-   "bytes": 1172
+   "trees": 78,
+   "bytes": 1160
   },
   {
    "key": "24_27",
@@ -13063,8 +13043,8 @@
    "originX": 4000,
    "originZ": 5500,
    "triangles": 517,
-   "trees": 256,
-   "bytes": 7696
+   "trees": 264,
+   "bytes": 7752
   },
   {
    "key": "24_28",
@@ -13073,8 +13053,8 @@
    "originX": 4000,
    "originZ": 6000,
    "triangles": 1823,
-   "trees": 1286,
-   "bytes": 27500
+   "trees": 1253,
+   "bytes": 27272
   },
   {
    "key": "24_29",
@@ -13083,8 +13063,8 @@
    "originX": 4000,
    "originZ": 6500,
    "triangles": 567,
-   "trees": 372,
-   "bytes": 8436
+   "trees": 406,
+   "bytes": 8672
   },
   {
    "key": "25_16",
@@ -13092,9 +13072,9 @@
    "cz": 16,
    "originX": 4500,
    "originZ": 0,
-   "triangles": 465,
-   "trees": 240,
-   "bytes": 6992
+   "triangles": 438,
+   "trees": 247,
+   "bytes": 6724
   },
   {
    "key": "25_17",
@@ -13103,8 +13083,8 @@
    "originX": 4500,
    "originZ": 500,
    "triangles": 3,
-   "trees": 7,
-   "bytes": 136
+   "trees": 8,
+   "bytes": 144
   },
   {
    "key": "25_19",
@@ -13143,8 +13123,8 @@
    "originX": 4500,
    "originZ": 3000,
    "triangles": 192,
-   "trees": 148,
-   "bytes": 3320
+   "trees": 160,
+   "bytes": 3404
   },
   {
    "key": "25_23",
@@ -13153,8 +13133,8 @@
    "originX": 4500,
    "originZ": 3500,
    "triangles": 68,
-   "trees": 62,
-   "bytes": 1480
+   "trees": 57,
+   "bytes": 1444
   },
   {
    "key": "25_24",
@@ -13173,8 +13153,8 @@
    "originX": 4500,
    "originZ": 4500,
    "triangles": 188,
-   "trees": 275,
-   "bytes": 3952
+   "trees": 299,
+   "bytes": 4120
   },
   {
    "key": "25_26",
@@ -13183,8 +13163,8 @@
    "originX": 4500,
    "originZ": 5000,
    "triangles": 1291,
-   "trees": 1006,
-   "bytes": 20420
+   "trees": 1021,
+   "bytes": 20528
   },
   {
    "key": "25_27",
@@ -13193,8 +13173,8 @@
    "originX": 4500,
    "originZ": 5500,
    "triangles": 1346,
-   "trees": 705,
-   "bytes": 18540
+   "trees": 637,
+   "bytes": 18064
   },
   {
    "key": "25_28",
@@ -13203,8 +13183,8 @@
    "originX": 4500,
    "originZ": 6000,
    "triangles": 505,
-   "trees": 261,
-   "bytes": 7000
+   "trees": 255,
+   "bytes": 6956
   },
   {
    "key": "25_29",
@@ -13213,8 +13193,8 @@
    "originX": 4500,
    "originZ": 6500,
    "triangles": 877,
-   "trees": 227,
-   "bytes": 10916
+   "trees": 232,
+   "bytes": 10952
   },
   {
    "key": "26_20",
@@ -13253,8 +13233,8 @@
    "originX": 5000,
    "originZ": 3500,
    "triangles": 51,
-   "trees": 76,
-   "bytes": 1280
+   "trees": 67,
+   "bytes": 1216
   },
   {
    "key": "26_24",
@@ -13263,8 +13243,8 @@
    "originX": 5000,
    "originZ": 4000,
    "triangles": 58,
-   "trees": 19,
-   "bytes": 972
+   "trees": 22,
+   "bytes": 992
   },
   {
    "key": "26_25",
@@ -13283,8 +13263,8 @@
    "originX": 5000,
    "originZ": 5000,
    "triangles": 31,
-   "trees": 2,
-   "bytes": 480
+   "trees": 0,
+   "bytes": 468
   },
   {
    "key": "26_27",
@@ -13293,8 +13273,8 @@
    "originX": 5000,
    "originZ": 5500,
    "triangles": 912,
-   "trees": 535,
-   "bytes": 13112
+   "trees": 517,
+   "bytes": 12984
   },
   {
    "key": "26_28",
@@ -13303,8 +13283,8 @@
    "originX": 5000,
    "originZ": 6000,
    "triangles": 873,
-   "trees": 610,
-   "bytes": 13392
+   "trees": 607,
+   "bytes": 13372
   },
   {
    "key": "26_29",
@@ -13393,8 +13373,8 @@
    "originX": 5500,
    "originZ": 6500,
    "triangles": 44,
-   "trees": 21,
-   "bytes": 752
+   "trees": 22,
+   "bytes": 760
   },
   {
    "key": "27_3",
@@ -13413,8 +13393,8 @@
    "originX": 5500,
    "originZ": -6000,
    "triangles": 288,
-   "trees": 111,
-   "bytes": 4136
+   "trees": 103,
+   "bytes": 4080
   },
   {
    "key": "27_5",
@@ -13423,8 +13403,8 @@
    "originX": 5500,
    "originZ": -5500,
    "triangles": 714,
-   "trees": 368,
-   "bytes": 10268
+   "trees": 389,
+   "bytes": 10416
   },
   {
    "key": "27_6",
@@ -13433,8 +13413,8 @@
    "originX": 5500,
    "originZ": -5000,
    "triangles": 231,
-   "trees": 156,
-   "bytes": 3864
+   "trees": 153,
+   "bytes": 3844
   },
   {
    "key": "27_7",
@@ -13443,8 +13423,8 @@
    "originX": 5500,
    "originZ": -4500,
    "triangles": 16,
-   "trees": 9,
-   "bytes": 356
+   "trees": 11,
+   "bytes": 372
   },
   {
    "key": "28_23",
@@ -13463,8 +13443,8 @@
    "originX": 6000,
    "originZ": 4500,
    "triangles": 123,
-   "trees": 104,
-   "bytes": 2132
+   "trees": 94,
+   "bytes": 2060
   },
   {
    "key": "28_3",
@@ -13483,8 +13463,8 @@
    "originX": 6000,
    "originZ": -5500,
    "triangles": 33,
-   "trees": 12,
-   "bytes": 584
+   "trees": 8,
+   "bytes": 556
   },
   {
    "key": "28_6",
@@ -13493,8 +13473,8 @@
    "originX": 6000,
    "originZ": -5000,
    "triangles": 112,
-   "trees": 17,
-   "bytes": 1644
+   "trees": 16,
+   "bytes": 1636
   },
   {
    "key": "28_7",
@@ -13513,8 +13493,8 @@
    "originX": 6500,
    "originZ": -5000,
    "triangles": 227,
-   "trees": 12,
-   "bytes": 3000
+   "trees": 14,
+   "bytes": 3012
   },
   {
    "key": "29_7",
@@ -13523,8 +13503,8 @@
    "originX": 6500,
    "originZ": -4500,
    "triangles": 626,
-   "trees": 518,
-   "bytes": 11332
+   "trees": 515,
+   "bytes": 11312
   },
   {
    "key": "2_12",
@@ -13533,8 +13513,8 @@
    "originX": -7000,
    "originZ": -2000,
    "triangles": 75,
-   "trees": 22,
-   "bytes": 1164
+   "trees": 32,
+   "bytes": 1236
   },
   {
    "key": "2_13",
@@ -13542,9 +13522,9 @@
    "cz": 13,
    "originX": -7000,
    "originZ": -1500,
-   "triangles": 2280,
-   "trees": 1139,
-   "bytes": 32020
+   "triangles": 2426,
+   "trees": 1128,
+   "bytes": 33392
   },
   {
    "key": "2_14",
@@ -13552,9 +13532,9 @@
    "cz": 14,
    "originX": -7000,
    "originZ": -1000,
-   "triangles": 2651,
-   "trees": 282,
-   "bytes": 25312
+   "triangles": 2697,
+   "trees": 286,
+   "bytes": 25720
   },
   {
    "key": "2_15",
@@ -13623,8 +13603,8 @@
    "originX": -6500,
    "originZ": -2500,
    "triangles": 6,
-   "trees": 7,
-   "bytes": 184
+   "trees": 0,
+   "bytes": 132
   },
   {
    "key": "3_12",
@@ -13632,9 +13612,9 @@
    "cz": 12,
    "originX": -6500,
    "originZ": -2000,
-   "triangles": 4146,
-   "trees": 1716,
-   "bytes": 54024
+   "triangles": 4943,
+   "trees": 1598,
+   "bytes": 60876
   },
   {
    "key": "3_13",
@@ -13642,9 +13622,9 @@
    "cz": 13,
    "originX": -6500,
    "originZ": -1500,
-   "triangles": 2551,
-   "trees": 2001,
-   "bytes": 41508
+   "triangles": 3066,
+   "trees": 2011,
+   "bytes": 46636
   },
   {
    "key": "3_14",
@@ -13652,9 +13632,9 @@
    "cz": 14,
    "originX": -6500,
    "originZ": -1000,
-   "triangles": 473,
-   "trees": 557,
-   "bytes": 8924
+   "triangles": 407,
+   "trees": 545,
+   "bytes": 8156
   },
   {
    "key": "3_15",
@@ -13663,8 +13643,8 @@
    "originX": -6500,
    "originZ": -500,
    "triangles": 1195,
-   "trees": 637,
-   "bytes": 17348
+   "trees": 628,
+   "bytes": 17284
   },
   {
    "key": "3_16",
@@ -13672,9 +13652,9 @@
    "cz": 16,
    "originX": -6500,
    "originZ": 0,
-   "triangles": 16952,
-   "trees": 2223,
-   "bytes": 186384
+   "triangles": 16378,
+   "trees": 2252,
+   "bytes": 178884
   },
   {
    "key": "3_17",
@@ -13683,8 +13663,8 @@
    "originX": -6500,
    "originZ": 500,
    "triangles": 10537,
-   "trees": 504,
-   "bytes": 108884
+   "trees": 470,
+   "bytes": 108644
   },
   {
    "key": "3_18",
@@ -13693,8 +13673,8 @@
    "originX": -6500,
    "originZ": 1000,
    "triangles": 25373,
-   "trees": 115,
-   "bytes": 230996
+   "trees": 100,
+   "bytes": 230892
   },
   {
    "key": "3_19",
@@ -13703,8 +13683,8 @@
    "originX": -6500,
    "originZ": 1500,
    "triangles": 27148,
-   "trees": 84,
-   "bytes": 250372
+   "trees": 86,
+   "bytes": 250388
   },
   {
    "key": "3_2",
@@ -13733,8 +13713,8 @@
    "originX": -6500,
    "originZ": 2500,
    "triangles": 20194,
-   "trees": 117,
-   "bytes": 185088
+   "trees": 100,
+   "bytes": 184968
   },
   {
    "key": "3_22",
@@ -13742,9 +13722,9 @@
    "cz": 22,
    "originX": -6500,
    "originZ": 3000,
-   "triangles": 14125,
-   "trees": 103,
-   "bytes": 128724
+   "triangles": 14127,
+   "trees": 89,
+   "bytes": 128648
   },
   {
    "key": "3_23",
@@ -13752,9 +13732,9 @@
    "cz": 23,
    "originX": -6500,
    "originZ": 3500,
-   "triangles": 3183,
-   "trees": 55,
-   "bytes": 30388
+   "triangles": 2906,
+   "trees": 66,
+   "bytes": 28252
   },
   {
    "key": "3_24",
@@ -13773,8 +13753,8 @@
    "originX": -6500,
    "originZ": 4500,
    "triangles": 1948,
-   "trees": 279,
-   "bytes": 23128
+   "trees": 290,
+   "bytes": 23204
   },
   {
    "key": "3_26",
@@ -13783,8 +13763,8 @@
    "originX": -6500,
    "originZ": 5000,
    "triangles": 2236,
-   "trees": 406,
-   "bytes": 25848
+   "trees": 360,
+   "bytes": 25524
   },
   {
    "key": "3_27",
@@ -13793,8 +13773,8 @@
    "originX": -6500,
    "originZ": 5500,
    "triangles": 876,
-   "trees": 72,
-   "bytes": 9684
+   "trees": 81,
+   "bytes": 9748
   },
   {
    "key": "3_3",
@@ -13823,8 +13803,8 @@
    "originX": -6000,
    "originZ": -2500,
    "triangles": 90,
-   "trees": 20,
-   "bytes": 1212
+   "trees": 17,
+   "bytes": 1192
   },
   {
    "key": "4_12",
@@ -13832,9 +13812,9 @@
    "cz": 12,
    "originX": -6000,
    "originZ": -2000,
-   "triangles": 4542,
-   "trees": 3458,
-   "bytes": 72088
+   "triangles": 4513,
+   "trees": 3513,
+   "bytes": 72340
   },
   {
    "key": "4_13",
@@ -13842,9 +13822,9 @@
    "cz": 13,
    "originX": -6000,
    "originZ": -1500,
-   "triangles": 834,
-   "trees": 834,
-   "bytes": 15028
+   "triangles": 836,
+   "trees": 888,
+   "bytes": 15416
   },
   {
    "key": "4_15",
@@ -13853,8 +13833,8 @@
    "originX": -6000,
    "originZ": -500,
    "triangles": 1310,
-   "trees": 682,
-   "bytes": 18536
+   "trees": 698,
+   "bytes": 18648
   },
   {
    "key": "4_16",
@@ -13862,9 +13842,9 @@
    "cz": 16,
    "originX": -6000,
    "originZ": 0,
-   "triangles": 15502,
-   "trees": 2543,
-   "bytes": 172624
+   "triangles": 15138,
+   "trees": 2667,
+   "bytes": 169236
   },
   {
    "key": "4_17",
@@ -13873,8 +13853,8 @@
    "originX": -6000,
    "originZ": 500,
    "triangles": 5212,
-   "trees": 404,
-   "bytes": 54308
+   "trees": 402,
+   "bytes": 54296
   },
   {
    "key": "4_18",
@@ -13892,9 +13872,9 @@
    "cz": 19,
    "originX": -6000,
    "originZ": 1500,
-   "triangles": 23,
+   "triangles": 16,
    "trees": 0,
-   "bytes": 364
+   "bytes": 256
   },
   {
    "key": "4_23",
@@ -13902,9 +13882,9 @@
    "cz": 23,
    "originX": -6000,
    "originZ": 3500,
-   "triangles": 748,
-   "trees": 321,
-   "bytes": 11388
+   "triangles": 732,
+   "trees": 309,
+   "bytes": 11084
   },
   {
    "key": "4_24",
@@ -13912,9 +13892,9 @@
    "cz": 24,
    "originX": -6000,
    "originZ": 4000,
-   "triangles": 987,
-   "trees": 283,
-   "bytes": 15092
+   "triangles": 966,
+   "trees": 247,
+   "bytes": 14556
   },
   {
    "key": "4_25",
@@ -13923,8 +13903,8 @@
    "originX": -6000,
    "originZ": 4500,
    "triangles": 4024,
-   "trees": 1296,
-   "bytes": 51212
+   "trees": 1302,
+   "bytes": 51256
   },
   {
    "key": "4_26",
@@ -13933,8 +13913,8 @@
    "originX": -6000,
    "originZ": 5000,
    "triangles": 13056,
-   "trees": 2425,
-   "bytes": 148036
+   "trees": 2359,
+   "bytes": 147576
   },
   {
    "key": "4_27",
@@ -13943,8 +13923,8 @@
    "originX": -6000,
    "originZ": 5500,
    "triangles": 8904,
-   "trees": 2469,
-   "bytes": 106904
+   "trees": 2557,
+   "bytes": 107520
   },
   {
    "key": "4_28",
@@ -13953,8 +13933,8 @@
    "originX": -6000,
    "originZ": 6000,
    "triangles": 4766,
-   "trees": 1256,
-   "bytes": 57400
+   "trees": 1282,
+   "bytes": 57584
   },
   {
    "key": "4_29",
@@ -13963,8 +13943,8 @@
    "originX": -6000,
    "originZ": 6500,
    "triangles": 1118,
-   "trees": 76,
-   "bytes": 13028
+   "trees": 78,
+   "bytes": 13044
   },
   {
    "key": "4_30",
@@ -13983,8 +13963,8 @@
    "originX": -6000,
    "originZ": 7500,
    "triangles": 252,
-   "trees": 31,
-   "bytes": 3152
+   "trees": 32,
+   "bytes": 3156
   },
   {
    "key": "4_4",
@@ -14003,8 +13983,8 @@
    "originX": -5500,
    "originZ": -2500,
    "triangles": 54,
-   "trees": 22,
-   "bytes": 864
+   "trees": 28,
+   "bytes": 904
   },
   {
    "key": "5_12",
@@ -14012,9 +13992,9 @@
    "cz": 12,
    "originX": -5500,
    "originZ": -2000,
-   "triangles": 4336,
-   "trees": 2942,
-   "bytes": 66400
+   "triangles": 4323,
+   "trees": 2890,
+   "bytes": 65908
   },
   {
    "key": "5_13",
@@ -14022,9 +14002,9 @@
    "cz": 13,
    "originX": -5500,
    "originZ": -1500,
-   "triangles": 3158,
-   "trees": 1811,
-   "bytes": 46048
+   "triangles": 3162,
+   "trees": 1792,
+   "bytes": 45956
   },
   {
    "key": "5_14",
@@ -14043,8 +14023,8 @@
    "originX": -5500,
    "originZ": -500,
    "triangles": 1788,
-   "trees": 771,
-   "bytes": 23912
+   "trees": 776,
+   "bytes": 23944
   },
   {
    "key": "5_16",
@@ -14053,8 +14033,8 @@
    "originX": -5500,
    "originZ": 0,
    "triangles": 12569,
-   "trees": 1888,
-   "bytes": 137988
+   "trees": 1913,
+   "bytes": 138164
   },
   {
    "key": "5_17",
@@ -14063,8 +14043,8 @@
    "originX": -5500,
    "originZ": 500,
    "triangles": 7623,
-   "trees": 622,
-   "bytes": 79660
+   "trees": 623,
+   "bytes": 79668
   },
   {
    "key": "5_18",
@@ -14073,8 +14053,8 @@
    "originX": -5500,
    "originZ": 1000,
    "triangles": 3363,
-   "trees": 353,
-   "bytes": 35144
+   "trees": 357,
+   "bytes": 35172
   },
   {
    "key": "5_19",
@@ -14083,8 +14063,8 @@
    "originX": -5500,
    "originZ": 1500,
    "triangles": 4114,
-   "trees": 326,
-   "bytes": 41812
+   "trees": 358,
+   "bytes": 42036
   },
   {
    "key": "5_2",
@@ -14093,8 +14073,8 @@
    "originX": -5500,
    "originZ": -7000,
    "triangles": 5,
-   "trees": 13,
-   "bytes": 228
+   "trees": 15,
+   "bytes": 240
   },
   {
    "key": "5_20",
@@ -14102,9 +14082,9 @@
    "cz": 20,
    "originX": -5500,
    "originZ": 2000,
-   "triangles": 5650,
-   "trees": 955,
-   "bytes": 62988
+   "triangles": 5268,
+   "trees": 861,
+   "bytes": 57836
   },
   {
    "key": "5_21",
@@ -14112,9 +14092,9 @@
    "cz": 21,
    "originX": -5500,
    "originZ": 2500,
-   "triangles": 1300,
-   "trees": 308,
-   "bytes": 15568
+   "triangles": 1308,
+   "trees": 305,
+   "bytes": 15660
   },
   {
    "key": "5_22",
@@ -14123,8 +14103,8 @@
    "originX": -5500,
    "originZ": 3000,
    "triangles": 113,
-   "trees": 148,
-   "bytes": 2444
+   "trees": 153,
+   "bytes": 2480
   },
   {
    "key": "5_23",
@@ -14132,9 +14112,9 @@
    "cz": 23,
    "originX": -5500,
    "originZ": 3500,
-   "triangles": 397,
-   "trees": 87,
-   "bytes": 5588
+   "triangles": 400,
+   "trees": 92,
+   "bytes": 5668
   },
   {
    "key": "5_24",
@@ -14142,9 +14122,9 @@
    "cz": 24,
    "originX": -5500,
    "originZ": 4000,
-   "triangles": 1686,
-   "trees": 647,
-   "bytes": 24084
+   "triangles": 1684,
+   "trees": 649,
+   "bytes": 24076
   },
   {
    "key": "5_25",
@@ -14153,8 +14133,8 @@
    "originX": -5500,
    "originZ": 4500,
    "triangles": 9863,
-   "trees": 2271,
-   "bytes": 116284
+   "trees": 2267,
+   "bytes": 116256
   },
   {
    "key": "5_26",
@@ -14163,8 +14143,8 @@
    "originX": -5500,
    "originZ": 5000,
    "triangles": 7845,
-   "trees": 2578,
-   "bytes": 99268
+   "trees": 2513,
+   "bytes": 98816
   },
   {
    "key": "5_27",
@@ -14173,8 +14153,8 @@
    "originX": -5500,
    "originZ": 5500,
    "triangles": 3323,
-   "trees": 1348,
-   "bytes": 43184
+   "trees": 1388,
+   "bytes": 43464
   },
   {
    "key": "5_28",
@@ -14183,8 +14163,8 @@
    "originX": -5500,
    "originZ": 6000,
    "triangles": 3284,
-   "trees": 2819,
-   "bytes": 53888
+   "trees": 2756,
+   "bytes": 53444
   },
   {
    "key": "5_29",
@@ -14193,8 +14173,8 @@
    "originX": -5500,
    "originZ": 6500,
    "triangles": 5365,
-   "trees": 2286,
-   "bytes": 76756
+   "trees": 2315,
+   "bytes": 76960
   },
   {
    "key": "5_3",
@@ -14203,8 +14183,8 @@
    "originX": -5500,
    "originZ": -6500,
    "triangles": 4,
-   "trees": 4,
-   "bytes": 128
+   "trees": 3,
+   "bytes": 124
   },
   {
    "key": "5_30",
@@ -14213,8 +14193,8 @@
    "originX": -5500,
    "originZ": 7000,
    "triangles": 1971,
-   "trees": 1215,
-   "bytes": 31168
+   "trees": 1208,
+   "bytes": 31120
   },
   {
    "key": "5_31",
@@ -14223,8 +14203,8 @@
    "originX": -5500,
    "originZ": 7500,
    "triangles": 411,
-   "trees": 202,
-   "bytes": 5712
+   "trees": 200,
+   "bytes": 5700
   },
   {
    "key": "6_1",
@@ -14242,9 +14222,9 @@
    "cz": 11,
    "originX": -5000,
    "originZ": -2500,
-   "triangles": 165,
-   "trees": 68,
-   "bytes": 2448
+   "triangles": 112,
+   "trees": 50,
+   "bytes": 1736
   },
   {
    "key": "6_12",
@@ -14252,9 +14232,9 @@
    "cz": 12,
    "originX": -5000,
    "originZ": -2000,
-   "triangles": 960,
-   "trees": 420,
-   "bytes": 13772
+   "triangles": 745,
+   "trees": 437,
+   "bytes": 11528
   },
   {
    "key": "6_13",
@@ -14262,9 +14242,9 @@
    "cz": 13,
    "originX": -5000,
    "originZ": -1500,
-   "triangles": 465,
-   "trees": 224,
-   "bytes": 7244
+   "triangles": 429,
+   "trees": 249,
+   "bytes": 6980
   },
   {
    "key": "6_14",
@@ -14283,8 +14263,8 @@
    "originX": -5000,
    "originZ": -500,
    "triangles": 3767,
-   "trees": 1046,
-   "bytes": 45084
+   "trees": 1034,
+   "bytes": 45000
   },
   {
    "key": "6_16",
@@ -14293,8 +14273,8 @@
    "originX": -5000,
    "originZ": 0,
    "triangles": 11493,
-   "trees": 1907,
-   "bytes": 127952
+   "trees": 1928,
+   "bytes": 128100
   },
   {
    "key": "6_17",
@@ -14303,8 +14283,8 @@
    "originX": -5000,
    "originZ": 500,
    "triangles": 7880,
-   "trees": 221,
-   "bytes": 78760
+   "trees": 222,
+   "bytes": 78768
   },
   {
    "key": "6_18",
@@ -14323,8 +14303,8 @@
    "originX": -5000,
    "originZ": -7000,
    "triangles": 1177,
-   "trees": 1361,
-   "bytes": 22056
+   "trees": 1459,
+   "bytes": 22740
   },
   {
    "key": "6_20",
@@ -14333,8 +14313,8 @@
    "originX": -5000,
    "originZ": 2000,
    "triangles": 47,
-   "trees": 1,
-   "bytes": 836
+   "trees": 0,
+   "bytes": 828
   },
   {
    "key": "6_21",
@@ -14343,8 +14323,8 @@
    "originX": -5000,
    "originZ": 2500,
    "triangles": 2910,
-   "trees": 59,
-   "bytes": 27596
+   "trees": 40,
+   "bytes": 27460
   },
   {
    "key": "6_22",
@@ -14353,8 +14333,8 @@
    "originX": -5000,
    "originZ": 3000,
    "triangles": 536,
-   "trees": 141,
-   "bytes": 7228
+   "trees": 146,
+   "bytes": 7264
   },
   {
    "key": "6_23",
@@ -14362,9 +14342,9 @@
    "cz": 23,
    "originX": -5000,
    "originZ": 3500,
-   "triangles": 1384,
-   "trees": 748,
-   "bytes": 20596
+   "triangles": 1359,
+   "trees": 835,
+   "bytes": 21000
   },
   {
    "key": "6_24",
@@ -14372,9 +14352,9 @@
    "cz": 24,
    "originX": -5000,
    "originZ": 4000,
-   "triangles": 1247,
-   "trees": 284,
-   "bytes": 15884
+   "triangles": 1224,
+   "trees": 274,
+   "bytes": 15540
   },
   {
    "key": "6_25",
@@ -14383,8 +14363,8 @@
    "originX": -5000,
    "originZ": 4500,
    "triangles": 9601,
-   "trees": 3102,
-   "bytes": 122668
+   "trees": 3052,
+   "bytes": 122320
   },
   {
    "key": "6_26",
@@ -14393,8 +14373,8 @@
    "originX": -5000,
    "originZ": 5000,
    "triangles": 6949,
-   "trees": 3913,
-   "bytes": 106424
+   "trees": 3945,
+   "bytes": 106648
   },
   {
    "key": "6_27",
@@ -14403,8 +14383,8 @@
    "originX": -5000,
    "originZ": 5500,
    "triangles": 5081,
-   "trees": 2317,
-   "bytes": 69140
+   "trees": 2291,
+   "bytes": 68956
   },
   {
    "key": "6_28",
@@ -14413,8 +14393,8 @@
    "originX": -5000,
    "originZ": 6000,
    "triangles": 4902,
-   "trees": 2559,
-   "bytes": 70092
+   "trees": 2705,
+   "bytes": 71112
   },
   {
    "key": "6_29",
@@ -14423,8 +14403,8 @@
    "originX": -5000,
    "originZ": 6500,
    "triangles": 6613,
-   "trees": 3490,
-   "bytes": 93892
+   "trees": 3371,
+   "bytes": 93060
   },
   {
    "key": "6_3",
@@ -14433,8 +14413,8 @@
    "originX": -5000,
    "originZ": -6500,
    "triangles": 1074,
-   "trees": 1363,
-   "bytes": 21620
+   "trees": 1232,
+   "bytes": 20700
   },
   {
    "key": "6_30",
@@ -14443,8 +14423,8 @@
    "originX": -5000,
    "originZ": 7000,
    "triangles": 3828,
-   "trees": 1833,
-   "bytes": 56608
+   "trees": 1779,
+   "bytes": 56232
   },
   {
    "key": "7_1",
@@ -14453,8 +14433,8 @@
    "originX": -4500,
    "originZ": -7500,
    "triangles": 31,
-   "trees": 29,
-   "bytes": 656
+   "trees": 49,
+   "bytes": 796
   },
   {
    "key": "7_10",
@@ -14462,9 +14442,9 @@
    "cz": 10,
    "originX": -4500,
    "originZ": -3000,
-   "triangles": 1642,
-   "trees": 180,
-   "bytes": 18732
+   "triangles": 1517,
+   "trees": 156,
+   "bytes": 17060
   },
   {
    "key": "7_11",
@@ -14472,9 +14452,9 @@
    "cz": 11,
    "originX": -4500,
    "originZ": -2500,
-   "triangles": 2218,
-   "trees": 1013,
-   "bytes": 32164
+   "triangles": 2581,
+   "trees": 1004,
+   "bytes": 35996
   },
   {
    "key": "7_12",
@@ -14483,8 +14463,8 @@
    "originX": -4500,
    "originZ": -2000,
    "triangles": 151,
-   "trees": 148,
-   "bytes": 2964
+   "trees": 166,
+   "bytes": 3088
   },
   {
    "key": "7_13",
@@ -14503,8 +14483,8 @@
    "originX": -4500,
    "originZ": -500,
    "triangles": 5843,
-   "trees": 1169,
-   "bytes": 66064
+   "trees": 1117,
+   "bytes": 65700
   },
   {
    "key": "7_16",
@@ -14513,8 +14493,8 @@
    "originX": -4500,
    "originZ": 0,
    "triangles": 12201,
-   "trees": 2230,
-   "bytes": 137116
+   "trees": 2199,
+   "bytes": 136900
   },
   {
    "key": "7_17",
@@ -14523,8 +14503,8 @@
    "originX": -4500,
    "originZ": 500,
    "triangles": 9288,
-   "trees": 132,
-   "bytes": 92000
+   "trees": 126,
+   "bytes": 91960
   },
   {
    "key": "7_18",
@@ -14533,8 +14513,8 @@
    "originX": -4500,
    "originZ": 1000,
    "triangles": 46,
-   "trees": 57,
-   "bytes": 1136
+   "trees": 65,
+   "bytes": 1192
   },
   {
    "key": "7_19",
@@ -14543,8 +14523,8 @@
    "originX": -4500,
    "originZ": 1500,
    "triangles": 121,
-   "trees": 100,
-   "bytes": 2336
+   "trees": 74,
+   "bytes": 2152
   },
   {
    "key": "7_2",
@@ -14553,8 +14533,8 @@
    "originX": -4500,
    "originZ": -7000,
    "triangles": 18,
-   "trees": 37,
-   "bytes": 548
+   "trees": 43,
+   "bytes": 592
   },
   {
    "key": "7_20",
@@ -14563,8 +14543,8 @@
    "originX": -4500,
    "originZ": 2000,
    "triangles": 805,
-   "trees": 1395,
-   "bytes": 18068
+   "trees": 1445,
+   "bytes": 18420
   },
   {
    "key": "7_22",
@@ -14573,8 +14553,8 @@
    "originX": -4500,
    "originZ": 3000,
    "triangles": 65,
-   "trees": 65,
-   "bytes": 1352
+   "trees": 68,
+   "bytes": 1372
   },
   {
    "key": "7_23",
@@ -14582,9 +14562,9 @@
    "cz": 23,
    "originX": -4500,
    "originZ": 3500,
-   "triangles": 2464,
-   "trees": 1627,
-   "bytes": 37628
+   "triangles": 2838,
+   "trees": 1701,
+   "bytes": 42068
   },
   {
    "key": "7_24",
@@ -14593,8 +14573,8 @@
    "originX": -4500,
    "originZ": 4000,
    "triangles": 213,
-   "trees": 59,
-   "bytes": 3336
+   "trees": 68,
+   "bytes": 3400
   },
   {
    "key": "7_25",
@@ -14603,8 +14583,8 @@
    "originX": -4500,
    "originZ": 4500,
    "triangles": 4685,
-   "trees": 2031,
-   "bytes": 67184
+   "trees": 2046,
+   "bytes": 67288
   },
   {
    "key": "7_26",
@@ -14612,9 +14592,9 @@
    "cz": 26,
    "originX": -4500,
    "originZ": 5000,
-   "triangles": 10754,
-   "trees": 2545,
-   "bytes": 135000
+   "triangles": 10752,
+   "trees": 2551,
+   "bytes": 135016
   },
   {
    "key": "7_27",
@@ -14623,8 +14603,8 @@
    "originX": -4500,
    "originZ": 5500,
    "triangles": 7418,
-   "trees": 1885,
-   "bytes": 90120
+   "trees": 1917,
+   "bytes": 90344
   },
   {
    "key": "7_28",
@@ -14633,8 +14613,8 @@
    "originX": -4500,
    "originZ": 6000,
    "triangles": 3182,
-   "trees": 1142,
-   "bytes": 41500
+   "trees": 1135,
+   "bytes": 41452
   },
   {
    "key": "7_29",
@@ -14643,8 +14623,8 @@
    "originX": -4500,
    "originZ": 6500,
    "triangles": 3065,
-   "trees": 1094,
-   "bytes": 41824
+   "trees": 1128,
+   "bytes": 42064
   },
   {
    "key": "7_3",
@@ -14653,8 +14633,8 @@
    "originX": -4500,
    "originZ": -6500,
    "triangles": 393,
-   "trees": 329,
-   "bytes": 7008
+   "trees": 346,
+   "bytes": 7124
   },
   {
    "key": "7_30",
@@ -14663,8 +14643,8 @@
    "originX": -4500,
    "originZ": 7000,
    "triangles": 2038,
-   "trees": 1214,
-   "bytes": 32144
+   "trees": 1209,
+   "bytes": 32108
   },
   {
    "key": "7_31",
@@ -14682,9 +14662,9 @@
    "cz": 1,
    "originX": -4000,
    "originZ": -7500,
-   "triangles": 837,
-   "trees": 1112,
-   "bytes": 16900
+   "triangles": 869,
+   "trees": 1077,
+   "bytes": 16984
   },
   {
    "key": "8_10",
@@ -14692,9 +14672,9 @@
    "cz": 10,
    "originX": -4000,
    "originZ": -3000,
-   "triangles": 3971,
-   "trees": 2512,
-   "bytes": 58456
+   "triangles": 2757,
+   "trees": 2455,
+   "bytes": 46012
   },
   {
    "key": "8_11",
@@ -14702,9 +14682,9 @@
    "cz": 11,
    "originX": -4000,
    "originZ": -2500,
-   "triangles": 4759,
-   "trees": 2850,
-   "bytes": 68972
+   "triangles": 6107,
+   "trees": 2731,
+   "bytes": 81328
   },
   {
    "key": "8_12",
@@ -14713,8 +14693,8 @@
    "originX": -4000,
    "originZ": -2000,
    "triangles": 1566,
-   "trees": 448,
-   "bytes": 19424
+   "trees": 463,
+   "bytes": 19532
   },
   {
    "key": "8_13",
@@ -14732,9 +14712,9 @@
    "cz": 15,
    "originX": -4000,
    "originZ": -500,
-   "triangles": 5813,
-   "trees": 1128,
-   "bytes": 65484
+   "triangles": 5811,
+   "trees": 1130,
+   "bytes": 65460
   },
   {
    "key": "8_16",
@@ -14743,8 +14723,8 @@
    "originX": -4000,
    "originZ": 0,
    "triangles": 13727,
-   "trees": 1870,
-   "bytes": 151680
+   "trees": 1867,
+   "bytes": 151660
   },
   {
    "key": "8_17",
@@ -14753,8 +14733,8 @@
    "originX": -4000,
    "originZ": 500,
    "triangles": 7578,
-   "trees": 48,
-   "bytes": 75580
+   "trees": 45,
+   "bytes": 75560
   },
   {
    "key": "8_19",
@@ -14763,8 +14743,8 @@
    "originX": -4000,
    "originZ": 1500,
    "triangles": 16,
-   "trees": 48,
-   "bytes": 584
+   "trees": 64,
+   "bytes": 696
   },
   {
    "key": "8_2",
@@ -14783,8 +14763,8 @@
    "originX": -4000,
    "originZ": 2000,
    "triangles": 436,
-   "trees": 622,
-   "bytes": 9104
+   "trees": 576,
+   "bytes": 8780
   },
   {
    "key": "8_21",
@@ -14792,9 +14772,9 @@
    "cz": 21,
    "originX": -4000,
    "originZ": 2500,
-   "triangles": 245,
+   "triangles": 237,
    "trees": 225,
-   "bytes": 4616
+   "bytes": 4516
   },
   {
    "key": "8_22",
@@ -14812,9 +14792,9 @@
    "cz": 23,
    "originX": -4000,
    "originZ": 3500,
-   "triangles": 3019,
-   "trees": 2025,
-   "bytes": 45808
+   "triangles": 4051,
+   "trees": 1924,
+   "bytes": 55156
   },
   {
    "key": "8_24",
@@ -14843,8 +14823,8 @@
    "originX": -4000,
    "originZ": 5000,
    "triangles": 3964,
-   "trees": 305,
-   "bytes": 53812
+   "trees": 308,
+   "bytes": 53832
   },
   {
    "key": "8_27",
@@ -14853,8 +14833,8 @@
    "originX": -4000,
    "originZ": 5500,
    "triangles": 915,
-   "trees": 250,
-   "bytes": 13628
+   "trees": 249,
+   "bytes": 13624
   },
   {
    "key": "8_28",
@@ -14873,8 +14853,8 @@
    "originX": -4000,
    "originZ": 6500,
    "triangles": 3825,
-   "trees": 1625,
-   "bytes": 54376
+   "trees": 1627,
+   "bytes": 54388
   },
   {
    "key": "8_3",
@@ -14892,9 +14872,9 @@
    "cz": 30,
    "originX": -4000,
    "originZ": 7000,
-   "triangles": 148,
-   "trees": 135,
-   "bytes": 2668
+   "triangles": 220,
+   "trees": 138,
+   "bytes": 3700
   },
   {
    "key": "8_31",
@@ -14902,9 +14882,9 @@
    "cz": 31,
    "originX": -4000,
    "originZ": 7500,
-   "triangles": 56,
-   "trees": 29,
-   "bytes": 908
+   "triangles": 366,
+   "trees": 52,
+   "bytes": 5008
   },
   {
    "key": "8_6",
@@ -14923,8 +14903,8 @@
    "originX": -4000,
    "originZ": -4500,
    "triangles": 2559,
-   "trees": 274,
-   "bytes": 29340
+   "trees": 268,
+   "bytes": 29300
   },
   {
    "key": "8_8",
@@ -14933,8 +14913,8 @@
    "originX": -4000,
    "originZ": -4000,
    "triangles": 8619,
-   "trees": 800,
-   "bytes": 90992
+   "trees": 766,
+   "bytes": 90752
   },
   {
    "key": "8_9",
@@ -14942,9 +14922,9 @@
    "cz": 9,
    "originX": -4000,
    "originZ": -3500,
-   "triangles": 6360,
-   "trees": 1283,
-   "bytes": 72012
+   "triangles": 6126,
+   "trees": 1321,
+   "bytes": 69832
   },
   {
    "key": "9_1",
@@ -14952,9 +14932,9 @@
    "cz": 1,
    "originX": -3500,
    "originZ": -7500,
-   "triangles": 81,
-   "trees": 47,
-   "bytes": 1304
+   "triangles": 80,
+   "trees": 61,
+   "bytes": 1368
   },
   {
    "key": "9_10",
@@ -14962,9 +14942,9 @@
    "cz": 10,
    "originX": -3500,
    "originZ": -3000,
-   "triangles": 2003,
-   "trees": 2061,
-   "bytes": 35408
+   "triangles": 1169,
+   "trees": 2119,
+   "bytes": 27588
   },
   {
    "key": "9_11",
@@ -14972,9 +14952,9 @@
    "cz": 11,
    "originX": -3500,
    "originZ": -2500,
-   "triangles": 4687,
-   "trees": 2308,
-   "bytes": 64888
+   "triangles": 5460,
+   "trees": 2090,
+   "bytes": 71052
   },
   {
    "key": "9_12",
@@ -14983,8 +14963,8 @@
    "originX": -3500,
    "originZ": -2000,
    "triangles": 1999,
-   "trees": 733,
-   "bytes": 25896
+   "trees": 730,
+   "bytes": 25872
   },
   {
    "key": "9_13",
@@ -14993,8 +14973,8 @@
    "originX": -3500,
    "originZ": -1500,
    "triangles": 999,
-   "trees": 416,
-   "bytes": 12988
+   "trees": 383,
+   "bytes": 12756
   },
   {
    "key": "9_14",
@@ -15003,8 +14983,8 @@
    "originX": -3500,
    "originZ": -1000,
    "triangles": 941,
-   "trees": 321,
-   "bytes": 11928
+   "trees": 315,
+   "bytes": 11884
   },
   {
    "key": "9_15",
@@ -15012,9 +14992,9 @@
    "cz": 15,
    "originX": -3500,
    "originZ": -500,
-   "triangles": 6205,
-   "trees": 1370,
-   "bytes": 71516
+   "triangles": 6182,
+   "trees": 1395,
+   "bytes": 71380
   },
   {
    "key": "9_16",
@@ -15022,9 +15002,9 @@
    "cz": 16,
    "originX": -3500,
    "originZ": 0,
-   "triangles": 25014,
-   "trees": 3177,
-   "bytes": 271660
+   "triangles": 24597,
+   "trees": 3254,
+   "bytes": 266880
   },
   {
    "key": "9_17",
@@ -15043,8 +15023,8 @@
    "originX": -3500,
    "originZ": 1000,
    "triangles": 72,
-   "trees": 41,
-   "bytes": 1272
+   "trees": 48,
+   "bytes": 1320
   },
   {
    "key": "9_19",
@@ -15053,8 +15033,8 @@
    "originX": -3500,
    "originZ": 1500,
    "triangles": 51,
-   "trees": 105,
-   "bytes": 1468
+   "trees": 93,
+   "bytes": 1384
   },
   {
    "key": "9_2",
@@ -15083,8 +15063,8 @@
    "originX": -3500,
    "originZ": 3000,
    "triangles": 138,
-   "trees": 187,
-   "bytes": 2992
+   "trees": 180,
+   "bytes": 2940
   },
   {
    "key": "9_23",
@@ -15092,8 +15072,8 @@
    "cz": 23,
    "originX": -3500,
    "originZ": 3500,
-   "triangles": 1309,
-   "trees": 1247,
+   "triangles": 1307,
+   "trees": 1250,
    "bytes": 23240
   },
   {
@@ -15123,8 +15103,8 @@
    "originX": -3500,
    "originZ": 5000,
    "triangles": 1539,
-   "trees": 142,
-   "bytes": 20672
+   "trees": 145,
+   "bytes": 20696
   },
   {
    "key": "9_27",
@@ -15133,8 +15113,8 @@
    "originX": -3500,
    "originZ": 5500,
    "triangles": 457,
-   "trees": 44,
-   "bytes": 5780
+   "trees": 41,
+   "bytes": 5760
   },
   {
    "key": "9_28",
@@ -15143,8 +15123,8 @@
    "originX": -3500,
    "originZ": 6000,
    "triangles": 1559,
-   "trees": 564,
-   "bytes": 21808
+   "trees": 586,
+   "bytes": 21960
   },
   {
    "key": "9_29",
@@ -15153,8 +15133,8 @@
    "originX": -3500,
    "originZ": 6500,
    "triangles": 4705,
-   "trees": 2041,
-   "bytes": 69152
+   "trees": 2054,
+   "bytes": 69240
   },
   {
    "key": "9_30",
@@ -15162,9 +15142,9 @@
    "cz": 30,
    "originX": -3500,
    "originZ": 7000,
-   "triangles": 962,
-   "trees": 418,
-   "bytes": 13976
+   "triangles": 1086,
+   "trees": 432,
+   "bytes": 15760
   },
   {
    "key": "9_31",
@@ -15172,9 +15152,9 @@
    "cz": 31,
    "originX": -3500,
    "originZ": 7500,
-   "triangles": 623,
-   "trees": 328,
-   "bytes": 8560
+   "triangles": 1728,
+   "trees": 517,
+   "bytes": 23772
   },
   {
    "key": "9_6",
@@ -15183,8 +15163,8 @@
    "originX": -3500,
    "originZ": -5000,
    "triangles": 19,
-   "trees": 4,
-   "bytes": 340
+   "trees": 9,
+   "bytes": 376
   },
   {
    "key": "9_7",
@@ -15192,9 +15172,9 @@
    "cz": 7,
    "originX": -3500,
    "originZ": -4500,
-   "triangles": 8289,
-   "trees": 1416,
-   "bytes": 93588
+   "triangles": 8473,
+   "trees": 1365,
+   "bytes": 94792
   },
   {
    "key": "9_8",
@@ -15202,9 +15182,9 @@
    "cz": 8,
    "originX": -3500,
    "originZ": -4000,
-   "triangles": 752,
-   "trees": 2285,
-   "bytes": 24364
+   "triangles": 763,
+   "trees": 2271,
+   "bytes": 24352
   },
   {
    "key": "9_9",
@@ -15212,9 +15192,9 @@
    "cz": 9,
    "originX": -3500,
    "originZ": -3500,
-   "triangles": 500,
-   "trees": 1986,
-   "bytes": 19156
+   "triangles": 489,
+   "trees": 1956,
+   "bytes": 18824
   }
  ]
 }

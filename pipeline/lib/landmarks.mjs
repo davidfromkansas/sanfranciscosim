@@ -130,6 +130,15 @@ export const LANDMARKS = [
     camera: { distance: 550, yaw: 120, pitch: 16 },
   },
   {
+    id: 'conservatoryOfFlowers',
+    name: 'Conservatory of Flowers',
+    lon: -122.4602321,
+    lat: 37.7725965,
+    height: 18.3,
+    exclude: 70,
+    camera: { distance: 260, yaw: 170, pitch: 16 },
+  },
+  {
     id: 'calAcademy',
     name: 'California Academy of Sciences',
     lon: -122.4662432,
@@ -137,6 +146,15 @@ export const LANDMARKS = [
     height: 19.3,
     exclude: 120,
     camera: { distance: 700, yaw: 225, pitch: 20 },
+  },
+  {
+    id: 'deYoung',
+    name: 'de Young Museum',
+    lon: -122.4688156,
+    lat: 37.7715,
+    height: 43.9,
+    exclude: 100,
+    camera: { distance: 700, yaw: 135, pitch: 20 },
   },
   {
     id: 'fishermansWharf',
