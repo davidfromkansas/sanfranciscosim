@@ -165,6 +165,15 @@ export const LANDMARKS = [
     exclude: 260,
     camera: { distance: 900, yaw: 180, pitch: 20 },
   },
+  {
+    id: 'stMarysCathedral',
+    name: 'Cathedral of Saint Mary of the Assumption',
+    lon: -122.4253877,
+    lat: 37.7842352,
+    height: 78.7,
+    exclude: 90,
+    camera: { distance: 700, yaw: 200, pitch: 20 },
+  },
 ];
 
 // Parks/green spaces the landcover bake must match at least one source polygon

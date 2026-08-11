@@ -197,5 +197,23 @@
       43.9
     ],
     "tris": 2201
+  },
+  {
+    "id": "st-marys-cathedral",
+    "file": "st-marys-cathedral.glb",
+    "anchor": [
+      -122.4253877,
+      37.7842352
+    ],
+    "targetHeightM": 78.7,
+    "cat": 8,
+    "name": "Cathedral of Saint Mary of the Assumption",
+    "estimated": false,
+    "dims": [
+      94.8154,
+      94.8154,
+      78.7
+    ],
+    "tris": 7074
   }
 ]
