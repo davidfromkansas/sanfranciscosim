@@ -225,7 +225,9 @@ sweep. Verify the clock panel updates too — it re-renders on its own 1 Hz time
 even when the render loop is crawling under software GL.
 
 `SF.setTime(t)` still exists but is deprecated: it logs a warning and maps the old 0–1 sweep onto
-7 PM→9:30 PM local. Use `setClock`.
+7 PM→9:30 PM San Francisco time — the day boundary comes from `localDayStart` in `astro.mjs`, so it does
+not care what zone the browser is in (the Devin browser runs in UTC). Assert on the console warning plus
+`SF.sky.localTime` rather than on the look. Use `setClock`.
 
 One thing that repeatedly costs time here (re-measure, do not assume the exact number):
 **X11 clicks need a Y offset relative to page coordinates.** With the 1600×1122 Chrome window used in
@@ -296,6 +298,25 @@ dark. Corroborate numerically, then hunt for a view:
   (SoMa) give a far more legible screenshot than dense hills (Nob Hill).
 - Project the matched vertices with `SF.camera` to get the exact pixel box, then crop the root screenshot
   to it — otherwise a 4 m prop is invisible in a 1600 px frame.
+
+## Measuring draw calls (the stats overlay lies)
+
+The overlay's `draw calls` line reads **1**, always. `app/src/toypost.js` renders the scene into a render
+target and then draws one fullscreen quad; `renderer.info` auto-resets per render, so the number the
+overlay prints is the quad pass, not the city. To check the < 300 budget, wrap the renderer for a few
+seconds and take the peak of the scene pass:
+
+```js
+const r = SF.renderer;
+if (!r.__orig) { r.__orig = r.render.bind(r); window.__peak = 0;
+  r.render = (s, c) => { r.__orig(s, c); const n = r.info.render.calls; if (n > window.__peak) window.__peak = n; }; }
+// wait ~20 s under software GL (only a handful of frames render), then read:
+window.__peak
+```
+
+Observed on the deployed build at street level downtown: 60 peak at 1 PM, 67 at 2 AM — well inside the
+budget. `fps` in the overlay reads 1–2 here and is meaningless: software rasterizer, report it as
+environment-limited rather than as a regression.
 
 ## Testing live-data layers (live ferries, `app/src/ferries.js`)
 

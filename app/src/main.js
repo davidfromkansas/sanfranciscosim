@@ -31,7 +31,7 @@ import { createFocusOverlay } from './focus.js';
 import { createContextCard, createSearch } from './cards.js';
 import { createConcierge } from './concierge.js';
 import { createSkyClock } from './sky-clock.js';
-import { moonPosition, skySnapshot, sunPosition } from '../../api/_lib/astro.mjs';
+import { localDayStart, moonPosition, skySnapshot, sunPosition } from '../../api/_lib/astro.mjs';
 
 const canvas = document.getElementById('view');
 const loader = createLoader();
@@ -505,10 +505,10 @@ async function boot() {
     // running; it now just freezes the clock around sunset.
     setTime(t) {
       console.warn('SF.setTime is deprecated — use SF.setClock(msOrIso), or SF.setClock(null) for live time');
-      const day = new Date(clockOverride === null ? Date.now() : clockOverride);
-      day.setHours(0, 0, 0, 0);
+      // Midnight in San Francisco, not in whatever zone the browser is in.
+      const midnight = localDayStart(clockOverride === null ? Date.now() : clockOverride);
       // t = 0 is the golden hour, t = 1 is a couple of hours after sunset.
-      return this.setClock(day.getTime() + (19 + Math.min(1, Math.max(0, t)) * 2.5) * 3600 * 1000);
+      return this.setClock(midnight + (19 + Math.min(1, Math.max(0, t)) * 2.5) * 3600 * 1000);
     },
     assets,
     get style() {
