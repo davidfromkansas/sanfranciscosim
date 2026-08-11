@@ -9,7 +9,7 @@ all app code are untouched. Integration is a separate job
 (`docs/asset-plans/INTEGRATION-PROMPT.md` + the notes in
 `docs/asset-plans/coit-tower.md` §2.13).
 
-The exact exported GLB was re-imported before all seven review renders were
+The exact exported GLB was re-imported before all nine review renders were
 produced. `validation.json` is the machine-readable authority for the metrics
 below.
 
@@ -28,6 +28,7 @@ LTS** (`/Applications/Blender.app`, CPU Cycles). No 4.5-specific API is used.
 - `coit-tower.glb` — final binary deliverable (565 KB, self-contained)
 - `validation.json` — full object-level machine report
 - `coit-tower-{north,east,south,west,top,aerial}.png`
+- `coit-tower-night.png`, `coit-tower-night-entrance.png` — night-state previews
 - `coit-tower-contact-sheet.png`
 
 Rebuild from this directory with:
@@ -63,15 +64,15 @@ within a few degrees.
 | Plausible real-world meters | PASS | 23.8014 × 23.8014 × 64.0 m; rotunda extent matches the 22.4–23.1 m OSM footprint (corners of the yawed bay cross set the axis-aligned bounds), height matches the published 64 m / 210 ft |
 | Origin / base | PASS | bbox min Z 0.0 m; XY center offset [0.0, 0.0] m |
 | Orientation | PASS | +Y = true north; entrance at measured bearing 346° (see above) |
-| Triangle budget (≤ 12,000) | PASS | **11,164** triangles |
-| Applied transforms | PASS | all 167 imported mesh objects at location 0, rotation 0, scale 1 |
+| Triangle budget (≤ 12,000) | PASS | **11,848** triangles |
+| Applied transforms | PASS | all 194 imported mesh objects at location 0, rotation 0, scale 1 |
 | Negative scales | PASS | none |
 | Normals | PASS | 0 invalid/non-unit loop normals; 22,496 deterministic visibility rays, 0 flipped visible faces (all geometry authored as closed manifold solids — no single-sided sheets) |
-| Unexpected / leaked geometry | PASS | 167 mesh objects only; no studio plane, context, camera or light in the GLB |
+| Unexpected / leaked geometry | PASS | 194 mesh objects only; no studio plane, context, camera or light in the GLB |
 | Image textures / PBR maps | PASS | 0 images, 0 texture nodes |
 | Transparency | PASS | all material alpha 1.0, opaque |
-| Flat material contract | PASS | six `Toy_*` palette materials, roughness 0.85, no `Toy_body` |
-| Glow naming | PASS | `Toy_white_Glow` only on the loggia inner drum and lantern arch reveals — the crown openings that light up at night |
+| Flat material contract | PASS | seven `Toy_*` palette materials, roughness 0.85, no `Toy_body` |
+| Glow naming | PASS | `Toy_white_Glow` / `Toy_gold_Glow` only on dedicated night-lamp surfaces: the loggia glow shell, the lantern well liner, the 24 pier-slot centres and the entrance door lamp |
 | Cameras / lights | PASS | 0 / 0 |
 | Animations / armatures / constraints | PASS | 0 / 0 / 0 |
 | Degenerate geometry | PASS | 0 degenerate triangles |
@@ -79,14 +80,14 @@ within a few degrees.
 
 ## Geometry and materials
 
-- Object count: **167 mesh objects**
-- Triangle count: **11,164**
+- Object count: **194 mesh objects**
+- Triangle count: **11,848**
 - Dimensions: **[23.8014, 23.8014, 64.0] m**
 - Bounding box min: **[-11.9007, -11.9007, 0.0] m**
 - Bounding box max: **[11.9007, 11.9007, 64.0] m**
 - Minimum Z: **0.0 m**
 - XY center offset: **[0.0, 0.0] m**
-- Materials: `Toy_glass`, `Toy_ink`, `Toy_stone`, `Toy_trim`, `Toy_white`, `Toy_white_Glow`
+- Materials: `Toy_glass`, `Toy_gold_Glow`, `Toy_ink`, `Toy_stone`, `Toy_trim`, `Toy_white`, `Toy_white_Glow`
 
 The mapped rotunda footprint is ~22.4 m across the bay faces; the 23.8 m
 axis-aligned bounds come from the corners of the four rectangular bays on
@@ -130,7 +131,7 @@ north-west of the tower so the entrance quadrant is visible.
     23.8014,
     64.0
   ],
-  "tris": 11164
+  "tris": 11848
 }
 ```
 
@@ -139,6 +140,27 @@ coordinates; it agrees with the plan's anchor (-122.4058407, 37.8023762)
 within ~0.6 m — either lands the tower on the same summit spot. Height 64 m
 is the tower's height above its own terrace (OSM `height`, Wikipedia 210 ft);
 the GLB starts at z = 0 and the app's terrain supplies Telegraph Hill.
+
+## Night state
+
+The day/night switch is entirely app-side and needs no configuration in the
+asset. `app/src/env.js` computes the real San Francisco sun elevation at the
+real wall clock and drives the `uNight` uniform (toy mode: day above +8°
+elevation, blending through golden and dusk to night below −4°). The landmark
+loader (`app/src/assets.js`) merges every `*_Glow`-named material into one
+unlit overlay whose opacity is `0.12 + uNight × 0.95`
+(`updateLandmarkGlow`, `app/src/kit.js`); the glow colour is the material's
+baked colour. So the GLB encodes *what* lights up, and the city decides
+*when*.
+
+Because that overlay is only ~12 % opaque in daylight, glow materials are
+never used for structure here — the asset uses the light-strip pattern: solid
+`Toy_white` walls with four dedicated lamp surfaces floating just proud of
+them (loggia glow shell behind the 8 arches, lantern well liner, 24 lit slot
+centres over the dark ink slots, and one `Toy_gold_Glow` entrance lamp).
+`coit-tower-night.png` and `coit-tower-night-entrance.png` preview the effect
+by rendering the re-imported GLB with the glow materials emissive under a
+dusk sky — the same surfaces the app ignites.
 
 ## Scope confirmation
 

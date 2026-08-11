@@ -93,6 +93,7 @@ PALETTE_HEX = {
     "Toy_glass": "2a4d73",
     "Toy_ink": "3a3530",
     "Toy_white_Glow": "f7f4ec",
+    "Toy_gold_Glow": "caa64a",
 }
 
 
@@ -370,7 +371,7 @@ def build_shaft(white):
     return new_mesh("shaft", verts, faces, [white])
 
 
-def build_rotunda(white, trim, stone, glass, ink):
+def build_rotunda(white, trim, stone, glass, ink, gold_glow):
     bay_bearings = [BEARING0 + k * 90.0 for k in range(4)]
 
     tube("rotunda_drum", ROT_R, 0.0, ROT_H + 0.01, white, seg=36)
@@ -401,6 +402,8 @@ def build_rotunda(white, trim, stone, glass, ink):
                       0.0, 3.4, 1.9, 0.28, ink)
             ph = panel_box("entrance_phoenix", bearing, BAY_FACE_R + 0.16, 0.0,
                            3.7, 5.3, 1.7, 0.3, trim)
+            panel_box("entrance_lamp", bearing, BAY_FACE_R + 0.18, 0.0,
+                      3.44, 3.64, 1.5, 0.06, gold_glow)
             bevel(ph, width=0.07, segments=1)
             for k, xo in enumerate((-1.9, 1.9)):
                 panel_box(f"entrance_win_{k}", bearing, BAY_FACE_R + 0.05, xo,
@@ -425,7 +428,11 @@ def build_loggia(white, trim, ink, glow):
     bay_arc, pier_arc = 31.0, 14.0
     annulus("loggia_floor", SHAFT_R1 - 0.6, LOG_R, LOG_Z0 + 0.02, white, seg=36)
     # the glowing inner drum: white by day, the lit gallery ring at night
-    tube("loggia_core", LOG_R - LOG_T - 0.25, LOG_Z0 + 0.03, LOG_Z1 - 0.02, glow, seg=32)
+    tube("loggia_core", LOG_R - LOG_T - 0.25, LOG_Z0 + 0.03, LOG_Z1 - 0.02, white, seg=32)
+    # night lamp: a thin glow shell floating between the core and the arch
+    # backs - hidden against the white core by day, the lit gallery at night
+    tube("loggia_glow_shell", LOG_R - LOG_T - 0.08, ARCH_SILL - 0.2,
+         ARCH_SPRING + 1.4, glow, seg=24)
     for k in range(BAYS):
         bearing = BEARING0 + k * 45.0
         bay_w = 2 * LOG_R * math.sin(math.radians(bay_arc / 2)) + 0.16
@@ -449,6 +456,8 @@ def build_loggia(white, trim, ink, glow):
         for sk, xo in enumerate((-0.42, 0.0, 0.42)):
             panel_box(f"loggia_slot_{k}_{sk}", pier_bearing, LOG_R + 0.06, xo,
                       57.6, 58.8, 0.3, 0.14, ink)
+            panel_box(f"loggia_slotglow_{k}_{sk}", pier_bearing, LOG_R + 0.085, xo,
+                      57.68, 58.72, 0.22, 0.03, glow)
 
 
 def build_lantern(white, trim, stone, glass, glow):
@@ -459,7 +468,10 @@ def build_lantern(white, trim, stone, glass, glow):
         bearing = BEARING0 + 22.5 + k * 45.0
         w = 2 * LAN_R * math.sin(math.radians(22.5)) + 0.3
         arch_wall(f"lantern_bay_{k}", bearing, LAN_R, w, LAN_Z0, LAN_Z1,
-                  LAN_ARCH_W, LAN_SILL, LAN_SPRING, LAN_T, white, tunnel_mat=glow)
+                  LAN_ARCH_W, LAN_SILL, LAN_SPRING, LAN_T, white)
+    # night lamp inside the well: reads through all 8 arches and from above
+    tube("lantern_glow_liner", LAN_R - LAN_T - 0.06, LAN_SILL - 0.2, LAN_Z1 - 0.3,
+         glow, seg=24)
     # flared rim lip, open in the centre (aerials look straight down the well)
     ring_wall("lantern_rim", LAN_R - LAN_T, RIM_R, RIM_Z0 - 0.02, RIM_Z1, white, seg=36)
     # the well floor: deck, skylight ring, and the small central cap
@@ -481,8 +493,9 @@ def build():
     glass = material("Toy_glass")
     ink = material("Toy_ink")
     glow = material("Toy_white_Glow")
+    gold_glow = material("Toy_gold_Glow")
 
-    build_rotunda(white, trim, stone, glass, ink)
+    build_rotunda(white, trim, stone, glass, ink, gold_glow)
     build_shaft(white)
     build_dentils(white, trim)
     build_loggia(white, trim, ink, glow)

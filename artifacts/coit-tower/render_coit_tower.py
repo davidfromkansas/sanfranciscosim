@@ -188,6 +188,50 @@ def main():
     aim(aer, Vector((center.x, center.y, center.z * 0.92)))
     render_to(os.path.join(out, f"{prefix}-aerial.png"), aer, AER_RES)
 
+    # --- night state: simulate the app's dusk system ------------------------
+    # In the app (assets.js + kit.js updateLandmarkGlow), every material named
+    # *_Glow is drawn as an UNLIT overlay whose opacity rises with the real
+    # San Francisco sun elevation (uNight 0 -> 1). Full night = the glow
+    # surfaces at their own baked colour, self-luminous. Here: emission on for
+    # *_Glow, a dim cool moon key, and a deep dusk sky.
+    world = bpy.context.scene.world
+    bg = world.node_tree.nodes["Background"]
+    bg.inputs[0].default_value = (0.012, 0.020, 0.045, 1.0)
+    bg.inputs[1].default_value = 0.22
+    for light in bpy.data.lights:
+        if light.name == "key":
+            light.energy = 0.28
+            light.color = (0.62, 0.72, 1.0)          # moonlight
+        elif light.name == "fill":
+            light.energy = 0.06
+            light.color = (0.5, 0.6, 0.9)
+        else:
+            light.energy = 0.0
+    for mat in bpy.data.materials:
+        if mat.name.endswith("_Glow") and mat.use_nodes:
+            bsdf = mat.node_tree.nodes.get("Principled BSDF")
+            if bsdf:
+                bsdf.inputs["Emission Strength"].default_value = (
+                    7.0 if mat.name.startswith("Toy_gold") else 3.6
+                )
+    render_to(os.path.join(out, f"{prefix}-night.png"), aer, AER_RES)
+
+    ncam = make_camera("cam_night_north")
+    ncam.data.type = "PERSP"
+    ncam.data.lens = 55.0
+    pitch_n = math.radians(9)
+    az_n = math.radians(346)  # standing on the parking-circle approach
+    rn = height * 2.1
+    ncam.location = Vector(
+        (
+            center.x + rn * math.cos(pitch_n) * math.sin(az_n),
+            center.y + rn * math.cos(pitch_n) * math.cos(az_n),
+            center.z + rn * math.sin(pitch_n),
+        )
+    )
+    aim(ncam, Vector((center.x, center.y, height * 0.52)))
+    render_to(os.path.join(out, f"{prefix}-night-entrance.png"), ncam, (1100, 1400))
+
 
 if __name__ == "__main__":
     main()

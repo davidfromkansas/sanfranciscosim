@@ -139,9 +139,37 @@ locks cleanly to the 8 crown bays (3 flutes per bay).
 - **Day:** pale warm-white/grey unpainted concrete all over; openings read as
   dark voids; the concrete rim shadows do all the drawing.
 - **Night:** the tower is floodlit and the crown openings glow warm from
-  interior lighting — the crown is the identity feature after dark. Only the
-  crown-opening backing surfaces use `Toy_white_Glow`; the shaft stays
-  non-emissive (floodlighting is the city's job, not the asset's).
+  interior lighting — the crown is the identity feature after dark. The shaft
+  stays non-emissive (floodlighting is the city's job, not the asset's).
+
+### How the night state works in the app (and how the asset encodes it)
+
+The trigger lives entirely app-side: `app/src/env.js` computes the real sun
+elevation for San Francisco at the real wall clock and drives the shared
+`uNight` uniform (toy mode blends day → golden → dusk → night across
+elevation +8° … −4°). The landmark loader (`app/src/assets.js`) buckets
+geometry by material-name suffix: `*_Glow` faces merge into one **unlit**
+overlay mesh whose opacity is `0.12 + uNight × 0.95`
+(`updateLandmarkGlow` in `app/src/kit.js`), colored by the baked material
+color. The asset therefore never decides when it is night — it only tags
+which surfaces are lamps.
+
+Because glow surfaces are only ~12 % opaque in daylight, **structural
+surfaces must never be glow-only** (they would turn ghost-transparent by
+day). The asset follows the light-strip pattern instead (as the Golden Gate
+GLB does): solid `Toy_white` structure everywhere, with thin dedicated glow
+surfaces floating just proud of it —
+
+- a `Toy_white_Glow` shell between the loggia's white inner drum and the
+  arch backs: invisible against the white core by day, the warm lit gallery
+  behind all 8 arches and balustrades at night;
+- a `Toy_white_Glow` liner inside the lantern well: the open top and the 8
+  lantern arches read as a lit lamp from the air and the street;
+- narrow `Toy_white_Glow` centres over the dark `Toy_ink` pier slots: dark
+  graphics by day, 24 lit slivers at night (the real slots are lit
+  openings);
+- one small `Toy_gold_Glow` strip over the entrance door — a warm porch
+  lamp on the approach side.
 
 ## Strongest recognition cues (ranked)
 
