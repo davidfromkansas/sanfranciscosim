@@ -221,11 +221,6 @@ def build():
         t=(i+0.5)/5; u=a[0]+du*t; v=a[1]+dv*t
         arch_plane(f"right_field_arch_{i}",u-4.05*math.sin(angle),v+4.05*math.cos(angle),1.0,9.2,6.8,ink,angle,10)
         local_box(f"arcade_pier_{i}",u,v,0,9.8,1.8,9.0,brick,angle,0.08)
-    # Secondary promenade arch rhythm toward center field.
-    for i in range(7):
-        t=(i+0.5)/7; u=56+41*t; v=-14+24*t
-        arch_plane(f"promenade_arch_{i}",u,v,1.0,5.2,5.7,glass,math.radians(30),8)
-
     # Short right-field foul pole and wall termination.
     local_box("right_foul_pole",18,-77,7.0,37.0,0.65,0.65,gold,0,0.02)
     local_box("left_foul_pole",25,75,2.0,32.0,0.65,0.65,gold,0,0.02)

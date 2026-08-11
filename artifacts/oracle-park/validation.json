@@ -3,22 +3,22 @@
   "validator": "Blender 4.5.3 LTS",
   "fresh_isolated_scene": true,
   "reimported_final_glb": true,
-  "object_count": 171,
-  "mesh_object_count": 171,
-  "triangle_count": 9358,
+  "object_count": 164,
+  "mesh_object_count": 164,
+  "triangle_count": 9295,
   "triangle_budget": 27000,
   "dimensions_m": [
-    224.1379,
+    222.4833,
     229.9117,
     45.0
   ],
   "bbox_min_m": [
-    -112.069,
+    -111.2416,
     -114.9558,
     0.0
   ],
   "bbox_max_m": [
-    112.069,
+    111.2416,
     114.9558,
     45.0
   ],
@@ -142,14 +142,9 @@
   "negative_scales": false,
   "degenerate_triangle_count": 0,
   "invalid_or_nonunit_loop_normal_count": 0,
-  "normal_ray_cast_first_hits": 7350,
-  "normal_ray_cast_flipped_visible_faces": 8,
+  "normal_ray_cast_first_hits": 7352,
+  "normal_ray_cast_flipped_visible_faces": 1,
   "normal_ray_cast_flipped_by_object": {
-    "promenade_arch_0": 2,
-    "promenade_arch_1": 2,
-    "promenade_arch_2": 1,
-    "promenade_arch_3": 1,
-    "right_field_arch_3": 1,
     "right_field_arch_4": 1
   },
   "normal_ray_cast_tolerance": 59,
@@ -1854,139 +1849,6 @@
     {
       "name": "pitcher_rubber",
       "triangles": 108,
-      "location": [
-        0.0,
-        0.0,
-        0.0
-      ],
-      "rotation_euler": [
-        0.0,
-        0.0,
-        0.0
-      ],
-      "scale": [
-        1.0,
-        1.0,
-        1.0
-      ]
-    },
-    {
-      "name": "promenade_arch_0",
-      "triangles": 9,
-      "location": [
-        0.0,
-        0.0,
-        0.0
-      ],
-      "rotation_euler": [
-        0.0,
-        0.0,
-        0.0
-      ],
-      "scale": [
-        1.0,
-        1.0,
-        1.0
-      ]
-    },
-    {
-      "name": "promenade_arch_1",
-      "triangles": 9,
-      "location": [
-        0.0,
-        0.0,
-        0.0
-      ],
-      "rotation_euler": [
-        0.0,
-        0.0,
-        0.0
-      ],
-      "scale": [
-        1.0,
-        1.0,
-        1.0
-      ]
-    },
-    {
-      "name": "promenade_arch_2",
-      "triangles": 9,
-      "location": [
-        0.0,
-        0.0,
-        0.0
-      ],
-      "rotation_euler": [
-        0.0,
-        0.0,
-        0.0
-      ],
-      "scale": [
-        1.0,
-        1.0,
-        1.0
-      ]
-    },
-    {
-      "name": "promenade_arch_3",
-      "triangles": 9,
-      "location": [
-        0.0,
-        0.0,
-        0.0
-      ],
-      "rotation_euler": [
-        0.0,
-        0.0,
-        0.0
-      ],
-      "scale": [
-        1.0,
-        1.0,
-        1.0
-      ]
-    },
-    {
-      "name": "promenade_arch_4",
-      "triangles": 9,
-      "location": [
-        0.0,
-        0.0,
-        0.0
-      ],
-      "rotation_euler": [
-        0.0,
-        0.0,
-        0.0
-      ],
-      "scale": [
-        1.0,
-        1.0,
-        1.0
-      ]
-    },
-    {
-      "name": "promenade_arch_5",
-      "triangles": 9,
-      "location": [
-        0.0,
-        0.0,
-        0.0
-      ],
-      "rotation_euler": [
-        0.0,
-        0.0,
-        0.0
-      ],
-      "scale": [
-        1.0,
-        1.0,
-        1.0
-      ]
-    },
-    {
-      "name": "promenade_arch_6",
-      "triangles": 9,
       "location": [
         0.0,
         0.0,

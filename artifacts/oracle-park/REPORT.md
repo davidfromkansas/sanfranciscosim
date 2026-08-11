@@ -38,7 +38,7 @@ The model follows `docs/styles/miniature-toy.md` §22:
 4. The scoreboard, five arches, aisles and light arrays are semantically enlarged for the high aerial camera.
 5. Facades use broad brick pier/window and arcade rhythms.
 6. The top view is intentionally designed around the field graphic, dark seating horseshoe, pale aisle rhythm, canopy and open Bay side.
-7. A final simplification pass removed most bevel-generated topology and brought the asset to 9,358 triangles.
+7. A final simplification pass removed most bevel-generated topology and brought the asset to 9,295 triangles.
 
 ## Orientation decision
 
@@ -51,21 +51,21 @@ Real placement overrides the generic “front faces -Y” shorthand because this
 - Willie Mays Plaza identity block is authored at the north-west/Second-and-King side.
 - `placeGeneric` only scales and positions, so no loader rotation is expected.
 
-The exported axis-aligned bounds are **224.14 × 229.91 m**. They are a true-world rotated envelope, comparable to the independently measured OSM axis-aligned envelope of approximately 245.2 × 244.2 m. The OSM footprint's own oriented bound is 212.2 × 191.2 m.
+The exported axis-aligned bounds are **222.48 × 229.91 m**. They are a true-world rotated envelope, comparable to the independently measured OSM axis-aligned envelope of approximately 245.2 × 244.2 m. The OSM footprint's own oriented bound is 212.2 × 191.2 m.
 
 ## Contract results
 
 | Rule | Result | Evidence |
 |---|---|---|
 | Binary GLB, self-contained | PASS | `oracle-park.glb`; no external dependencies |
-| Real-world meters | PASS | 224.14 × 229.91 × 45.0 m re-imported bounds |
+| Real-world meters | PASS | 222.48 × 229.91 × 45.0 m re-imported bounds |
 | Origin / base at z≈0 | PASS | bbox min Z 0.0 m; XY center [0.0, 0.0] m |
 | True-world orientation | PASS | +Y north, +X east; 76° home-to-center bearing baked in |
-| Triangle budget | PASS | 9,358 / 27,000 triangles |
-| Applied transforms | PASS | all 171 imported mesh objects at location 0, rotation 0, scale 1 |
+| Triangle budget | PASS | 9,295 / 27,000 triangles |
+| Applied transforms | PASS | all 164 imported mesh objects at location 0, rotation 0, scale 1 |
 | Negative scales | PASS | none |
-| Normals outward | PASS | 0 invalid/non-unit loop normals; 8 flipped first hits within deterministic ray tolerance (coplanar decorative planes) |
-| Unexpected/leaked geometry | PASS | 171 mesh objects only; no context, plinth, floor, cameras or lights |
+| Normals outward | PASS | 0 invalid/non-unit loop normals; 1 flipped first hit within deterministic ray tolerance (coplanar decorative plane) |
+| Unexpected/leaked geometry | PASS | 164 mesh objects only; no context, plinth, floor, cameras or lights |
 | Image textures | PASS | 0 images and 0 image texture nodes |
 | Transparency | PASS | all material alpha 1.0 |
 | Flat `Toy_*` materials | PASS | `Toy_brick`, `Toy_glass`, `Toy_gold`, `Toy_ink`, `Toy_mint`, `Toy_roofd`, `Toy_rust`, `Toy_steel`, `Toy_trim`, `Toy_verdigris`, `Toy_white_Glow`; no `Toy_body` |
@@ -82,7 +82,7 @@ The exported axis-aligned bounds are **224.14 × 229.91 m**. They are a true-wor
 | Large open baseball bowl facing the Bay | Three-tier horseshoe stops at the low eastern field edge |
 | Brick exterior | Continuous west/north street shell plus entrance and right-field wall |
 | Green steel details | Upper structural ring, arcade elements, scoreboard supports and light masts |
-| Arched waterfront facade | Five enlarged right-field view arches plus seven secondary promenade arches |
+| Arched waterfront facade | Five enlarged right-field view arches set into the low Portwalk arcade |
 | Recognizable light towers | Five owner-verified standards, each with paired masts and glow face |
 | Giant scoreboard | Elevated center-field slab with oversized glow face |
 | Right-field arcade and wall | 7.32 m brick wall, top walk, pale arcade and five principal arches |
@@ -107,11 +107,11 @@ The requested architectural/manifest height is **45 m** from the OSM tag. Giants
   "name": "Oracle Park",
   "estimated": false,
   "dims": [
-    224.1379,
+    222.4833,
     229.9117,
     45.0
   ],
-  "tris": 9358
+  "tris": 9295
 }
 ```
 

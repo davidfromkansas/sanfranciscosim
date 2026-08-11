@@ -103,7 +103,7 @@ Day appearance is dominated by warm red brick, matte dark-green steel/seating, p
 - Tens of thousands of seats become smooth stepped green seating bands with broad pale aisles.
 - Complex concourses and ramps become a few thick ring volumes and visible green support bays.
 - Street facades use large arched/window recess rhythms rather than literal brick/window grids.
-- The five Portwalk view arches are enlarged for aerial readability; secondary waterfront arcade arches are represented as a restrained rhythm.
+- The five principal Portwalk view arches are enlarged for aerial readability; smaller secondary openings are omitted to keep the east edge clean.
 - The scoreboard is slightly reduced from its current literal 46.7 × 21.6 m face but remains intentionally oversized as a recognition cue.
 - Light standards use chunky paired masts and one readable lamp array each, not hundreds of fixtures.
 - No Coke bottle, glove, people, boats, water, streets, bridge, statues or plaza furniture in the GLB.
