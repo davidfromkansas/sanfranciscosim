@@ -1,0 +1,309 @@
+{
+  "asset": "city-hall.glb",
+  "validator": "Blender 4.5.3 LTS",
+  "fresh_isolated_scene": true,
+  "reimported_final_glb": true,
+  "object_count": 8,
+  "mesh_object_count": 8,
+  "triangle_count": 17440,
+  "triangle_budget": 27000,
+  "dimensions_m": [
+    122.9836,
+    144.92,
+    93.75
+  ],
+  "bbox_min_m": [
+    -60.9964,
+    -72.46,
+    0.0
+  ],
+  "bbox_max_m": [
+    61.9872,
+    72.46,
+    93.75
+  ],
+  "min_z_m": 0.0,
+  "xy_center_offset_m": [
+    0.4954,
+    0.0
+  ],
+  "materials": [
+    "Toy_cream",
+    "Toy_glass",
+    "Toy_gold",
+    "Toy_roofc",
+    "Toy_roofd",
+    "Toy_sand",
+    "Toy_stone",
+    "Toy_trim"
+  ],
+  "material_details": [
+    {
+      "name": "Toy_cream",
+      "contract_compliant": true,
+      "image_texture_nodes": [],
+      "alpha": 1.0,
+      "roughness": 0.84,
+      "glow": false,
+      "exported_emission_strength": 0.0
+    },
+    {
+      "name": "Toy_glass",
+      "contract_compliant": true,
+      "image_texture_nodes": [],
+      "alpha": 1.0,
+      "roughness": 0.84,
+      "glow": false,
+      "exported_emission_strength": 0.0
+    },
+    {
+      "name": "Toy_gold",
+      "contract_compliant": true,
+      "image_texture_nodes": [],
+      "alpha": 1.0,
+      "roughness": 0.84,
+      "glow": false,
+      "exported_emission_strength": 0.0
+    },
+    {
+      "name": "Toy_roofc",
+      "contract_compliant": true,
+      "image_texture_nodes": [],
+      "alpha": 1.0,
+      "roughness": 0.84,
+      "glow": false,
+      "exported_emission_strength": 0.0
+    },
+    {
+      "name": "Toy_roofd",
+      "contract_compliant": true,
+      "image_texture_nodes": [],
+      "alpha": 1.0,
+      "roughness": 0.84,
+      "glow": false,
+      "exported_emission_strength": 0.0
+    },
+    {
+      "name": "Toy_sand",
+      "contract_compliant": true,
+      "image_texture_nodes": [],
+      "alpha": 1.0,
+      "roughness": 0.84,
+      "glow": false,
+      "exported_emission_strength": 0.0
+    },
+    {
+      "name": "Toy_stone",
+      "contract_compliant": true,
+      "image_texture_nodes": [],
+      "alpha": 1.0,
+      "roughness": 0.84,
+      "glow": false,
+      "exported_emission_strength": 0.0
+    },
+    {
+      "name": "Toy_trim",
+      "contract_compliant": true,
+      "image_texture_nodes": [],
+      "alpha": 1.0,
+      "roughness": 0.84,
+      "glow": false,
+      "exported_emission_strength": 0.0
+    }
+  ],
+  "image_texture_count": 0,
+  "textured_materials": [],
+  "transparent_materials": [],
+  "camera_count": 0,
+  "light_count": 0,
+  "animation_fcurve_count": 0,
+  "armature_count": 0,
+  "constraint_count": 0,
+  "transforms_applied": true,
+  "negative_scales": false,
+  "degenerate_triangle_count": 0,
+  "invalid_or_nonunit_loop_normal_count": 0,
+  "normal_ray_cast_first_hits": 4866,
+  "normal_ray_cast_flipped_visible_faces": 0,
+  "normal_ray_cast_flipped_by_object": {},
+  "normal_ray_cast_tolerance": 37,
+  "normal_orientation_status": "PASS",
+  "normal_orientation_method": "Finite/unit re-imported loop normals plus 5,850 deterministic exterior first-hit rays (0.75% tolerance for overlapping decorative planes).",
+  "unexpected_geometry_or_objects": [],
+  "material_contract_violations": [],
+  "glow_contract_violations": [],
+  "duplicate_object_names": [],
+  "object_details": [
+    {
+      "name": "CityHall_cream",
+      "triangles": 2216,
+      "location": [
+        0.0,
+        0.0,
+        0.0
+      ],
+      "rotation_euler": [
+        0.0,
+        0.0,
+        0.0
+      ],
+      "scale": [
+        1.0,
+        1.0,
+        1.0
+      ]
+    },
+    {
+      "name": "CityHall_glass",
+      "triangles": 2636,
+      "location": [
+        0.0,
+        0.0,
+        0.0
+      ],
+      "rotation_euler": [
+        0.0,
+        0.0,
+        0.0
+      ],
+      "scale": [
+        1.0,
+        1.0,
+        1.0
+      ]
+    },
+    {
+      "name": "CityHall_gold",
+      "triangles": 2520,
+      "location": [
+        0.0,
+        0.0,
+        0.0
+      ],
+      "rotation_euler": [
+        0.0,
+        0.0,
+        0.0
+      ],
+      "scale": [
+        1.0,
+        1.0,
+        1.0
+      ]
+    },
+    {
+      "name": "CityHall_roofc",
+      "triangles": 432,
+      "location": [
+        0.0,
+        0.0,
+        0.0
+      ],
+      "rotation_euler": [
+        0.0,
+        0.0,
+        0.0
+      ],
+      "scale": [
+        1.0,
+        1.0,
+        1.0
+      ]
+    },
+    {
+      "name": "CityHall_roofd",
+      "triangles": 1148,
+      "location": [
+        0.0,
+        0.0,
+        0.0
+      ],
+      "rotation_euler": [
+        0.0,
+        0.0,
+        0.0
+      ],
+      "scale": [
+        1.0,
+        1.0,
+        1.0
+      ]
+    },
+    {
+      "name": "CityHall_sand",
+      "triangles": 432,
+      "location": [
+        0.0,
+        0.0,
+        0.0
+      ],
+      "rotation_euler": [
+        0.0,
+        0.0,
+        0.0
+      ],
+      "scale": [
+        1.0,
+        1.0,
+        1.0
+      ]
+    },
+    {
+      "name": "CityHall_stone",
+      "triangles": 1136,
+      "location": [
+        0.0,
+        0.0,
+        0.0
+      ],
+      "rotation_euler": [
+        0.0,
+        0.0,
+        0.0
+      ],
+      "scale": [
+        1.0,
+        1.0,
+        1.0
+      ]
+    },
+    {
+      "name": "CityHall_trim",
+      "triangles": 6920,
+      "location": [
+        0.0,
+        0.0,
+        0.0
+      ],
+      "rotation_euler": [
+        0.0,
+        0.0,
+        0.0
+      ],
+      "scale": [
+        1.0,
+        1.0,
+        1.0
+      ]
+    }
+  ],
+  "checks": {
+    "meters_and_plausible_dimensions": true,
+    "base_at_z_zero": true,
+    "origin_at_base_center": true,
+    "under_triangle_budget": true,
+    "no_image_textures": true,
+    "no_transparency": true,
+    "materials_follow_contract": true,
+    "no_cameras_or_lights": true,
+    "no_animation_skin_or_constraints": true,
+    "transforms_applied": true,
+    "no_negative_scales": true,
+    "normals_outward": true,
+    "no_degenerate_geometry": true,
+    "no_unexpected_objects": true,
+    "unique_object_names": true
+  },
+  "overall": "PASS",
+  "reimport_review_image": "city-hall-validation-aerial.png"
+}
