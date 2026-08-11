@@ -130,6 +130,15 @@ export const LANDMARKS = [
     camera: { distance: 550, yaw: 120, pitch: 16 },
   },
   {
+    id: 'conservatoryOfFlowers',
+    name: 'Conservatory of Flowers',
+    lon: -122.4602321,
+    lat: 37.7725965,
+    height: 18.3,
+    exclude: 70,
+    camera: { distance: 260, yaw: 170, pitch: 16 },
+  },
+  {
     id: 'fishermansWharf',
     name: "Pier 39 / Fisherman's Wharf",
     lon: -122.4098,
