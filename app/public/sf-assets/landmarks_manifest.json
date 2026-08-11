@@ -71,5 +71,23 @@
       16.51
     ],
     "tris": 15744
+  },
+  {
+    "id": "city-hall",
+    "file": "city-hall.glb",
+    "anchor": [
+      -122.4192838,
+      37.7793223
+    ],
+    "targetHeightM": 93.73,
+    "cat": 18,
+    "name": "San Francisco City Hall",
+    "estimated": false,
+    "dims": [
+      122.9836,
+      144.92,
+      93.75
+    ],
+    "tris": 17440
   }
 ]
