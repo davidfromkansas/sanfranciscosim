@@ -613,8 +613,8 @@
    "cz": 15,
    "originX": -2500,
    "originZ": -500,
-   "buildings": 155,
-   "bytes": 8488
+   "buildings": 149,
+   "bytes": 7922
   },
   {
    "key": "11_16",
@@ -820,8 +820,8 @@
    "cz": 15,
    "originX": -2000,
    "originZ": -500,
-   "buildings": 33,
-   "bytes": 1836
+   "buildings": 28,
+   "bytes": 1580
   },
   {
    "key": "12_16",
