@@ -135,13 +135,19 @@ export async function loadStreetKit() {
 // The context-layer facts the worker cannot see: where Market Street runs and
 // where the shops are. Cells are fetched once and cached; these are the same
 // sidecars the picking layer already streams for the cells under the camera.
-export function createStreetHints(manifest) {
+export function createStreetHints(manifest, contextCells) {
   const grid = manifest.grid;
   const cells = new Map();
+  const EMPTY = { market: [], commercial: [] };
 
   function load(key) {
     const cached = cells.get(key);
     if (cached) return cached;
+    // Cells the bake never wrote carry no hints, and requesting one is a 404.
+    if (contextCells && !contextCells.has(key)) {
+      cells.set(key, EMPTY);
+      return EMPTY;
+    }
     const promise = fetch(tileUrl(`ctx/${key}.json`))
       .then((r) => (r.ok ? r.json() : null))
       .catch(() => null)
