@@ -215,5 +215,23 @@
       99.06
     ],
     "tris": 13380
+  },
+  {
+    "id": "grace-cathedral",
+    "file": "grace-cathedral.glb",
+    "anchor": [
+      -122.4134339,
+      37.7918333
+    ],
+    "targetHeightM": 75.3,
+    "cat": 8,
+    "name": "Grace Cathedral",
+    "estimated": false,
+    "dims": [
+      109.0939,
+      48.1688,
+      75.3
+    ],
+    "tris": 10814
   }
 ]
