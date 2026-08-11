@@ -6,6 +6,7 @@
 import { emitProps, makeCtx } from './props.js';
 import { readBuildings, readLandcover, readStreets } from './tilebin.js';
 import { planKit } from './kitplan.js';
+import { planStreetFurniture } from './streetplan.js';
 
 // Night lighting profile per category (0 residential, 1 commercial, 2 always-on,
 // 3 dark), mirrored from pipeline/taxonomy.mjs. The bake already folds this into
@@ -603,6 +604,45 @@ function chopDashes(px, py, pz, n, rhythm) {
   return dashes.filter((d) => d.px.length >= 2);
 }
 
+// Street furniture anchors for one ground group. The blobs are re-read rather
+// than folded into the ribbon loop: the planner wants whole world-space
+// polylines, the ribbon builder wants group-local ones, and decoding a polyline
+// twice is cheaper than entangling the two.
+function planFurniture(streetBlobs, streetClasses, plan) {
+  const roads = [];
+  const sidewalks = [];
+  for (const blob of streetBlobs) {
+    const d = readStreets(blob.buffer);
+    for (let l = 0; l < d.count; l++) {
+      const n = d.ptCount[l];
+      if (n < 2) continue;
+      const cls = streetClasses[d.klass[l]] || streetClasses[6];
+      const isSidewalk = cls.profile === 'curb';
+      if (!isSidewalk && (cls.detail || !cls.sidewalk)) continue;
+      const po = d.ptOffset[l];
+      const px = new Float64Array(n);
+      const py = new Float64Array(n);
+      const pz = new Float64Array(n);
+      for (let k = 0; k < n; k++) {
+        px[k] = d.originX + d.xz[(po + k) * 2] * d.quant;
+        pz[k] = d.originZ + d.xz[(po + k) * 2 + 1] * d.quant;
+        py[k] = d.y[po + k] * 0.1;
+      }
+      if (isSidewalk) sidewalks.push({ px, py, pz, n });
+      else roads.push({ px, py, pz, n, klass: d.klass[l], width: cls.width, sidewalk: cls.sidewalk });
+    }
+  }
+  if (!roads.length || !sidewalks.length) return new Float32Array(0);
+  return planStreetFurniture({
+    roads,
+    sidewalks,
+    market: plan.market,
+    commercial: plan.commercial,
+    exclusions: plan.exclusions,
+    limit: plan.limit,
+  });
+}
+
 function buildGround(
   streetBlobs,
   landcoverBlobs,
@@ -610,7 +650,8 @@ function buildGround(
   originZ,
   streetClasses,
   landKinds,
-  detail = false
+  detail = false,
+  plan = null
 ) {
   const positions = [];
   const colors = [];
@@ -855,6 +896,7 @@ function buildGround(
     indices: idx,
     trees: new Float32Array(trees),
     lamps: new Float32Array(lamps),
+    furniture: plan ? planFurniture(streetBlobs, streetClasses, plan) : new Float32Array(0),
     paths,
   };
 }
@@ -895,7 +937,8 @@ self.onmessage = (event) => {
         msg.originZ,
         msg.streetClasses,
         msg.landKinds,
-        msg.type === 'grounddetail'
+        msg.type === 'grounddetail',
+        msg.plan || null
       );
       self.postMessage({ id: msg.id, type: msg.type, key: msg.key, ...out }, [
         out.positions.buffer,
@@ -905,6 +948,7 @@ self.onmessage = (event) => {
         out.indices.buffer,
         out.trees.buffer,
         out.lamps.buffer,
+        out.furniture.buffer,
       ]);
     }
   } catch (err) {
