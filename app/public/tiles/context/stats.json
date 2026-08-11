@@ -1,5 +1,5 @@
 {
- "generated": "2026-08-11T13:42:48.659Z",
+ "generated": "2026-08-11T16:19:12.329Z",
  "buildings": 171472,
  "cells": 547,
  "categories": [
@@ -7,21 +7,21 @@
    "cat": 0,
    "id": "misc",
    "label": "Building",
-   "count": 10156,
+   "count": 10155,
    "night": 3
   },
   {
    "cat": 1,
    "id": "house",
    "label": "House",
-   "count": 122110,
+   "count": 122104,
    "night": 0
   },
   {
    "cat": 2,
    "id": "apartments",
    "label": "Apartments",
-   "count": 13933,
+   "count": 13935,
    "night": 0
   },
   {
@@ -35,14 +35,14 @@
    "cat": 4,
    "id": "retail",
    "label": "Retail",
-   "count": 7944,
+   "count": 7945,
    "night": 1
   },
   {
    "cat": 5,
    "id": "restaurant_cafe",
    "label": "Restaurant / Café",
-   "count": 2817,
+   "count": 2818,
    "night": 1
   },
   {
@@ -140,7 +140,7 @@
    "cat": 19,
    "id": "industrial",
    "label": "Industrial",
-   "count": 1985,
+   "count": 1987,
    "night": 3
   },
   {
@@ -182,7 +182,7 @@
    "cat": 25,
    "id": "transit_station",
    "label": "Transit station",
-   "count": 308,
+   "count": 309,
    "night": 2
   }
  ],
@@ -190,12 +190,12 @@
   {
    "sub": "apartments",
    "label": "Apartments",
-   "count": 5314
+   "count": 5316
   },
   {
    "sub": "shop",
    "label": "Shop",
-   "count": 2131
+   "count": 2133
   },
   {
    "sub": "office",
@@ -205,7 +205,7 @@
   {
    "sub": "restaurant",
    "label": "Restaurant",
-   "count": 1815
+   "count": 1816
   },
   {
    "sub": "hotel",
@@ -233,14 +233,14 @@
    "count": 745
   },
   {
-   "sub": "community_center",
-   "label": "Community center",
+   "sub": "factory",
+   "label": "Factory",
    "count": 684
   },
   {
-   "sub": "factory",
-   "label": "Factory",
-   "count": 682
+   "sub": "community_center",
+   "label": "Community center",
+   "count": 683
   },
   {
    "sub": "church",
@@ -260,7 +260,7 @@
   {
    "sub": "auto_repair",
    "label": "Auto repair",
-   "count": 453
+   "count": 452
   },
   {
    "sub": "elementary_school",
@@ -295,7 +295,7 @@
   {
    "sub": "muni_station",
    "label": "Muni station",
-   "count": 227
+   "count": 228
   },
   {
    "sub": "hardware_store",
@@ -649,18 +649,18 @@
   }
  ],
  "sources": {
-  "landuse": 140201,
-  "business": 10177,
-  "heuristic": 4948,
+  "landuse": 140196,
+  "business": 10183,
+  "heuristic": 4947,
   "datasf": 1254,
   "overture": 6585,
   "osm": 8307
  },
  "confidence": [
-  145149,
-  15223,
-  4182,
-  6918
+  145143,
+  15230,
+  4178,
+  6921
  ],
  "streets": {
   "named": 2509,
