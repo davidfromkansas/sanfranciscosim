@@ -307,9 +307,9 @@
    "cz": 15,
    "originX": -2500,
    "originZ": -500,
-   "buildings": 93,
+   "buildings": 90,
    "streets": 11,
-   "bytes": 10887
+   "bytes": 10468
   },
   {
    "key": "11_16",
@@ -537,9 +537,9 @@
    "cz": 15,
    "originX": -2000,
    "originZ": -500,
-   "buildings": 17,
+   "buildings": 12,
    "streets": 16,
-   "bytes": 3613
+   "bytes": 3018
   },
   {
    "key": "12_16",
