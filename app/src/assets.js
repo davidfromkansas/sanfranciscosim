@@ -33,6 +33,22 @@ function camelId(id) {
   return id.replace(/-([a-z])/g, (_, c) => c.toUpperCase());
 }
 
+// Quantized assets (KHR_mesh_quantization) arrive with integer — often
+// interleaved — attributes whose real values come from the node transform.
+// Matrix and merge maths need plain float buffers, so widen them first.
+function dequantize(geometry) {
+  for (const [name, attribute] of Object.entries(geometry.attributes)) {
+    if (!attribute.isInterleavedBufferAttribute && attribute.array instanceof Float32Array) continue;
+    const { itemSize, count } = attribute;
+    const array = new Float32Array(count * itemSize);
+    for (let i = 0; i < count; i++) {
+      for (let c = 0; c < itemSize; c++) array[i * itemSize + c] = attribute.getComponent(i, c);
+    }
+    geometry.setAttribute(name, new BufferAttribute(array, itemSize));
+  }
+  return geometry;
+}
+
 // Every mesh in the default scene, flattened with its world matrix already
 // applied, split by whether its material glows.
 function collect(root) {
@@ -57,7 +73,7 @@ function collect(root) {
     }
     materials.add(material.name);
 
-    const geometry = object.geometry.clone();
+    const geometry = dequantize(object.geometry.clone());
     geometry.applyMatrix4(object.matrixWorld);
     geometry.deleteAttribute('uv');
     geometry.deleteAttribute('uv1');
