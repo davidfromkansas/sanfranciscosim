@@ -109,6 +109,24 @@
     "tris": 20808
   },
   {
+    "id": "coit-tower",
+    "file": "coit-tower.glb",
+    "anchor": [
+      -122.4058338,
+      37.8023742
+    ],
+    "targetHeightM": 64,
+    "cat": 0,
+    "name": "Coit Tower",
+    "estimated": false,
+    "dims": [
+      23.8014,
+      23.8014,
+      64
+    ],
+    "tris": 11848
+  },
+  {
     "id": "conservatory-of-flowers",
     "file": "conservatory-of-flowers.glb",
     "anchor": [
