@@ -48,19 +48,17 @@ Muni routes are fixed to a mode, so **`LineRef` alone resolves the model**:
 |---|---|
 | `J` `K` `L` `M` `N` `T` | Muni Metro LRV |
 | `F`, `E` | Historic streetcar |
-| Powell–Mason, Powell–Hyde, California | Cable car |
+| `PM`, `PH`, `CA` | Cable car |
 | Trolleybus route numbers (1, 2, 3, 5, 6, 7, 14, 21, 22, 24, 30, 31, 33, 41, 45, 49) | Trolley coach |
 | All other numbered routes | Hybrid bus |
 
 Five buckets, matching SFMTA's own "Meet Our Fleet" page exactly. One GLB per
 bucket renders the feed faithfully with no guessing.
 
-(**Caveat, recorded honestly:** that every mode actually appears in the feed is
-unverified — buses and Metro certainly do, the F line almost certainly does,
-cable cars are unconfirmed. Settling it needs one authenticated request; see
-[INTEGRATION-LATER.md](./INTEGRATION-LATER.md). It does not change the model
-count either way: the five families are the five families, and a mode missing
-from the feed just needs a different placement route.)
+(**Verified 2026-08-12** against the live feed: all five modes report positions —
+329 buses, 108 trolley coaches, 65 LRVs, 9 `F` streetcars on PCC fleet numbers,
+and 6 cable cars on `PM` / `PH` / `CA`. Details, including the bus-substitution
+trap, in [INTEGRATION-LATER.md](./INTEGRATION-LATER.md).)
 
 **What was cut, and why it can come back.** Earlier drafts split four of the
 families by sub-variant — 40 vs 60 foot, Powell vs California, PCC vs Milan — for

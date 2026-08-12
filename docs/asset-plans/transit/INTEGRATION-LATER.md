@@ -36,18 +36,37 @@ same treatment the ferries already got:
 - The optional-key discipline of AGENTS rule 4: without `MUNI_511_KEY` the
   endpoint answers `{ live: false }` and procedural/roaming vehicles stay
 
-**Unverified — check this first.** That every Muni *mode* appears in the feed is
-an assumption, not a confirmed fact. Buses and Metro certainly do. The F line
-almost certainly does (third-party apps show live F-line vehicle positions on the
-route map). **Cable cars are unconfirmed** — SFMTA material refers to tracking
-"bus, train, streetcar or cable car," but nothing consulted confirms they are in
-511's SIRI feed, and 511's own SFMTA page does not list modes. One authenticated
-request with `agency=SF` settles it: read the distinct `LineRef` values and see
-which modes are present. Do that before designing anything around the feed.
+**Verified 2026-08-12, 08:26 PDT** with a live `agency=SF` request: **all five
+Muni vehicle families report positions.** 695 vehicles in the feed, 527 in
+service, 58 distinct lines.
 
-If a mode turns out to be missing, the model is still wanted — it just needs a
-different placement route (the whitelist option below). Nothing about the asset
-plans changes.
+| Family | Vehicles live | `LineRef` values |
+|---|---|---|
+| Hybrid bus | 329 | numbered routes (`38`, `29`, `9`, `38R`…) |
+| Trolley coach | 108 | `49`, `22`, `1`, `24`, `30`, `45`… |
+| Metro LRV | 65 | `J` `K` `L` `M` `N` `T` |
+| Historic streetcar | 9 | **`F`** — "MARKET & WHARVES" |
+| Cable car | 6 | **`PM`** Powell–Mason, **`PH`** Powell–Hyde, **`CA`** California Street |
+
+Details that matter for the mapping:
+
+- **Cable car line codes are `PM` / `PH` / `CA`**, not spelled-out names.
+- **The F line's 9 vehicles all carry PCC fleet numbers (1006–1080)**, so they are
+  genuinely historic streetcars. No Milan cars (1807–1895) were in service at the
+  sample time — only 11 exist.
+- **Bus substitution is visible and must be handled.** A midnight sample showed
+  `FBUS` ("MARKET & WHARVES BUS") on hybrid-bus fleet numbers, plus `NBUS`,
+  `KBUS`, `NOWL`, `LOWL`. **Map on `VehicleRef`, not `LineRef` alone** — a
+  `LineRef` of `F` at 1am may be a bus. The fleet-number blocks are authoritative.
+- **Fleet-number blocks confirmed in the wild**: LRV4 2xxx (65), XT40 5701–5885
+  (90), XT60 7201–7293 (18), XDE60 6500–6730 (156), XDE40 8601–8969 (173).
+  Cable cars use 1–2 digit numbers. A block of 8531–8560 also appeared — the
+  32-foot ENC E-Z Rider II, a sixth bus type not covered by any plan.
+- **The 60-foot artics are not a minority**: 156 XDE60 against 173 XDE40. The
+  deferred articulated variant is closer to half the bus fleet than a rarity —
+  worth revisiting the decision to cut it.
+- **71% of vehicles have a null `LineRef`** at night, 24% by day (168 of 695) —
+  deadheading or out of service. Filter on non-null `LineRef` before placing.
 
 Three further things to check when that work starts:
 
