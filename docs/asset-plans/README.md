@@ -107,3 +107,16 @@ different things; see that plan's 2.1.
 
 The executing agent is expected to re-verify height, anchor, footprint and
 orientation before modelling — the dossier is a head start, not a citation.
+
+## Night renders: drive `_Glow` from Base Color, not from the imported emission
+
+A review rig that re-imports the exported GLB (which is the required way to
+render — always render the file that ships) cannot simply raise
+`Emission Strength` on the `_Glow` materials. glTF writes
+`emissiveFactor = 0` when the authored emission strength is 0, so a re-imported
+`_Glow` material carries a **default white** emission and every glow surface
+renders as a white slab. Copy `Base Color` into `Emission Color` and use
+strength 1.0 — that is also exactly what the app does, since its night layer is
+an unlit overlay drawn at the material's own baked colour. Caught on
+`chase-center` (its blue video board rendered pure white);
+`tools/glb-optimize/render_ab.py` already does it correctly.

@@ -107,6 +107,17 @@ npx gltfpack@0.24 -i mid.glb -o out.glb -cc -kn -km
   name-only), silently killing the night layer. Always `-cc -kn -km`.
 - `ALLOW_MESHOPT=no` fallback: drop `-cc` only (quantization is
   `KHR_mesh_quantization`, core-supported; only `-cc` needs the decoder).
+- **`-cc -kn -km` quantizes; `pipeline/compress-assets.mjs` uses `-c -km -kn -noq`
+  and its header says quantized attributes corrupt the merge paths.** For
+  **landmarks** the app wins and quantization is fine: `collect()` in
+  `app/src/assets.js` runs `prepareGeometryForTransforms()`, which converts
+  position/normal/tangent to float32 *before* baking the world matrix, and
+  `st-marys-cathedral`, `war-memorial-opera-house` and now `chase-center` all
+  ship quantized and render correctly. The `-noq` rule still stands for **kit,
+  streetkit, vehicle and flora** pieces, whose merge path has no such
+  conversion. Note also that `compress-assets.mjs` *skips* any file already
+  carrying `EXT_meshopt_compression`, so it is not a safety net that would
+  catch a wrongly-packed asset — this is the check.
 - Verify on the output, never trust flags: material name set, manifest node
   names, re-imported bbox within tolerance.
 - Record raw + gzipped bytes and estimated GPU vertex-buffer bytes
