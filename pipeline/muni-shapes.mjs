@@ -14,6 +14,13 @@
 // polylines or a falling trip-match rate in the muni stats line.
 //
 // Output: app/public/tiles/muni-shapes.bin, committed like the other tiles.
+//
+// IT MUST STAY IN `npm run all`. This file was silently deleted once already:
+// a landmark re-bake branch that predated it regenerated app/public/tiles/
+// wholesale, and the merge resolved the absence as a deletion (PR #91). Nothing
+// failed loudly — the client just warned "no route shapes" to a console nobody
+// was reading and every live bus fell back to dead reckoning in production.
+// Being a step of the full bake is what keeps a re-bake branch carrying it.
 // GLB-style container: 16-byte header (magic 'MUN1', version, jsonLen,
 // floatCount), a JSON chunk, then one Float32Array of [x, z, s] triplets for
 // all shapes back to back ('s' = cumulative arc length in metres, what the
@@ -141,7 +148,16 @@ async function main() {
     (process.env.FERRY_511_KEY || '').trim();
 
   if (argv.includes('--fresh') || !existsSync(ZIP)) {
-    if (!key) throw new Error('no 511 key: set MUNI_511_KEY / FERRY_511_KEY or pass --key');
+    if (!key) {
+      // Part of `npm run all`, which must not fail for want of an optional key.
+      // The committed .bin is the shipped artifact; leaving it untouched is the
+      // right outcome here, not an error.
+      console.warn(
+        '[muni-shapes] no 511 key and no cached GTFS zip — leaving the committed ' +
+          'app/public/tiles/muni-shapes.bin as is. Set MUNI_511_KEY to re-bake.',
+      );
+      return;
+    }
     await download(key);
   } else {
     console.log('[muni-shapes] using cached zip (pass --fresh to re-download)');
