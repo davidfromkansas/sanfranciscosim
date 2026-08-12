@@ -339,6 +339,28 @@ export function createKitMaterial() {
   return material;
 }
 
+// A plain vertex-coloured Lambert whose per-batch-instance colour alpha drives
+// the same ordered-dither fade the kit uses: landmark bodies stream in and out
+// of one BatchedMesh as a stipple, never a pop. The rgb multiplier stays 1 —
+// landmark colours are authored, only the alpha channel is used.
+export function createBatchFadeLambert() {
+  const material = new MeshLambertMaterial({ vertexColors: true, dithering: true });
+  material.onBeforeCompile = (shader) => {
+    shader.fragmentShader = shader.fragmentShader
+      .replace(
+        '#include <common>',
+        `#include <common>
+        ${DITHER}`
+      )
+      .replace(
+        '#include <clipping_planes_fragment>',
+        `#include <clipping_planes_fragment>
+        if (vColor.a < 0.999 && ditherThreshold(gl_FragCoord.xy) > vColor.a) discard;`
+      );
+  };
+  return material;
+}
+
 // Far tier: one merged prism mesh per 2 km super-cell, with a per-quadrant fade
 // so a 1 km near chunk can take over exactly its own quarter.
 export function createFarBuildingMaterial() {

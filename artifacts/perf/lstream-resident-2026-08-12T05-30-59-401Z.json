@@ -1,0 +1,151 @@
+{
+  "tool": "pipeline/perf-harness.mjs",
+  "version": 1,
+  "label": "lstream-resident",
+  "startedAt": "2026-08-12T05:30:59.401Z",
+  "url": "http://localhost:5699",
+  "git": {
+    "branch": "perf/landmark-streaming",
+    "commit": "c180475a"
+  },
+  "settings": {
+    "sampleSeconds": 6,
+    "settleSeconds": 75,
+    "quality": "high"
+  },
+  "host": {
+    "platform": "darwin",
+    "arch": "arm64",
+    "cpus": 15,
+    "node": "v22.19.0"
+  },
+  "notes": [],
+  "profiles": [
+    {
+      "profile": "desktop",
+      "label": "desktop (unthrottled)",
+      "stations": [
+        {
+          "station": "hero",
+          "name": "Hero view",
+          "clock": "day",
+          "clockIso": "2026-08-01T13:00:00-07:00",
+          "settled": true,
+          "sampleSeconds": 6.00189999999106,
+          "rafFrames": 180,
+          "fpsMean": 29.999832403170945,
+          "fpsFromWall": 29.99050300742567,
+          "frameTimeMeanMs": 33.33351955307261,
+          "frameTimeP50Ms": 33.30000000000291,
+          "frameTimeP95Ms": 33.80000000000291,
+          "frameTimeMaxMs": 34.30000000000291,
+          "rendererFrames": 360,
+          "drawCallsPeak": 164,
+          "drawCallsLast": 1,
+          "triangles": 37352516,
+          "geometries": 153,
+          "textures": 8,
+          "jsHeapMB": 1201.1,
+          "pixelRatio": 1,
+          "cityStats": {
+            "cellsLoaded": 1662,
+            "cellsTotal": 1590,
+            "nearChunks": 18,
+            "farGroups": 50,
+            "groundGroups": 56,
+            "groundDetail": 2,
+            "trees": 272235,
+            "lamps": 41055,
+            "kitInstances": 19276,
+            "kitPieceTypes": 161,
+            "kitPlaced": 19276,
+            "kitConsidered": 27701,
+            "furniture": 4281,
+            "furnitureDraws": 20
+          },
+          "cityProgress": 1.0452830188679245,
+          "governor": {
+            "mode": "high",
+            "tier": "high",
+            "emaMs": 33.33865421953333,
+            "fps": 29.99521196671741,
+            "heldOff": null,
+            "timeSinceLastChangeMs": 66462.8,
+            "totalChanges": 2,
+            "unstableTiers": []
+          }
+        },
+        {
+          "station": "hero",
+          "name": "Hero view",
+          "clock": "night",
+          "clockIso": "2026-08-01T22:00:00-07:00",
+          "settled": true,
+          "sampleSeconds": 6.001599999994039,
+          "rafFrames": 180,
+          "fpsMean": 29.999832403170945,
+          "fpsFromWall": 29.992002132794383,
+          "frameTimeMeanMs": 33.33351955307261,
+          "frameTimeP50Ms": 33.30000000000291,
+          "frameTimeP95Ms": 33.59999999999127,
+          "frameTimeMaxMs": 34.10000000000582,
+          "rendererFrames": 360,
+          "drawCallsPeak": 178,
+          "drawCallsLast": 1,
+          "triangles": 38009874,
+          "geometries": 153,
+          "textures": 8,
+          "jsHeapMB": 1198.3,
+          "pixelRatio": 1,
+          "cityStats": {
+            "cellsLoaded": 1662,
+            "cellsTotal": 1590,
+            "nearChunks": 18,
+            "farGroups": 50,
+            "groundGroups": 56,
+            "groundDetail": 2,
+            "trees": 272235,
+            "lamps": 41055,
+            "kitInstances": 19276,
+            "kitPieceTypes": 161,
+            "kitPlaced": 19276,
+            "kitConsidered": 27701,
+            "furniture": 4281,
+            "furnitureDraws": 20
+          },
+          "cityProgress": 1.0452830188679245,
+          "governor": {
+            "mode": "high",
+            "tier": "high",
+            "emaMs": 33.33494896097127,
+            "fps": 29.998546005599266,
+            "heldOff": null,
+            "timeSinceLastChangeMs": 78496,
+            "totalChanges": 2,
+            "unstableTiers": []
+          }
+        }
+      ],
+      "load": {
+        "profileNetwork": "Fast 4G (4 Mbps / 70 ms RTT)",
+        "timeToSFms": 7620,
+        "timeToTilesSeconds": 69.4,
+        "timedOut": false,
+        "cellsLoaded": 1576,
+        "cellsTotal": 1590,
+        "transferredMB": 32.5
+      },
+      "environment": {
+        "userAgent": "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) HeadlessChrome/151.0.0.0 Safari/537.36",
+        "dpr": 1,
+        "viewport": [
+          1600,
+          900
+        ],
+        "hardwareConcurrency": 15,
+        "gpu": "ANGLE (Apple, ANGLE Metal Renderer: Apple M5 Pro, Unspecified Version)"
+      }
+    }
+  ],
+  "finishedAt": "2026-08-12T05:32:38.816Z"
+}

@@ -100,6 +100,9 @@ async function boot() {
         }
       }
     },
+    onUnloaded(landmarkId) {
+      landmarks.restoreCodeBuilt(landmarkId);
+    },
   });
   const agents = createAgents(scene, data, city);
   // Real WETA vessels from /api/ferries; falls back to the procedural ferries.
@@ -531,6 +534,7 @@ async function boot() {
     agents,
     ferries,
     governor,
+    assets,
     landmarks,
     piers,
     presets,
@@ -636,7 +640,7 @@ async function boot() {
     ferries.update(dt);
     trackVessel(dt);
     landmarks.update();
-    assets.update();
+    assets.update(camera.position, dt);
     water.update(camera.position);
     // Clouds drift on wall time so the sky moves at the same rate whatever the
     // frame rate; the simulation clamp would slow them to a crawl below 20 fps.
