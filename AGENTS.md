@@ -9,7 +9,7 @@ A data-accurate 3D San Francisco in Three.js, rendered as a **toy diorama** (min
 ## Repo layout
 
 - `app/` — Vite + three.js frontend. Static assets in `app/public/` (`tiles/` = baked city geometry, `sf-assets/` = hand-made GLB landmarks + manifest, `fonts/`).
-- `api/` — zero-dependency Vercel functions (`agent.mjs` = the "concierge" LLM endpoint via Vercel AI Gateway).
+- `api/` — zero-dependency Vercel functions. `agent.mjs` = the "concierge" LLM endpoint via Vercel AI Gateway. All live data feeds (`/api/ferries`, `/api/live`, future feeds) share ONE function — `api/[...path].mjs` dispatching into the feed registry (`api/_lib/feedcore.mjs`); adding a feed = one fetcher module in `api/_lib/feeds/` + one import line (the full recipe is in feedcore's header). Feeds share a process on purpose: it is what lets `/api/live` compose a consolidated snapshot from memory.
 - `pipeline/` — offline Node scripts that download open data and bake the binary tiles the app streams. Re-run only when data or formats change.
 - `docs/styles/` — the canonical style bibles (see `docs/styles/README.md`); `.agents/skills/` — agent procedures (asset intake, testing, style pointer).
 - `vercel.json` — build config (`cd app && npm install && npm run build`, output `app/dist`).
