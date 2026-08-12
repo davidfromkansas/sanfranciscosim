@@ -182,3 +182,71 @@ are only ~20 m wide.
 The window request was executed as deviation 8 above and the asset re-rendered, re-validated
 (overall PASS, 16/16) and re-committed before stage 4 began. The same message authorises the
 push and pull request that stage 5 otherwise stops to ask for.
+
+## Stage 5 — integration (local)
+
+Case **B** (new landmark). Executed per `docs/asset-plans/INTEGRATION-PROMPT.md` Part 1.
+
+| Step | Result | Evidence |
+|---|---|---|
+| Re-validation of the shipping GLB (fresh scene) | **PASS** | overall PASS, 16/16; 11,604 tris; min Z 0.0000; centre 0.038 / −0.002 |
+| GLB dropped in | **PASS** | `app/public/sf-assets/landmarks/375-alabama.glb`, byte-identical to `artifacts/` |
+| Manifest entry | **PASS** | 19th entry; `dims`/`tris` taken from the validator, not the plan |
+| `estimated: true` | **PASS** | corrected from the plan's draft — 22.5 m is inferred, not published (REFERENCE §8) |
+| `loadRadius` decision | **PASS** | 2500 m = the default `max(2500, 22.5 × 30)`. Beyond it the site is empty ground (the baked building is carved out), but a 22.5 m building at 2.5 km is far below a pixel, so the absence is illegible |
+| id mapping | **PASS** | `camelId('375-alabama')` → `375Alabama`, which hits the new registry entry — no procedural twin |
+| Case B registry entry | **PASS** | `pipeline/lib/landmarks.mjs`, `exclude: 42`, camera `{330, 215, 18}` |
+| Tile re-bake | **PASS** | terrain → bridges → buildings → streets → landcover → lore → toy; toy tier published to `app/public/tiles/` |
+| Exclusion outcome | **PASS** | procedural footprints 171,438 → **171,437**: exactly one removed, so `exclude: 42` hit this building and no neighbour |
+| `pipeline/audit.mjs` check 1.6 | **PASS** | "no procedural footprint inside a bespoke landmark exclusion zone — 25 landmarks clear" |
+| Loader scale | **PASS** | `targetHeightM / measured Y` = 22.5 / 22.5 = **1.000000** |
+| Terrain seating | **PASS (noted)** | `sampleElevation` at the anchor = 11.00 m; the four surrounding samples run 11.00–11.90 m, so the flat base sits on grade with up to ~0.9 m of cross-site slope — normal for a flat-based asset, and 4% of the building's height |
+| `npm run lint` | **PASS** | eslint clean |
+| `npm run build` | **PASS** | built in 1.69 s; compress-tiles 3,186 tiles 55.7 → 31.2 MB |
+| Three round-trip | **PASS** | `g3check`: `G3-OK … meshes:14 tris:11604`, 12 materials, no decode errors |
+| **Running-app QA** | **NOT RUN — see below** | |
+| **Fallback drill** | **NOT RUN — see below** | |
+
+### What could not be verified locally, and why
+
+The Browser pane allows five dev servers per folder and all five are held by other
+concurrent sessions in this workspace, so the app could not be started here. That leaves
+these checks from step 5/6 unperformed:
+
+- the `sf-assets: 375-alabama merged N objects / M materials -> …; uniform xS` console line
+- a visual single-building check at the site (no procedural twin, no z-fighting)
+- orientation on screen against the real streets
+- the night sweep past dusk confirming only `_Glow` surfaces light
+- the draw-call/fps overlay against AGENTS rule 2
+- the mandatory fallback drill (rename the GLB, confirm one warning and graceful degradation)
+
+The checks above substitute for some of these deterministically — the loader's scale
+arithmetic, the id mapping that prevents a twin, the exclusion outcome that prevents an
+intersecting baked block, and a pinned-three load of the actual shipping file — but they
+are not a substitute for the visual and runtime ones. **These must be run before this is
+treated as verified in production.**
+
+### Re-bake scope — read before reviewing the tile diff
+
+`pipeline/data/` and `pipeline/out/` are gitignored and were absent on this machine, so the
+Case B re-bake started from a fresh download of every source. The resulting bake therefore
+carries a source-data refresh as well as this landmark's exclusion, and every toy and
+toyland cell is rewritten (918 files). The substance of the refresh is small — toy records
+226,482 → 226,599 (+0.05%), trees 272,235 → 272,766 (+0.2%), base buildings −1 (this
+building) — and all toy sanity gates pass. It could not be separated: `toy.json` is a single
+index over all cells, so committing a subset of the regenerated `.bin` files would leave the
+index disagreeing with them.
+
+`pipeline/validate.mjs` reports one FAIL, `tallest procedural building 200-340 m — 175.4 m`.
+This is pre-existing and unrelated: the **committed** `app/public/tiles/buildings.json`
+carries the identical `tallest.height: 175.4`. `pipeline/audit.mjs` reports three FAILs
+(1.2b facade-height percentile, 1.3c Telegraph Hill DEM, 1.7b one sampled tree offshore),
+all citywide source-data characteristics that adding one 22.5 m Mission landmark cannot
+cause. I did not A/B them against the previous bake, because `pipeline/out/` is gitignored
+and this run overwrote it.
+
+The integration prompt's clean-machine recipe (`npm run buildings && streets && landcover &&
+validate && toy`) is also incomplete: `buildings.mjs` needs `out/terrain.json` and
+`out/bridges.json`, and `toy.mjs` needs `out/lore.json`, so `terrain`, `bridges`, `lore` and
+`loredata` have to run too — and `loredata.mjs` needs the `overturemaps` Python CLI, which
+was installed into a throwaway venv rather than globally.
