@@ -276,8 +276,8 @@ Drive (south/west) and O'Reilly Avenue (north). The building group occupies the
 west half of the site; the land slopes gently down eastward, meadow → stream →
 lagoon. Building B is the front-of-house: its southwest corner carries the main
 ILM entrance and the Yoda Fountain forecourt facing Letterman Drive. A is the
-long bar on the south, C and D pair up on the east side of the group with a
-courtyard gap between them. The campus grid is rotated ~25° from north —
+long bar on the north (along O'Reilly Avenue, with the lagoon due east of it),
+C sits south-centre and D southeast, with courtyard gaps between them. The campus grid is rotated ~25° from north —
 author the true rotation; the loader will not correct it.
 
 ### 2.4 What each side shows
