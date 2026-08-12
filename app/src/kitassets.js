@@ -12,7 +12,7 @@
 // drops it and the lot goes back to the procedural mass with one warning.
 
 import { BufferAttribute, Vector3 } from 'three';
-import { GLTFLoader } from 'three/addons/loaders/GLTFLoader.js';
+import { createGLTFLoader } from './gltf.js';
 import { mergeGeometries } from 'three/addons/utils/BufferGeometryUtils.js';
 import { createKitCatalog } from './kitplan.js';
 
@@ -76,7 +76,7 @@ function mergePiece(root) {
  * actually asks for are ever fetched.
  */
 export function createKitLoader(catalog, { onWarn = console.warn } = {}) {
-  const loader = new GLTFLoader();
+  const loader = createGLTFLoader();
   const pending = new Map();
   const ready = new Map();
   const failed = new Set();

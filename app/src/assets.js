@@ -20,7 +20,7 @@ import {
   MeshLambertMaterial,
   Vector3,
 } from 'three';
-import { GLTFLoader } from 'three/addons/loaders/GLTFLoader.js';
+import { createGLTFLoader } from './gltf.js';
 import { MeshoptDecoder } from 'three/addons/libs/meshopt_decoder.module.js';
 import { mergeGeometries } from 'three/addons/utils/BufferGeometryUtils.js';
 import { updateLandmarkGlow } from './kit.js';
@@ -320,7 +320,7 @@ export function createAssets(scene, data, { onPlaced } = {}) {
       return;
     }
 
-    const loader = new GLTFLoader();
+    const loader = createGLTFLoader();
     loader.setMeshoptDecoder(MeshoptDecoder);
     for (const entry of manifest) {
       try {
