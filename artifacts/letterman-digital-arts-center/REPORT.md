@@ -4,8 +4,13 @@
 Drive as one grouped SF-SIM landmark: four buildings, the Halprin landscape,
 and the Yoda Fountain.
 
-**Status:** built and validated (stage 2 of
-`docs/asset-pipeline/ADDRESS-TO-ASSET.md`). Pre-approval, pre-optimize.
+**Status:** built, validated, approved, and optimized (stages 2-4 of
+`docs/asset-pipeline/ADDRESS-TO-ASSET.md`). The shipping GLB is the stage-4
+output; `optimize/REPORT.md` carries that pass's gates and metrics.
+
+**Gate 3 — approval, 12 August 2026.** David, on the contact sheet, aerial and
+night renders: *"yay create a PR so i can review and merge"*. Advancing to
+stage 4 (optimize) and stage 5 (integrate).
 
 ## Numbers
 
@@ -17,7 +22,9 @@ and the Yoda Fountain.
 | bbox min / max | `[-156.111, -149.082, 0.0]` / `[156.111, 149.082, 22.0]` |
 | min Z | 0.0 |
 | XY centre offset | `[0.0, 0.0]` |
-| File | 1,032,424 B raw · 249,384 B gzip (pre-optimize) |
+| File (shipped, post-optimize) | 166,464 B raw · 104,465 B gzip |
+| File (as approved, pre-optimize) | 1,032,424 B raw · 249,384 B gzip |
+| Draw primitives (shipped) | 20 (from 215) |
 | Materials | 12, all `Toy_*`, flat, no textures, no alpha, no `Toy_body` |
 | Glow objects | 6 — `b_glow_door`, `b_glow_fascia`, `win_{A,B,C,D}_lit` |
 | Scale factor at load | **1.0** — bbox top is exactly `targetHeightM` |

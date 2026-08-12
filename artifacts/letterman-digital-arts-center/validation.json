@@ -3922,5 +3922,13 @@
     "no_unexpected_objects": true,
     "glow_limited_to_declared_night_surfaces": true
   },
-  "overall": "PASS"
+  "overall": "PASS",
+  "_shipped_file_note": "This record validates the PRE-OPTIMIZE asset, which is what stage 3 approved and what artifacts/.../optimize/input/ archives. The shipping letterman-digital-arts-center.glb is the stage-4 output: identical geometry, meshopt-compressed and joined per material (197 objects -> 14, 215 primitives -> 20, 1,032,424 -> 166,464 bytes). Triangle count, dimensions, bbox, origin and the material-name set are unchanged and re-verified in optimize/validation.json.",
+  "shipped": {
+    "file_bytes_raw": 166464,
+    "file_bytes_gzip9": 104475,
+    "triangle_count": 18238,
+    "draw_primitives": 20,
+    "meshopt_compressed": true
+  }
 }
