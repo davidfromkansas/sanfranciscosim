@@ -82,8 +82,8 @@ entries = entries.filter((entry) => (entry.weight ?? 1) > 0);
 manifest's `weight` field is read **only** as a `> 0` filter — it does not
 weight anything.
 
-Consequence: adding the ~13 transit types these plans define would make Muni
-**~48% of San Francisco's traffic**, roughly 350 transit vehicles against 370
+Consequence: adding the 5 transit types these plans define would make Muni
+**~26% of San Francisco's traffic**, roughly 190 transit vehicles against 530
 cars, under the current spawner.
 
 The fix is small — build a cumulative weight table at load, sample it with the
@@ -162,9 +162,8 @@ per-type scale override.
   three baked-livery GLBs at three draw calls. See that plan's §2.6.
 - **Every manifest entry is a permanent draw call.** `loadVehicles()` builds one
   `InstancedMesh` per entry, `frustumCulled = false`, alive for the session. The
-  five plans add ~13 types = ~13 calls against the 300-call budget of AGENTS
-  rule 2. That arithmetic already shaped the plans' variant counts; it also caps
-  how many more variants can ever be added.
+  five plans add 5 types = 5 calls against the 300-call budget of AGENTS rule 2.
+  Each deferred variant picked up later adds one more.
 - **`commuter-bus.glb` stays.** It is a plausible non-Muni coach (charter,
   shuttle). Deleting it when the Muni buses land would be a regression.
 - **Articulation bending** (LRV, artic coaches) is a runtime feature, not a
