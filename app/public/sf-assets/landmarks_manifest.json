@@ -400,5 +400,24 @@
     ],
     "tris": 18238,
     "loadRadius": 2500
+  },
+  {
+    "id": "542-presidio-blvd",
+    "file": "542-presidio-blvd.glb",
+    "anchor": [
+      -122.4516862,
+      37.7971579
+    ],
+    "targetHeightM": 10.6,
+    "cat": 1,
+    "name": "542 Presidio Boulevard",
+    "estimated": true,
+    "dims": [
+      23.608,
+      25.4555,
+      10.6
+    ],
+    "tris": 3092,
+    "loadRadius": 2500
   }
 ]

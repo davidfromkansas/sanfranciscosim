@@ -285,6 +285,32 @@ export const LANDMARKS = [
     clearTrees: true,
     camera: { distance: 700, yaw: 220, pitch: 24 },
   },
+  {
+    // One of the 1912-17 Mission Revival officers' quarters on Presidio Blvd.
+    // The exclusion window here is the narrowest of any landmark so far, because
+    // this is a mid-row house with close siblings: measured from the anchor,
+    // 542's own footprint reaches 11.3 m, while the nearest NEIGHBOUR vertex
+    // (543 Presidio Blvd, way/288361199) is 18.1 m and 541 is 20.2 m. So the
+    // safe band is 11.3-18.1 m and 14 leaves ~2.7 m over its own ring and ~4.1 m
+    // of clearance to 543. Do NOT use the 70-120 m typical of the other
+    // landmarks: it would delete six or seven baked neighbours that have no GLB
+    // to replace them, punching a hole in the middle of the row.
+    id: '542PresidioBlvd',
+    name: '542 Presidio Boulevard',
+    lon: -122.4516862,
+    lat: 37.7971579,
+    height: 10.6,
+    exclude: 14,
+    // `camera` is NOT optional, even for a building too small to deserve a
+    // fly-to preset: context.mjs bakes `camera: l.camera` straight into
+    // context/landmarks.json, and camera.js reads `preset.yaw` unconditionally,
+    // so omitting it ships a landmark whose preset is undefined and the whole
+    // city fails to boot with "Cannot read properties of undefined (reading
+    // 'yaw')". Verified by doing exactly that first.
+    // yaw 30 puts the camera to the SSE, looking at the ESE entrance front and
+    // the SSW hip end; 200 m suits a 10.6 m house (cf. 380Brannan at 220).
+    camera: { distance: 200, yaw: 30, pitch: 26 },
+  },
 ];
 
 // Parks/green spaces the landcover bake must match at least one source polygon

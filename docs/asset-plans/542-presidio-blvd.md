@@ -447,17 +447,22 @@ well before 2500 m.
 
 Two traps here, both worth reading before touching the registry:
 
-- **The exclusion radius must be small — about 13 m.** Every existing landmark uses
-  `exclude: 70–120`. That value here would be destructive: 543 Presidio Blvd is 25.1 m away
-  centre-to-centre and 541 is 29.4 m away, so an 80 m exclusion would delete six or seven
-  baked neighbours that have no GLB to replace them, punching a hole in the middle of the row.
-  542's own half-diagonal is 11.96 m, so `exclude: 13` clears its own baked footprint with a
-  small margin and touches nothing else. Verify against the re-baked tile before shipping.
-- **The registry id cannot start with a digit.** `pipeline/lib/landmarks.mjs` uses bare
-  JavaScript identifiers for ids (`fairmont`, `stIgnatius`, `conservatoryOfFlowers`), so
-  `542-presidio-blvd` and `542PresidioBlvd` are both illegal there. Use `presidioBlvd542` in
-  the registry and keep `542-presidio-blvd` as the manifest id, then confirm the manifest→
-  registry mapping actually resolves — this pairing is not the usual identity mapping.
+- **The exclusion radius must be small — 14 m.** Most landmarks use `exclude: 70–120`,
+  which here would be destructive: an 80 m radius would delete six or seven baked
+  neighbours that have no GLB to replace them, punching a hole in the middle of the row.
+  Measured from the anchor against actual ring geometry (not centroids): 542's own
+  footprint reaches **11.3 m**, the nearest neighbour vertex — 543 Presidio Blvd,
+  `way/288361199` — is **18.1 m**, and 541 is 20.2 m. `excluded()` in
+  `pipeline/buildings.mjs` tests every ring vertex, not just the centroid, so the safe
+  band is 11.3–18.1 m; **14** leaves ~2.7 m over its own ring and ~4.1 m of clearance to
+  543. This matches the tight-band precedent set by `380Brannan` (9) and `550Third` (8).
+- **The registry id is `542PresidioBlvd`.** `camelId()` in `app/src/assets.js` is just
+  `id.replace(/-([a-z])/g, ...)`, so the manifest's `542-presidio-blvd` maps to
+  `542PresidioBlvd`, and that is what `pipeline/lib/landmarks.mjs` must use. Registry ids
+  are quoted string values, not bare identifiers, so a leading digit is fine —
+  `380Brannan`, `550Third` and `375Alabama` are already in there. (An earlier draft of
+  this plan claimed a digit-leading id was illegal and proposed `presidioBlvd542`; that
+  was wrong, and using it would have broken the id round trip.)
 - **New landmark**: needs the `pipeline/lib/landmarks.mjs` entry and a re-bake of the affected
   tiles, plus audit 1.6 per `INTEGRATION-PROMPT.md`.
 - No camera preset is warranted: a 10.6 m house does not deserve a search/fly-to preset of its

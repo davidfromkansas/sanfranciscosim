@@ -181,6 +181,91 @@ the crossover point is worth measuring rather than assuming. Recorded, not acted
 | G7 GPU budget | n/a | bake mode off |
 | G8 Hygiene | PASS | re-import object count matches, deterministic re-run reproduces, no `.blend1` left |
 
+## Stage 5 — integration
+
+Case **B** (new landmark): manifest entry + `pipeline/lib/landmarks.mjs` registry entry +
+tile re-bake. Two bugs were found by doing it, both of which would have shipped broken.
+
+### The `camera` field is not optional — omitting it breaks the whole city
+
+The plan's §2.13 said "No camera preset is warranted: a 10.6 m house does not deserve a
+search/fly-to preset of its own. Omit `camera`." **That is wrong and it took the app down.**
+
+`pipeline/context.mjs:258` bakes `camera: l.camera` straight through, and
+`app/src/main.js:126` maps every `manifest.landmarks` entry through `toCameraTarget()`,
+which reads `preset.camera.yaw` unconditionally. A registry entry without `camera`
+therefore produces a landmark whose preset is `undefined`, and the app dies at boot with
+`Failed to load the city: Cannot read properties of undefined (reading 'yaw')` — not a
+degraded landmark, the entire city. Fixed by giving it
+`camera: { distance: 200, yaw: 30, pitch: 26 }`, and the constraint is now commented in
+the registry so the next small landmark doesn't repeat it.
+
+### Pipeline step order matters: `validate` must run before `toy`/`lore`/`notables`/`context`
+
+After adding the camera I re-ran `npm run validate` alone to regenerate `manifest.json`.
+`validate` republishes the base tile set and clears everything else, which deleted the
+`toy/`, `toyland/`, `toystreets/`, `ctx/` and `context/` tiers — 2,260 files. The
+documented chain order is not cosmetic. Recovered by re-running
+`toy → notables → context` afterwards.
+
+### The tile diff is 598 files, and all of it is required
+
+Removing one baked footprint renumbers the global building index, and the `ctx/*.json`
+sidecars store building ids as indices into that array. Verified across 15 randomly
+sampled far-away cells: coordinates, identities and search payloads are **byte-identical**
+and only the ids shift by exactly 0 or 1. So the citywide diff is not upstream data drift —
+it is one deletion propagating — and a partial commit would desync ids from geometry.
+`api/_data/stats.json` confirms it: `buildings 174770 → 174769`.
+
+Geometry changes are confined to the affected cells: `buildings/13_9.bin`,
+`landcover/13_9.bin`, `landcover/13_10.bin`, `toy/13_9.bin`, `toyland/13_9.bin`,
+`toyland/13_10.bin`, plus the indexes.
+
+### Exclusion radius, verified against the bake
+
+`exclude: 14` (not the 13 the plan proposed — 14 centres the margin better). Measured
+against the freshly baked footprints: **0 baked footprints have a vertex inside r = 14 m**,
+and the nearest surviving baked vertex is **18.91 m** away (543 Presidio Blvd). 542 is
+dropped, every neighbour is intact. `node pipeline/audit.mjs` check **1.6 PASS —
+29 landmarks clear**.
+
+### Local QA
+
+| Item | Result |
+|---|---|
+| Re-validation of the shipped GLB | **PASS** — 16/16 contract checks after the optimize swap |
+| Manifest entry | **PASS** — matches existing formatting, `dims`/`tris` from the measurement |
+| id mapping | **PASS** — `camelId('542-presidio-blvd')` → `542PresidioBlvd`, matches the registry |
+| Registry + re-bake | **PASS** — one footprint removed, indexes regenerated |
+| audit 1.6 | **PASS** — 29 landmarks clear |
+| Single building at the site | **PASS** — no procedural twin, no z-fighting |
+| Loader scale | **PASS** — manifest `targetHeightM` 10.6 over measured 10.6 → x1.0000 |
+| Orientation | **PASS** — ridge NNE–SSW, porch faces the boulevard |
+| Terrain seating | **PASS** — sits on the slope, no floating or sinking |
+| Asset loads | **PASS** — `542PresidioBlvd` placed, `failed: 0` |
+| Draw calls | **PASS** — `landmark-streaming-check`: **avg 90/frame < 300** |
+| Boot with streamed entries unloaded | **PASS** (same harness) |
+| Streamed load on approach | **PASS** (same harness) |
+| Night glow | **PASS with a note** — only the porch light and the three lit panes light up, but see the open questions |
+| Fallback drill | **PASS** — app boots, area renders, neighbours intact, site is empty ground inside the exclusion zone (the documented Case B outcome) |
+| Lint / build | **PASS** — `eslint src` clean, `vite build` succeeds |
+
+**Not verified, honestly:** the harness's `stream-out` and `re-approach` phases need the
+100-entry synthetic manifest its header documents, so release-on-depart was not exercised
+end to end; and fps could not be measured because the preview pane does not composite
+continuously (the same reason that harness exists). Draw calls came from the headless
+harness, which does render continuously, so the rule-2 budget itself is covered.
+
+### Two art-direction notes for David
+
+1. **The roof reads more saturated in the app than in the Blender review.** `Toy_brick`
+   `#c96f4a` is a legitimate palette entry and real Presidio roofs are terracotta, but next
+   to the muted baked neighbours it currently reads as a saturated accent rather than
+   restrained architecture. If it is too loud, `Toy_rust` `#a86444` is the obvious swap.
+2. **The night state is very quiet.** A porch lamp and three panes is deliberate — a house
+   is not a skyline piece — but beside the procedurally lit neighbours the building reads
+   as almost unlit. Easy to raise; wanted a decision rather than a guess.
+
 ## Stage 3 — approval
 
 Approved in advance by David on 12 August 2026, quoted verbatim:
