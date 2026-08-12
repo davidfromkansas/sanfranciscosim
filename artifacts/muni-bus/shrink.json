@@ -1,0 +1,365 @@
+{
+  "asset_class": "vehicle",
+  "results": [
+    {
+      "input": "/Users/david_lietjauw/sanfranciscosim-muni/artifacts/muni-bus/build/muni-bus-40.glb",
+      "output": "/Users/david_lietjauw/sanfranciscosim-muni/artifacts/muni-bus/shrunk/muni-bus-40.glb",
+      "log": [
+        {
+          "step": "0-input",
+          "bytes": 141396,
+          "objects": 10,
+          "verts": 4924,
+          "tris": 2438
+        },
+        {
+          "step": "1-weld",
+          "verts_removed": 3224,
+          "objects": 10,
+          "verts": 1700,
+          "tris": 2414
+        },
+        {
+          "step": "2-degenerate+interior",
+          "degenerate_faces_removed": 0,
+          "interior_faces_removed": 0,
+          "closed_occluders": 7,
+          "objects": 10,
+          "verts": 1700,
+          "tris": 2414
+        },
+        {
+          "step": "3-limited-dissolve@0.05deg",
+          "faces_merged": 1045,
+          "objects": 10,
+          "verts": 1664,
+          "tris": 2378
+        },
+        {
+          "step": "4-retessellate",
+          "action": "audited, no change",
+          "wheel_segments": 10,
+          "hub_segments": 8,
+          "objects": 10,
+          "verts": 1664,
+          "tris": 2378
+        },
+        {
+          "step": "5-join-by-material",
+          "materials": 10,
+          "already_one_object_per_material": true,
+          "would_join": {},
+          "objects": 10,
+          "verts": 1664,
+          "tris": 2378
+        },
+        {
+          "step": "6-normals-audit",
+          "per_object": [
+            {
+              "object": "Toy_glass",
+              "signed_volume": 1.69977,
+              "closed": true
+            },
+            {
+              "object": "Toy_ink",
+              "signed_volume": 7.96353,
+              "closed": false
+            },
+            {
+              "object": "Toy_munired",
+              "signed_volume": 25.92561,
+              "closed": false
+            },
+            {
+              "object": "Toy_mustard_Glow",
+              "signed_volume": 0.09909,
+              "closed": true
+            },
+            {
+              "object": "Toy_red_Glow",
+              "signed_volume": 0.01109,
+              "closed": true
+            },
+            {
+              "object": "Toy_silver",
+              "signed_volume": 84.77915,
+              "closed": false
+            },
+            {
+              "object": "Toy_steel",
+              "signed_volume": 1.80484,
+              "closed": true
+            },
+            {
+              "object": "Toy_tire",
+              "signed_volume": 0.95362,
+              "closed": true
+            },
+            {
+              "object": "Toy_white",
+              "signed_volume": 3.24896,
+              "closed": true
+            },
+            {
+              "object": "Toy_white_Glow",
+              "signed_volume": 0.00403,
+              "closed": true
+            }
+          ],
+          "all_positive": true,
+          "objects": 10,
+          "verts": 1664,
+          "tris": 2378
+        },
+        {
+          "step": "7-export",
+          "bytes": 130068,
+          "objects": 10,
+          "verts": 1664,
+          "tris": 2378
+        }
+      ]
+    },
+    {
+      "input": "/Users/david_lietjauw/sanfranciscosim-muni/artifacts/muni-bus/build/muni-bus-40-9-san-bruno.glb",
+      "output": "/Users/david_lietjauw/sanfranciscosim-muni/artifacts/muni-bus/shrunk/muni-bus-40-9-san-bruno.glb",
+      "log": [
+        {
+          "step": "0-input",
+          "bytes": 142800,
+          "objects": 10,
+          "verts": 4976,
+          "tris": 2464
+        },
+        {
+          "step": "1-weld",
+          "verts_removed": 3240,
+          "objects": 10,
+          "verts": 1736,
+          "tris": 2440
+        },
+        {
+          "step": "2-degenerate+interior",
+          "degenerate_faces_removed": 0,
+          "interior_faces_removed": 0,
+          "closed_occluders": 7,
+          "objects": 10,
+          "verts": 1736,
+          "tris": 2440
+        },
+        {
+          "step": "3-limited-dissolve@0.05deg",
+          "faces_merged": 1065,
+          "objects": 10,
+          "verts": 1686,
+          "tris": 2390
+        },
+        {
+          "step": "4-retessellate",
+          "action": "audited, no change",
+          "wheel_segments": 10,
+          "hub_segments": 8,
+          "objects": 10,
+          "verts": 1686,
+          "tris": 2390
+        },
+        {
+          "step": "5-join-by-material",
+          "materials": 10,
+          "already_one_object_per_material": true,
+          "would_join": {},
+          "objects": 10,
+          "verts": 1686,
+          "tris": 2390
+        },
+        {
+          "step": "6-normals-audit",
+          "per_object": [
+            {
+              "object": "Toy_glass",
+              "signed_volume": 1.69977,
+              "closed": true
+            },
+            {
+              "object": "Toy_ink",
+              "signed_volume": 8.02169,
+              "closed": false
+            },
+            {
+              "object": "Toy_munired",
+              "signed_volume": 25.92561,
+              "closed": false
+            },
+            {
+              "object": "Toy_mustard_Glow",
+              "signed_volume": 0.09909,
+              "closed": true
+            },
+            {
+              "object": "Toy_red_Glow",
+              "signed_volume": 0.01109,
+              "closed": true
+            },
+            {
+              "object": "Toy_silver",
+              "signed_volume": 84.77915,
+              "closed": false
+            },
+            {
+              "object": "Toy_steel",
+              "signed_volume": 1.80484,
+              "closed": true
+            },
+            {
+              "object": "Toy_tire",
+              "signed_volume": 0.95362,
+              "closed": true
+            },
+            {
+              "object": "Toy_white",
+              "signed_volume": 3.24896,
+              "closed": true
+            },
+            {
+              "object": "Toy_white_Glow",
+              "signed_volume": 0.00403,
+              "closed": true
+            }
+          ],
+          "all_positive": true,
+          "objects": 10,
+          "verts": 1686,
+          "tris": 2390
+        },
+        {
+          "step": "7-export",
+          "bytes": 130716,
+          "objects": 10,
+          "verts": 1686,
+          "tris": 2390
+        }
+      ]
+    },
+    {
+      "input": "/Users/david_lietjauw/sanfranciscosim-muni/artifacts/muni-bus/build/muni-bus-40-43-masonic.glb",
+      "output": "/Users/david_lietjauw/sanfranciscosim-muni/artifacts/muni-bus/shrunk/muni-bus-40-43-masonic.glb",
+      "log": [
+        {
+          "step": "0-input",
+          "bytes": 141720,
+          "objects": 10,
+          "verts": 4936,
+          "tris": 2444
+        },
+        {
+          "step": "1-weld",
+          "verts_removed": 3234,
+          "objects": 10,
+          "verts": 1702,
+          "tris": 2420
+        },
+        {
+          "step": "2-degenerate+interior",
+          "degenerate_faces_removed": 0,
+          "interior_faces_removed": 0,
+          "closed_occluders": 7,
+          "objects": 10,
+          "verts": 1702,
+          "tris": 2420
+        },
+        {
+          "step": "3-limited-dissolve@0.05deg",
+          "faces_merged": 1052,
+          "objects": 10,
+          "verts": 1658,
+          "tris": 2376
+        },
+        {
+          "step": "4-retessellate",
+          "action": "audited, no change",
+          "wheel_segments": 10,
+          "hub_segments": 8,
+          "objects": 10,
+          "verts": 1658,
+          "tris": 2376
+        },
+        {
+          "step": "5-join-by-material",
+          "materials": 10,
+          "already_one_object_per_material": true,
+          "would_join": {},
+          "objects": 10,
+          "verts": 1658,
+          "tris": 2376
+        },
+        {
+          "step": "6-normals-audit",
+          "per_object": [
+            {
+              "object": "Toy_glass",
+              "signed_volume": 1.69977,
+              "closed": true
+            },
+            {
+              "object": "Toy_ink",
+              "signed_volume": 7.92985,
+              "closed": false
+            },
+            {
+              "object": "Toy_munired",
+              "signed_volume": 25.92561,
+              "closed": false
+            },
+            {
+              "object": "Toy_mustard_Glow",
+              "signed_volume": 0.09909,
+              "closed": true
+            },
+            {
+              "object": "Toy_red_Glow",
+              "signed_volume": 0.01109,
+              "closed": true
+            },
+            {
+              "object": "Toy_silver",
+              "signed_volume": 84.77915,
+              "closed": false
+            },
+            {
+              "object": "Toy_steel",
+              "signed_volume": 1.80484,
+              "closed": true
+            },
+            {
+              "object": "Toy_tire",
+              "signed_volume": 0.95362,
+              "closed": true
+            },
+            {
+              "object": "Toy_white",
+              "signed_volume": 3.24896,
+              "closed": true
+            },
+            {
+              "object": "Toy_white_Glow",
+              "signed_volume": 0.00403,
+              "closed": true
+            }
+          ],
+          "all_positive": true,
+          "objects": 10,
+          "verts": 1658,
+          "tris": 2376
+        },
+        {
+          "step": "7-export",
+          "bytes": 129960,
+          "objects": 10,
+          "verts": 1658,
+          "tris": 2376
+        }
+      ]
+    }
+  ]
+}
