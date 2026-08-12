@@ -60,12 +60,17 @@ const FRAG = /* glsl */ `
 export function createToyPost(renderer) {
   const size = renderer.getSize(new Vector2());
   const pixelRatio = renderer.getPixelRatio();
+  // MSAA lives HERE, on the buffer the diorama is actually rendered into.
+  // The canvas's own antialias flag smooths a buffer the post pass never
+  // shows, so main.js creates the renderer with antialias: false and this
+  // target carries the samples instead (a governor-adjustable rung).
   const target = new WebGLRenderTarget(size.x * pixelRatio, size.y * pixelRatio, {
     minFilter: LinearFilter,
     magFilter: LinearFilter,
     format: RGBAFormat,
     depthBuffer: true,
     stencilBuffer: false,
+    samples: 4,
   });
 
   const material = new ShaderMaterial({
@@ -108,6 +113,13 @@ export function createToyPost(renderer) {
       if (enabled) setSize();
     },
     setSize,
+    setSamples(n) {
+      if (target.samples === n) return;
+      target.samples = n;
+      // Force the target's GL framebuffer to rebuild with the new sample count.
+      target.dispose();
+      setSize();
+    },
     // Drop-in for renderer.render: off, it renders straight to the canvas.
     render(scene, camera) {
       if (!enabled) {

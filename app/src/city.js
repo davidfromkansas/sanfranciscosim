@@ -271,6 +271,9 @@ export function createCity(scene, data) {
     try {
       const loaded = await loadStreetKit();
       streetkit.fleet = createStreetKitFleet(scene, loaded, data.sampleElevation);
+      // The governor may already have picked a tier before the kit finished
+      // loading; a fresh fleet starts at whatever is current.
+      if (quality.tier) streetkit.fleet.setQuality(quality.tier);
       streetkit.hints = createStreetHints(manifest, data.contextCells);
       streetkit.exclusions = landmarkExclusions(manifest, data.project);
     } catch (error) {
@@ -993,12 +996,19 @@ export function createCity(scene, data) {
     get progress() {
       return stats.cellsTotal ? stats.cellsLoaded / stats.cellsTotal : 0;
     },
-    setQuality(q) {
+    setQuality(q, tier) {
       quality.windows = q.windows;
+      quality.tier = tier;
       for (const c of chunks.values()) {
         // The toy tier has no procedural window grid to turn down.
         const windows = c.material?.uniformsHolder.uWindows;
         if (windows) windows.value = q.windows;
+      }
+      // Street furniture answers to the same knob: the placement stays
+      // planned, only the per-class meshes hide (PERF-PLAN #6).
+      if (tier && streetkit.fleet) {
+        streetkit.fleet.setQuality(tier);
+        stats.furnitureDraws = streetkit.fleet.drawCalls;
       }
     },
   };

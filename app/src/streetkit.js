@@ -277,6 +277,20 @@ export function createStreetKitFleet(scene, kit, sampleElevation) {
     return max - min > MAX_SLOPE;
   }
 
+  // Quality mask: the placement data always stays planned and packed, only
+  // the meshes hide, so the governor can pull this lever without a replan.
+  // low keeps the pieces that carry the street's function (lamps, signals);
+  // medium sheds the clutter that reads only up close.
+  const LOW_KEEPS = new Set(['sl_standard', 'sl_pathofgold', 'sl_residential', 'traffic_signal']);
+  const MEDIUM_DROPS = new Set(['newsboxes', 'planter', 'bikerack', 'trashcan']);
+  let allowedId = () => true;
+
+  function applyVisibility(type) {
+    const on = type.body.count > 0 && allowedId(type.id);
+    type.body.visible = on;
+    if (type.glow) type.glow.visible = on;
+  }
+
   function repack(type) {
     let n = 0;
     for (const list of type.groups.values()) {
@@ -289,13 +303,12 @@ export function createStreetKitFleet(scene, kit, sampleElevation) {
       }
     }
     type.body.count = n;
-    type.body.visible = n > 0;
     type.body.instanceMatrix.needsUpdate = true;
     if (type.glow) {
       type.glow.count = n;
-      type.glow.visible = n > 0;
       type.glow.instanceMatrix.needsUpdate = true;
     }
+    applyVisibility(type);
     return n;
   }
 
@@ -305,6 +318,15 @@ export function createStreetKitFleet(scene, kit, sampleElevation) {
 
   return {
     root,
+    setQuality(tier) {
+      allowedId =
+        tier === 'low'
+          ? (id) => LOW_KEEPS.has(id)
+          : tier === 'medium'
+            ? (id) => !MEDIUM_DROPS.has(id)
+            : () => true;
+      for (const type of types) applyVisibility(type);
+    },
     /** Adds one group's planned anchors. Returns how many pieces were placed. */
     add(key, anchors) {
       if (!anchors || anchors.length === 0) return 0;

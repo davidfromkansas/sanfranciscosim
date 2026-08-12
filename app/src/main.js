@@ -37,7 +37,10 @@ import { localDayStart, moonPosition, skySnapshot, sunPosition } from '../../api
 const canvas = document.getElementById('view');
 const loader = createLoader();
 
-const renderer = new WebGLRenderer({ canvas, antialias: true, powerPreference: 'high-performance' });
+// antialias: false is deliberate (PERF-PLAN #7): the diorama always renders
+// through the post pass's offscreen target, so canvas MSAA smoothed a buffer
+// nobody sees. The samples live on the post target instead (toypost.js).
+const renderer = new WebGLRenderer({ canvas, antialias: false, powerPreference: 'high-performance' });
 renderer.outputColorSpace = SRGBColorSpace;
 renderer.toneMapping = ACESFilmicToneMapping;
 renderer.toneMappingExposure = 1.06;
@@ -68,7 +71,8 @@ async function boot() {
   const data = await loadCore((p) => loader.set(p * 0.55));
 
   const env = createEnvironment(scene);
-  for (const mesh of createTerrain(data)) scene.add(mesh);
+  const terrain = createTerrain(data);
+  for (const mesh of terrain.meshes) scene.add(mesh);
   loader.set(0.75);
   const water = createWater(scene);
   const landmarks = createLandmarks(scene, data);
@@ -153,8 +157,14 @@ async function boot() {
     renderer.setPixelRatio(Math.min(window.devicePixelRatio, quality.pixelRatio));
     env.setShadowQuality(quality.shadow);
     renderer.shadowMap.enabled = quality.shadow > 0;
-    city.setQuality(quality);
+    // Every visual subsystem answers to the tier (PERF-PLAN #6): the governor
+    // pulls one lever and the whole frame gets cheaper, not just the pixels.
+    city.setQuality(quality, key);
     water.setGlitter(key === 'low' ? 0.6 : 1);
+    water.setQuality(key);
+    agents.setQuality(key);
+    terrain.setQuality(key);
+    post.setSamples(quality.samples);
     renderer.setSize(window.innerWidth, window.innerHeight, false);
     post.setSize();
   }

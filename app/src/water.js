@@ -22,6 +22,7 @@ const FRAG = /* glsl */ `
   uniform float uTime;
   uniform float uNight;
   uniform float uGlitter;
+  uniform float uCheap;
   uniform vec3 uFogColor;
   uniform float uFogDensity;
   varying vec3 vWorld;
@@ -51,14 +52,22 @@ const FRAG = /* glsl */ `
     float detail = clamp(1.0 - dist / 9000.0, 0.08, 1.0);
     vec2 p = vWorld.xz * 0.035;
     float t = uTime * 0.35;
+    // The low tier keeps only the first octave and a soft specular exponent:
+    // two fewer noise fetches per fragment over the biggest surface in the
+    // frame, and the tame exponent also stops the mediump shimmer some mobile
+    // GPUs make of pow(x, 220).
     float n1 = noise(p + vec2(t, t * 0.6));
-    float n2 = noise(p * 2.7 - vec2(t * 0.8, t * 0.4));
-    float n3 = noise(p * 0.31 + vec2(t * 0.15, -t * 0.1));
+    float n2 = 0.0;
+    float n3 = 0.0;
+    if (uCheap < 0.5) {
+      n2 = noise(p * 2.7 - vec2(t * 0.8, t * 0.4));
+      n3 = noise(p * 0.31 + vec2(t * 0.15, -t * 0.1));
+    }
     vec3 N = normalize(vec3((n1 * 0.55 + n2 * 0.3) * detail, 1.0, (n2 * 0.5 - n1 * 0.35 + n3 * 0.4) * detail));
 
     vec3 L = normalize(uSunDir);
     vec3 H = normalize(L + V);
-    float spec = pow(max(dot(N, H), 0.0), 220.0);
+    float spec = pow(max(dot(N, H), 0.0), mix(220.0, 48.0, uCheap));
     // Broad sun streak along the sun azimuth, the classic golden-hour glitter.
     // Safe horizontal vectors: normalize(vec3(0)) is undefined and some GPU
     // drivers spread that NaN across an entire large plane triangle.
@@ -90,6 +99,7 @@ export function createWater(scene) {
     uTime: shared.uTime,
     uCameraPos: { value: new Vector3() },
     uGlitter: { value: 1 },
+    uCheap: { value: 0 },
     uFogColor: { value: scene.fog.color },
     uFogDensity: { value: scene.fog.density },
   };
@@ -116,6 +126,9 @@ export function createWater(scene) {
     },
     setGlitter(v) {
       uniforms.uGlitter.value = v;
+    },
+    setQuality(tier) {
+      uniforms.uCheap.value = tier === 'low' ? 1 : 0;
     },
   };
 }

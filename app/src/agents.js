@@ -32,6 +32,11 @@ const ASSETS = `${import.meta.env.BASE_URL}sf-assets/`;
 const CAR_COUNT = 720;
 const PED_COUNT = 420;
 const BIRD_COUNT = 90;
+// The low tier halves-or-better the live population instead of resizing the
+// pools: the instanced meshes keep their allocation and the simulation simply
+// stops at the cap, so the governor can move this lever every few seconds
+// without a rebuild.
+const LOW_CAPS = { cars: 320, peds: 160, birds: 45 };
 const CAR_RANGE = 2200;
 // Vehicle geometry is base-origin, and the renderer lifts every car this far
 // off its path so street cars clear the road ribbon.
@@ -898,6 +903,9 @@ export function createAgents(scene, data, city) {
   let carScale = 1;
   let pedScale = 1;
   let toy = false;
+  let carCap = CAR_COUNT;
+  let pedCap = PED_COUNT;
+  let birdCap = BIRD_COUNT;
 
   function paintCars(list) {
     // Fleet colours are baked into the models; only the fallback pool is tinted.
@@ -1011,7 +1019,7 @@ export function createAgents(scene, data, city) {
 
     let visibleCars = 0;
     fleetCursors.fill(0);
-    for (let i = 0; i < cars.length; i++) {
+    for (let i = 0; i < Math.min(cars.length, carCap); i++) {
       const car = cars[i];
       if (!car) continue;
       const { cumulative, total } = car.path.meta;
@@ -1091,7 +1099,7 @@ export function createAgents(scene, data, city) {
         if (Math.hypot(path.points[0] - pivot.x, path.points[2] - pivot.z) < PED_RANGE * 2) candidates.push(path);
       }
       let visible = 0;
-      for (let i = 0; i < PED_COUNT && candidates.length; i++) {
+      for (let i = 0; i < pedCap && candidates.length; i++) {
         let ped = peds[i];
         if (!ped || Math.hypot(ped.x - pivot.x, ped.z - pivot.z) > PED_RANGE * 2.2) {
           const path = candidates[Math.floor(Math.random() * candidates.length)];
@@ -1132,7 +1140,8 @@ export function createAgents(scene, data, city) {
 
     // Gulls.
     const time = shared.uTime.value;
-    for (let i = 0; i < BIRD_COUNT; i++) {
+    birdMesh.count = birdCap;
+    for (let i = 0; i < birdCap; i++) {
       const flock = flocks[i % flocks.length];
       const k = Math.floor(i / flocks.length);
       const a = time * 0.35 + flock.phase + k * 0.7;
@@ -1181,6 +1190,12 @@ export function createAgents(scene, data, city) {
     group,
     update,
     setToy,
+    setQuality(tier) {
+      const low = tier === 'low';
+      carCap = low ? LOW_CAPS.cars : CAR_COUNT;
+      pedCap = low ? LOW_CAPS.peds : PED_COUNT;
+      birdCap = low ? LOW_CAPS.birds : BIRD_COUNT;
+    },
     useBridgeDeckTop,
     // The live-ferry system hides the two looping procedural ferries when real
     // vessel positions are flowing, and shows them again on any fallback.
