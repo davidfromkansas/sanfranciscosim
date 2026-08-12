@@ -176,6 +176,15 @@ export const LANDMARKS = [
     camera: { distance: 700, yaw: 135, pitch: 20 },
   },
   {
+    id: 'operaHouse',
+    name: 'War Memorial Opera House',
+    lon: -122.4209170,
+    lat: 37.7786126,
+    height: 44,
+    exclude: 62,
+    camera: { distance: 700, yaw: 90, pitch: 18 },
+  },
+  {
     id: 'fishermansWharf',
     name: "Pier 39 / Fisherman's Wharf",
     lon: -122.4098,

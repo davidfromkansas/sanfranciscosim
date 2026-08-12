@@ -332,15 +332,15 @@
   }
  ],
  "stats": {
-  "baseBuildings": 171448,
-  "records": 226493,
+  "baseBuildings": 171447,
+  "records": 226492,
   "pitched": 146501,
   "garnish": 55045,
   "helipads": 6,
   "tallest": 200,
   "trees": 272235,
   "bytes": {
-   "buildings": 11993508,
+   "buildings": 11993398,
    "streets": 8576096,
    "landcover": 5481936
   }
@@ -2089,8 +2089,8 @@
    "cz": 14,
    "originX": 1000,
    "originZ": -1000,
-   "buildings": 560,
-   "bytes": 31842
+   "buildings": 559,
+   "bytes": 31732
   },
   {
    "key": "18_15",
