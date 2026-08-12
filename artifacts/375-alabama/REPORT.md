@@ -12,7 +12,7 @@ Built from `docs/asset-plans/375-alabama.md` (Part 1) under
 | | |
 |---|---|
 | Triangles | **11,604** (cap 14,000) |
-| Objects | 345 |
+| Objects | 13 shipped (345 as authored — joined per material in stage 4) |
 | Dimensions (XY bbox / Z) | 67.32 x 61.61 x 22.50 m |
 | Building itself | 61.10 x 54.63 m footprint — the larger XY bbox is the 4.32° heading, not a scale error |
 | min Z | 0.0000 |
@@ -21,7 +21,9 @@ Built from `docs/asset-plans/375-alabama.md` (Part 1) under
 | Glow groups | 3 — `Toy_trim_Glow` (tower crown + entrance), `Toy_glass_Glow` (125 lit bays), `Toy_glassl_Glow` (two lit monitors) |
 | Anchor | `-122.4118477, 37.7645633` |
 | targetHeightM | 22.5 (stair-tower crown, normalised exactly — loader scale lands at 1.000) |
-| Validation | `validation.json` — **overall PASS**, all 16 checks |
+| File size | **318,672 B** shipped (753,288 B pre-optimize, −57.7%) — well inside the 500 KB budget |
+| Draw submeshes | 14 (346 pre-optimize) |
+| Validation | `validation.json` — **overall PASS**, all 16 checks, re-run against the shipped optimized file |
 
 ## Reproduce
 
@@ -109,9 +111,18 @@ deliberate decision, not a slip.
 | Triangle budget | PASS | 11,604 / 14,000 (PERF-PLAN hard limit 30,000) |
 | No cameras / lights / animation / armatures / constraints | PASS | all zero |
 | Transforms applied, no negative scales | PASS | — |
-| Outward normals | PASS | 345/345 objects positive signed volume; 0 non-unit loop normals; 31,500-ray visibility test residual 0 |
+| Outward normals | PASS | 13/13 shipped objects positive signed volume; 0 non-unit loop normals; 31,500-ray visibility test residual 0 |
 | No degenerate geometry | PASS | 0 degenerate triangles |
 | No foreign / leaked geometry | PASS | fresh-scene re-import contains only the asset |
+
+## Stage 4 — optimize
+
+Run per `docs/asset-pipeline/GLB-OPTIMIZE-PROMPT.md`; full metrics, census, A/B renders and
+gate table in `optimize/REPORT.md`. Headline: 753,288 → 318,672 B (−57.7%), 345 → 13
+objects, 346 → 14 draw submeshes, triangles and bbox unchanged, all 8 gates PASS, worst
+A/B pixel delta 0.22% against a 2%/4% gate. The pre-optimize original is archived at
+`optimize/input/375-alabama.glb`. Renders in this directory were made from the
+pre-optimize file; the A/B pass proves the two are visually identical.
 
 ## Renders
 
