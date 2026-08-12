@@ -11,9 +11,9 @@ wins** — it describes what was built and why.
 
 | | |
 |---|---|
-| File | `1008-general-kennedy.glb`, 371,992 bytes |
+| File | `1008-general-kennedy.glb`, **165,192 bytes** (shipped, meshopt-compressed; pre-optimize 371,992 B archived at `optimize/input/`) |
 | Triangles | **5,688** (budget 9,000) |
-| Objects | 148 |
+| Objects | **10** (joined per material in the stage-4 optimize pass; 148 before) |
 | Dimensions | 55.131 × 35.473 × 11.900 m |
 | Bounding box | min `[-27.565, -17.736, 0.0]`, max `[27.565, 17.736, 11.9]` |
 | min Z | 0.000 m |
@@ -22,7 +22,7 @@ wins** — it describes what was built and why.
 | Glow materials | `Toy_glass_Glow` (9 lit windows), `Toy_trim_Glow` (head landing soffit) |
 | Textures / cameras / lights / animation | 0 / 0 / 0 / 0 |
 | Transforms | applied; no negative scales |
-| Normals | outward — 148/148 objects pass per-object signed volume; 31,500 visibility rays, 0 flipped visible faces (0.00% residual) |
+| Normals | outward — 10/10 objects pass per-object signed volume; 31,500 visibility rays, 0 flipped visible faces (0.00% residual) |
 | Degenerate triangles | 0 |
 
 **The XY bounding box is 55.1 × 35.5 m for a building that is 55.14 × 12.02 m.** That is
@@ -168,6 +168,16 @@ blender -b --python render_1008_general_kennedy.py -- --night
 python3 make_contact_sheet.py
 blender -b --python validate_1008_general_kennedy.py
 ```
+
+## Stage 4 — optimize
+
+The shipping GLB is the stage-4 output: 371,992 → **165,192 B** (−55.6%), 148 → **10** draw
+submeshes, triangles unchanged at 5,688, appearance identical within 0.111% mean RGB delta
+at every A/B view. All gates G1–G6 and G8 pass (G7 n/a, no bake). Full metrics, census and
+judgment calls in `optimize/REPORT.md`.
+
+The optimized file was then re-run through this asset's own stage-2 contract validator and
+still passes all 16 checks, now reporting 10 objects instead of 148.
 
 ## Known limitations
 
