@@ -15,7 +15,7 @@ prompt, Part 2 is the research and design dossier behind it.
 | Manifest id | `540-presidio-blvd` |
 | Existing procedural builder | none — new landmark (needs a `pipeline/lib/landmarks.mjs` entry and a re-bake, see 2.13) |
 | WGS84 anchor | `-122.4519267, 37.7966669` |
-| Target height | **11.5 m** to the chimney caps (*estimated*; eave 8.0 m is the only measured datum — see 2.1) |
+| Target height | **11.5 m** to the chimney caps (*estimated*; eave 8.0 m is the only measured datum — see 2.1). Ridge as built is 10.5 m — see `artifacts/540-presidio-blvd/REPORT.md` |
 | OSM footprint | way/288360343, 247.6 m², oriented bounding box 14.47 x 19.72 m at +6.49° |
 | Triangle cap | 6,000 |
 | Category | `1` (House) |
@@ -274,8 +274,10 @@ No published architectural height was found. The chain is:
    8.0 m is the reason this plan treats 8 m as the eave rather than the top.
 3. Hip rise: the main block is 11.44 m across its short (E–W) span, so a 4:12 pitch — the
    normal range for a low Mission/Colonial Revival tile roof — rises 5.72 × 0.3333 = 1.91 m
-   over the half-span. Ridge = **9.9 m**. *(Pitch is the estimate; ±1:12 moves the ridge
-   ±0.5 m.)*
+   over the half-span. Ridge ≈ **9.9 m**. *(Pitch is the estimate; ±1:12 moves the ridge
+   ±0.5 m.)* **As built this became 10.5 m**: the roof springs from the overhang edge, not
+   the wall face, and 4:12 read as a flat plate from the app camera. The 11.5 m top is
+   unchanged. See REPORT.md "Corrections made to the plan".
 4. Chimneys clear the ridge by ~1.6 m. Architectural top = **11.5 m**.
 
 5. **External check.** `1008-general-kennedy`, researched independently for this same repo from
@@ -493,8 +495,8 @@ eye will eat them. Use the footprint, not a generous circle.
 - Re-import the exported GLB into a fresh scene; validate the re-import.
 - Max Z = 11.50 exactly, min Z = 0.00, XY centre offset = (0, 0) — so the loader's scale is
   1.000.
-- Dimensions ≈ 16.2 × 21.5 × 11.5 (the roof overhang widens the footprint bbox past the
-  14.47 × 19.72 walls; the yaw widens it again).
+- Dimensions ≈ 16.7 × 22.8 × 11.5 as built (the roof overhang widens the footprint bbox
+  past the 14.47 × 19.72 walls; the yaw widens it again).
 - ≤ 6,000 triangles.
 - Materials exactly the nine in 2.8; no textures, no alpha < 1, no `Toy_body`.
 - No cameras, lights, animation, armatures, constraints; transforms applied; no negative
