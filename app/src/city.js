@@ -26,9 +26,12 @@ import {
 } from 'three';
 import { mergeGeometries } from 'three/addons/utils/BufferGeometryUtils.js';
 import {
+  alignPoolToGround,
   createBuildingMaterial,
   createFarBuildingMaterial,
   createGroundMaterial,
+  createLampPoolGeometry,
+  createLampPoolMaterial,
   createToyBuildingMaterial,
   createTreeMaterial,
 } from './materials.js';
@@ -46,6 +49,12 @@ const NEAR_ENTER = 2400;
 const NEAR_EXIT = 3100;
 const TREE_RANGE = 3400;
 const LAMP_RANGE = 2600;
+// The pool of light a lamp throws on the road. Shorter than LAMP_RANGE: the
+// lamp head still reads as a bright dot from far off, but the pool is a
+// ground-level detail that stops earning its fill rate well before that.
+const POOL_RANGE = 1500;
+const POOL_RADIUS = 7.5; // m; a ~6.5 m lamp lights a little wider than it is tall
+const POOL_LIFT = 0.08; // m above the road, clear of z-fighting with the ribbon
 // Kerb faces, centre dashes and zebras: built per ground group while the camera
 // is near it, dropped again behind. Sub-pixel at this range, so nothing pops.
 const DETAIL_ENTER = 1800;
@@ -222,12 +231,14 @@ export function createCity(scene, data) {
   let onPathsReady = () => {};
 
   const groundMaterial = createGroundMaterial();
-  const quality = { windows: 1 };
+  const quality = { windows: 1, poolScale: 1, poolStrength: 1 };
   const treeMaterial = createTreeMaterial();
   const lampMaterial = new MeshBasicMaterial({ color: new Color(1.0, 0.82, 0.55), transparent: true, opacity: 0 });
+  const lampPoolMaterial = createLampPoolMaterial();
   const treeGeometry = treeArchetype();
   const toyTreeGeometry = toyTreeArchetype();
   const lampGeometry = new SphereGeometry(0.9, 6, 4);
+  const lampPoolGeometry = createLampPoolGeometry();
 
   // Diorama tier. `toy` holds the lazily fetched toy index (palette + street
   // classes); the cell grid, hysteresis and bookkeeping are shared with the base
@@ -356,6 +367,7 @@ export function createCity(scene, data) {
         groundMesh: null,
         trees: null,
         lamps: null,
+        lampPools: null,
         quadFade: [1, 1, 1, 1],
         requested: false,
         groundRequested: false,
@@ -628,21 +640,42 @@ export function createCity(scene, data) {
     }
 
     if (result.lamps.length > 0) {
-      const count = result.lamps.length / 3;
+      const count = result.lamps.length / 4;
       const lamps = new InstancedMesh(lampGeometry, lampMaterial, count);
+      const pools = new InstancedMesh(lampPoolGeometry, lampPoolMaterial, count);
       const dummy = new Object3D();
       for (let i = 0; i < count; i++) {
-        dummy.position.set(result.lamps[i * 3], result.lamps[i * 3 + 1], result.lamps[i * 3 + 2]);
+        const x = result.lamps[i * 4];
+        const y = result.lamps[i * 4 + 1];
+        const z = result.lamps[i * 4 + 2];
+        const roadY = result.lamps[i * 4 + 3];
+        dummy.position.set(x, y, z);
         dummy.scale.setScalar(1);
         dummy.updateMatrix();
         lamps.setMatrixAt(i, dummy.matrix);
+        // The pool lies on the road under the head, not at the head, and tilts
+        // with the grade so it stays on the tarmac instead of hovering.
+        dummy.position.set(x, roadY + POOL_LIFT, z);
+        alignPoolToGround(dummy.quaternion, x, z, data.sampleElevation);
+        dummy.scale.set(POOL_RADIUS, 1, POOL_RADIUS);
+        dummy.updateMatrix();
+        pools.setMatrixAt(i, dummy.matrix);
+        dummy.quaternion.identity();
       }
       lamps.instanceMatrix.needsUpdate = true;
       lamps.instanceMatrix.setUsage(DynamicDrawUsage);
       lamps.visible = false;
       lamps.name = `lamps-${g.key}`;
       scene.add(lamps);
+      pools.instanceMatrix.needsUpdate = true;
+      pools.instanceMatrix.setUsage(DynamicDrawUsage);
+      pools.visible = false;
+      pools.name = `lamp-pools-${g.key}`;
+      // After the road ribbon, so the additive wash lands on top of it.
+      pools.renderOrder = 3;
+      scene.add(pools);
       g.lamps = lamps;
+      g.lampPools = pools;
       g.lampCount = count;
       stats.lamps += count;
     }
@@ -837,7 +870,7 @@ export function createCity(scene, data) {
     stats.lamps -= g.lampCount || 0;
     g.treeCount = 0;
     g.lampCount = 0;
-    for (const key of ['groundMesh', 'trees', 'lamps']) {
+    for (const key of ['groundMesh', 'trees', 'lamps', 'lampPools']) {
       const obj = g[key];
       if (!obj) continue;
       scene.remove(obj);
@@ -968,7 +1001,11 @@ export function createCity(scene, data) {
       // kit lamps for. Where kit lamps stand, they are the lamp — two glows in
       // one place read as a bloom bug.
       if (g.lamps) {
-        g.lamps.visible = shared.uNight.value > 0.08 && dist < LAMP_RANGE && !g.furniture;
+        const lit = shared.uNight.value > 0.08 && !g.furniture;
+        g.lamps.visible = lit && dist < LAMP_RANGE;
+        // Same either/or as the head: where the kit's real lamps stand, their
+        // own pools light the road and this group must not double them.
+        if (g.lampPools) g.lampPools.visible = lit && dist < POOL_RANGE * quality.poolScale;
       }
       if (dist < DETAIL_ENTER && !g.detailRequested) {
         buildGroundDetail(g).catch((err) => console.warn('streetscape failed', g.key, err));
@@ -977,6 +1014,7 @@ export function createCity(scene, data) {
       }
     }
     lampMaterial.opacity = Math.min(0.85, shared.uNight.value * 0.95);
+    lampPoolMaterial.opacity = Math.min(1, shared.uNight.value * 1.1) * quality.poolStrength;
     if (streetkit.fleet) streetkit.fleet.update();
   }
 
@@ -999,6 +1037,10 @@ export function createCity(scene, data) {
     setQuality(q, tier) {
       quality.windows = q.windows;
       quality.tier = tier;
+      // Lamp pools are fill rate, so the tier scales both how far they reach
+      // and how hard they hit; `low` turns them off outright.
+      quality.poolScale = q.poolScale;
+      quality.poolStrength = q.poolStrength;
       for (const c of chunks.values()) {
         // The toy tier has no procedural window grid to turn down.
         const windows = c.material?.uniformsHolder.uWindows;

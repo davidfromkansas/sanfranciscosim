@@ -3,7 +3,17 @@
 // at dusk, cheap vertical AO, and hashed-dither LOD cross-fades (dithered, never
 // blended, so there is no sorting cost and no visible pop).
 
-import { Color, MeshLambertMaterial, Vector4 } from 'three';
+import {
+  AdditiveBlending,
+  BufferGeometry,
+  Color,
+  DoubleSide,
+  Float32BufferAttribute,
+  MeshBasicMaterial,
+  MeshLambertMaterial,
+  Vector3,
+  Vector4,
+} from 'three';
 import { shared } from './env.js';
 
 const DITHER = /* glsl */ `
@@ -497,6 +507,87 @@ export function createCloudShadedMaterial() {
 
 export function createTreeMaterial() {
   return createCloudShadedMaterial();
+}
+
+// --------------------------------------------------- streetlight pools ---
+// The disc of light a streetlight throws on the road at night. Shared by both
+// lamp systems: the procedural glow spheres in `city.js` and the kit's modelled
+// `sl_*` poles in `streetkit.js`, so a pool looks the same whichever kind of
+// lamp is standing there.
+//
+// Unit radius, lying in the XZ plane. The falloff lives in RGBA vertex colours
+// rather than a texture or a patched shader: three's AdditiveBlending is
+// (SRC_ALPHA, ONE), so that alpha ramp becomes a soft round wash straight out
+// of MeshBasicMaterial. Two rings, not one — a lone fan puts the whole
+// highlight on a single centre vertex and the pool reads as a cone.
+// 16 segments, not 24: the disc is soft-edged and small on screen, so the extra
+// tessellation is invisible while costing a third of the pool triangle budget —
+// and hero-view night triangles are already the tightest number in PERF-PLAN.
+export function createLampPoolGeometry(segments = 16) {
+  const RINGS = [
+    { r: 0, a: 1 },
+    { r: 0.34, a: 0.72 },
+    { r: 1, a: 0 },
+  ];
+  const positions = [0, 0, 0];
+  const colors = [1, 1, 1, 1];
+  const indices = [];
+  for (let ring = 1; ring < RINGS.length; ring++) {
+    const { r, a } = RINGS[ring];
+    for (let i = 0; i <= segments; i++) {
+      const t = (i / segments) * Math.PI * 2;
+      positions.push(Math.cos(t) * r, 0, Math.sin(t) * r);
+      colors.push(1, 1, 1, a);
+    }
+  }
+  const ringStart = (ring) => 1 + (ring - 1) * (segments + 1);
+  for (let i = 0; i < segments; i++) indices.push(0, ringStart(1) + i, ringStart(1) + i + 1);
+  for (let ring = 1; ring < RINGS.length - 1; ring++) {
+    const inner = ringStart(ring);
+    const outer = ringStart(ring + 1);
+    for (let i = 0; i < segments; i++) {
+      indices.push(inner + i, outer + i, outer + i + 1);
+      indices.push(inner + i, outer + i + 1, inner + i + 1);
+    }
+  }
+  const geometry = new BufferGeometry();
+  geometry.setAttribute('position', new Float32BufferAttribute(positions, 3));
+  geometry.setAttribute('color', new Float32BufferAttribute(colors, 4));
+  geometry.setIndex(indices);
+  return geometry;
+}
+
+// Lays a pool flat on the ground it is standing on rather than on a global
+// horizontal plane. San Francisco's grades are the whole reason this exists: a
+// flat disc on a 20% street floats over a metre clear of the tarmac at its
+// downhill rim and buries itself at the uphill one, which reads as a hovering
+// ellipse rather than light on a road. The normal comes from finite
+// differences on the terrain either side of the lamp.
+//
+// Writes into `out` and returns it. Called at build time, never per frame.
+const GROUND_UP = new Vector3(0, 1, 0);
+const groundNormal = new Vector3();
+export function alignPoolToGround(out, x, z, sampleElevation, probe = 3) {
+  const ex = sampleElevation(x + probe, z) - sampleElevation(x - probe, z);
+  const ez = sampleElevation(x, z + probe) - sampleElevation(x, z - probe);
+  // Gradient (ex, ez) over 2*probe; the surface normal is (-dx, 1, -dz).
+  groundNormal.set(-ex / (2 * probe), 1, -ez / (2 * probe)).normalize();
+  return out.setFromUnitVectors(GROUND_UP, groundNormal);
+}
+
+// Additive so the pool brightens the road rather than painting over it, and
+// depthWrite off so overlapping pools from neighbouring lamps blend instead of
+// fighting each other. Opacity is driven from the night ramp by the owner.
+export function createLampPoolMaterial() {
+  return new MeshBasicMaterial({
+    color: new Color(1.0, 0.76, 0.42),
+    vertexColors: true,
+    transparent: true,
+    opacity: 0,
+    blending: AdditiveBlending,
+    depthWrite: false,
+    side: DoubleSide,
+  });
 }
 
 export const PALETTE_TINT = new Color();
