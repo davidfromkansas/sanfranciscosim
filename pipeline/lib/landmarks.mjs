@@ -44,6 +44,15 @@ export const LANDMARKS = [
     camera: { distance: 800, yaw: 60, pitch: 20 },
   },
   {
+    id: 'columbusTower',
+    name: 'Columbus Tower (Sentinel Building)',
+    lon: -122.4050266,
+    lat: 37.7965554,
+    height: 29,
+    exclude: 35,
+    camera: { distance: 260, yaw: 210, pitch: 16 },
+  },
+  {
     id: '555California',
     name: '555 California Street',
     lon: -122.4037741,
@@ -174,6 +183,15 @@ export const LANDMARKS = [
     height: 43.9,
     exclude: 100,
     camera: { distance: 700, yaw: 135, pitch: 20 },
+  },
+  {
+    id: 'operaHouse',
+    name: 'War Memorial Opera House',
+    lon: -122.4209170,
+    lat: 37.7786126,
+    height: 44,
+    exclude: 62,
+    camera: { distance: 700, yaw: 90, pitch: 18 },
   },
   {
     id: 'fishermansWharf',

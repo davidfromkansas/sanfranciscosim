@@ -272,6 +272,42 @@
     "tris": 8386
   },
   {
+    "id": "columbus-tower",
+    "file": "columbus-tower.glb",
+    "anchor": [
+      -122.4050266,
+      37.7965554
+    ],
+    "targetHeightM": 29,
+    "cat": 3,
+    "name": "Columbus Tower (Sentinel Building)",
+    "estimated": false,
+    "dims": [
+      19.8831,
+      18.2508,
+      29.0
+    ],
+    "tris": 9360
+  },
+  {
+    "id": "opera-house",
+    "file": "war-memorial-opera-house.glb",
+    "anchor": [
+      -122.420917,
+      37.7786126
+    ],
+    "targetHeightM": 44,
+    "cat": 17,
+    "name": "War Memorial Opera House",
+    "estimated": false,
+    "dims": [
+      113.967,
+      77.687,
+      44
+    ],
+    "tris": 9696
+  },
+  {
     "id": "555-california",
     "file": "555-california.glb",
     "anchor": [
