@@ -106,21 +106,6 @@ export function createUI({ presets, onPreset, onQuality }) {
   };
 }
 
-export function createLoader() {
-  const loader = document.getElementById('loader');
-  const bar = loader.querySelector('i');
-  let done = false;
-  return {
-    set(fraction) {
-      if (done) return;
-      bar.style.width = `${Math.round(Math.min(1, fraction) * 100)}%`;
-    },
-    finish() {
-      if (done) return;
-      done = true;
-      bar.style.width = '100%';
-      loader.classList.add('done');
-      setTimeout(() => loader.remove(), 900);
-    },
-  };
-}
+// The boot progress indicator now lives in boot.js — a full-screen fog curtain
+// with its own reveal gate, mounted from index.html so it paints before any
+// module parses. The old bottom hairline bar was removed with it.

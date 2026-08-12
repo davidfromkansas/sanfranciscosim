@@ -1,5 +1,7 @@
 // Bootstrap: load the baked city, build the scene, and open on the hero frame —
-// the whole of San Francisco as a diorama, no title card, no fade-in.
+// the whole of San Francisco as a diorama. The boot curtain (boot.js) covers
+// the load with fog and lifts onto the finished frame; behind it the city has
+// always been building, and there is still no style transition of any kind.
 
 import {
   ACESFilmicToneMapping,
@@ -25,7 +27,8 @@ import { createLiveFerries } from './ferries.js';
 import { createCameraRig } from './camera.js';
 import { createSigns } from './signs.js';
 import { createToyPost } from './toypost.js';
-import { QUALITY, QUALITY_LADDER, createLoader, createUI } from './ui.js';
+import { QUALITY, QUALITY_LADDER, createUI } from './ui.js';
+import { createBootScreen } from './boot.js';
 import { createGovernor } from './governor.js';
 import { createContext } from './context.js';
 import { createFocusOverlay } from './focus.js';
@@ -35,7 +38,7 @@ import { createSkyClock } from './sky-clock.js';
 import { localDayStart, moonPosition, skySnapshot, sunPosition } from '../../api/_lib/astro.mjs';
 
 const canvas = document.getElementById('view');
-const loader = createLoader();
+const bootScreen = createBootScreen();
 
 // antialias: false is deliberate (PERF-PLAN #7): the diorama always renders
 // through the post pass's offscreen target, so canvas MSAA smoothed a buffer
@@ -68,16 +71,16 @@ const scene = new Scene();
 const camera = new PerspectiveCamera(52, window.innerWidth / window.innerHeight, 4, 60000);
 
 async function boot() {
-  const data = await loadCore((p) => loader.set(p * 0.55));
+  const data = await loadCore((p) => bootScreen.core(p * 0.82));
 
   const env = createEnvironment(scene);
   const terrain = createTerrain(data);
   for (const mesh of terrain.meshes) scene.add(mesh);
-  loader.set(0.75);
+  bootScreen.core(0.9);
   const water = createWater(scene);
   const landmarks = createLandmarks(scene, data);
   const piers = createPiers(scene, data);
-  loader.set(0.9);
+  bootScreen.core(1);
 
   const context = await createContext(data);
   const city = createCity(scene, data);
@@ -534,7 +537,7 @@ async function boot() {
     agents,
     ferries,
     governor,
-    assets,
+    boot: bootScreen,
     landmarks,
     piers,
     presets,
@@ -604,7 +607,6 @@ async function boot() {
   let frames = 0;
   let fpsAccumulator = 0;
   let fps = 0;
-  let loaderDone = false;
   let assetsRequested = false;
 
   function frame(now) {
@@ -666,12 +668,9 @@ async function boot() {
       fpsAccumulator = 0;
     }
 
-    const progress = 0.9 + city.progress * 0.1;
-    loader.set(progress);
-    if (!loaderDone && city.progress > 0.985) {
-      loaderDone = true;
-      loader.finish();
-    }
+    // The curtain owns its own phase weighting and reveal gate (boot.js); this
+    // is both its proof that the renderer is painting and its stream numbers.
+    bootScreen.rendered(city.stats);
 
     if (ui.debugVisible) {
       const info = renderer.info;
@@ -721,6 +720,9 @@ function toCameraTarget(preset, data) {
 
 boot().catch((error) => {
   console.error(error);
+  // Never leave the user behind the fog: the curtain reports the failure on its
+  // own bar and then lifts, so the message below is readable.
+  bootScreen.fail(error.message);
   const message = document.createElement('div');
   message.className = 'panel';
   message.style.position = 'fixed';

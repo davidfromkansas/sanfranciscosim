@@ -13,7 +13,6 @@
 
 import {
   BatchedMesh,
-  Box3,
   BufferAttribute,
   Group,
   Matrix4,

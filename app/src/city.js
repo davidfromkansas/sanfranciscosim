@@ -215,6 +215,12 @@ export function createCity(scene, data) {
     cellsLoaded: 0,
     cellsTotal: 0,
     nearChunks: 0,
+    // Groups in the grid. farGroups/groundGroups count the meshes actually in
+    // the scene, so the ratio against this is "how much of the frame is built"
+    // — which is what the boot curtain's reveal gate watches. Cell counts
+    // cannot answer that: most cells belong to tiers the opening view never
+    // draws.
+    groupsTotal: 0,
     farGroups: 0,
     groundGroups: 0,
     groundDetail: 0,
@@ -427,6 +433,7 @@ export function createCity(scene, data) {
   }
   stats.cellsTotal =
     indexes.buildings.cells.length + indexes.streets.cells.length + indexes.landcover.cells.length;
+  stats.groupsTotal = groups.size;
 
   const inflight = new Map();
   function cacheBlob(id, buffer) {
