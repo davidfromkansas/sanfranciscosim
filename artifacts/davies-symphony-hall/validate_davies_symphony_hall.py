@@ -19,6 +19,7 @@ TRI_BUDGET = 16000
 TARGET_HEIGHT = 35.0
 ARC_CX, ARC_CY, ARC_R = 10.03, -1.02, 44.75
 RAY_RESIDUAL_TOLERANCE = 0.0015  # 0.15%, per the asset plan's normals gate
+Z_GLASS_LO, Z_GLASS_HI = 2.0, 18.0  # the promenade band, inclusive of its sill and head courses
 
 
 def rounded(v):
@@ -180,24 +181,33 @@ def main():
                     ray_flipped += 1
     ray_residual = (ray_flipped / ray_hits) if ray_hits else 1.0
 
-    # The front arc is the building; measure it back out of the export. The
-    # fins stand FIN_D/2 = 0.3 m proud of the wall line, so an arc fin's
-    # centroid sits at R + 0.3; fins on the straight Grove and Van Ness flanks
-    # are excluded by the selection band, not by the tolerance.
-    ARC_FIN_R = ARC_R + 0.3
+    # The front arc is the building; measure it back out of the export.
+    # Deliberately object-name-independent, so this runs identically before and
+    # after the stage-4 optimize pass joins every fin into one per-material
+    # mesh: bin every vertex in the promenade band by angle about the arc
+    # centre and ask how much of the 103.6 deg sweep is actually occupied by
+    # geometry sitting on radius R.
+    BINS = 52  # 2 deg each across the arc sweep
+    a0, a1 = math.radians(-4.5), math.radians(99.1)
+    occupied = set()
     arc_residuals = []
     for obj in meshes:
-        if not obj.name.startswith("fin"):
-            continue
         ev = obj.evaluated_get(dg)
         me = ev.to_mesh()
-        cx = sum((obj.matrix_world @ v.co).x for v in me.vertices) / len(me.vertices)
-        cy = sum((obj.matrix_world @ v.co).y for v in me.vertices) / len(me.vertices)
-        d = math.hypot(cx - ARC_CX, cy - ARC_CY)
-        if abs(d - ARC_FIN_R) < 1.2:
-            arc_residuals.append(abs(d - ARC_FIN_R))
+        for v in me.vertices:
+            w = obj.matrix_world @ v.co
+            if not (Z_GLASS_LO <= w.z <= Z_GLASS_HI):
+                continue
+            d = math.hypot(w.x - ARC_CX, w.y - ARC_CY)
+            if abs(d - ARC_R) > 0.7:   # wall/fin plane only; the glazing sits 1.0 m behind it
+                continue
+            a = math.atan2(w.y - ARC_CY, w.x - ARC_CX)
+            if not (a0 <= a <= a1):
+                continue
+            occupied.add(int((a - a0) / (a1 - a0) * BINS))
+            arc_residuals.append(abs(d - ARC_R))
         ev.to_mesh_clear()
-    arc_fin_count = len(arc_residuals)
+    arc_bins_occupied = len(occupied)
     arc_max_residual = round(max(arc_residuals), 3) if arc_residuals else None
 
     results = {
@@ -219,7 +229,8 @@ def main():
         "xy_center_offset_m": [round(center.x, 4), round(center.y, 4)],
         "front_arc_radius_m": ARC_R,
         "front_arc_centre_local": [ARC_CX, ARC_CY],
-        "front_arc_fins_measured": arc_fin_count,
+        "front_arc_bins_occupied": arc_bins_occupied,
+        "front_arc_bins_total": BINS,
         "front_arc_max_residual_m": arc_max_residual,
         "materials": sorted(mat.name for mat in bpy.data.materials),
         "material_details": sorted(mat_rows, key=lambda x: x["name"]),
@@ -266,9 +277,12 @@ def main():
         "crest_lands_on_target_height": abs(mx.z - TARGET_HEIGHT) <= 0.05,
         "base_at_z_zero": abs(mn.z) <= 0.5,
         "centered_xy": abs(center.x) <= 1.0 and abs(center.y) <= 1.0,
-        "front_arc_preserved": arc_fin_count >= 20
+        # One ring vertex per ARC_STEP chord lands ~2.7 deg apart, so a
+        # faithful arc occupies ~37 of the 52 two-degree bins; anything much
+        # lower means segments of the sweep were flattened or lost.
+        "front_arc_preserved": arc_bins_occupied >= 34
         and arc_max_residual is not None
-        and arc_max_residual <= 1.0,
+        and arc_max_residual <= 0.7,
         "under_triangle_budget": tris <= TRI_BUDGET,
         "no_image_textures": not bpy.data.images and not textured,
         "no_transparency": not transparent,

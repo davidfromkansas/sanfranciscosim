@@ -11,14 +11,15 @@ what was verified at build time and what the asset actually contains.
 
 | | |
 |---|---|
-| Triangles | **9,829** (cap 16,000) |
-| Objects | 177 |
+| Triangles | **9,518** shipped (9,829 as built; cap 16,000) |
+| Objects | 12 shipped (177 as built) |
+| Shipping file | **211,452 bytes** raw, 16 draw submeshes (548,804 B / 181 before the stage-4 optimize pass) |
 | Dimensions | 124.75 × 95.04 × **35.00** m |
 | Min Z | 0.000 |
 | XY centre offset | 0.110, 0.708 m |
 | Loader scale (`targetHeightM / measuredHeight`) | **1.000000** |
 | Materials | 11, all `Toy_*`, 3 of them `_Glow` |
-| Front arc, measured back out of the export | 42 fins on R 44.75 m about local `(10.03, −1.02)`, max residual 0.71 m |
+| Front arc, measured back out of the export | 52 of 52 two-degree bins of the 103.6° sweep occupied on R 44.75 m about local `(10.03, −1.02)`, max residual 0.612 m — **identical before and after optimization** |
 | File | see `validation.json` for the full machine-readable report |
 
 Materials: `Toy_cream`, `Toy_glass`, `Toy_gold`, `Toy_gold_Glow`, `Toy_ink`,
@@ -34,8 +35,8 @@ Materials: `Toy_cream`, `Toy_glass`, `Toy_gold`, `Toy_gold_Glow`, `Toy_ink`,
 | Crest lands on the 35.0 m target height | PASS (35.000) |
 | Base at z = 0 | PASS (0.000) |
 | Centred in XY | PASS (0.11, 0.71 m) |
-| Front arc preserved (R 44.75 m) | PASS (42 fins, max residual 0.71 m) |
-| Under the triangle budget | PASS (9,829 / 16,000) |
+| Front arc preserved (R 44.75 m) | PASS (52/52 bins, max residual 0.612 m) |
+| Under the triangle budget | PASS (9,518 / 16,000) |
 | No image textures | PASS |
 | No transparency | PASS |
 | Materials follow the contract | PASS |
@@ -53,10 +54,12 @@ before export. On re-import, per-object signed volume is authoritative for the
 closed solids and all of them come back positive — note that glTF stores split
 vertices for flat shading, so the validator welds coincident vertices before
 asking whether a mesh is closed, otherwise every solid falsely reads as an open
-shell. Eight objects are single-sided *by design* — `shell_roof`, `shell_ribs`,
-`shell_crown`, `lettering_band`, `lettering_glow`, `promenade_glow_l1`,
-`promenade_glow_l2`, `clerestory_glow` — so 22,500 deterministic visibility rays
-gate the back-facing residual at 0.15%. Measured residual: **0.12%**.
+shell. Some surfaces are single-sided *by design* — the shell roof, its ribs and
+crown, the lettering band and the night-glow shells; a roof has no underside —
+which after the stage-4 per-material join leaves five open groups
+(`grp_Toy_steel`, `grp_Toy_trim`, `grp_Toy_gold_Glow`, `grp_Toy_mustard_Glow`,
+`lettering_band`). So 22,500 deterministic visibility rays gate the back-facing
+residual at 0.15%. Measured residual on the shipping file: **0.12%**.
 
 ## Dossier corrections made at build time
 
@@ -135,7 +138,10 @@ consistent with the Opera House next door.
 ## Renders
 
 All generated from the exported GLB, re-imported into an empty scene — every
-image depicts exactly the geometry that ships.
+image depicts exactly the geometry that ships. They were rendered from the
+pre-optimize export; stage 4's A/B pass measured the optimized file against it
+at a mean delta of 0.005–0.21% across day, night and all four elevations, so
+they remain accurate for the shipping asset (`optimize/REPORT.md`).
 
 `davies-symphony-hall-north.png`, `-east.png`, `-south.png`, `-west.png` (one
 orthographic rig, identical scale/framing/lighting/exposure, differing only in
@@ -165,7 +171,7 @@ Not applied here — integration is a separate job
     95.0375,
     35.0
   ],
-  "tris": 9829,
+  "tris": 9518,
   "loadRadius": 2500
 }
 ```
@@ -173,6 +179,14 @@ Not applied here — integration is a separate job
 `"estimated": false` — both the cornice and the crest are LiDAR measurements.
 `cat: 17` matches `opera-house`, so the two Performing Arts Center halls are
 treated consistently by search and the concierge.
+
+## Stage 4 — optimize
+
+Full detail in `optimize/REPORT.md`. Headline: **548,804 → 211,452 bytes
+(−61.5%), 181 → 16 draw submeshes, all gates PASS**, appearance identical
+(mean pixel delta 0.005–0.21%). The optimized file is now the shipping
+`davies-symphony-hall.glb`; the pre-optimize asset is archived byte-for-byte at
+`optimize/input/davies-symphony-hall.glb`.
 
 ## Notes for integration
 
