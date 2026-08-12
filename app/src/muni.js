@@ -48,7 +48,9 @@ const MISSES_TO_DROP = 2;
 const CAR_SCALE = 1.6;
 
 // Movement tuning against the acceptance bar: stopped must read as stopped.
-const DWELL_SPEED = 0.7; // m/s reported below this counts as dwelling
+// Displacement across one fix gap below which a bus is standing still. A
+// speed READING of 0 means nothing here — see the note in apply().
+const DWELL_STEP_M = 14; // ~one 40-foot coach at 1.6x
 const DECEL = 3.2; // m/s^2 easing into a stop (~2 s from cruise)
 const ACCEL = 1.4; // m/s^2 pulling away
 const CATCHUP_FACTOR = 1.3; // max overspeed while closing a gap to the fix
@@ -71,11 +73,24 @@ const BADGE_H = 7.2;
 // Height of the QUAD CENTRE. The tail tip sits ~0.36 x BADGE_H below centre, so
 // this lands the point just above the 5.5 m roof (3.42 m body x 1.6 carScale).
 const BADGE_Y = 8.6;
-// Deliberately short. Badges are a "the city is moving" cue, not a data layer:
-// past this the buses still drive, they just stop shouting, and the skyline is
-// left alone. `working` below tightens this further when a corridor is dense.
-const BADGE_NEAR = 380; // full opacity inside this camera distance...
-const BADGE_FAR = 620; // ...gone past this
+// Badges follow the ZOOM, not a fixed distance in metres. A radius tuned for
+// street level shows nothing from the air, which is where this camera spends
+// most of its time; one tuned for the air carpets the Mission at street level.
+// So the working radius is derived from the camera's height each frame and the
+// bubbles are scaled to hold a roughly constant SIZE ON SCREEN — a bubble a
+// kilometre away is drawn a kilometre-sized, which is what makes them legible
+// from up high. Density is then bounded by MAX_BADGES, not by the radius.
+const BADGE_RADIUS_MIN = 300;
+const BADGE_RADIUS_MAX = 2600;
+const BADGE_RADIUS_PER_M = 1.15; // radius per metre of camera height
+// Above this camera height the whole city is on screen and bubbles would be
+// pixel soup: the layer switches off entirely.
+const BADGE_CEILING_Y = 3400;
+// Camera distance at which a bubble is drawn at its authored size; scale is
+// proportional to distance either side of it, so screen size stays put.
+const BADGE_REF_DIST = 420;
+const BADGE_SCALE_MIN = 0.85;
+const BADGE_SCALE_MAX = 9;
 // Hard ceiling on how many shout at once, whatever the radius.
 const MAX_BADGES = 18;
 
@@ -380,11 +395,10 @@ export function createLiveMuni(scene, data) {
   let polling = false;
   let warnedFetch = false;
   let demoStart = 0;
-  // Adaptive badge radius. A fixed radius is either too tight downtown or too
-  // loud in the Sunset, so it breathes: overshoot the cap and it pulls in, sit
-  // well under and it eases back out. O(1) per frame, no sorting, no allocation,
-  // and it moves slowly enough that bubbles fade rather than blink.
-  let badgeRadius = BADGE_FAR;
+  // Adaptive badge radius, within whatever the zoom allows. A dense corridor
+  // pulls it in, a quiet neighbourhood lets it back out. O(1) per frame, no
+  // sorting, no allocation, and slow enough that bubbles fade rather than blink.
+  let badgeRadius = BADGE_RADIUS_MAX;
 
   async function load() {
     // The shapes bake is an enhancement, not a requirement: without it every
@@ -518,19 +532,25 @@ export function createLiveMuni(scene, data) {
         }
       }
 
-      // The speed the follower should hold to arrive at the new projection in
-      // about one fix gap, informed by the reported speed. A reported crawl or
-      // an unmoved projection means dwell — target zero and STOP (the "stopped
-      // means stopped" rule); the distance stays banked in targetS and is paid
-      // out when the bus reports moving again.
+      // How fast to run so the bus covers the ground it actually covered.
+      //
+      // DWELL IS A DISPLACEMENT TEST, NOT A SPEED READING. GTFS-RT's `speed` is
+      // an instantaneous sample at the fix moment, and 260 of 507 Muni vehicles
+      // report exactly 0 at any given instant — every one sitting at a light or
+      // a stop when the sample was taken. Reading that as "parked" froze half
+      // the fleet on every poll even though those buses had plainly moved
+      // hundreds of metres since their previous fix. Only a bus that has not
+      // MOVED between two fixes is dwelling; the reported speed merely biases
+      // how fast it runs once we know it has.
       const reported = Number.isFinite(bus.speedMs) ? bus.speedMs : null;
       const fixStep = Math.hypot(x - prevFixX, z - prevFixZ);
-      const dwelling = (reported != null && reported < DWELL_SPEED) || (reported == null && fixStep < 8);
       if (state.shapeIdx >= 0) {
         const gapS = Math.max(0, state.targetS - state.s);
-        state.targetSpeed = dwelling ? 0 : Math.min(MAX_SPEED, Math.max(reported ?? 0, gapS / gap) );
+        // One bus length of slack: less than that across a whole fix gap is
+        // genuinely standing still, and the dwell easing takes it to a stop.
+        state.targetSpeed = gapS < DWELL_STEP_M ? 0 : Math.min(MAX_SPEED, Math.max(gapS / gap, (reported ?? 0) * 0.6));
       } else {
-        state.targetSpeed = dwelling ? 0 : Math.min(MAX_SPEED, reported ?? fixStep / gap);
+        state.targetSpeed = fixStep < DWELL_STEP_M ? 0 : Math.min(MAX_SPEED, fixStep / gap);
         state.deadYaw = fixStep > 4 ? Math.atan2(x - prevFixX, z - prevFixZ) : state.deadYaw;
       }
     }
@@ -695,6 +715,15 @@ export function createLiveMuni(scene, data) {
     let count = 0;
     let badgeCount = 0;
     let eligible = 0;
+    // Camera height stands in for zoom: the rig is pitch-locked, so height and
+    // orbit distance move together and this needs no extra plumbing.
+    const camY = camera.position.y;
+    const badgesOn = camY < BADGE_CEILING_Y;
+    const zoomRadius = Math.max(BADGE_RADIUS_MIN, Math.min(BADGE_RADIUS_MAX, camY * BADGE_RADIUS_PER_M));
+    const badgeScale = Math.max(
+      BADGE_SCALE_MIN,
+      Math.min(BADGE_SCALE_MAX, Math.max(camY, 120) / BADGE_REF_DIST),
+    );
 
     for (const state of buses.values()) {
       if (now - state.lastFixAt > STALE_MS) {
@@ -749,22 +778,22 @@ export function createLiveMuni(scene, data) {
       // enough to be worth calling out. Counted separately from the body so a
       // skipped bubble costs an instance rather than leaving a hole.
       const dist = Math.hypot(state.x - camX, state.z - camZ);
-      const near = Math.min(BADGE_NEAR, badgeRadius - 60);
-      if (dist < badgeRadius && badgeCount < MAX_BADGES) {
-        const fade = dist < near ? 1 : Math.max(0, 1 - (dist - near) / Math.max(1, badgeRadius - near));
+      const near = badgeRadius * 0.72; // fade over the outer quarter of the ring
+      if (badgesOn && dist < badgeRadius) {
         eligible++;
-        const rect = atlas.rect(state.route);
-        dummy.position.set(state.x, y + BADGE_Y, state.z);
-        dummy.quaternion.copy(camQ);
-        // Grows very gently with distance so a far bubble stays readable without
-        // the near ones turning into billboards over the rooftops.
-        dummy.scale.setScalar((0.85 + dist / 5200) * fade);
-        dummy.updateMatrix();
-        badge.mesh.setMatrixAt(badgeCount, dummy.matrix);
-        badge.uvRect.setXYZW(badgeCount, rect[0], rect[1], rect[2], rect[3]);
-        badgeCount++;
-      } else if (dist < badgeRadius) {
-        eligible++;
+        if (badgeCount < MAX_BADGES) {
+          const fade = dist < near ? 1 : Math.max(0, 1 - (dist - near) / Math.max(1, badgeRadius - near));
+          const rect = atlas.rect(state.route);
+          dummy.position.set(state.x, y + BADGE_Y * badgeScale, state.z);
+          dummy.quaternion.copy(camQ);
+          // Proportional to distance => constant on screen. Anchored so the
+          // tail still meets the roof: BADGE_Y scales with the bubble.
+          dummy.scale.setScalar(badgeScale * fade);
+          dummy.updateMatrix();
+          badge.mesh.setMatrixAt(badgeCount, dummy.matrix);
+          badge.uvRect.setXYZW(badgeCount, rect[0], rect[1], rect[2], rect[3]);
+          badgeCount++;
+        }
       }
 
       count++;
@@ -781,9 +810,10 @@ export function createLiveMuni(scene, data) {
     badge.mesh.instanceMatrix.needsUpdate = true;
     badge.uvRect.needsUpdate = true;
 
-    // Breathe the radius toward whatever keeps roughly MAX_BADGES on screen.
-    const target = eligible > MAX_BADGES ? badgeRadius * 0.94 : badgeRadius * 1.04;
-    badgeRadius = Math.max(140, Math.min(BADGE_FAR, badgeRadius + (target - badgeRadius) * Math.min(1, dt * 1.5)));
+    // Breathe the radius toward whatever keeps roughly MAX_BADGES on screen,
+    // bounded by what the current zoom allows.
+    const target = eligible > MAX_BADGES ? badgeRadius * 0.94 : badgeRadius * 1.06;
+    badgeRadius = Math.max(140, Math.min(zoomRadius, badgeRadius + (target - badgeRadius) * Math.min(1, dt * 1.5)));
   }
 
   // ------------------------------------------------------------- entities
