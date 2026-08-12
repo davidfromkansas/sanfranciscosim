@@ -7,7 +7,7 @@
   "rows": 32
  },
  "stats": {
-  "sidecarBytes": 18037616,
+  "sidecarBytes": 18037216,
   "cells": 547
  },
  "cells": [
@@ -1697,9 +1697,9 @@
    "cz": 12,
    "originX": 500,
    "originZ": -2000,
-   "buildings": 225,
+   "buildings": 224,
    "streets": 39,
-   "bytes": 29650
+   "bytes": 29557
   },
   {
    "key": "17_13",
@@ -1937,9 +1937,9 @@
    "cz": 12,
    "originX": 1000,
    "originZ": -2000,
-   "buildings": 116,
+   "buildings": 113,
    "streets": 46,
-   "bytes": 18445
+   "bytes": 18138
   },
   {
    "key": "18_13",

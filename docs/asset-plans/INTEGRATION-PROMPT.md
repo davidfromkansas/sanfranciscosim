@@ -154,8 +154,9 @@ Then, in the browser (real key presses, not synthetic events — see the testing
 - Check the footprint size against reality (compare with the neighbouring blocks and
   the plan's §2.1). The loader scales uniformly by height, so a height error shows up
   as a plan-size error — this matters most for wide, low assets.
-- Check orientation: the real front must face the real street. The loader never
-  rotates, so what you see is what was authored.
+- Check orientation: the real front must face the real street. Assets should still be
+  authored in true-world orientation; an explicit manifest `yawDeg` is a
+  data-visible placement override only when the authored heading is wrong.
 - Check it sits on the terrain: no floating, no sinking (hill sites especially).
 - Night: sweep the time slider past dusk and confirm only the intended `_Glow`
   surfaces light up.
@@ -232,7 +233,9 @@ acceptable; a hidden one is not.
   group.position.set(x, Math.max(0, data.sampleElevation(x, z)), z);
   ```
   Uniform scale from height, position from the real anchor and sampled terrain, and
-  **no rotation** — assets must be authored in true-world orientation.
+  optional `yawDeg` rotation about the model's vertical axis through its placement
+  origin. Assets must still be authored in true-world orientation; `yawDeg` is an
+  explicit, data-visible override for an asset whose authored heading is wrong.
 - `camelId('<slug>')` (`id.replace(/-([a-z])/g, ...)`) produces the pipeline's
   landmark id; `onPlaced` then lets `app/src/landmarks.js` hide the procedural twin.
   Bridges take the separate `placeBridge()` path with `ends`/`southEnd`.
@@ -266,7 +269,7 @@ inside the new asset.
 | Two buildings on the same spot | `camelId(id)` does not match the procedural/pipeline id, or Case B without a re-bake | fix the id, or add the registry entry and re-bake |
 | Baked blocks poking through the model | exclusion radius too small | raise `exclude`, re-bake, re-run `pipeline/audit.mjs` check 1.6 |
 | Model far too large or small | `targetHeightM` disagrees with the authored height | log line shows the scale factor; fix the manifest height, not the model |
-| Model faces the wrong way | authored to the `-Y` convention instead of true-world orientation | fix in authoring; the loader never rotates |
+| Model faces the wrong way | authored to the `-Y` convention instead of true-world orientation | fix in authoring, or use an explicit manifest `yawDeg` override for a known authored-heading error |
 | Model floats or sinks | terrain sampled at the anchor differs from the model's base | check `min Z` ~ 0 and the anchor; hill sites need a real base plinth |
 | Whole facade glows at night | `_Glow` on the wrong materials | fix material names in authoring |
 | More than 2 draw calls for the asset | more than one glow material set, or unmerged parts | check the merge line; usually an authoring issue |
