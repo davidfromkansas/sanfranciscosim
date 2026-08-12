@@ -56,9 +56,14 @@ route, and the park plans depend on it (§E8 of the parks README).
 | [Conservatory of Flowers](./conservatory-of-flowers.md) | `conservatory-of-flowers` | 18.3 m | new landmark |
 | [War Memorial Opera House](./war-memorial-opera-house.md) | `opera-house` | 44 m | new landmark |
 | [Fairmont San Francisco](./fairmont-san-francisco.md) | `fairmont` | 99 m | new landmark |
+| [380 Brannan Street](./380-brannan.md) | `380-brannan` | 12.6 m | new landmark |
+| [550 Third Street](./550-third.md) | `550-third` | 11 m | new landmark |
+| [375 Alabama Street (Ames Harris Neville Co.)](./375-alabama.md) | `375-alabama` | 22.5 m | new landmark |
+| [1008 General Kennedy Avenue](./1008-general-kennedy.md) | `1008-general-kennedy` | 11.9 m | new landmark |
+| [Letterman Digital Arts Center](./letterman-digital-arts-center.md) | `letterman` | ~22 m (estimated) | new landmark |
 | [Chase Center](./chase-center.md) | `chase-center` | 40.8 m | new landmark |
 
-## Shared contract (all 20)
+## Shared contract (all 25)
 
 - Style: `docs/styles/miniature-toy.md` (authoritative for artistic decisions)
 - Technical contract: `.agents/skills/sf-asset-check/SKILL.md` (authoritative for the GLB)
@@ -101,9 +106,11 @@ with the source named in each row. Anything visual, derived or unconfirmed is
 labelled *inferred* or *estimated* and is called out again in each plan's section
 2.15. Several OSM `height` tags describe only a low shell (City Hall 30 m, St
 Mary's 18.9 m, Cal Academy 11 m, de Young 13 m) and must never be used as the
-architectural target height. Chase Center is the inverse case — three published
-figures (structural 31.755 m, OSM 38.1 m, facade crest 40.84 m) measure three
-different things; see that plan's 2.1.
+architectural target height. 550 Third Street is the sharpest case: its OSM
+`height=7` and the 2010 city LiDAR agree, and both are wrong, because they
+predate the rooftop penthouse that gives the building its crest. Chase Center is
+the inverse case — three published figures (structural 31.755 m, OSM 38.1 m,
+facade crest 40.84 m) each measure a different thing; see that plan's 2.1.
 
 The executing agent is expected to re-verify height, anchor, footprint and
 orientation before modelling — the dossier is a head start, not a citation.

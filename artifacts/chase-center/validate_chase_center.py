@@ -1,6 +1,7 @@
 """Fresh-scene contract validation for chase-center.glb.
 
     blender -b --python validate_chase_center.py -- [--glb FILE] [--out FILE]
+                                                    [--closed-solids]
 
 This script factory-resets, imports only the final GLB, and writes the complete
 machine-readable report. It does not inspect the source .blend.
@@ -9,6 +10,11 @@ Normals: Chase Center is a union of closed solids, so per-object signed volume
 is the authoritative test (every object must enclose positive volume). A
 deterministic visibility ray sweep runs as a secondary check; a small residual
 is expected where two solids interpenetrate, and is reported rather than hidden.
+
+Pass `--closed-solids` when validating the AUTHORED export
+(`optimize/input/chase-center.glb`) to additionally assert that every object is
+a closed manifold. Do not pass it for the shipped file: the stage-4 optimize
+pass deletes provably-buried faces, which opens those shells on purpose.
 """
 
 import json
@@ -203,12 +209,12 @@ def main():
     ray_residual = (ray_flipped / ray_hits) if ray_hits else 1.0
 
     # Closedness is required of the AUTHORED export - it is how the build
-    # guarantees outward normals. It is NOT required of the shipped file: the
-    # stage-4 optimize pass deletes faces it can prove are buried inside another
-    # solid, which deliberately opens those shells. On the shipped file the
-    # authoritative tests are the ones the pipeline doc names - per-object
-    # signed volume positive, plus a ray residual at or under 0.15%.
-    closed_solids_expected = identity
+    # guarantees outward normals - and is asserted with --closed-solids. It is
+    # NOT required of the SHIPPED file: the stage-4 optimize pass deletes faces
+    # it can prove are buried inside another solid, which deliberately opens
+    # those shells. There the authoritative tests are the ones the pipeline doc
+    # names - per-object signed volume positive, plus ray residual <= 0.15%.
+    closed_solids_expected = "--closed-solids" in argv
     normals_ok = (
         invalid_normal_count == 0
         and not inverted_solids

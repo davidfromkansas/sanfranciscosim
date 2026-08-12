@@ -9,23 +9,21 @@ file disagree, this file is what was built and why — §4 lists every correctio
 
 ## 1. Shipped numbers
 
-| | |
-|---|---|
 Numbers below are the **shipped** file — post stage-4 optimize. The
 pre-optimize authored export is archived at `optimize/input/chase-center.glb`
 and its figures are in brackets.
 
 | | |
 |---|---|
-| Triangles | **11,289** (cap 27,000) [authored 11,660] |
+| Triangles | **11,291** (cap 27,000) [authored 11,660] |
 | Mesh objects | 11 [authored 40] |
-| Dimensions | 164.364 × 159.127 × **40.803** m [40.800] |
+| Dimensions | 164.364 × 159.125 × **40.800** m |
 | Min Z | 0.000 |
-| Bbox top | 40.803 — so `targetHeightM / measuredHeight` = **0.999936** |
+| Bbox top | 40.800 — so `targetHeightM / measuredHeight` = **1.000000** |
 | Draw submeshes | 14 [authored 43] |
 | Materials | 10, all `Toy_*`, flat, opaque, no textures |
 | Glow materials | `Toy_sky_Glow` (video board), `Toy_white_Glow` (atrium lobby + west parapet cove) |
-| File | **98,220 B raw / 64,174 B gzip** [581,884 / 143,720] |
+| File | **237,440 B raw / 164,492 B gzip** [581,884 / 143,720] — unquantized per the repo `-noq` standard |
 | Validation | `validation.json` — **overall PASS**, all 15 checks |
 | Optimize | `optimize/REPORT.md` — gates G1–G6, G8 **PASS**, G7 n/a |
 
@@ -114,6 +112,14 @@ Each came out of a review render; all are also recorded in `REFERENCE.md` §8.
    white emission**. The night rig now drives emission from Base Color at
    strength 1.0, which is exactly what the app's unlit night overlay does. Worth
    knowing for every future asset's night render.
+7. **Re-packed unquantized** when main was merged in. Stage 4 originally ran
+   `gltfpack -cc -kn -km` per the then-current prompt, which quantizes; while
+   this branch was in flight main standardised on `-c -km -kn -noq`
+   (`380-brannan`, PR #88). Re-ran Phase B and C from the archived input with
+   the repo flags: 98,220 B -> 237,440 B, but float32 attributes, identity node
+   transforms, the strict contract validator with no special cases, and a loader
+   scale of exactly 1.0. All gates re-run and passed; the A/B pixel deltas got
+   *better* (worst view 0.136% -> 0.107%).
 
 ## 6. Orientation — recorded contract deviation
 
@@ -172,10 +178,10 @@ in the session summary.
   "loadRadius": 2500,
   "dims": [
     164.3642,
-    159.1272,
-    40.8026
+    159.1251,
+    40.8
   ],
-  "tris": 11289
+  "tris": 11291
 }
 ```
 

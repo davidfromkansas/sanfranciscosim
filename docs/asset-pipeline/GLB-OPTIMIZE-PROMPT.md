@@ -99,25 +99,49 @@ predicted savings before executing.
 ## 4. Phase C — Packing pass (always on)
 
 ```
-npx gltfpack@0.24 -i mid.glb -o out.glb -cc -kn -km
+npx gltfpack@0.24 -i mid.glb -o out.glb -c -km -kn -noq
 ```
 
 - **`-km` is mandatory**, not optional: without it gltfpack merges
   identical-parameter materials ACROSS the `_Glow` boundary (glow-ness is
-  name-only), silently killing the night layer. Always `-cc -kn -km`.
-- `ALLOW_MESHOPT=no` fallback: drop `-cc` only (quantization is
-  `KHR_mesh_quantization`, core-supported; only `-cc` needs the decoder).
-- **`-cc -kn -km` quantizes; `pipeline/compress-assets.mjs` uses `-c -km -kn -noq`
-  and its header says quantized attributes corrupt the merge paths.** For
-  **landmarks** the app wins and quantization is fine: `collect()` in
-  `app/src/assets.js` runs `prepareGeometryForTransforms()`, which converts
-  position/normal/tangent to float32 *before* baking the world matrix, and
-  `st-marys-cathedral`, `war-memorial-opera-house` and now `chase-center` all
-  ship quantized and render correctly. The `-noq` rule still stands for **kit,
-  streetkit, vehicle and flora** pieces, whose merge path has no such
-  conversion. Note also that `compress-assets.mjs` *skips* any file already
-  carrying `EXT_meshopt_compression`, so it is not a safety net that would
-  catch a wrongly-packed asset — this is the check.
+  name-only), silently killing the night layer. Always keep `-kn -km`.
+- **`-noq` is also mandatory for this repo — do NOT quantize.** The recipe above
+  originally read `-cc -kn -km`, which quantizes by default. That conflicts with
+  `pipeline/compress-assets.mjs` (the mandatory ship step per `sf-asset-check` §8),
+  which runs `-c -km -kn -noq` because the runtime kit/landmark merge needs float32
+  attributes, and with `sf-asset-check`'s warning that quantization "silently breaks
+  the app's merge paths (every piece falls back to procedural and the city looks
+  fine)". A quantized build also fails the stage-2 contract validator on
+  `transforms_applied` and `no_unexpected_objects`, because gltfpack stores the
+  dequantize matrix as a node transform and splits each node into an empty parent
+  plus a `Mesh_N` child. Every shipped landmark except `st-marys-cathedral` is
+  unquantized. Use:
+
+  ```
+  npx gltfpack@0.24 -i mid.glb -o out.glb -c -km -kn -noq
+  ```
+
+  Expect a smaller headline win than the numbers quoted above — those were measured
+  with quantization on. Recorded 12 Aug 2026 while optimizing `380-brannan`
+  (see `artifacts/380-brannan/optimize/REPORT.md` §4).
+- **The `st-marys-cathedral` console check above: done, and it is NOT falling back.**
+  Observed 12 Aug 2026 in a local dev run:
+  `sf-assets: st-marys-cathedral merged 9 objects / 8 materials -> batched (1606
+  tris body); uniform x1.0000`. A quantized `chase-center` build merged and batched
+  the same way before being re-packed to `-noq`. The reason is landmark-specific:
+  `collect()` in `app/src/assets.js` calls `prepareGeometryForTransforms()`, which
+  converts position/normal/tangent to float32 *before* baking the world matrix, so
+  the landmark path survives quantization. The kit/vehicle merge path has no such
+  conversion, which is what `sf-asset-check`'s warning is really about.
+  **`-noq` still stands as the repo standard** — it is what
+  `compress-assets.mjs` produces, it keeps the stage-2 contract validator strict
+  (no `transforms_applied` / `no_unexpected_objects` special cases), and one
+  encoding across all assets is worth more than the extra bytes. This note exists
+  so the question is not re-opened; it is not a licence to quantize.
+- `compress-assets.mjs` **skips** any file that already carries
+  `EXT_meshopt_compression`, so it will not re-pack a wrongly-quantized asset. This
+  step is the only check.
+- `ALLOW_MESHOPT=no` fallback: drop `-c` only.
 - Verify on the output, never trust flags: material name set, manifest node
   names, re-imported bbox within tolerance.
 - Record raw + gzipped bytes and estimated GPU vertex-buffer bytes

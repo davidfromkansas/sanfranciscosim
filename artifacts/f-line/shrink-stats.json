@@ -1,0 +1,135 @@
+{
+ "input_materials": [
+  "Toy_body",
+  "Toy_cream",
+  "Toy_glass",
+  "Toy_ink",
+  "Toy_mustard_Glow",
+  "Toy_red_Glow",
+  "Toy_roofd",
+  "Toy_steel",
+  "Toy_white_Glow"
+ ],
+ "steps": [
+  {
+   "step": "weld+degenerate",
+   "tris": 1924,
+   "verts": 1092,
+   "objects": 65
+  },
+  {
+   "step": "interior-faces",
+   "tris": 1923,
+   "verts": 1092,
+   "objects": 65
+  },
+  {
+   "step": "limited-dissolve",
+   "tris": 1923,
+   "verts": 1092,
+   "objects": 65
+  },
+  {
+   "step": "join-per-material",
+   "tris": 1923,
+   "verts": 1092,
+   "objects": 8
+  }
+ ],
+ "retessellation": "SKIPPED - the wheels are 10-segment discs and the trolley pole a 6-segment shank, already authored at the 15-120 m vehicle band times the app's 1.6x render scale; halving them flat-spots the wheels against a street the car never leaves",
+ "dissolve_angle_deg": 0.05,
+ "input": {
+  "tris": 1924,
+  "verts": 3820,
+  "objects": 65,
+  "faces": 1924
+ },
+ "glow_objects_exempt_from_interior_deletion": [
+  "headlight_lens",
+  "interior_strip_l0",
+  "interior_strip_r0",
+  "interior_strip_r1",
+  "interior_strip_r2",
+  "sign_face",
+  "taillight_lens_l",
+  "taillight_lens_r"
+ ],
+ "interior_faces_by_object": {
+  "pole_shank": {
+   "faces": 1,
+   "buried_in": [
+    "pole_shoe"
+   ]
+  }
+ },
+ "interior_faces_removed": 1,
+ "interior_faces_removed_fraction": 0.00052,
+ "interior_face_alarm": false,
+ "inverted_after_dissolve": [],
+ "wheel_face_counts": {
+  "wheel_fal": 12,
+  "wheel_far": 12,
+  "wheel_fbl": 12,
+  "wheel_fbr": 12,
+  "wheel_ral": 12,
+  "wheel_rar": 12,
+  "wheel_rbl": 12,
+  "wheel_rbr": 12
+ },
+ "joins": {
+  "grp_Toy_steel": 4,
+  "grp_Toy_ink": 14,
+  "grp_Toy_glass": 22,
+  "grp_Toy_roofd": 16,
+  "grp_Toy_mustard_Glow": 5,
+  "grp_Toy_red_Glow": 2
+ },
+ "tintable_objects_after_join": [
+  "body_shell"
+ ],
+ "tintable_not_merged_into_another_material_group": true,
+ "inverted_solids_after_join": [],
+ "group_signed_volumes": {
+  "body_shell": 96.871283,
+  "grp_Toy_glass": 0.154539,
+  "grp_Toy_ink": 6.379145,
+  "grp_Toy_mustard_Glow": 0.126022,
+  "grp_Toy_red_Glow": 0.003564,
+  "grp_Toy_roofd": 0.392823,
+  "grp_Toy_steel": 0.223862,
+  "headlight_lens": 0.002296
+ },
+ "merge_vehicle_safe": true,
+ "inverted_note": "A joined per-material group is a UNION of solids, not one solid; its signed volume is the sum of its parts and MUST stay positive, because app/src/agents.js mergeVehicle() reverses any source mesh whose signed volume is negative. A negative group here ships that whole material inside out. Per-object closure is proved before the join by validate_f_line.py.",
+ "reimport": {
+  "objects": 8,
+  "tris": 1923,
+  "verts": 3657,
+  "materials": [
+   "Toy_body",
+   "Toy_cream",
+   "Toy_glass",
+   "Toy_ink",
+   "Toy_mustard_Glow",
+   "Toy_red_Glow",
+   "Toy_roofd",
+   "Toy_steel",
+   "Toy_white_Glow"
+  ],
+  "bbox_dims": [
+   2.566,
+   14.76,
+   4.9036
+  ],
+  "bbox_min": [
+   -1.283,
+   -7.38,
+   0.0
+  ]
+ },
+ "bbox_ok": true,
+ "material_set_ok": true,
+ "glow_layer_intact": true,
+ "toy_body_survived": true,
+ "toy_body_is_own_slot": true
+}

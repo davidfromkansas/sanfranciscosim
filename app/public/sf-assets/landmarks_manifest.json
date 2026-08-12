@@ -326,6 +326,82 @@
     "tris": 10412
   },
   {
+    "id": "380-brannan",
+    "file": "380-brannan.glb",
+    "anchor": [
+      -122.3940217,
+      37.7806308
+    ],
+    "targetHeightM": 12.6,
+    "cat": 3,
+    "name": "380 Brannan Street",
+    "estimated": false,
+    "dims": [
+      31.3134,
+      31.5872,
+      12.6
+    ],
+    "tris": 7760,
+    "loadRadius": 2500
+  },
+  {
+    "id": "550-third",
+    "file": "550-third.glb",
+    "anchor": [
+      -122.3953409,
+      37.7804407
+    ],
+    "targetHeightM": 11.0,
+    "cat": 3,
+    "name": "550 Third Street",
+    "estimated": true,
+    "dims": [
+      49.21,
+      50.41,
+      11.0
+    ],
+    "tris": 6244,
+    "loadRadius": 2500
+  },
+  {
+    "id": "375-alabama",
+    "file": "375-alabama.glb",
+    "anchor": [
+      -122.4118477,
+      37.7645633
+    ],
+    "targetHeightM": 22.5,
+    "cat": 19,
+    "name": "375 Alabama Street",
+    "estimated": true,
+    "dims": [
+      67.3172,
+      61.6109,
+      22.5
+    ],
+    "tris": 11604,
+    "loadRadius": 2500
+  },
+  {
+    "id": "letterman",
+    "file": "letterman-digital-arts-center.glb",
+    "anchor": [
+      -122.4494466,
+      37.7997327
+    ],
+    "targetHeightM": 22,
+    "cat": 3,
+    "name": "Letterman Digital Arts Center",
+    "estimated": true,
+    "dims": [
+      312.222,
+      298.157,
+      21.993
+    ],
+    "tris": 18238,
+    "loadRadius": 2500
+  },
+  {
     "id": "chase-center",
     "file": "chase-center.glb",
     "anchor": [

@@ -1,0 +1,70 @@
+{
+  "file": "f-line-pcc.glb",
+  "loader": "app/src/gltf.js createGLTFLoader() (GLTFLoader + MeshoptDecoder)",
+  "meshopt_extension": true,
+  "meshes": 12,
+  "triangles": 1923,
+  "bbox_min": [
+    -1.283,
+    0,
+    -7.38
+  ],
+  "bbox_max": [
+    1.283,
+    4.9036,
+    7.38
+  ],
+  "dimensions": [
+    2.566,
+    4.9036,
+    14.76
+  ],
+  "min_y": 0,
+  "xz_center": [
+    0,
+    0
+  ],
+  "negative_volume_meshes_mergeVehicle_would_reverse": 0,
+  "baked_vertex_colours_by_material": {
+    "Toy_body": {
+      "hex": "#d8d3c8",
+      "meshes": 1
+    },
+    "Toy_cream": {
+      "hex": "#f2ede3",
+      "meshes": 1
+    },
+    "Toy_steel": {
+      "hex": "#9aa0a6",
+      "meshes": 2
+    },
+    "Toy_ink": {
+      "hex": "#3a3530",
+      "meshes": 2
+    },
+    "Toy_glass": {
+      "hex": "#2a4d73",
+      "meshes": 2
+    },
+    "Toy_mustard_Glow": {
+      "hex": "#d9a441",
+      "meshes": 1
+    },
+    "Toy_red_Glow": {
+      "hex": "#c4453c",
+      "meshes": 1
+    },
+    "Toy_roofd": {
+      "hex": "#45454a",
+      "meshes": 1
+    },
+    "Toy_white_Glow": {
+      "hex": "#f7f4ec",
+      "meshes": 1
+    }
+  },
+  "toy_body_present": true,
+  "toy_body_baked_hex": "#d8d3c8",
+  "toy_body_expected_hex": "#d8d3c8",
+  "pass": true
+}

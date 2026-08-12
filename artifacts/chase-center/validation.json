@@ -3,32 +3,32 @@
   "validator": "Blender 5.2.0 LTS",
   "fresh_isolated_scene": true,
   "reimported_final_glb": true,
-  "object_count": 22,
+  "object_count": 11,
   "mesh_object_count": 11,
-  "triangle_count": 11289,
+  "triangle_count": 11291,
   "triangle_budget": 27000,
   "dimensions_m": [
     164.3642,
-    159.1272,
-    40.8026
+    159.1251,
+    40.8
   ],
   "bbox_min_m": [
     -86.084,
-    -77.714,
+    -77.7119,
     0.0
   ],
   "bbox_max_m": [
     78.2802,
     81.4132,
-    40.8026
+    40.8
   ],
   "min_z_m": 0.0,
-  "max_z_m": 40.8026,
+  "max_z_m": 40.8,
   "target_height_m": 40.8,
-  "loader_scale_factor": 0.999936,
+  "loader_scale_factor": 1.0,
   "xy_center_offset_m": [
     -3.9019,
-    1.8496
+    1.8507
   ],
   "xy_origin_note": "The origin is the surveyed footprint centroid (the manifest anchor), which is what placeGeneric positions. The bbox centre sits west of it because the entry canopy projects onto the plaza; Palace of Fine Arts ships with the same asymmetry.",
   "materials": [
@@ -128,39 +128,27 @@
   "armature_count": 0,
   "constraint_count": 0,
   "transforms_applied": true,
-  "transform_form": "meshopt_quantized",
+  "transform_form": "identity",
   "node_scale": [
-    0.010032609,
-    0.010032609,
-    0.010032609
+    1.0,
+    1.0,
+    1.0
   ],
-  "empty_parent_nodes": [
-    "atrium_glow",
-    "board_frame",
-    "board_screen",
-    "grp_Toy_glass",
-    "grp_Toy_roofd",
-    "grp_Toy_sand",
-    "grp_Toy_steel",
-    "grp_Toy_stone",
-    "grp_Toy_trim",
-    "sail_crest",
-    "sail_skin"
-  ],
+  "empty_parent_nodes": [],
   "negative_scales": false,
   "degenerate_triangle_count": 0,
   "invalid_or_nonunit_loop_normal_count": 0,
   "non_manifold_objects": [
-    "Mesh_10",
-    "Mesh_3",
-    "Mesh_5",
-    "Mesh_6",
-    "Mesh_7",
-    "Mesh_8"
+    "grp_Toy_glass",
+    "grp_Toy_sand",
+    "grp_Toy_steel",
+    "grp_Toy_stone",
+    "grp_Toy_trim",
+    "sail_skin"
   ],
   "closed_solids_expected": false,
   "inverted_solid_objects": [],
-  "normal_ray_cast_first_hits": 22414,
+  "normal_ray_cast_first_hits": 22415,
   "normal_ray_cast_flipped_visible_faces": 0,
   "normal_ray_cast_residual": 0.0,
   "normal_orientation_status": "PASS",
@@ -169,12 +157,12 @@
   "material_contract_violations": [],
   "object_details": [
     {
-      "name": "Mesh_0",
+      "name": "atrium_glow",
       "triangles": 108,
-      "signed_volume_m3": 52.072,
+      "signed_volume_m3": 51.871,
       "location": [
-        -86.084,
-        81.4132,
+        0.0,
+        0.0,
         0.0
       ],
       "rotation_euler": [
@@ -183,18 +171,18 @@
         0.0
       ],
       "scale": [
-        0.01,
-        0.01,
-        0.01
+        1.0,
+        1.0,
+        1.0
       ]
     },
     {
-      "name": "Mesh_1",
+      "name": "board_frame",
       "triangles": 108,
-      "signed_volume_m3": 684.168,
+      "signed_volume_m3": 685.288,
       "location": [
-        -86.084,
-        81.4132,
+        0.0,
+        0.0,
         0.0
       ],
       "rotation_euler": [
@@ -203,38 +191,18 @@
         0.0
       ],
       "scale": [
-        0.01,
-        0.01,
-        0.01
+        1.0,
+        1.0,
+        1.0
       ]
     },
     {
-      "name": "Mesh_10",
-      "triangles": 1879,
-      "signed_volume_m3": 15119.964,
-      "location": [
-        -86.084,
-        81.4132,
-        0.0
-      ],
-      "rotation_euler": [
-        0.0,
-        0.0,
-        0.0
-      ],
-      "scale": [
-        0.01,
-        0.01,
-        0.01
-      ]
-    },
-    {
-      "name": "Mesh_2",
+      "name": "board_screen",
       "triangles": 108,
-      "signed_volume_m3": 235.723,
+      "signed_volume_m3": 236.432,
       "location": [
-        -86.084,
-        81.4132,
+        0.0,
+        0.0,
         0.0
       ],
       "rotation_euler": [
@@ -243,18 +211,18 @@
         0.0
       ],
       "scale": [
-        0.01,
-        0.01,
-        0.01
+        1.0,
+        1.0,
+        1.0
       ]
     },
     {
-      "name": "Mesh_3",
+      "name": "grp_Toy_glass",
       "triangles": 559,
-      "signed_volume_m3": 132184.204,
+      "signed_volume_m3": 132149.729,
       "location": [
-        -86.084,
-        81.4132,
+        0.0,
+        0.0,
         0.0
       ],
       "rotation_euler": [
@@ -263,18 +231,18 @@
         0.0
       ],
       "scale": [
-        0.01,
-        0.01,
-        0.01
+        1.0,
+        1.0,
+        1.0
       ]
     },
     {
-      "name": "Mesh_4",
+      "name": "grp_Toy_roofd",
       "triangles": 2360,
-      "signed_volume_m3": 1660.304,
+      "signed_volume_m3": 1655.022,
       "location": [
-        -86.084,
-        81.4132,
+        0.0,
+        0.0,
         0.0
       ],
       "rotation_euler": [
@@ -283,18 +251,18 @@
         0.0
       ],
       "scale": [
-        0.01,
-        0.01,
-        0.01
+        1.0,
+        1.0,
+        1.0
       ]
     },
     {
-      "name": "Mesh_5",
+      "name": "grp_Toy_sand",
       "triangles": 735,
-      "signed_volume_m3": 15752.073,
+      "signed_volume_m3": 15878.831,
       "location": [
-        -86.084,
-        81.4132,
+        0.0,
+        0.0,
         0.0
       ],
       "rotation_euler": [
@@ -303,18 +271,18 @@
         0.0
       ],
       "scale": [
-        0.01,
-        0.01,
-        0.01
+        1.0,
+        1.0,
+        1.0
       ]
     },
     {
-      "name": "Mesh_6",
+      "name": "grp_Toy_steel",
       "triangles": 852,
-      "signed_volume_m3": 9801.206,
+      "signed_volume_m3": 9811.115,
       "location": [
-        -86.084,
-        81.4132,
+        0.0,
+        0.0,
         0.0
       ],
       "rotation_euler": [
@@ -323,18 +291,18 @@
         0.0
       ],
       "scale": [
-        0.01,
-        0.01,
-        0.01
+        1.0,
+        1.0,
+        1.0
       ]
     },
     {
-      "name": "Mesh_7",
+      "name": "grp_Toy_stone",
       "triangles": 1409,
-      "signed_volume_m3": 99563.539,
+      "signed_volume_m3": 99623.772,
       "location": [
-        -86.084,
-        81.4132,
+        0.0,
+        0.0,
         0.0
       ],
       "rotation_euler": [
@@ -343,18 +311,18 @@
         0.0
       ],
       "scale": [
-        0.01,
-        0.01,
-        0.01
+        1.0,
+        1.0,
+        1.0
       ]
     },
     {
-      "name": "Mesh_8",
-      "triangles": 1255,
-      "signed_volume_m3": 159207.161,
+      "name": "grp_Toy_trim",
+      "triangles": 1257,
+      "signed_volume_m3": 159228.353,
       "location": [
-        -86.084,
-        81.4132,
+        0.0,
+        0.0,
         0.0
       ],
       "rotation_euler": [
@@ -363,18 +331,18 @@
         0.0
       ],
       "scale": [
-        0.01,
-        0.01,
-        0.01
+        1.0,
+        1.0,
+        1.0
       ]
     },
     {
-      "name": "Mesh_9",
+      "name": "sail_crest",
       "triangles": 1916,
-      "signed_volume_m3": 1086.562,
+      "signed_volume_m3": 1087.247,
       "location": [
-        -86.084,
-        81.4132,
+        0.0,
+        0.0,
         0.0
       ],
       "rotation_euler": [
@@ -383,9 +351,29 @@
         0.0
       ],
       "scale": [
-        0.01,
-        0.01,
-        0.01
+        1.0,
+        1.0,
+        1.0
+      ]
+    },
+    {
+      "name": "sail_skin",
+      "triangles": 1879,
+      "signed_volume_m3": 15118.841,
+      "location": [
+        0.0,
+        0.0,
+        0.0
+      ],
+      "rotation_euler": [
+        0.0,
+        0.0,
+        0.0
+      ],
+      "scale": [
+        1.0,
+        1.0,
+        1.0
       ]
     }
   ],
