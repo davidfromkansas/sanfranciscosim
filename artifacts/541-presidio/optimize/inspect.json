@@ -1,0 +1,498 @@
+{
+ "file_bytes": {
+  "raw": 220396,
+  "gzip9": 32598
+ },
+ "objects": 77,
+ "total_tris": 3404,
+ "total_verts": 7044,
+ "primitives_est": 77,
+ "top20": [
+  {
+   "name": "plinth",
+   "tris": 332,
+   "verts": 648,
+   "dims": [
+    20.011,
+    22.851,
+    0.9
+   ],
+   "materials": [
+    "Toy_stone"
+   ]
+  },
+  {
+   "name": "fascia_main",
+   "tris": 240,
+   "verts": 480,
+   "dims": [
+    22.259,
+    25.099,
+    0.22
+   ],
+   "materials": [
+    "Toy_trim"
+   ]
+  },
+  {
+   "name": "fascia_porch",
+   "tris": 240,
+   "verts": 480,
+   "dims": [
+    7.612,
+    10.554,
+    0.18
+   ],
+   "materials": [
+    "Toy_trim"
+   ]
+  },
+  {
+   "name": "chimney_0",
+   "tris": 108,
+   "verts": 216,
+   "dims": [
+    1.102,
+    1.172,
+    1.8
+   ],
+   "materials": [
+    "Toy_stone"
+   ]
+  },
+  {
+   "name": "chimney_1",
+   "tris": 108,
+   "verts": 216,
+   "dims": [
+    1.102,
+    1.172,
+    1.8
+   ],
+   "materials": [
+    "Toy_stone"
+   ]
+  },
+  {
+   "name": "front_door",
+   "tris": 108,
+   "verts": 216,
+   "dims": [
+    0.689,
+    0.927,
+    2.2
+   ],
+   "materials": [
+    "Toy_ink"
+   ]
+  },
+  {
+   "name": "house_block",
+   "tris": 108,
+   "verts": 216,
+   "dims": [
+    20.011,
+    22.851,
+    6.3
+   ],
+   "materials": [
+    "Toy_white"
+   ]
+  },
+  {
+   "name": "porch",
+   "tris": 108,
+   "verts": 216,
+   "dims": [
+    6.365,
+    9.132,
+    2.5
+   ],
+   "materials": [
+    "Toy_white"
+   ]
+  },
+  {
+   "name": "rear_bay",
+   "tris": 108,
+   "verts": 216,
+   "dims": [
+    2.987,
+    4.302,
+    6.3
+   ],
+   "materials": [
+    "Toy_white"
+   ]
+  },
+  {
+   "name": "roof_main",
+   "tris": 80,
+   "verts": 162,
+   "dims": [
+    21.705,
+    24.546,
+    2.376
+   ],
+   "materials": [
+    "Toy_red"
+   ]
+  },
+  {
+   "name": "roof_porch",
+   "tris": 80,
+   "verts": 162,
+   "dims": [
+    7.114,
+    10.056,
+    0.905
+   ],
+   "materials": [
+    "Toy_red"
+   ]
+  },
+  {
+   "name": "win_bay_hi_sill",
+   "tris": 44,
+   "verts": 96,
+   "dims": [
+    0.713,
+    1.132,
+    0.12
+   ],
+   "materials": [
+    "Toy_trim"
+   ]
+  },
+  {
+   "name": "win_bay_lo_sill",
+   "tris": 44,
+   "verts": 96,
+   "dims": [
+    0.713,
+    1.132,
+    0.12
+   ],
+   "materials": [
+    "Toy_trim"
+   ]
+  },
+  {
+   "name": "win_endn_hi_0_sill",
+   "tris": 44,
+   "verts": 96,
+   "dims": [
+    1.132,
+    0.713,
+    0.12
+   ],
+   "materials": [
+    "Toy_trim"
+   ]
+  },
+  {
+   "name": "win_endn_hi_1_sill",
+   "tris": 44,
+   "verts": 96,
+   "dims": [
+    1.132,
+    0.713,
+    0.12
+   ],
+   "materials": [
+    "Toy_trim"
+   ]
+  },
+  {
+   "name": "win_endn_hi_2_sill",
+   "tris": 44,
+   "verts": 96,
+   "dims": [
+    1.132,
+    0.713,
+    0.12
+   ],
+   "materials": [
+    "Toy_trim"
+   ]
+  },
+  {
+   "name": "win_endn_lo_0_sill",
+   "tris": 44,
+   "verts": 96,
+   "dims": [
+    1.132,
+    0.713,
+    0.12
+   ],
+   "materials": [
+    "Toy_trim"
+   ]
+  },
+  {
+   "name": "win_endn_lo_1_sill",
+   "tris": 44,
+   "verts": 96,
+   "dims": [
+    1.132,
+    0.713,
+    0.12
+   ],
+   "materials": [
+    "Toy_trim"
+   ]
+  },
+  {
+   "name": "win_endn_lo_2_sill",
+   "tris": 44,
+   "verts": 96,
+   "dims": [
+    1.132,
+    0.713,
+    0.12
+   ],
+   "materials": [
+    "Toy_trim"
+   ]
+  },
+  {
+   "name": "win_ends_hi_0_sill",
+   "tris": 44,
+   "verts": 96,
+   "dims": [
+    1.132,
+    0.713,
+    0.12
+   ],
+   "materials": [
+    "Toy_trim"
+   ]
+  }
+ ],
+ "vertex_attrs": [
+  "NORMAL"
+ ],
+ "materials": [
+  {
+   "name": "Toy_glass",
+   "glow": false,
+   "user_objects": 31
+  },
+  {
+   "name": "Toy_glass_Glow",
+   "glow": true,
+   "user_objects": 3
+  },
+  {
+   "name": "Toy_ink",
+   "glow": false,
+   "user_objects": 1
+  },
+  {
+   "name": "Toy_red",
+   "glow": false,
+   "user_objects": 2
+  },
+  {
+   "name": "Toy_stone",
+   "glow": false,
+   "user_objects": 3
+  },
+  {
+   "name": "Toy_trim",
+   "glow": false,
+   "user_objects": 33
+  },
+  {
+   "name": "Toy_trim_Glow",
+   "glow": true,
+   "user_objects": 1
+  },
+  {
+   "name": "Toy_white",
+   "glow": false,
+   "user_objects": 3
+  }
+ ],
+ "textures": [],
+ "bbox": {
+  "dims": [
+   22.2592,
+   25.0994,
+   10.0
+  ],
+  "min": [
+   -11.1296,
+   -12.5497,
+   0.0
+  ],
+  "origin_offset_xy": [
+   0.0,
+   0.0
+  ],
+  "base_z": 0.0
+ },
+ "duplicate_mesh_groups": [
+  {
+   "signature": {
+    "verts": 96,
+    "tris": 44,
+    "dims": [
+     0.7126,
+     1.1323,
+     0.12
+    ]
+   },
+   "objects": [
+    "win_bay_hi_sill",
+    "win_bay_lo_sill",
+    "win_front_hi_0_sill",
+    "win_front_hi_1_sill",
+    "win_front_hi_2_sill",
+    "win_front_hi_3_sill",
+    "win_front_hi_4_sill",
+    "win_front_lo_0_sill",
+    "win_front_lo_4_sill",
+    "win_porch_0_sill",
+    "win_porch_1_sill",
+    "win_rear_hi_0_sill",
+    "win_rear_hi_1_sill",
+    "win_rear_hi_3_sill",
+    "win_rear_hi_4_sill",
+    "win_rear_lo_0_sill",
+    "win_rear_lo_1_sill",
+    "win_rear_lo_3_sill",
+    "win_rear_lo_4_sill"
+   ]
+  },
+  {
+   "signature": {
+    "verts": 96,
+    "tris": 44,
+    "dims": [
+     1.1323,
+     0.7126,
+     0.12
+    ]
+   },
+   "objects": [
+    "win_endn_hi_0_sill",
+    "win_endn_hi_1_sill",
+    "win_endn_hi_2_sill",
+    "win_endn_lo_0_sill",
+    "win_endn_lo_1_sill",
+    "win_endn_lo_2_sill",
+    "win_ends_hi_0_sill",
+    "win_ends_hi_1_sill",
+    "win_ends_hi_2_sill",
+    "win_ends_lo_0_sill",
+    "win_ends_lo_1_sill",
+    "win_ends_lo_2_sill"
+   ]
+  },
+  {
+   "signature": {
+    "verts": 24,
+    "tris": 12,
+    "dims": [
+     0.6817,
+     1.0175,
+     1.9
+    ]
+   },
+   "objects": [
+    "win_bay_hi_fill",
+    "win_bay_lo_fill",
+    "win_front_hi_0_fill",
+    "win_front_hi_1_fill",
+    "win_front_hi_2_fill",
+    "win_front_hi_3_fill",
+    "win_front_hi_4_fill",
+    "win_front_lo_0_fill",
+    "win_front_lo_4_fill",
+    "win_porch_0_fill",
+    "win_porch_1_fill",
+    "win_rear_hi_0_fill",
+    "win_rear_hi_1_fill",
+    "win_rear_hi_3_fill",
+    "win_rear_hi_4_fill",
+    "win_rear_lo_0_fill",
+    "win_rear_lo_1_fill",
+    "win_rear_lo_3_fill",
+    "win_rear_lo_4_fill"
+   ]
+  },
+  {
+   "signature": {
+    "verts": 216,
+    "tris": 108,
+    "dims": [
+     1.1019,
+     1.1719,
+     1.8
+    ]
+   },
+   "objects": [
+    "chimney_0",
+    "chimney_1"
+   ]
+  },
+  {
+   "signature": {
+    "verts": 24,
+    "tris": 12,
+    "dims": [
+     1.0175,
+     0.6817,
+     1.9
+    ]
+   },
+   "objects": [
+    "win_endn_hi_0_fill",
+    "win_endn_hi_1_fill",
+    "win_endn_hi_2_fill",
+    "win_endn_lo_0_fill",
+    "win_endn_lo_1_fill",
+    "win_endn_lo_2_fill",
+    "win_ends_hi_0_fill",
+    "win_ends_hi_1_fill",
+    "win_ends_hi_2_fill",
+    "win_ends_lo_0_fill",
+    "win_ends_lo_1_fill",
+    "win_ends_lo_2_fill"
+   ]
+  },
+  {
+   "signature": {
+    "verts": 24,
+    "tris": 12,
+    "dims": [
+     0.5446,
+     0.8804,
+     1.8
+    ]
+   },
+   "objects": [
+    "win_front_hi_1_glow",
+    "win_front_hi_3_glow",
+    "win_porch_0_glow"
+   ]
+  }
+ ],
+ "dup_redundant_tris": 1756,
+ "join_candidates": {
+  "Toy_glass": 31,
+  "Toy_glass_Glow": 3,
+  "Toy_red": 2,
+  "Toy_stone": 3,
+  "Toy_trim": 33,
+  "Toy_white": 3
+ },
+ "degenerate_tris": 0,
+ "coincident_vert_pairs": 5192,
+ "over_tess": {
+  "near_distance_m": 37.65,
+  "one_px_world_m": 0.0254,
+  "note": "cylinders whose chord error < one_px_world_m can halve segments"
+ }
+}

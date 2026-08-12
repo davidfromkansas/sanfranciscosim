@@ -419,5 +419,81 @@
     ],
     "tris": 11291,
     "loadRadius": 2500
+  },
+  {
+    "id": "540-presidio-blvd",
+    "file": "540-presidio-blvd.glb",
+    "anchor": [
+      -122.4519224,
+      37.7966667
+    ],
+    "targetHeightM": 11.5,
+    "cat": 1,
+    "name": "540 Presidio Boulevard",
+    "estimated": true,
+    "dims": [
+      16.6623,
+      22.7566,
+      11.5
+    ],
+    "tris": 3690,
+    "loadRadius": 2500
+  },
+  {
+    "id": "541-presidio",
+    "file": "541-presidio.glb",
+    "anchor": [
+      -122.4518601,
+      37.7969312
+    ],
+    "targetHeightM": 10.0,
+    "cat": 1,
+    "name": "541 Presidio Boulevard",
+    "estimated": true,
+    "dims": [
+      22.259,
+      25.099,
+      10.0
+    ],
+    "tris": 3404,
+    "loadRadius": 2500
+  },
+  {
+    "id": "542-presidio-blvd",
+    "file": "542-presidio-blvd.glb",
+    "anchor": [
+      -122.4516862,
+      37.7971579
+    ],
+    "targetHeightM": 10.6,
+    "cat": 1,
+    "name": "542 Presidio Boulevard",
+    "estimated": true,
+    "dims": [
+      23.608,
+      25.4555,
+      10.6
+    ],
+    "tris": 3092,
+    "loadRadius": 2500
+  },
+  {
+    "id": "543-presidio-blvd",
+    "file": "543-presidio-blvd.glb",
+    "anchor": [
+      -122.4515766,
+      37.7973711
+    ],
+    "targetHeightM": 9.55,
+    "cat": 1,
+    "name": "543 Presidio Blvd",
+    "estimated": true,
+    "dims": [
+      17.1972,
+      17.7268,
+      9.55
+    ],
+    "tris": 2848,
+    "loadRadius": 2500
   }
 ]
