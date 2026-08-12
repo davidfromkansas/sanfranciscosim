@@ -17,6 +17,7 @@ const GLYPHS = {
   chat: '<path d="M4 5h16v11H9l-5 4z"/>',
   view: '<circle cx="12" cy="12" r="3"/><path d="M2 12s4-6 10-6 10 6 10 6-4 6-10 6S2 12 2 12z"/>',
   vessel: '<path d="M4 14h16l-2 5H6zM12 14V5l6 4-6 2M7 14v-4h5"/>',
+  transit: '<rect x="5" y="4" width="14" height="13" rx="2"/><path d="M5 12h14M8 20l1-3M16 20l-1-3"/><circle cx="9" cy="15" r=".5"/><circle cx="15" cy="15" r=".5"/>',
 };
 
 const KIND_GLYPH = {
@@ -28,6 +29,7 @@ const KIND_GLYPH = {
   water: 'water',
   view: 'view',
   vessel: 'vessel',
+  transit: 'transit',
 };
 
 const CAT_TONE = [
@@ -72,6 +74,16 @@ function relative(ms, now = Date.now()) {
   if (minutes > 0) return `in ${minutes} min`;
   return `${-minutes} min ago`;
 }
+
+const OCCUPANCY_LABEL = {
+  empty: 'Empty',
+  manySeatsAvailable: 'Many seats available',
+  fewSeatsAvailable: 'Few seats available',
+  standingRoomOnly: 'Standing room only',
+  crushedStandingRoomOnly: 'Crowded',
+  full: 'Full',
+  notAcceptingPassengers: 'Not accepting passengers',
+};
 
 function when(ms) {
   const time = clock(ms);
@@ -190,6 +202,25 @@ export function createContextCard({ onFly, onAsk, onSelectHistory }) {
       }
       fact('Speed', `${entity.speedKn.toFixed(1)} kn`);
       fact('Position reported', relative(entity.recordedAt));
+    } else if (entity.kind === 'transit') {
+      subtitle.textContent = entity.routeName ? `Muni · ${entity.routeName}` : 'Muni';
+      chips.append(chip(entity.demo ? 'Demo bus' : 'Live bus', 'teal', 'transit'));
+      chips.append(chip(entity.route, 'coral'));
+      if (entity.occupancy && OCCUPANCY_LABEL[entity.occupancy]) {
+        chips.append(chip(OCCUPANCY_LABEL[entity.occupancy], 'mustard'));
+      }
+      fact('Bus', `${entity.fleetNumber} · New Flyer XDE40 hybrid`);
+      fact('Headed to', entity.destination || 'Not reported');
+      if (entity.stops?.length) {
+        // The next stops with live ETAs, the way the rider-facing signs put it.
+        for (const [i, stop] of entity.stops.entries()) {
+          fact(i === 0 ? 'Next stop' : 'Then', `${stop.name} · ${when(stop.arrivalAt) || 'no prediction'}`);
+        }
+      } else {
+        fact('Next stop', entity.degraded ? 'No predictions (degraded feed)' : 'No prediction');
+      }
+      fact('Speed', `${Math.round(entity.speedKmh)} km/h`);
+      fact('Position reported', relative(entity.recordedAt));
     } else if (entity.kind === 'neighborhood') {
       subtitle.textContent = 'Analysis neighbourhood';
       chips.append(chip('Neighbourhood', 'plum', 'neighborhood'));
@@ -200,7 +231,7 @@ export function createContextCard({ onFly, onAsk, onSelectHistory }) {
 
     // The concierge only knows the baked city, so it has nothing to say about a
     // boat that showed up in a live feed thirty seconds ago.
-    askButton.hidden = entity.kind === 'vessel';
+    askButton.hidden = entity.kind === 'vessel' || entity.kind === 'transit';
 
     const bits = [`Source: ${sourceLabel(entity.source)}`];
     if (entity.kind === 'building') bits.push(confidenceLabel(entity.confidence));

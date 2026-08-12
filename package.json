@@ -1,0 +1,9 @@
+{
+  "name": "sanfranciscosim-api",
+  "private": true,
+  "type": "module",
+  "description": "Dependencies for the Vercel functions in api/. The app has its own package.json in app/. The api layer was zero-dependency until the Muni GTFS-Realtime feed needed a protobuf decoder (owner-approved, 2026-08-12); adding anything else here needs an owner decision.",
+  "dependencies": {
+    "gtfs-realtime-bindings": "1.1.1"
+  }
+}

@@ -1,6 +1,6 @@
 {
- "generated": "2026-08-12T17:21:22.450Z",
- "buildings": 174789,
+ "generated": "2026-08-12T17:42:21.179Z",
+ "buildings": 174788,
  "cells": 596,
  "categories": [
   {
@@ -28,7 +28,7 @@
    "cat": 3,
    "id": "office",
    "label": "Office",
-   "count": 2761,
+   "count": 2760,
    "night": 3
   },
   {
@@ -654,7 +654,7 @@
   }
  ],
  "sources": {
-  "landuse": 140708,
+  "landuse": 140707,
   "business": 10215,
   "heuristic": 7280,
   "datasf": 1288,
@@ -662,7 +662,7 @@
   "osm": 8630
  },
  "confidence": [
-  147988,
+  147987,
   15338,
   4499,
   6964

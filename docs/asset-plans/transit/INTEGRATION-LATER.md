@@ -14,7 +14,16 @@ rediscover it. Everything below is measured from `origin/main`.
 
 ---
 
-## The headline: live Muni positions are one parameter away
+## LANDED: the live-data path shipped for motor coaches
+
+The hybrid-bus live layer described below is implemented (MUNI-LIVE-PROMPT.md):
+`api/_lib/feeds/muni.mjs` (GTFS-Realtime, not SIRI — owner decision 2026-08-12),
+`pipeline/muni-shapes.mjs` + `tiles/muni-shapes.bin`, and `app/src/muni.js`.
+The four remaining modes (trolley / LRV / streetcar / cable) plug into the same
+layer as new entries in its mode→model map once their GLBs exist — the feed
+already tags every vehicle's mode. Everything below stays as background.
+
+## The original finding: live Muni positions are one parameter away
 
 `api/ferries.mjs` normalises **511.org's SIRI VehicleMonitoring feed** for the
 ferry fleet, and its own source comment names the answer:

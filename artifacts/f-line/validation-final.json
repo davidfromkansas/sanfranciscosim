@@ -1,0 +1,417 @@
+{
+  "asset": "f-line-pcc.glb",
+  "validator": "Blender 5.2.0 LTS",
+  "fresh_isolated_scene": true,
+  "reimported_final_glb": true,
+  "reporting_space": "glTF / three.js (Y up, front -Z); converted from Blender by (x, z, -y)",
+  "object_count": 8,
+  "mesh_object_count": 8,
+  "triangle_count": 1923,
+  "triangle_budget": 4000,
+  "dimensions_m": [
+    2.566,
+    4.904,
+    14.76
+  ],
+  "published_dimensions_m": [
+    2.54,
+    3.124,
+    14.76
+  ],
+  "published_height_note": "Published height 3.124 m is rail to the top of the roof crown. The model's bbox y is taller because the trolley pole and the roof ventilators stand above the crown; body_height_m below is the figure to compare against the published one.",
+  "body_height_m": 3.124,
+  "bbox_min_m": [
+    -1.283,
+    0.0,
+    -7.38
+  ],
+  "bbox_max_m": [
+    1.283,
+    4.9036,
+    7.38
+  ],
+  "min_y_m": 0.0,
+  "min_y_represents": "the WHEEL CONTACT PATCH, i.e. the top of rail. This scene contains no rails (docs/asset-plans/transit/README.md, the no-rails-no-wires decision), so top of rail coincides with the street surface and the car grounds exactly like a bus - it sits one rail-head lower relative to the pavement than a real streetcar would.",
+  "xz_center_offset_m": [
+    0.0,
+    0.0
+  ],
+  "front_face_direction": "-Z",
+  "front_face_evidence": {
+    "headlight_glow_z_range_m": [
+      -7.368,
+      -7.318
+    ],
+    "taillight_glow_z_range_m": [
+      7.32,
+      7.375
+    ],
+    "test": "single central headlight at the -Z extreme; tail lights entirely behind it"
+  },
+  "wheel_gauge_m": null,
+  "wheel_gauge_expected_m": 1.435,
+  "wheel_object_count": 0,
+  "materials": [
+    "Toy_body",
+    "Toy_cream",
+    "Toy_glass",
+    "Toy_ink",
+    "Toy_mustard_Glow",
+    "Toy_red_Glow",
+    "Toy_roofd",
+    "Toy_steel",
+    "Toy_white_Glow"
+  ],
+  "material_details": [
+    {
+      "name": "Toy_body",
+      "base_color_hex": "#d8d3c8",
+      "image_texture_nodes": [],
+      "alpha": 1.0,
+      "roughness": 0.85,
+      "emission_strength": 0.0,
+      "glow": false,
+      "tintable": true
+    },
+    {
+      "name": "Toy_cream",
+      "base_color_hex": "#f2ede3",
+      "image_texture_nodes": [],
+      "alpha": 1.0,
+      "roughness": 0.85,
+      "emission_strength": 0.0,
+      "glow": false,
+      "tintable": false
+    },
+    {
+      "name": "Toy_glass",
+      "base_color_hex": "#2a4d73",
+      "image_texture_nodes": [],
+      "alpha": 1.0,
+      "roughness": 0.85,
+      "emission_strength": 0.0,
+      "glow": false,
+      "tintable": false
+    },
+    {
+      "name": "Toy_ink",
+      "base_color_hex": "#3a3530",
+      "image_texture_nodes": [],
+      "alpha": 1.0,
+      "roughness": 0.85,
+      "emission_strength": 0.0,
+      "glow": false,
+      "tintable": false
+    },
+    {
+      "name": "Toy_mustard_Glow",
+      "base_color_hex": "#d9a441",
+      "image_texture_nodes": [],
+      "alpha": 1.0,
+      "roughness": 0.85,
+      "emission_strength": 0.0,
+      "glow": true,
+      "tintable": false
+    },
+    {
+      "name": "Toy_red_Glow",
+      "base_color_hex": "#c4453c",
+      "image_texture_nodes": [],
+      "alpha": 1.0,
+      "roughness": 0.85,
+      "emission_strength": 0.0,
+      "glow": true,
+      "tintable": false
+    },
+    {
+      "name": "Toy_roofd",
+      "base_color_hex": "#45454a",
+      "image_texture_nodes": [],
+      "alpha": 1.0,
+      "roughness": 0.85,
+      "emission_strength": 0.0,
+      "glow": false,
+      "tintable": false
+    },
+    {
+      "name": "Toy_steel",
+      "base_color_hex": "#9aa0a6",
+      "image_texture_nodes": [],
+      "alpha": 1.0,
+      "roughness": 0.85,
+      "emission_strength": 0.0,
+      "glow": false,
+      "tintable": false
+    },
+    {
+      "name": "Toy_white_Glow",
+      "base_color_hex": "#f7f4ec",
+      "image_texture_nodes": [],
+      "alpha": 1.0,
+      "roughness": 0.85,
+      "emission_strength": 0.0,
+      "glow": true,
+      "tintable": false
+    }
+  ],
+  "tintable_material": "Toy_body",
+  "tintable_present": true,
+  "tintable_objects": [
+    "body_shell"
+  ],
+  "tintable_triangle_count": 428,
+  "tintable_note": "app/src/kitfleet.js multiplies a per-instance colour into this material's authored #d8d3c8. Everything NOT on this material - roof, glazing, reveals, trucks, wheels, pole, anti-climbers, headlight, route board - is fixed, so a tint cannot wash the trim out. Requires the kitfleet.js tinting path to be ported into agents.js; see REPORT.md.",
+  "image_texture_count": 0,
+  "textured_materials": [],
+  "transparent_materials": [],
+  "camera_count": 0,
+  "light_count": 0,
+  "animation_fcurve_count": 0,
+  "armature_count": 0,
+  "constraint_count": 0,
+  "transforms_applied": true,
+  "negative_scales": false,
+  "degenerate_triangle_count": 0,
+  "invalid_or_nonunit_loop_normal_count": 0,
+  "open_shell_objects": [
+    "grp_Toy_ink",
+    "grp_Toy_steel"
+  ],
+  "inverted_or_zero_volume_objects": [],
+  "glow_materials": [
+    "Toy_mustard_Glow",
+    "Toy_red_Glow",
+    "Toy_white_Glow"
+  ],
+  "off_palette_warnings": [],
+  "material_contract_violations": [],
+  "unexpected_geometry_or_objects": [],
+  "object_details": [
+    {
+      "name": "body_shell",
+      "triangles": 428,
+      "materials": [
+        "Toy_body",
+        "Toy_cream",
+        "Toy_glass",
+        "Toy_ink",
+        "Toy_steel"
+      ],
+      "closed_solid": true,
+      "signed_volume_m3": 96.871286,
+      "location": [
+        0.0,
+        0.0,
+        0.0
+      ],
+      "rotation_euler": [
+        0.0,
+        0.0,
+        0.0
+      ],
+      "scale": [
+        1.0,
+        1.0,
+        1.0
+      ]
+    },
+    {
+      "name": "grp_Toy_glass",
+      "triangles": 264,
+      "materials": [
+        "Toy_glass"
+      ],
+      "closed_solid": true,
+      "signed_volume_m3": 0.154539,
+      "location": [
+        0.0,
+        0.0,
+        0.0
+      ],
+      "rotation_euler": [
+        0.0,
+        0.0,
+        0.0
+      ],
+      "scale": [
+        1.0,
+        1.0,
+        1.0
+      ]
+    },
+    {
+      "name": "grp_Toy_ink",
+      "triangles": 392,
+      "materials": [
+        "Toy_ink"
+      ],
+      "closed_solid": false,
+      "signed_volume_m3": 6.379145,
+      "location": [
+        0.0,
+        0.0,
+        0.0
+      ],
+      "rotation_euler": [
+        0.0,
+        0.0,
+        0.0
+      ],
+      "scale": [
+        1.0,
+        1.0,
+        1.0
+      ]
+    },
+    {
+      "name": "grp_Toy_mustard_Glow",
+      "triangles": 60,
+      "materials": [
+        "Toy_mustard_Glow"
+      ],
+      "closed_solid": true,
+      "signed_volume_m3": 0.126022,
+      "location": [
+        0.0,
+        0.0,
+        0.0
+      ],
+      "rotation_euler": [
+        0.0,
+        0.0,
+        0.0
+      ],
+      "scale": [
+        1.0,
+        1.0,
+        1.0
+      ]
+    },
+    {
+      "name": "grp_Toy_red_Glow",
+      "triangles": 24,
+      "materials": [
+        "Toy_red_Glow"
+      ],
+      "closed_solid": true,
+      "signed_volume_m3": 0.003564,
+      "location": [
+        0.0,
+        0.0,
+        0.0
+      ],
+      "rotation_euler": [
+        0.0,
+        0.0,
+        0.0
+      ],
+      "scale": [
+        1.0,
+        1.0,
+        1.0
+      ]
+    },
+    {
+      "name": "grp_Toy_roofd",
+      "triangles": 576,
+      "materials": [
+        "Toy_roofd"
+      ],
+      "closed_solid": true,
+      "signed_volume_m3": 0.392823,
+      "location": [
+        0.0,
+        0.0,
+        0.0
+      ],
+      "rotation_euler": [
+        0.0,
+        0.0,
+        0.0
+      ],
+      "scale": [
+        1.0,
+        1.0,
+        1.0
+      ]
+    },
+    {
+      "name": "grp_Toy_steel",
+      "triangles": 143,
+      "materials": [
+        "Toy_steel"
+      ],
+      "closed_solid": false,
+      "signed_volume_m3": 0.223862,
+      "location": [
+        0.0,
+        0.0,
+        0.0
+      ],
+      "rotation_euler": [
+        0.0,
+        0.0,
+        0.0
+      ],
+      "scale": [
+        1.0,
+        1.0,
+        1.0
+      ]
+    },
+    {
+      "name": "headlight_lens",
+      "triangles": 36,
+      "materials": [
+        "Toy_white_Glow"
+      ],
+      "closed_solid": true,
+      "signed_volume_m3": 0.002296,
+      "location": [
+        0.0,
+        0.0,
+        0.0
+      ],
+      "rotation_euler": [
+        0.0,
+        0.0,
+        0.0
+      ],
+      "scale": [
+        1.0,
+        1.0,
+        1.0
+      ]
+    }
+  ],
+  "stage": "shipped",
+  "checks": {
+    "meters_and_published_dimensions": true,
+    "ground_at_min_y_zero": true,
+    "centered_in_xz_footprint": true,
+    "front_faces_minus_z": true,
+    "under_triangle_budget": true,
+    "no_image_textures": true,
+    "no_transparency": true,
+    "materials_follow_contract": true,
+    "toy_body_present_and_addressable": true,
+    "no_cameras_or_lights": true,
+    "no_animation_skin_or_constraints": true,
+    "transforms_applied": true,
+    "no_negative_scales": true,
+    "normals_finite_and_unit": true,
+    "no_degenerate_geometry": true,
+    "no_unexpected_objects": true,
+    "glow_set_is_night_only": true,
+    "glow_set_complete": true
+  },
+  "per_object_observations": {
+    "every_object_is_a_closed_solid": false,
+    "every_object_signed_volume_positive": true,
+    "tint_confined_to_the_body_shell": true,
+    "eight_wheels": false,
+    "standard_gauge_wheels": false
+  },
+  "per_object_note": "Not gated at this stage. The shrink pass joins the authored objects into per-material groups and deletes provably buried faces, so a group is a union of solids rather than one closed solid, and the wheels no longer exist as separate objects. What still has to hold - and is gated in shrink-stats.json as merge_vehicle_safe - is that every group's signed volume stays POSITIVE, because mergeVehicle() reverses any source mesh whose volume is negative. Per-object closure is gated on the authored export in validation.json.",
+  "overall": "PASS"
+}
