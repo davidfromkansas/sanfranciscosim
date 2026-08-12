@@ -146,33 +146,54 @@ export function createTerrain(data) {
         }
       }
 
-      const indices = new Uint32Array(SEGMENTS * SEGMENTS * 6);
-      let k = 0;
-      for (let j = 0; j < SEGMENTS; j++) {
-        for (let i = 0; i < SEGMENTS; i++) {
-          const a = j * side + i;
-          indices[k++] = a;
-          indices[k++] = a + side;
-          indices[k++] = a + 1;
-          indices[k++] = a + 1;
-          indices[k++] = a + side;
-          indices[k++] = a + side + 1;
+      // Two prebuilt index buffers over the same vertices: full 15 m grid and
+      // a stride-2 30 m grid. Dropping a tier swaps the index — a quarter of
+      // the terrain triangles for the price of one setIndex, no rebake.
+      function gridIndex(stride) {
+        const cells = SEGMENTS / stride;
+        const indices = new Uint32Array(cells * cells * 6);
+        let k = 0;
+        for (let j = 0; j < SEGMENTS; j += stride) {
+          for (let i = 0; i < SEGMENTS; i += stride) {
+            const a = j * side + i;
+            indices[k++] = a;
+            indices[k++] = a + side * stride;
+            indices[k++] = a + stride;
+            indices[k++] = a + stride;
+            indices[k++] = a + side * stride;
+            indices[k++] = a + side * stride + stride;
+          }
         }
+        return new BufferAttribute(indices, 1);
       }
+
+      const fullIndex = gridIndex(1);
+      const coarseIndex = gridIndex(2);
 
       const geometry = new BufferGeometry();
       geometry.setAttribute('position', new BufferAttribute(positions, 3));
       geometry.setAttribute('normal', new BufferAttribute(normals, 3));
       geometry.setAttribute('color', new BufferAttribute(colors, 3));
-      geometry.setIndex(new BufferAttribute(indices, 1));
+      geometry.setIndex(fullIndex);
       geometry.computeBoundingSphere();
 
       const mesh = new Mesh(geometry, createCloudShadedMaterial());
       mesh.receiveShadow = true;
       mesh.name = `terrain-${qx}-${qz}`;
+      mesh.userData.terrainIndex = { full: fullIndex, coarse: coarseIndex };
       meshes.push(mesh);
     }
   }
 
-  return meshes;
+  return {
+    meshes,
+    setQuality(tier) {
+      const coarse = tier === 'low' || tier === 'medium';
+      for (const mesh of meshes) {
+        const { full, coarse: half } = mesh.userData.terrainIndex;
+        const next = coarse ? half : full;
+        if (mesh.geometry.getIndex() !== next) mesh.geometry.setIndex(next);
+      }
+    },
+  };
 }

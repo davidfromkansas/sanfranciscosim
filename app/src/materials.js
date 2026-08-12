@@ -45,6 +45,9 @@ const CLOUDS = /* glsl */ `
   }
 
   float cloudShadow(vec2 world) {
+    // The diorama multiplies the result to 1.0 anyway — skip the two noise
+    // evaluations instead of computing a no-op per fragment.
+    if (uToy > 0.5) return 1.0;
     vec2 p = world * 0.00055 + uCloudDrift;
     float n = cloudNoise(p) * 0.65 + cloudNoise(p * 2.3 + 11.0) * 0.35;
     float shade = smoothstep(0.42, 0.72, n);
@@ -333,6 +336,28 @@ export function createKitMaterial() {
       );
   };
 
+  return material;
+}
+
+// A plain vertex-coloured Lambert whose per-batch-instance colour alpha drives
+// the same ordered-dither fade the kit uses: landmark bodies stream in and out
+// of one BatchedMesh as a stipple, never a pop. The rgb multiplier stays 1 —
+// landmark colours are authored, only the alpha channel is used.
+export function createBatchFadeLambert() {
+  const material = new MeshLambertMaterial({ vertexColors: true, dithering: true });
+  material.onBeforeCompile = (shader) => {
+    shader.fragmentShader = shader.fragmentShader
+      .replace(
+        '#include <common>',
+        `#include <common>
+        ${DITHER}`
+      )
+      .replace(
+        '#include <clipping_planes_fragment>',
+        `#include <clipping_planes_fragment>
+        if (vColor.a < 0.999 && ditherThreshold(gl_FragCoord.xy) > vColor.a) discard;`
+      );
+  };
   return material;
 }
 

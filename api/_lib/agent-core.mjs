@@ -7,6 +7,12 @@
 // itself, clamped to the city's own extent.
 
 import { skySnapshot } from './astro.mjs';
+// Imported only to enumerate the registered live feeds for the live_data tool:
+// the registrations run here, but this function never fetches an upstream —
+// live_data goes through the deployment's own /api/<feed> URLs, so reads hit
+// the CDN/dispatcher cache and cost no extra upstream quota.
+import { allFeeds } from './feedcore.mjs';
+import './feeds/index.mjs';
 
 const MODEL = 'anthropic/claude-sonnet-5';
 const ENDPOINT = 'https://ai-gateway.vercel.sh/v1/messages';
@@ -35,9 +41,34 @@ The model's sky is the real one: it runs on San Francisco's wall clock, with the
 sun and moon where they actually are. Call sky_now for anything about the time,
 the light, sunrise or sunset, or the moon. You cannot change the time of day.
 
+Some of the city is live: call live_data with exactly the feeds a question
+needs — one feed, or several in a single call when the answer spans sources.
+Live readings are real: report how fresh they are (from each feed's fetchedAt),
+and if a feed is unavailable or stale, say so and answer from what you have.
+
 Answer in at most four short sentences. No lists unless asked.`;
 
+const LIVE_FEEDS = allFeeds();
+const LIVE_FEED_NAMES = LIVE_FEEDS.map((f) => f.name);
+
 const TOOLS = [
+  {
+    name: 'live_data',
+    description:
+      `Real-time readings from the living city, one shopping-list call: request exactly the feeds the question needs. Feeds: ${LIVE_FEEDS.map((f) => `${f.name} — ${f.describe}`).join('; ')}. Each feed returns { live, fetchedAt, stale, ... }.`,
+    input_schema: {
+      type: 'object',
+      properties: {
+        feeds: {
+          type: 'array',
+          items: { type: 'string', enum: LIVE_FEED_NAMES },
+          minItems: 1,
+          maxItems: 4,
+        },
+      },
+      required: ['feeds'],
+    },
+  },
   {
     name: 'search_city',
     description:
@@ -181,7 +212,40 @@ export function sanitizeMessages(messages) {
 
 const distance = (ax, az, bx, bz) => Math.hypot(ax - bx, az - bz);
 
-// The read-only tools. `data` is the loaded bake: nothing is fetched per call.
+// This deployment's own base URL for live_data's self-fetch. VERCEL_URL is the
+// per-deployment host (works on production and previews alike); locally under
+// `vercel dev` it is a localhost origin. Absent both (plain vite dev, tests),
+// live_data reports itself unavailable instead of erroring the turn.
+function selfBase() {
+  const host = process.env.VERCEL_URL || process.env.VERCEL_PROJECT_PRODUCTION_URL || '';
+  if (!host) return null;
+  if (/^https?:\/\//.test(host)) return host;
+  return /^(localhost|127\.)/.test(host) ? `http://${host}` : `https://${host}`;
+}
+
+const LIVE_FETCH_TIMEOUT_MS = 5000;
+
+// Shrink one feed's payload to its share of the tool budget by halving its
+// largest array (vessels, vehicles, …) until it fits, recording what was cut.
+// Generic on purpose: future feeds inherit it without per-feed code.
+function fitBudget(payload, budget) {
+  let out = payload;
+  let json = JSON.stringify(out);
+  while (json.length > budget) {
+    const arrays = Object.entries(out)
+      .filter(([, v]) => Array.isArray(v) && v.length > 1)
+      .sort((a, b) => JSON.stringify(b[1]).length - JSON.stringify(a[1]).length);
+    if (!arrays.length) break; // nothing left to trim; the global cap still applies
+    const [key, arr] = arrays[0];
+    const keep = Math.ceil(arr.length / 2);
+    out = { ...out, [key]: arr.slice(0, keep), [`${key}_omitted`]: (out[`${key}_omitted`] || 0) + (arr.length - keep) };
+    json = JSON.stringify(out);
+  }
+  return out;
+}
+
+// The read-only tools. `data` is the loaded bake; only live_data fetches, and
+// only from the city's own feed endpoints.
 export function createTools(data) {
   const { search, places, parks, neighborhoods, streets, stats } = data;
 
@@ -201,6 +265,44 @@ export function createTools(data) {
   }
 
   return {
+    // The one async tool: fetches the requested feeds concurrently from the
+    // deployment's own /api/<feed> endpoints (CDN-cached — no extra upstream
+    // quota). Each feed fails soft, so a dead source never sinks the answer.
+    async live_data({ feeds }) {
+      const wanted = [...new Set(Array.isArray(feeds) ? feeds.map(String) : [])].slice(0, 4);
+      const known = wanted.filter((name) => LIVE_FEED_NAMES.includes(name));
+      if (!known.length) {
+        return { error: `no known feeds requested; available: ${LIVE_FEED_NAMES.join(', ')}` };
+      }
+      const base = selfBase();
+      if (!base) {
+        return { error: 'live data is unavailable in this environment' };
+      }
+      const budget = Math.floor(MAX_TOOL_CHARS / known.length) - 40;
+      const out = {};
+      await Promise.all(
+        known.map(async (name) => {
+          const controller = new AbortController();
+          const timer = setTimeout(() => controller.abort(), LIVE_FETCH_TIMEOUT_MS);
+          try {
+            const res = await fetch(`${base}/api/${name}`, {
+              signal: controller.signal,
+              headers: { accept: 'application/json' },
+            });
+            if (!res.ok) throw new Error(`http ${res.status}`);
+            const payload = await res.json();
+            delete payload.now; // redundant with fetchedAt for the model
+            out[name] = fitBudget(payload, budget);
+          } catch {
+            out[name] = { error: 'unavailable' };
+          } finally {
+            clearTimeout(timer);
+          }
+        }),
+      );
+      return out;
+    },
+
     search_city({ query, kind = 'any', limit = 8 }) {
       const q = String(query || '').toLowerCase().trim();
       if (!q) return [];
@@ -342,7 +444,7 @@ export async function runTurn({ messages, context, tools, apiKey, fetchImpl = fe
         continue;
       }
       try {
-        const value = JSON.stringify(tool(call.input || {}));
+        const value = JSON.stringify(await tool(call.input || {}));
         results.push({ type: 'tool_result', tool_use_id: call.id, content: value.slice(0, MAX_TOOL_CHARS) });
       } catch (error) {
         results.push({ type: 'tool_result', tool_use_id: call.id, content: `error: ${error.message}`, is_error: true });

@@ -86,11 +86,23 @@ Append one entry to `app/public/sf-assets/landmarks_manifest.json`:
   "name": "<Name>",
   "estimated": false,
   "dims": [<measured x>, <measured y>, <measured z>],
-  "tris": <measured triangles>
+  "tris": <measured triangles>,
+  "loadRadius": <metres, see below — or omit>
 }
 ```
 
 Rules for the values:
+
+- `loadRadius` (PERF-PLAN #3) makes the asset **streamed**: the GLB is fetched
+  only when the camera comes within this many metres of the anchor and is
+  released again past 1.25×. Choose it so the swap happens while the asset is
+  still small on screen (a good default is `max(2500, targetHeightM * 30)`).
+  Omit it — or set `"alwaysLoaded": true` — only for skyline-scale pieces
+  (bridges, towers over ~150 m) that must never leave the frame. Every new
+  integration MUST make this decision explicitly and record it in the REPORT;
+  remember the far stand-in is the baked/code-built version, and for a bespoke
+  landmark whose baked buildings were carved out, beyond the radius the site
+  is empty — pick a radius at which that absence is illegible.
 
 - `anchor` and `targetHeightM` are the **real** WGS84 position and architectural
   height (AGENTS rule 5). Never nudge them to make the model sit better; if the model

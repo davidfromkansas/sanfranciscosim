@@ -1,0 +1,723 @@
+{
+  "asset": "cable-car-powell.glb",
+  "validator": "Blender 5.2.0 LTS",
+  "fresh_isolated_scene": true,
+  "reimported_final_glb": true,
+  "reporting_space": "glTF / three.js (Y up, front -Z); converted from Blender by (x, z, -y)",
+  "object_count": 20,
+  "mesh_object_count": 20,
+  "triangle_count": 3776,
+  "triangle_budget": 6000,
+  "dimensions_m": [
+    2.42,
+    3.18,
+    8.4
+  ],
+  "published_dimensions_m": [
+    2.4,
+    3.18,
+    8.4
+  ],
+  "bbox_min_m": [
+    -1.21,
+    0.0,
+    -4.2
+  ],
+  "bbox_max_m": [
+    1.21,
+    3.18,
+    4.2
+  ],
+  "min_y_m": 0.0,
+  "min_y_represents": "the wheel contact patch on the STREET surface. There are no rails in this scene (docs/asset-plans/transit/README.md), so there is no top-of-rail question: the car grounds exactly like a bus.",
+  "xz_center_offset_m": [
+    0.0,
+    0.0
+  ],
+  "front_face_direction": "-Z",
+  "front_face_evidence": {
+    "headlamp_glow_z_range_m": [
+      -4.2,
+      -4.135
+    ],
+    "cabin_glazing_z_range_m": [
+      -0.78,
+      3.57
+    ],
+    "test": "headlamp at the -Z extreme; cabin glazing entirely behind it"
+  },
+  "wheel_gauge_m": 1.067,
+  "wheel_gauge_expected_m": 1.067,
+  "materials": [
+    "Toy_cream",
+    "Toy_glass",
+    "Toy_gold",
+    "Toy_ink",
+    "Toy_maroon",
+    "Toy_mustard",
+    "Toy_mustard_Glow",
+    "Toy_oak",
+    "Toy_p_coral",
+    "Toy_p_cream",
+    "Toy_p_mustard",
+    "Toy_p_navy",
+    "Toy_p_tan",
+    "Toy_p_teal",
+    "Toy_roofd",
+    "Toy_sand",
+    "Toy_sky",
+    "Toy_steel",
+    "Toy_white",
+    "Toy_white_Glow"
+  ],
+  "material_details": [
+    {
+      "name": "Toy_cream",
+      "image_texture_nodes": [],
+      "alpha": 1.0,
+      "roughness": 0.85,
+      "emission_strength": 0.0,
+      "glow": false
+    },
+    {
+      "name": "Toy_glass",
+      "image_texture_nodes": [],
+      "alpha": 1.0,
+      "roughness": 0.85,
+      "emission_strength": 0.0,
+      "glow": false
+    },
+    {
+      "name": "Toy_gold",
+      "image_texture_nodes": [],
+      "alpha": 1.0,
+      "roughness": 0.85,
+      "emission_strength": 0.0,
+      "glow": false
+    },
+    {
+      "name": "Toy_ink",
+      "image_texture_nodes": [],
+      "alpha": 1.0,
+      "roughness": 0.85,
+      "emission_strength": 0.0,
+      "glow": false
+    },
+    {
+      "name": "Toy_maroon",
+      "image_texture_nodes": [],
+      "alpha": 1.0,
+      "roughness": 0.85,
+      "emission_strength": 0.0,
+      "glow": false
+    },
+    {
+      "name": "Toy_mustard",
+      "image_texture_nodes": [],
+      "alpha": 1.0,
+      "roughness": 0.85,
+      "emission_strength": 0.0,
+      "glow": false
+    },
+    {
+      "name": "Toy_mustard_Glow",
+      "image_texture_nodes": [],
+      "alpha": 1.0,
+      "roughness": 0.85,
+      "emission_strength": 0.0,
+      "glow": true
+    },
+    {
+      "name": "Toy_oak",
+      "image_texture_nodes": [],
+      "alpha": 1.0,
+      "roughness": 0.85,
+      "emission_strength": 0.0,
+      "glow": false
+    },
+    {
+      "name": "Toy_p_coral",
+      "image_texture_nodes": [],
+      "alpha": 1.0,
+      "roughness": 0.85,
+      "emission_strength": 0.0,
+      "glow": false
+    },
+    {
+      "name": "Toy_p_cream",
+      "image_texture_nodes": [],
+      "alpha": 1.0,
+      "roughness": 0.85,
+      "emission_strength": 0.0,
+      "glow": false
+    },
+    {
+      "name": "Toy_p_mustard",
+      "image_texture_nodes": [],
+      "alpha": 1.0,
+      "roughness": 0.85,
+      "emission_strength": 0.0,
+      "glow": false
+    },
+    {
+      "name": "Toy_p_navy",
+      "image_texture_nodes": [],
+      "alpha": 1.0,
+      "roughness": 0.85,
+      "emission_strength": 0.0,
+      "glow": false
+    },
+    {
+      "name": "Toy_p_tan",
+      "image_texture_nodes": [],
+      "alpha": 1.0,
+      "roughness": 0.85,
+      "emission_strength": 0.0,
+      "glow": false
+    },
+    {
+      "name": "Toy_p_teal",
+      "image_texture_nodes": [],
+      "alpha": 1.0,
+      "roughness": 0.85,
+      "emission_strength": 0.0,
+      "glow": false
+    },
+    {
+      "name": "Toy_roofd",
+      "image_texture_nodes": [],
+      "alpha": 1.0,
+      "roughness": 0.85,
+      "emission_strength": 0.0,
+      "glow": false
+    },
+    {
+      "name": "Toy_sand",
+      "image_texture_nodes": [],
+      "alpha": 1.0,
+      "roughness": 0.85,
+      "emission_strength": 0.0,
+      "glow": false
+    },
+    {
+      "name": "Toy_sky",
+      "image_texture_nodes": [],
+      "alpha": 1.0,
+      "roughness": 0.85,
+      "emission_strength": 0.0,
+      "glow": false
+    },
+    {
+      "name": "Toy_steel",
+      "image_texture_nodes": [],
+      "alpha": 1.0,
+      "roughness": 0.85,
+      "emission_strength": 0.0,
+      "glow": false
+    },
+    {
+      "name": "Toy_white",
+      "image_texture_nodes": [],
+      "alpha": 1.0,
+      "roughness": 0.85,
+      "emission_strength": 0.0,
+      "glow": false
+    },
+    {
+      "name": "Toy_white_Glow",
+      "image_texture_nodes": [],
+      "alpha": 1.0,
+      "roughness": 0.85,
+      "emission_strength": 0.0,
+      "glow": true
+    }
+  ],
+  "image_texture_count": 0,
+  "textured_materials": [],
+  "transparent_materials": [],
+  "camera_count": 0,
+  "light_count": 0,
+  "animation_fcurve_count": 0,
+  "armature_count": 0,
+  "constraint_count": 0,
+  "transforms_applied": true,
+  "negative_scales": false,
+  "degenerate_triangle_count": 0,
+  "invalid_or_nonunit_loop_normal_count": 0,
+  "open_shell_objects": [
+    "grp_Toy_gold",
+    "grp_Toy_ink",
+    "grp_Toy_maroon",
+    "grp_Toy_oak",
+    "grp_Toy_p_coral",
+    "grp_Toy_p_mustard",
+    "grp_Toy_p_teal",
+    "grp_Toy_sky",
+    "grp_Toy_steel"
+  ],
+  "inverted_or_zero_volume_objects": [],
+  "glow_materials": [
+    "Toy_mustard_Glow",
+    "Toy_white_Glow"
+  ],
+  "off_palette_warnings": {
+    "Toy_maroon": "the Powell livery; Toy_brick #c96f4a reads as terracotta",
+    "Toy_oak": "varnished wood - posts, benches, window frames, monitor wall"
+  },
+  "material_contract_violations": [],
+  "unexpected_geometry_or_objects": [],
+  "figure_object_count": 1,
+  "figure_triangle_count": 12,
+  "object_details": [
+    {
+      "name": "grp_Toy_cream",
+      "triangles": 180,
+      "closed_solid": true,
+      "signed_volume_m3": 3.178866,
+      "location": [
+        0.0,
+        0.0,
+        0.0
+      ],
+      "rotation_euler": [
+        0.0,
+        0.0,
+        0.0
+      ],
+      "scale": [
+        1.0,
+        1.0,
+        1.0
+      ]
+    },
+    {
+      "name": "grp_Toy_glass",
+      "triangles": 280,
+      "closed_solid": true,
+      "signed_volume_m3": 0.182196,
+      "location": [
+        0.0,
+        0.0,
+        0.0
+      ],
+      "rotation_euler": [
+        0.0,
+        0.0,
+        0.0
+      ],
+      "scale": [
+        1.0,
+        1.0,
+        1.0
+      ]
+    },
+    {
+      "name": "grp_Toy_gold",
+      "triangles": 260,
+      "closed_solid": false,
+      "signed_volume_m3": 0.142932,
+      "location": [
+        0.0,
+        0.0,
+        0.0
+      ],
+      "rotation_euler": [
+        0.0,
+        0.0,
+        0.0
+      ],
+      "scale": [
+        1.0,
+        1.0,
+        1.0
+      ]
+    },
+    {
+      "name": "grp_Toy_ink",
+      "triangles": 620,
+      "closed_solid": false,
+      "signed_volume_m3": 3.536748,
+      "location": [
+        0.0,
+        0.0,
+        0.0
+      ],
+      "rotation_euler": [
+        0.0,
+        0.0,
+        0.0
+      ],
+      "scale": [
+        1.0,
+        1.0,
+        1.0
+      ]
+    },
+    {
+      "name": "grp_Toy_maroon",
+      "triangles": 398,
+      "closed_solid": false,
+      "signed_volume_m3": 6.601672,
+      "location": [
+        0.0,
+        0.0,
+        0.0
+      ],
+      "rotation_euler": [
+        0.0,
+        0.0,
+        0.0
+      ],
+      "scale": [
+        1.0,
+        1.0,
+        1.0
+      ]
+    },
+    {
+      "name": "grp_Toy_mustard",
+      "triangles": 48,
+      "closed_solid": true,
+      "signed_volume_m3": 0.054505,
+      "location": [
+        0.0,
+        0.0,
+        0.0
+      ],
+      "rotation_euler": [
+        0.0,
+        0.0,
+        0.0
+      ],
+      "scale": [
+        1.0,
+        1.0,
+        1.0
+      ]
+    },
+    {
+      "name": "grp_Toy_mustard_Glow",
+      "triangles": 220,
+      "closed_solid": true,
+      "signed_volume_m3": 0.971303,
+      "location": [
+        0.0,
+        0.0,
+        0.0
+      ],
+      "rotation_euler": [
+        0.0,
+        0.0,
+        0.0
+      ],
+      "scale": [
+        1.0,
+        1.0,
+        1.0
+      ]
+    },
+    {
+      "name": "grp_Toy_oak",
+      "triangles": 784,
+      "closed_solid": false,
+      "signed_volume_m3": 5.622676,
+      "location": [
+        0.0,
+        0.0,
+        0.0
+      ],
+      "rotation_euler": [
+        0.0,
+        0.0,
+        0.0
+      ],
+      "scale": [
+        1.0,
+        1.0,
+        1.0
+      ]
+    },
+    {
+      "name": "grp_Toy_p_coral",
+      "triangles": 46,
+      "closed_solid": false,
+      "signed_volume_m3": 0.082559,
+      "location": [
+        0.0,
+        0.0,
+        0.0
+      ],
+      "rotation_euler": [
+        0.0,
+        0.0,
+        0.0
+      ],
+      "scale": [
+        1.0,
+        1.0,
+        1.0
+      ]
+    },
+    {
+      "name": "grp_Toy_p_mustard",
+      "triangles": 46,
+      "closed_solid": false,
+      "signed_volume_m3": 0.080629,
+      "location": [
+        0.0,
+        0.0,
+        0.0
+      ],
+      "rotation_euler": [
+        0.0,
+        0.0,
+        0.0
+      ],
+      "scale": [
+        1.0,
+        1.0,
+        1.0
+      ]
+    },
+    {
+      "name": "grp_Toy_p_navy",
+      "triangles": 144,
+      "closed_solid": true,
+      "signed_volume_m3": 0.240451,
+      "location": [
+        0.0,
+        0.0,
+        0.0
+      ],
+      "rotation_euler": [
+        0.0,
+        0.0,
+        0.0
+      ],
+      "scale": [
+        1.0,
+        1.0,
+        1.0
+      ]
+    },
+    {
+      "name": "grp_Toy_p_tan",
+      "triangles": 96,
+      "closed_solid": true,
+      "signed_volume_m3": 0.058394,
+      "location": [
+        0.0,
+        0.0,
+        0.0
+      ],
+      "rotation_euler": [
+        0.0,
+        0.0,
+        0.0
+      ],
+      "scale": [
+        1.0,
+        1.0,
+        1.0
+      ]
+    },
+    {
+      "name": "grp_Toy_p_teal",
+      "triangles": 34,
+      "closed_solid": false,
+      "signed_volume_m3": 0.05453,
+      "location": [
+        0.0,
+        0.0,
+        0.0
+      ],
+      "rotation_euler": [
+        0.0,
+        0.0,
+        0.0
+      ],
+      "scale": [
+        1.0,
+        1.0,
+        1.0
+      ]
+    },
+    {
+      "name": "grp_Toy_roofd",
+      "triangles": 176,
+      "closed_solid": true,
+      "signed_volume_m3": 0.112896,
+      "location": [
+        0.0,
+        0.0,
+        0.0
+      ],
+      "rotation_euler": [
+        0.0,
+        0.0,
+        0.0
+      ],
+      "scale": [
+        1.0,
+        1.0,
+        1.0
+      ]
+    },
+    {
+      "name": "grp_Toy_sand",
+      "triangles": 128,
+      "closed_solid": true,
+      "signed_volume_m3": 2.535542,
+      "location": [
+        0.0,
+        0.0,
+        0.0
+      ],
+      "rotation_euler": [
+        0.0,
+        0.0,
+        0.0
+      ],
+      "scale": [
+        1.0,
+        1.0,
+        1.0
+      ]
+    },
+    {
+      "name": "grp_Toy_sky",
+      "triangles": 112,
+      "closed_solid": false,
+      "signed_volume_m3": 2.108606,
+      "location": [
+        0.0,
+        0.0,
+        0.0
+      ],
+      "rotation_euler": [
+        0.0,
+        0.0,
+        0.0
+      ],
+      "scale": [
+        1.0,
+        1.0,
+        1.0
+      ]
+    },
+    {
+      "name": "grp_Toy_steel",
+      "triangles": 32,
+      "closed_solid": false,
+      "signed_volume_m3": 0.017621,
+      "location": [
+        0.0,
+        0.0,
+        0.0
+      ],
+      "rotation_euler": [
+        0.0,
+        0.0,
+        0.0
+      ],
+      "scale": [
+        1.0,
+        1.0,
+        1.0
+      ]
+    },
+    {
+      "name": "grp_Toy_white",
+      "triangles": 124,
+      "closed_solid": true,
+      "signed_volume_m3": 0.235517,
+      "location": [
+        0.0,
+        0.0,
+        0.0
+      ],
+      "rotation_euler": [
+        0.0,
+        0.0,
+        0.0
+      ],
+      "scale": [
+        1.0,
+        1.0,
+        1.0
+      ]
+    },
+    {
+      "name": "lamp_lens",
+      "triangles": 36,
+      "closed_solid": true,
+      "signed_volume_m3": 0.001075,
+      "location": [
+        0.0,
+        0.0,
+        0.0
+      ],
+      "rotation_euler": [
+        0.0,
+        0.0,
+        0.0
+      ],
+      "scale": [
+        1.0,
+        1.0,
+        1.0
+      ]
+    },
+    {
+      "name": "rider_br0_torso",
+      "triangles": 12,
+      "closed_solid": true,
+      "signed_volume_m3": 0.028028,
+      "location": [
+        0.0,
+        0.0,
+        0.0
+      ],
+      "rotation_euler": [
+        0.0,
+        0.0,
+        0.0
+      ],
+      "scale": [
+        1.0,
+        1.0,
+        1.0
+      ]
+    }
+  ],
+  "stage": "shipped",
+  "checks": {
+    "meters_and_published_dimensions": true,
+    "ground_at_min_y_zero": true,
+    "centered_in_xz_footprint": true,
+    "front_faces_minus_z": true,
+    "narrow_gauge_wheels": true,
+    "under_triangle_budget": true,
+    "no_image_textures": true,
+    "no_transparency": true,
+    "materials_follow_contract": true,
+    "no_toy_body": true,
+    "no_cameras_or_lights": true,
+    "no_animation_skin_or_constraints": true,
+    "transforms_applied": true,
+    "no_negative_scales": true,
+    "normals_finite_and_unit": true,
+    "no_degenerate_geometry": true,
+    "no_unexpected_objects": true,
+    "glow_set_is_night_only": true,
+    "glow_materials_present": true
+  },
+  "per_object_observations": {
+    "every_object_is_a_closed_solid": false,
+    "every_object_signed_volume_positive": true,
+    "gripman_and_conductor_present": false,
+    "at_least_three_standees_on_running_boards": false
+  },
+  "per_object_note": "Not gated at this stage. The shrink pass joins the 227 authored objects into 20 per-material groups and deletes provably buried faces, so a group is a union of solids rather than one closed solid. What still has to hold - and is gated in shrink-stats.json as merge_vehicle_safe - is that every group's signed volume stays POSITIVE, because mergeVehicle() reverses any source mesh whose volume is negative. Per-object closure is gated on the authored export in validation.json.",
+  "overall": "PASS"
+}

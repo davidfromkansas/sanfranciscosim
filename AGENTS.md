@@ -9,7 +9,7 @@ A data-accurate 3D San Francisco in Three.js, rendered as a **toy diorama** (min
 ## Repo layout
 
 - `app/` — Vite + three.js frontend. Static assets in `app/public/` (`tiles/` = baked city geometry, `sf-assets/` = hand-made GLB landmarks + manifest, `fonts/`).
-- `api/` — zero-dependency Vercel functions (`agent.mjs` = the "concierge" LLM endpoint via Vercel AI Gateway).
+- `api/` — zero-dependency Vercel functions. `agent.mjs` = the "concierge" LLM endpoint via Vercel AI Gateway. All live data feeds (`/api/ferries`, `/api/live`, future feeds) share ONE function — `api/[...path].mjs` dispatching into the feed registry (`api/_lib/feedcore.mjs`); adding a feed = one fetcher module in `api/_lib/feeds/` + one import line (the full recipe is in feedcore's header). Feeds share a process on purpose: it is what lets `/api/live` compose a consolidated snapshot from memory.
 - `pipeline/` — offline Node scripts that download open data and bake the binary tiles the app streams. Re-run only when data or formats change.
 - `docs/styles/` — the canonical style bibles (see `docs/styles/README.md`); `.agents/skills/` — agent procedures (asset intake, testing, style pointer).
 - `vercel.json` — build config (`cd app && npm install && npm run build`, output `app/dist`).
@@ -29,7 +29,7 @@ Rules for maintaining these: they are the single source of truth — update them
 ## Iron rules (do not violate; they override any older text you find)
 
 1. **Diorama mode is the DEFAULT AND ONLY user-facing style.** The app boots into it with no flash of any other look. The old realistic/golden style must not be reachable (`M` toggle and `?style=golden` are retired).
-2. **Performance budgets are hard gates:** < 300 draw calls worst case, 60 fps in the popular browsers on desktop (Chrome, Safari, Edge, Firefox) AND mobile (Chrome, Safari) reference devices, `devicePixelRatio` clamped ≤ 2, no per-frame allocation, no memory growth while flying around. Verify with the in-app stats overlay at street level in the Mission and downtown (the stress cells). The full guardrail — browser matrix, reference devices, measurement cadence — is defined in `docs/plans/PERF-PLAN.md` (THE GUARDRAIL section); a change that holds 60 fps in desktop Chrome but drops any matrix browser below 60 is a FAIL.
+2. **Performance budgets are hard gates:** < 300 draw calls worst case, 60 fps in the popular browsers on desktop (Chrome, Safari, Edge, Firefox) AND mobile (Chrome, Safari) reference devices, `devicePixelRatio` clamped ≤ 2, no per-frame allocation, no memory growth while flying around. Verify with the in-app stats overlay at street level in the Mission and downtown (the stress cells). The full guardrail — browser matrix, reference devices, measurement cadence — is defined in `docs/plans/PERF-PLAN.md` (THE GUARDRAIL section); a change that holds 60 fps in desktop Chrome but drops any matrix browser below 60 is a FAIL. Every visual subsystem exposes `setQuality(tier)` and is fanned out from `applyQuality` in `main.js` (the `QUALITY` table in `ui.js` documents what each tier means) — a new visual feature ships its lever in the same PR.
 3. **Procedural fallback is a guarantee, never delete it.** Baked/procedural builders remain the fallback at every level: a missing/broken GLB, an unfit kit piece, or an empty `sf-assets/` folder must degrade to the procedural version with one console warning — never a hole, never a crash.
 4. **Zero required paid keys.** The only key the app uses is the Vercel AI Gateway key for the concierge (optional — without it the concierge shows a friendly offline state). `GOOGLE_PLACES_KEY` is strictly optional. Never add a service that makes the build require new billing.
 5. **Data accuracy is the product.** Buildings/streets/landmarks sit at real coordinates and real heights. Never invent, move, or rescale real-world features for convenience (semantic/style exaggeration happens in ASSET AUTHORING, not in placement).
@@ -53,7 +53,7 @@ The full, canonical style bible is `docs/styles/miniature-toy.md` — read it be
 
 ## The concierge (api/agent.mjs)
 
-LLM agent over the city's data. Rules it must keep: answers city facts ONLY from tool results; camera/focus/highlight actions are **intent objects validated server-side and applied client-side** (the model never touches the scene directly); every tool spatially scoped through the cell grid (no citywide scans); per-IP rate limits; friendly 503 without a key; replies as plain text (`textContent`, never HTML).
+LLM agent over the city's data. Rules it must keep: answers city facts ONLY from tool results; live conditions come through ONE `live_data` tool that requests exactly the feeds a question needs (names and descriptions derive from the feed registry — a newly registered feed reaches the concierge with zero concierge changes) and self-fetches the deployment's own `/api/<feed>` URLs so reads hit the CDN, never the upstreams; camera/focus/highlight actions are **intent objects validated server-side and applied client-side** (the model never touches the scene directly); every tool spatially scoped through the cell grid (no citywide scans); per-IP rate limits; friendly 503 without a key; replies as plain text (`textContent`, never HTML).
 
 ## UI
 

@@ -64,10 +64,12 @@ export function createKitFleet(parent, catalog, loader) {
     let id = geometryIds.get(index);
     if (id !== undefined) return id;
     const entry = loader.get(index);
-    if (!entry) return undefined;
+    if (!entry || !entry.geometry) return undefined;
     id = mesh.addGeometry(entry.geometry);
     geometryIds.set(index, id);
     triangles += entry.triangles;
+    // The batch now owns a copy; the loader's CPU-side arrays are dead weight.
+    loader.release(index);
     return id;
   }
 

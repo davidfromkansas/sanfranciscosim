@@ -1,20 +1,23 @@
-// GET /api/ferries — real San Francisco Bay Ferry (WETA) vessel positions.
+// /api/ferries — real San Francisco Bay Ferry (WETA) vessel positions.
 //
 // Thin normaliser over 511.org's SIRI VehicleMonitoring feed for agency SB, plus
 // the scheduled departure of each vessel's current trip from StopTimetable.
-// Without FERRY_511_KEY it answers 200 with { live: false } and the client keeps
-// its procedural ferries: the city never requires a key.
+// Without FERRY_511_KEY it answers { live: false } and the client keeps its
+// procedural ferries: the city never requires a key.
 //
-// 511 allows 60 requests an hour. Positions memoise for 90 s (40/h worst case)
-// and the CDN caches for the same, which leaves headroom for the per-terminal
-// timetables — those are fetched at most one per invocation, capped per hour,
-// and cached for six hours since they are a published schedule. An upstream
-// failure serves the last good fix (marked stale) and backs off for five minutes.
+// 511 allows 60 requests an hour. Positions cache for 90 s in the feed registry
+// (40/h worst case) and the CDN caches for the same, which leaves headroom for
+// the per-terminal timetables — those are fetched at most one per refresh,
+// capped per hour, and cached for six hours since they are a published
+// schedule. An upstream failure serves the last good fix (marked stale, via the
+// registry) and backs off for five minutes.
+
+import { registerFeed } from '../feedcore.mjs';
 
 const UPSTREAM = 'https://api.511.org/transit/VehicleMonitoring';
 const TIMETABLE = 'https://api.511.org/transit/StopTimetable';
 const AGENCY = 'SB'; // SB = SF Bay Ferry / WETA (SF is Muni, GF is Golden Gate).
-const MEMO_MS = 90 * 1000;
+const TTL_MS = 90 * 1000;
 const STALE_MS = 10 * 60 * 1000;
 const BACKOFF_MS = 5 * 60 * 1000;
 const TIMEOUT_MS = 10 * 1000;
@@ -22,8 +25,6 @@ const TIMETABLE_TTL_MS = 6 * 60 * 60 * 1000;
 const TIMETABLE_BUDGET = 12; // Per instance per hour, well inside the 60/h key limit.
 
 // Module scope survives across invocations on a warm instance.
-let memo = null; // { fetchedAt, vessels }
-let backoffUntil = 0;
 // stopRef -> { fetchedAt, departures: Map<datedVehicleJourneyRef, epochMs> }
 const timetables = new Map();
 let timetableSpend = { hour: 0, count: 0 };
@@ -146,7 +147,7 @@ async function loadTimetable(key, stopRef, now) {
     }
     timetables.set(String(stopRef), { fetchedAt: now, departures });
   } catch {
-    // Leave the stop uncached; the next invocation may retry within budget.
+    // Leave the stop uncached; the next refresh may retry within budget.
   } finally {
     clearTimeout(timer);
   }
@@ -169,74 +170,42 @@ function staleTimetableStops(vessels, now) {
   return [...wanted];
 }
 
-function serveMemo(res, now, reason) {
-  if (memo && now - memo.fetchedAt <= STALE_MS) {
-    return res.status(200).json({
-      live: true,
-      stale: true,
-      reason,
-      fetchedAt: memo.fetchedAt,
-      vessels: memo.vessels,
-    });
-  }
-  return res.status(200).json({ live: false, reason, vessels: [] });
-}
-
-export default async function handler(req, res) {
-  if (req.method && req.method !== 'GET') {
-    res.status(405).json({ error: 'method not allowed' });
-    return;
-  }
-
-  res.setHeader('Cache-Control', 's-maxage=90, stale-while-revalidate=300');
-
+async function fetchFerries() {
   const key = (process.env.FERRY_511_KEY || '').trim();
-  if (!key) {
-    res.status(200).json({ live: false, reason: 'no-key', vessels: [] });
-    return;
-  }
+  if (!key) return { live: false, reason: 'no-key', vessels: [] };
 
   const now = Date.now();
-  if (memo && now - memo.fetchedAt < MEMO_MS) {
-    res.status(200).json({ live: true, fetchedAt: memo.fetchedAt, vessels: memo.vessels });
-    return;
-  }
-  if (now < backoffUntil) {
-    serveMemo(res, now, 'backoff');
-    return;
-  }
-
   const controller = new AbortController();
   const timer = setTimeout(() => controller.abort(), TIMEOUT_MS);
   try {
     const url = `${UPSTREAM}?api_key=${encodeURIComponent(key)}&agency=${AGENCY}&format=json`;
     const upstream = await fetch(url, { signal: controller.signal });
-    if (upstream.status === 429 || upstream.status >= 500) {
-      backoffUntil = now + BACKOFF_MS;
-      serveMemo(res, now, `upstream-${upstream.status}`);
-      return;
-    }
-    if (!upstream.ok) {
-      serveMemo(res, now, `upstream-${upstream.status}`);
-      return;
-    }
+    if (!upstream.ok) throw new Error(`upstream-${upstream.status}`);
     // 511 serves this feed as UTF-8 with a BOM, which JSON.parse rejects.
     const text = await upstream.text();
     const payload = JSON.parse(text.replace(/^\uFEFF/, ''));
     const vessels = normalise(payload, now);
-    // One terminal per invocation: enough to warm every terminal within a
-    // couple of minutes without crowding the hourly request budget.
+    // One terminal per refresh: enough to warm every terminal within a couple
+    // of minutes without crowding the hourly request budget.
     const missing = staleTimetableStops(vessels, now);
     if (missing.length) await loadTimetable(key, missing[0], now);
     for (const vessel of vessels) {
       vessel.origin.departedAt = scheduledDeparture(vessel.origin.ref, vessel.tripRef);
     }
-    memo = { fetchedAt: now, vessels };
-    res.status(200).json({ live: true, fetchedAt: now, vessels });
+    return { live: true, vessels };
   } catch (error) {
-    backoffUntil = now + BACKOFF_MS;
-    serveMemo(res, now, error.name === 'AbortError' ? 'timeout' : 'upstream');
+    throw error?.name === 'AbortError' ? new Error('timeout') : error;
   } finally {
     clearTimeout(timer);
   }
 }
+
+registerFeed('ferries', {
+  describe:
+    'real San Francisco Bay Ferry (WETA) vessel positions on the Bay right now — lat/lon, bearing, route, destination, next stop with live ETA',
+  ttl: TTL_MS,
+  staleMs: STALE_MS,
+  backoffMs: BACKOFF_MS,
+  fetcher: fetchFerries,
+  empty: { live: false, vessels: [] },
+});

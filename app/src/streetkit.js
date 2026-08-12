@@ -27,7 +27,7 @@ import {
   Quaternion,
   Vector3,
 } from 'three';
-import { GLTFLoader } from 'three/addons/loaders/GLTFLoader.js';
+import { createGLTFLoader } from './gltf.js';
 import { mergeGeometries } from 'three/addons/utils/BufferGeometryUtils.js';
 import { shared } from './env.js';
 import { tileUrl } from './data.js';
@@ -120,7 +120,7 @@ export async function loadStreetKit() {
   const missing = PIECES.filter((id) => !byId.has(id));
   if (missing.length) throw new Error(`index is missing ${missing.join(', ')}`);
 
-  const loader = new GLTFLoader();
+  const loader = createGLTFLoader();
   const pieces = [];
   for (const id of PIECES) {
     const entry = byId.get(id);
@@ -137,16 +137,31 @@ export async function loadStreetKit() {
 // sidecars the picking layer already streams for the cells under the camera.
 export function createStreetHints(manifest, contextCells) {
   const grid = manifest.grid;
+  // LRU: hints for cells the camera left long ago are cheap to refetch (the
+  // sidecars are immutable-cached JSON) and needless to keep for a whole
+  // session. Recency-refreshed on read, oldest evicted past the cap.
   const cells = new Map();
+  const CELLS_MAX = 150;
   const EMPTY = { market: [], commercial: [] };
+
+  function remember(key, value) {
+    cells.set(key, value);
+    while (cells.size > CELLS_MAX) {
+      cells.delete(cells.keys().next().value);
+    }
+    return value;
+  }
 
   function load(key) {
     const cached = cells.get(key);
-    if (cached) return cached;
+    if (cached) {
+      cells.delete(key);
+      cells.set(key, cached);
+      return cached;
+    }
     // Cells the bake never wrote carry no hints, and requesting one is a 404.
     if (contextCells && !contextCells.has(key)) {
-      cells.set(key, EMPTY);
-      return EMPTY;
+      return remember(key, EMPTY);
     }
     const promise = fetch(tileUrl(`ctx/${key}.json`))
       .then((r) => (r.ok ? r.json() : null))
@@ -166,11 +181,11 @@ export function createStreetHints(manifest, contextCells) {
           if (info && SHOP_CATEGORIES.has(info.c)) commercial.push(pick.x[i], pick.z[i]);
         }
         const value = { market, commercial };
-        cells.set(key, value);
-        return value;
+        // The promise entry may already have been evicted under pressure;
+        // remember() re-inserts the resolved value either way.
+        return remember(key, value);
       });
-    cells.set(key, promise);
-    return promise;
+    return remember(key, promise);
   }
 
   /** Hint arrays covering a box, with a margin for the pieces on its edge. */
@@ -262,6 +277,20 @@ export function createStreetKitFleet(scene, kit, sampleElevation) {
     return max - min > MAX_SLOPE;
   }
 
+  // Quality mask: the placement data always stays planned and packed, only
+  // the meshes hide, so the governor can pull this lever without a replan.
+  // low keeps the pieces that carry the street's function (lamps, signals);
+  // medium sheds the clutter that reads only up close.
+  const LOW_KEEPS = new Set(['sl_standard', 'sl_pathofgold', 'sl_residential', 'traffic_signal']);
+  const MEDIUM_DROPS = new Set(['newsboxes', 'planter', 'bikerack', 'trashcan']);
+  let allowedId = () => true;
+
+  function applyVisibility(type) {
+    const on = type.body.count > 0 && allowedId(type.id);
+    type.body.visible = on;
+    if (type.glow) type.glow.visible = on;
+  }
+
   function repack(type) {
     let n = 0;
     for (const list of type.groups.values()) {
@@ -274,13 +303,12 @@ export function createStreetKitFleet(scene, kit, sampleElevation) {
       }
     }
     type.body.count = n;
-    type.body.visible = n > 0;
     type.body.instanceMatrix.needsUpdate = true;
     if (type.glow) {
       type.glow.count = n;
-      type.glow.visible = n > 0;
       type.glow.instanceMatrix.needsUpdate = true;
     }
+    applyVisibility(type);
     return n;
   }
 
@@ -290,6 +318,15 @@ export function createStreetKitFleet(scene, kit, sampleElevation) {
 
   return {
     root,
+    setQuality(tier) {
+      allowedId =
+        tier === 'low'
+          ? (id) => LOW_KEEPS.has(id)
+          : tier === 'medium'
+            ? (id) => !MEDIUM_DROPS.has(id)
+            : () => true;
+      for (const type of types) applyVisibility(type);
+    },
     /** Adds one group's planned anchors. Returns how many pieces were placed. */
     add(key, anchors) {
       if (!anchors || anchors.length === 0) return 0;

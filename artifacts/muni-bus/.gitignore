@@ -1,0 +1,4 @@
+# Reproducible intermediates — rebuild with ./shrink.sh
+build/
+shrunk/
+*.blend1
