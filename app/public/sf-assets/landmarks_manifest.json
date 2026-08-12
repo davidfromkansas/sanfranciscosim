@@ -381,5 +381,24 @@
     ],
     "tris": 11604,
     "loadRadius": 2500
+  },
+  {
+    "id": "letterman",
+    "file": "letterman-digital-arts-center.glb",
+    "anchor": [
+      -122.4494466,
+      37.7997327
+    ],
+    "targetHeightM": 22,
+    "cat": 3,
+    "name": "Letterman Digital Arts Center",
+    "estimated": true,
+    "dims": [
+      312.222,
+      298.157,
+      21.993
+    ],
+    "tris": 18238,
+    "loadRadius": 2500
   }
 ]
