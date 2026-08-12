@@ -1,6 +1,6 @@
 {
- "generated": "2026-08-12T18:48:21.056Z",
- "buildings": 174770,
+ "generated": "2026-08-12T23:35:03.955Z",
+ "buildings": 174766,
  "cells": 596,
  "categories": [
   {
@@ -21,7 +21,7 @@
    "cat": 2,
    "id": "apartments",
    "label": "Apartments",
-   "count": 14021,
+   "count": 14020,
    "night": 0
   },
   {
@@ -133,7 +133,7 @@
    "cat": 18,
    "id": "government",
    "label": "Government",
-   "count": 431,
+   "count": 430,
    "night": 2
   },
   {
@@ -168,7 +168,7 @@
    "cat": 23,
    "id": "parking_garage",
    "label": "Parking garage",
-   "count": 1850,
+   "count": 1848,
    "night": 3
   },
   {
@@ -275,7 +275,7 @@
   {
    "sub": "civic_office",
    "label": "Civic office",
-   "count": 358
+   "count": 357
   },
   {
    "sub": "trade_school",
@@ -654,18 +654,18 @@
   }
  ],
  "sources": {
-  "landuse": 140698,
+  "landuse": 140695,
   "business": 10214,
   "heuristic": 7280,
   "osm": 8626,
   "overture": 6664,
-  "datasf": 1288
+  "datasf": 1287
  },
  "confidence": [
-  147978,
+  147975,
   15334,
   4498,
-  6960
+  6959
  ],
  "streets": {
   "named": 2509,

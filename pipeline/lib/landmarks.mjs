@@ -285,6 +285,18 @@ export const LANDMARKS = [
     clearTrees: true,
     camera: { distance: 700, yaw: 220, pitch: 24 },
   },
+  {
+    id: 'billGrahamCivicAuditorium',
+    name: 'Bill Graham Civic Auditorium',
+    lon: -122.4173309,
+    lat: 37.7780621,
+    height: 37,
+    // Footprint 128 x 78.6 m at 80.69 deg; half-diagonal 75.1 m, so 80 m clears
+    // it. Checked against the neighbours: City Hall is 228 m away (110 m zone)
+    // and the Opera House 322 m (62 m zone) - neither zone is touched.
+    exclude: 80,
+    camera: { distance: 700, yaw: 200, pitch: 24 },
+  },
 ];
 
 // Parks/green spaces the landcover bake must match at least one source polygon

@@ -7,7 +7,7 @@
   "rows": 32
  },
  "stats": {
-  "sidecarBytes": 18361971,
+  "sidecarBytes": 18361518,
   "cells": 596
  },
  "cells": [
@@ -2079,7 +2079,7 @@
    "originZ": 1000,
    "buildings": 599,
    "streets": 43,
-   "bytes": 67241
+   "bytes": 67239
   },
   {
    "key": "18_19",
@@ -2287,9 +2287,9 @@
    "cz": 14,
    "originX": 1500,
    "originZ": -1000,
-   "buildings": 80,
+   "buildings": 76,
    "streets": 40,
-   "bytes": 13782
+   "bytes": 13323
   },
   {
    "key": "19_15",
@@ -2779,7 +2779,7 @@
    "originZ": -3000,
    "buildings": 414,
    "streets": 91,
-   "bytes": 66335
+   "bytes": 66343
   },
   {
    "key": "21_11",
