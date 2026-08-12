@@ -3,3 +3,4 @@
 // once; adding a feed here is step 3 of the recipe in feedcore.mjs.
 
 import './ferries.mjs';
+import './muni.mjs';

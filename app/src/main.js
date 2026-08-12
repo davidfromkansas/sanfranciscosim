@@ -24,6 +24,7 @@ import { createAssets } from './assets.js';
 import { createPiers } from './piers.js';
 import { createAgents } from './agents.js';
 import { createLiveFerries } from './ferries.js';
+import { createLiveMuni } from './muni.js';
 import { createCameraRig } from './camera.js';
 import { createSigns } from './signs.js';
 import { createToyPost } from './toypost.js';
@@ -110,6 +111,9 @@ async function boot() {
   const agents = createAgents(scene, data, city);
   // Real WETA vessels from /api/ferries; falls back to the procedural ferries.
   const ferries = createLiveFerries(scene, data, agents);
+  // Real Muni buses from /api/muni; when the feed is away this layer is simply
+  // empty — the procedural road traffic never depended on it.
+  const muni = createLiveMuni(scene, data);
   const signs = createSigns(scene, data);
   const post = createToyPost(renderer);
 
@@ -435,6 +439,15 @@ async function boot() {
         return;
       }
       if (intent.type === 'focus_entity' || intent.type === 'highlight') {
+        // Live-fleet ids from the muni feed ("SF:8632"): the concierge saw them
+        // in live_data and the bus layer has the current position.
+        if (typeof intent.id === 'string' && intent.id.startsWith('SF:')) {
+          const bus = muni.busEntity(intent.id);
+          if (bus) {
+            selectEntity(bus, { fly: intent.type === 'focus_entity' });
+            return;
+          }
+        }
         if (typeof intent.id === 'string' && intent.id.startsWith('b:')) {
           const entity = await context.loadBuilding(Number(intent.id.slice(2)), intent.x, intent.z);
           if (entity) {
@@ -473,8 +486,9 @@ async function boot() {
   let vesselCardAge = 0;
   function trackVessel(dt) {
     const selected = focus.entity;
-    if (selected?.kind !== 'vessel') return;
-    const fresh = ferries.vesselEntity(selected.id);
+    if (selected?.kind !== 'vessel' && selected?.kind !== 'transit') return;
+    const fresh =
+      selected.kind === 'vessel' ? ferries.vesselEntity(selected.id) : muni.busEntity(selected.id);
     if (!fresh) return;
     focus.entity = fresh;
     overlay.show(fresh, { toy: style === 'toy', groundY: 0 });
@@ -491,6 +505,8 @@ async function boot() {
     pickRay.setFromCamera(pickPointer, camera);
     const vessel = ferries.pickVessel(pickRay.ray.origin, pickRay.ray.direction);
     if (vessel) return vessel;
+    const bus = muni.pickBus(pickRay.ray.origin, pickRay.ray.direction);
+    if (bus) return bus;
     return context.pick(pickRay.ray.origin, pickRay.ray.direction, hasGround ? groundPoint : null, {
       toy: style === 'toy',
     });
@@ -536,6 +552,7 @@ async function boot() {
     city,
     agents,
     ferries,
+    muni,
     governor,
     boot: bootScreen,
     landmarks,
@@ -640,6 +657,7 @@ async function boot() {
     city.update(dt, pivotWorld, camera.position, quality);
     agents.update(dt, pivotWorld, camera.position);
     ferries.update(dt);
+    muni.update(dt, camera);
     trackVessel(dt);
     landmarks.update();
     assets.update(camera.position, dt);
@@ -685,6 +703,7 @@ async function boot() {
           `trees      ${city.stats.trees}  lamps ${city.stats.lamps}`,
           `cars       ${agents.carCount}`,
           `ferries    ${ferries.count}${ferries.live ? ' live' : ' procedural'}`,
+          `muni       ${muni.count}${muni.live ? ` live (${muni.onShapeCount} on-route${muni.degraded ? ', degraded' : ''})` : ' off'}`,
           `altitude   ${(camera.position.y - rig.state.pivot.y).toFixed(0)} m`,
           `zoom       ${rig.state.distance.toFixed(0)} m`,
           `time       ${sky ? sky.localTime : 'fallback'}${clockOverride === null ? '' : ' (held)'}`,
