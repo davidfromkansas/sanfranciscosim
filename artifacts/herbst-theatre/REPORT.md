@@ -24,9 +24,14 @@ Built as stage 2 of `docs/asset-pipeline/ADDRESS-TO-ASSET.md`.
 ## Validated result (fresh-scene re-import of the GLB)
 
 - **PASS** — `validation.json`, all 15 checks.
-- **220 objects, 9,844 triangles** (budget 18,000), dims
-  **92.53 × 70.71 × 31.00 m** (world-axis AABB of the building rotated 81.11°),
-  min-z 0.0, XY centre offset 0.0 / 0.0.
+- **SHIPPED (post stage-4 optimize): 9 objects, 9,821 triangles** (budget
+  18,000), **244,260 B**, dims **92.53 × 70.71 × 31.00 m** (world-axis AABB of
+  the building rotated 81.11°), min-z 0.0, XY centre offset 0.0 / 0.0.
+  Pre-optimize the same asset was 220 objects / 18,078 verts / 554,680 B;
+  stage 4 welded and joined it to 9 draw submeshes with the bbox bit-identical
+  (`optimize/REPORT.md`). The GLB's own index count is 9,844 triangles; 9,821 is
+  what a fresh Blender re-import measures as renderable after the weld, and is
+  the number the manifest carries (same convention as the Opera House entry).
 - Normals: `inverted_solids: []`, **`ray_flipped_fraction` 0.0** across 22,500
   rays, 0 degenerate triangles, 0 non-unit loop normals. (Cleaner than the
   0.1%-tolerance the union-of-solids gate allows.)
@@ -161,14 +166,13 @@ Result: see the QA table below.
   "cat": 17,
   "name": "Herbst Theatre (War Memorial Veterans Building)",
   "estimated": true,
-  "dims": [92.532, 70.711, 31.0],
-  "tris": 9844,
+  "dims": [92.5318, 70.7108, 31.0],
+  "tris": 9821,
   "loadRadius": 2500
 }
 ```
 
-`dims`/`tris` are the pre-optimize numbers and are rewritten to the shipped
-values by stage 4.
+`dims`/`tris` are the shipped, post-optimize numbers.
 
 **Streaming decision (mandatory, PERF-PLAN #3):** `loadRadius: 2500` — the
 skill's default `max(2500, targetHeightM * 30)`. At 2,500 m the whole Civic
@@ -199,12 +203,13 @@ but is called out for the integration QA.
 | min-z ≈ 0, XY centred | PASS (0.0 / 0.0, 0.0) |
 | Max Z equals target height exactly (loader scale 1.0000) | PASS (31.000) |
 | Real-metre dims consistent with the measured footprint | PASS |
-| ≤ 18,000 triangles | PASS (9,844) |
+| ≤ 18,000 triangles | PASS (9,821 shipped) |
 | Materials `Toy_*`, flat, no textures/alpha, no `Toy_body` | PASS |
 | `_Glow` only on lit panes + colonnade soffit, emission 0 | PASS |
 | No cameras/lights/animations/armatures/constraints | PASS |
 | Transforms applied, no negative scales, outward normals | PASS (flipped fraction 0.0) |
-| No foreign/leaked geometry | PASS (fresh factory scene build, 220/220 objects) |
+| No foreign/leaked geometry | PASS (fresh factory scene build; 9/9 objects after optimize) |
 | 5 controlled views + aerial + night ×2 + contact sheet from the export | PASS |
 | Twin test — cornice/base/roof aligned with the Opera House | PASS (see above) |
-| Committed | PASS — stage-2 gate commit on `pipeline/herbst-theatre` |
+| Committed | PASS — stage-2 and stage-4 gate commits on `pipeline/herbst-theatre` |
+| Stage-4 optimize gates G1–G8 | PASS (`optimize/REPORT.md`) |
