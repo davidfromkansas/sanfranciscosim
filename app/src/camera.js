@@ -460,6 +460,9 @@ export function createCameraRig(camera, domElement, sampleElevation, extent) {
     get diorama() {
       return diorama;
     },
+    get flying() {
+      return animation !== null;
+    },
     dispose,
     screenToGround,
     pointer,

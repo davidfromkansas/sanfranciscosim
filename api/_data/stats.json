@@ -1,13 +1,13 @@
 {
- "generated": "2026-08-11T22:52:27.141Z",
- "buildings": 171458,
+ "generated": "2026-08-12T00:24:37.046Z",
+ "buildings": 171454,
  "cells": 547,
  "categories": [
   {
    "cat": 0,
    "id": "misc",
    "label": "Building",
-   "count": 10153,
+   "count": 10151,
    "night": 3
   },
   {
@@ -21,7 +21,7 @@
    "cat": 2,
    "id": "apartments",
    "label": "Apartments",
-   "count": 13932,
+   "count": 13931,
    "night": 0
   },
   {
@@ -168,7 +168,7 @@
    "cat": 23,
    "id": "parking_garage",
    "label": "Parking garage",
-   "count": 1765,
+   "count": 1764,
    "night": 3
   },
   {
@@ -225,7 +225,7 @@
   {
    "sub": "parking_garage",
    "label": "Parking garage",
-   "count": 848
+   "count": 847
   },
   {
    "sub": "house",
@@ -649,17 +649,17 @@
   }
  ],
  "sources": {
-  "landuse": 140187,
+  "landuse": 140184,
   "business": 10183,
   "heuristic": 4946,
   "datasf": 1254,
   "overture": 6585,
-  "osm": 8303
+  "osm": 8302
  },
  "confidence": [
-  145133,
+  145130,
   15230,
-  4177,
+  4176,
   6918
  ],
  "streets": {
