@@ -141,8 +141,17 @@ building on that footprint, so the GLB will intersect it. You must also:
    cd pipeline && npm install
    npm run download   # hundreds of MB; only if pipeline/data/ is absent
    npm run buildings && npm run streets && npm run landcover && npm run validate && npm run toy
+   node lore.mjs && node notables.mjs && node context.mjs
    ```
-   Commit the regenerated files under `app/public/tiles/` that actually changed.
+   **The second line is not optional.** `context.mjs` imports `LANDMARKS`, so the
+   context tier owns your landmark's pick box, its `search-index` entry and its
+   `context/landmarks.json` row — and the publish step in `validate.mjs` drops
+   `app/public/tiles/ctx/` and `context/` if you stop at `toy`, which silently
+   deletes 550-odd committed files and breaks the concierge and search. `lore.mjs`
+   must run first or `context.mjs` fails its own "every building has a pick box and
+   an identity" check against a stale join. It also rewrites `api/_data/`.
+   Commit the regenerated files under `app/public/tiles/` and `api/_data/` that
+   actually changed.
 3. Confirm with `node pipeline/audit.mjs` that check 1.6 (no procedural footprint
    inside a bespoke landmark exclusion zone) passes.
 
