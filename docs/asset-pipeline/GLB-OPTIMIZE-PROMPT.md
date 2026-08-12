@@ -105,27 +105,32 @@ npx gltfpack@0.24 -i mid.glb -o out.glb -c -km -kn -noq
 - **`-km` is mandatory**, not optional: without it gltfpack merges
   identical-parameter materials ACROSS the `_Glow` boundary (glow-ness is
   name-only), silently killing the night layer. Always keep `-kn -km`.
-- **`-noq` is also mandatory for this repo — do NOT quantize.** The recipe above
-  originally read `-cc -kn -km`, which quantizes by default. That conflicts with
-  `pipeline/compress-assets.mjs` (the mandatory ship step per `sf-asset-check` §8),
-  which runs `-c -km -kn -noq` because the runtime kit/landmark merge needs float32
-  attributes, and with `sf-asset-check`'s warning that quantization "silently breaks
-  the app's merge paths (every piece falls back to procedural and the city looks
-  fine)". A quantized build also fails the stage-2 contract validator on
-  `transforms_applied` and `no_unexpected_objects`, because gltfpack stores the
-  dequantize matrix as a node transform and splits each node into an empty parent
-  plus a `Mesh_N` child. Every shipped landmark except `st-marys-cathedral` is
-  unquantized. Use:
+- **Use `-noq`, not the default quantization.** The recipe above originally read
+  `-cc -kn -km`, which quantizes. Prefer:
 
   ```
   npx gltfpack@0.24 -i mid.glb -o out.glb -c -km -kn -noq
   ```
 
-  Expect a smaller headline win than the numbers quoted above — those were measured
-  with quantization on. Recorded 12 Aug 2026 while optimizing `380-brannan`
-  (see `artifacts/380-brannan/optimize/REPORT.md` §4). **`st-marys-cathedral.glb` is
-  quantized and may be falling back to procedural in production — worth one console
-  check.**
+  Two reasons, neither of them "quantization is broken":
+
+  1. It matches `pipeline/compress-assets.mjs`, the mandatory ship step per
+     `sf-asset-check` §8, whose stated intent is keeping attributes float32.
+  2. A quantized build fails the stage-2 contract validator on `transforms_applied`
+     and `no_unexpected_objects`, because gltfpack stores the dequantize matrix as a
+     node transform and splits each node into an empty parent plus a `Mesh_N` child.
+
+  **The runtime merge handles quantization fine** — `st-marys-cathedral.glb` ships
+  quantized and the app logs `merged 9 objects / 8 materials -> batched … uniform
+  x1.0000`. `sf-asset-check`'s "default quantization silently breaks the app's merge
+  paths" warning is best read as being about gltfpack's *other* defaults (no `-km`
+  merges materials across the `_Glow` boundary; no `-kn` drops node names), which are
+  the real silent killers.
+
+  So this is a house-style choice, not a correctness one: `-noq` costs bytes but keeps
+  the contract validator green. Expect a smaller headline win than the numbers quoted
+  above — those were measured with quantization on. Recorded 12 Aug 2026 while
+  optimizing `380-brannan` (see `artifacts/380-brannan/optimize/REPORT.md` §4).
 - `ALLOW_MESHOPT=no` fallback: drop `-c` only.
 - Verify on the output, never trust flags: material name set, manifest node
   names, re-imported bbox within tolerance.

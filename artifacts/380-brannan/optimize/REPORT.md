@@ -67,9 +67,24 @@ produced a 90,328-byte file — a headline 5.1× reduction — but with
 - contradicts `pipeline/compress-assets.mjs`, the **mandatory** ship step per
   `.agents/skills/sf-asset-check/SKILL.md` §8, which runs `-c -km -kn -noq` with the
   code comment *"-noq keeps attributes float32: the kit/landmark merge …"*;
-- contradicts `sf-asset-check`'s explicit warning that *"default quantization
-  silently breaks the app's merge paths (every piece falls back to procedural and
-  the city looks fine)"* — a failure mode that is invisible in visual QA.
+- sits against `sf-asset-check`'s warning that *"default quantization silently
+  breaks the app's merge paths (every piece falls back to procedural and the city
+  looks fine)"*.
+
+**That last warning turns out to be overstated, and this report originally
+over-claimed on the back of it.** `st-marys-cathedral.glb` ships quantized, and the
+running app merges it perfectly well:
+
+```
+sf-assets: st-marys-cathedral merged 9 objects / 8 materials -> batched (1606 tris body); uniform x1.0000 at 1066, -1574
+```
+
+A merge line with a scale factor is the success path — a genuine failure warns and
+keeps the code-built version instead. So quantization does **not** break the runtime
+merge, three's `GLTFLoader` handles `KHR_mesh_quantization` natively, and St Mary's is
+fine in production. The skill's warning is most likely about gltfpack's *other*
+defaults (without `-km` it merges materials across the `_Glow` boundary, without
+`-kn` it drops the node names), which genuinely are silent killers.
 
 Evidence from what is already shipped in `app/public/sf-assets/landmarks/`:
 
@@ -84,12 +99,17 @@ Evidence from what is already shipped in `app/public/sf-assets/landmarks/`:
 Only `st-marys-cathedral` — the one asset previously taken through this optimize
 prompt — is quantized. Everything else went through `compress-assets.mjs` and is not.
 
-**Decision: ship the `-noq` build.** It is 132 KB larger but it matches the mandatory
-ship tool, keeps float32 attributes for the runtime merge, and passes all 16 checks
-of the stage-2 contract validator where the quantized build passed only 14. Since a
-broken merge fails *silently* into the procedural fallback, the conservative option
-is the correct one, and the merge is verified empirically in stage 5 by reading the
-app's console merge line.
+**Decision: ship the `-noq` build.** Not because quantization is broken — it isn't —
+but because `-noq` matches `pipeline/compress-assets.mjs`, the mandatory ship step,
+and its stated intent of keeping attributes float32; and because the `-noq` output
+passes all 16 checks of the stage-2 contract validator where the quantized build
+passes only 14. The cost is 132 KB on a file that is well inside the 500 KB budget,
+which is a cheap price for matching the repo's own tool.
+
+A reasonable person could ship the quantized 90 KB build instead. If that becomes the
+house style, the contract validator's `transforms_applied` and
+`no_unexpected_objects` checks need relaxing for quantized assets first — right now
+they would fail every one.
 
 Final command:
 
@@ -100,10 +120,8 @@ npx gltfpack@0.24 -i mid.glb -o 380-brannan.optimized.glb -c -km -kn -noq
 `extensionsRequired: ["EXT_meshopt_compression"]`, 0 of 12 nodes carry a
 scale/translation — byte-for-byte the same shape as the other shipped landmarks.
 
-**Open question for David, not silently acted on:** if quantization really does break
-the merge, `st-marys-cathedral.glb` is currently shipping broken and falling back to
-procedural. That is one console line to check on the deployed site. It was left
-untouched here — the integration prompt forbids editing another landmark's asset.
+`st-marys-cathedral.glb` was left untouched, and needs no action: it merges correctly
+despite being quantized (see the console line above).
 
 ## 5. Phase D — bake
 
