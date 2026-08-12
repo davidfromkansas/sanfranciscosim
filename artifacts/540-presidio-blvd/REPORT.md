@@ -10,7 +10,7 @@ file disagree, this file records what was actually built and measured.
 
 | File | What it is |
 |---|---|
-| `540-presidio-blvd.glb` | the shipping asset, 229 KB raw / 36 KB gzipped |
+| `540-presidio-blvd.glb` | the shipping asset **after the stage-4 optimize pass** — 112,108 bytes, meshopt-compressed, 10 draw submeshes. The pre-optimize original is archived at `optimize/input/`. |
 | `540-presidio-blvd.blend` | the build's saved scene |
 | `build_540_presidio_blvd.py` | deterministic build — rebuilds the GLB byte-for-byte |
 | `validate_540_presidio_blvd.py` | fresh-scene contract validation of the exported GLB |
@@ -34,14 +34,14 @@ blender -b --python build_540_presidio_blvd.py \
 
 | | |
 |---|---|
-| Objects | 76 mesh objects |
-| Triangles | **3,712** (cap 6,000; contract 30,000) |
+| Objects | **10** mesh objects shipped (76 as authored; joined per material in the optimize pass) |
+| Triangles | **3,690** shipped (3,712 as authored; gltfpack dropped 22 degenerates). Cap 6,000; contract 30,000 |
 | Dimensions | **16.6623 × 22.7566 × 11.5 m** |
 | Bounding box | min `[−8.3312, −11.3783, 0.0]`, max `[8.3312, 11.3783, 11.5]` |
 | Min Z | **0.0** · XY centre offset **[0.0, 0.0]** |
-| Materials | 10, all `Toy_*`, all flat, all alpha 1.0, roughness 0.85 |
+| Materials | 10, all `Toy_*`, all flat, all alpha 1.0, roughness 0.85 — unchanged by the optimize pass |
 | Glow materials | `Toy_glass_Glow`, `Toy_gold_Glow` |
-| File size | 229 KB raw, 36 KB gzipped (budget 500 KB compressed) |
+| File size | **112,108 bytes** raw / 71 KB gzipped (budget 500 KB compressed). The pre-optimize file was 234,548 raw / 36 KB gzipped — see `optimize/REPORT.md` §4 on why meshopt raises the gzip number and why it ships anyway |
 | Loader scale | **1.000** — max Z is normalised to `targetHeightM` exactly |
 
 The XY box (16.7 × 22.8 m) is larger than the 14.47 × 19.72 m footprint because it is the
@@ -110,7 +110,9 @@ that survives the render's Standard view transform at this exposure.
 ## Contract validation
 
 Fresh factory-reset Blender scene, importing **only** the exported GLB — the source
-`.blend` is not inspected. `validation.json`, **overall PASS**, every check true:
+`.blend` is not inspected. Run twice: once on the authored export, and again on the
+optimized file after the stage-4 shipping swap. Both **overall PASS**; the numbers below
+are the shipped ones.
 
 | Check | Result | Measured |
 |---|---|---|
@@ -118,7 +120,7 @@ Fresh factory-reset Blender scene, importing **only** the exported GLB — the s
 | Crest normalised to target | PASS | max Z = 11.5000, target 11.5 → loader scale 1.000 |
 | Base at z = 0 | PASS | min Z = 0.0 |
 | Centred in XY | PASS | offset [0.0, 0.0] |
-| Under triangle budget | PASS | 3,712 / 6,000 |
+| Under triangle budget | PASS | 3,690 / 6,000 |
 | No image textures | PASS | 0 images, 0 textured materials |
 | No transparency | PASS | every material alpha 1.0 |
 | Materials follow contract | PASS | 10 materials, all `Toy_*`, no `Toy_body` |
@@ -126,10 +128,10 @@ Fresh factory-reset Blender scene, importing **only** the exported GLB — the s
 | No animation, skin or constraints | PASS | 0 f-curves, 0 armatures, 0 constraints |
 | Transforms applied | PASS | every object identity transform |
 | No negative scales | PASS | — |
-| Normals outward (signed volume) | PASS | **76 / 76** objects positive |
+| Normals outward (signed volume) | PASS | **10 / 10** objects positive |
 | Normals outward (ray test) | PASS | 31,500 rays, **0** flipped first faces (0.0000%) |
 | No degenerate geometry | PASS | 0 triangles under 1e-8 area |
-| No unexpected objects | PASS | 76 meshes, nothing else |
+| No unexpected objects | PASS | 10 meshes, nothing else |
 
 Every solid in this asset is closed, so the per-object signed-volume test is
 authoritative and the ray test is a redundant second opinion. It came back at exactly
@@ -161,7 +163,7 @@ zero, not merely inside the 0.15% coincident-face tolerance.
   "name": "540 Presidio Boulevard",
   "estimated": true,
   "dims": [16.6623, 22.7566, 11.5],
-  "tris": 3712,
+  "tris": 3690,
   "loadRadius": 2500
 }
 ```
@@ -175,6 +177,15 @@ so there was no reason to tune below the default. `alwaysLoaded` would be absurd
 
 `cat: 1` (House) rather than `2` (Apartments) is a judgement call for a two-unit rental;
 House matches the built form the model shows.
+
+## Optimize pass (stage 4)
+
+Full account in `optimize/REPORT.md`. Summary: 76 objects → 10 (joined per material),
+7,686 → 2,002 vertices (weld ≤ 1 mm), 234,548 → 112,108 raw bytes, meshopt-compressed with
+`-c -km -kn -noq`. All eight gates pass; the largest A/B pixel delta across day/night ×
+near/far is **0.19%** against a 2% gate. Gzipped bytes rise from 36 KB to 71 KB, which is
+inherent to meshopt and is declared rather than buried — and the repo's mandatory ship step
+(`pipeline/compress-assets.mjs`) applies the same compression regardless.
 
 ## Known limitations
 
