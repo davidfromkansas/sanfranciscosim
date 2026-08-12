@@ -61,8 +61,9 @@ route, and the park plans depend on it (§E8 of the parks README).
 | [375 Alabama Street (Ames Harris Neville Co.)](./375-alabama.md) | `375-alabama` | 22.5 m | new landmark |
 | [1008 General Kennedy Avenue](./1008-general-kennedy.md) | `1008-general-kennedy` | 11.9 m | new landmark |
 | [Letterman Digital Arts Center](./letterman-digital-arts-center.md) | `letterman` | ~22 m (estimated) | new landmark |
+| [San Francisco Civic Center Courthouse](./civic-center-courthouse.md) | `civic-center-courthouse` | 29.6 m | new landmark |
 
-## Shared contract (all 24)
+## Shared contract (all 25)
 
 - Style: `docs/styles/miniature-toy.md` (authoritative for artistic decisions)
 - Technical contract: `.agents/skills/sf-asset-check/SKILL.md` (authoritative for the GLB)
