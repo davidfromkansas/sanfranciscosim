@@ -89,6 +89,69 @@ diff counts (a few hundred changed pixels) as motion.
 - Because only 2–3 frames elapse per key-hold, ratio-based control assertions (e.g. Shift boost ≈3.4×)
   are unreliable; zoom-scaled pan speed (≥10× between distance 9000 and 150) still resolves cleanly.
 
+## Perf harness (`pipeline/perf-harness.mjs`) — the guardrail measurement
+The canonical way to produce numbers for `docs/plans/PERF-PLAN.md` THE GUARDRAIL. Zero dependencies,
+Node 22 only (native `WebSocket`; the default `node` here is v20 → `source ~/.nvm/nvm.sh && nvm use 22`).
+It drives headless Chrome over CDP, changes **no** app runtime code, and writes one JSON + one console
+table per run under `artifacts/perf/`.
+
+```
+cd app && npm install && npm run build          # the harness serves app/dist via vite preview
+cd .. && node pipeline/perf-harness.mjs --label baseline-main            # both profiles
+node pipeline/perf-harness.mjs --profile desktop --sample 15 --no-load-test
+node pipeline/perf-harness.mjs --url http://localhost:4173 --no-serve    # reuse a running server
+node pipeline/perf-harness.mjs --stations mission-street,downtown-street # stress cells only
+```
+Useful flags: `--settle <s>` (max wait for tiles/near-tier to stop changing), `--quality <tier>` (pin
+Ultra/High/Medium/Low), `--load-timeout <s>`, `--attach <port>` (use the already-running Chrome on 29229),
+`--headful`, `--out <dir>`.
+
+What it does per run: 4 stations (hero, Mission street level, downtown street level, Golden Gate) x
+day/night with the clock pinned via `SF.setClock` to fixed 13:00 / 22:00 America/Los_Angeles timestamps;
+waits for `SF.city.stats`/near-tier chunks to stop changing before sampling; samples real rAF deltas
+(mean fps + frame-time p95 — never the overlay fps); records **peak scene-pass** `renderer.info.render.calls`
+and triangles by wrapping `renderer.render` (the post-processing quad otherwise masks the real numbers),
+`renderer.info.memory.geometries`, JS heap, `SF.city.stats`, and `SF.governor` state when it exists; and
+once per run a cold cache-disabled load on Fast 4G for time-to-tiles + bytes transferred.
+
+Profiles: `desktop` (1600x900, DPR 1, no throttle) and `mobile` (390x844, DPR 3, touch + mobile UA,
+CDP CPU throttle 4x, Fast 4G for the load measurement).
+
+**GPU cannot be emulated.** This VM has no `/dev/dri`; Chrome falls back to SwiftShader, so fps/frame-time
+from either profile are host-limited (fractions of a frame per second) and are NOT evidence for the 60 fps
+guardrail — the harness stamps a `softwareGpu` note in the JSON when it detects one. Draw calls, triangles,
+geometries, heap, tile counts and bytes ARE valid on this host. Real desktop Safari/Edge/Firefox and mobile
+Chrome/Safari numbers must come from the manual recipe below, run on real hardware.
+
+### Manual `window.SF` recipe (Safari / Edge / Firefox / real phones)
+Serve the build (`cd app && npm run build && npx vite preview --host`), open it on the target
+browser/device, then paste into that browser's console (works without any automation dependency):
+```js
+// 1. pin the clock (day; use 22:00 for night)
+SF.setClock('2026-08-01T13:00:00-07:00');
+// 2. go to a station, then WAIT for streaming to stop before sampling
+// hero: press 0 (or SF.presets[0]); Golden Gate: press 1
+SF.goTo(-122.418, 37.760, 200, 210, 42);   // Mission street level
+SF.goTo(-122.400, 37.789, 200, 210, 42);   // downtown street level
+SF.city.stats; SF.city.progress;            // poll until these stop changing
+// 3. measure real cadence over 10 s + peak scene-pass draw calls
+window.__m = await new Promise((res) => {
+  const r = SF.renderer, orig = r.render.bind(r);
+  let peak = 0, tris = 0, t0 = performance.now(), prev = t0, d = [];
+  r.render = (s, c) => { orig(s, c); const k = r.info.render.calls;
+    if (k > peak) { peak = k; tris = r.info.render.triangles; } };
+  (function loop(t) { d.push(t - prev); prev = t;
+    if (t - t0 < 10000) requestAnimationFrame(loop);
+    else { r.render = orig; d.shift(); d.sort((a, b) => a - b);
+      res({ fps: +(1000 / (d.reduce((a, b) => a + b, 0) / d.length)).toFixed(1),
+            p95: +d[Math.floor(d.length * 0.95)].toFixed(1), calls: peak, tris,
+            geometries: r.info.memory.geometries, stats: { ...SF.city.stats } }); }
+  })(performance.now());
+});
+```
+Record `fps`, `p95`, `calls`, `tris`, `geometries` per station/day-night and paste them next to the
+harness JSON. Safari has no `performance.memory`, so skip JS heap there.
+
 ## Geometry/continuity probing recipes
 - Landmark screen position: traverse `SF.scene` for the named object, build its world bbox centre, then
   `v.project(SF.camera)` → pixels. Note `getWorldPosition` returns the origin for landmark groups whose
