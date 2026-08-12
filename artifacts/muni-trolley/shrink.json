@@ -1,0 +1,425 @@
+{
+  "asset_class": "vehicle",
+  "results": [
+    {
+      "input": "/Users/david_lietjauw/sanfranciscosim-trolley/artifacts/muni-trolley/build/muni-trolley-40.glb",
+      "output": "/Users/david_lietjauw/sanfranciscosim-trolley/artifacts/muni-trolley/shrunk/muni-trolley-40.glb",
+      "log": [
+        {
+          "step": "0-input",
+          "bytes": 153108,
+          "pole_zone_objects": [
+            "Toy_ink",
+            "Toy_steel"
+          ],
+          "objects": 10,
+          "verts": 5356,
+          "tris": 2662
+        },
+        {
+          "step": "1-weld",
+          "verts_removed": 3576,
+          "objects": 10,
+          "verts": 1780,
+          "tris": 2638
+        },
+        {
+          "step": "2-degenerate+interior",
+          "degenerate_faces_removed": 0,
+          "interior_faces_removed": 0,
+          "closed_occluders": 7,
+          "objects": 10,
+          "verts": 1780,
+          "tris": 2638
+        },
+        {
+          "step": "3-limited-dissolve@0.05deg",
+          "faces_merged": 1168,
+          "objects": 10,
+          "verts": 1738,
+          "tris": 2596
+        },
+        {
+          "step": "4-retessellate",
+          "action": "audited, no change",
+          "excluded_from_retessellation": [
+            "Toy_ink",
+            "Toy_steel"
+          ],
+          "exclusion_reason": "pole assembly \u2014 8-segment lofts whose chord error is sub-pixel; cutting them undoes the deliberate diameter exaggeration. Shares Toy_steel with the wheel hubs, so the hubs are excluded with them.",
+          "eligible_objects": [
+            "Toy_glass",
+            "Toy_munired",
+            "Toy_mustard_Glow",
+            "Toy_red_Glow",
+            "Toy_silver",
+            "Toy_tire",
+            "Toy_white",
+            "Toy_white_Glow"
+          ],
+          "wheel_segments": 10,
+          "hub_segments": 8,
+          "pole_segments": 8,
+          "objects": 10,
+          "verts": 1738,
+          "tris": 2596
+        },
+        {
+          "step": "5-join-by-material",
+          "materials": 10,
+          "already_one_object_per_material": true,
+          "would_join": {},
+          "objects": 10,
+          "verts": 1738,
+          "tris": 2596
+        },
+        {
+          "step": "6-normals-audit",
+          "per_object": [
+            {
+              "object": "Toy_glass",
+              "signed_volume": 1.69977,
+              "closed": true
+            },
+            {
+              "object": "Toy_ink",
+              "signed_volume": 8.25994,
+              "closed": false
+            },
+            {
+              "object": "Toy_munired",
+              "signed_volume": 25.92561,
+              "closed": false
+            },
+            {
+              "object": "Toy_mustard_Glow",
+              "signed_volume": 0.09909,
+              "closed": true
+            },
+            {
+              "object": "Toy_red_Glow",
+              "signed_volume": 0.01109,
+              "closed": true
+            },
+            {
+              "object": "Toy_silver",
+              "signed_volume": 84.77915,
+              "closed": false
+            },
+            {
+              "object": "Toy_steel",
+              "signed_volume": 1.96098,
+              "closed": true
+            },
+            {
+              "object": "Toy_tire",
+              "signed_volume": 0.95362,
+              "closed": true
+            },
+            {
+              "object": "Toy_white",
+              "signed_volume": 3.24896,
+              "closed": true
+            },
+            {
+              "object": "Toy_white_Glow",
+              "signed_volume": 0.00403,
+              "closed": true
+            }
+          ],
+          "all_positive": true,
+          "objects": 10,
+          "verts": 1738,
+          "tris": 2596
+        },
+        {
+          "step": "7-export",
+          "bytes": 141456,
+          "objects": 10,
+          "verts": 1738,
+          "tris": 2596
+        }
+      ]
+    },
+    {
+      "input": "/Users/david_lietjauw/sanfranciscosim-trolley/artifacts/muni-trolley/build/muni-trolley-40-22-fillmore.glb",
+      "output": "/Users/david_lietjauw/sanfranciscosim-trolley/artifacts/muni-trolley/shrunk/muni-trolley-40-22-fillmore.glb",
+      "log": [
+        {
+          "step": "0-input",
+          "bytes": 153000,
+          "pole_zone_objects": [
+            "Toy_ink",
+            "Toy_steel"
+          ],
+          "objects": 10,
+          "verts": 5352,
+          "tris": 2660
+        },
+        {
+          "step": "1-weld",
+          "verts_removed": 3568,
+          "objects": 10,
+          "verts": 1784,
+          "tris": 2636
+        },
+        {
+          "step": "2-degenerate+interior",
+          "degenerate_faces_removed": 0,
+          "interior_faces_removed": 0,
+          "closed_occluders": 7,
+          "objects": 10,
+          "verts": 1784,
+          "tris": 2636
+        },
+        {
+          "step": "3-limited-dissolve@0.05deg",
+          "faces_merged": 1164,
+          "objects": 10,
+          "verts": 1748,
+          "tris": 2600
+        },
+        {
+          "step": "4-retessellate",
+          "action": "audited, no change",
+          "excluded_from_retessellation": [
+            "Toy_ink",
+            "Toy_steel"
+          ],
+          "exclusion_reason": "pole assembly \u2014 8-segment lofts whose chord error is sub-pixel; cutting them undoes the deliberate diameter exaggeration. Shares Toy_steel with the wheel hubs, so the hubs are excluded with them.",
+          "eligible_objects": [
+            "Toy_glass",
+            "Toy_munired",
+            "Toy_mustard_Glow",
+            "Toy_red_Glow",
+            "Toy_silver",
+            "Toy_tire",
+            "Toy_white",
+            "Toy_white_Glow"
+          ],
+          "wheel_segments": 10,
+          "hub_segments": 8,
+          "pole_segments": 8,
+          "objects": 10,
+          "verts": 1748,
+          "tris": 2600
+        },
+        {
+          "step": "5-join-by-material",
+          "materials": 10,
+          "already_one_object_per_material": true,
+          "would_join": {},
+          "objects": 10,
+          "verts": 1748,
+          "tris": 2600
+        },
+        {
+          "step": "6-normals-audit",
+          "per_object": [
+            {
+              "object": "Toy_glass",
+              "signed_volume": 1.69977,
+              "closed": true
+            },
+            {
+              "object": "Toy_ink",
+              "signed_volume": 8.17431,
+              "closed": false
+            },
+            {
+              "object": "Toy_munired",
+              "signed_volume": 25.92561,
+              "closed": false
+            },
+            {
+              "object": "Toy_mustard_Glow",
+              "signed_volume": 0.09909,
+              "closed": true
+            },
+            {
+              "object": "Toy_red_Glow",
+              "signed_volume": 0.01109,
+              "closed": true
+            },
+            {
+              "object": "Toy_silver",
+              "signed_volume": 84.77915,
+              "closed": false
+            },
+            {
+              "object": "Toy_steel",
+              "signed_volume": 1.96098,
+              "closed": true
+            },
+            {
+              "object": "Toy_tire",
+              "signed_volume": 0.95362,
+              "closed": true
+            },
+            {
+              "object": "Toy_white",
+              "signed_volume": 3.24896,
+              "closed": true
+            },
+            {
+              "object": "Toy_white_Glow",
+              "signed_volume": 0.00403,
+              "closed": true
+            }
+          ],
+          "all_positive": true,
+          "objects": 10,
+          "verts": 1748,
+          "tris": 2600
+        },
+        {
+          "step": "7-export",
+          "bytes": 141672,
+          "objects": 10,
+          "verts": 1748,
+          "tris": 2600
+        }
+      ]
+    },
+    {
+      "input": "/Users/david_lietjauw/sanfranciscosim-trolley/artifacts/muni-trolley/build/muni-trolley-40-24-divisadero.glb",
+      "output": "/Users/david_lietjauw/sanfranciscosim-trolley/artifacts/muni-trolley/shrunk/muni-trolley-40-24-divisadero.glb",
+      "log": [
+        {
+          "step": "0-input",
+          "bytes": 154188,
+          "pole_zone_objects": [
+            "Toy_ink",
+            "Toy_steel"
+          ],
+          "objects": 10,
+          "verts": 5396,
+          "tris": 2682
+        },
+        {
+          "step": "1-weld",
+          "verts_removed": 3572,
+          "objects": 10,
+          "verts": 1824,
+          "tris": 2658
+        },
+        {
+          "step": "2-degenerate+interior",
+          "degenerate_faces_removed": 0,
+          "interior_faces_removed": 0,
+          "closed_occluders": 7,
+          "objects": 10,
+          "verts": 1824,
+          "tris": 2658
+        },
+        {
+          "step": "3-limited-dissolve@0.05deg",
+          "faces_merged": 1177,
+          "objects": 10,
+          "verts": 1784,
+          "tris": 2618
+        },
+        {
+          "step": "4-retessellate",
+          "action": "audited, no change",
+          "excluded_from_retessellation": [
+            "Toy_ink",
+            "Toy_steel"
+          ],
+          "exclusion_reason": "pole assembly \u2014 8-segment lofts whose chord error is sub-pixel; cutting them undoes the deliberate diameter exaggeration. Shares Toy_steel with the wheel hubs, so the hubs are excluded with them.",
+          "eligible_objects": [
+            "Toy_glass",
+            "Toy_munired",
+            "Toy_mustard_Glow",
+            "Toy_red_Glow",
+            "Toy_silver",
+            "Toy_tire",
+            "Toy_white",
+            "Toy_white_Glow"
+          ],
+          "wheel_segments": 10,
+          "hub_segments": 8,
+          "pole_segments": 8,
+          "objects": 10,
+          "verts": 1784,
+          "tris": 2618
+        },
+        {
+          "step": "5-join-by-material",
+          "materials": 10,
+          "already_one_object_per_material": true,
+          "would_join": {},
+          "objects": 10,
+          "verts": 1784,
+          "tris": 2618
+        },
+        {
+          "step": "6-normals-audit",
+          "per_object": [
+            {
+              "object": "Toy_glass",
+              "signed_volume": 1.69977,
+              "closed": true
+            },
+            {
+              "object": "Toy_ink",
+              "signed_volume": 8.32814,
+              "closed": false
+            },
+            {
+              "object": "Toy_munired",
+              "signed_volume": 25.92561,
+              "closed": false
+            },
+            {
+              "object": "Toy_mustard_Glow",
+              "signed_volume": 0.09909,
+              "closed": true
+            },
+            {
+              "object": "Toy_red_Glow",
+              "signed_volume": 0.01109,
+              "closed": true
+            },
+            {
+              "object": "Toy_silver",
+              "signed_volume": 84.77915,
+              "closed": false
+            },
+            {
+              "object": "Toy_steel",
+              "signed_volume": 1.96098,
+              "closed": true
+            },
+            {
+              "object": "Toy_tire",
+              "signed_volume": 0.95362,
+              "closed": true
+            },
+            {
+              "object": "Toy_white",
+              "signed_volume": 3.24896,
+              "closed": true
+            },
+            {
+              "object": "Toy_white_Glow",
+              "signed_volume": 0.00403,
+              "closed": true
+            }
+          ],
+          "all_positive": true,
+          "objects": 10,
+          "verts": 1784,
+          "tris": 2618
+        },
+        {
+          "step": "7-export",
+          "bytes": 142644,
+          "objects": 10,
+          "verts": 1784,
+          "tris": 2618
+        }
+      ]
+    }
+  ]
+}

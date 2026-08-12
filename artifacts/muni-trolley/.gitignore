@@ -1,0 +1,7 @@
+# Reproducible intermediates — rebuild with ./shrink.sh
+build/
+shrunk/
+*.blend1
+
+# Blender leaves these next to an imported module
+__pycache__/
