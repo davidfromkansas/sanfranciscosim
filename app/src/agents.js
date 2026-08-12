@@ -22,7 +22,7 @@ import {
   ShaderMaterial,
   Vector3,
 } from 'three';
-import { GLTFLoader } from 'three/addons/loaders/GLTFLoader.js';
+import { createGLTFLoader } from './gltf.js';
 import { mergeGeometries } from 'three/addons/utils/BufferGeometryUtils.js';
 import { shared } from './env.js';
 import { DECK_HALF_THICKNESS } from './landmarks.js';
@@ -547,7 +547,7 @@ export function createAgents(scene, data, city) {
       return;
     }
 
-    const loader = new GLTFLoader();
+    const loader = createGLTFLoader();
     let loaded;
     try {
       loaded = await Promise.all(

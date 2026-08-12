@@ -27,7 +27,7 @@ import {
   Quaternion,
   Vector3,
 } from 'three';
-import { GLTFLoader } from 'three/addons/loaders/GLTFLoader.js';
+import { createGLTFLoader } from './gltf.js';
 import { mergeGeometries } from 'three/addons/utils/BufferGeometryUtils.js';
 import { shared } from './env.js';
 import { tileUrl } from './data.js';
@@ -120,7 +120,7 @@ export async function loadStreetKit() {
   const missing = PIECES.filter((id) => !byId.has(id));
   if (missing.length) throw new Error(`index is missing ${missing.join(', ')}`);
 
-  const loader = new GLTFLoader();
+  const loader = createGLTFLoader();
   const pieces = [];
   for (const id of PIECES) {
     const entry = byId.get(id);

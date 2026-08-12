@@ -19,7 +19,7 @@ import {
   PlaneGeometry,
   Vector2,
 } from 'three';
-import { GLTFLoader } from 'three/addons/loaders/GLTFLoader.js';
+import { createGLTFLoader } from './gltf.js';
 import { mergeGeometries } from 'three/addons/utils/BufferGeometryUtils.js';
 
 const ASSET = `${import.meta.env.BASE_URL}sf-assets/vehicles/SF_Bay_Ferry.glb`;
@@ -220,7 +220,7 @@ export function createLiveFerries(scene, data, agents) {
 
     let merged;
     try {
-      const gltf = await new GLTFLoader().loadAsync(entry ? `${import.meta.env.BASE_URL}sf-assets/${entry.file}` : ASSET);
+      const gltf = await createGLTFLoader().loadAsync(entry ? `${import.meta.env.BASE_URL}sf-assets/${entry.file}` : ASSET);
       merged = mergeFerry(gltf.scene);
     } catch (error) {
       console.warn(`sf-ferries: ferry model failed to load (${error.message}) — keeping procedural ferries`);
