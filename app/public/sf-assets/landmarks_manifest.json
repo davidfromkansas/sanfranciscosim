@@ -400,5 +400,24 @@
     ],
     "tris": 18238,
     "loadRadius": 2500
+  },
+  {
+    "id": "541-presidio",
+    "file": "541-presidio.glb",
+    "anchor": [
+      -122.4518601,
+      37.7969312
+    ],
+    "targetHeightM": 10.0,
+    "cat": 1,
+    "name": "541 Presidio Boulevard",
+    "estimated": true,
+    "dims": [
+      22.259,
+      25.099,
+      10.0
+    ],
+    "tris": 3404,
+    "loadRadius": 2500
   }
 ]

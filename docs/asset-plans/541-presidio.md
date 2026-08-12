@@ -596,14 +596,23 @@ should never be `alwaysLoaded`.
   there, kebab `541-presidio` in the manifest) and re-bake the affected tiles, or the baked
   procedural building will intersect the GLB.
 - **The exclusion radius is the delicate part, and it is delicate in the opposite
-  direction from 375 Alabama.** This house is one of twelve on a ~25 m pitch. The
-  measured window is wide but bounded: our own ring centroid sits **0.36 m** from the
-  anchor, while the nearest *neighbour* centroids are **29 m** (542) and **30 m** (540).
-  Anything from roughly 2 m to 28 m drops 541 alone. Use **`exclude: 14`** — the middle of
-  the window, tolerant of the few metres by which the baked footprint's simplified ring
-  centroid may differ from the OSM one, and nowhere near taking a neighbour. A generous
-  radius here would punch a hole in the row and be immediately visible as two missing
-  houses.
+  direction from 375 Alabama.** This house is one of twelve on a ~25 m pitch, so a
+  generous radius punches a hole in the row and reads as two missing houses.
+
+  **Size it on the metric `excluded()` in `pipeline/buildings.mjs` actually uses:** a
+  footprint is dropped if its centroid **or any ring vertex** falls inside the radius —
+  so the binding constraint is the nearest *vertex* of the neighbours, not their
+  centroids. Measured from OSM rings against this anchor: 541's own centroid is
+  **0.36 m** and its nearest vertex **6.15 m**; the nearest neighbour vertices are
+  **18.86 m** (540) and **20.43 m** (542). Safe window: **(0.36, 18.86) m**.
+
+  Use **`exclude: 12`** — 541 is dropped on its centroid alone with metres to spare, and
+  there is 6.9 m of headroom before 540 is at risk, which matters because the baked ring
+  comes from DataSF/Overture rather than OSM and may differ by a metre or two.
+
+  *(An earlier draft of this plan said `exclude: 14` on a centroid-only reading that put
+  the neighbours at 29–30 m and the window at (2, 28) m. That was measured on the wrong
+  metric and is corrected here.)*
 - **Do not set `clearTrees`.** Unlike Letterman, this asset has no hand-modelled grounds,
   and the baked cypress/eucalyptus scatter around it *is* the East Housing character. The
   Presidio `PARK_COVER` entry (`base: 'trees'`, cypress/eucalyptus) should keep running

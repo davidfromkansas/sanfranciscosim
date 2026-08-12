@@ -285,6 +285,34 @@ export const LANDMARKS = [
     clearTrees: true,
     camera: { distance: 700, yaw: 220, pitch: 24 },
   },
+  {
+    // Building 541, one of twelve near-identical WWI-era officer quarters
+    // (Bldgs. 540-551) on the curve of Presidio Boulevard. The row sits on a
+    // ~25 m pitch, so the exclusion window is bounded at BOTH ends and the
+    // danger here is the opposite of 375 Alabama's: too generous a radius
+    // punches a hole in the row and reads as two missing houses.
+    //
+    // Sized on the metric excluded() actually uses — centroid OR any ring
+    // vertex inside the radius drops the footprint — not on centroid distance.
+    // Measured from OSM rings against this anchor: 541's own centroid is 0.36 m
+    // and its nearest vertex 6.15 m, while the nearest NEIGHBOUR vertices are
+    // 18.86 m (540) and 20.43 m (542). So the safe window is (0.36, 18.86) m.
+    // 12 m sits well inside it: 541 goes on its centroid alone with metres to
+    // spare, and there is 6.9 m of headroom before 540 is at risk — margin that
+    // matters because the baked ring comes from DataSF/Overture, not OSM, and
+    // may differ by a metre or two.
+    id: '541Presidio',
+    name: '541 Presidio Boulevard',
+    lon: -122.4518601,
+    lat: 37.7969312,
+    height: 10,
+    exclude: 12,
+    // Deliberately NO clearTrees, unlike Letterman: this asset has no
+    // hand-modelled grounds, and the baked cypress/eucalyptus scatter around it
+    // IS the East Housing character. The Presidio PARK_COVER entry should keep
+    // running right up to the house.
+    camera: { distance: 170, yaw: 300, pitch: 22 },
+  },
 ];
 
 // Parks/green spaces the landcover bake must match at least one source polygon

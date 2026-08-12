@@ -195,6 +195,94 @@ Not applied here — integration is a separate stage.
 `"estimated": true` because the crest is derived from 2010 city LiDAR rather than
 published, and the eave, ridge and pitch are inferred from it.
 
+## Stage 5 — integration (local)
+
+Case **B** (new landmark: no procedural builder, no registry entry existed).
+
+Files changed: `app/public/sf-assets/landmarks/541-presidio.glb` (new),
+`app/public/sf-assets/landmarks_manifest.json` (+1 entry),
+`pipeline/lib/landmarks.mjs` (+1 `LANDMARKS` entry, `id: '541Presidio'`).
+
+### Verified headlessly
+
+| Item | Result |
+|---|---|
+| Re-validation of the shipped GLB (fresh scene) | **PASS** — 16/16, 3,404 tris, crest 10.000 m |
+| GLB parses via pinned three + MeshoptDecoder | **PASS** — 8 meshes, 8 materials, no decode errors |
+| id round-trip `camelId('541-presidio')` → `541Presidio` | **PASS** — matches the registry id exactly |
+| Loader scale `targetHeightM / size.y` | **PASS** — exactly **1.0000** |
+| Manifest `dims`/`tris` vs the GLB | **PASS** — match to 1e-2 m / exact |
+| Under the 30k landmark triangle cap | **PASS** — 3,404 |
+| Glow set separate after meshopt | **PASS** — `Toy_glass_Glow`, `Toy_trim_Glow` |
+| `loadRadius` decision | **PASS** — 2500, the `max(2500, 10 × 30)` floor; **not** `alwaysLoaded` (a 10 m house never should be) |
+| Exclusion radius sized against the real baked tile | **PASS** — see below |
+| `npm run lint` | **PASS** — clean |
+| `npm run build` | **PASS** — built in 3.3 s |
+| No generated tiles hand-edited | **PASS** — `git status app/public/tiles/` empty |
+
+### The exclusion radius, verified against the baked tile
+
+Rather than trust the plan's arithmetic, the committed tile that contains this site
+(`app/public/tiles/buildings/13_10.bin`, cell origin −1500, −3000, 65 footprints) was
+parsed directly and every footprint measured against the anchor:
+
+| Footprint | Nearest ring vertex | Centroid | Height | Inside `exclude: 12`? |
+|---|---|---|---|---|
+| idx 39 — **the baked 541 twin** (12-vertex ring, matches the OSM ring) | 6.70 m | **1.15 m** | 10.7 m | **yes** — dropped |
+| idx 33 — the 540 twin | **18.40 m** | 29.45 m | 9.7 m | no — survives, 6.4 m clear |
+| idx 22 | 26.75 m | 31.64 m | 13.3 m | no |
+| idx 35 | 46.40 m | 58.20 m | 10.1 m | no |
+
+`excluded()` in `pipeline/buildings.mjs` drops a footprint whose centroid **or any ring
+vertex** is inside the radius, so `exclude: 12` removes exactly one footprint — the
+541 twin, on its 1.15 m centroid — and the nearest survivor is 6.4 m clear. The
+measurement also confirms the OSM-derived prediction (18.86 m predicted for 540 vs
+18.40 m in the bake: 0.46 m agreement).
+
+This corrected the plan's original `exclude: 14`, which had been sized on
+centroid distance only; §2.13 of the plan is updated with the right metric.
+
+### NOT verified — outstanding
+
+| Item | Status | Why |
+|---|---|---|
+| **Case B tile re-bake** | **NOT DONE** | See below — the blocking item. |
+| `audit.mjs` check 1.6 | **NOT RUN** | Needs `pipeline/out/terrain.json`; `pipeline/out/` is gitignored and absent on this checkout. |
+| In-app QA: single-building check, orientation on terrain, terrain seating, night glow sweep, draw calls < 300, console merge line | **NOT RUN** | The browser-preview tool caps dev servers at 5 per folder and 5 are already held by parallel sessions in this repo. |
+| Mandatory fallback drill | **NOT RUN** | Same reason — it requires observing the app's console warning. |
+| Deployed production QA | **NOT RUN** | Correctly gated behind the user's ship decision. |
+
+**The re-bake is genuinely outstanding, and it is the one real defect.** Until the
+buildings tile is re-baked, footprint idx 39 above — a 10.7 m procedural block on
+exactly this footprint — remains in `13_10.bin` and the GLB will intersect it: a
+visible double building at this site. The registry entry is in place, so the *next*
+bake fixes it automatically.
+
+It was not run here, for two reasons, and the second is the more important one:
+
+1. **The inputs are not available.** `pipeline/data/` and `pipeline/out/` are
+   gitignored and absent, so the bake needs a fresh `npm run download` (~700 MB), and
+   the Overture step shells out to the `overturemaps` CLI, which is not installed on
+   this machine.
+2. **A fresh download would not reproduce the committed tiles.** Overture publishes
+   monthly releases, so re-baking today would rebuild the *entire* city from a newer
+   data vintage than whatever produced the current 84 MB of committed tiles. That
+   turns a one-house PR into a city-wide data refresh with an unreviewable diff —
+   exactly the wrong thing to bundle here. The correct minimal change is one footprint
+   removed from one cell.
+
+`app/public/tiles/` was therefore left untouched rather than hand-edited, per the
+integration prompt's "Never hand-edit anything under `app/public/tiles/`".
+
+### Note for whoever merges
+
+A parallel session in this repo is working on **540 Presidio Boulevard** — the
+immediate neighbour in the same row (a `sf-3d-540-presidio` dev server is registered
+against `.claude/worktrees/540-presidio-blvd`). Expect textual merge conflicts with
+this branch in `landmarks_manifest.json` and `pipeline/lib/landmarks.mjs`, both of
+which are append-at-the-end. The two exclusion zones do not overlap: 12 m radii
+around anchors ~30 m apart, and each measured clear of the other's footprint by 6+ m.
+
 ## Open questions carried forward
 
 Unchanged from plan §2.15 and `REFERENCE.md`; none of them blocks this asset, and
