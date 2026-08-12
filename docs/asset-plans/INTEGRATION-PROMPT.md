@@ -139,8 +139,11 @@ building on that footprint, so the GLB will intersect it. You must also:
    gitignored, so a clean machine needs the download step first:
    ```
    cd pipeline && npm install
-   npm run download   # hundreds of MB; only if pipeline/data/ is absent
-   npm run buildings && npm run streets && npm run landcover && npm run validate && npm run toy
+   npm run download && npm run loredata   # ~700 MB; only if pipeline/data/ is absent
+   npm run terrain && npm run bridges && npm run buildings && npm run streets \
+     && npm run landcover && npm run validate && npm run lore && npm run toy \
+     && npm run notables && npm run context
+   # or just: npm run all (same order, includes the downloads)
    ```
    Commit the regenerated files under `app/public/tiles/` that actually changed.
 3. Confirm with `node pipeline/audit.mjs` that check 1.6 (no procedural footprint
