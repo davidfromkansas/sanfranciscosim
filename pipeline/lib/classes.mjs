@@ -23,4 +23,6 @@ export const LAND_KINDS = [
   { id: 'pitch', color: [0.31, 0.45, 0.28] },
   { id: 'scrub', color: [0.42, 0.45, 0.28] },
   { id: 'paved', color: [0.42, 0.42, 0.42] },
+  { id: 'marsh', color: [0.427, 0.478, 0.29] },
+  { id: 'rock', color: [0.604, 0.561, 0.502] },
 ];
