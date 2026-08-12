@@ -242,37 +242,49 @@ measurement also confirms the OSM-derived prediction (18.86 m predicted for 540 
 This corrected the plan's original `exclude: 14`, which had been sized on
 centroid distance only; §2.13 of the plan is updated with the right metric.
 
+### Case B re-bake — DONE
+
+Run after the first pass of this report claimed it could not be. The full chain
+(`download`, `loredata`, `terrain`, `bridges`, `buildings`, `streets`, `landcover`,
+`validate`, `lore`, `toy`, `notables`, `context`) was re-run against Overture release
+**2026-07-22.0** — the same release the previous bake used, so nothing drifted.
+
+Scope, verified by sha256 over all 3,922 tile files before and after:
+
+| | |
+|---|---|
+| Buildings | **174,769 vs 174,770** — exactly one footprint dropped |
+| Overture contribution | unchanged: 3,351 added, 263 heights corrected |
+| Cells / tallest | unchanged: 585 cells, 244 m |
+| Binary tiles changed | **only cell `13_10`**, in `buildings/`, `landcover/`, `toy/`, `toyland/` |
+| `ctx/*.json` changed | 584 of 596 — a **pure global-index renumber** (see below) |
+| `api/_data/search-index.json` | +1 entry: 541 Presidio Boulevard is now searchable |
+| `audit.mjs` check **1.6** | **PASS** — 29 landmarks clear |
+| `pipeline validate` | **PASS** — lists "541 Presidio Boulevard — cell 13_10" |
+
+**Why 584 sidecars changed, and why it is benign.** `ctx/*.json` keys buildings by
+*global* index, so removing one footprint shifts every later index down by 1. Verified
+shift-aware on a cell far from the Presidio (SoMa `23_13`): of 233 buildings, 34 keep
+their index and 199 shift by exactly 1, and **zero have any content difference**. A
+naive key-wise diff appears to show two buildings with changed fields; that is an
+artifact of comparing index *N* across the renumber (old #N+1 became new #N), not real
+drift.
+
+**Three audit checks fail, and they are pre-existing:** 1.2b (95th-percentile height
+outside a 25–120 m band, measured 13.9 m — the check's own message notes the DataSF
+source p95 is 12.4 m median-roof / 15.7 m ridge, so the band does not match the source
+at all), 1.3c (Telegraph Hill 90.5 m from the Terrarium DEM against a surveyed 84 m),
+and 1.7b (1 of 793 sampled trees more than 30 m offshore). None touches the Presidio,
+and removing one 10.7 m building cannot move a city-wide p95 by 11 m. Reported rather
+than hidden.
+
 ### NOT verified — outstanding
 
 | Item | Status | Why |
 |---|---|---|
-| **Case B tile re-bake** | **NOT DONE** | See below — the blocking item. |
-| `audit.mjs` check 1.6 | **NOT RUN** | Needs `pipeline/out/terrain.json`; `pipeline/out/` is gitignored and absent on this checkout. |
 | In-app QA: single-building check, orientation on terrain, terrain seating, night glow sweep, draw calls < 300, console merge line | **NOT RUN** | The browser-preview tool caps dev servers at 5 per folder and 5 are already held by parallel sessions in this repo. |
 | Mandatory fallback drill | **NOT RUN** | Same reason — it requires observing the app's console warning. |
 | Deployed production QA | **NOT RUN** | Correctly gated behind the user's ship decision. |
-
-**The re-bake is genuinely outstanding, and it is the one real defect.** Until the
-buildings tile is re-baked, footprint idx 39 above — a 10.7 m procedural block on
-exactly this footprint — remains in `13_10.bin` and the GLB will intersect it: a
-visible double building at this site. The registry entry is in place, so the *next*
-bake fixes it automatically.
-
-It was not run here, for two reasons, and the second is the more important one:
-
-1. **The inputs are not available.** `pipeline/data/` and `pipeline/out/` are
-   gitignored and absent, so the bake needs a fresh `npm run download` (~700 MB), and
-   the Overture step shells out to the `overturemaps` CLI, which is not installed on
-   this machine.
-2. **A fresh download would not reproduce the committed tiles.** Overture publishes
-   monthly releases, so re-baking today would rebuild the *entire* city from a newer
-   data vintage than whatever produced the current 84 MB of committed tiles. That
-   turns a one-house PR into a city-wide data refresh with an unreviewable diff —
-   exactly the wrong thing to bundle here. The correct minimal change is one footprint
-   removed from one cell.
-
-`app/public/tiles/` was therefore left untouched rather than hand-edited, per the
-integration prompt's "Never hand-edit anything under `app/public/tiles/`".
 
 ### Note for whoever merges
 
