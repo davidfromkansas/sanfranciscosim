@@ -44,6 +44,15 @@ export const LANDMARKS = [
     camera: { distance: 800, yaw: 60, pitch: 20 },
   },
   {
+    id: 'columbusTower',
+    name: 'Columbus Tower (Sentinel Building)',
+    lon: -122.4050266,
+    lat: 37.7965554,
+    height: 29,
+    exclude: 35,
+    camera: { distance: 260, yaw: 210, pitch: 16 },
+  },
+  {
     id: 'coitTower',
     name: 'Coit Tower',
     lon: -122.4058,
