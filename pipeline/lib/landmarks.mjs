@@ -132,6 +132,15 @@ export const LANDMARKS = [
     camera: { distance: 500, yaw: 110, pitch: 16 },
   },
   {
+    id: 'fairmont',
+    name: 'Fairmont San Francisco',
+    lon: -122.4100666,
+    lat: 37.7924244,
+    height: 99.06,
+    exclude: 80,
+    camera: { distance: 520, yaw: 110, pitch: 18 },
+  },
+  {
     id: 'stIgnatius',
     name: 'St. Ignatius Church',
     lon: -122.4506,
@@ -174,6 +183,15 @@ export const LANDMARKS = [
     exclude: 260,
     camera: { distance: 900, yaw: 180, pitch: 20 },
   },
+  {
+    id: 'missionDolores',
+    name: 'Mission Dolores Basilica',
+    lon: -122.4269098,
+    lat: 37.7643109,
+    height: 41,
+    exclude: 45,
+    camera: { distance: 500, yaw: 90, pitch: 16 },
+  },
 ];
 
 // Parks/green spaces the landcover bake must match at least one source polygon
@@ -191,6 +209,15 @@ export const NAMED_PARKS = [
   { id: 'crissyField', name: 'Crissy Field', lon: -122.464, lat: 37.8045 },
   { id: 'lincolnPark', name: 'Lincoln Park', lon: -122.4996, lat: 37.7825 },
 ];
+
+export const PARK_COVER = {
+  presidio: {
+    base: 'trees',
+    treeArea: 180,
+    mode: 'grid',
+    species: { broadleaf: 0.1, cypress: 0.45, eucalyptus: 0.45 },
+  },
+};
 
 // Extra hero/overview camera presets.
 export const VIEW_PRESETS = [
@@ -229,5 +256,12 @@ export const VIEW_PRESETS = [
     lon: -122.4907,
     lat: 37.7532,
     camera: { distance: 700, yaw: 75, pitch: 12 },
+  },
+  {
+    id: 'presidio',
+    name: 'Presidio Main Post',
+    lon: -122.468,
+    lat: 37.8035,
+    camera: { distance: 4600, yaw: 45, pitch: 24 },
   },
 ];

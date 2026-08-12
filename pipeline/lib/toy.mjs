@@ -35,6 +35,9 @@ export const TOY_BASE = [0, 1, 2, 3];
 export const TOY_ACCENT = [4, 5, 6, 7, 8];
 export const TOY_TOWER_GLASS = 9;
 export const TOY_ROOFS = [10, 11, 12, 13];
+// Presidio Main Post: pale walls under terracotta, the park's one warm accent.
+export const TOY_PALE = [0, 3];
+export const TOY_ROOF_BRICK = 10;
 export const TOY_HVAC = 14;
 export const TOY_GARDEN = 15;
 export const TOY_SOLAR = 16;
