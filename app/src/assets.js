@@ -371,10 +371,18 @@ export function createAssets(scene, data, { onPlaced, onUnloaded } = {}) {
       bodyBatch.castShadow = true;
       bodyBatch.receiveShadow = true;
       bodyBatch.sortObjects = false;
+      // Same lesson kitfleet already carries: the batch's own bounds cover the
+      // reserved (mostly empty) buffer, so whole-batch and per-instance frustum
+      // tests cull landmarks that are plainly on screen. The batch spans the
+      // whole city anyway — culling it is never a win at 2 draw calls.
+      bodyBatch.frustumCulled = false;
+      bodyBatch.perObjectFrustumCulled = false;
       glowMaterial = new MeshBasicMaterial({ vertexColors: true, transparent: true, opacity: 1 });
       glowBatch = new BatchedMesh(MAX_BATCHED, GLOW_VERTS, GLOW_INDICES, glowMaterial);
       glowBatch.name = 'landmark-glow';
       glowBatch.sortObjects = false;
+      glowBatch.frustumCulled = false;
+      glowBatch.perObjectFrustumCulled = false;
       group.add(bodyBatch, glowBatch);
       return true;
     } catch (error) {
