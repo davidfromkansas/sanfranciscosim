@@ -400,5 +400,24 @@
     ],
     "tris": 18238,
     "loadRadius": 2500
+  },
+  {
+    "id": "civic-center-courthouse",
+    "file": "civic-center-courthouse.glb",
+    "anchor": [
+      -122.4192537,
+      37.7804897
+    ],
+    "targetHeightM": 29.6,
+    "cat": 18,
+    "name": "Civic Center Courthouse",
+    "estimated": false,
+    "dims": [
+      91.077,
+      51.303,
+      29.6
+    ],
+    "tris": 4712,
+    "loadRadius": 2500
   }
 ]
