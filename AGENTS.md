@@ -53,7 +53,7 @@ The full, canonical style bible is `docs/styles/miniature-toy.md` — read it be
 
 ## The concierge (api/agent.mjs)
 
-LLM agent over the city's data. Rules it must keep: answers city facts ONLY from tool results; camera/focus/highlight actions are **intent objects validated server-side and applied client-side** (the model never touches the scene directly); every tool spatially scoped through the cell grid (no citywide scans); per-IP rate limits; friendly 503 without a key; replies as plain text (`textContent`, never HTML).
+LLM agent over the city's data. Rules it must keep: answers city facts ONLY from tool results; live conditions come through ONE `live_data` tool that requests exactly the feeds a question needs (names and descriptions derive from the feed registry — a newly registered feed reaches the concierge with zero concierge changes) and self-fetches the deployment's own `/api/<feed>` URLs so reads hit the CDN, never the upstreams; camera/focus/highlight actions are **intent objects validated server-side and applied client-side** (the model never touches the scene directly); every tool spatially scoped through the cell grid (no citywide scans); per-IP rate limits; friendly 503 without a key; replies as plain text (`textContent`, never HTML).
 
 ## UI
 
