@@ -196,6 +196,49 @@ Not applied here — integration is a separate job
   Case B is carved out by the exclusion zone, so the site reads as empty ground at
   range. At 2,500 m a 9.5 m house is sub-pixel and that absence is illegible.
 
+## OUTSTANDING: the Case B tile re-bake is NOT in this branch
+
+Everything else shipped. The tile re-bake did not, and this is a real, visible
+defect until it does: **the baked procedural house still stands on 543's
+footprint, so it intersects the GLB.** The registry entry that excludes it is
+committed; only the regenerated tiles are missing.
+
+Why it was held back rather than shipped:
+
+The re-bake was run, verified, and then deliberately discarded. `pipeline/data/`
+is a gitignored download cache, and the cache on this machine is a **different
+data vintage** from the one that produced `origin/main`'s committed tiles. The
+control run proves it: re-baking with main's *exact* registry config — no 543
+entry at all, nothing changed — still produced **523 building tiles differing
+from main's**, at an identical building count of 174,770. Shipping those tiles
+would have silently replaced the Chase Center branch's bake with a different
+snapshot of DataSF and Overture, under a commit message about one house.
+
+What the re-bake looked like when it ran against a self-consistent baseline
+(recorded here so the numbers are known good):
+
+- buildings 174,770 → 174,769 — the procedural footprint on 543's site is
+  dropped and **nothing else**; 541 and 545 both survive
+- `node pipeline/audit.mjs` check 1.6 goes from 28 to 29 landmarks clear
+- only cell `13_9` loses a pick box (21 → 20)
+- the ~580 changed `ctx/*.json` sidecars are mechanical: baked building ids are
+  sequential indices, so removing one shifts every later id down by exactly 1.
+  Sampling 25 cells gave an id-delta histogram of `{0: 2633, -1: 3468}` and no
+  other value.
+
+To finish it, on top of current `main` and with a fresh cache:
+
+```bash
+cd pipeline && npm install
+npm run download && npm run loredata
+node buildings.mjs && node validate.mjs && node lore.mjs \
+  && node toy.mjs && node notables.mjs && node context.mjs
+node audit.mjs   # check 1.6 must read "29 landmarks clear"
+```
+
+`lore.mjs` alone takes ~3 min and the chain ~12 min. Run `lore` **before** `toy`
+or `context.mjs` fails with `every building has a pick box and an identity`.
+
 ## Integration notes (Case B)
 
 No `543-presidio-blvd` id exists in `pipeline/lib/landmarks.mjs` or
