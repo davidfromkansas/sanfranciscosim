@@ -25,7 +25,7 @@ import { createLiveFerries } from './ferries.js';
 import { createCameraRig } from './camera.js';
 import { createSigns } from './signs.js';
 import { createToyPost } from './toypost.js';
-import { QUALITY, createLoader, createUI } from './ui.js';
+import { QUALITY, QUALITY_LADDER, createLoader, createUI } from './ui.js';
 import { createGovernor } from './governor.js';
 import { createContext } from './context.js';
 import { createFocusOverlay } from './focus.js';
@@ -146,6 +146,7 @@ async function boot() {
   const qualityPreference = readQualityPreference();
   const governor = createGovernor({
     tiers: QUALITY,
+    ladder: QUALITY_LADDER,
     initialTier: qualityPreference === 'auto' ? qualityKey : qualityPreference,
     mode: qualityPreference,
     apply: applyQuality,

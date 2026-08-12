@@ -10,6 +10,7 @@ const STREAMING_WINDOW_MS = 1500;
 
 export function createGovernor({
   tiers,
+  ladder,
   initialTier,
   mode = 'auto',
   apply,
@@ -17,9 +18,18 @@ export function createGovernor({
   readStreaming,
   tauMs = DEFAULT_TAU_MS,
 }) {
-  const keys = Object.keys(tiers);
+  if (!Array.isArray(ladder) || ladder.length !== Object.keys(tiers).length) {
+    throw new Error('quality governor requires a complete worst-to-best tier ladder');
+  }
+  const keys = ladder.slice();
   const indexByKey = Object.create(null);
-  for (let i = 0; i < keys.length; i++) indexByKey[keys[i]] = i;
+  for (let i = 0; i < keys.length; i++) {
+    const key = keys[i];
+    if (!tiers[key] || indexByKey[key] !== undefined) {
+      throw new Error(`quality governor ladder has invalid tier: ${key}`);
+    }
+    indexByKey[key] = i;
+  }
 
   let current = indexByKey[initialTier] === undefined ? keys[0] : indexByKey[initialTier];
   let currentMode = mode === 'auto' || indexByKey[mode] !== undefined ? mode : 'auto';
@@ -120,7 +130,6 @@ export function createGovernor({
       fps: emaMs ? 1000 / emaMs : null,
       heldOff,
       timeSinceLastChangeMs: clockMs - lastChangeMs,
-      timeSinceLastChange: clockMs - lastChangeMs,
       totalChanges,
       unstableTiers: keys.filter((_, i) => unstable & (1 << i)),
     };

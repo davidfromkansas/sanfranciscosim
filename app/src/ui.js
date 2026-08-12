@@ -8,6 +8,7 @@ export const QUALITY = {
   medium: { label: 'Medium', pixelRatio: 1, shadow: 2048, nearScale: 0.75, treeScale: 0.7, windows: 1 },
   low: { label: 'Low', pixelRatio: 0.85, shadow: 0, nearScale: 0.5, treeScale: 0.45, windows: 0 },
 };
+export const QUALITY_LADDER = ['low', 'medium', 'high', 'ultra'];
 
 export function createUI({ presets, onPreset, onQuality }) {
   const hud = document.getElementById('hud');
