@@ -177,3 +177,67 @@ is far enough that the absence is illegible.
   ~170 m from the anchor. Consider `clearTrees: true` (Palace of Fine Arts
   precedent) — the grounds are hand-modelled and baked scatter will conflict.
 - **Lagoon colour** beside the app's own water material.
+
+---
+
+## Stage 5 — integration (local QA)
+
+| Check | Result | Evidence |
+|---|---|---|
+| Re-validation of the shipping GLB (fresh Blender scene) | **PASS** | 18,238 tris; 312.222 × 298.157 × 21.993 m; min Z 0.0; centre (0.0, 0.004); 12 `Toy_*` materials; 0 textures, 0 transparent, 0 cameras/lights/actions/armatures |
+| GLB dropped into `app/public/sf-assets/landmarks/` | **PASS** | byte-identical to the artifacts copy |
+| Manifest entry | **PASS** | served 200, parsed by the app, `loadRadius: 2500` |
+| id mapping `letterman` → `letterman` | **PASS** | no hyphens, so `camelId()` is identity; matches the registry id |
+| Registry entry (Case B) | **PASS** | `pipeline/lib/landmarks.mjs`, `exclude: 185`, `clearTrees: true` |
+| **Tile re-bake (Case B)** | **FAIL — not done, blocked** | see below |
+| Asset loads and merges | **PASS** | `sf-assets: letterman merged 20 objects / 12 materials -> batched (9388 tris body); uniform x1.0003 at -1051, -3287` |
+| Scale factor ≈ 1.0 | **PASS** | **1.0003** |
+| Streaming lifecycle | **PASS** | starts `far`, transitions to `loading` → `live` inside the 2,500 m radius |
+| Position / orientation | **PASS** | lands at world (−1051, −3287) = the manifest anchor; the ~25° campus grid lines up with Letterman Drive and O'Reilly Avenue on screen |
+| Terrain seating | **PASS** (no visible float or sink at this site) | the 312 m base slab sits flush; the feared edge float did not materialise |
+| Single building at the spot | **FAIL** | the baked procedural buildings are still present and intersect the model — the direct consequence of the missing re-bake |
+| Night glow | **PASS** | at 22:30 local only the lit-room veneers and B's entrance light; the rest of the campus stays dark |
+| Draw calls | **PASS** | the merge line ends in `-> batched`: the asset joins the shared `BatchedMesh` pair, so it adds 0 draw calls (landmarks cost 2 total regardless of count). Not read off the stats overlay — stated from the merge line plus `assets.js`'s batching architecture |
+| Fallback drill | **PASS** | GLB renamed away → app boots, area renders, other 18 landmarks unaffected (`live: 18`), exactly one warning: `sf-assets: letterman failed to load (...)`. Case B, so the site is the baked ground — expected. File restored byte-identical |
+| `npm run lint` | **PASS** | clean |
+| `npm run build` | **PASS** | built in 1.77 s; 3,183 tiles compressed |
+
+### The re-bake is blocked — the one FAIL, and why
+
+Case B requires re-baking the tiles so `excluded()` drops the four procedural
+footprints inside the new 185 m exclusion zone and `clearTrees` lifts the
+Presidio scatter off the hand-modelled grounds. **That re-bake could not be
+produced on this machine, and no tiles are committed in this change.**
+
+`pipeline/buildings.mjs` gap-fills building heights from
+`pipeline/data/overture_buildings.geojsonseq` — the source its own header
+comment says carries "current OSM heights", because "the 2010 DataSF height
+refresh predates the whole post-2015 SoMa skyline". **`pipeline/download.mjs`
+never fetches that file**, and it exists nowhere on this machine.
+`pipeline/data/` is gitignored, so a fresh `npm run download` produces a data
+set the bake cannot reproduce the committed tiles from.
+
+Measured consequences of running the bake anyway:
+
+- `pipeline/validate.mjs` fails its own gate: *tallest procedural building
+  200-340 m — 175.4 m*. `overtureAdded: 0`.
+- Every building cell diverges from what is committed — 40/40 sampled cells
+  differ, including cells nowhere near the Presidio. So the change cannot be
+  narrowed to "the cells this landmark touched"; publishing it would flatten
+  the downtown skyline across the whole city to fix one Presidio site.
+
+Committing that was the wrong trade, so the tiles are untouched
+(`git status app/public/tiles` = 0 changed) and the FAIL is reported here
+rather than hidden.
+
+**What this looks like until the re-bake happens:** the GLB loads and places
+correctly, but the baked grey blocks stand on the same four footprints and the
+Presidio tree scatter covers the meadow. Verified on screen at
+`http://localhost:5344`.
+
+**To finish it:** obtain `overture_buildings.geojsonseq` into `pipeline/data/`,
+then `cd pipeline && node terrain.mjs && node bridges.mjs && node buildings.mjs
+&& node streets.mjs && node landcover.mjs && node validate.mjs && node toy.mjs`,
+confirm `node audit.mjs` check 1.6 passes, and commit the changed tiles. Worth
+fixing at the source too: `download.mjs` should fetch the Overture extract so
+the bake is reproducible from a clean checkout.

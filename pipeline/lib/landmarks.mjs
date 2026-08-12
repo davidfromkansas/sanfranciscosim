@@ -219,6 +219,21 @@ export const LANDMARKS = [
     exclude: 45,
     camera: { distance: 500, yaw: 90, pitch: 16 },
   },
+  {
+    id: 'letterman',
+    name: 'Letterman Digital Arts Center',
+    lon: -122.4494466,
+    lat: 37.7997327,
+    height: 22,
+    // The asset is the whole campus — four buildings AND the Halprin grounds
+    // (312 x 298 m). The radius must clear all four baked footprints plus the
+    // lagoon, measured from the anchor to the far corner of the modelled base.
+    exclude: 185,
+    // The grounds are hand-modelled; baked tree scatter fights the meadow,
+    // the lagoon and the groves (Palace of Fine Arts precedent).
+    clearTrees: true,
+    camera: { distance: 700, yaw: 220, pitch: 24 },
+  },
 ];
 
 // Parks/green spaces the landcover bake must match at least one source polygon
