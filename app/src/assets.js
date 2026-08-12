@@ -33,18 +33,23 @@ function camelId(id) {
   return id.replace(/-([a-z])/g, (_, c) => c.toUpperCase());
 }
 
-// Quantized assets (KHR_mesh_quantization) arrive with integer — often
-// interleaved — attributes whose real values come from the node transform.
-// Matrix and merge maths need plain float buffers, so widen them first.
-function dequantize(geometry) {
-  for (const [name, attribute] of Object.entries(geometry.attributes)) {
-    if (!attribute.isInterleavedBufferAttribute && attribute.array instanceof Float32Array) continue;
-    const { itemSize, count } = attribute;
-    const array = new Float32Array(count * itemSize);
-    for (let i = 0; i < count; i++) {
-      for (let c = 0; c < itemSize; c++) array[i * itemSize + c] = attribute.getComponent(i, c);
+function floatAttribute(attribute) {
+  if (!attribute || attribute.array instanceof Float32Array) return attribute;
+  const values = new Float32Array(attribute.count * attribute.itemSize);
+  for (let i = 0; i < attribute.count; i++) {
+    for (let j = 0; j < attribute.itemSize; j++) {
+      values[i * attribute.itemSize + j] = attribute.getComponent(i, j);
     }
-    geometry.setAttribute(name, new BufferAttribute(array, itemSize));
+  }
+  return new BufferAttribute(values, attribute.itemSize, false);
+}
+
+function prepareGeometryForTransforms(geometry) {
+  for (const name of ['position', 'normal', 'tangent']) {
+    const attribute = geometry.getAttribute(name);
+    if (attribute && !(attribute.array instanceof Float32Array)) {
+      geometry.setAttribute(name, floatAttribute(attribute));
+    }
   }
   return geometry;
 }
@@ -73,7 +78,8 @@ function collect(root) {
     }
     materials.add(material.name);
 
-    const geometry = dequantize(object.geometry.clone());
+    const geometry = object.geometry.clone();
+    prepareGeometryForTransforms(geometry);
     geometry.applyMatrix4(object.matrixWorld);
     geometry.deleteAttribute('uv');
     geometry.deleteAttribute('uv1');
@@ -285,6 +291,7 @@ function placeGeneric(group, box, entry, data) {
   const scale = entry.targetHeightM / size.y;
   const [x, z] = data.project(entry.anchor[0], entry.anchor[1]);
   group.scale.setScalar(scale);
+  if (entry.yawDeg !== undefined) group.rotation.y = (entry.yawDeg * Math.PI) / 180;
   group.position.set(x, Math.max(0, data.sampleElevation(x, z)), z);
   return { ends: [], log: `uniform x${scale.toFixed(4)} at ${x.toFixed(0)}, ${z.toFixed(0)}` };
 }
