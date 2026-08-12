@@ -1,0 +1,1407 @@
+{
+  "asset": "muni-trolley-40",
+  "contract": "vehicle (docs/asset-plans/transit/README.md overrides)",
+  "validated": [
+    "muni-trolley-40.glb",
+    "muni-trolley-40-22-fillmore.glb",
+    "muni-trolley-40-24-divisadero.glb"
+  ],
+  "all_pass": true,
+  "results": [
+    {
+      "file": "muni-trolley-40.glb",
+      "bytes": 69640,
+      "objects": 10,
+      "total_objects_in_scene": 10,
+      "triangles": 2596,
+      "triangle_budget": 3400,
+      "dims_gltf_xyz": [
+        3.3,
+        5.7914,
+        12.4899
+      ],
+      "bbox_gltf_min": [
+        -1.65,
+        0.0,
+        -6.22
+      ],
+      "bbox_gltf_max": [
+        1.65,
+        5.7914,
+        6.2699
+      ],
+      "min_y": 0.0,
+      "centre_offset_xz": [
+        0.0,
+        0.025
+      ],
+      "footprint_dims_gltf_xyz": [
+        3.3,
+        3.22,
+        12.415
+      ],
+      "footprint_centre_offset_xz": [
+        0.0,
+        -0.0125
+      ],
+      "pole_zone_z_range": [
+        6.0999,
+        6.2699
+      ],
+      "pole_zone_materials": [
+        "Toy_ink",
+        "Toy_steel"
+      ],
+      "front_face_direction": "-Z",
+      "materials": [
+        "Toy_glass",
+        "Toy_ink",
+        "Toy_munired",
+        "Toy_mustard_Glow",
+        "Toy_red_Glow",
+        "Toy_silver",
+        "Toy_steel",
+        "Toy_tire",
+        "Toy_white",
+        "Toy_white_Glow"
+      ],
+      "material_detail": [
+        {
+          "name": "Toy_glass",
+          "glow": false,
+          "prefixed": true,
+          "textures": 0,
+          "base_color": [
+            0.0194,
+            0.0513,
+            0.1119
+          ],
+          "emission_strength": 0.0,
+          "alpha": 1.0,
+          "metallic": 0.0,
+          "roughness": 0.85
+        },
+        {
+          "name": "Toy_ink",
+          "glow": false,
+          "prefixed": true,
+          "textures": 0,
+          "base_color": [
+            0.0423,
+            0.0356,
+            0.0296
+          ],
+          "emission_strength": 0.0,
+          "alpha": 1.0,
+          "metallic": 0.0,
+          "roughness": 0.85
+        },
+        {
+          "name": "Toy_munired",
+          "glow": false,
+          "prefixed": true,
+          "textures": 0,
+          "base_color": [
+            0.5333,
+            0.0203,
+            0.0262
+          ],
+          "emission_strength": 0.0,
+          "alpha": 1.0,
+          "metallic": 0.0,
+          "roughness": 0.85
+        },
+        {
+          "name": "Toy_mustard_Glow",
+          "glow": true,
+          "prefixed": true,
+          "textures": 0,
+          "base_color": [
+            0.6939,
+            0.3712,
+            0.0529
+          ],
+          "emission_strength": 0.0,
+          "alpha": 1.0,
+          "metallic": 0.0,
+          "roughness": 0.85
+        },
+        {
+          "name": "Toy_red_Glow",
+          "glow": true,
+          "prefixed": true,
+          "textures": 0,
+          "base_color": [
+            0.552,
+            0.0595,
+            0.0452
+          ],
+          "emission_strength": 0.0,
+          "alpha": 1.0,
+          "metallic": 0.0,
+          "roughness": 0.85
+        },
+        {
+          "name": "Toy_silver",
+          "glow": false,
+          "prefixed": true,
+          "textures": 0,
+          "base_color": [
+            0.402,
+            0.4397,
+            0.4851
+          ],
+          "emission_strength": 0.0,
+          "alpha": 1.0,
+          "metallic": 0.0,
+          "roughness": 0.85
+        },
+        {
+          "name": "Toy_steel",
+          "glow": false,
+          "prefixed": true,
+          "textures": 0,
+          "base_color": [
+            0.3231,
+            0.3515,
+            0.3813
+          ],
+          "emission_strength": 0.0,
+          "alpha": 1.0,
+          "metallic": 0.0,
+          "roughness": 0.85
+        },
+        {
+          "name": "Toy_tire",
+          "glow": false,
+          "prefixed": true,
+          "textures": 0,
+          "base_color": [
+            0.0252,
+            0.0252,
+            0.0284
+          ],
+          "emission_strength": 0.0,
+          "alpha": 1.0,
+          "metallic": 0.0,
+          "roughness": 0.85
+        },
+        {
+          "name": "Toy_white",
+          "glow": false,
+          "prefixed": true,
+          "textures": 0,
+          "base_color": [
+            0.9301,
+            0.9047,
+            0.8388
+          ],
+          "emission_strength": 0.0,
+          "alpha": 1.0,
+          "metallic": 0.0,
+          "roughness": 0.85
+        },
+        {
+          "name": "Toy_white_Glow",
+          "glow": true,
+          "prefixed": true,
+          "textures": 0,
+          "base_color": [
+            0.9301,
+            0.9047,
+            0.8388
+          ],
+          "emission_strength": 0.0,
+          "alpha": 1.0,
+          "metallic": 0.0,
+          "roughness": 0.85
+        }
+      ],
+      "image_textures": 0,
+      "cameras": 0,
+      "lights": 0,
+      "animations": 0,
+      "armatures": 0,
+      "objects_with_unapplied_transforms": [],
+      "objects_with_negative_scale": [],
+      "per_object": [
+        {
+          "name": "Toy_glass",
+          "materials": [
+            "Toy_glass"
+          ],
+          "triangles": 112,
+          "signed_volume": 1.69977,
+          "signed_volume_positive": true,
+          "gltf_min": [
+            -1.337,
+            1.02,
+            -6.22
+          ],
+          "gltf_max": [
+            1.337,
+            2.66,
+            6.115
+          ],
+          "constraints": 0,
+          "vertex_groups": 0,
+          "shape_keys": false
+        },
+        {
+          "name": "Toy_ink",
+          "materials": [
+            "Toy_ink"
+          ],
+          "triangles": 900,
+          "signed_volume": 8.25994,
+          "signed_volume_positive": true,
+          "gltf_min": [
+            -1.65,
+            0.3,
+            -6.195
+          ],
+          "gltf_max": [
+            1.65,
+            5.7914,
+            6.2699
+          ],
+          "constraints": 0,
+          "vertex_groups": 0,
+          "shape_keys": false
+        },
+        {
+          "name": "Toy_munired",
+          "materials": [
+            "Toy_munired"
+          ],
+          "triangles": 392,
+          "signed_volume": 25.92561,
+          "signed_volume_positive": true,
+          "gltf_min": [
+            -1.329,
+            0.34,
+            -6.117
+          ],
+          "gltf_max": [
+            1.329,
+            2.82,
+            6.117
+          ],
+          "constraints": 0,
+          "vertex_groups": 0,
+          "shape_keys": false
+        },
+        {
+          "name": "Toy_mustard_Glow",
+          "materials": [
+            "Toy_mustard_Glow"
+          ],
+          "triangles": 36,
+          "signed_volume": 0.09909,
+          "signed_volume_positive": true,
+          "gltf_min": [
+            -1.349,
+            2.19,
+            -6.135
+          ],
+          "gltf_max": [
+            1.349,
+            3.08,
+            5.605
+          ],
+          "constraints": 0,
+          "vertex_groups": 0,
+          "shape_keys": false
+        },
+        {
+          "name": "Toy_red_Glow",
+          "materials": [
+            "Toy_red_Glow"
+          ],
+          "triangles": 24,
+          "signed_volume": 0.01109,
+          "signed_volume_positive": true,
+          "gltf_min": [
+            -1.01,
+            1.05,
+            6.14
+          ],
+          "gltf_max": [
+            1.01,
+            1.61,
+            6.185
+          ],
+          "constraints": 0,
+          "vertex_groups": 0,
+          "shape_keys": false
+        },
+        {
+          "name": "Toy_silver",
+          "materials": [
+            "Toy_silver"
+          ],
+          "triangles": 532,
+          "signed_volume": 84.77915,
+          "signed_volume_positive": true,
+          "gltf_min": [
+            -1.322,
+            0.34,
+            -6.095
+          ],
+          "gltf_max": [
+            1.322,
+            3.265,
+            6.095
+          ],
+          "constraints": 0,
+          "vertex_groups": 0,
+          "shape_keys": false
+        },
+        {
+          "name": "Toy_steel",
+          "materials": [
+            "Toy_steel"
+          ],
+          "triangles": 348,
+          "signed_volume": 1.96099,
+          "signed_volume_positive": true,
+          "gltf_min": [
+            -1.31,
+            0.26,
+            -4.005
+          ],
+          "gltf_max": [
+            1.31,
+            5.7852,
+            6.223
+          ],
+          "constraints": 0,
+          "vertex_groups": 0,
+          "shape_keys": false
+        },
+        {
+          "name": "Toy_tire",
+          "materials": [
+            "Toy_tire"
+          ],
+          "triangles": 144,
+          "signed_volume": 0.95362,
+          "signed_volume_positive": true,
+          "gltf_min": [
+            -1.285,
+            0.0,
+            -4.2395
+          ],
+          "gltf_max": [
+            1.285,
+            1.04,
+            3.9595
+          ],
+          "constraints": 0,
+          "vertex_groups": 0,
+          "shape_keys": false
+        },
+        {
+          "name": "Toy_white",
+          "materials": [
+            "Toy_white"
+          ],
+          "triangles": 84,
+          "signed_volume": 3.24896,
+          "signed_volume_positive": true,
+          "gltf_min": [
+            -1.245,
+            3.11,
+            -6.025
+          ],
+          "gltf_max": [
+            1.245,
+            3.22,
+            6.025
+          ],
+          "constraints": 0,
+          "vertex_groups": 0,
+          "shape_keys": false
+        },
+        {
+          "name": "Toy_white_Glow",
+          "materials": [
+            "Toy_white_Glow"
+          ],
+          "triangles": 24,
+          "signed_volume": 0.00403,
+          "signed_volume_positive": true,
+          "gltf_min": [
+            -0.99,
+            1.01,
+            -6.18
+          ],
+          "gltf_max": [
+            0.99,
+            1.17,
+            -6.135
+          ],
+          "constraints": 0,
+          "vertex_groups": 0,
+          "shape_keys": false
+        }
+      ],
+      "checks": {
+        "front_faces_minus_z": true,
+        "poles_trail_aft": true,
+        "min_y_zero": true,
+        "footprint_centred_in_xz": true,
+        "triangles_within_budget": true,
+        "no_cameras": true,
+        "no_lights": true,
+        "no_animations": true,
+        "no_armatures": true,
+        "no_shape_keys": true,
+        "no_constraints": true,
+        "transforms_applied": true,
+        "no_negative_scale": true,
+        "all_signed_volumes_positive": true,
+        "all_materials_toy_prefixed": true,
+        "no_image_textures": true,
+        "no_transparency": true,
+        "emission_zero": true,
+        "no_toy_body": true,
+        "glow_materials_present": true,
+        "no_glow_in_pole_zone": true,
+        "material_set_matches_hybrid_bus": true,
+        "one_primitive_per_material": true
+      },
+      "pass": true
+    },
+    {
+      "file": "muni-trolley-40-22-fillmore.glb",
+      "bytes": 70060,
+      "objects": 10,
+      "total_objects_in_scene": 10,
+      "triangles": 2600,
+      "triangle_budget": 3400,
+      "dims_gltf_xyz": [
+        3.3,
+        5.7914,
+        12.4899
+      ],
+      "bbox_gltf_min": [
+        -1.65,
+        0.0,
+        -6.22
+      ],
+      "bbox_gltf_max": [
+        1.65,
+        5.7914,
+        6.2699
+      ],
+      "min_y": 0.0,
+      "centre_offset_xz": [
+        0.0,
+        0.025
+      ],
+      "footprint_dims_gltf_xyz": [
+        3.3,
+        3.22,
+        12.415
+      ],
+      "footprint_centre_offset_xz": [
+        0.0,
+        -0.0125
+      ],
+      "pole_zone_z_range": [
+        6.0999,
+        6.2699
+      ],
+      "pole_zone_materials": [
+        "Toy_ink",
+        "Toy_steel"
+      ],
+      "front_face_direction": "-Z",
+      "materials": [
+        "Toy_glass",
+        "Toy_ink",
+        "Toy_munired",
+        "Toy_mustard_Glow",
+        "Toy_red_Glow",
+        "Toy_silver",
+        "Toy_steel",
+        "Toy_tire",
+        "Toy_white",
+        "Toy_white_Glow"
+      ],
+      "material_detail": [
+        {
+          "name": "Toy_glass",
+          "glow": false,
+          "prefixed": true,
+          "textures": 0,
+          "base_color": [
+            0.0194,
+            0.0513,
+            0.1119
+          ],
+          "emission_strength": 0.0,
+          "alpha": 1.0,
+          "metallic": 0.0,
+          "roughness": 0.85
+        },
+        {
+          "name": "Toy_ink",
+          "glow": false,
+          "prefixed": true,
+          "textures": 0,
+          "base_color": [
+            0.0423,
+            0.0356,
+            0.0296
+          ],
+          "emission_strength": 0.0,
+          "alpha": 1.0,
+          "metallic": 0.0,
+          "roughness": 0.85
+        },
+        {
+          "name": "Toy_munired",
+          "glow": false,
+          "prefixed": true,
+          "textures": 0,
+          "base_color": [
+            0.5333,
+            0.0203,
+            0.0262
+          ],
+          "emission_strength": 0.0,
+          "alpha": 1.0,
+          "metallic": 0.0,
+          "roughness": 0.85
+        },
+        {
+          "name": "Toy_mustard_Glow",
+          "glow": true,
+          "prefixed": true,
+          "textures": 0,
+          "base_color": [
+            0.6939,
+            0.3712,
+            0.0529
+          ],
+          "emission_strength": 0.0,
+          "alpha": 1.0,
+          "metallic": 0.0,
+          "roughness": 0.85
+        },
+        {
+          "name": "Toy_red_Glow",
+          "glow": true,
+          "prefixed": true,
+          "textures": 0,
+          "base_color": [
+            0.552,
+            0.0595,
+            0.0452
+          ],
+          "emission_strength": 0.0,
+          "alpha": 1.0,
+          "metallic": 0.0,
+          "roughness": 0.85
+        },
+        {
+          "name": "Toy_silver",
+          "glow": false,
+          "prefixed": true,
+          "textures": 0,
+          "base_color": [
+            0.402,
+            0.4397,
+            0.4851
+          ],
+          "emission_strength": 0.0,
+          "alpha": 1.0,
+          "metallic": 0.0,
+          "roughness": 0.85
+        },
+        {
+          "name": "Toy_steel",
+          "glow": false,
+          "prefixed": true,
+          "textures": 0,
+          "base_color": [
+            0.3231,
+            0.3515,
+            0.3813
+          ],
+          "emission_strength": 0.0,
+          "alpha": 1.0,
+          "metallic": 0.0,
+          "roughness": 0.85
+        },
+        {
+          "name": "Toy_tire",
+          "glow": false,
+          "prefixed": true,
+          "textures": 0,
+          "base_color": [
+            0.0252,
+            0.0252,
+            0.0284
+          ],
+          "emission_strength": 0.0,
+          "alpha": 1.0,
+          "metallic": 0.0,
+          "roughness": 0.85
+        },
+        {
+          "name": "Toy_white",
+          "glow": false,
+          "prefixed": true,
+          "textures": 0,
+          "base_color": [
+            0.9301,
+            0.9047,
+            0.8388
+          ],
+          "emission_strength": 0.0,
+          "alpha": 1.0,
+          "metallic": 0.0,
+          "roughness": 0.85
+        },
+        {
+          "name": "Toy_white_Glow",
+          "glow": true,
+          "prefixed": true,
+          "textures": 0,
+          "base_color": [
+            0.9301,
+            0.9047,
+            0.8388
+          ],
+          "emission_strength": 0.0,
+          "alpha": 1.0,
+          "metallic": 0.0,
+          "roughness": 0.85
+        }
+      ],
+      "image_textures": 0,
+      "cameras": 0,
+      "lights": 0,
+      "animations": 0,
+      "armatures": 0,
+      "objects_with_unapplied_transforms": [],
+      "objects_with_negative_scale": [],
+      "per_object": [
+        {
+          "name": "Toy_glass",
+          "materials": [
+            "Toy_glass"
+          ],
+          "triangles": 112,
+          "signed_volume": 1.69977,
+          "signed_volume_positive": true,
+          "gltf_min": [
+            -1.337,
+            1.02,
+            -6.22
+          ],
+          "gltf_max": [
+            1.337,
+            2.66,
+            6.115
+          ],
+          "constraints": 0,
+          "vertex_groups": 0,
+          "shape_keys": false
+        },
+        {
+          "name": "Toy_ink",
+          "materials": [
+            "Toy_ink"
+          ],
+          "triangles": 904,
+          "signed_volume": 8.17431,
+          "signed_volume_positive": true,
+          "gltf_min": [
+            -1.65,
+            0.3,
+            -6.195
+          ],
+          "gltf_max": [
+            1.65,
+            5.7914,
+            6.2699
+          ],
+          "constraints": 0,
+          "vertex_groups": 0,
+          "shape_keys": false
+        },
+        {
+          "name": "Toy_munired",
+          "materials": [
+            "Toy_munired"
+          ],
+          "triangles": 392,
+          "signed_volume": 25.92561,
+          "signed_volume_positive": true,
+          "gltf_min": [
+            -1.329,
+            0.34,
+            -6.117
+          ],
+          "gltf_max": [
+            1.329,
+            2.82,
+            6.117
+          ],
+          "constraints": 0,
+          "vertex_groups": 0,
+          "shape_keys": false
+        },
+        {
+          "name": "Toy_mustard_Glow",
+          "materials": [
+            "Toy_mustard_Glow"
+          ],
+          "triangles": 36,
+          "signed_volume": 0.09909,
+          "signed_volume_positive": true,
+          "gltf_min": [
+            -1.349,
+            2.19,
+            -6.135
+          ],
+          "gltf_max": [
+            1.349,
+            3.08,
+            5.605
+          ],
+          "constraints": 0,
+          "vertex_groups": 0,
+          "shape_keys": false
+        },
+        {
+          "name": "Toy_red_Glow",
+          "materials": [
+            "Toy_red_Glow"
+          ],
+          "triangles": 24,
+          "signed_volume": 0.01109,
+          "signed_volume_positive": true,
+          "gltf_min": [
+            -1.01,
+            1.05,
+            6.14
+          ],
+          "gltf_max": [
+            1.01,
+            1.61,
+            6.185
+          ],
+          "constraints": 0,
+          "vertex_groups": 0,
+          "shape_keys": false
+        },
+        {
+          "name": "Toy_silver",
+          "materials": [
+            "Toy_silver"
+          ],
+          "triangles": 532,
+          "signed_volume": 84.77915,
+          "signed_volume_positive": true,
+          "gltf_min": [
+            -1.322,
+            0.34,
+            -6.095
+          ],
+          "gltf_max": [
+            1.322,
+            3.265,
+            6.095
+          ],
+          "constraints": 0,
+          "vertex_groups": 0,
+          "shape_keys": false
+        },
+        {
+          "name": "Toy_steel",
+          "materials": [
+            "Toy_steel"
+          ],
+          "triangles": 348,
+          "signed_volume": 1.96099,
+          "signed_volume_positive": true,
+          "gltf_min": [
+            -1.31,
+            0.26,
+            -4.005
+          ],
+          "gltf_max": [
+            1.31,
+            5.7852,
+            6.223
+          ],
+          "constraints": 0,
+          "vertex_groups": 0,
+          "shape_keys": false
+        },
+        {
+          "name": "Toy_tire",
+          "materials": [
+            "Toy_tire"
+          ],
+          "triangles": 144,
+          "signed_volume": 0.95362,
+          "signed_volume_positive": true,
+          "gltf_min": [
+            -1.285,
+            0.0,
+            -4.2395
+          ],
+          "gltf_max": [
+            1.285,
+            1.04,
+            3.9595
+          ],
+          "constraints": 0,
+          "vertex_groups": 0,
+          "shape_keys": false
+        },
+        {
+          "name": "Toy_white",
+          "materials": [
+            "Toy_white"
+          ],
+          "triangles": 84,
+          "signed_volume": 3.24896,
+          "signed_volume_positive": true,
+          "gltf_min": [
+            -1.245,
+            3.11,
+            -6.025
+          ],
+          "gltf_max": [
+            1.245,
+            3.22,
+            6.025
+          ],
+          "constraints": 0,
+          "vertex_groups": 0,
+          "shape_keys": false
+        },
+        {
+          "name": "Toy_white_Glow",
+          "materials": [
+            "Toy_white_Glow"
+          ],
+          "triangles": 24,
+          "signed_volume": 0.00403,
+          "signed_volume_positive": true,
+          "gltf_min": [
+            -0.99,
+            1.01,
+            -6.18
+          ],
+          "gltf_max": [
+            0.99,
+            1.17,
+            -6.135
+          ],
+          "constraints": 0,
+          "vertex_groups": 0,
+          "shape_keys": false
+        }
+      ],
+      "checks": {
+        "front_faces_minus_z": true,
+        "poles_trail_aft": true,
+        "min_y_zero": true,
+        "footprint_centred_in_xz": true,
+        "triangles_within_budget": true,
+        "no_cameras": true,
+        "no_lights": true,
+        "no_animations": true,
+        "no_armatures": true,
+        "no_shape_keys": true,
+        "no_constraints": true,
+        "transforms_applied": true,
+        "no_negative_scale": true,
+        "all_signed_volumes_positive": true,
+        "all_materials_toy_prefixed": true,
+        "no_image_textures": true,
+        "no_transparency": true,
+        "emission_zero": true,
+        "no_toy_body": true,
+        "glow_materials_present": true,
+        "no_glow_in_pole_zone": true,
+        "material_set_matches_hybrid_bus": true,
+        "one_primitive_per_material": true
+      },
+      "pass": true
+    },
+    {
+      "file": "muni-trolley-40-24-divisadero.glb",
+      "bytes": 70312,
+      "objects": 10,
+      "total_objects_in_scene": 10,
+      "triangles": 2618,
+      "triangle_budget": 3400,
+      "dims_gltf_xyz": [
+        3.3,
+        5.7914,
+        12.4899
+      ],
+      "bbox_gltf_min": [
+        -1.65,
+        0.0,
+        -6.22
+      ],
+      "bbox_gltf_max": [
+        1.65,
+        5.7914,
+        6.2699
+      ],
+      "min_y": 0.0,
+      "centre_offset_xz": [
+        0.0,
+        0.025
+      ],
+      "footprint_dims_gltf_xyz": [
+        3.3,
+        3.22,
+        12.415
+      ],
+      "footprint_centre_offset_xz": [
+        0.0,
+        -0.0125
+      ],
+      "pole_zone_z_range": [
+        6.0999,
+        6.2699
+      ],
+      "pole_zone_materials": [
+        "Toy_ink",
+        "Toy_steel"
+      ],
+      "front_face_direction": "-Z",
+      "materials": [
+        "Toy_glass",
+        "Toy_ink",
+        "Toy_munired",
+        "Toy_mustard_Glow",
+        "Toy_red_Glow",
+        "Toy_silver",
+        "Toy_steel",
+        "Toy_tire",
+        "Toy_white",
+        "Toy_white_Glow"
+      ],
+      "material_detail": [
+        {
+          "name": "Toy_glass",
+          "glow": false,
+          "prefixed": true,
+          "textures": 0,
+          "base_color": [
+            0.0194,
+            0.0513,
+            0.1119
+          ],
+          "emission_strength": 0.0,
+          "alpha": 1.0,
+          "metallic": 0.0,
+          "roughness": 0.85
+        },
+        {
+          "name": "Toy_ink",
+          "glow": false,
+          "prefixed": true,
+          "textures": 0,
+          "base_color": [
+            0.0423,
+            0.0356,
+            0.0296
+          ],
+          "emission_strength": 0.0,
+          "alpha": 1.0,
+          "metallic": 0.0,
+          "roughness": 0.85
+        },
+        {
+          "name": "Toy_munired",
+          "glow": false,
+          "prefixed": true,
+          "textures": 0,
+          "base_color": [
+            0.5333,
+            0.0203,
+            0.0262
+          ],
+          "emission_strength": 0.0,
+          "alpha": 1.0,
+          "metallic": 0.0,
+          "roughness": 0.85
+        },
+        {
+          "name": "Toy_mustard_Glow",
+          "glow": true,
+          "prefixed": true,
+          "textures": 0,
+          "base_color": [
+            0.6939,
+            0.3712,
+            0.0529
+          ],
+          "emission_strength": 0.0,
+          "alpha": 1.0,
+          "metallic": 0.0,
+          "roughness": 0.85
+        },
+        {
+          "name": "Toy_red_Glow",
+          "glow": true,
+          "prefixed": true,
+          "textures": 0,
+          "base_color": [
+            0.552,
+            0.0595,
+            0.0452
+          ],
+          "emission_strength": 0.0,
+          "alpha": 1.0,
+          "metallic": 0.0,
+          "roughness": 0.85
+        },
+        {
+          "name": "Toy_silver",
+          "glow": false,
+          "prefixed": true,
+          "textures": 0,
+          "base_color": [
+            0.402,
+            0.4397,
+            0.4851
+          ],
+          "emission_strength": 0.0,
+          "alpha": 1.0,
+          "metallic": 0.0,
+          "roughness": 0.85
+        },
+        {
+          "name": "Toy_steel",
+          "glow": false,
+          "prefixed": true,
+          "textures": 0,
+          "base_color": [
+            0.3231,
+            0.3515,
+            0.3813
+          ],
+          "emission_strength": 0.0,
+          "alpha": 1.0,
+          "metallic": 0.0,
+          "roughness": 0.85
+        },
+        {
+          "name": "Toy_tire",
+          "glow": false,
+          "prefixed": true,
+          "textures": 0,
+          "base_color": [
+            0.0252,
+            0.0252,
+            0.0284
+          ],
+          "emission_strength": 0.0,
+          "alpha": 1.0,
+          "metallic": 0.0,
+          "roughness": 0.85
+        },
+        {
+          "name": "Toy_white",
+          "glow": false,
+          "prefixed": true,
+          "textures": 0,
+          "base_color": [
+            0.9301,
+            0.9047,
+            0.8388
+          ],
+          "emission_strength": 0.0,
+          "alpha": 1.0,
+          "metallic": 0.0,
+          "roughness": 0.85
+        },
+        {
+          "name": "Toy_white_Glow",
+          "glow": true,
+          "prefixed": true,
+          "textures": 0,
+          "base_color": [
+            0.9301,
+            0.9047,
+            0.8388
+          ],
+          "emission_strength": 0.0,
+          "alpha": 1.0,
+          "metallic": 0.0,
+          "roughness": 0.85
+        }
+      ],
+      "image_textures": 0,
+      "cameras": 0,
+      "lights": 0,
+      "animations": 0,
+      "armatures": 0,
+      "objects_with_unapplied_transforms": [],
+      "objects_with_negative_scale": [],
+      "per_object": [
+        {
+          "name": "Toy_glass",
+          "materials": [
+            "Toy_glass"
+          ],
+          "triangles": 112,
+          "signed_volume": 1.69977,
+          "signed_volume_positive": true,
+          "gltf_min": [
+            -1.337,
+            1.02,
+            -6.22
+          ],
+          "gltf_max": [
+            1.337,
+            2.66,
+            6.115
+          ],
+          "constraints": 0,
+          "vertex_groups": 0,
+          "shape_keys": false
+        },
+        {
+          "name": "Toy_ink",
+          "materials": [
+            "Toy_ink"
+          ],
+          "triangles": 922,
+          "signed_volume": 8.32814,
+          "signed_volume_positive": true,
+          "gltf_min": [
+            -1.65,
+            0.3,
+            -6.195
+          ],
+          "gltf_max": [
+            1.65,
+            5.7914,
+            6.2699
+          ],
+          "constraints": 0,
+          "vertex_groups": 0,
+          "shape_keys": false
+        },
+        {
+          "name": "Toy_munired",
+          "materials": [
+            "Toy_munired"
+          ],
+          "triangles": 392,
+          "signed_volume": 25.92561,
+          "signed_volume_positive": true,
+          "gltf_min": [
+            -1.329,
+            0.34,
+            -6.117
+          ],
+          "gltf_max": [
+            1.329,
+            2.82,
+            6.117
+          ],
+          "constraints": 0,
+          "vertex_groups": 0,
+          "shape_keys": false
+        },
+        {
+          "name": "Toy_mustard_Glow",
+          "materials": [
+            "Toy_mustard_Glow"
+          ],
+          "triangles": 36,
+          "signed_volume": 0.09909,
+          "signed_volume_positive": true,
+          "gltf_min": [
+            -1.349,
+            2.19,
+            -6.135
+          ],
+          "gltf_max": [
+            1.349,
+            3.08,
+            5.605
+          ],
+          "constraints": 0,
+          "vertex_groups": 0,
+          "shape_keys": false
+        },
+        {
+          "name": "Toy_red_Glow",
+          "materials": [
+            "Toy_red_Glow"
+          ],
+          "triangles": 24,
+          "signed_volume": 0.01109,
+          "signed_volume_positive": true,
+          "gltf_min": [
+            -1.01,
+            1.05,
+            6.14
+          ],
+          "gltf_max": [
+            1.01,
+            1.61,
+            6.185
+          ],
+          "constraints": 0,
+          "vertex_groups": 0,
+          "shape_keys": false
+        },
+        {
+          "name": "Toy_silver",
+          "materials": [
+            "Toy_silver"
+          ],
+          "triangles": 532,
+          "signed_volume": 84.77915,
+          "signed_volume_positive": true,
+          "gltf_min": [
+            -1.322,
+            0.34,
+            -6.095
+          ],
+          "gltf_max": [
+            1.322,
+            3.265,
+            6.095
+          ],
+          "constraints": 0,
+          "vertex_groups": 0,
+          "shape_keys": false
+        },
+        {
+          "name": "Toy_steel",
+          "materials": [
+            "Toy_steel"
+          ],
+          "triangles": 348,
+          "signed_volume": 1.96099,
+          "signed_volume_positive": true,
+          "gltf_min": [
+            -1.31,
+            0.26,
+            -4.005
+          ],
+          "gltf_max": [
+            1.31,
+            5.7852,
+            6.223
+          ],
+          "constraints": 0,
+          "vertex_groups": 0,
+          "shape_keys": false
+        },
+        {
+          "name": "Toy_tire",
+          "materials": [
+            "Toy_tire"
+          ],
+          "triangles": 144,
+          "signed_volume": 0.95362,
+          "signed_volume_positive": true,
+          "gltf_min": [
+            -1.285,
+            0.0,
+            -4.2395
+          ],
+          "gltf_max": [
+            1.285,
+            1.04,
+            3.9595
+          ],
+          "constraints": 0,
+          "vertex_groups": 0,
+          "shape_keys": false
+        },
+        {
+          "name": "Toy_white",
+          "materials": [
+            "Toy_white"
+          ],
+          "triangles": 84,
+          "signed_volume": 3.24896,
+          "signed_volume_positive": true,
+          "gltf_min": [
+            -1.245,
+            3.11,
+            -6.025
+          ],
+          "gltf_max": [
+            1.245,
+            3.22,
+            6.025
+          ],
+          "constraints": 0,
+          "vertex_groups": 0,
+          "shape_keys": false
+        },
+        {
+          "name": "Toy_white_Glow",
+          "materials": [
+            "Toy_white_Glow"
+          ],
+          "triangles": 24,
+          "signed_volume": 0.00403,
+          "signed_volume_positive": true,
+          "gltf_min": [
+            -0.99,
+            1.01,
+            -6.18
+          ],
+          "gltf_max": [
+            0.99,
+            1.17,
+            -6.135
+          ],
+          "constraints": 0,
+          "vertex_groups": 0,
+          "shape_keys": false
+        }
+      ],
+      "checks": {
+        "front_faces_minus_z": true,
+        "poles_trail_aft": true,
+        "min_y_zero": true,
+        "footprint_centred_in_xz": true,
+        "triangles_within_budget": true,
+        "no_cameras": true,
+        "no_lights": true,
+        "no_animations": true,
+        "no_armatures": true,
+        "no_shape_keys": true,
+        "no_constraints": true,
+        "transforms_applied": true,
+        "no_negative_scale": true,
+        "all_signed_volumes_positive": true,
+        "all_materials_toy_prefixed": true,
+        "no_image_textures": true,
+        "no_transparency": true,
+        "emission_zero": true,
+        "no_toy_body": true,
+        "glow_materials_present": true,
+        "no_glow_in_pole_zone": true,
+        "material_set_matches_hybrid_bus": true,
+        "one_primitive_per_material": true
+      },
+      "pass": true
+    }
+  ]
+}
