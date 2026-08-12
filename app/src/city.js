@@ -128,6 +128,22 @@ function makeAttributes(geometry, data) {
   geometry.setIndex(new BufferAttribute(data.indices, 1));
 }
 
+// three keeps a CPU copy of every array it uploads; for the fully-built city
+// that is hundreds of MB the app never reads again — the exact duplication
+// that pushes iOS Safari past its memory watchdog. Static city geometry drops
+// its arrays the moment the GPU has them (bounds are computed before upload;
+// picking never raycasts these meshes — context.pick works off baked cell
+// data; only the SF.pick debug helper loses these tiers). Rebuilds create
+// fresh geometry from blobs, so eviction and tier swaps are unaffected.
+function releaseArray() {
+  this.array = null;
+}
+function releaseAfterUpload(geometry) {
+  for (const attribute of Object.values(geometry.attributes)) attribute.onUpload(releaseArray);
+  if (geometry.index) geometry.index.onUpload(releaseArray);
+  return geometry;
+}
+
 function treeArchetype() {
   const parts = [];
   const trunk = new CylinderGeometry(0.34, 0.46, 3.2, 5, 1);
@@ -502,6 +518,7 @@ export function createCity(scene, data) {
     makeAttributes(geometry, result);
     geometry.setAttribute('aQuad', new BufferAttribute(result.quads, 1));
     geometry.computeBoundingSphere();
+    releaseAfterUpload(geometry);
     const material = createFarBuildingMaterial();
     const mesh = new Mesh(geometry, material);
     mesh.position.set(g.originX, 0, g.originZ);
@@ -590,6 +607,7 @@ export function createCity(scene, data) {
       makeAttributes(geometry, result);
       geometry.setAttribute('aKind', new BufferAttribute(result.kinds, 1));
       geometry.computeBoundingSphere();
+    releaseAfterUpload(geometry);
       const mesh = new Mesh(geometry, groundMaterial);
       mesh.position.set(g.originX, 0, g.originZ);
       mesh.receiveShadow = true;
@@ -744,6 +762,7 @@ export function createCity(scene, data) {
     makeAttributes(geometry, result);
     geometry.setAttribute('aKind', new BufferAttribute(result.kinds, 1));
     geometry.computeBoundingSphere();
+    releaseAfterUpload(geometry);
     const mesh = new Mesh(geometry, groundMaterial);
     mesh.position.set(g.originX, 0, g.originZ);
     mesh.receiveShadow = true;
@@ -840,6 +859,7 @@ export function createCity(scene, data) {
     // The lore flag byte: night profile, glow and band suppression per vertex.
     if (result.flag) geometry.setAttribute('aFlag', new BufferAttribute(result.flag, 1));
     geometry.computeBoundingSphere();
+    releaseAfterUpload(geometry);
     const material = toyTier
       ? createToyBuildingMaterial()
       : createBuildingMaterial({ windows: quality.windows });
