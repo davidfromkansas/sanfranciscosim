@@ -186,7 +186,11 @@ still passes all 16 checks, now reporting 10 objects instead of 148.
 - The west arcade stub is modelled as open single-storey. Whether this particular ward's
   connector is open, enclosed or two-storey was not resolved.
 - The window rhythm is 11 bays, inferred from oblique photography.
-- **The integration exclusion zone is the open problem, not the asset.** The procedural
-  source polygon is the entire Thoreau Center, not this ward. See §2.13 of the plan: a
-  radius large enough to clear this building will also delete 1007 and 1009. This is
-  addressed in the integration commit; it is called out here so it is not lost.
+- **The integration exclusion zone is the open problem, not the asset, and it is
+  unresolved.** Stage 5 was attempted, verified locally (scale exactly 1.0000, correct
+  placement, orientation, terrain seating and night glow, zero added draw calls) and then
+  backed out: the procedural footprint at this site is the entire Thoreau Center as one
+  159 x 147 m polygon whose nearest vertex is 4.7 m from this anchor, so any usable
+  exclusion radius deletes 1007, 1009 and the Tides Converge block along with it. Full
+  evidence and the three follow-up options are in `INTEGRATION.md`. Nothing under `app/`
+  is changed by this branch.
