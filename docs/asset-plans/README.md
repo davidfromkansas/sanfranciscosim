@@ -62,8 +62,12 @@ route, and the park plans depend on it (§E8 of the parks README).
 | [1008 General Kennedy Avenue](./1008-general-kennedy.md) | `1008-general-kennedy` | 11.9 m | new landmark |
 | [Letterman Digital Arts Center](./letterman-digital-arts-center.md) | `letterman` | ~22 m (estimated) | new landmark |
 | [Chase Center](./chase-center.md) | `chase-center` | 40.8 m | new landmark |
+| [540 Presidio Boulevard](./540-presidio-blvd.md) | `540-presidio-blvd` | 11.5 m (estimated) | new landmark |
+| [541 Presidio Boulevard](./541-presidio.md) | `541-presidio` | 10.0 m (LiDAR-derived) | new landmark |
+| [542 Presidio Boulevard](./542-presidio-blvd.md) | `542-presidio-blvd` | 10.6 m (estimated) | new landmark |
+| [543 Presidio Blvd](./543-presidio-blvd.md) | `543-presidio-blvd` | 9.55 m | new landmark |
 
-## Shared contract (all 25)
+## Shared contract (all 29)
 
 - Style: `docs/styles/miniature-toy.md` (authoritative for artistic decisions)
 - Technical contract: `.agents/skills/sf-asset-check/SKILL.md` (authoritative for the GLB)
@@ -110,7 +114,10 @@ architectural target height. 550 Third Street is the sharpest case: its OSM
 `height=7` and the 2010 city LiDAR agree, and both are wrong, because they
 predate the rooftop penthouse that gives the building its crest. Chase Center is
 the inverse case — three published figures (structural 31.755 m, OSM 38.1 m,
-facade crest 40.84 m) each measure a different thing; see that plan's 2.1.
+facade crest 40.84 m) each measure a different thing; see that plan's 2.1. 543
+Presidio Blvd is a third variety: its OSM `height=8` is neither eave nor crest but
+the LiDAR *median* height over a hipped roof, which by construction falls between
+the two — the crest is 9.55 m.
 
 The executing agent is expected to re-verify height, anchor, footprint and
 orientation before modelling — the dossier is a head start, not a citation.
