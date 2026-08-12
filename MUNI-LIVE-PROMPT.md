@@ -21,6 +21,37 @@ changes: the procedural road traffic keeps flowing and the app never shows an
 error. AGENTS rules 3 (procedural fallback) and 4 (zero required keys) apply to
 this feature exactly as they did to the ferries.
 
+## What the user sees (the experience this spec exists to produce)
+
+This section is the acceptance bar for every mechanical decision below. Judge
+the feature from the deployed app against these sentences, not against the
+implementation details.
+
+- **The city's buses are simply *there*, alive.** Pan over Geary or Mission and
+  the buses you see are the real fleet: as many as are actually in service,
+  each on its real route. They drive continuously — pulling away, cruising,
+  slowing into stops, waiting, pulling out — never frozen between data
+  refreshes, never sliding sideways, never jumping. A viewer who watches one
+  bus for two minutes should believe it is being driven.
+- **Stopped means stopped.** A bus dwelling at a stop or a red light sits
+  still, exactly as a real one does. Motion resumes when the data says so.
+- **Each bus wears its route** on a hovering badge — glance at the scene and
+  you can see the 29 climbing toward McLaren, two 38Rs leapfrogging on Geary.
+- **Click one and it becomes a character**: the card names it (`29 Sunset ·
+  bus 8632`), says where it is heading and when it reaches its next stops,
+  and the camera can follow it down the street.
+- **At night it reads as occupied**: amber destination sign and interior strip
+  lit, headlights and tail lights on.
+- **What we do not pretend:** positions arrive ~60–180 s behind reality (the
+  feed's cadence plus our poll). The scene is a smooth, truthful *replay a
+  moment behind* — a bus is on its real alignment and typically within a
+  block of where the physical bus is, but it is not a synchronised clock. The
+  card's data-age line is the honest tell; nothing in the UI claims
+  second-accurate positions.
+- **When the data goes away, the city does not die** — ordinary procedural
+  traffic continues and no error is shown. Live buses return when the feed
+  does.
+
 ## Data source decision (owner-decided 2026-08-12 — do not re-litigate)
 
 **Use 511.org's GTFS-Realtime feeds for `agency=SF`:**
@@ -228,7 +259,15 @@ missed polls, pick + entity + follow. Differences:
    previous position — never snap backwards), then advance `s` along the
    polyline at a speed blended from reported `speedMs` and the distance to the
    next fix's projection, so buses glide through corners on the real alignment
-   and never teleport. Heading = shape tangent. Fallbacks, in order: no shape →
+   and never teleport. Heading = shape tangent.
+   **Dwell behaviour — stopped must read as stopped:** when a fix reports
+   `speedMs` ≈ 0, or two consecutive fixes project to the same arc-length
+   (± a bus length), the instance decelerates to a halt over ~2 s and holds —
+   no creeping forward to pre-spend the gap to the next fix. On the next
+   moving fix it accelerates back to the blended speed and, if it has fallen
+   behind the projection, catches up gently (capped ~1.3× route speed) rather
+   than lurching. Buses near a baked stop's arc-length get the same easing so
+   stop dwells look intentional. Fallbacks, in order: no shape →
    ferry-style straight-line dead reckoning; no fix for > 3 min → fade the
    instance out. `y = sampleElevation(x, z) + lift`, per traffic.
 3. **Route badges.** One additional `InstancedMesh` of camera-facing quads,
@@ -302,8 +341,10 @@ missed polls, pick + entity + follow. Differences:
 3. Buses appear at real positions — spot-check three against a transit app
    (routes 29/44/43 pass through distinctive geography; screenshot one at a
    known intersection).
-4. Movement: 5-minute screen recording — buses follow street alignments
-   through turns, no teleports, no buses through buildings, stale buses fade.
+4. Movement: 5-minute screen recording judged against "What the user sees" —
+   buses follow street alignments through turns, motion is continuous across
+   poll boundaries, dwelling buses actually stand still and pull away again,
+   no teleports, no buses through buildings, stale buses fade.
 5. Badges legible at the default camera, gone when zoomed out, styled to the
    toy UI, one draw call (stats overlay).
 6. Click a bus → card with route, destination, next stops + ETAs, fleet
