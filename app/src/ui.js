@@ -32,6 +32,10 @@ export function createUI({ presets, onPreset, onQuality }) {
   const qualityLabel = document.createElement('label');
   qualityLabel.textContent = 'Quality';
   const qualitySelect = document.createElement('select');
+  const autoOption = document.createElement('option');
+  autoOption.value = 'auto';
+  autoOption.textContent = 'Auto';
+  qualitySelect.appendChild(autoOption);
   for (const [key, value] of Object.entries(QUALITY)) {
     const option = document.createElement('option');
     option.value = key;
