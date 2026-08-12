@@ -206,3 +206,78 @@ blender -b --python validate_380_brannan.py
 
 Blender 5.2.0 LTS, Pillow 11.3.0. The build script is deterministic; re-running it
 reproduces the same 7,832-triangle export.
+
+## 11. Stage 5 — local integration QA
+
+Verified locally on the dev server at `localhost:5433` (worktree
+`sf-worktrees/380-brannan`, branch `pipeline/380-brannan`).
+
+| Item | Result | Evidence |
+|---|---|---|
+| Re-validation before integrating | PASS | 16/16 contract checks on the shipped GLB |
+| GLB copied to `app/public/sf-assets/landmarks/` | PASS | byte-identical, 222,516 B, served 200 |
+| Manifest entry | PASS | 19 entries, valid JSON, served correctly |
+| id mapping `380-brannan` → `380Brannan` | PASS | `camelId()` round trip verified |
+| Case B registry entry | PASS | `pipeline/lib/landmarks.mjs`, parses, 25 landmarks |
+| **Loader merge** | **PASS** | `sf-assets: 380-brannan merged 13 objects / 11 materials -> batched (4496 tris body); uniform x1.0000 at 3826, -1175` |
+| **Scale factor** | **PASS — exactly 1.0000** | authored crest and `targetHeightM` agree |
+| Anchor placement | PASS | placed at 3826, -1175 = the surveyed anchor |
+| Orientation | PASS | front reads onto Brannan St at the real 45° heading (screenshot) |
+| Terrain seating | PASS | ground sampled at y 8.71 m vs LiDAR 8.31 m; no float, no sink |
+| Draw calls | PASS | 85, well under the 300 budget |
+| Streaming lifecycle | PASS | enters `loading` → `live` when the camera comes inside `loadRadius`; 19/19 live |
+| Fallback drill | PASS | with the GLB renamed the app still boots, 18 landmarks load, and exactly one warning appears: `sf-assets: 380-brannan failed to load (...)`. That is the documented streamed-asset path — `assets.js` deliberately emits a per-asset warning rather than the single-shot "keeping the code-built landmark" message used by resident assets. |
+| `npm run lint` | PASS | eslint clean |
+| `npm run build` | PASS | built in 3.92s; 3,182 tiles compressed 55.2 → 31.0 MB |
+| **Tile re-bake (Case B)** | **NOT DONE — outstanding** | see below |
+| Night sweep in-app | NOT VERIFIED | see below |
+
+### Exclusion radius — measured, not guessed
+
+The plan's §2.13 suggested `exclude: ~18`. That is **wrong for this site** and would
+have damaged the block. Decoding the baked buildings tiles (`22..24_12..14`,
+921 footprints) and simulating `excluded()` gives:
+
+| Radius | Footprints dropped |
+|---|---|
+| 9–12 m | **1** — `23_13 #102`, centroid 0.04 m from the anchor, topY 20.5 m: the correct target |
+| 15 m | 2 (eats neighbour #146, 13.3 m away) |
+| 18 m | 3 |
+| 35 m | 12 — a crater through the block |
+
+Shipped value: **`exclude: 9`**, the middle of the safe band. On a mid-block SoMa site
+a generous radius deletes the neighbours; Columbus Tower's 35 m works only because it
+stands on a corner.
+
+### Outstanding: the tile re-bake
+
+**This is the one thing the pipeline asks for that is not done, and the integration is
+not complete without it.** Baked footprint `23_13 #102` sits 0.04 m from the anchor at
+**20.5 m** tall — ~8 m taller than this 12.6 m asset — so until the tiles are re-baked
+the procedural box will poke through the GLB's roof.
+
+It was not run because `pipeline/data/` is absent from every checkout on this machine
+and the re-bake needs a full `npm run download` (hundreds of MB from DataSF, Overture
+and Overpass; Overpass was returning dispatcher timeouts throughout this session). A
+partially-completed bake writes into `app/public/tiles/`, so starting one that might
+fail halfway would have risked corrupting committed tiles for no verifiable gain.
+
+To finish:
+
+```
+cd pipeline && npm install && npm run download
+npm run buildings && npm run streets && npm run landcover && npm run validate && npm run toy
+node pipeline/audit.mjs      # check 1.6 must pass
+```
+
+Then commit only the changed files under `app/public/tiles/`.
+
+### Night state not verified in-app
+
+The Browser pane ran hidden for this session, which throttles `requestAnimationFrame`;
+the render loop only advanced when a screenshot forced a paint, so the streaming scan
+had to be driven manually and the tile cross-fade never settled enough to judge a
+day/night sweep honestly. The asset's own night render (`380-brannan-aerial-night.png`)
+shows the intended glow set — three lit upper windows and the canopy underside — and
+the loader reported the full 11-material set including both `_Glow` materials, but
+the in-app dusk sweep should be repeated with the pane visible.
