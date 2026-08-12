@@ -36,7 +36,20 @@ same treatment the ferries already got:
 - The optional-key discipline of AGENTS rule 4: without `MUNI_511_KEY` the
   endpoint answers `{ live: false }` and procedural/roaming vehicles stay
 
-Three things to check when that work starts:
+**Unverified — check this first.** That every Muni *mode* appears in the feed is
+an assumption, not a confirmed fact. Buses and Metro certainly do. The F line
+almost certainly does (third-party apps show live F-line vehicle positions on the
+route map). **Cable cars are unconfirmed** — SFMTA material refers to tracking
+"bus, train, streetcar or cable car," but nothing consulted confirms they are in
+511's SIRI feed, and 511's own SFMTA page does not list modes. One authenticated
+request with `agency=SF` settles it: read the distinct `LineRef` values and see
+which modes are present. Do that before designing anything around the feed.
+
+If a mode turns out to be missing, the model is still wanted — it just needs a
+different placement route (the whitelist option below). Nothing about the asset
+plans changes.
+
+Three further things to check when that work starts:
 
 - **The 60 requests/hour key limit is shared.** `api/ferries.mjs` budgets against
   it carefully (90 s memoisation, a per-hour timetable cap). A second agency

@@ -55,6 +55,13 @@ Muni routes are fixed to a mode, so **`LineRef` alone resolves the model**:
 Five buckets, matching SFMTA's own "Meet Our Fleet" page exactly. One GLB per
 bucket renders the feed faithfully with no guessing.
 
+(**Caveat, recorded honestly:** that every mode actually appears in the feed is
+unverified — buses and Metro certainly do, the F line almost certainly does,
+cable cars are unconfirmed. Settling it needs one authenticated request; see
+[INTEGRATION-LATER.md](./INTEGRATION-LATER.md). It does not change the model
+count either way: the five families are the five families, and a mode missing
+from the feed just needs a different placement route.)
+
 **What was cut, and why it can come back.** Earlier drafts split four of the
 families by sub-variant — 40 vs 60 foot, Powell vs California, PCC vs Milan — for
 nine GLBs. None of those are *mode* distinctions, so none are required. Each is
