@@ -9,10 +9,12 @@
 // only on low), terrain (30 m grid on medium/low), and the post target's MSAA
 // samples below.
 export const QUALITY = {
-  ultra: { label: 'Ultra', pixelRatio: 2, shadow: 4096, nearScale: 1.35, treeScale: 1.3, windows: 1, samples: 4 },
-  high: { label: 'High', pixelRatio: 1.5, shadow: 3072, nearScale: 1, treeScale: 1, windows: 1, samples: 4 },
-  medium: { label: 'Medium', pixelRatio: 1, shadow: 2048, nearScale: 0.75, treeScale: 0.7, windows: 1, samples: 2 },
-  low: { label: 'Low', pixelRatio: 0.85, shadow: 0, nearScale: 0.5, treeScale: 0.45, windows: 0, samples: 0 },
+  // poolScale/poolStrength: how far the streetlights' pools of light reach and
+  // how hard they hit. Pure overdraw at ground level, so `low` drops them.
+  ultra: { label: 'Ultra', pixelRatio: 2, shadow: 4096, nearScale: 1.35, treeScale: 1.3, windows: 1, samples: 4, poolScale: 1.35, poolStrength: 1 },
+  high: { label: 'High', pixelRatio: 1.5, shadow: 3072, nearScale: 1, treeScale: 1, windows: 1, samples: 4, poolScale: 1, poolStrength: 1 },
+  medium: { label: 'Medium', pixelRatio: 1, shadow: 2048, nearScale: 0.75, treeScale: 0.7, windows: 1, samples: 2, poolScale: 0.7, poolStrength: 0.9 },
+  low: { label: 'Low', pixelRatio: 0.85, shadow: 0, nearScale: 0.5, treeScale: 0.45, windows: 0, samples: 0, poolScale: 0, poolStrength: 0 },
 };
 export const QUALITY_LADDER = ['low', 'medium', 'high', 'ultra'];
 

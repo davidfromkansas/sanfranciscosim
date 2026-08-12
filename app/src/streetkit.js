@@ -29,6 +29,7 @@ import {
 } from 'three';
 import { createGLTFLoader } from './gltf.js';
 import { mergeGeometries } from 'three/addons/utils/BufferGeometryUtils.js';
+import { alignPoolToGround, createLampPoolGeometry, createLampPoolMaterial } from './materials.js';
 import { shared } from './env.js';
 import { tileUrl } from './data.js';
 import { ANCHOR_STRIDE, PIECES } from './streetplan.js';
@@ -42,6 +43,15 @@ const SHOP_CATEGORIES = new Set([4, 5, 6, 7, 15, 16, 17, 22, 24]);
 // Worst case per group, so a dense downtown group cannot blow the instance
 // budget on its own.
 const GROUP_LIMIT = 2400;
+// Which pieces light the road, and how wide their pool is. Only the lamps: a
+// signal head or a lit shelter is not what the street is lit by. Radii follow
+// the fixture — the Path of Gold standards on Market are taller and throw
+// wider than a residential pole.
+const POOL_RADIUS = {
+  sl_standard: 7.5,
+  sl_pathofgold: 9,
+  sl_residential: 6,
+};
 const CAPACITY = {
   sl_standard: 3000,
   sl_pathofgold: 400,
@@ -226,11 +236,19 @@ export function createStreetKitFleet(scene, kit, sampleElevation) {
 
   const bodyMaterial = new MeshLambertMaterial({ vertexColors: true });
   const glowMaterial = new MeshBasicMaterial({ vertexColors: true, transparent: true, opacity: 0.2 });
+  const poolMaterial = createLampPoolMaterial();
+  const poolGeometry = createLampPoolGeometry();
   const matrix = new Matrix4();
+  const poolMatrix = new Matrix4();
   const position = new Vector3();
   const quaternion = new Quaternion();
   const scale = new Vector3(1, 1, 1);
+  const poolScale = new Vector3(1, 1, 1);
+  const poolTilt = new Quaternion();
   const axis = new Vector3(0, 1, 0);
+  // The pool sits on the pavement the pole stands on: the kit contract puts a
+  // piece's origin at its base centre, so the anchor's own y is ground level.
+  const POOL_LIFT = 0.08;
 
   const types = kit.pieces.map((piece) => {
     const capacity = CAPACITY[piece.id] || 400;
@@ -251,7 +269,19 @@ export function createStreetKitFleet(scene, kit, sampleElevation) {
       glow.frustumCulled = false;
       root.add(glow);
     }
-    return { id: piece.id, capacity, body, glow, groups: new Map(), dirty: false, overflow: 0 };
+    let pool = null;
+    const poolRadius = POOL_RADIUS[piece.id] || 0;
+    if (poolRadius) {
+      pool = new InstancedMesh(poolGeometry, poolMaterial, capacity);
+      pool.instanceMatrix.setUsage(DynamicDrawUsage);
+      pool.name = `streetkit-${piece.id}-pool`;
+      pool.count = 0;
+      pool.visible = false;
+      pool.frustumCulled = false;
+      pool.renderOrder = 3; // after the road ribbon, so the wash lands on it
+      root.add(pool);
+    }
+    return { id: piece.id, capacity, body, glow, pool, poolRadius, groups: new Map(), dirty: false, overflow: 0 };
   });
 
   let instances = 0;
@@ -284,11 +314,18 @@ export function createStreetKitFleet(scene, kit, sampleElevation) {
   const LOW_KEEPS = new Set(['sl_standard', 'sl_pathofgold', 'sl_residential', 'traffic_signal']);
   const MEDIUM_DROPS = new Set(['newsboxes', 'planter', 'bikerack', 'trashcan']);
   let allowedId = () => true;
+  // The pools are ground-level overdraw, so the tier scales them down and
+  // `low` switches them off. `poolsLit` is the night gate, updated per frame.
+  let poolStrength = 1;
+  let poolsLit = false;
 
   function applyVisibility(type) {
     const on = type.body.count > 0 && allowedId(type.id);
     type.body.visible = on;
     if (type.glow) type.glow.visible = on;
+    // The pool follows its pole, but only while the night ramp has it lit and
+    // the tier is paying for pools at all.
+    if (type.pool) type.pool.visible = on && poolsLit;
   }
 
   function repack(type) {
@@ -299,6 +336,17 @@ export function createStreetKitFleet(scene, kit, sampleElevation) {
         matrix.fromArray(list, i);
         type.body.setMatrixAt(n, matrix);
         if (type.glow) type.glow.setMatrixAt(n, matrix);
+        if (type.pool) {
+          // On the ground under the pole: the pole's translation, tilted to the
+          // grade rather than the pole's own yaw (a disc has no yaw to inherit),
+          // scaled to the pool radius.
+          position.setFromMatrixPosition(matrix);
+          alignPoolToGround(poolTilt, position.x, position.z, sampleElevation);
+          position.y += POOL_LIFT;
+          poolScale.set(type.poolRadius, 1, type.poolRadius);
+          poolMatrix.compose(position, poolTilt, poolScale);
+          type.pool.setMatrixAt(n, poolMatrix);
+        }
         n++;
       }
     }
@@ -307,6 +355,10 @@ export function createStreetKitFleet(scene, kit, sampleElevation) {
     if (type.glow) {
       type.glow.count = n;
       type.glow.instanceMatrix.needsUpdate = true;
+    }
+    if (type.pool) {
+      type.pool.count = n;
+      type.pool.instanceMatrix.needsUpdate = true;
     }
     applyVisibility(type);
     return n;
@@ -325,6 +377,8 @@ export function createStreetKitFleet(scene, kit, sampleElevation) {
           : tier === 'medium'
             ? (id) => !MEDIUM_DROPS.has(id)
             : () => true;
+      poolStrength = tier === 'low' ? 0 : tier === 'medium' ? 0.9 : 1;
+      if (poolStrength === 0) poolsLit = false;
       for (const type of types) applyVisibility(type);
     },
     /** Adds one group's planned anchors. Returns how many pieces were placed. */
@@ -385,6 +439,14 @@ export function createStreetKitFleet(scene, kit, sampleElevation) {
       // Lamp heads, signal lenses and the shelter strip are the only lit
       // surfaces; they ignite on the same dusk curve as the landmark glows.
       glowMaterial.opacity = Math.min(1, 0.1 + shared.uNight.value * 0.95);
+      // The pools ignite on the same curve, but from nothing: an unlit lamp
+      // throws no light, so there is no daytime floor here.
+      poolMaterial.opacity = Math.min(1, shared.uNight.value * 1.1) * poolStrength;
+      const lit = shared.uNight.value > 0.08 && poolStrength > 0;
+      if (lit !== poolsLit) {
+        poolsLit = lit;
+        for (const type of types) applyVisibility(type);
+      }
     },
     get instances() {
       return instances;
@@ -394,6 +456,7 @@ export function createStreetKitFleet(scene, kit, sampleElevation) {
       for (const type of types) {
         if (type.body.visible) calls++;
         if (type.glow?.visible) calls++;
+        if (type.pool?.visible) calls++;
       }
       return calls;
     },
