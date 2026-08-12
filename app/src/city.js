@@ -33,7 +33,7 @@ import {
   createTreeMaterial,
 } from './materials.js';
 import { shared } from './env.js';
-import { tileUrl } from './data.js';
+import { fetchTileBin, tileUrl } from './data.js';
 import { catalogForWorker } from './kitplan.js';
 import { createKitLoader, loadKitIndex } from './kitassets.js';
 import { createKitFleet } from './kitfleet.js';
@@ -423,9 +423,7 @@ export function createCity(scene, data) {
     if (concurrent) return concurrent;
 
     const request = (async () => {
-      const res = await fetch(tileUrl(`${kind}/${cellKey}.bin`));
-      if (!res.ok) throw new Error(`${id}: ${res.status}`);
-      const buffer = await res.arrayBuffer();
+      const buffer = await fetchTileBin(`${kind}/${cellKey}.bin`);
       blobCache.set(id, buffer);
       stats.cellsLoaded++;
       return buffer;
