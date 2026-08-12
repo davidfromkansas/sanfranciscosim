@@ -1,0 +1,122 @@
+{
+  "input": "build/muni-lrv.glb",
+  "output": "shrunk/muni-lrv.glb",
+  "params": {
+    "weld_m": 0.001,
+    "degenerate_m2": 1e-06,
+    "dissolve_deg": 0.05
+  },
+  "before": {
+    "triangles": 3620,
+    "vertices": 7234,
+    "primitives": 19,
+    "objects": 3,
+    "bytes": 207992
+  },
+  "steps": {
+    "1_weld": {
+      "verts_removed": 4656,
+      "after": {
+        "triangles": 3616,
+        "vertices": 2578,
+        "primitives": 19,
+        "objects": 3
+      },
+      "guard": "per-vertex material-boundary guard; no weld can cross a _Glow boundary"
+    },
+    "2_degenerate_interior": {
+      "degenerate_faces_removed": 0,
+      "interior_faces_removed": 0,
+      "occluder_note": "sections are unions of solids with hosted flat detail, not closed manifolds; excluded from occluder duty by design (README Part 3 step 2)",
+      "after": {
+        "triangles": 3616,
+        "vertices": 2578,
+        "primitives": 19,
+        "objects": 3
+      }
+    },
+    "3_limited_dissolve": {
+      "angle_deg": 0.05,
+      "faces_merged": 1820,
+      "after": {
+        "triangles": 3522,
+        "vertices": 2496,
+        "primitives": 19,
+        "objects": 3
+      }
+    },
+    "4_curves": {
+      "changed": false,
+      "note": "wheels 8-gon, pantograph arms 5/6-gon, verified against near 15 m / far 120 m at 1.6x"
+    },
+    "5_join_by_material": {
+      "performed": false,
+      "note": "satisfied at authoring time: one primitive per material within each section. Materials are not joined ACROSS sections because the brief requires LRV_Section_A/B/Bellows to stay separable.",
+      "materials_spanning_sections": {
+        "Toy_ink": [
+          "LRV_Bellows",
+          "LRV_Section_A",
+          "LRV_Section_B"
+        ],
+        "Toy_white": [
+          "LRV_Section_A",
+          "LRV_Section_B"
+        ],
+        "Toy_lrvbody": [
+          "LRV_Section_A",
+          "LRV_Section_B"
+        ],
+        "Toy_steel": [
+          "LRV_Section_A",
+          "LRV_Section_B"
+        ],
+        "Toy_munired": [
+          "LRV_Section_A",
+          "LRV_Section_B"
+        ],
+        "Toy_glass": [
+          "LRV_Section_A",
+          "LRV_Section_B"
+        ],
+        "Toy_mustard_Glow": [
+          "LRV_Section_A",
+          "LRV_Section_B"
+        ],
+        "Toy_white_Glow": [
+          "LRV_Section_A",
+          "LRV_Section_B"
+        ],
+        "Toy_red_Glow": [
+          "LRV_Section_A",
+          "LRV_Section_B"
+        ]
+      }
+    },
+    "6_normals": {
+      "signed_volumes": {
+        "LRV_Bellows": 7.4019,
+        "LRV_Section_A": 107.925,
+        "LRV_Section_B": 127.9127
+      },
+      "all_positive": true
+    }
+  },
+  "after": {
+    "triangles": 3522,
+    "vertices": 2496,
+    "primitives": 19,
+    "objects": 3,
+    "bytes": 191464
+  },
+  "gates": {
+    "G1_materials_identical": true,
+    "G1_nodes_identical": true,
+    "G1_glow_intact": [
+      "Toy_mustard_Glow",
+      "Toy_red_Glow",
+      "Toy_white_Glow"
+    ],
+    "G5_primitives_not_increased": true,
+    "G6_smaller": true
+  }
+}

@@ -1,0 +1,6 @@
+# Reproducible intermediates — rebuild with ./shrink.sh
+build/
+shrunk/
+*.blend1
+# Regenerate with: node export_city_cell.mjs  (4.5 MB of baked-tile geometry)
+city-cell.json

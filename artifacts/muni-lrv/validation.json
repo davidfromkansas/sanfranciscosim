@@ -1,0 +1,321 @@
+{
+  "results": [
+    {
+      "file": "muni-lrv.glb",
+      "bytes": 96896,
+      "objects": 3,
+      "primitives": 19,
+      "triangles": 3522,
+      "triangle_budget": 5000,
+      "within_budget": true,
+      "dims_gltf_xyz": [
+        2.658,
+        4.7606,
+        22.86
+      ],
+      "bbox_min": [
+        -1.329,
+        0.0,
+        -11.43
+      ],
+      "bbox_max": [
+        1.329,
+        4.7606,
+        11.43
+      ],
+      "min_y": 0.0,
+      "min_y_ok": true,
+      "centre_offset_xz": [
+        0.0,
+        0.0
+      ],
+      "centre_ok": true,
+      "orientation": {
+        "long_axis": "Z",
+        "long_axis_is_z": true,
+        "front": "-Z",
+        "double_ended": true,
+        "note": "Double-ended (REFERENCE.md \u00a73): both ends are cabs, so the silhouette is symmetric about Z. `front = -Z` is satisfied by either end; the check that matters is that the 22.86 m axis is Z."
+      },
+      "straightness": {
+        "section_centroids": {
+          "LRV_Bellows": [
+            0.0,
+            1.86166,
+            0.0
+          ],
+          "LRV_Section_A": [
+            0.00171,
+            2.08152,
+            -8.00986
+          ],
+          "LRV_Section_B": [
+            0.00027,
+            1.98021,
+            8.08945
+          ]
+        },
+        "lateral_offset_m": 0.00144,
+        "straight": true,
+        "symmetric_about_joint_m": 0.0796
+      },
+      "section_nodes_present": [
+        "LRV_Bellows",
+        "LRV_Section_A",
+        "LRV_Section_B"
+      ],
+      "section_nodes_ok": true,
+      "node_names": [
+        "LRV_Bellows",
+        "LRV_Section_A",
+        "LRV_Section_B"
+      ],
+      "materials": [
+        "Toy_glass",
+        "Toy_ink",
+        "Toy_lrvbody",
+        "Toy_munired",
+        "Toy_mustard_Glow",
+        "Toy_red_Glow",
+        "Toy_steel",
+        "Toy_white",
+        "Toy_white_Glow"
+      ],
+      "all_toy_prefixed": true,
+      "toy_body_absent": true,
+      "glow_materials": [
+        "Toy_mustard_Glow",
+        "Toy_red_Glow",
+        "Toy_white_Glow"
+      ],
+      "images": 0,
+      "cameras": 0,
+      "lights": 0,
+      "armatures": 0,
+      "animations": 0,
+      "shape_keys": 0,
+      "unapplied_transforms": [],
+      "negative_scales": [],
+      "per_object": [
+        {
+          "name": "LRV_Bellows",
+          "tris": 72,
+          "verts": 144,
+          "materials": [
+            "Toy_ink"
+          ],
+          "signed_volume": 7.4019,
+          "signed_volume_positive": true,
+          "bbox_min": [
+            -1.205,
+            0.3,
+            -0.3
+          ],
+          "bbox_max": [
+            1.205,
+            3.34,
+            0.3
+          ]
+        },
+        {
+          "name": "LRV_Section_A",
+          "tris": 1764,
+          "verts": 3270,
+          "materials": [
+            "Toy_white",
+            "Toy_lrvbody",
+            "Toy_steel",
+            "Toy_munired",
+            "Toy_ink",
+            "Toy_glass",
+            "Toy_mustard_Glow",
+            "Toy_white_Glow",
+            "Toy_red_Glow"
+          ],
+          "signed_volume": 107.925,
+          "signed_volume_positive": true,
+          "bbox_min": [
+            -1.329,
+            0.0,
+            -11.43
+          ],
+          "bbox_max": [
+            1.329,
+            4.7606,
+            -0.3
+          ]
+        },
+        {
+          "name": "LRV_Section_B",
+          "tris": 1686,
+          "verts": 3122,
+          "materials": [
+            "Toy_white",
+            "Toy_lrvbody",
+            "Toy_steel",
+            "Toy_munired",
+            "Toy_ink",
+            "Toy_glass",
+            "Toy_mustard_Glow",
+            "Toy_white_Glow",
+            "Toy_red_Glow"
+          ],
+          "signed_volume": 127.9127,
+          "signed_volume_positive": true,
+          "bbox_min": [
+            -1.329,
+            0.0,
+            0.3
+          ],
+          "bbox_max": [
+            1.329,
+            3.468,
+            11.43
+          ]
+        }
+      ],
+      "per_material": [
+        {
+          "name": "Toy_glass",
+          "glow": false,
+          "prefixed": true,
+          "textures": 0,
+          "base_color": [
+            0.0194,
+            0.0513,
+            0.1119
+          ],
+          "emission_strength": 0.0,
+          "alpha": 1.0,
+          "metallic": 0.0,
+          "roughness": 0.85
+        },
+        {
+          "name": "Toy_ink",
+          "glow": false,
+          "prefixed": true,
+          "textures": 0,
+          "base_color": [
+            0.0273,
+            0.0242,
+            0.0212
+          ],
+          "emission_strength": 0.0,
+          "alpha": 1.0,
+          "metallic": 0.0,
+          "roughness": 0.85
+        },
+        {
+          "name": "Toy_lrvbody",
+          "glow": false,
+          "prefixed": true,
+          "textures": 0,
+          "base_color": [
+            0.7157,
+            0.7157,
+            0.6867
+          ],
+          "emission_strength": 0.0,
+          "alpha": 1.0,
+          "metallic": 0.0,
+          "roughness": 0.85
+        },
+        {
+          "name": "Toy_munired",
+          "glow": false,
+          "prefixed": true,
+          "textures": 0,
+          "base_color": [
+            0.5333,
+            0.0203,
+            0.0262
+          ],
+          "emission_strength": 0.0,
+          "alpha": 1.0,
+          "metallic": 0.0,
+          "roughness": 0.85
+        },
+        {
+          "name": "Toy_mustard_Glow",
+          "glow": true,
+          "prefixed": true,
+          "textures": 0,
+          "base_color": [
+            0.6939,
+            0.3712,
+            0.0529
+          ],
+          "emission_strength": 0.0,
+          "alpha": 1.0,
+          "metallic": 0.0,
+          "roughness": 0.85
+        },
+        {
+          "name": "Toy_red_Glow",
+          "glow": true,
+          "prefixed": true,
+          "textures": 0,
+          "base_color": [
+            0.552,
+            0.0595,
+            0.0452
+          ],
+          "emission_strength": 0.0,
+          "alpha": 1.0,
+          "metallic": 0.0,
+          "roughness": 0.85
+        },
+        {
+          "name": "Toy_steel",
+          "glow": false,
+          "prefixed": true,
+          "textures": 0,
+          "base_color": [
+            0.3231,
+            0.3515,
+            0.3813
+          ],
+          "emission_strength": 0.0,
+          "alpha": 1.0,
+          "metallic": 0.0,
+          "roughness": 0.85
+        },
+        {
+          "name": "Toy_white",
+          "glow": false,
+          "prefixed": true,
+          "textures": 0,
+          "base_color": [
+            0.8879,
+            0.8632,
+            0.807
+          ],
+          "emission_strength": 0.0,
+          "alpha": 1.0,
+          "metallic": 0.0,
+          "roughness": 0.85
+        },
+        {
+          "name": "Toy_white_Glow",
+          "glow": true,
+          "prefixed": true,
+          "textures": 0,
+          "base_color": [
+            0.9301,
+            0.9047,
+            0.8388
+          ],
+          "emission_strength": 0.0,
+          "alpha": 1.0,
+          "metallic": 0.0,
+          "roughness": 0.85
+        }
+      ],
+      "all_volumes_positive": true,
+      "no_textures": true,
+      "no_transparency": true,
+      "emission_zero": true,
+      "PASS": true
+    }
+  ]
+}
