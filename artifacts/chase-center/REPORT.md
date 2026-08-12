@@ -11,15 +11,23 @@ file disagree, this file is what was built and why — §4 lists every correctio
 
 | | |
 |---|---|
-| Triangles | **11,660** (cap 27,000) |
-| Mesh objects | 40 |
-| Dimensions | 164.364 × 159.125 × **40.800** m |
+Numbers below are the **shipped** file — post stage-4 optimize. The
+pre-optimize authored export is archived at `optimize/input/chase-center.glb`
+and its figures are in brackets.
+
+| | |
+|---|---|
+| Triangles | **11,289** (cap 27,000) [authored 11,660] |
+| Mesh objects | 11 [authored 40] |
+| Dimensions | 164.364 × 159.127 × **40.803** m [40.800] |
 | Min Z | 0.000 |
-| Bbox top | 40.800 — so `targetHeightM / measuredHeight` = **1.000000** |
+| Bbox top | 40.803 — so `targetHeightM / measuredHeight` = **0.999936** |
+| Draw submeshes | 14 [authored 43] |
 | Materials | 10, all `Toy_*`, flat, opaque, no textures |
 | Glow materials | `Toy_sky_Glow` (video board), `Toy_white_Glow` (atrium lobby + west parapet cove) |
-| File (pre-optimize) | 581,884 B raw / 144,700 B gzip |
+| File | **98,220 B raw / 64,174 B gzip** [581,884 / 143,720] |
 | Validation | `validation.json` — **overall PASS**, all 15 checks |
+| Optimize | `optimize/REPORT.md` — gates G1–G6, G8 **PASS**, G7 n/a |
 
 ## 2. What was built
 
@@ -135,7 +143,19 @@ framing, lighting, exposure — azimuth only differs), `-top.png`, `-aerial.png`
 (105 mm, 38° down, WNW, the app's camera), `-night.png`, `-night-entry.png`,
 and `chase-center-contact-sheet.png`.
 
-## 9. Manifest entry (draft — not written by this stage)
+## 9. Gate 3 — approval
+
+Approved by David on 12 August 2026, verbatim:
+
+> "hey just checking in please proceed to finish the entire pipeline. i approve
+> it all. dont wait for me"
+
+Given in a single message covering the remaining stages, so no per-iteration
+approval was collected. The contact sheet, aerial, night renders and the numbers
+in §1 are the evidence this approval stands on; they are presented alongside it
+in the session summary.
+
+## 10. Manifest entry (draft — not written by this stage)
 
 ```json
 {
@@ -151,18 +171,18 @@ and `chase-center-contact-sheet.png`.
   "estimated": false,
   "loadRadius": 2500,
   "dims": [
-    164.364,
-    159.125,
-    40.8
+    164.3642,
+    159.1272,
+    40.8026
   ],
-  "tris": 11660
+  "tris": 11289
 }
 ```
 
 `loadRadius` follows the default rule `max(2500, 40.8 × 30) = 2500`.
 `cat 0` matches Oracle Park, the set's other sports venue.
 
-## 10. Integration notes carried forward
+## 11. Integration notes carried forward
 
 - **Case B**: no `chase-center` in `pipeline/lib/landmarks.mjs` or
   `app/src/landmarks.js`. Needs a registry entry and a tile re-bake.

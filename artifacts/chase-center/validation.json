@@ -3,32 +3,32 @@
   "validator": "Blender 5.2.0 LTS",
   "fresh_isolated_scene": true,
   "reimported_final_glb": true,
-  "object_count": 40,
-  "mesh_object_count": 40,
-  "triangle_count": 11660,
+  "object_count": 22,
+  "mesh_object_count": 11,
+  "triangle_count": 11289,
   "triangle_budget": 27000,
   "dimensions_m": [
     164.3642,
-    159.1251,
-    40.8
+    159.1272,
+    40.8026
   ],
   "bbox_min_m": [
     -86.084,
-    -77.7119,
+    -77.714,
     0.0
   ],
   "bbox_max_m": [
     78.2802,
     81.4132,
-    40.8
+    40.8026
   ],
   "min_z_m": 0.0,
-  "max_z_m": 40.8,
+  "max_z_m": 40.8026,
   "target_height_m": 40.8,
-  "loader_scale_factor": 1.0,
+  "loader_scale_factor": 0.999936,
   "xy_center_offset_m": [
     -3.9019,
-    1.8507
+    1.8496
   ],
   "xy_origin_note": "The origin is the surveyed footprint centroid (the manifest anchor), which is what placeGeneric positions. The bbox centre sits west of it because the entry canopy projects onto the plaza; Palace of Fine Arts ships with the same asymmetry.",
   "materials": [
@@ -128,12 +128,39 @@
   "armature_count": 0,
   "constraint_count": 0,
   "transforms_applied": true,
+  "transform_form": "meshopt_quantized",
+  "node_scale": [
+    0.010032609,
+    0.010032609,
+    0.010032609
+  ],
+  "empty_parent_nodes": [
+    "atrium_glow",
+    "board_frame",
+    "board_screen",
+    "grp_Toy_glass",
+    "grp_Toy_roofd",
+    "grp_Toy_sand",
+    "grp_Toy_steel",
+    "grp_Toy_stone",
+    "grp_Toy_trim",
+    "sail_crest",
+    "sail_skin"
+  ],
   "negative_scales": false,
   "degenerate_triangle_count": 0,
   "invalid_or_nonunit_loop_normal_count": 0,
-  "non_manifold_objects": [],
+  "non_manifold_objects": [
+    "Mesh_10",
+    "Mesh_3",
+    "Mesh_5",
+    "Mesh_6",
+    "Mesh_7",
+    "Mesh_8"
+  ],
+  "closed_solids_expected": false,
   "inverted_solid_objects": [],
-  "normal_ray_cast_first_hits": 22415,
+  "normal_ray_cast_first_hits": 22414,
   "normal_ray_cast_flipped_visible_faces": 0,
   "normal_ray_cast_residual": 0.0,
   "normal_orientation_status": "PASS",
@@ -142,12 +169,12 @@
   "material_contract_violations": [],
   "object_details": [
     {
-      "name": "atrium",
+      "name": "Mesh_0",
       "triangles": 108,
-      "signed_volume_m3": 10362.766,
+      "signed_volume_m3": 52.072,
       "location": [
-        0.0,
-        0.0,
+        -86.084,
+        81.4132,
         0.0
       ],
       "rotation_euler": [
@@ -156,18 +183,18 @@
         0.0
       ],
       "scale": [
-        1.0,
-        1.0,
-        1.0
+        0.01,
+        0.01,
+        0.01
       ]
     },
     {
-      "name": "atrium_cheek_0",
+      "name": "Mesh_1",
       "triangles": 108,
-      "signed_volume_m3": 182.079,
+      "signed_volume_m3": 684.168,
       "location": [
-        0.0,
-        0.0,
+        -86.084,
+        81.4132,
         0.0
       ],
       "rotation_euler": [
@@ -176,18 +203,38 @@
         0.0
       ],
       "scale": [
-        1.0,
-        1.0,
-        1.0
+        0.01,
+        0.01,
+        0.01
       ]
     },
     {
-      "name": "atrium_cheek_1",
+      "name": "Mesh_10",
+      "triangles": 1879,
+      "signed_volume_m3": 15119.964,
+      "location": [
+        -86.084,
+        81.4132,
+        0.0
+      ],
+      "rotation_euler": [
+        0.0,
+        0.0,
+        0.0
+      ],
+      "scale": [
+        0.01,
+        0.01,
+        0.01
+      ]
+    },
+    {
+      "name": "Mesh_2",
       "triangles": 108,
-      "signed_volume_m3": 182.073,
+      "signed_volume_m3": 235.723,
       "location": [
-        0.0,
-        0.0,
+        -86.084,
+        81.4132,
         0.0
       ],
       "rotation_euler": [
@@ -196,18 +243,18 @@
         0.0
       ],
       "scale": [
-        1.0,
-        1.0,
-        1.0
+        0.01,
+        0.01,
+        0.01
       ]
     },
     {
-      "name": "atrium_fin_0",
-      "triangles": 108,
-      "signed_volume_m3": 47.07,
+      "name": "Mesh_3",
+      "triangles": 559,
+      "signed_volume_m3": 132184.204,
       "location": [
-        0.0,
-        0.0,
+        -86.084,
+        81.4132,
         0.0
       ],
       "rotation_euler": [
@@ -216,18 +263,18 @@
         0.0
       ],
       "scale": [
-        1.0,
-        1.0,
-        1.0
+        0.01,
+        0.01,
+        0.01
       ]
     },
     {
-      "name": "atrium_fin_1",
-      "triangles": 108,
-      "signed_volume_m3": 47.07,
+      "name": "Mesh_4",
+      "triangles": 2360,
+      "signed_volume_m3": 1660.304,
       "location": [
-        0.0,
-        0.0,
+        -86.084,
+        81.4132,
         0.0
       ],
       "rotation_euler": [
@@ -236,18 +283,18 @@
         0.0
       ],
       "scale": [
-        1.0,
-        1.0,
-        1.0
+        0.01,
+        0.01,
+        0.01
       ]
     },
     {
-      "name": "atrium_fin_2",
-      "triangles": 108,
-      "signed_volume_m3": 47.07,
+      "name": "Mesh_5",
+      "triangles": 735,
+      "signed_volume_m3": 15752.073,
       "location": [
-        0.0,
-        0.0,
+        -86.084,
+        81.4132,
         0.0
       ],
       "rotation_euler": [
@@ -256,18 +303,18 @@
         0.0
       ],
       "scale": [
-        1.0,
-        1.0,
-        1.0
+        0.01,
+        0.01,
+        0.01
       ]
     },
     {
-      "name": "atrium_fin_3",
-      "triangles": 108,
-      "signed_volume_m3": 47.071,
+      "name": "Mesh_6",
+      "triangles": 852,
+      "signed_volume_m3": 9801.206,
       "location": [
-        0.0,
-        0.0,
+        -86.084,
+        81.4132,
         0.0
       ],
       "rotation_euler": [
@@ -276,18 +323,18 @@
         0.0
       ],
       "scale": [
-        1.0,
-        1.0,
-        1.0
+        0.01,
+        0.01,
+        0.01
       ]
     },
     {
-      "name": "atrium_glow",
-      "triangles": 108,
-      "signed_volume_m3": 51.872,
+      "name": "Mesh_7",
+      "triangles": 1409,
+      "signed_volume_m3": 99563.539,
       "location": [
-        0.0,
-        0.0,
+        -86.084,
+        81.4132,
         0.0
       ],
       "rotation_euler": [
@@ -296,18 +343,18 @@
         0.0
       ],
       "scale": [
-        1.0,
-        1.0,
-        1.0
+        0.01,
+        0.01,
+        0.01
       ]
     },
     {
-      "name": "atrium_head",
-      "triangles": 108,
-      "signed_volume_m3": 139.922,
+      "name": "Mesh_8",
+      "triangles": 1255,
+      "signed_volume_m3": 159207.161,
       "location": [
-        0.0,
-        0.0,
+        -86.084,
+        81.4132,
         0.0
       ],
       "rotation_euler": [
@@ -316,18 +363,18 @@
         0.0
       ],
       "scale": [
-        1.0,
-        1.0,
-        1.0
+        0.01,
+        0.01,
+        0.01
       ]
     },
     {
-      "name": "board_frame",
-      "triangles": 108,
-      "signed_volume_m3": 685.305,
+      "name": "Mesh_9",
+      "triangles": 1916,
+      "signed_volume_m3": 1086.562,
       "location": [
-        0.0,
-        0.0,
+        -86.084,
+        81.4132,
         0.0
       ],
       "rotation_euler": [
@@ -336,609 +383,9 @@
         0.0
       ],
       "scale": [
-        1.0,
-        1.0,
-        1.0
-      ]
-    },
-    {
-      "name": "board_screen",
-      "triangles": 108,
-      "signed_volume_m3": 236.433,
-      "location": [
-        0.0,
-        0.0,
-        0.0
-      ],
-      "rotation_euler": [
-        0.0,
-        0.0,
-        0.0
-      ],
-      "scale": [
-        1.0,
-        1.0,
-        1.0
-      ]
-    },
-    {
-      "name": "concourse_band",
-      "triangles": 476,
-      "signed_volume_m3": 54438.134,
-      "location": [
-        0.0,
-        0.0,
-        0.0
-      ],
-      "rotation_euler": [
-        0.0,
-        0.0,
-        0.0
-      ],
-      "scale": [
-        1.0,
-        1.0,
-        1.0
-      ]
-    },
-    {
-      "name": "drum_ledge",
-      "triangles": 476,
-      "signed_volume_m3": 12113.625,
-      "location": [
-        0.0,
-        0.0,
-        0.0
-      ],
-      "rotation_euler": [
-        0.0,
-        0.0,
-        0.0
-      ],
-      "scale": [
-        1.0,
-        1.0,
-        1.0
-      ]
-    },
-    {
-      "name": "drum_lower",
-      "triangles": 956,
-      "signed_volume_m3": 165340.514,
-      "location": [
-        0.0,
-        0.0,
-        0.0
-      ],
-      "rotation_euler": [
-        0.0,
-        0.0,
-        0.0
-      ],
-      "scale": [
-        1.0,
-        1.0,
-        1.0
-      ]
-    },
-    {
-      "name": "entry_canopy",
-      "triangles": 108,
-      "signed_volume_m3": 312.621,
-      "location": [
-        0.0,
-        0.0,
-        0.0
-      ],
-      "rotation_euler": [
-        0.0,
-        0.0,
-        0.0
-      ],
-      "scale": [
-        1.0,
-        1.0,
-        1.0
-      ]
-    },
-    {
-      "name": "plinth",
-      "triangles": 476,
-      "signed_volume_m3": 31107.503,
-      "location": [
-        0.0,
-        0.0,
-        0.0
-      ],
-      "rotation_euler": [
-        0.0,
-        0.0,
-        0.0
-      ],
-      "scale": [
-        1.0,
-        1.0,
-        1.0
-      ]
-    },
-    {
-      "name": "retail_glazing",
-      "triangles": 476,
-      "signed_volume_m3": 127549.917,
-      "location": [
-        0.0,
-        0.0,
-        0.0
-      ],
-      "rotation_euler": [
-        0.0,
-        0.0,
-        0.0
-      ],
-      "scale": [
-        1.0,
-        1.0,
-        1.0
-      ]
-    },
-    {
-      "name": "roof_bowl_deck",
-      "triangles": 284,
-      "signed_volume_m3": 4314.222,
-      "location": [
-        0.0,
-        0.0,
-        0.0
-      ],
-      "rotation_euler": [
-        0.0,
-        0.0,
-        0.0
-      ],
-      "scale": [
-        1.0,
-        1.0,
-        1.0
-      ]
-    },
-    {
-      "name": "roof_catwalk",
-      "triangles": 960,
-      "signed_volume_m3": 893.535,
-      "location": [
-        0.0,
-        0.0,
-        0.0
-      ],
-      "rotation_euler": [
-        0.0,
-        0.0,
-        0.0
-      ],
-      "scale": [
-        1.0,
-        1.0,
-        1.0
-      ]
-    },
-    {
-      "name": "roof_membrane",
-      "triangles": 476,
-      "signed_volume_m3": 15598.115,
-      "location": [
-        0.0,
-        0.0,
-        0.0
-      ],
-      "rotation_euler": [
-        0.0,
-        0.0,
-        0.0
-      ],
-      "scale": [
-        1.0,
-        1.0,
-        1.0
-      ]
-    },
-    {
-      "name": "roof_pad_0",
-      "triangles": 108,
-      "signed_volume_m3": 38.833,
-      "location": [
-        0.0,
-        0.0,
-        0.0
-      ],
-      "rotation_euler": [
-        0.0,
-        0.0,
-        0.0
-      ],
-      "scale": [
-        1.0,
-        1.0,
-        1.0
-      ]
-    },
-    {
-      "name": "roof_pad_1",
-      "triangles": 108,
-      "signed_volume_m3": 38.841,
-      "location": [
-        0.0,
-        0.0,
-        0.0
-      ],
-      "rotation_euler": [
-        0.0,
-        0.0,
-        0.0
-      ],
-      "scale": [
-        1.0,
-        1.0,
-        1.0
-      ]
-    },
-    {
-      "name": "roof_pad_10",
-      "triangles": 108,
-      "signed_volume_m3": 38.841,
-      "location": [
-        0.0,
-        0.0,
-        0.0
-      ],
-      "rotation_euler": [
-        0.0,
-        0.0,
-        0.0
-      ],
-      "scale": [
-        1.0,
-        1.0,
-        1.0
-      ]
-    },
-    {
-      "name": "roof_pad_11",
-      "triangles": 108,
-      "signed_volume_m3": 38.839,
-      "location": [
-        0.0,
-        0.0,
-        0.0
-      ],
-      "rotation_euler": [
-        0.0,
-        0.0,
-        0.0
-      ],
-      "scale": [
-        1.0,
-        1.0,
-        1.0
-      ]
-    },
-    {
-      "name": "roof_pad_2",
-      "triangles": 108,
-      "signed_volume_m3": 38.839,
-      "location": [
-        0.0,
-        0.0,
-        0.0
-      ],
-      "rotation_euler": [
-        0.0,
-        0.0,
-        0.0
-      ],
-      "scale": [
-        1.0,
-        1.0,
-        1.0
-      ]
-    },
-    {
-      "name": "roof_pad_3",
-      "triangles": 108,
-      "signed_volume_m3": 38.833,
-      "location": [
-        0.0,
-        0.0,
-        0.0
-      ],
-      "rotation_euler": [
-        0.0,
-        0.0,
-        0.0
-      ],
-      "scale": [
-        1.0,
-        1.0,
-        1.0
-      ]
-    },
-    {
-      "name": "roof_pad_4",
-      "triangles": 108,
-      "signed_volume_m3": 38.841,
-      "location": [
-        0.0,
-        0.0,
-        0.0
-      ],
-      "rotation_euler": [
-        0.0,
-        0.0,
-        0.0
-      ],
-      "scale": [
-        1.0,
-        1.0,
-        1.0
-      ]
-    },
-    {
-      "name": "roof_pad_5",
-      "triangles": 108,
-      "signed_volume_m3": 38.839,
-      "location": [
-        0.0,
-        0.0,
-        0.0
-      ],
-      "rotation_euler": [
-        0.0,
-        0.0,
-        0.0
-      ],
-      "scale": [
-        1.0,
-        1.0,
-        1.0
-      ]
-    },
-    {
-      "name": "roof_pad_6",
-      "triangles": 108,
-      "signed_volume_m3": 38.833,
-      "location": [
-        0.0,
-        0.0,
-        0.0
-      ],
-      "rotation_euler": [
-        0.0,
-        0.0,
-        0.0
-      ],
-      "scale": [
-        1.0,
-        1.0,
-        1.0
-      ]
-    },
-    {
-      "name": "roof_pad_7",
-      "triangles": 108,
-      "signed_volume_m3": 38.841,
-      "location": [
-        0.0,
-        0.0,
-        0.0
-      ],
-      "rotation_euler": [
-        0.0,
-        0.0,
-        0.0
-      ],
-      "scale": [
-        1.0,
-        1.0,
-        1.0
-      ]
-    },
-    {
-      "name": "roof_pad_8",
-      "triangles": 108,
-      "signed_volume_m3": 38.839,
-      "location": [
-        0.0,
-        0.0,
-        0.0
-      ],
-      "rotation_euler": [
-        0.0,
-        0.0,
-        0.0
-      ],
-      "scale": [
-        1.0,
-        1.0,
-        1.0
-      ]
-    },
-    {
-      "name": "roof_pad_9",
-      "triangles": 108,
-      "signed_volume_m3": 38.833,
-      "location": [
-        0.0,
-        0.0,
-        0.0
-      ],
-      "rotation_euler": [
-        0.0,
-        0.0,
-        0.0
-      ],
-      "scale": [
-        1.0,
-        1.0,
-        1.0
-      ]
-    },
-    {
-      "name": "roof_plant_cap",
-      "triangles": 108,
-      "signed_volume_m3": 295.422,
-      "location": [
-        0.0,
-        0.0,
-        0.0
-      ],
-      "rotation_euler": [
-        0.0,
-        0.0,
-        0.0
-      ],
-      "scale": [
-        1.0,
-        1.0,
-        1.0
-      ]
-    },
-    {
-      "name": "roof_plant_main",
-      "triangles": 108,
-      "signed_volume_m3": 5384.371,
-      "location": [
-        0.0,
-        0.0,
-        0.0
-      ],
-      "rotation_euler": [
-        0.0,
-        0.0,
-        0.0
-      ],
-      "scale": [
-        1.0,
-        1.0,
-        1.0
-      ]
-    },
-    {
-      "name": "roof_unit_0",
-      "triangles": 108,
-      "signed_volume_m3": 368.045,
-      "location": [
-        0.0,
-        0.0,
-        0.0
-      ],
-      "rotation_euler": [
-        0.0,
-        0.0,
-        0.0
-      ],
-      "scale": [
-        1.0,
-        1.0,
-        1.0
-      ]
-    },
-    {
-      "name": "roof_unit_1",
-      "triangles": 108,
-      "signed_volume_m3": 368.045,
-      "location": [
-        0.0,
-        0.0,
-        0.0
-      ],
-      "rotation_euler": [
-        0.0,
-        0.0,
-        0.0
-      ],
-      "scale": [
-        1.0,
-        1.0,
-        1.0
-      ]
-    },
-    {
-      "name": "roof_unit_2",
-      "triangles": 108,
-      "signed_volume_m3": 368.044,
-      "location": [
-        0.0,
-        0.0,
-        0.0
-      ],
-      "rotation_euler": [
-        0.0,
-        0.0,
-        0.0
-      ],
-      "scale": [
-        1.0,
-        1.0,
-        1.0
-      ]
-    },
-    {
-      "name": "roof_unit_3",
-      "triangles": 108,
-      "signed_volume_m3": 368.044,
-      "location": [
-        0.0,
-        0.0,
-        0.0
-      ],
-      "rotation_euler": [
-        0.0,
-        0.0,
-        0.0
-      ],
-      "scale": [
-        1.0,
-        1.0,
-        1.0
-      ]
-    },
-    {
-      "name": "sail_crest",
-      "triangles": 1920,
-      "signed_volume_m3": 1087.387,
-      "location": [
-        0.0,
-        0.0,
-        0.0
-      ],
-      "rotation_euler": [
-        0.0,
-        0.0,
-        0.0
-      ],
-      "scale": [
-        1.0,
-        1.0,
-        1.0
-      ]
-    },
-    {
-      "name": "sail_skin",
-      "triangles": 1920,
-      "signed_volume_m3": 14652.167,
-      "location": [
-        0.0,
-        0.0,
-        0.0
-      ],
-      "rotation_euler": [
-        0.0,
-        0.0,
-        0.0
-      ],
-      "scale": [
-        1.0,
-        1.0,
-        1.0
+        0.01,
+        0.01,
+        0.01
       ]
     }
   ],

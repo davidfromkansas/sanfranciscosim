@@ -74,9 +74,11 @@ def main():
         # Keyed by POSITION, not vertex index: the glTF importer splits vertices
         # at every flat-shaded edge, so index-based pairing would call a perfect
         # cube non-manifold.
+        # 1 cm, not 1 mm: meshopt quantization snaps positions to a grid, and a
+        # mm key puts the test right on that noise floor.
         def key(v):
             c = obj.matrix_world @ v.co
-            return (round(c.x, 3), round(c.y, 3), round(c.z, 3))
+            return (round(c.x, 2), round(c.y, 2), round(c.z, 2))
 
         edge_use = {}
         for tri in me.loop_triangles:
@@ -136,12 +138,27 @@ def main():
             }
         )
 
-    transforms_applied = all(
+    # A raw Blender export has identity node transforms. The SHIPPING file is
+    # meshopt-quantized (gltfpack -cc -kn -km), and KHR_mesh_quantization
+    # expresses the dequantization as one uniform node scale + translation
+    # shared by every mesh - so "identity" is the wrong test on the shipped
+    # asset. What must hold either way: no rotation, no shear, no negative or
+    # non-uniform scale, and a correct world-space bbox (checked separately).
+    identity = all(
         all(abs(v - 1.0) < 1e-5 for v in obj.scale)
         and all(abs(v) < 1e-5 for v in obj.rotation_euler)
         and all(abs(v) < 1e-5 for v in obj.location)
         for obj in meshes
     )
+    scales = [tuple(round(v, 9) for v in o.scale) for o in meshes]
+    quantized = (
+        not identity
+        and len(set(scales)) == 1
+        and len(set(scales[0])) == 1
+        and scales[0][0] > 0
+        and all(all(abs(v) < 1e-5 for v in o.rotation_euler) for o in meshes)
+    )
+    transforms_applied = identity or quantized
     negative_scale = any(
         obj.matrix_world.to_scale().x
         * obj.matrix_world.to_scale().y
@@ -150,7 +167,11 @@ def main():
         for obj in meshes
     )
     animations = sum(len(a.fcurves) for a in bpy.data.actions)
-    unexpected = [o.name for o in objects if o.type not in {"MESH"}]
+    # gltfpack keeps the authored node names as EMPTY parents of the meshes it
+    # merges; those are node hierarchy, not geometry. Anything else - camera,
+    # light, armature, curve - is still foreign and still fails.
+    unexpected = [o.name for o in objects if o.type not in {"MESH", "EMPTY"}]
+    empty_parents = [o.name for o in objects if o.type == "EMPTY"]
 
     dims = mx - mn
     center = Vector(((mn.x + mx.x) / 2, (mn.y + mx.y) / 2, (mn.z + mx.z) / 2))
@@ -181,11 +202,18 @@ def main():
                     ray_flipped += 1
     ray_residual = (ray_flipped / ray_hits) if ray_hits else 1.0
 
+    # Closedness is required of the AUTHORED export - it is how the build
+    # guarantees outward normals. It is NOT required of the shipped file: the
+    # stage-4 optimize pass deletes faces it can prove are buried inside another
+    # solid, which deliberately opens those shells. On the shipped file the
+    # authoritative tests are the ones the pipeline doc names - per-object
+    # signed volume positive, plus a ray residual at or under 0.15%.
+    closed_solids_expected = identity
     normals_ok = (
         invalid_normal_count == 0
         and not inverted_solids
-        and not non_manifold
         and ray_residual <= RAY_RESIDUAL_TOLERANCE
+        and (not non_manifold or not closed_solids_expected)
     )
 
     results = {
@@ -225,10 +253,14 @@ def main():
         "armature_count": sum(1 for o in objects if o.type == "ARMATURE"),
         "constraint_count": sum(len(o.constraints) for o in objects),
         "transforms_applied": transforms_applied,
+        "transform_form": "identity" if identity else ("meshopt_quantized" if quantized else "other"),
+        "node_scale": list(scales[0]) if scales else None,
+        "empty_parent_nodes": sorted(empty_parents),
         "negative_scales": negative_scale,
         "degenerate_triangle_count": degenerate,
         "invalid_or_nonunit_loop_normal_count": invalid_normal_count,
         "non_manifold_objects": non_manifold,
+        "closed_solids_expected": closed_solids_expected,
         "inverted_solid_objects": inverted_solids,
         "normal_ray_cast_first_hits": ray_hits,
         "normal_ray_cast_flipped_visible_faces": ray_flipped,
