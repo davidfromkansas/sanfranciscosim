@@ -219,6 +219,27 @@ export const LANDMARKS = [
     exclude: 45,
     camera: { distance: 500, yaw: 90, pitch: 16 },
   },
+  {
+    // Mission Bay's arena. The exclusion radius is unusually tight for a 155 m
+    // footprint, and deliberately so: `excluded()` drops a footprint when ANY
+    // of its vertices is in the zone, and here Che Fico Pizzeria's nearest
+    // vertex is 80.4 m out with Uber HQ Buildings 4 and 3 at 84.4 and 85.7 m.
+    // The only footprints that reach under the skin are the arena itself and a
+    // 16 m outbuilding whose nearest vertex is 74.7 m out, so (74.7, 80.4) is
+    // the entire usable window. Anything near the 115 m the plan suggested
+    // would delete two real office towers and a restaurant from the baked city.
+    //
+    // Today the zone drops nothing: DataSF's footprints predate the 2019 arena
+    // and have no vertex within 108.8 m of this anchor, and Overture's gap-fill
+    // adds none. It is insurance for the next data refresh.
+    id: 'chaseCenter',
+    name: 'Chase Center',
+    lon: -122.3873962,
+    lat: 37.7678739,
+    height: 40.8,
+    exclude: 78,
+    camera: { distance: 850, yaw: 250, pitch: 20 },
+  },
 ];
 
 // Parks/green spaces the landcover bake must match at least one source polygon
