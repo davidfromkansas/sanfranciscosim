@@ -1,6 +1,15 @@
 const DEFAULT_TAU_MS = 1000;
 const DOWN_THRESHOLD_MS = 19;
 const DOWN_SUSTAIN_MS = 1500;
+// While tiles are streaming a down-step stays allowed (sustained jank while
+// navigating is still jank), it just has to qualify for longer so a transient
+// parse/upload burst on a capable device never demotes it.
+const STREAMING_DOWN_SUSTAIN_MS = 4000;
+// A frame gap this long is a hidden tab or a system pause, not slow rendering.
+// Feeding it to the EMA would poison the average (one background switch reads
+// as seconds-long "frames") and a single such delta would satisfy the sustain
+// window by itself, down-stepping a perfectly healthy device on resume.
+const PAUSE_FRAME_MS = 500;
 const UP_THRESHOLD_MS = 12;
 const UP_SUSTAIN_MS = 10000;
 const DOWN_COOLDOWN_MS = 4000;
@@ -70,6 +79,10 @@ export function createGovernor({
 
   function update(frameTimeMs) {
     const dtMs = Number.isFinite(frameTimeMs) && frameTimeMs > 0 ? frameTimeMs : 0;
+    if (dtMs > PAUSE_FRAME_MS) {
+      resetQualification();
+      return;
+    }
     clockMs += dtMs;
     if (emaMs === null) emaMs = dtMs;
     else emaMs += (dtMs - emaMs) * (1 - Math.exp(-dtMs / tauMs));
@@ -86,7 +99,7 @@ export function createGovernor({
     const flying = isFlying();
     if (cooldownMs > 0) cooldownMs = Math.max(0, cooldownMs - dtMs);
 
-    if (currentMode !== 'auto' || flying || clockMs < streamingUntilMs) {
+    if (currentMode !== 'auto' || flying) {
       resetQualification();
       return;
     }
@@ -95,17 +108,23 @@ export function createGovernor({
       return;
     }
 
+    // Streaming never blocks a down-step outright: navigating across the city
+    // keeps nearChunks churning, so a full hold-off would defer adaptation for
+    // exactly as long as a struggling device needs it most. Down-steps just
+    // qualify slower while streaming; up-steps wait for a quiet scene.
+    const streamingHold = clockMs < streamingUntilMs;
+
     if (emaMs > DOWN_THRESHOLD_MS) {
       downQualifyingMs += dtMs;
       upQualifyingMs = 0;
     } else if (emaMs < UP_THRESHOLD_MS) {
-      upQualifyingMs += dtMs;
+      upQualifyingMs += streamingHold ? 0 : dtMs;
       downQualifyingMs = 0;
     } else {
       resetQualification();
     }
 
-    if (downQualifyingMs >= DOWN_SUSTAIN_MS) {
+    if (downQualifyingMs >= (streamingHold ? STREAMING_DOWN_SUSTAIN_MS : DOWN_SUSTAIN_MS)) {
       if (!changeTier(current - 1)) resetQualification();
     } else if (upQualifyingMs >= UP_SUSTAIN_MS) {
       if (!changeTier(current + 1)) resetQualification();

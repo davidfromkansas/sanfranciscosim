@@ -465,6 +465,12 @@ async function boot() {
   }
 
   canvas.addEventListener('pointerdown', (event) => {
+    // A second finger means a pinch/twist, not a tap — whatever this press was,
+    // it must not pick on release.
+    if (event.pointerType === 'touch' && press) {
+      press = null;
+      return;
+    }
     if (event.button !== 0) return;
     press = { x: event.clientX, y: event.clientY, at: performance.now() };
   });
