@@ -256,6 +256,20 @@ export const LANDMARKS = [
     exclude: 8,
     camera: { distance: 190, yaw: 260, pitch: 34 },
   },
+  {
+    // Ames Harris Neville Co. Building, 1926 — a whole block corner, so the
+    // exclusion radius has to clear a 41 m footprint half-diagonal. 42 m is
+    // deliberately tight: Alabama and Florida Streets are only ~20 m wide and a
+    // generous radius would punch holes in the facing blocks. Verified against
+    // the re-bake: procedural footprints dropped by exactly one.
+    id: '375Alabama',
+    name: '375 Alabama Street',
+    lon: -122.4118477,
+    lat: 37.7645633,
+    height: 22.5,
+    exclude: 42,
+    camera: { distance: 330, yaw: 215, pitch: 18 },
+  },
 ];
 
 // Parks/green spaces the landcover bake must match at least one source polygon

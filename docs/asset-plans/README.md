@@ -58,8 +58,9 @@ route, and the park plans depend on it (§E8 of the parks README).
 | [Fairmont San Francisco](./fairmont-san-francisco.md) | `fairmont` | 99 m | new landmark |
 | [380 Brannan Street](./380-brannan.md) | `380-brannan` | 12.6 m | new landmark |
 | [550 Third Street](./550-third.md) | `550-third` | 11 m | new landmark |
+| [375 Alabama Street (Ames Harris Neville Co.)](./375-alabama.md) | `375-alabama` | 22.5 m | new landmark |
 
-## Shared contract (all 21)
+## Shared contract (all 22)
 
 - Style: `docs/styles/miniature-toy.md` (authoritative for artistic decisions)
 - Technical contract: `.agents/skills/sf-asset-check/SKILL.md` (authoritative for the GLB)

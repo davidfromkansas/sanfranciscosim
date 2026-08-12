@@ -362,5 +362,24 @@
     ],
     "tris": 6244,
     "loadRadius": 2500
+  },
+  {
+    "id": "375-alabama",
+    "file": "375-alabama.glb",
+    "anchor": [
+      -122.4118477,
+      37.7645633
+    ],
+    "targetHeightM": 22.5,
+    "cat": 19,
+    "name": "375 Alabama Street",
+    "estimated": true,
+    "dims": [
+      67.3172,
+      61.6109,
+      22.5
+    ],
+    "tris": 11604,
+    "loadRadius": 2500
   }
 ]
