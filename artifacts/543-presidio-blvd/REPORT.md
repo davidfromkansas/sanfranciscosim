@@ -13,7 +13,7 @@ beats `REFERENCE.md` on anything about what was actually built.
 | Blender | 5.2.0 LTS |
 | Build script | `build_543_presidio_blvd.py` (deterministic; no manual editing) |
 | Triangles | **2,848** (plan cap 9,000; contract 27,000; PERF-PLAN hard limit 30,000) |
-| Mesh objects | 63 |
+| Mesh objects | **9** (63 as built; joined per material in stage 4) |
 | Dimensions (x, y, z) | **17.197 × 17.727 × 9.550 m** |
 | bbox min / max | (−8.599, −8.863, 0.000) / (8.599, 8.863, 9.550) |
 | min Z | 0.000 |
@@ -21,8 +21,10 @@ beats `REFERENCE.md` on anything about what was actually built.
 | Materials | `Toy_brick`, `Toy_glass`, `Toy_glass_Glow`, `Toy_ink`, `Toy_red`, `Toy_stone`, `Toy_trim`, `Toy_trim_Glow`, `Toy_white` |
 | Glow materials | `Toy_glass_Glow`, `Toy_trim_Glow` |
 | Textures / transparency / cameras / lights / animation | none |
-| File size (pre-optimize) | 184,296 B raw · 30,524 B gzip |
-| Validation | `validation.json`, overall **PASS** |
+| File size (**shipped**, meshopt) | **87,484 B** raw · 57,162 B gzip |
+| File size (as built, pre-optimize) | 184,296 B raw · 30,524 B gzip — archived at `optimize/input/` |
+| Draw submeshes | 9 (63 as built) |
+| Validation | `validation.json`, overall **PASS** — re-run against the shipped optimized GLB, not the as-built one |
 
 ## Dimensions — why the XY box is 17 m for a 13.7 m house
 
@@ -143,6 +145,11 @@ Every check in `validation.json` passes.
 | **normals outward — ray test** | PASS — **0 flipped of 31,500 first hits (0.000%)**, tolerance 0.15% |
 | no degenerate geometry | PASS — 0 |
 | no unexpected objects | PASS |
+
+Re-run against the **shipped** (stage-4 optimized) GLB. Triangles, dimensions,
+crest, origin and material set are bit-identical to the as-built asset; only the
+object count (63 → 9) and the encoding changed. Stage-4 gates and the gzip
+finding are in `optimize/REPORT.md`.
 
 The signed-volume test is the authoritative one for a union of interpenetrating
 solids; the 31,500-ray visibility test is the secondary check and came back exactly
