@@ -1,6 +1,6 @@
 {
- "generated": "2026-08-12T00:24:37.046Z",
- "buildings": 171454,
+ "generated": "2026-08-12T00:40:40.840Z",
+ "buildings": 171448,
  "cells": 547,
  "categories": [
   {
@@ -28,28 +28,28 @@
    "cat": 3,
    "id": "office",
    "label": "Office",
-   "count": 2728,
+   "count": 2727,
    "night": 3
   },
   {
    "cat": 4,
    "id": "retail",
    "label": "Retail",
-   "count": 7944,
+   "count": 7943,
    "night": 1
   },
   {
    "cat": 5,
    "id": "restaurant_cafe",
    "label": "Restaurant / Café",
-   "count": 2819,
+   "count": 2817,
    "night": 1
   },
   {
    "cat": 6,
    "id": "bar",
    "label": "Bar",
-   "count": 522,
+   "count": 521,
    "night": 1
   },
   {
@@ -84,7 +84,7 @@
    "cat": 11,
    "id": "hospital",
    "label": "Hospital",
-   "count": 113,
+   "count": 112,
    "night": 2
   },
   {
@@ -205,7 +205,7 @@
   {
    "sub": "restaurant",
    "label": "Restaurant",
-   "count": 1815
+   "count": 1813
   },
   {
    "sub": "hotel",
@@ -270,7 +270,7 @@
   {
    "sub": "bar",
    "label": "Bar",
-   "count": 417
+   "count": 416
   },
   {
    "sub": "civic_office",
@@ -455,7 +455,7 @@
   {
    "sub": "medical_center",
    "label": "Medical center",
-   "count": 49
+   "count": 48
   },
   {
    "sub": "library",
@@ -649,18 +649,18 @@
   }
  ],
  "sources": {
-  "landuse": 140184,
+  "landuse": 140182,
   "business": 10183,
   "heuristic": 4946,
   "datasf": 1254,
-  "overture": 6585,
-  "osm": 8302
+  "overture": 6582,
+  "osm": 8301
  },
  "confidence": [
-  145130,
-  15230,
+  145128,
+  15227,
   4176,
-  6918
+  6917
  ],
  "streets": {
   "named": 2509,
