@@ -400,5 +400,24 @@
     ],
     "tris": 18238,
     "loadRadius": 2500
+  },
+  {
+    "id": "540-presidio-blvd",
+    "file": "540-presidio-blvd.glb",
+    "anchor": [
+      -122.4519224,
+      37.7966667
+    ],
+    "targetHeightM": 11.5,
+    "cat": 1,
+    "name": "540 Presidio Boulevard",
+    "estimated": true,
+    "dims": [
+      16.6623,
+      22.7566,
+      11.5
+    ],
+    "tris": 3690,
+    "loadRadius": 2500
   }
 ]

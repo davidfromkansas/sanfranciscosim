@@ -285,6 +285,26 @@ export const LANDMARKS = [
     clearTrees: true,
     camera: { distance: 700, yaw: 220, pitch: 24 },
   },
+  {
+    id: '540PresidioBlvd',
+    name: '540 Presidio Boulevard',
+    lon: -122.4519224,
+    lat: 37.7966667,
+    height: 11.5,
+    // Tight on purpose. The house's own footprint reaches 12.2 m from the
+    // anchor (14.47 x 19.72 m OBB, half-diagonal), so the radius has to clear
+    // that. But 541 Presidio Blvd is a SEPARATE baked building whose nearest
+    // vertex is only 19.1 m away — measured out of the shipped tile
+    // app/public/tiles/buildings/13_10.bin, where this house is building 33
+    // and 541 is building 39. A generous circle would delete a neighbour that
+    // has no replacement. 15 m sits in the middle of that 12.2-19.1 m window.
+    exclude: 15,
+    // camera.js places the eye at target + distance*(sin yaw, ., cos yaw) with
+    // +x east and +z south, so yaw 52 stands east-south-east of the house —
+    // the three-quarter that shows the porch front and the south hip together,
+    // matching the asset's beauty render.
+    camera: { distance: 120, yaw: 52, pitch: 20 },
+  },
 ];
 
 // Parks/green spaces the landcover bake must match at least one source polygon
