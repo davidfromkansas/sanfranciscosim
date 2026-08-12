@@ -1,0 +1,835 @@
+{
+ "file_bytes": {
+  "raw": 380076,
+  "gzip9": 62441
+ },
+ "objects": 135,
+ "total_tris": 6280,
+ "total_verts": 12428,
+ "primitives_est": 136,
+ "top20": [
+  {
+   "name": "parapet",
+   "tris": 360,
+   "verts": 656,
+   "dims": [
+    48.965,
+    50.158,
+    0.63
+   ],
+   "materials": [
+    "Toy_white"
+   ]
+  },
+  {
+   "name": "parapet_cap",
+   "tris": 360,
+   "verts": 656,
+   "dims": [
+    49.168,
+    50.367,
+    0.12
+   ],
+   "materials": [
+    "Toy_ink"
+   ]
+  },
+  {
+   "name": "body",
+   "tris": 136,
+   "verts": 268,
+   "dims": [
+    48.916,
+    50.107,
+    7.45
+   ],
+   "materials": [
+    "Toy_stone",
+    "Toy_white"
+   ]
+  },
+  {
+   "name": "bench_0",
+   "tris": 108,
+   "verts": 216,
+   "dims": [
+    3.555,
+    3.504,
+    0.34
+   ],
+   "materials": [
+    "Toy_trim"
+   ]
+  },
+  {
+   "name": "bench_1",
+   "tris": 108,
+   "verts": 216,
+   "dims": [
+    3.555,
+    3.504,
+    0.34
+   ],
+   "materials": [
+    "Toy_trim"
+   ]
+  },
+  {
+   "name": "duct_0",
+   "tris": 108,
+   "verts": 216,
+   "dims": [
+    3.325,
+    3.293,
+    0.46
+   ],
+   "materials": [
+    "Toy_roofd"
+   ]
+  },
+  {
+   "name": "duct_1",
+   "tris": 108,
+   "verts": 216,
+   "dims": [
+    3.325,
+    3.293,
+    0.46
+   ],
+   "materials": [
+    "Toy_roofd"
+   ]
+  },
+  {
+   "name": "elevator",
+   "tris": 108,
+   "verts": 216,
+   "dims": [
+    4.067,
+    4.019,
+    3.2
+   ],
+   "materials": [
+    "Toy_white"
+   ]
+  },
+  {
+   "name": "entry_lintel",
+   "tris": 108,
+   "verts": 216,
+   "dims": [
+    2.351,
+    2.318,
+    0.32
+   ],
+   "materials": [
+    "Toy_steel"
+   ]
+  },
+  {
+   "name": "firepit",
+   "tris": 108,
+   "verts": 216,
+   "dims": [
+    1.942,
+    1.919,
+    0.5
+   ],
+   "materials": [
+    "Toy_brick"
+   ]
+  },
+  {
+   "name": "garage_0",
+   "tris": 108,
+   "verts": 216,
+   "dims": [
+    2.45,
+    2.7,
+    3.4
+   ],
+   "materials": [
+    "Toy_ink"
+   ]
+  },
+  {
+   "name": "garage_1",
+   "tris": 108,
+   "verts": 216,
+   "dims": [
+    2.45,
+    2.7,
+    3.4
+   ],
+   "materials": [
+    "Toy_ink"
+   ]
+  },
+  {
+   "name": "garage_lintel",
+   "tris": 108,
+   "verts": 216,
+   "dims": [
+    6.651,
+    7.334,
+    0.32
+   ],
+   "materials": [
+    "Toy_steel"
+   ]
+  },
+  {
+   "name": "hedge_0",
+   "tris": 108,
+   "verts": 216,
+   "dims": [
+    13.226,
+    13.03,
+    0.63
+   ],
+   "materials": [
+    "Toy_mint"
+   ]
+  },
+  {
+   "name": "hedge_1",
+   "tris": 108,
+   "verts": 216,
+   "dims": [
+    4.949,
+    4.903,
+    0.63
+   ],
+   "materials": [
+    "Toy_mint"
+   ]
+  },
+  {
+   "name": "hedge_2",
+   "tris": 108,
+   "verts": 216,
+   "dims": [
+    4.949,
+    4.903,
+    0.63
+   ],
+   "materials": [
+    "Toy_mint"
+   ]
+  },
+  {
+   "name": "lounge_0",
+   "tris": 108,
+   "verts": 216,
+   "dims": [
+    2.279,
+    2.255,
+    0.54
+   ],
+   "materials": [
+    "Toy_teal"
+   ]
+  },
+  {
+   "name": "lounge_1",
+   "tris": 108,
+   "verts": 216,
+   "dims": [
+    2.279,
+    2.255,
+    0.54
+   ],
+   "materials": [
+    "Toy_teal"
+   ]
+  },
+  {
+   "name": "lounge_2",
+   "tris": 108,
+   "verts": 216,
+   "dims": [
+    2.279,
+    2.255,
+    0.54
+   ],
+   "materials": [
+    "Toy_teal"
+   ]
+  },
+  {
+   "name": "mech_0",
+   "tris": 108,
+   "verts": 216,
+   "dims": [
+    2.637,
+    2.604,
+    0.9
+   ],
+   "materials": [
+    "Toy_roofd"
+   ]
+  }
+ ],
+ "vertex_attrs": [
+  "NORMAL"
+ ],
+ "materials": [
+  {
+   "name": "Toy_brick",
+   "glow": false,
+   "user_objects": 1
+  },
+  {
+   "name": "Toy_glass",
+   "glow": false,
+   "user_objects": 14
+  },
+  {
+   "name": "Toy_glassl",
+   "glow": false,
+   "user_objects": 7
+  },
+  {
+   "name": "Toy_glassl_Glow",
+   "glow": true,
+   "user_objects": 6
+  },
+  {
+   "name": "Toy_ink",
+   "glow": false,
+   "user_objects": 62
+  },
+  {
+   "name": "Toy_mint",
+   "glow": false,
+   "user_objects": 4
+  },
+  {
+   "name": "Toy_roofd",
+   "glow": false,
+   "user_objects": 7
+  },
+  {
+   "name": "Toy_steel",
+   "glow": false,
+   "user_objects": 17
+  },
+  {
+   "name": "Toy_stone",
+   "glow": false,
+   "user_objects": 1
+  },
+  {
+   "name": "Toy_teal",
+   "glow": false,
+   "user_objects": 3
+  },
+  {
+   "name": "Toy_trim",
+   "glow": false,
+   "user_objects": 4
+  },
+  {
+   "name": "Toy_white",
+   "glow": false,
+   "user_objects": 9
+  },
+  {
+   "name": "Toy_white_Glow",
+   "glow": true,
+   "user_objects": 1
+  }
+ ],
+ "textures": [],
+ "bbox": {
+  "dims": [
+   49.2093,
+   50.4098,
+   11.0
+  ],
+  "min": [
+   -24.5827,
+   -25.184,
+   0.0
+  ],
+  "origin_offset_xy": [
+   0.022,
+   0.0209
+  ],
+  "base_z": 0.0
+ },
+ "duplicate_mesh_groups": [
+  {
+   "signature": {
+    "verts": 216,
+    "tris": 108,
+    "dims": [
+     6.3459,
+     6.2658,
+     0.36
+    ]
+   },
+   "objects": [
+    "sky_0_frame",
+    "sky_1_frame",
+    "sky_2_frame",
+    "sky_3_frame",
+    "sky_4_frame"
+   ]
+  },
+  {
+   "signature": {
+    "verts": 216,
+    "tris": 108,
+    "dims": [
+     2.6372,
+     2.6042,
+     0.9
+    ]
+   },
+   "objects": [
+    "mech_0",
+    "mech_1",
+    "mech_2",
+    "mech_3"
+   ]
+  },
+  {
+   "signature": {
+    "verts": 216,
+    "tris": 108,
+    "dims": [
+     2.2793,
+     2.255,
+     0.54
+    ]
+   },
+   "objects": [
+    "lounge_0",
+    "lounge_1",
+    "lounge_2"
+   ]
+  },
+  {
+   "signature": {
+    "verts": 216,
+    "tris": 108,
+    "dims": [
+     3.5552,
+     3.5035,
+     0.34
+    ]
+   },
+   "objects": [
+    "bench_0",
+    "bench_1"
+   ]
+  },
+  {
+   "signature": {
+    "verts": 216,
+    "tris": 108,
+    "dims": [
+     3.3249,
+     3.2932,
+     0.46
+    ]
+   },
+   "objects": [
+    "duct_0",
+    "duct_1"
+   ]
+  },
+  {
+   "signature": {
+    "verts": 216,
+    "tris": 108,
+    "dims": [
+     2.4501,
+     2.7004,
+     3.4
+    ]
+   },
+   "objects": [
+    "garage_0",
+    "garage_1"
+   ]
+  },
+  {
+   "signature": {
+    "verts": 216,
+    "tris": 108,
+    "dims": [
+     4.9487,
+     4.903,
+     0.63
+    ]
+   },
+   "objects": [
+    "hedge_1",
+    "hedge_2"
+   ]
+  },
+  {
+   "signature": {
+    "verts": 216,
+    "tris": 108,
+    "dims": [
+     5.1444,
+     5.0964,
+     0.36
+    ]
+   },
+   "objects": [
+    "planter_1",
+    "planter_2"
+   ]
+  },
+  {
+   "signature": {
+    "verts": 24,
+    "tris": 12,
+    "dims": [
+     0.1205,
+     0.1199,
+     2.1
+    ]
+   },
+   "objects": [
+    "winA_hi_mull_v1",
+    "winA_hi_mull_v2",
+    "winA_hi_mull_v3",
+    "winA_lo_mull_v1",
+    "winA_lo_mull_v2",
+    "winA_lo_mull_v3",
+    "winB_hi_mull_v1",
+    "winB_hi_mull_v2",
+    "winB_hi_mull_v3",
+    "winB_lo_mull_v1",
+    "winB_lo_mull_v2",
+    "winB_lo_mull_v3"
+   ]
+  },
+  {
+   "signature": {
+    "verts": 24,
+    "tris": 12,
+    "dims": [
+     2.3519,
+     2.5916,
+     0.1
+    ]
+   },
+   "objects": [
+    "garage_0_rib1",
+    "garage_0_rib2",
+    "garage_0_rib3",
+    "garage_1_rib1",
+    "garage_1_rib2",
+    "garage_1_rib3"
+   ]
+  },
+  {
+   "signature": {
+    "verts": 24,
+    "tris": 12,
+    "dims": [
+     0.1183,
+     0.1218,
+     1.2
+    ]
+   },
+   "objects": [
+    "rear_band_mull_v1",
+    "rear_band_mull_v2",
+    "rear_band_mull_v3",
+    "rear_band_mull_v4",
+    "rear_band_mull_v5"
+   ]
+  },
+  {
+   "signature": {
+    "verts": 24,
+    "tris": 12,
+    "dims": [
+     5.4084,
+     5.3393,
+     0.04
+    ]
+   },
+   "objects": [
+    "sky_0_glow",
+    "sky_1_glow",
+    "sky_2_glow",
+    "sky_3_glow",
+    "sky_4_glow"
+   ]
+  },
+  {
+   "signature": {
+    "verts": 24,
+    "tris": 12,
+    "dims": [
+     5.693,
+     5.6205,
+     0.22
+    ]
+   },
+   "objects": [
+    "sky_0_pane",
+    "sky_1_pane",
+    "sky_2_pane",
+    "sky_3_pane",
+    "sky_4_pane"
+   ]
+  },
+  {
+   "signature": {
+    "verts": 24,
+    "tris": 12,
+    "dims": [
+     0.4692,
+     0.4642,
+     0.1008
+    ]
+   },
+   "objects": [
+    "num_0_0",
+    "num_1_0",
+    "num_2_0",
+    "num_2_1"
+   ]
+  },
+  {
+   "signature": {
+    "verts": 24,
+    "tris": 12,
+    "dims": [
+     0.1579,
+     0.1577,
+     0.2352
+    ]
+   },
+   "objects": [
+    "num_0_1",
+    "num_0_3",
+    "num_1_1",
+    "num_1_3"
+   ]
+  },
+  {
+   "signature": {
+    "verts": 24,
+    "tris": 12,
+    "dims": [
+     0.5331,
+     0.5275,
+     0.69
+    ]
+   },
+   "objects": [
+    "pw_a_0_glass",
+    "pw_a_1_glass",
+    "pw_a_2_glass",
+    "pw_a_3_glass"
+   ]
+  },
+  {
+   "signature": {
+    "verts": 24,
+    "tris": 12,
+    "dims": [
+     0.7111,
+     0.7031,
+     0.95
+    ]
+   },
+   "objects": [
+    "pw_a_0_reveal",
+    "pw_a_1_reveal",
+    "pw_a_2_reveal",
+    "pw_a_3_reveal"
+   ]
+  },
+  {
+   "signature": {
+    "verts": 24,
+    "tris": 12,
+    "dims": [
+     0.5322,
+     0.5284,
+     0.69
+    ]
+   },
+   "objects": [
+    "pw_b_0_glass",
+    "pw_b_1_glass",
+    "pw_b_2_glass",
+    "pw_b_3_glass"
+   ]
+  },
+  {
+   "signature": {
+    "verts": 24,
+    "tris": 12,
+    "dims": [
+     0.7098,
+     0.7044,
+     0.95
+    ]
+   },
+   "objects": [
+    "pw_b_0_reveal",
+    "pw_b_1_reveal",
+    "pw_b_2_reveal",
+    "pw_b_3_reveal"
+   ]
+  },
+  {
+   "signature": {
+    "verts": 24,
+    "tris": 12,
+    "dims": [
+     4.5447,
+     4.4777,
+     2.1
+    ]
+   },
+   "objects": [
+    "winA_hi_glass",
+    "winA_lo_glass",
+    "winB_hi_glass",
+    "winB_lo_glass"
+   ]
+  },
+  {
+   "signature": {
+    "verts": 24,
+    "tris": 12,
+    "dims": [
+     4.5306,
+     4.4635,
+     0.12
+    ]
+   },
+   "objects": [
+    "winA_hi_mull_h1",
+    "winA_lo_mull_h1",
+    "winB_hi_mull_h1",
+    "winB_lo_mull_h1"
+   ]
+  },
+  {
+   "signature": {
+    "verts": 24,
+    "tris": 12,
+    "dims": [
+     4.6591,
+     4.5896,
+     2.3
+    ]
+   },
+   "objects": [
+    "winA_hi_reveal",
+    "winA_lo_reveal",
+    "winB_hi_reveal",
+    "winB_lo_reveal"
+   ]
+  },
+  {
+   "signature": {
+    "verts": 24,
+    "tris": 12,
+    "dims": [
+     0.4093,
+     0.4053,
+     0.1008
+    ]
+   },
+   "objects": [
+    "num_0_2",
+    "num_1_2"
+   ]
+  },
+  {
+   "signature": {
+    "verts": 24,
+    "tris": 12,
+    "dims": [
+     0.4293,
+     0.4249,
+     0.1008
+    ]
+   },
+   "objects": [
+    "num_0_4",
+    "num_1_4"
+   ]
+  },
+  {
+   "signature": {
+    "verts": 24,
+    "tris": 12,
+    "dims": [
+     0.1579,
+     0.1577,
+     0.4592
+    ]
+   },
+   "objects": [
+    "num_2_2",
+    "num_2_3"
+   ]
+  },
+  {
+   "signature": {
+    "verts": 24,
+    "tris": 12,
+    "dims": [
+     5.856,
+     5.7685,
+     3.0
+    ]
+   },
+   "objects": [
+    "pent_mull_0",
+    "pent_mull_1"
+   ]
+  },
+  {
+   "signature": {
+    "verts": 24,
+    "tris": 12,
+    "dims": [
+     4.7016,
+     4.6604,
+     3.0
+    ]
+   },
+   "objects": [
+    "pent_mull_2",
+    "pent_mull_3"
+   ]
+  }
+ ],
+ "dup_redundant_tris": 2232,
+ "join_candidates": {
+  "Toy_glass": 14,
+  "Toy_glassl": 7,
+  "Toy_glassl_Glow": 6,
+  "Toy_ink": 62,
+  "Toy_mint": 4,
+  "Toy_roofd": 7,
+  "Toy_steel": 17,
+  "Toy_teal": 3,
+  "Toy_trim": 4,
+  "Toy_white": 9
+ },
+ "degenerate_tris": 0,
+ "coincident_vert_pairs": 9022,
+ "over_tess": {
+  "near_distance_m": 75.61,
+  "one_px_world_m": 0.051,
+  "note": "cylinders whose chord error < one_px_world_m can halve segments"
+ }
+}

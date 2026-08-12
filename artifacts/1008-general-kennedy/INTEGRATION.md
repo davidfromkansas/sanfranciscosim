@@ -55,7 +55,22 @@ for (let i = 0; i < ring.length; i += 2) {
 
 Because the nearest vertex is 4.7 m away, **any exclusion radius above ~5 m deletes the
 entire complex** — and a radius below that leaves the procedural mass in place. There is no
-value that clears 1008 alone. Confirmed visually: with the manifest entry live and no
+value that clears 1008 alone.
+
+**Compare `550Third` in `pipeline/lib/landmarks.mjs`**, which solved the neighbouring
+version of this problem and is the right thing to measure against. There, the target
+footprint's centroid sits 0.96 m from the anchor and the nearest *neighbour* vertex is
+11.17 m, so any radius in ~1–11 m drops that building alone. The same measurement here:
+
+| | 550 Third Street | **1008 General Kennedy** |
+|---|---|---|
+| Anchor → target footprint centroid | 0.96 m | 41.1 m |
+| Anchor → nearest vertex that must survive | 11.17 m (a neighbour) | **4.68 m (the same footprint)** |
+| Usable radius window | ~1–11 m | **none** |
+
+The window is empty because the vertex that must survive belongs to the *same* footprint as
+the building being replaced. 1008 is not a separate footprint, so no radius can separate
+them. Confirmed visually: with the manifest entry live and no
 exclusion, the ward renders correctly but sits inside a ~16.5 m procedural block that
 swallows it, and at night the procedural complex's lit windows bury the asset entirely.
 
