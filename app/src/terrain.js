@@ -19,6 +19,8 @@ const KIND_COLORS = {
   4: [0.29, 0.43, 0.26], // pitch
   5: [0.42, 0.45, 0.27], // scrub
   6: [0.4, 0.4, 0.41], // paved
+  7: [0.427, 0.478, 0.29], // marsh
+  8: [0.604, 0.561, 0.502], // rock
 };
 
 // Bare urban ground between the buildings: warm grey, drifting sandier towards
@@ -120,12 +122,12 @@ export function createTerrain(data) {
           const ez = sampleElevation(x, z + stepZ) - sampleElevation(x, z - stepZ);
           const nx = -ex / (2 * stepX);
           const nz = -ez / (2 * stepZ);
+          const slope = Math.hypot(ex / (2 * stepX), ez / (2 * stepZ));
           const len = Math.hypot(nx, 1, nz);
           normals[p] = nx / len;
           normals[p + 1] = 1 / len;
           normals[p + 2] = nz / len;
 
-          const slope = Math.hypot(ex / (2 * stepX), ez / (2 * stepZ));
           const kind = submerged ? 3 : sampleLanduse(x, z);
           const preset = KIND_COLORS[kind];
           if (preset) {
