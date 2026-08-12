@@ -56,6 +56,7 @@ route, and the park plans depend on it (§E8 of the parks README).
 | [Conservatory of Flowers](./conservatory-of-flowers.md) | `conservatory-of-flowers` | 18.3 m | new landmark |
 | [War Memorial Opera House](./war-memorial-opera-house.md) | `opera-house` | 44 m | new landmark |
 | [Fairmont San Francisco](./fairmont-san-francisco.md) | `fairmont` | 99 m | new landmark |
+| [Letterman Digital Arts Center](./letterman-digital-arts-center.md) | `letterman` | ~22 m (estimated) | new landmark |
 
 ## Shared contract (all 19)
 
