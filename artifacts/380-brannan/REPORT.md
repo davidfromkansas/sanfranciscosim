@@ -6,21 +6,29 @@ via the address-to-asset pipeline (`docs/asset-pipeline/ADDRESS-TO-ASSET.md`).
 **This report beats the plan.** Where the dossier in the plan file and this report
 disagree, this report and `REFERENCE.md` are correct.
 
-## 1. Headline numbers (pre-optimize)
+## 1. Headline numbers
 
-| | |
-|---|---|
-| Triangles | **7,832** (cap 9,000) |
-| Objects | 115 |
-| Dimensions (AABB) | 31.31 x 31.59 x 12.60 m |
-| Min Z | 0.0 |
-| XY centre offset | (0.186, 0.019) m |
-| Materials | 11, all `Toy_*`, flat, opaque |
-| Glow materials | `Toy_glass_Glow`, `Toy_trim_Glow` |
-| File | 461,728 bytes raw / 83,200 gzipped |
-| Validation | **PASS** on all 16 checks |
-| Anchor | `-122.3940217, 37.7806308` |
-| Target height | 12.6 m (bbox top normalized exactly, so loader scale = 1.0) |
+Both columns are real: the asset was built, approved, then optimized in stage 4
+(`optimize/REPORT.md`). **The shipped column is what the manifest describes.**
+
+| | As built | **Shipped (post-optimize)** |
+|---|---|---|
+| Triangles | 7,832 (cap 9,000) | **7,760** |
+| Objects | 115 | 12 |
+| Draw submeshes | 116 | **13** |
+| Dimensions (AABB) | 31.3134 x 31.5872 x 12.60 m | 31.3134 x 31.5872 x 12.60 m |
+| Min Z | 0.0 | 0.0 |
+| XY centre offset | (0.186, 0.019) m | (0.186, 0.019) m |
+| Materials | 11, all `Toy_*`, flat, opaque | 11, identical set |
+| Glow materials | `Toy_glass_Glow`, `Toy_trim_Glow` | identical |
+| File, raw | 461,728 B | **222,516 B** (−51.8%) |
+| Contract validation | PASS on all 16 checks | **PASS on all 16 checks** |
+| Anchor | `-122.3940217, 37.7806308` | unchanged |
+| Target height | 12.6 m (bbox top normalized exactly, so loader scale = 1.0) | unchanged |
+
+Compression is `EXT_meshopt_compression` without `KHR_mesh_quantization`, matching
+`pipeline/compress-assets.mjs` — see `optimize/REPORT.md` §4 for why the optimize
+prompt's own recipe was overridden.
 
 Note the AABB is ~31 x 31 m for a 20.2 x 23.9 m building. That is the expected
 consequence of authoring at the real 45.6° SoMa heading, not a scale error.

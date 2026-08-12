@@ -99,14 +99,34 @@ predicted savings before executing.
 ## 4. Phase C — Packing pass (always on)
 
 ```
-npx gltfpack@0.24 -i mid.glb -o out.glb -cc -kn -km
+npx gltfpack@0.24 -i mid.glb -o out.glb -c -km -kn -noq
 ```
 
 - **`-km` is mandatory**, not optional: without it gltfpack merges
   identical-parameter materials ACROSS the `_Glow` boundary (glow-ness is
-  name-only), silently killing the night layer. Always `-cc -kn -km`.
-- `ALLOW_MESHOPT=no` fallback: drop `-cc` only (quantization is
-  `KHR_mesh_quantization`, core-supported; only `-cc` needs the decoder).
+  name-only), silently killing the night layer. Always keep `-kn -km`.
+- **`-noq` is also mandatory for this repo — do NOT quantize.** The recipe above
+  originally read `-cc -kn -km`, which quantizes by default. That conflicts with
+  `pipeline/compress-assets.mjs` (the mandatory ship step per `sf-asset-check` §8),
+  which runs `-c -km -kn -noq` because the runtime kit/landmark merge needs float32
+  attributes, and with `sf-asset-check`'s warning that quantization "silently breaks
+  the app's merge paths (every piece falls back to procedural and the city looks
+  fine)". A quantized build also fails the stage-2 contract validator on
+  `transforms_applied` and `no_unexpected_objects`, because gltfpack stores the
+  dequantize matrix as a node transform and splits each node into an empty parent
+  plus a `Mesh_N` child. Every shipped landmark except `st-marys-cathedral` is
+  unquantized. Use:
+
+  ```
+  npx gltfpack@0.24 -i mid.glb -o out.glb -c -km -kn -noq
+  ```
+
+  Expect a smaller headline win than the numbers quoted above — those were measured
+  with quantization on. Recorded 12 Aug 2026 while optimizing `380-brannan`
+  (see `artifacts/380-brannan/optimize/REPORT.md` §4). **`st-marys-cathedral.glb` is
+  quantized and may be falling back to procedural in production — worth one console
+  check.**
+- `ALLOW_MESHOPT=no` fallback: drop `-c` only.
 - Verify on the output, never trust flags: material name set, manifest node
   names, re-imported bbox within tolerance.
 - Record raw + gzipped bytes and estimated GPU vertex-buffer bytes
