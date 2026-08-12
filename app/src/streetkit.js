@@ -137,16 +137,31 @@ export async function loadStreetKit() {
 // sidecars the picking layer already streams for the cells under the camera.
 export function createStreetHints(manifest, contextCells) {
   const grid = manifest.grid;
+  // LRU: hints for cells the camera left long ago are cheap to refetch (the
+  // sidecars are immutable-cached JSON) and needless to keep for a whole
+  // session. Recency-refreshed on read, oldest evicted past the cap.
   const cells = new Map();
+  const CELLS_MAX = 150;
   const EMPTY = { market: [], commercial: [] };
+
+  function remember(key, value) {
+    cells.set(key, value);
+    while (cells.size > CELLS_MAX) {
+      cells.delete(cells.keys().next().value);
+    }
+    return value;
+  }
 
   function load(key) {
     const cached = cells.get(key);
-    if (cached) return cached;
+    if (cached) {
+      cells.delete(key);
+      cells.set(key, cached);
+      return cached;
+    }
     // Cells the bake never wrote carry no hints, and requesting one is a 404.
     if (contextCells && !contextCells.has(key)) {
-      cells.set(key, EMPTY);
-      return EMPTY;
+      return remember(key, EMPTY);
     }
     const promise = fetch(tileUrl(`ctx/${key}.json`))
       .then((r) => (r.ok ? r.json() : null))
@@ -166,11 +181,11 @@ export function createStreetHints(manifest, contextCells) {
           if (info && SHOP_CATEGORIES.has(info.c)) commercial.push(pick.x[i], pick.z[i]);
         }
         const value = { market, commercial };
-        cells.set(key, value);
-        return value;
+        // The promise entry may already have been evicted under pressure;
+        // remember() re-inserts the resolved value either way.
+        return remember(key, value);
       });
-    cells.set(key, promise);
-    return promise;
+    return remember(key, promise);
   }
 
   /** Hint arrays covering a box, with a margin for the pieces on its edge. */

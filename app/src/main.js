@@ -45,6 +45,22 @@ renderer.shadowMap.enabled = true;
 renderer.shadowMap.type = PCFShadowMap;
 renderer.setSize(window.innerWidth, window.innerHeight, false);
 
+// Mobile browsers confiscate the GL context under memory pressure or after an
+// app switch. preventDefault on the lost event is what makes the context
+// restorable at all; three re-uploads everything it owns on the restored
+// event, and the frame loop sits out the gap so the governor and simulation
+// never see the dead time.
+let contextLost = false;
+canvas.addEventListener('webglcontextlost', (event) => {
+  event.preventDefault();
+  contextLost = true;
+  console.warn('WebGL context lost — pausing until the browser restores it');
+});
+canvas.addEventListener('webglcontextrestored', () => {
+  contextLost = false;
+  console.warn('WebGL context restored — resuming');
+});
+
 const scene = new Scene();
 const camera = new PerspectiveCamera(52, window.innerWidth / window.innerHeight, 4, 60000);
 
@@ -578,6 +594,13 @@ async function boot() {
   let assetsRequested = false;
 
   function frame(now) {
+    if (contextLost) {
+      // Keep the loop alive but idle: rendering into a lost context is a
+      // no-op at best, and simulation/governor time must not accumulate.
+      last = now;
+      requestAnimationFrame(frame);
+      return;
+    }
     // Simulation dt is clamped so a stall cannot teleport the city, but the fps
     // readout must use real wall time or it reports the clamp (20) forever.
     const elapsed = (now - last) / 1000;
