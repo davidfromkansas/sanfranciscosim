@@ -12,9 +12,10 @@ Built from `docs/asset-plans/541-presidio.md`; research re-verified in
 
 | | |
 |---|---|
-| File | `541-presidio.glb` |
+| File | `541-presidio.glb` — **100,200 B** raw (post-optimize; see `optimize/REPORT.md`) |
 | Triangles | **3,404** (cap 8,000) |
-| Mesh objects | 77 |
+| Mesh objects | **8** (77 as authored, joined per material by the stage-4 pass) |
+| Draw submeshes | **8** |
 | Dimensions (axis-aligned) | 22.259 × 25.099 × 10.000 m |
 | Building dimensions (own axes) | 19.77 × 11.65 m main block + 9.68 × 1.75 m porch |
 | Min Z | 0.000 |
@@ -113,6 +114,31 @@ reads the solid `Toy_glass` behind them. The roof does not glow.
 Three of 31 openings is deliberate: this is a single-family house on a quiet Presidio
 street, and a fully lit twelve-window box would read as an institution.
 
+## Stage 4 — optimize (shipped numbers)
+
+`541-presidio.glb` in this directory is now the **optimized** build; the
+pre-optimize original is archived at `optimize/input/541-presidio.glb`. Full detail
+in [`optimize/REPORT.md`](./optimize/REPORT.md). Headlines:
+
+| | Authored | Shipped |
+|---|---|---|
+| File, raw | 220,396 B | **100,200 B** (−54.5%) |
+| File, gzip −9 | 32,615 B | 64,888 B (+99% — meshopt resists gzip) |
+| Triangles | 3,404 | 3,404 (unchanged) |
+| Objects / draw submeshes | 77 | **8** (−89.6%) |
+| Materials | 8 | 8 |
+| BBox / origin | — | identical to 1e-5 m |
+
+All eight optimize gates pass (G7 N/A, G6 PASS-with-note at −54.5% against a 60%
+aspiration). Appearance delta ≤ 0.11% mean across day/night × near/far. The shipped
+file carries `EXT_meshopt_compression` with **no** quantization and 0 node
+transforms, which is what keeps the runtime merge working — and it is byte-for-byte
+the output `pipeline/compress-assets.mjs` would produce, so the mandatory intake
+compression is already done. **Do not re-compress at integration.**
+
+`validation.json` in this directory has been regenerated against the shipped file:
+`overall: PASS`, 16/16.
+
 ## Deliverables
 
 ```
@@ -189,3 +215,19 @@ all of them would be settled by one elevation drawing of any house in the row:
 `validation.json` `overall: PASS`, all 16 checks true, fresh-scene re-import of the
 exported GLB. Triangles 3,404 / 8,000. Crest 10.000 m. Normals outward by
 per-object signed volume (77/77) with a 0.0000 ray residual.
+
+## Gate 3 — approval
+
+Approval was given in advance for every stage of the pipeline run, 2026-08-12.
+Quoted verbatim:
+
+> Do it on a new branch and PR -- i approve all stages just proceed
+
+Presented at the time of approval: the contact sheet (all seven views), the day and
+night three-quarter aerials, and the shipped numbers table above. No revision was
+requested, so there is one build iteration on record (the two-step review in
+"Review iterations", both self-directed).
+
+Because the approval was blanket and given before the renders existed, the open
+questions in the section below — chiefly whether the front projection is a porch or
+a full-height bay — have **not** been ruled on by a human. They remain open.
