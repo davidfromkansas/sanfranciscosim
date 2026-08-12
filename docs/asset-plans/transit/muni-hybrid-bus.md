@@ -482,27 +482,20 @@ will be made from.
 - The bus and the trolley coach share a body. Build this one so the trolley
   coach plan can import its component functions rather than fork them.
 
-### 2.16 The deferred 60-foot articulated variant
+### 2.16 The 60-foot articulated coach — not a separate model
 
-Not in scope. The 511 SIRI feed resolves vehicle **mode** from `LineRef`, and
-mode is what these five plans model — one GLB per Muni fleet family. Rigid
-versus articulated is not a mode distinction, so it is not required to render
-the feed faithfully.
+**Owner decision, 12 August 2026: reuse this GLB for both lengths.** Articulated
+coaches are ~156 of the 329 buses live in the feed at any moment, so they are
+common — but at the app's 42° aerial camera and 1.6× render scale, a bus is a
+white-and-red box with a black window band. The accordion joint is not worth a
+second model, a second draw call, or a second build.
 
-The research is kept here because the variant is cheap to add later and the data
-would support it:
+Practically: when the live-data work maps a vehicle to a model, XDE60 fleet
+numbers (6500–6730) point at `muni-bus-40` just like XDE40 numbers
+(8601–8969) do. No special case, no lookup table.
 
-| Item | Value |
-|---|---|
-| Model | New Flyer Xcelsior **XDE60** |
-| Fleet numbers | 6500–6554, 6560–6697, 6700–6730 (~224 buses, 2015–2018) |
-| Length | 18.29 m (60 ft); same 2.59 m width and ~3.3 m height |
-| Build | the rigid body plus a second rear section, a 0.9 m ribbed bellows, and 6 wheels |
-| Triangle cap | 4,200 |
-
-Two things to know if it is ever picked up. **The feed can drive it:** SIRI
-returns `VehicleRef`, which is the real fleet number, and Muni's number ranges
-are blocked by model — 8601–8969 is XDE40, 6500–6730 is XDE60 — so a lookup
-table would pick the right GLB per vehicle with no guessing. **And the reason it
-was cut is scale:** at `carScale = 1.6` a 60-footer renders at 29.3 m, most of a
-Sunset block, which made it the riskiest asset in the set.
+Kept for the record in case that ever changes: the XDE60 is 18.29 m against the
+XDE40's 12.19 m, same 2.59 m width, built as the rigid body plus a second rear
+section and a 0.9 m ribbed bellows on 6 wheels. That is why this plan asks for
+component functions rather than a straight-line script — but nobody is expected
+to build it.

@@ -60,18 +60,17 @@ bucket renders the feed faithfully with no guessing.
 and 6 cable cars on `PM` / `PH` / `CA`. Details, including the bus-substitution
 trap, in [INTEGRATION-LATER.md](./INTEGRATION-LATER.md).)
 
-**What was cut, and why it can come back.** Earlier drafts split four of the
-families by sub-variant — 40 vs 60 foot, Powell vs California, PCC vs Milan — for
-nine GLBs. None of those are *mode* distinctions, so none are required. Each is
-retained as a "deferred variant" section at the end of its plan, with dimensions,
-fleet numbers and build notes intact.
+**What was cut.** Earlier drafts split four families by sub-variant — 40 vs 60
+foot, Powell vs California, PCC vs Milan — for nine GLBs. None are *mode*
+distinctions, so none are required.
 
-They are cheap to add later because the feed can drive them too: `VehicleRef` is
-a real Muni fleet number and the ranges are blocked by model (8601–8969 XDE40,
-6500–6730 XDE60, 5701–5885 XT40, 7201–7293 XT60, 1006–1080 PCC, 1807–1895
-Milan), so a lookup table would pick the right GLB per vehicle. Every build
-script is therefore specified as reusable component functions rather than a
-straight-line script.
+- **The 60-foot articulated bus and trolley coach are settled: reuse the 40-foot
+  GLB for both.** At the app's 42° camera and 1.6× scale the accordion joint does
+  not earn a second model or a second draw call. Their fleet numbers map to the
+  rigid model with no special case.
+- The California cable car and the Milan streetcar are kept as "deferred variant"
+  sections at the end of their plans, with dimensions, fleet numbers and build
+  notes intact, in case they are ever wanted.
 
 ---
 
