@@ -250,3 +250,23 @@ validate && toy`) is also incomplete: `buildings.mjs` needs `out/terrain.json` a
 `out/bridges.json`, and `toy.mjs` needs `out/lore.json`, so `terrain`, `bridges`, `lore` and
 `loredata` have to run too — and `loredata.mjs` needs the `overturemaps` Python CLI, which
 was installed into a throwaway venv rather than globally.
+
+### Merge with main (12 August 2026)
+
+`380-brannan` (#88) and `550-third` (#90) merged into `main` while this branch was in
+flight. Both are Case B landmarks that re-baked the same tiles, so the manifest, the
+registry, `docs/asset-plans/README.md` and 529 tile cells all conflicted.
+
+Resolved by keeping every entry from both sides and **re-baking from the merged registry**
+— binary tiles cannot be text-merged, so the only correct resolution is to regenerate them
+with all three exclusions applied at once (`buildings → landcover → lore → toy`).
+
+| Check after the merge | Result |
+|---|---|
+| Registry entries | 27, ending `380Brannan` (exclude 9) / `550Third` (exclude 8) / `375Alabama` (exclude 42) |
+| Manifest entries | 21; this branch's diff against main is a clean +19-line append |
+| Procedural footprints | 171,438 → **171,435** — exactly three removed, one per new landmark |
+| `pipeline/audit.mjs` 1.6 | **PASS** — "27 landmarks clear" |
+| Toy sanity gates | all PASS (171,435 toy / 171,435 base, 0.00%) |
+| `npm run lint` / `npm run build` | PASS / PASS |
+| Loader scale, id mapping, cell index | unchanged — 1.000000, `375Alabama` hit, cell 20_17 present |
