@@ -26,8 +26,10 @@ import {
   TOY_GARDEN,
   TOY_HELIPAD,
   TOY_HVAC,
+  TOY_PALE,
   TOY_PALETTE,
   TOY_ROOFS,
+  TOY_ROOF_BRICK,
   TOY_ROOF_RISE,
   TOY_SOLAR,
   TOY_TOWER_GLASS,
@@ -87,6 +89,8 @@ const TEST_CELLS = {
   sunset: [-122.49, 37.753],
   mission: [-122.4185, 37.7585],
   russianhill: [-122.4185, 37.8005],
+  presidio: [-122.4689, 37.8009],
+  fortpoint: [-122.477, 37.8106],
 };
 
 const arg = process.argv.slice(2).find((a) => a.startsWith('--cells='));
@@ -267,6 +271,8 @@ function loreFrame(ring, cx, cz) {
 // on the roof they belong to (an OBB corner patch can overhang the footprint).
 let treeBlocked = () => false;
 let onBuilding = () => true;
+const MAIN_POST_STYLE_ZONE = { lon: -122.458479, lat: 37.800197, radius: 500 };
+const [mainPostX, mainPostZ] = project(MAIN_POST_STYLE_ZONE.lon, MAIN_POST_STYLE_ZONE.lat);
 if (!onlyStreets) {
   const { sampleElevation } = await loadHeightmap();
   ({ blocked: treeBlocked, onBuilding } = await loadTreeBlockers({ sampleElevation, out: OUT }));
@@ -358,6 +364,7 @@ let vehicles = 0;
 let propBuildings = 0;
 let propTrianglesTotal = 0;
 let propTrianglesMax = 0;
+let mainPostBuildings = 0;
 const catCounts = new Array(CATS.length).fill(0);
 
 let buildingId = -1;
@@ -374,6 +381,9 @@ for (const [ringIn, height, baseY, seed] of source.buildings) {
   const [cx, cz] = ringCentroid(ring);
   const cell = cellFor(cx, cz);
   if (!cell) continue;
+  const inMainPost =
+    (cx - mainPostX) ** 2 + (cz - mainPostZ) ** 2 <= MAIN_POST_STYLE_ZONE.radius ** 2;
+  if (inMainPost) mainPostBuildings++;
 
   const floors = Math.max(2, Math.round(height / TOY_FLOOR));
   const toyHeight = Math.min(MAX_HEIGHT, Math.max(MIN_HEIGHT, floors * TOY_FLOOR));
@@ -381,6 +391,7 @@ for (const [ringIn, height, baseY, seed] of source.buildings) {
 
   let palette;
   if (floors > 20) palette = TOY_TOWER_GLASS;
+  else if (inMainPost) palette = TOY_PALE[Math.floor(rnd(seed, 2) * TOY_PALE.length)];
   else if (rnd(seed, 1 + Math.round(cx)) < 0.7) palette = TOY_BASE[Math.floor(rnd(seed, 2) * TOY_BASE.length)];
   else palette = TOY_ACCENT[Math.floor(rnd(seed, 3) * TOY_ACCENT.length)];
 
@@ -409,7 +420,9 @@ for (const [ringIn, height, baseY, seed] of source.buildings) {
     // generated in the worker from the four corners.
     const box = obbRing(ring);
     const wallH = Math.max(TOY_FLOOR, (floors - 1) * TOY_FLOOR);
-    const roofPalette = TOY_ROOFS[Math.floor(rnd(seed, 4) * TOY_ROOFS.length)];
+    const roofPalette = inMainPost
+      ? TOY_ROOF_BRICK
+      : TOY_ROOFS[Math.floor(rnd(seed, 4) * TOY_ROOFS.length)];
     emit(cell, box, baseY, baseY + wallH, palette, seed, TOY_FLAG_PITCHED | flagBits, roofPalette, loreRec);
     pitchedCount++;
     tallestToy = Math.max(tallestToy, wallH + TOY_ROOF_RISE);
@@ -488,6 +501,7 @@ if (!onlyStreets) {
     `toy buildings: ${toyRecords} records in ${toyIndex.length} cells, ${(toyBytes / 1e6).toFixed(1)} MB ` +
       `(${pitchedCount} pitched, ${garnishCount} garnish, ${helipads} helipads, tallest ${tallestToy.toFixed(0)} m)`
   );
+  console.log(`Main Post style zone: ${mainPostBuildings} buildings`);
   console.log(
     `lore props: ${propBuildings} buildings, avg ${(propTrianglesTotal / Math.max(1, propBuildings)).toFixed(1)} tris ` +
       `(cap ${propTrianglesMax}), ${vehicles} vehicles, ` +

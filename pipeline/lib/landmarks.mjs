@@ -210,6 +210,15 @@ export const NAMED_PARKS = [
   { id: 'lincolnPark', name: 'Lincoln Park', lon: -122.4996, lat: 37.7825 },
 ];
 
+export const PARK_COVER = {
+  presidio: {
+    base: 'trees',
+    treeArea: 180,
+    mode: 'grid',
+    species: { broadleaf: 0.1, cypress: 0.45, eucalyptus: 0.45 },
+  },
+};
+
 // Extra hero/overview camera presets.
 export const VIEW_PRESETS = [
   {
@@ -247,5 +256,12 @@ export const VIEW_PRESETS = [
     lon: -122.4907,
     lat: 37.7532,
     camera: { distance: 700, yaw: 75, pitch: 12 },
+  },
+  {
+    id: 'presidio',
+    name: 'Presidio Main Post',
+    lon: -122.468,
+    lat: 37.8035,
+    camera: { distance: 4600, yaw: 45, pitch: 24 },
   },
 ];
