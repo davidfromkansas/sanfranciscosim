@@ -219,6 +219,57 @@ export const LANDMARKS = [
     exclude: 45,
     camera: { distance: 500, yaw: 90, pitch: 16 },
   },
+  // Mid-block in SoMa with neighbours a few metres off both flanks, so this
+  // exclusion radius is deliberately TIGHT rather than generous. excluded() drops
+  // a footprint if its centroid OR any ring vertex falls inside the radius.
+  //
+  // Measured against the 921 baked footprints in tiles 22..24_12..14, the target
+  // (23_13 #102, h 20.5 m) sits 0.04 m from this anchor and its nearest neighbour
+  // centroid is 13.3 m away:
+  //
+  //   exclude  9-12 m -> drops 1 building  (correct: #102 only)
+  //   exclude 15 m    -> drops 2  (eats neighbour #146)
+  //   exclude 18 m    -> drops 3
+  //   exclude 35 m    -> drops 12 (a crater through the block)
+  //
+  // 9 m is the middle of the safe band. Do not raise it past 12 without re-running
+  // that check — on a mid-block site a generous radius removes the neighbours.
+  {
+    id: '380Brannan',
+    name: '380 Brannan Street',
+    lon: -122.3940217,
+    lat: 37.7806308,
+    height: 12.6,
+    exclude: 9,
+    camera: { distance: 220, yaw: 45, pitch: 24 },
+  },
+  {
+    // Through lot with party walls on both long sides, so the exclusion window
+    // is narrow: this footprint's simplified ring centroid sits 0.96 m from the
+    // anchor while the nearest NEIGHBOUR vertex is 11.17 m (SF3776007). Anything
+    // from ~1 to ~11 m drops this building alone; 12 would take the neighbour.
+    id: '550Third',
+    name: '550 Third Street',
+    lon: -122.3953409,
+    lat: 37.7804407,
+    height: 11,
+    exclude: 8,
+    camera: { distance: 190, yaw: 260, pitch: 34 },
+  },
+  {
+    // Ames Harris Neville Co. Building, 1926 — a whole block corner, so the
+    // exclusion radius has to clear a 41 m footprint half-diagonal. 42 m is
+    // deliberately tight: Alabama and Florida Streets are only ~20 m wide and a
+    // generous radius would punch holes in the facing blocks. Verified against
+    // the re-bake: procedural footprints dropped by exactly one.
+    id: '375Alabama',
+    name: '375 Alabama Street',
+    lon: -122.4118477,
+    lat: 37.7645633,
+    height: 22.5,
+    exclude: 42,
+    camera: { distance: 330, yaw: 215, pitch: 18 },
+  },
   {
     id: 'letterman',
     name: 'Letterman Digital Arts Center',
