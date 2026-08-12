@@ -14,11 +14,55 @@ async function json(path) {
   return res.json();
 }
 
-async function bin(path) {
+// Binary tiles ship as .bin.gz alongside the raw .bin (written by
+// scripts/compress-tiles.mjs at build time) and inflate off the wire with the
+// native DecompressionStream — no dependency, no worker change. The raw file
+// is the guaranteed fallback: a browser without the API, a dev server without
+// the archives, or one missing file all degrade to exactly the old behaviour
+// (rule 3), with a single console warning when compressed delivery is off
+// entirely.
+let gzTiles = typeof DecompressionStream === 'function' ? 'probe' : 'off';
+
+// Some static servers send .gz files with `content-encoding: gzip` (the
+// browser inflates them on the wire — vite preview does this), others send the
+// raw archive bytes (Vercel). Sniffing the gzip magic covers both: a baked
+// tile can never start 0x1f 0x8b (every blob opens with its own format magic).
+async function inflateIfGzip(buffer) {
+  const head = new Uint8Array(buffer, 0, 2);
+  if (head[0] !== 0x1f || head[1] !== 0x8b) return buffer;
+  const stream = new Blob([buffer]).stream().pipeThrough(new DecompressionStream('gzip'));
+  return new Response(stream).arrayBuffer();
+}
+
+export async function fetchTileBin(path) {
+  if (gzTiles !== 'off') {
+    try {
+      const res = await fetch(tileUrl(path + '.gz'));
+      // A server with an SPA fallback answers a missing archive with 200 +
+      // index.html — that is a miss, not a tile.
+      const isTile = res.ok && !(res.headers.get('content-type') || '').includes('text/html');
+      if (isTile) {
+        const buffer = await inflateIfGzip(await res.arrayBuffer());
+        gzTiles = 'on';
+        return buffer;
+      }
+      if (gzTiles === 'probe') {
+        gzTiles = 'off';
+        console.warn(`compressed tiles unavailable (${path}.gz: ${res.status}) — using raw .bin`);
+      }
+    } catch (err) {
+      if (gzTiles === 'probe') {
+        gzTiles = 'off';
+        console.warn('compressed tiles unavailable — using raw .bin', err);
+      }
+    }
+  }
   const res = await fetch(tileUrl(path));
   if (!res.ok) throw new Error(`failed to load ${path}: ${res.status}`);
   return res.arrayBuffer();
 }
+
+const bin = fetchTileBin;
 
 export async function loadCore(onProgress = () => {}) {
   const manifest = await json('manifest.json');
