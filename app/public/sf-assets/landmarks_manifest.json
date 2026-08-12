@@ -400,5 +400,24 @@
     ],
     "tris": 18238,
     "loadRadius": 2500
+  },
+  {
+    "id": "543-presidio-blvd",
+    "file": "543-presidio-blvd.glb",
+    "anchor": [
+      -122.4515766,
+      37.7973711
+    ],
+    "targetHeightM": 9.55,
+    "cat": 1,
+    "name": "543 Presidio Blvd",
+    "estimated": true,
+    "dims": [
+      17.1972,
+      17.7268,
+      9.55
+    ],
+    "tris": 2848,
+    "loadRadius": 2500
   }
 ]

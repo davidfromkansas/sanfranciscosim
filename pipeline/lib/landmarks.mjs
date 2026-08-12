@@ -285,6 +285,22 @@ export const LANDMARKS = [
     clearTrees: true,
     camera: { distance: 700, yaw: 220, pitch: 24 },
   },
+  {
+    // A WWI-era officers' family residence on Presidio Boulevard. The tightest
+    // exclusion radius in the set, and the numbers behind it are worth keeping:
+    // measured from the anchor, this house's own footprint reaches 10.1 m, and
+    // the nearest neighbouring DataSF footprint (201006.0016579, the larger
+    // duplex type) reaches 15.9 m. excluded() drops a footprint when ANY vertex
+    // falls inside the radius, so the window is 10.1 < r < 15.9 and 12 m sits
+    // in the middle of it. Anything past ~15.5 m deletes the neighbour.
+    id: '543PresidioBlvd',
+    name: '543 Presidio Blvd',
+    lon: -122.4515766,
+    lat: 37.7973711,
+    height: 9.55,
+    exclude: 12,
+    camera: { distance: 120, yaw: 130, pitch: 28 },
+  },
 ];
 
 // Parks/green spaces the landcover bake must match at least one source polygon
