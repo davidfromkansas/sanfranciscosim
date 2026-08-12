@@ -402,6 +402,25 @@
     "loadRadius": 2500
   },
   {
+    "id": "chase-center",
+    "file": "chase-center.glb",
+    "anchor": [
+      -122.3873962,
+      37.7678739
+    ],
+    "targetHeightM": 40.8,
+    "cat": 0,
+    "name": "Chase Center",
+    "estimated": false,
+    "dims": [
+      164.3642,
+      159.1251,
+      40.8
+    ],
+    "tris": 11291,
+    "loadRadius": 2500
+  },
+  {
     "id": "543-presidio-blvd",
     "file": "543-presidio-blvd.glb",
     "anchor": [

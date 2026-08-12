@@ -145,7 +145,16 @@ building on that footprint, so the GLB will intersect it. You must also:
      && npm run notables && npm run context
    # or just: npm run all (same order, includes the downloads)
    ```
-   Commit the regenerated files under `app/public/tiles/` that actually changed.
+   **Run the whole chain — stopping at `toy` is a trap.** `context.mjs` imports
+   `LANDMARKS`, so the context tier owns your landmark's pick box, its
+   `search-index` entry and its `context/landmarks.json` row; and the publish step
+   in `validate.mjs` drops `app/public/tiles/ctx/` and `context/`, so stopping
+   early silently deletes ~550 committed files and breaks search and the
+   concierge. `lore` must run before `context`, or `context` fails its own
+   "every building has a pick box and an identity" check against a stale join.
+   `context` also rewrites `api/_data/`.
+   Commit the regenerated files under `app/public/tiles/` and `api/_data/` that
+   actually changed.
 3. Confirm with `node pipeline/audit.mjs` that check 1.6 (no procedural footprint
    inside a bespoke landmark exclusion zone) passes.
 

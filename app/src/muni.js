@@ -48,7 +48,9 @@ const MISSES_TO_DROP = 2;
 const CAR_SCALE = 1.6;
 
 // Movement tuning against the acceptance bar: stopped must read as stopped.
-const DWELL_SPEED = 0.7; // m/s reported below this counts as dwelling
+// Displacement across one fix gap below which a bus is standing still. A
+// speed READING of 0 means nothing here — see the note in apply().
+const DWELL_STEP_M = 14; // ~one 40-foot coach at 1.6x
 const DECEL = 3.2; // m/s^2 easing into a stop (~2 s from cruise)
 const ACCEL = 1.4; // m/s^2 pulling away
 const CATCHUP_FACTOR = 1.3; // max overspeed while closing a gap to the fix
@@ -59,13 +61,38 @@ const HEADING_EASE = 2.4; // rad/s toward the tangent
 
 // Badges: cream route pills over each roof, one instanced quad layer fed by a
 // lazily-grown canvas atlas (a draw call per route would be ~40 calls).
+// Speech-bubble callouts, the idiom of the isometric city-builder the look is
+// borrowed from: a cream bubble with a tail pointing down at the roof, so a
+// glance from the locked 42 deg camera reads "that vehicle is saying 38R".
+// Square atlas cells (bubble in the top ~2/3, tail below) at 8x8 = 64 slots;
+// only motor coaches are drawn and Muni runs ~44 of those, so 64 is headroom.
 const BADGE_COLS = 8;
-const BADGE_ROWS = 16;
-const BADGE_W = 9; // metres on screen-facing quad
-const BADGE_H = 4.5;
-const BADGE_Y = 12; // metres above the street (roof is ~5.5 m at 1.6x)
-const BADGE_NEAR = 2000; // full opacity inside this camera distance...
-const BADGE_FAR = 4000; // ...gone past this
+const BADGE_ROWS = 8;
+const BADGE_W = 7.2; // metres, square quad: the tail needs vertical room
+const BADGE_H = 7.2;
+// Height of the QUAD CENTRE. The tail tip sits ~0.36 x BADGE_H below centre, so
+// this lands the point just above the 5.5 m roof (3.42 m body x 1.6 carScale).
+const BADGE_Y = 8.6;
+// Badges follow the ZOOM, not a fixed distance in metres. A radius tuned for
+// street level shows nothing from the air, which is where this camera spends
+// most of its time; one tuned for the air carpets the Mission at street level.
+// So the working radius is derived from the camera's height each frame and the
+// bubbles are scaled to hold a roughly constant SIZE ON SCREEN — a bubble a
+// kilometre away is drawn a kilometre-sized, which is what makes them legible
+// from up high. Density is then bounded by MAX_BADGES, not by the radius.
+const BADGE_RADIUS_MIN = 300;
+const BADGE_RADIUS_MAX = 2600;
+const BADGE_RADIUS_PER_M = 1.15; // radius per metre of camera height
+// Above this camera height the whole city is on screen and bubbles would be
+// pixel soup: the layer switches off entirely.
+const BADGE_CEILING_Y = 3400;
+// Camera distance at which a bubble is drawn at its authored size; scale is
+// proportional to distance either side of it, so screen size stays put.
+const BADGE_REF_DIST = 420;
+const BADGE_SCALE_MIN = 0.85;
+const BADGE_SCALE_MAX = 9;
+// Hard ceiling on how many shout at once, whatever the radius.
+const MAX_BADGES = 18;
 
 const PICK_RADIUS = 16;
 const MAX_PICK_DISTANCE = 9000;
@@ -252,44 +279,70 @@ class BadgeAtlas {
     this.slots = new Map(); // route -> [u, v, w, h]
   }
 
+  // One cell: a rounded bubble with a tail dropping from its underside, drawn
+  // once the first time a route appears on screen.
   rect(route) {
     let slot = this.slots.get(route);
     if (slot) return slot;
     const index = this.slots.size;
     if (index >= BADGE_COLS * BADGE_ROWS) return [0, 0, 0, 0];
-    const cw = this.canvas.width / BADGE_COLS;
-    const ch = this.canvas.height / BADGE_ROWS;
-    const x = (index % BADGE_COLS) * cw;
-    const y = Math.floor(index / BADGE_COLS) * ch;
+    const cell = this.canvas.width / BADGE_COLS; // 128 px, square
+    const x = (index % BADGE_COLS) * cell;
+    const y = Math.floor(index / BADGE_COLS) * cell;
 
     const ctx = this.ctx;
-    const pad = 6;
-    const r = 16;
-    const bx = x + pad;
-    const by = y + pad;
-    const bw = cw - pad * 2;
-    const bh = ch - pad * 2;
-    ctx.clearRect(x, y, cw, ch);
-    // Hard offset shadow first, then the pill, then the border — the press-down
-    // physicality the HUD cards use, at diorama scale.
+    ctx.clearRect(x, y, cell, cell);
+    ctx.save();
+    ctx.translate(x, y);
+
+    // Bubble body + tail as ONE path, so the outline runs around the joint
+    // instead of drawing a seam across the bubble's underside.
+    const bx = 7;
+    const by = 6;
+    const bw = cell - 14;
+    const bh = 82;
+    const r = 20;
+    const tailL = 48;
+    const tailR = 80;
+    const tipX = 56; // a touch left of centre, as the reference does it
+    const tipY = 118;
     ctx.beginPath();
-    ctx.roundRect(bx + 4, by + 5, bw - 4, bh - 5, r);
-    ctx.fillStyle = 'rgba(58, 53, 48, 0.85)';
+    ctx.moveTo(bx + r, by);
+    ctx.lineTo(bx + bw - r, by);
+    ctx.quadraticCurveTo(bx + bw, by, bx + bw, by + r);
+    ctx.lineTo(bx + bw, by + bh - r);
+    ctx.quadraticCurveTo(bx + bw, by + bh, bx + bw - r, by + bh);
+    ctx.lineTo(tailR, by + bh);
+    ctx.lineTo(tipX, tipY); // the point, aimed at the roof below
+    ctx.lineTo(tailL, by + bh);
+    ctx.lineTo(bx + r, by + bh);
+    ctx.quadraticCurveTo(bx, by + bh, bx, by + bh - r);
+    ctx.lineTo(bx, by + r);
+    ctx.quadraticCurveTo(bx, by, bx + r, by);
+    ctx.closePath();
+
+    // Soft drop shadow lifts the bubble off whatever roof is behind it.
+    ctx.shadowColor = 'rgba(28, 24, 20, 0.34)';
+    ctx.shadowBlur = 7;
+    ctx.shadowOffsetY = 4;
+    ctx.fillStyle = '#fbf7ee';
     ctx.fill();
-    ctx.beginPath();
-    ctx.roundRect(bx, by, bw - 4, bh - 5, r);
-    ctx.fillStyle = '#f7f1e3';
-    ctx.fill();
-    ctx.lineWidth = 3;
+    ctx.shadowColor = 'transparent';
+    ctx.lineWidth = 5;
+    ctx.lineJoin = 'round';
     ctx.strokeStyle = '#3a3530';
     ctx.stroke();
+
     ctx.fillStyle = '#3a3530';
-    ctx.font = `700 ${route.length > 2 ? 34 : 40}px ui-rounded, -apple-system, system-ui, sans-serif`;
+    const size = route.length > 3 ? 36 : route.length > 2 ? 44 : 54;
+    ctx.font = `800 ${size}px ui-rounded, "SF Pro Rounded", -apple-system, system-ui, sans-serif`;
     ctx.textAlign = 'center';
     ctx.textBaseline = 'middle';
-    ctx.fillText(route, bx + (bw - 4) / 2, by + (bh - 5) / 2 + 2);
+    ctx.fillText(route, bx + bw / 2, by + bh / 2 + 1);
+    ctx.restore();
 
-    slot = [x / this.canvas.width, 1 - (y + ch) / this.canvas.height, cw / this.canvas.width, ch / this.canvas.height];
+    const u = cell / this.canvas.width;
+    slot = [x / this.canvas.width, 1 - (y + cell) / this.canvas.height, u, u];
     this.slots.set(route, slot);
     this.texture.needsUpdate = true;
     return slot;
@@ -342,6 +395,10 @@ export function createLiveMuni(scene, data) {
   let polling = false;
   let warnedFetch = false;
   let demoStart = 0;
+  // Adaptive badge radius, within whatever the zoom allows. A dense corridor
+  // pulls it in, a quiet neighbourhood lets it back out. O(1) per frame, no
+  // sorting, no allocation, and slow enough that bubbles fade rather than blink.
+  let badgeRadius = BADGE_RADIUS_MAX;
 
   async function load() {
     // The shapes bake is an enhancement, not a requirement: without it every
@@ -475,19 +532,25 @@ export function createLiveMuni(scene, data) {
         }
       }
 
-      // The speed the follower should hold to arrive at the new projection in
-      // about one fix gap, informed by the reported speed. A reported crawl or
-      // an unmoved projection means dwell — target zero and STOP (the "stopped
-      // means stopped" rule); the distance stays banked in targetS and is paid
-      // out when the bus reports moving again.
+      // How fast to run so the bus covers the ground it actually covered.
+      //
+      // DWELL IS A DISPLACEMENT TEST, NOT A SPEED READING. GTFS-RT's `speed` is
+      // an instantaneous sample at the fix moment, and 260 of 507 Muni vehicles
+      // report exactly 0 at any given instant — every one sitting at a light or
+      // a stop when the sample was taken. Reading that as "parked" froze half
+      // the fleet on every poll even though those buses had plainly moved
+      // hundreds of metres since their previous fix. Only a bus that has not
+      // MOVED between two fixes is dwelling; the reported speed merely biases
+      // how fast it runs once we know it has.
       const reported = Number.isFinite(bus.speedMs) ? bus.speedMs : null;
       const fixStep = Math.hypot(x - prevFixX, z - prevFixZ);
-      const dwelling = (reported != null && reported < DWELL_SPEED) || (reported == null && fixStep < 8);
       if (state.shapeIdx >= 0) {
         const gapS = Math.max(0, state.targetS - state.s);
-        state.targetSpeed = dwelling ? 0 : Math.min(MAX_SPEED, Math.max(reported ?? 0, gapS / gap) );
+        // One bus length of slack: less than that across a whole fix gap is
+        // genuinely standing still, and the dwell easing takes it to a stop.
+        state.targetSpeed = gapS < DWELL_STEP_M ? 0 : Math.min(MAX_SPEED, Math.max(gapS / gap, (reported ?? 0) * 0.6));
       } else {
-        state.targetSpeed = dwelling ? 0 : Math.min(MAX_SPEED, reported ?? fixStep / gap);
+        state.targetSpeed = fixStep < DWELL_STEP_M ? 0 : Math.min(MAX_SPEED, fixStep / gap);
         state.deadYaw = fixStep > 4 ? Math.atan2(x - prevFixX, z - prevFixZ) : state.deadYaw;
       }
     }
@@ -650,6 +713,17 @@ export function createLiveMuni(scene, data) {
     const camX = camera.position.x;
     const camZ = camera.position.z;
     let count = 0;
+    let badgeCount = 0;
+    let eligible = 0;
+    // Camera height stands in for zoom: the rig is pitch-locked, so height and
+    // orbit distance move together and this needs no extra plumbing.
+    const camY = camera.position.y;
+    const badgesOn = camY < BADGE_CEILING_Y;
+    const zoomRadius = Math.max(BADGE_RADIUS_MIN, Math.min(BADGE_RADIUS_MAX, camY * BADGE_RADIUS_PER_M));
+    const badgeScale = Math.max(
+      BADGE_SCALE_MIN,
+      Math.min(BADGE_SCALE_MAX, Math.max(camY, 120) / BADGE_REF_DIST),
+    );
 
     for (const state of buses.values()) {
       if (now - state.lastFixAt > STALE_MS) {
@@ -700,17 +774,27 @@ export function createLiveMuni(scene, data) {
       bodyMesh.setMatrixAt(count, dummy.matrix);
       if (glowMesh) glowMesh.setMatrixAt(count, dummy.matrix);
 
-      // Badge: billboarded to the camera, faded by distance, atlas cell by route.
+      // Badge: a speech bubble billboarded to the camera, only for buses close
+      // enough to be worth calling out. Counted separately from the body so a
+      // skipped bubble costs an instance rather than leaving a hole.
       const dist = Math.hypot(state.x - camX, state.z - camZ);
-      const fade = dist < BADGE_NEAR ? 1 : dist > BADGE_FAR ? 0 : 1 - (dist - BADGE_NEAR) / (BADGE_FAR - BADGE_NEAR);
-      const rect = atlas.rect(state.route);
-      dummy.position.set(state.x, y + BADGE_Y, state.z);
-      dummy.quaternion.copy(camQ);
-      const badgeScale = fade > 0 ? 1 + dist / 2600 : 0; // grow a little with distance so pills stay legible
-      dummy.scale.setScalar(badgeScale * fade);
-      dummy.updateMatrix();
-      badge.mesh.setMatrixAt(count, dummy.matrix);
-      badge.uvRect.setXYZW(count, rect[0], rect[1], rect[2], rect[3]);
+      const near = badgeRadius * 0.72; // fade over the outer quarter of the ring
+      if (badgesOn && dist < badgeRadius) {
+        eligible++;
+        if (badgeCount < MAX_BADGES) {
+          const fade = dist < near ? 1 : Math.max(0, 1 - (dist - near) / Math.max(1, badgeRadius - near));
+          const rect = atlas.rect(state.route);
+          dummy.position.set(state.x, y + BADGE_Y * badgeScale, state.z);
+          dummy.quaternion.copy(camQ);
+          // Proportional to distance => constant on screen. Anchored so the
+          // tail still meets the roof: BADGE_Y scales with the bubble.
+          dummy.scale.setScalar(badgeScale * fade);
+          dummy.updateMatrix();
+          badge.mesh.setMatrixAt(badgeCount, dummy.matrix);
+          badge.uvRect.setXYZW(badgeCount, rect[0], rect[1], rect[2], rect[3]);
+          badgeCount++;
+        }
+      }
 
       count++;
       if (count >= CAPACITY) break;
@@ -722,9 +806,14 @@ export function createLiveMuni(scene, data) {
       glowMesh.count = count;
       glowMesh.instanceMatrix.needsUpdate = true;
     }
-    badge.mesh.count = count;
+    badge.mesh.count = badgeCount;
     badge.mesh.instanceMatrix.needsUpdate = true;
     badge.uvRect.needsUpdate = true;
+
+    // Breathe the radius toward whatever keeps roughly MAX_BADGES on screen,
+    // bounded by what the current zoom allows.
+    const target = eligible > MAX_BADGES ? badgeRadius * 0.94 : badgeRadius * 1.06;
+    badgeRadius = Math.max(140, Math.min(zoomRadius, badgeRadius + (target - badgeRadius) * Math.min(1, dt * 1.5)));
   }
 
   // ------------------------------------------------------------- entities

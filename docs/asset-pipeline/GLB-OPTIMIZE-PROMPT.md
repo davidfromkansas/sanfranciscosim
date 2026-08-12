@@ -123,9 +123,24 @@ npx gltfpack@0.24 -i mid.glb -o out.glb -c -km -kn -noq
 
   Expect a smaller headline win than the numbers quoted above — those were measured
   with quantization on. Recorded 12 Aug 2026 while optimizing `380-brannan`
-  (see `artifacts/380-brannan/optimize/REPORT.md` §4). **`st-marys-cathedral.glb` is
-  quantized and may be falling back to procedural in production — worth one console
-  check.**
+  (see `artifacts/380-brannan/optimize/REPORT.md` §4).
+- **The `st-marys-cathedral` console check above: done, and it is NOT falling back.**
+  Observed 12 Aug 2026 in a local dev run:
+  `sf-assets: st-marys-cathedral merged 9 objects / 8 materials -> batched (1606
+  tris body); uniform x1.0000`. A quantized `chase-center` build merged and batched
+  the same way before being re-packed to `-noq`. The reason is landmark-specific:
+  `collect()` in `app/src/assets.js` calls `prepareGeometryForTransforms()`, which
+  converts position/normal/tangent to float32 *before* baking the world matrix, so
+  the landmark path survives quantization. The kit/vehicle merge path has no such
+  conversion, which is what `sf-asset-check`'s warning is really about.
+  **`-noq` still stands as the repo standard** — it is what
+  `compress-assets.mjs` produces, it keeps the stage-2 contract validator strict
+  (no `transforms_applied` / `no_unexpected_objects` special cases), and one
+  encoding across all assets is worth more than the extra bytes. This note exists
+  so the question is not re-opened; it is not a licence to quantize.
+- `compress-assets.mjs` **skips** any file that already carries
+  `EXT_meshopt_compression`, so it will not re-pack a wrongly-quantized asset. This
+  step is the only check.
 - `ALLOW_MESHOPT=no` fallback: drop `-c` only.
 - Verify on the output, never trust flags: material name set, manifest node
   names, re-imported bbox within tolerance.
