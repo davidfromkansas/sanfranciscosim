@@ -22,9 +22,10 @@
 
 const feeds = new Map();
 
-export function registerFeed(name, { ttl, fetcher, empty = {}, backoffMs = 60_000, staleMs = 10 * 60_000, swrMs }) {
+export function registerFeed(name, { ttl, fetcher, empty = {}, backoffMs = 60_000, staleMs = 10 * 60_000, swrMs, describe }) {
   feeds.set(name, {
     name,
+    describe: describe || 'live city data', // one line for the concierge's live_data tool
     ttl,
     fetcher,
     empty,

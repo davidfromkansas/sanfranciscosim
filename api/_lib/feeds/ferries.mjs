@@ -201,6 +201,8 @@ async function fetchFerries() {
 }
 
 registerFeed('ferries', {
+  describe:
+    'real San Francisco Bay Ferry (WETA) vessel positions on the Bay right now — lat/lon, bearing, route, destination, next stop with live ETA',
   ttl: TTL_MS,
   staleMs: STALE_MS,
   backoffMs: BACKOFF_MS,
