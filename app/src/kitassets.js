@@ -114,6 +114,18 @@ export function createKitLoader(catalog, { onWarn = console.warn } = {}) {
     get(index) {
       return ready.get(index) || null;
     },
+    /**
+     * Drops a piece's CPU-side merged geometry once the fleet has copied it
+     * into the batch. The entry itself survives — `front`/`triangles` place
+     * every later instance, and a present entry keeps ensure() from
+     * refetching — but the vertex arrays (the bulk of the kit's heap) go.
+     */
+    release(index) {
+      const entry = ready.get(index);
+      if (!entry || !entry.geometry) return;
+      entry.geometry.dispose();
+      entry.geometry = null;
+    },
     failed(index) {
       return failed.has(index);
     },

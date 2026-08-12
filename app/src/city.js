@@ -191,7 +191,13 @@ export function createCity(scene, data) {
   const palette = manifest.palette.map((p) => p.color.map((c) => Math.round(c * 255)));
   const pool = new WorkerPool(Math.max(2, Math.min(6, (navigator.hardwareConcurrency || 4) - 1)));
 
-  const blobCache = new Map(); // `${kind}:${cellKey}` -> ArrayBuffer
+  // LRU: tile blobs are only inputs to geometry builds, and the browser's
+  // immutable HTTP cache makes a refetch near-free — holding every cell's raw
+  // buffer forever is what grows long sessions toward the mobile tab-kill
+  // threshold. `blobsSeen` keeps the tiles readout monotonic under eviction.
+  const blobCache = new Map(); // `${kind}:${cellKey}` -> ArrayBuffer, oldest first
+  const BLOB_CACHE_MAX = 200;
+  const blobsSeen = new Set();
   const brokenStreets = new Set(); // warned once per unusable street tile
   const brokenLandcover = new Set(); // warned once per unusable landcover tile
   const groups = new Map();
@@ -408,10 +414,26 @@ export function createCity(scene, data) {
     indexes.buildings.cells.length + indexes.streets.cells.length + indexes.landcover.cells.length;
 
   const inflight = new Map();
+  function cacheBlob(id, buffer) {
+    blobCache.set(id, buffer);
+    if (!blobsSeen.has(id)) {
+      blobsSeen.add(id);
+      stats.cellsLoaded++;
+    }
+    while (blobCache.size > BLOB_CACHE_MAX) {
+      blobCache.delete(blobCache.keys().next().value);
+    }
+  }
+
   async function blob(kind, cellKey) {
     const id = `${kind}:${cellKey}`;
     const cached = blobCache.get(id);
-    if (cached) return cached;
+    if (cached) {
+      // Refresh recency so the working set survives and only stale cells fall out.
+      blobCache.delete(id);
+      blobCache.set(id, cached);
+      return cached;
+    }
     const existing = inflight.get(id);
     if (existing) return existing;
 
@@ -424,8 +446,7 @@ export function createCity(scene, data) {
 
     const request = (async () => {
       const buffer = await fetchTileBin(`${kind}/${cellKey}.bin`);
-      blobCache.set(id, buffer);
-      stats.cellsLoaded++;
+      cacheBlob(id, buffer);
       return buffer;
     })();
     inflight.set(id, request);
@@ -864,16 +885,16 @@ export function createCity(scene, data) {
     onPathsReady(paths);
 
     // Drop the outgoing tier's blobs so repeated toggles do not grow the cache.
-    for (const id of [...blobCache.keys()]) {
+    const dropped = (id) => {
       const kind = id.slice(0, id.indexOf(':'));
-      if (kind === previous.streets || kind === previous.landcover || kind === previous.buildings) {
-        blobCache.delete(id);
-      }
-    }
+      return kind === previous.streets || kind === previous.landcover || kind === previous.buildings;
+    };
+    for (const id of [...blobCache.keys()]) if (dropped(id)) blobCache.delete(id);
+    for (const id of [...blobsSeen]) if (dropped(id)) blobsSeen.delete(id);
 
-    // cellsLoaded counts blobs held for the current tier, so the tile readout
-    // stays coherent instead of accumulating across swaps.
-    stats.cellsLoaded = blobCache.size;
+    // cellsLoaded counts cells fetched for the current tier, so the tile
+    // readout stays coherent instead of accumulating across swaps.
+    stats.cellsLoaded = blobsSeen.size;
 
     for (const g of reload) buildGround(g).catch((err) => console.warn('ground reload failed', g.key, err));
   }
