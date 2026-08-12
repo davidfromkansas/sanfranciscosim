@@ -62,8 +62,9 @@ route, and the park plans depend on it (§E8 of the parks README).
 | [1008 General Kennedy Avenue](./1008-general-kennedy.md) | `1008-general-kennedy` | 11.9 m | new landmark |
 | [Letterman Digital Arts Center](./letterman-digital-arts-center.md) | `letterman` | ~22 m (estimated) | new landmark |
 | [Chase Center](./chase-center.md) | `chase-center` | 40.8 m | new landmark |
+| [Asian Art Museum (Old Main Library)](./asian-art-museum.md) | `asian-art-museum` | 28.1 m | new landmark |
 
-## Shared contract (all 25)
+## Shared contract (all 26)
 
 - Style: `docs/styles/miniature-toy.md` (authoritative for artistic decisions)
 - Technical contract: `.agents/skills/sf-asset-check/SKILL.md` (authoritative for the GLB)
@@ -110,7 +111,10 @@ architectural target height. 550 Third Street is the sharpest case: its OSM
 `height=7` and the 2010 city LiDAR agree, and both are wrong, because they
 predate the rooftop penthouse that gives the building its crest. Chase Center is
 the inverse case — three published figures (structural 31.755 m, OSM 38.1 m,
-facade crest 40.84 m) each measure a different thing; see that plan's 2.1.
+facade crest 40.84 m) each measure a different thing; see that plan's 2.1. The
+Asian Art Museum is a third failure mode: its OSM `height=46` is not a height at
+all but the NAVD88 roof *elevation* (152.93 ft), which is 1.6x the real 28.1 m
+crest — see that plan's 2.3 before trusting any `height` tag near sea-level datum.
 
 The executing agent is expected to re-verify height, anchor, footprint and
 orientation before modelling — the dossier is a head start, not a citation.
