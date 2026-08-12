@@ -12,41 +12,55 @@ Put the **real Muni motor-coach fleet** on San Francisco's streets: every
 40-foot hybrid bus currently in service appears as the hand-made
 `muni-bus-40.glb`, at its real position, driving its real route, with a
 hovering route badge (`38R`, `29`, `44`…) over its roof. Clicking a bus opens
-the same kind of card a live ferry gets: route, destination, next stop with
-live ETA, fleet number, and what the vehicle is. The concierge can answer
-"where's the nearest 29?" from the same data.
+the same kind of card a live ferry gets: route, destination, upcoming stops
+with live ETAs, fleet number, and what the vehicle is. The concierge can
+answer "where's the nearest 29?" from the same data.
 
 When live data is unavailable — no key, API down, dev offline — nothing
 changes: the procedural road traffic keeps flowing and the app never shows an
 error. AGENTS rules 3 (procedural fallback) and 4 (zero required keys) apply to
 this feature exactly as they did to the ferries.
 
-## Data source decision (already researched — do not re-litigate)
+## Data source decision (owner-decided 2026-08-12 — do not re-litigate)
 
-**Use 511.org's SIRI VehicleMonitoring endpoint with `agency=SF`.** The
-alternatives were evaluated and rejected:
+**Use 511.org's GTFS-Realtime feeds for `agency=SF`:**
 
-| Source | Verdict |
-|---|---|
-| **511.org SIRI VehicleMonitoring, `agency=SF`** | **Use this.** The same endpoint, same JSON dialect, same key mechanics as the shipped ferry feed — `api/_lib/feeds/ferries.mjs` is a proven template for every failure mode (BOM, gzip, timeout, stale, backoff). It is the region's official open feed of SFMTA's own AVL data. |
-| NextBus / UMO public XML (`webservices.umoiq.com`) | Dead — Cubic retired the public API in March 2024. Anything citing it is stale. |
-| 511.org GTFS-Realtime (`/transit/vehiclepositions`, protobuf) | Same underlying SFMTA data, but protobuf needs a decoder and `api/` is zero-dependency by rule. SIRI JSON already carries positions + next-stop predictions (`MonitoredCall` / `OnwardCalls`). No advantage that pays for the complexity. |
-| Swiftly (SFMTA's AVL vendor) | Not publicly keyed; partnership tier. Violates rule 4. |
+- `https://api.511.org/transit/vehiclepositions?agency=SF` — positions
+- `https://api.511.org/transit/tripupdates?agency=SF` — per-stop predictions
 
-So: there is no better free source — 511 *is* the city's recommended API, and
-the repo already ships against it. What is genuinely new here is scale and
-routing, and that is what this spec is about.
+Both are protobuf. **David has approved adding the decoder dependency**
+(`gtfs-realtime-bindings`), which retires the `api/` zero-dependency
+convention for this one package — Part 4 updates the doc line in `AGENTS.md`.
 
-**Key budget — this matters.** A 511 key allows 60 requests/hour.
-`feeds/ferries.mjs` already budgets ~40/h of positions + up to 12/h of
-timetables on `FERRY_511_KEY`. A Muni feed polling every 60 s is another 60/h —
-**it cannot share the ferry key.** Provision a second free key as
-`MUNI_511_KEY` (Production, Preview, Development). Fetcher behaviour:
+Why GTFS-RT over the SIRI JSON the ferry feed uses (same underlying SFMTA AVL
+data, same key, same rate limit — the differences are around the positions):
 
-- `MUNI_511_KEY` set → use it, TTL 60 s.
-- Unset but `FERRY_511_KEY` set → fall back to the ferry key **at TTL 180 s**
-  (20/h, fits the shared budget) so preview deployments work without a second
-  key. Log one warning.
+1. **Exact route-shape matching.** Each vehicle carries a `trip_id` that links
+   through GTFS static (`trips.txt`) to a `shape_id` — the *exact* polyline
+   that bus is driving, including short-turns and branch variants. SIRI would
+   have forced heuristic route+direction matching. The movement system rides
+   on this.
+2. **Whole-trip predictions.** TripUpdates predicts every remaining stop, not
+   just the next call — richer cards for free.
+3. **Payload size.** Protobuf is a few hundred KB where the SIRI fleet dump is
+   1–3 MB of JSON.
+
+Rejected: NextBus/UMO (public API retired March 2024), Swiftly (not publicly
+keyed), SIRI for this feed (weaker on all three points above). **The ferry
+feed stays on SIRI untouched** — it is shipped and working; rewriting it buys
+nothing.
+
+**Key budget — this matters.** A 511 key allows 60 requests/hour and this
+feature makes two kinds of request. `feeds/ferries.mjs` already spends ~52/h
+of `FERRY_511_KEY`, so **Muni cannot share the ferry key at full rate.**
+Provision a second free key as `MUNI_511_KEY` (Production, Preview,
+Development). Fetcher behaviour:
+
+- `MUNI_511_KEY` set → VehiclePositions at TTL 90 s (40/h) + TripUpdates at
+  TTL 5 min (12/h) = 52/h, mirroring the ferry feed's own budget shape.
+- Unset but `FERRY_511_KEY` set → degraded preview mode on the ferry key:
+  VehiclePositions only, TTL 8 min (~8/h, fits beside the ferry's 52/h);
+  cards show positions but no predictions. Log one warning.
 - Neither → `{ live: false, reason: 'no-key', vehicles: [] }`, never a 500.
 
 ## Scope: motor coaches only, one model
@@ -56,10 +70,10 @@ peak. Only the hybrid-bus GLB exists today, so **this task renders motor-coach
 routes only** and the server tags each vehicle with its mode so the client
 never needs a route table:
 
-- `LineRef` ∈ {J, K, L, M, N, T} → `lrv`; {F, E} → `streetcar`;
-  {59, 60, 61} (Powell–Mason, Powell–Hyde, California) → `cable`;
+- `route_id` ∈ {J, K, L, M, N, T} → `lrv`; {F, E} → `streetcar`;
+  the three cable lines (route ids 59/60/61, verify) → `cable`;
   trolleybus numbers {1, 2, 3, 5, 6, 7, 14, 21, 22, 24, 30, 31, 33, 41, 45, 49}
-  (and their letter-suffixed variants, e.g. `5R`, `14R`) → `trolley`;
+  and their letter-suffixed variants (`5R`, `14R`) → `trolley`;
   everything else numbered → **`bus`** (motor coach).
 - The client instantiates **one bus per live `bus`-mode vehicle** and skips the
   rest. When the trolley/LRV/streetcar/cable GLBs land later, they are new
@@ -73,32 +87,42 @@ five" at implementation time; route electrification does shift.
 ## Architecture
 
 ```
-511 SIRI VehicleMonitoring, agency=SF (JSON, 60 req/hr/key)
-        │ polled server-side, TTL 60 s
-        ▼
-api/_lib/feeds/muni.mjs      fetcher + normaliser, registered in feedcore
-        │ GET /api/muni (CDN-cached, last-good stale serving — feedcore owns this)
+511 GTFS-Realtime, agency=SF (protobuf, 60 req/hr/key)
+  vehiclepositions (TTL 90 s)      tripupdates (TTL 5 min)
+        └──────────────┬───────────────┘
+                       ▼
+api/_lib/feeds/muni.mjs      decodes both, joins on trip_id, normalises;
+        │                    registered in feedcore
+        │ GET /api/muni (JSON out — protobuf never reaches the browser)
         │ + automatically included in /api/live and the concierge's live_data tool
         ▼
-app/src/muni.js              GLB → InstancedMesh (body + glow); route-shape
+app/src/muni.js              GLB → InstancedMesh (body + glow); exact-shape
         │                    following between fixes; route-badge layer; picking
         ▼
-app/public/tiles/muni-shapes.bin   baked GTFS route geometry (new pipeline step)
+app/public/tiles/muni-shapes.bin   baked GTFS static geometry + stop names
+                                   + trip→shape index (new pipeline step)
 ```
 
 Follow the feedcore recipe at the top of `api/_lib/feedcore.mjs` — fetcher
-file, `registerFeed`, one import line in `feeds/index.mjs`. That is the entire
-server wiring; do not hand-roll caching that feedcore already owns.
+file, `registerFeed`, one import line in `feeds/index.mjs`. Feedcore owns
+caching/stale/backoff; the two upstream TTLs live inside the fetcher the way
+the ferry fetcher stages its timetable calls.
 
 ## Part 1 — Server: `api/_lib/feeds/muni.mjs`
 
-Model it line-for-line on `feeds/ferries.mjs` (BOM strip, 10 s abort, throw on
-failure so the registry serves last-good). Differences:
+Structure like `feeds/ferries.mjs` (10 s abort, throw on failure so the
+registry serves last-good, module-scope caches on warm instances). New ground:
 
-1. `agency=SF`, key selection per the budget rules above.
-2. **Normalise aggressively — the upstream response is large** (hundreds of
-   vehicles with nested calls; expect ~1–3 MB). The client gets a compact
-   shape, ~200 bytes/vehicle:
+1. **The dependency.** Add a root `package.json` with `gtfs-realtime-bindings`
+   (pin the version) so Vercel installs it for the functions. Decode with
+   `GtfsRealtimeBindings.transit_realtime.FeedMessage.decode(new Uint8Array(buf))`.
+   This is the repo's first function dependency — Part 4 updates the docs to
+   say so.
+2. **Two staged fetches, one payload.** VehiclePositions on the feed's own
+   TTL; TripUpdates refreshed lazily on its longer TTL and held at module
+   scope (ferry-timetable idiom). Join on `trip_id`. A missing TripUpdates
+   refresh degrades predictions to null — never block positions on it.
+3. Normalise to a compact JSON shape, ~200 bytes/vehicle:
 
 ```json
 {
@@ -109,83 +133,78 @@ failure so the registry serves last-good). Differences:
       "fleetNumber": "8632",
       "mode": "bus",
       "route": "29",
-      "routeName": "29 Sunset",
-      "directionRef": "IB",
+      "directionId": 0,
+      "tripId": "11510230",
       "lat": 37.7607, "lon": -122.4885,
       "bearingDeg": 87.0,
       "speedMs": 6.2,
-      "occupancy": "seatsAvailable",
-      "destination": "Baker Beach",
+      "occupancy": "MANY_SEATS_AVAILABLE",
       "recordedAt": 1786550000000,
-      "tripRef": "t_...",
-      "next": { "name": "Judah St & 30th Ave", "arrivalAt": 1786550120000, "scheduledArrivalAt": null, "departureAt": null },
-      "onward": [ { "name": "...", "arrivalAt": 0 } ]
+      "stops": [
+        { "stopId": "14448", "arrivalAt": 1786550120000 },
+        { "stopId": "14449", "arrivalAt": 1786550260000 },
+        { "stopId": "14450", "arrivalAt": 1786550395000 }
+      ]
     }
   ]
 }
 ```
 
-- `fleetNumber` is `VehicleRef` — a real Muni fleet number; keep it verbatim.
-- `mode` from the `LineRef` table above. **Ship every mode in the payload**
+- `fleetNumber` from `vehicle.vehicle.id`/`label` — a real Muni fleet number;
+  keep it verbatim.
+- `mode` from the `route_id` table above. **Ship every mode in the payload**
   (the concierge should know about trains too); the client filters to `bus`.
-- `next` from `MonitoredCall`, `onward` capped at the next 2 calls —
-  that is what the card shows; more is payload bloat.
-- `occupancy` if the feed carries `Occupancy`; null otherwise, and the card
-  omits the chip rather than guessing.
-- Drop vehicles with no `LineRef` (not in service) and fixes older than 10 min,
-  as ferries do.
-3. `registerFeed('muni', …)` with `ttl` per key mode, `staleMs: 10 * 60_000`,
+- `stops`: the next **3** predicted stops from TripUpdates, stop_ids + epoch
+  times only. Stop *names* and the trip's *headsign/destination* resolve
+  client-side from the baked static data (Part 2) — shipping names per vehicle
+  per poll is pure payload bloat. Cap the array; the card never shows more.
+- `occupancy` when present (`occupancy_status`), else null and the card omits
+  the chip rather than guessing.
+- Drop vehicles with no trip/route (deadheading) and fixes older than 10 min.
+4. `registerFeed('muni', …)` with `staleMs: 10 * 60_000`,
    `backoffMs: 5 * 60_000`, `empty: { live: false, vehicles: [] }`, and a
    `describe` written for the concierge, e.g.: `'real Muni vehicle positions
-   right now — route, destination, next stop with live ETA, fleet number, mode
-   (bus/trolley/LRV/streetcar/cable) per vehicle'`.
+   right now — route, destination, upcoming stops with live ETAs, fleet
+   number, occupancy, mode (bus/trolley/LRV/streetcar/cable) per vehicle'`.
 
 **That registration is the entire concierge integration for data access** —
 `agent-core.mjs` enumerates registered feeds into the `live_data` tool
 automatically. Additionally, extend `focus_entity` so the agent can point the
-camera at a live bus by id (`SF:8632`), the same way it can a landmark; the
-client-side entity lookup in Part 3 provides the hook.
+camera at a live bus by id (`SF:8632`); the client-side entity lookup in
+Part 3 provides the hook.
 
-4. **Verification step (do first, report in the PR):** the ferry appendix
-   verified `agency=SB`, not `SF`. Before writing the normaliser, curl the SF
-   feed once with a real key (`vercel env pull`) and confirm: vehicle count at
-   a weekday hour, `LineRef` spelling for rapid routes (`38R` vs `38ated`),
-   whether `MonitoredCall` is populated for buses, occupancy field presence,
-   and response size. Paste a redacted sample into the PR description. If
-   `MonitoredCall` turns out empty for Muni, the card's ETA line degrades to
-   "next stop unknown" — do not invent times.
+5. **Verification step (do first, report in the PR):** with a real key
+   (`vercel env pull`), decode one VehiclePositions and one TripUpdates
+   response and confirm: vehicle count at a weekday hour, that `trip_id`s from
+   VehiclePositions appear in TripUpdates and in GTFS static `trips.txt`,
+   `route_id` spelling for rapid routes (`38R`), occupancy presence, and both
+   payload sizes. Paste a redacted summary into the PR description. If
+   `trip_id` join rates are poor (< ~80%), STOP and show David the numbers
+   before building on it.
 
-## Part 2 — Route shapes: `pipeline/muni-shapes.mjs` + `app/public/tiles/muni-shapes.bin`
+## Part 2 — Baked static data: `pipeline/muni-shapes.mjs` → `app/public/tiles/muni-shapes.bin`
 
-Buses must drive **streets**, not chords between GPS fixes. The ferry's
-straight-line dead reckoning is correct on open water and visibly wrong in a
-street grid — a bus cutting diagonally through SoMa blocks would be the first
-thing anyone notices. Two candidate mechanisms were considered:
+Buses must drive **streets**, not chords between GPS fixes. GTFS static gives
+the exact geometry; bake it once (schedules shift ~quarterly; document the
+re-run in the script header like the other pipeline steps).
 
-- *Map-match to the baked street graph at runtime* — no new data, but solving
-  turn-by-turn routing in the client against 2,501 polylines, one-ways
-  unknown, is real complexity with visible failure modes.
-- **Bake the real route geometry (recommended).** 511 publishes GTFS static
-  per agency (`https://api.511.org/transit/datafeeds?operator_id=SF`, a zip;
-  same key). `shapes.txt` + `trips.txt` + `routes.txt` give every Muni route's
-  actual street polyline per direction. This is the data-accuracy answer
-  (AGENTS rule 5): the 29 drives the real 29 alignment because that is what
-  the file says.
-
-New offline pipeline script `pipeline/muni-shapes.mjs`, run rarely (schedules
-shift ~quarterly; document the re-run in the script header like the other
-pipeline steps):
-
-1. Download GTFS static for SF (needs a key at bake time only).
-2. For each **motor-coach** route (same mode table; skip rail/cable/trolley
-   until their models exist): pick the most-used shape per direction
-   (`trips.txt` frequency), project to scene metres with THE projection
-   (`pipeline/lib` — never re-derive), decimate with Douglas-Peucker at ~3 m,
-   and store cumulative arc length per vertex.
-3. Write one compact binary (`muni-shapes.bin`, follow `tilebin.js`
-   conventions: magic, counts, Float32 x/z + cumulative s per vertex; a small
-   JSON index `route|direction → offset`). Target ≤ ~600 KB for ~45 routes ×
-   2 directions. Commit the baked file like other tiles.
+1. Download GTFS static for SF from 511 (`/transit/datafeeds?operator_id=SF`,
+   same key, zip — bake time only, never at runtime).
+2. From `trips.txt` + `shapes.txt` + `routes.txt` + `stops.txt`, for
+   **motor-coach routes** (same mode table):
+   - Every `shape_id` actually used by a motor-coach trip: project to scene
+     metres with THE projection (`pipeline/lib` — never re-derive), decimate
+     with Douglas-Peucker at ~3 m, store cumulative arc length per vertex.
+   - A `trip_id → shape_id` index (only for motor-coach trips), delta/varint
+     packed — this is what makes shape matching *exact* rather than heuristic.
+   - Per trip: `headsign` (the card's destination line), interned strings.
+   - Per stop on those shapes: `stop_id → name, arc-length s on each shape it
+     serves` — names for the card, positions so an approaching bus can be
+     placed relative to its next stop.
+3. One compact binary following `tilebin.js` conventions (magic, counts,
+   Float32 x/z + s, string table). Budget ≤ ~1 MB before meshopt-style gzip
+   on the wire; if the trip index pushes past that, keep per-route default
+   shapes plus exceptions only. Commit the baked file like other tiles.
 4. Heights are NOT baked: the client samples `sampleElevation(x, z)` at draw
    time like all traffic, so terrain changes never invalidate shapes.
 
@@ -203,14 +222,13 @@ missed polls, pick + entity + follow. Differences:
    vehicles (expect ~200–350 peak). One bus per live vehicle — exactly as many
    as the feed reports, never synthetic extras. Scale instances by
    `carScale` (1.6) to match street traffic; `dims` from the manifest entry.
-2. **Movement.** Each vehicle carries its matched shape (`route + directionRef`
-   from `muni-shapes.bin`). On each fix: project the fix onto the shape
-   (nearest arc-length in a window ahead of the previous position — never
-   snap backwards), then advance `s` along the polyline at a speed blended
-   from reported `speedMs` and the distance to the next fix's projection, so
-   buses glide through corners on the real alignment and never teleport.
-   Heading = shape tangent (buses drive forward along their direction; flip
-   180° only when a new fix proves it). Fallbacks, in order: no shape match →
+2. **Movement.** Each vehicle resolves `tripId → shape` via the baked index
+   (fallback: route + direction default shape; fallback: none). On each fix:
+   project the fix onto the shape (nearest arc-length in a window ahead of the
+   previous position — never snap backwards), then advance `s` along the
+   polyline at a speed blended from reported `speedMs` and the distance to the
+   next fix's projection, so buses glide through corners on the real alignment
+   and never teleport. Heading = shape tangent. Fallbacks, in order: no shape →
    ferry-style straight-line dead reckoning; no fix for > 3 min → fade the
    instance out. `y = sampleElevation(x, z) + lift`, per traffic.
 3. **Route badges.** One additional `InstancedMesh` of camera-facing quads,
@@ -223,23 +241,22 @@ missed polls, pick + entity + follow. Differences:
    total, one small texture.** (The extruded-TextGeometry idiom from
    `signs.js` was considered and rejected here: per-route geometry would cost
    a draw call per route in service, ~40+.) Badges fade with camera distance —
-   full at < 2 km, gone by 4 km, and hidden per-instance for buses outside the
-   frustum-ish range the ferries already use. This is a new *style element*;
-   screenshot it for David's approval early rather than polishing it in secret
-   (the STOP rule applies if the pill idiom looks wrong in the scene).
+   full at < 2 km, gone by 4 km. This is a new *style element*; screenshot it
+   for David's approval early rather than polishing it in secret (the STOP
+   rule applies if the pill idiom looks wrong in the scene).
 4. **Picking + card.** Copy the ferry's ray-vs-sphere pick (`PICK_RADIUS`
    ~14 m at 1.6×), `entityFor`, and `busEntity(id)` for follow-refresh. New
    entity `kind: 'transit'`; `cards.js` gets one new branch mirroring
    `vessel`'s (line ~168): title `29 Sunset · bus 8632`, chips for `Live` /
-   route badge / occupancy (when present), rows for destination, next stop
-   with live ETA (+ the 2 onward calls), speed, fleet number and model line
-   ("New Flyer XDE40 hybrid" — derivable from the fleet-number ranges in
+   route badge / occupancy (when present), rows for destination (trip
+   headsign from the bake), the next 3 stops with live ETAs (names from the
+   bake), speed, fleet number and model line ("New Flyer XDE40 hybrid" —
+   derivable from the fleet-number ranges in
    `docs/asset-plans/transit/README.md`), and data age. Times that are null
    say so ("no prediction"), never fabricate. Wire into `main.js` exactly as
-   ferries: import, create, `pickEntity` priority alongside `pickVessel`
-   (buses win over the city, lose to ferries only where they could never
-   overlap anyway), `update(dt)` in the frame loop, a `muni` line in the stats
-   overlay, and `window.SF.muni` for debugging.
+   ferries: import, create, `pickEntity` priority alongside `pickVessel`,
+   `update(dt)` in the frame loop, a `muni` line in the stats overlay, and
+   `window.SF.muni` for debugging.
 5. **Demo mode.** `?muni=demo` seeds ~6 synthetic buses on 2–3 real shapes
    (one rapid `38R`, one local `29`, one with no shape match to exercise the
    fallback), 20 s poll, exactly like `?ferries=demo`. This is what CI-less QA
@@ -247,10 +264,10 @@ missed polls, pick + entity + follow. Differences:
 6. **Fallback drill (rule 3).** No key / fetch fails / empty vehicles →
    `muni.js` renders nothing and procedural traffic is untouched. The GLB
    missing → one console warn, feature disabled, nothing else changes. Delete
-   `muni-shapes.bin` → buses still appear, dead-reckoned. None of these may
-   crash or blank the scene.
+   `muni-shapes.bin` → buses still appear, dead-reckoned, cards show stop ids'
+   times without names. None of these may crash or blank the scene.
 
-## Part 4 — Manifest + budgets
+## Part 4 — Manifest, dependency, budgets
 
 - Add the `muni-bus-40` entry to `app/public/sf-assets/vehicles_manifest.json`
   per the draft in `artifacts/muni-bus/REPORT.md` §8 — **with `weight: 0`**,
@@ -262,20 +279,25 @@ missed polls, pick + entity + follow. Differences:
   `app/public/sf-assets/vehicles/` and run
   `node pipeline/compress-assets.mjs` (it skips already-compressed files; the
   artifact GLB is already meshopt'd, so expect a skip — verify, don't assume).
+- **The dependency is an owner-approved rule change (2026-08-12).** Update the
+  `AGENTS.md` repo-layout line that calls `api/` "zero-dependency" to say the
+  functions carry exactly one dependency (`gtfs-realtime-bindings`, for the
+  Muni feed) and that adding more still needs an owner decision. Keep the API
+  surface JSON-only: protobuf never reaches the browser.
 - **Draw-call cost of this whole feature: 3** (bus bodies, glow layer, badge
   layer) against the < 300 budget. Instance updates are O(fleet) per frame
   with zero allocation — reuse the ferry's scratch-object idiom. Verify the
   perf gates of AGENTS rule 2 on the reference devices, day and night, with
   the fleet at peak (~350 buses).
-- Docs: add the feed to `api/_lib/feedcore.mjs`'s registry comment if it lists
-  feeds, note the second key in the README env section, and update
+- Docs: note the second key in the README env section, and update
   `docs/asset-plans/transit/INTEGRATION-LATER.md` to mark the live-data path
   as landed (leave the parts about the other four modes).
 
 ## QA checklist (report PASS/FAIL each, production URL first line)
 
 1. `/api/muni` with key: `live: true`, plausible vehicle count for the hour,
-   every vehicle has `mode`, motor coaches have `route`/`destination`.
+   every vehicle has `mode`, motor coaches have `route` and joined `stops`
+   predictions.
 2. `/api/muni` without key (preview env var removed): `live: false`, HTTP 200.
 3. Buses appear at real positions — spot-check three against a transit app
    (routes 29/44/43 pass through distinctive geography; screenshot one at a
@@ -284,14 +306,14 @@ missed polls, pick + entity + follow. Differences:
    through turns, no teleports, no buses through buildings, stale buses fade.
 5. Badges legible at the default camera, gone when zoomed out, styled to the
    toy UI, one draw call (stats overlay).
-6. Click a bus → card with route, destination, next stop + ETA, fleet number;
-   follow works (card refreshes as the bus moves); `Esc` releases.
+6. Click a bus → card with route, destination, next stops + ETAs, fleet
+   number; follow works (card refreshes as the bus moves); `Esc` releases.
 7. Concierge: "how many Muni buses are running right now?" and "where is the
    nearest 29?" answered from `live_data`; `focus_entity` flies to a bus.
 8. Night: destination-sign glow ignites with the dusk system (this is the
    first vehicle glow in the app — screenshot it).
 9. Fallback drill: key removed → procedural traffic unchanged; GLB renamed →
-   warn + skip; shapes deleted → dead-reckon.
+   warn + skip; shapes deleted → dead-reckon with nameless stops.
 10. Perf: 60 fps and < 300 draw calls at street level, Mission + downtown,
     desktop and mobile matrix per `docs/plans/PERF-PLAN.md`, with the live
     fleet up.
@@ -304,5 +326,3 @@ missed polls, pick + entity + follow. Differences:
 2. Should non-motor-coach vehicles appear as *anything* before their models
    exist (e.g. generic commuter-bus placeholder for trolleys), or nothing?
    (Spec assumes nothing — wrong-model vehicles are worse than absent ones.)
-3. Is a second 511 key acceptable? (Free, but it's a second credential to
-   manage. Spec assumes yes; the fallback keeps previews working either way.)
