@@ -22,7 +22,7 @@ import {
 } from 'three';
 import { GLTFLoader } from 'three/addons/loaders/GLTFLoader.js';
 import { MeshoptDecoder } from 'three/addons/libs/meshopt_decoder.module.js';
-import { deinterleaveGeometry, mergeGeometries } from 'three/addons/utils/BufferGeometryUtils.js';
+import { mergeGeometries } from 'three/addons/utils/BufferGeometryUtils.js';
 import { updateLandmarkGlow } from './kit.js';
 
 const ASSETS = `${import.meta.env.BASE_URL}sf-assets/`;
@@ -33,23 +33,23 @@ function camelId(id) {
   return id.replace(/-([a-z])/g, (_, c) => c.toUpperCase());
 }
 
-// Quantized or interleaved attributes (KHR_mesh_quantization, meshopt) must
-// become plain floats before a matrix is applied: transforming in place writes
-// the result back into an integer array and loses the dequantization scale.
-function floatGeometry(geometry) {
-  deinterleaveGeometry(geometry);
-  for (const name in geometry.attributes) {
-    const attribute = geometry.attributes[name];
-    if (attribute.array instanceof Float32Array) continue;
-    const values = new Float32Array(attribute.count * attribute.itemSize);
-    for (let i = 0; i < attribute.count; i++) {
-      const offset = i * attribute.itemSize;
-      values[offset] = attribute.getX(i);
-      if (attribute.itemSize >= 2) values[offset + 1] = attribute.getY(i);
-      if (attribute.itemSize >= 3) values[offset + 2] = attribute.getZ(i);
-      if (attribute.itemSize >= 4) values[offset + 3] = attribute.getW(i);
+function floatAttribute(attribute) {
+  if (!attribute || attribute.array instanceof Float32Array) return attribute;
+  const values = new Float32Array(attribute.count * attribute.itemSize);
+  for (let i = 0; i < attribute.count; i++) {
+    for (let j = 0; j < attribute.itemSize; j++) {
+      values[i * attribute.itemSize + j] = attribute.getComponent(i, j);
     }
-    geometry.setAttribute(name, new BufferAttribute(values, attribute.itemSize));
+  }
+  return new BufferAttribute(values, attribute.itemSize, false);
+}
+
+function prepareGeometryForTransforms(geometry) {
+  for (const name of ['position', 'normal', 'tangent']) {
+    const attribute = geometry.getAttribute(name);
+    if (attribute && !(attribute.array instanceof Float32Array)) {
+      geometry.setAttribute(name, floatAttribute(attribute));
+    }
   }
   return geometry;
 }
@@ -78,7 +78,8 @@ function collect(root) {
     }
     materials.add(material.name);
 
-    const geometry = floatGeometry(object.geometry.clone());
+    const geometry = object.geometry.clone();
+    prepareGeometryForTransforms(geometry);
     geometry.applyMatrix4(object.matrixWorld);
     geometry.deleteAttribute('uv');
     geometry.deleteAttribute('uv1');
@@ -290,6 +291,7 @@ function placeGeneric(group, box, entry, data) {
   const scale = entry.targetHeightM / size.y;
   const [x, z] = data.project(entry.anchor[0], entry.anchor[1]);
   group.scale.setScalar(scale);
+  if (entry.yawDeg !== undefined) group.rotation.y = (entry.yawDeg * Math.PI) / 180;
   group.position.set(x, Math.max(0, data.sampleElevation(x, z)), z);
   return { ends: [], log: `uniform x${scale.toFixed(4)} at ${x.toFixed(0)}, ${z.toFixed(0)}` };
 }
@@ -318,7 +320,8 @@ export function createAssets(scene, data, { onPlaced } = {}) {
       return;
     }
 
-    const loader = new GLTFLoader().setMeshoptDecoder(MeshoptDecoder);
+    const loader = new GLTFLoader();
+    loader.setMeshoptDecoder(MeshoptDecoder);
     for (const entry of manifest) {
       try {
         await place(loader, entry);

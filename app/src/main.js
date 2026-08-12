@@ -25,7 +25,8 @@ import { createLiveFerries } from './ferries.js';
 import { createCameraRig } from './camera.js';
 import { createSigns } from './signs.js';
 import { createToyPost } from './toypost.js';
-import { QUALITY, createLoader, createUI } from './ui.js';
+import { QUALITY, QUALITY_LADDER, createLoader, createUI } from './ui.js';
+import { createGovernor } from './governor.js';
 import { createContext } from './context.js';
 import { createFocusOverlay } from './focus.js';
 import { createContextCard, createSearch } from './cards.js';
@@ -112,6 +113,24 @@ async function boot() {
     quality = QUALITY.medium;
   }
 
+  function readQualityPreference() {
+    try {
+      const saved = window.localStorage.getItem('sf.quality');
+      if (saved === 'auto' || QUALITY[saved]) return saved;
+    } catch {
+      // Safari private windows can reject both reads and writes.
+    }
+    return 'auto';
+  }
+
+  function writeQualityPreference(key) {
+    try {
+      window.localStorage.setItem('sf.quality', key);
+    } catch {
+      // A pinned quality still applies for this session when storage is unavailable.
+    }
+  }
+
   function applyQuality(key) {
     qualityKey = key;
     quality = QUALITY[key];
@@ -123,6 +142,19 @@ async function boot() {
     renderer.setSize(window.innerWidth, window.innerHeight, false);
     post.setSize();
   }
+
+  const qualityPreference = readQualityPreference();
+  const governor = createGovernor({
+    tiers: QUALITY,
+    ladder: QUALITY_LADDER,
+    initialTier: qualityPreference === 'auto' ? qualityKey : qualityPreference,
+    mode: qualityPreference,
+    apply: applyQuality,
+    isFlying: () => rig.flying,
+    readStreaming: () => city.stats,
+  });
+  if (qualityPreference !== 'auto') qualityKey = qualityPreference;
+  quality = QUALITY[qualityKey];
 
   // Visual style. The diorama is the only one the app ships: it is applied
   // before the first frame and there is no key, control or URL parameter that
@@ -192,11 +224,13 @@ async function boot() {
       rig.flyTo(presets[index]);
     },
     onQuality(key) {
-      applyQuality(key);
+      writeQualityPreference(key);
+      governor.setMode(key);
+      if (key !== 'auto') applyQuality(key);
       ui.setQuality(key);
     },
   });
-  ui.setQuality(qualityKey);
+  ui.setQuality(qualityPreference);
   applyQuality(qualityKey);
 
   // Diorama is the only style this app ships. It is applied here, before the
@@ -464,6 +498,7 @@ async function boot() {
     city,
     agents,
     ferries,
+    governor,
     landmarks,
     piers,
     presets,
@@ -553,6 +588,7 @@ async function boot() {
     }
 
     rig.update(dt);
+    governor.update(elapsed * 1000);
     pivotWorld.copy(rig.state.pivot);
     context.prefetch(pivotWorld);
     overlay.update(dt);
@@ -613,6 +649,7 @@ async function boot() {
           `sun        ${sky ? `${sky.sun.elevationDeg.toFixed(0)}° el ${sky.sun.azimuthDeg.toFixed(0)}° az` : '—'}`,
           `night      ${shared.uNight.value.toFixed(2)}`,
           `style      ${style}`,
+          `quality    ${governor.mode === 'auto' ? `Auto (${governor.tier})` : governor.tier}`,
         ].join('\n')
       );
     }
