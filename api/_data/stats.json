@@ -1,5 +1,5 @@
 {
- "generated": "2026-08-12T18:48:21.056Z",
+ "generated": "2026-08-12T19:22:21.488Z",
  "buildings": 174770,
  "cells": 596,
  "categories": [
@@ -49,7 +49,7 @@
    "cat": 6,
    "id": "bar",
    "label": "Bar",
-   "count": 523,
+   "count": 524,
    "night": 1
   },
   {
@@ -168,7 +168,7 @@
    "cat": 23,
    "id": "parking_garage",
    "label": "Parking garage",
-   "count": 1850,
+   "count": 1849,
    "night": 3
   },
   {
@@ -230,7 +230,7 @@
   {
    "sub": "parking_garage",
    "label": "Parking garage",
-   "count": 900
+   "count": 899
   },
   {
    "sub": "community_center",
@@ -428,6 +428,11 @@
    "count": 57
   },
   {
+   "sub": "museum",
+   "label": "Museum",
+   "count": 56
+  },
+  {
    "sub": "bookstore",
    "label": "Bookstore",
    "count": 56
@@ -435,11 +440,6 @@
   {
    "sub": "self_storage",
    "label": "Self storage",
-   "count": 56
-  },
-  {
-   "sub": "museum",
-   "label": "Museum",
    "count": 56
   },
   {
@@ -468,6 +468,11 @@
    "count": 48
   },
   {
+   "sub": "workshop",
+   "label": "Workshop",
+   "count": 47
+  },
+  {
    "sub": "dispensary",
    "label": "Dispensary",
    "count": 47
@@ -475,11 +480,6 @@
   {
    "sub": "thrift_store",
    "label": "Thrift store",
-   "count": 47
-  },
-  {
-   "sub": "workshop",
-   "label": "Workshop",
    "count": 47
   },
   {
@@ -493,8 +493,8 @@
    "count": 43
   },
   {
-   "sub": "warehouse",
-   "label": "Warehouse",
+   "sub": "college",
+   "label": "College",
    "count": 40
   },
   {
@@ -503,13 +503,13 @@
    "count": 40
   },
   {
-   "sub": "event_venue",
-   "label": "Event venue",
+   "sub": "warehouse",
+   "label": "Warehouse",
    "count": 40
   },
   {
-   "sub": "college",
-   "label": "College",
+   "sub": "event_venue",
+   "label": "Event venue",
    "count": 40
   },
   {
@@ -535,7 +535,7 @@
   {
    "sub": "wine_bar",
    "label": "Wine bar",
-   "count": 31
+   "count": 32
   },
   {
    "sub": "ice_cream",
@@ -657,9 +657,9 @@
   "landuse": 140698,
   "business": 10214,
   "heuristic": 7280,
-  "osm": 8626,
-  "overture": 6664,
-  "datasf": 1288
+  "datasf": 1288,
+  "overture": 6663,
+  "osm": 8627
  },
  "confidence": [
   147978,

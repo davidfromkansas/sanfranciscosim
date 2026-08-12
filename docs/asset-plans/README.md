@@ -61,8 +61,9 @@ route, and the park plans depend on it (§E8 of the parks README).
 | [375 Alabama Street (Ames Harris Neville Co.)](./375-alabama.md) | `375-alabama` | 22.5 m | new landmark |
 | [1008 General Kennedy Avenue](./1008-general-kennedy.md) | `1008-general-kennedy` | 11.9 m | new landmark |
 | [Letterman Digital Arts Center](./letterman-digital-arts-center.md) | `letterman` | ~22 m (estimated) | new landmark |
+| [Chase Center](./chase-center.md) | `chase-center` | 40.8 m | new landmark |
 
-## Shared contract (all 24)
+## Shared contract (all 25)
 
 - Style: `docs/styles/miniature-toy.md` (authoritative for artistic decisions)
 - Technical contract: `.agents/skills/sf-asset-check/SKILL.md` (authoritative for the GLB)
@@ -107,7 +108,22 @@ labelled *inferred* or *estimated* and is called out again in each plan's sectio
 Mary's 18.9 m, Cal Academy 11 m, de Young 13 m) and must never be used as the
 architectural target height. 550 Third Street is the sharpest case: its OSM
 `height=7` and the 2010 city LiDAR agree, and both are wrong, because they
-predate the rooftop penthouse that gives the building its crest.
+predate the rooftop penthouse that gives the building its crest. Chase Center is
+the inverse case — three published figures (structural 31.755 m, OSM 38.1 m,
+facade crest 40.84 m) each measure a different thing; see that plan's 2.1.
 
 The executing agent is expected to re-verify height, anchor, footprint and
 orientation before modelling — the dossier is a head start, not a citation.
+
+## Night renders: drive `_Glow` from Base Color, not from the imported emission
+
+A review rig that re-imports the exported GLB (which is the required way to
+render — always render the file that ships) cannot simply raise
+`Emission Strength` on the `_Glow` materials. glTF writes
+`emissiveFactor = 0` when the authored emission strength is 0, so a re-imported
+`_Glow` material carries a **default white** emission and every glow surface
+renders as a white slab. Copy `Base Color` into `Emission Color` and use
+strength 1.0 — that is also exactly what the app does, since its night layer is
+an unlit overlay drawn at the material's own baked colour. Caught on
+`chase-center` (its blue video board rendered pure white);
+`tools/glb-optimize/render_ab.py` already does it correctly.
