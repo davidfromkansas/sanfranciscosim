@@ -31,6 +31,9 @@ export function createCameraRig(camera, domElement, sampleElevation, extent) {
   const pointerPx = new Vector2(-1000, -1000);
   const raycaster = new Raycaster();
   let dragMode = null; // 'rotate' | 'pan'
+  // Touch: active touch pointers by id; two of them make a pinch/twist gesture.
+  const touches = new Map();
+  let gesture = null; // { span, angle, midX, midY, twist }
   let lastX = 0;
   let lastY = 0;
   const panPlanePoint = new Vector3();
@@ -184,11 +187,48 @@ export function createCameraRig(camera, domElement, sampleElevation, extent) {
     if (event.code === 'ShiftLeft' || event.code === 'ShiftRight') state.boost = 1;
   }
 
+  // The first two touches (Map preserves insertion order) define the gesture;
+  // extra fingers are tracked but ignored.
+  function gesturePoints() {
+    const [a, b] = [...touches.values()];
+    return {
+      span: Math.hypot(b.x - a.x, b.y - a.y),
+      angle: Math.atan2(b.y - a.y, b.x - a.x),
+      midX: (a.x + b.x) / 2,
+      midY: (a.y + b.y) / 2,
+    };
+  }
+
+  function anchorPan(clientX, clientY) {
+    const rect = domElement.getBoundingClientRect();
+    lastX = clientX;
+    lastY = clientY;
+    pointer.x = ((clientX - rect.left) / rect.width) * 2 - 1;
+    pointer.y = -((clientY - rect.top) / rect.height) * 2 + 1;
+    dragMode = 'pan';
+    screenToGround(pointer.x, pointer.y, panPlanePoint);
+  }
+
   function onPointerDown(event) {
     domElement.setPointerCapture(event.pointerId);
+    animation = null;
+    if (event.pointerType === 'touch') {
+      touches.set(event.pointerId, { x: event.clientX, y: event.clientY });
+      if (touches.size === 2) {
+        dragMode = null;
+        gesture = { ...gesturePoints(), twist: 0 };
+        return;
+      }
+      if (touches.size > 2) return;
+    }
     lastX = event.clientX;
     lastY = event.clientY;
-    animation = null;
+    // Anchor from THIS event's position: a touch has no hover, so the shared
+    // pointer NDC can be stale from a previous contact and the first pan would
+    // grab the wrong ground point.
+    const rect = domElement.getBoundingClientRect();
+    pointer.x = ((event.clientX - rect.left) / rect.width) * 2 - 1;
+    pointer.y = -((event.clientY - rect.top) / rect.height) * 2 + 1;
     if (event.button === 2 || event.button === 1) {
       dragMode = 'rotate';
       domElement.style.cursor = 'grabbing';
@@ -203,13 +243,90 @@ export function createCameraRig(camera, domElement, sampleElevation, extent) {
     if (domElement.hasPointerCapture(event.pointerId)) {
       domElement.releasePointerCapture(event.pointerId);
     }
+    if (event.pointerType === 'touch') {
+      touches.delete(event.pointerId);
+      if (gesture) {
+        if (touches.size >= 2) {
+          // A spare finger lifted: re-baseline so span/angle don't jump.
+          gesture = { ...gesturePoints(), twist: gesture.twist };
+          return;
+        }
+        gesture = null;
+        if (touches.size === 1) {
+          // Hand the remaining finger a fresh pan anchor instead of ending the drag.
+          const [rest] = [...touches.values()];
+          anchorPan(rest.x, rest.y);
+          return;
+        }
+      }
+    }
     dragMode = null;
     domElement.style.cursor = 'default';
   }
 
   const dragTarget = new Vector3();
 
+  // Two fingers: pinch zooms toward the midpoint's ground point (same pull as
+  // wheel zoom), twist turns — stepped headings in diorama, free yaw otherwise —
+  // and outside diorama the midpoint's vertical travel tilts. Pitch stays locked
+  // in diorama, exactly like every other input path.
+  function onGestureMove() {
+    const g = gesturePoints();
+    const rect = domElement.getBoundingClientRect();
+
+    if (gesture.span > 0 && g.span > 0 && g.span !== gesture.span) {
+      state.holdY = false;
+      pointer.x = ((g.midX - rect.left) / rect.width) * 2 - 1;
+      pointer.y = -((g.midY - rect.top) / rect.height) * 2 + 1;
+      const scale = gesture.span / g.span; // fingers apart -> scale < 1 -> zoom in
+      const hasTarget = screenToGround(pointer.x, pointer.y, zoomTarget);
+      const next = Math.min(state.maxDistance, Math.max(state.minDistance, state.distance * scale));
+      if (hasTarget && scale < 1) {
+        const k = 1 - next / state.distance;
+        state.pivot.x += (zoomTarget.x - state.pivot.x) * k * 0.9;
+        state.pivot.z += (zoomTarget.z - state.pivot.z) * k * 0.9;
+        clampPivot();
+      }
+      state.distance = next;
+      if (!pitchLocked) state.pitch = pitchForDistance(state.distance);
+    }
+
+    let dAngle = g.angle - gesture.angle;
+    while (dAngle > Math.PI) dAngle -= Math.PI * 2;
+    while (dAngle < -Math.PI) dAngle += Math.PI * 2;
+    if (diorama) {
+      // Discrete like every other diorama yaw input: one heading per 30 degrees
+      // of twist.
+      const TWIST_STEP = 30 * DEG;
+      gesture.twist += dAngle;
+      while (Math.abs(gesture.twist) >= TWIST_STEP) {
+        stepYaw(gesture.twist > 0 ? 1 : -1);
+        gesture.twist -= Math.sign(gesture.twist) * TWIST_STEP;
+      }
+    } else {
+      state.yaw += dAngle;
+      state.pitch = Math.min(
+        86 * DEG,
+        Math.max(6 * DEG, state.pitch + (g.midY - gesture.midY) * 0.004)
+      );
+      pitchLocked = true;
+    }
+
+    gesture.span = g.span;
+    gesture.angle = g.angle;
+    gesture.midX = g.midX;
+    gesture.midY = g.midY;
+    apply();
+  }
+
   function onPointerMove(event) {
+    if (event.pointerType === 'touch' && touches.has(event.pointerId)) {
+      touches.set(event.pointerId, { x: event.clientX, y: event.clientY });
+      if (gesture && touches.size >= 2) {
+        onGestureMove();
+        return;
+      }
+    }
     const rect = domElement.getBoundingClientRect();
     pointerPx.set(event.clientX - rect.left, event.clientY - rect.top);
     pointer.x = (pointerPx.x / rect.width) * 2 - 1;
@@ -288,6 +405,7 @@ export function createCameraRig(camera, domElement, sampleElevation, extent) {
 
   domElement.addEventListener('pointerdown', onPointerDown);
   domElement.addEventListener('pointerup', onPointerUp);
+  domElement.addEventListener('pointercancel', onPointerUp);
   domElement.addEventListener('pointermove', onPointerMove);
   domElement.addEventListener('pointerleave', onPointerLeave);
   domElement.addEventListener('wheel', onWheel, { passive: false });
@@ -349,7 +467,7 @@ export function createCameraRig(camera, domElement, sampleElevation, extent) {
     if (keys.has('KeyA') || keys.has('ArrowLeft')) mx -= 1;
 
     // Edge scrolling.
-    if (state.edgeScroll && pointerPx.x > -500 && !dragMode) {
+    if (state.edgeScroll && pointerPx.x > -500 && !dragMode && !gesture) {
       const w = domElement.clientWidth;
       const h = domElement.clientHeight;
       const band = 22;
@@ -443,6 +561,7 @@ export function createCameraRig(camera, domElement, sampleElevation, extent) {
   function dispose() {
     domElement.removeEventListener('pointerdown', onPointerDown);
     domElement.removeEventListener('pointerup', onPointerUp);
+    domElement.removeEventListener('pointercancel', onPointerUp);
     domElement.removeEventListener('pointermove', onPointerMove);
     domElement.removeEventListener('pointerleave', onPointerLeave);
     domElement.removeEventListener('wheel', onWheel);
