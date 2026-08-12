@@ -1,0 +1,764 @@
+/* Boot curtain: full-screen animated fog with a Y2K/Tron progress bar, lifted
+   the moment the city is presentable. Linked from index.html's <head> so the
+   fog is on screen at first paint — before main.js has even parsed, and long
+   before the renderer exists.
+
+   Deliberately NOT built from the toy theme tokens in ui-theme.css. This is a
+   time-boxed curtain that is removed from the DOM before the toy UI is ever
+   interactive, so the two looks never share a frame. Its palette lives in the
+   --boot-* tokens below and nowhere else.
+
+   Performance contract: everything here animates transform/opacity only (no
+   layout, no background-position repaints, no per-frame filter rasterization),
+   because this runs during the heaviest CPU window of the app's life — the
+   workers decoding ~60 MB of tiles. The whole subtree is removed on reveal. */
+
+:root {
+  /* Karl: a marine layer at dusk. Deep cool slate underneath so the white
+     billows read as luminous, never a grey mist on black. */
+  --boot-void: #050a14;
+  --boot-deep: #0b1622;
+  --boot-haze: #1b2938;
+  /* Liquid-chrome capsule: silver bezel, blue→violet glass fill. */
+  --boot-chrome-hi: #ffffff;
+  --boot-chrome-mid: #c6cad6;
+  --boot-chrome-lo: #74788a;
+  --boot-blue: #1f6bff;
+  --boot-violet: #a94bf2;
+  --boot-violet-hi: #d79bff;
+  --boot-hot: #eef2ff;
+  --boot-ink: #aab3c8;
+  --boot-clear-ms: 2400ms;
+}
+
+#boot {
+  position: fixed;
+  inset: 0;
+  z-index: 100;
+  overflow: hidden;
+  background: var(--boot-void);
+  /* Block camera drags while the curtain is up; released the instant it lifts. */
+  pointer-events: auto;
+  contain: strict;
+}
+
+/* ------------------------------------------------------------------ scenery */
+
+/* Dusk sky the bank sits in: darkest overhead, brightening down toward the
+   horizon where the light gets trapped under the layer. */
+#boot .boot-sky {
+  position: absolute;
+  inset: 0;
+  background:
+    radial-gradient(120% 70% at 50% 100%, rgba(120, 160, 190, 0.3) 0%, transparent 64%),
+    radial-gradient(90% 55% at 50% 50%, rgba(70, 105, 140, 0.16) 0%, transparent 74%),
+    linear-gradient(
+      180deg,
+      var(--boot-void) 0%,
+      var(--boot-deep) 42%,
+      var(--boot-haze) 78%,
+      #24384a 100%
+    );
+}
+
+/* Tron floor. The inner element scrolls by exactly one grid step so the loop is
+   seamless, and it is a transform — the mask and perspective rasterize once. */
+#boot .boot-grid {
+  position: absolute;
+  left: -60%;
+  right: -60%;
+  bottom: -14%;
+  height: 62%;
+  perspective: 260px;
+  perspective-origin: 50% 0%;
+  /* Held well back now that the bank is bright — the grid is a hint of Tron
+     under the fog, not a competing subject. */
+  opacity: 0.62;
+  -webkit-mask-image: linear-gradient(to top, #000 0%, rgba(0, 0, 0, 0.35) 42%, transparent 78%);
+  mask-image: linear-gradient(to top, #000 0%, rgba(0, 0, 0, 0.35) 42%, transparent 78%);
+}
+
+#boot .boot-grid i {
+  position: absolute;
+  inset: -100% 0 -60% 0;
+  display: block;
+  transform: rotateX(70deg);
+  transform-origin: 50% 100%;
+  background:
+    repeating-linear-gradient(
+      to right,
+      rgba(0, 234, 255, 0.34) 0 1px,
+      transparent 1px 72px
+    ),
+    repeating-linear-gradient(
+      to bottom,
+      rgba(0, 234, 255, 0.34) 0 1px,
+      transparent 1px 72px
+    );
+  animation: boot-grid-run 2.8s linear infinite;
+}
+
+@keyframes boot-grid-run {
+  to {
+    transform: rotateX(70deg) translate3d(0, 72px, 0);
+  }
+}
+
+/* ---------------------------------------------------------------------- fog */
+
+/* Karl, built as cumulus rather than mist. Each tile is turbulence pushed
+   through blur → steep gamma (which rounds continuous noise into discrete
+   billows with defined edges) and then top-lit: the puff mask minus a copy of
+   itself shifted DOWN leaves a bright rim along every upper edge, which is what
+   makes a fog bank read as volume lit from above instead of flat noise.
+
+   Two tiles (coarse banks, fine wisps) shared by four layers, mirrored and
+   scaled differently for variety — rasterizing four separate turbulence+blur
+   filters at boot is the one thing here that could actually cost a frame. They
+   do not repeat: each layer is oversized and drifts inside its own bounds, so
+   there is no tiling seam to hide (the blur and offset would break stitching
+   anyway). */
+#boot .boot-fog {
+  position: absolute;
+  inset: 0;
+}
+
+#boot .boot-fog i {
+  position: absolute;
+  inset: -55%;
+  display: block;
+  background-position: center;
+  will-change: transform, opacity;
+  transform: translate3d(0, 0, 0);
+}
+
+/* Coarse bank tile. */
+#boot .boot-fog i:nth-child(1),
+#boot .boot-fog i:nth-child(2),
+#boot .boot-fog i:nth-child(3),
+#boot .boot-fog i:nth-child(4) {
+  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='600' height='600'%3E%3Cfilter id='n' x='0' y='0' width='100%25' height='100%25'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.011' numOctaves='5' stitchTiles='stitch' seed='7'/%3E%3CfeColorMatrix type='matrix' values='0 0 0 0 0.78 0 0 0 0 0.86 0 0 0 0 0.95 1.25 0 0 0 -0.42'/%3E%3C/filter%3E%3Crect width='600' height='600' filter='url(%23n)'/%3E%3C/svg%3E");
+  background-repeat: repeat;
+}
+
+/* Deep bank on the horizon: biggest forms, softest, sits behind everything. */
+#boot .boot-fog i:nth-child(1) {
+  background-size: 118% auto;
+  transform: scale(1.5);
+  opacity: 0.52;
+  mix-blend-mode: screen;
+  animation: boot-drift-a 83s ease-in-out infinite alternate;
+}
+
+/* The main body of the layer, held to the lower two thirds so it reads as a
+   bank with a top edge rather than an even wash. */
+#boot .boot-fog i:nth-child(2) {
+  background-size: 76% auto;
+  opacity: 0.4;
+  mix-blend-mode: screen;
+  -webkit-mask-image: linear-gradient(to top, #000 0%, #000 42%, rgba(0, 0, 0, 0.55) 72%, transparent 92%);
+  mask-image: linear-gradient(to top, #000 0%, #000 42%, rgba(0, 0, 0, 0.55) 72%, transparent 92%);
+  animation: boot-drift-b 61s ease-in-out infinite alternate;
+}
+
+/* Nearest billows, mirrored so the shared tile does not read as a repeat. */
+#boot .boot-fog i:nth-child(3) {
+  background-size: 46% auto;
+  opacity: 0.3;
+  mix-blend-mode: screen;
+  -webkit-mask-image: linear-gradient(to top, #000 0%, #000 26%, transparent 68%);
+  mask-image: linear-gradient(to top, #000 0%, #000 26%, transparent 68%);
+  animation: boot-drift-c 44s ease-in-out infinite alternate;
+}
+
+/* Thin wisps blowing across the whole frame, including over the console. */
+#boot .boot-fog i:nth-child(4) {
+  background-size: 32% auto;
+  opacity: 0.22;
+  mix-blend-mode: screen;
+  animation: boot-drift-d 31s linear infinite;
+}
+
+/* The banks breathe: they drift AND swell, which is what separates rolling fog
+   from a texture being slid across the screen. */
+@keyframes boot-drift-a {
+  from {
+    transform: translate3d(-4%, 1%, 0) scale(1.5);
+  }
+  to {
+    transform: translate3d(6%, -2%, 0) scale(1.62);
+  }
+}
+@keyframes boot-drift-b {
+  from {
+    transform: translate3d(3%, 2%, 0) scale(1.04);
+  }
+  50% {
+    transform: translate3d(-3%, -1%, 0) scale(1.14);
+  }
+  to {
+    transform: translate3d(-8%, 1%, 0) scale(1.08);
+  }
+}
+@keyframes boot-drift-c {
+  from {
+    transform: translate3d(-6%, 3%, 0) scaleX(-1) scale(1.06);
+  }
+  50% {
+    transform: translate3d(2%, -2%, 0) scaleX(-1) scale(1.16);
+  }
+  to {
+    transform: translate3d(9%, 2%, 0) scaleX(-1) scale(1.1);
+  }
+}
+@keyframes boot-drift-d {
+  from {
+    transform: translate3d(-16%, 0, 0) scale(1.2);
+  }
+  to {
+    transform: translate3d(16%, -3%, 0) scale(1.3);
+  }
+}
+
+/* ------------------------------------------- tier 2: Blender parting doors */
+
+/* Two halves of a fog curtain, rendered in Cycles as a real scattering volume
+   (artifacts/boot-fog/). Each half has the volume torn away past centre, so
+   the inner edge is genuine wisps and holes — a CSS-clipped plate would give a
+   straight cut and read as two rectangles sliding.
+
+   Hidden until boot.js confirms both decoded; a slow or failed fetch just
+   leaves the procedural SVG tier up. */
+#boot .boot-doors,
+#boot .boot-wisps {
+  position: absolute;
+  inset: 0;
+  opacity: 0;
+  transition: opacity 900ms ease;
+}
+
+#boot.has-doors .boot-doors {
+  opacity: 1;
+}
+
+#boot.has-wisps .boot-wisps {
+  opacity: 0.75;
+}
+
+/* The procedural tier stays faintly underneath so the gap never shows a hard
+   edge against the sky while the doors are still closed. */
+#boot.has-doors .boot-fog {
+  opacity: 0.22;
+  transition: opacity 900ms ease;
+}
+
+/* The slider and the idle drift MUST be separate elements. If one element's
+   transform is driven by an animation, removing that animation and setting a
+   new transform in the same style recalculation does not fire a transition —
+   the door teleports off screen instead of sliding. So `i` owns the slide and
+   nothing else; `i::after` carries the fog and its idle breathing. */
+#boot .boot-doors i {
+  position: absolute;
+  top: -4%;
+  bottom: -4%;
+  width: 104%;
+  display: block;
+  will-change: transform;
+  /* The door slide is the reveal — a long ease-in so it starts as a crack and
+     accelerates open, the way a heavy curtain actually moves. */
+  transition: transform 2100ms cubic-bezier(0.5, 0, 0.2, 1);
+}
+
+#boot .boot-doors i::after {
+  content: '';
+  position: absolute;
+  inset: -5%;
+  background-repeat: no-repeat;
+  background-size: 100% 100%;
+  will-change: transform;
+}
+
+#boot .boot-doors i:nth-child(1) {
+  left: -4%;
+}
+#boot .boot-doors i:nth-child(1)::after {
+  background-image: url('/boot/karl-door-left.webp');
+  background-position: left center;
+  animation: boot-door-idle-l 26s ease-in-out infinite alternate;
+}
+
+#boot .boot-doors i:nth-child(2) {
+  right: -4%;
+}
+#boot .boot-doors i:nth-child(2)::after {
+  background-image: url('/boot/karl-door-right.webp');
+  background-position: right center;
+  animation: boot-door-idle-r 31s ease-in-out infinite alternate;
+}
+
+/* Closed, the doors still breathe — fog is never perfectly still. */
+@keyframes boot-door-idle-l {
+  from {
+    transform: translate3d(0, 0, 0) scale(1);
+  }
+  to {
+    transform: translate3d(-1.6%, 1%, 0) scale(1.05);
+  }
+}
+@keyframes boot-door-idle-r {
+  from {
+    transform: translate3d(0, 0, 0) scale(1.03);
+  }
+  to {
+    transform: translate3d(1.8%, -1%, 0) scale(1);
+  }
+}
+
+/* Foreground wisps: sparse torn fragments close to camera. Without these the
+   doors read as a flat wall, because you are inside the bank rather than
+   looking at it. */
+#boot .boot-wisps i {
+  position: absolute;
+  inset: -25%;
+  display: block;
+  background-image: url('/boot/karl-wisp.webp');
+  background-repeat: no-repeat;
+  background-size: 100% 100%;
+  will-change: transform, opacity;
+  animation: boot-wisp-blow 34s linear infinite;
+}
+
+#boot .boot-wisps i:nth-child(2) {
+  opacity: 0.55;
+  transform: scaleX(-1);
+  animation: boot-wisp-blow-2 23s linear infinite;
+}
+
+@keyframes boot-wisp-blow {
+  from {
+    transform: translate3d(-14%, 2%, 0) scale(1.1);
+  }
+  to {
+    transform: translate3d(14%, -2%, 0) scale(1.24);
+  }
+}
+@keyframes boot-wisp-blow-2 {
+  from {
+    transform: translate3d(12%, -3%, 0) scaleX(-1) scale(1.16);
+  }
+  to {
+    transform: translate3d(-12%, 3%, 0) scaleX(-1) scale(1.3);
+  }
+}
+
+/* --------------------------------------------------------------- the console */
+
+#boot .boot-veil {
+  position: absolute;
+  left: 50%;
+  top: 50%;
+  width: min(1100px, 128vw);
+  height: min(560px, 62vh);
+  transform: translate(-50%, -50%);
+  background: radial-gradient(
+    closest-side,
+    rgba(6, 13, 22, 0.55) 0%,
+    rgba(6, 13, 22, 0.34) 44%,
+    rgba(6, 13, 22, 0.14) 70%,
+    transparent 100%
+  );
+  pointer-events: none;
+}
+
+#boot .boot-core {
+  position: absolute;
+  left: 50%;
+  top: 50%;
+  transform: translate(-50%, -50%);
+  width: min(560px, 86vw);
+  text-align: center;
+  font-family: ui-monospace, SFMono-Regular, 'SF Mono', Menlo, Consolas, monospace;
+  will-change: transform, opacity;
+}
+
+
+
+#boot .boot-frame {
+  position: relative;
+  margin-top: 0;
+  padding: 0;
+}
+
+/* Chrome bezel. The band of light/dark/light down the gradient is what reads
+   as polished metal — a single flat grey would just look like a border. */
+#boot .boot-bar {
+  position: relative;
+  height: clamp(34px, 5.4vw, 48px);
+  padding: 7px;
+  border: none;
+  border-radius: 999px;
+  background: linear-gradient(
+    180deg,
+    var(--boot-chrome-hi) 0%,
+    var(--boot-chrome-mid) 16%,
+    var(--boot-chrome-lo) 40%,
+    #eef0f6 54%,
+    var(--boot-chrome-mid) 74%,
+    #6d7183 100%
+  );
+  box-shadow:
+    inset 0 1px 0 rgba(255, 255, 255, 0.95),
+    inset 0 -1px 0 rgba(0, 0, 0, 0.4),
+    0 10px 26px rgba(0, 0, 0, 0.5),
+    0 0 0 1px rgba(255, 255, 255, 0.22);
+  overflow: visible;
+}
+
+/* Recessed track: dark, dotted, with a hard inner shadow so the fill sits
+   *inside* something rather than floating on top of it. */
+#boot .boot-bar::before {
+  content: '';
+  position: absolute;
+  inset: 7px;
+  border-radius: 999px;
+  background:
+    radial-gradient(circle, rgba(255, 255, 255, 0.11) 0.9px, transparent 1.6px) 0 0 / 9px 9px,
+    linear-gradient(180deg, #2b2f3d 0%, #171a23 60%, #0e1017 100%);
+  box-shadow:
+    inset 0 4px 9px rgba(0, 0, 0, 0.75),
+    inset 0 -1px 0 rgba(255, 255, 255, 0.14);
+  z-index: 0;
+}
+
+/* The liquid. Blue at the tail running to violet at the head, a rounded cap,
+   and a specular streak along the top that sells it as glass rather than a
+   coloured rectangle. */
+#boot .boot-fill {
+  position: relative;
+  z-index: 1;
+  display: block;
+  height: 100%;
+  width: 0%;
+  min-width: 0;
+  border-radius: 999px;
+  background:
+    repeating-linear-gradient(
+      90deg,
+      transparent 0 44px,
+      rgba(255, 255, 255, 0.16) 44px 46px
+    ),
+    linear-gradient(
+      90deg,
+      var(--boot-blue) 0%,
+      #3f5df4 42%,
+      #7b4ff2 72%,
+      var(--boot-violet) 100%
+    );
+  box-shadow:
+    0 0 20px rgba(122, 94, 246, 0.75),
+    0 0 44px rgba(90, 120, 255, 0.35),
+    inset 0 -7px 12px rgba(0, 0, 0, 0.3);
+  transition: width 320ms cubic-bezier(0.22, 0.61, 0.36, 1);
+}
+
+/* Specular streak. */
+#boot .boot-fill::before {
+  content: '';
+  position: absolute;
+  left: 3%;
+  right: 3%;
+  top: 10%;
+  height: 34%;
+  border-radius: 999px;
+  background: linear-gradient(
+    180deg,
+    rgba(255, 255, 255, 0.62) 0%,
+    rgba(255, 255, 255, 0.18) 60%,
+    transparent 100%
+  );
+  pointer-events: none;
+}
+
+/* Bright rounded head, so the leading edge reads as a meniscus. */
+#boot .boot-fill::after {
+  content: '';
+  position: absolute;
+  top: 0;
+  right: 0;
+  width: 14px;
+  height: 100%;
+  border-radius: 999px;
+  background: linear-gradient(90deg, transparent 0%, var(--boot-violet-hi) 70%, #ffffff 100%);
+  box-shadow: 0 0 14px 3px rgba(215, 155, 255, 0.85);
+}
+
+/* Gloss travelling across the capsule. */
+#boot .boot-scan {
+  position: absolute;
+  top: 7px;
+  bottom: 7px;
+  left: 7px;
+  z-index: 2;
+  width: 26%;
+  border-radius: 999px;
+  background: linear-gradient(
+    90deg,
+    transparent 0%,
+    rgba(255, 255, 255, 0.3) 50%,
+    transparent 100%
+  );
+  animation: boot-scan 2.6s linear infinite;
+  will-change: transform;
+  pointer-events: none;
+}
+
+@keyframes boot-scan {
+  from {
+    transform: translate3d(-130%, 0, 0);
+  }
+  to {
+    transform: translate3d(400%, 0, 0);
+  }
+}
+
+#boot .boot-readout {
+  display: flex;
+  gap: 10px;
+  justify-content: space-between;
+  align-items: baseline;
+  margin-top: 11px;
+  font-size: clamp(9px, 1.3vw, 11px);
+  letter-spacing: 0.2em;
+  color: var(--boot-ink);
+}
+
+#boot .boot-pct {
+  color: var(--boot-hot);
+  text-shadow: 0 0 10px rgba(140, 110, 255, 0.9);
+  /* Tabular digits so the readout does not jitter as it counts. */
+  font-variant-numeric: tabular-nums;
+}
+
+#boot .boot-status::before {
+  content: '> ';
+  color: var(--boot-violet-hi);
+}
+
+/* Narrow screens: the status line is the first thing to overflow, so let it
+   truncate rather than wrap and shove the percentage off the edge. */
+#boot .boot-status {
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+  min-width: 0;
+}
+
+#boot .boot-pct {
+  flex: none;
+}
+
+@media (max-width: 520px) {
+  #boot .boot-title {
+    letter-spacing: 0.3em;
+    text-indent: 0.3em;
+  }
+  #boot .boot-sub {
+    letter-spacing: 0.24em;
+    text-indent: 0.24em;
+  }
+  #boot .boot-bar {
+    height: 32px;
+  }
+  #boot .boot-readout {
+    letter-spacing: 0.12em;
+  }
+}
+
+/* CRT scanlines over everything. */
+#boot .boot-scanlines {
+  position: absolute;
+  inset: 0;
+  background: repeating-linear-gradient(
+    180deg,
+    rgba(0, 0, 0, 0.2) 0 1px,
+    transparent 1px 4px
+  );
+  /* Restrained: against a bright bank a heavy scanline reads as banding on a
+     photo rather than as a CRT. */
+  opacity: 0.22;
+}
+
+/* ------------------------------------------------------------------- reveal */
+
+/* One class starts the whole dissipation. The fog banks push outward and fade
+   on a stagger, the console powers down first, and the curtain is removed from
+   the DOM by boot.js when it is over. */
+#boot.is-clearing {
+  pointer-events: none;
+  transition: opacity 950ms ease 1450ms;
+  opacity: 0;
+}
+
+#boot.is-clearing .boot-fog i {
+  transition:
+    transform var(--boot-clear-ms) cubic-bezier(0.3, 0, 0.2, 1),
+    opacity var(--boot-clear-ms) cubic-bezier(0.4, 0, 0.7, 1);
+  opacity: 0;
+  animation-play-state: paused;
+}
+
+/* The doors part. `i` has never been animated, so its transform transitions
+   cleanly; the drift on ::after keeps breathing underneath the slide. */
+#boot.has-doors.is-clearing .boot-doors i:nth-child(1) {
+  transform: translate3d(-128%, -2%, 0) scale(1.06);
+}
+#boot.has-doors.is-clearing .boot-doors i:nth-child(2) {
+  transform: translate3d(128%, -2%, 0) scale(1.06);
+}
+
+/* Wisps blow clear a beat sooner, so nothing is left floating over the city. */
+#boot.has-doors.is-clearing .boot-wisps {
+  transition: opacity 700ms ease;
+  opacity: 0;
+}
+
+/* The gap has to show the CITY, not the curtain's own sky. Everything behind
+   the doors goes transparent the instant they start moving — a fade, however
+   short, means the first moments of the parting open onto a black slot. The
+   container itself must not fade either: the doors leave by sliding off
+   screen, and boot.js removes the node when they are gone. */
+#boot.has-doors.is-clearing {
+  background: transparent;
+  opacity: 1;
+  transition: none;
+}
+
+#boot.has-doors.is-clearing .boot-fog,
+#boot.has-doors.is-clearing .boot-sky,
+#boot.has-doors.is-clearing .boot-grid,
+#boot.has-doors.is-clearing .boot-scanlines,
+#boot.has-doors.is-clearing .boot-veil {
+  opacity: 0;
+  transition: opacity 180ms ease;
+}
+
+#boot.is-clearing .boot-veil {
+  transition: opacity 700ms ease;
+  opacity: 0;
+}
+
+#boot.is-clearing:not(.has-doors) .boot-sky,
+#boot.is-clearing:not(.has-doors) .boot-grid,
+#boot.is-clearing .boot-scanlines {
+  transition: opacity 900ms ease 200ms;
+  opacity: 0;
+}
+
+/* Power-down: one hot flash, then collapse. */
+#boot.is-clearing .boot-core {
+  animation: boot-power-down 620ms cubic-bezier(0.4, 0, 0.2, 1) forwards;
+}
+
+@keyframes boot-power-down {
+  0% {
+    transform: translate(-50%, -50%) scale(1);
+    opacity: 1;
+    filter: brightness(1);
+  }
+  22% {
+    transform: translate(-50%, -50%) scale(1.035);
+    opacity: 1;
+    filter: brightness(2.6);
+  }
+  100% {
+    transform: translate(-50%, -50%) scale(1.09);
+    opacity: 0;
+    filter: brightness(1);
+  }
+}
+
+/* The curtain must never outlive a failure: boot.js swaps to this if the app
+   throws, so the existing failure message is readable instead of fog-bound. */
+#boot.is-failed .boot-fog i,
+#boot.is-failed .boot-grid,
+#boot.is-failed .boot-scan {
+  animation-play-state: paused;
+  opacity: 0.12;
+}
+
+#boot.is-failed .boot-bar {
+  box-shadow:
+    inset 0 1px 0 rgba(255, 255, 255, 0.6),
+    0 0 18px rgba(255, 106, 94, 0.5);
+}
+
+#boot.is-failed .boot-fill {
+  background: linear-gradient(90deg, #8f2f28 0%, #ff6a5e 100%);
+  box-shadow: none;
+}
+
+#boot.is-failed .boot-status,
+#boot.is-failed .boot-pct {
+  color: #ffb3ac;
+  text-shadow: none;
+}
+
+/* ---------------------------------------------------------- reduced motion */
+
+/* Keep the look, drop the movement: no drift, no scan, no grid scroll, and a
+   plain cross-fade instead of the push-through. */
+@media (prefers-reduced-motion: reduce) {
+  /* The drift rules are per-layer (:nth-child), so this reset has to match
+     their specificity or it silently loses and the fog keeps moving. */
+  #boot .boot-doors i::after,
+  #boot .boot-wisps i,
+  #boot .boot-wisps i:nth-child(2),
+  #boot .boot-fog i:nth-child(1),
+  #boot .boot-fog i:nth-child(2),
+  #boot .boot-fog i:nth-child(3),
+  #boot .boot-fog i:nth-child(4),
+  #boot .boot-plates i:nth-child(1),
+  #boot .boot-plates i:nth-child(2),
+  #boot .boot-plates i:nth-child(3),
+  #boot .boot-roll i,
+  #boot .boot-grid i,
+  #boot .boot-scan {
+    animation: none;
+  }
+
+  /* The doors are the reveal, so they still part — just faster and without the
+     swell. */
+  #boot .boot-doors i {
+    transition-duration: 900ms;
+  }
+  #boot.has-doors.is-clearing .boot-doors i:nth-child(1) {
+    transform: translate3d(-128%, 0, 0);
+  }
+  #boot.has-doors.is-clearing .boot-doors i:nth-child(2) {
+    transform: translate3d(128%, 0, 0);
+  }
+
+  #boot .boot-scan {
+    opacity: 0.25;
+    transform: translate3d(120%, 0, 0);
+  }
+
+  #boot .boot-fill {
+    transition-duration: 120ms;
+  }
+
+  #boot.is-clearing {
+    transition: opacity 520ms ease;
+  }
+
+  #boot.is-clearing .boot-fog i {
+    transition: opacity 420ms ease;
+    transform: none;
+  }
+
+  #boot.is-clearing .boot-core {
+    animation: none;
+    opacity: 0;
+    transition: opacity 300ms ease;
+  }
+}
