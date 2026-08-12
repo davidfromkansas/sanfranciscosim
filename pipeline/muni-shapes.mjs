@@ -48,6 +48,9 @@ const DATA = path.join(HERE, 'data');
 const ZIP = path.join(DATA, 'muni-gtfs.zip');
 const EXTRACT = path.join(DATA, 'muni-gtfs');
 const OUT = path.join(HERE, '../app/public/tiles/muni-shapes.bin');
+// The concierge's transit_nearby tool runs inside api/agent.mjs, which cannot
+// read app/public — it gets its own copy beside the other bundled indexes.
+const OUT_STOPS = path.join(HERE, '../api/_data/muni-stops.json');
 
 const SIMPLIFY_TOLERANCE_M = 3;
 const MAX_RAW_BYTES = 1.2 * 1024 * 1024;
@@ -253,18 +256,28 @@ async function main() {
       `headsign ${Object.keys(tripHeadsign).length}/${trips.size}`,
   );
 
-  // stop_times.txt is the big one (~1M rows): stream it once, keeping only the
-  // stop ids that motor-coach trips actually serve.
+  // stop_times.txt is the big one (~1M rows): stream it once, recording both the
+  // stops motor-coach trips serve (for the client's card) and every stop with any
+  // service at all (for the concierge, whose questions span every mode).
   const wantedStops = new Set();
+  const servedStops = new Set();
   await eachRow('stop_times.txt', (cols, h) => {
+    servedStops.add(cols[h.stop_id]);
     if (trips.has(cols[h.trip_id])) wantedStops.add(cols[h.stop_id]);
   });
   const stops = {};
+  const allStops = {};
   await eachRow('stops.txt', (cols, h) => {
     const id = cols[h.stop_id];
-    if (!wantedStops.has(id)) return;
+    if (!servedStops.has(id)) return;
     const [x, z] = project(Number(cols[h.stop_lon]), Number(cols[h.stop_lat]));
-    stops[id] = { nameIdx: intern(cols[h.stop_name] || id), x: +x.toFixed(1), z: +z.toFixed(1) };
+    const name = cols[h.stop_name] || id;
+    // [name, x, z] as a tuple, not an object: 3,500 stops of {"name":...} keys
+    // is a megabyte of repeated property names in the function bundle.
+    allStops[id] = [name, Math.round(x), Math.round(z)];
+    if (wantedStops.has(id)) {
+      stops[id] = { nameIdx: intern(name), x: +x.toFixed(1), z: +z.toFixed(1) };
+    }
   });
   console.log(`[muni-shapes] stops kept: ${Object.keys(stops).length}, strings: ${strings.length}`);
 
@@ -302,6 +315,12 @@ async function main() {
     );
   }
   writeFileSync(OUT, blob);
+  mkdirSync(path.dirname(OUT_STOPS), { recursive: true });
+  writeFileSync(OUT_STOPS, JSON.stringify({ generated: new Date().toISOString(), stops: allStops }));
+  console.log(
+    `[muni-shapes] wrote ${OUT_STOPS}: ${Object.keys(allStops).length} stops, ` +
+      `${(readFileSync(OUT_STOPS).length / 1024).toFixed(0)} KB`,
+  );
   console.log(
     `[muni-shapes] wrote ${OUT}: ${(blob.length / 1024).toFixed(0)} KB ` +
       `(json ${(json.length / 1024).toFixed(0)} KB + ${shapeMeta.length} shapes, ${floats.length / 3} vertices)`,

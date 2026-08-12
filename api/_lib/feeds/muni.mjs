@@ -35,7 +35,8 @@ const TTL_SHARED_MS = 8 * 60 * 1000; // positions, borrowed ferry key
 const TRIPUPDATES_TTL_MS = 5 * 60 * 1000;
 const STALE_MS = 10 * 60 * 1000;
 const BACKOFF_MS = 5 * 60 * 1000;
-const ONWARD_STOPS = 3;
+const ONWARD_STOPS = 6; // ~12 min of horizon; 3 was only ~5, too short
+                        // for "when is the next bus" questions.
 
 // Muni route ids to fleet mode. Rail and cable are fixed sets; trolleybus
 // routes are the electrified lines (docs/asset-plans/transit/README.md "Why
@@ -189,6 +190,21 @@ function normalise(message, now, sharedKey) {
   return vehicles;
 }
 
+// Counts that survive truncation. The concierge's live_data tool clamps a tool
+// result to 6 KB by halving arrays, so a raw fleet dump reaches the model as ~16
+// vehicles off the FRONT of the list — which is ordered by fleet number, i.e.
+// every cable car and streetcar and not one bus. The summary is a scalar object,
+// so it is never trimmed and the model's counts stay right either way.
+function summarise(vehicles) {
+  const byMode = {};
+  const routes = new Set();
+  for (const v of vehicles) {
+    byMode[v.mode] = (byMode[v.mode] || 0) + 1;
+    routes.add(v.route);
+  }
+  return { total: vehicles.length, byMode, routesInService: routes.size };
+}
+
 async function fetchMuni() {
   const { key, shared } = keyMode();
   if (!key) return { live: false, reason: 'no-key', vehicles: [] };
@@ -209,7 +225,8 @@ async function fetchMuni() {
   }
 
   const message = await decodeFeed(key, 'vehiclepositions');
-  return { live: true, degraded: shared || undefined, vehicles: normalise(message, now, shared) };
+  const vehicles = normalise(message, now, shared);
+  return { live: true, degraded: shared || undefined, summary: summarise(vehicles), vehicles };
 }
 
 registerFeed('muni', {
