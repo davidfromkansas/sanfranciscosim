@@ -2,11 +2,17 @@
 // unobtrusive — the city is the interface. Time is not a control: the scene
 // runs on San Francisco's real clock (see sky-clock.js).
 
+// The single table of what each tier means. Beyond these numbers, every tier
+// key fans out to the subsystems' setQuality(tier) levers (PERF-PLAN #6):
+// water (1 noise octave + soft specular on low), agents (live-population caps
+// on low), street furniture (clutter classes hide on medium, lamps + signals
+// only on low), terrain (30 m grid on medium/low), and the post target's MSAA
+// samples below.
 export const QUALITY = {
-  ultra: { label: 'Ultra', pixelRatio: 2, shadow: 4096, nearScale: 1.35, treeScale: 1.3, windows: 1 },
-  high: { label: 'High', pixelRatio: 1.5, shadow: 3072, nearScale: 1, treeScale: 1, windows: 1 },
-  medium: { label: 'Medium', pixelRatio: 1, shadow: 2048, nearScale: 0.75, treeScale: 0.7, windows: 1 },
-  low: { label: 'Low', pixelRatio: 0.85, shadow: 0, nearScale: 0.5, treeScale: 0.45, windows: 0 },
+  ultra: { label: 'Ultra', pixelRatio: 2, shadow: 4096, nearScale: 1.35, treeScale: 1.3, windows: 1, samples: 4 },
+  high: { label: 'High', pixelRatio: 1.5, shadow: 3072, nearScale: 1, treeScale: 1, windows: 1, samples: 4 },
+  medium: { label: 'Medium', pixelRatio: 1, shadow: 2048, nearScale: 0.75, treeScale: 0.7, windows: 1, samples: 2 },
+  low: { label: 'Low', pixelRatio: 0.85, shadow: 0, nearScale: 0.5, treeScale: 0.45, windows: 0, samples: 0 },
 };
 export const QUALITY_LADDER = ['low', 'medium', 'high', 'ultra'];
 

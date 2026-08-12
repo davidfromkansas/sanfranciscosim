@@ -45,6 +45,9 @@ const CLOUDS = /* glsl */ `
   }
 
   float cloudShadow(vec2 world) {
+    // The diorama multiplies the result to 1.0 anyway — skip the two noise
+    // evaluations instead of computing a no-op per fragment.
+    if (uToy > 0.5) return 1.0;
     vec2 p = world * 0.00055 + uCloudDrift;
     float n = cloudNoise(p) * 0.65 + cloudNoise(p * 2.3 + 11.0) * 0.35;
     float shade = smoothstep(0.42, 0.72, n);
