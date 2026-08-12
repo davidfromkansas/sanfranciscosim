@@ -219,6 +219,19 @@ export const LANDMARKS = [
     exclude: 45,
     camera: { distance: 500, yaw: 90, pitch: 16 },
   },
+  {
+    // Through lot with party walls on both long sides, so the exclusion window
+    // is narrow: this footprint's simplified ring centroid sits 0.96 m from the
+    // anchor while the nearest NEIGHBOUR vertex is 11.17 m (SF3776007). Anything
+    // from ~1 to ~11 m drops this building alone; 12 would take the neighbour.
+    id: '550Third',
+    name: '550 Third Street',
+    lon: -122.3953409,
+    lat: 37.7804407,
+    height: 11,
+    exclude: 8,
+    camera: { distance: 190, yaw: 260, pitch: 34 },
+  },
 ];
 
 // Parks/green spaces the landcover bake must match at least one source polygon
