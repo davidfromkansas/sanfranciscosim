@@ -27,7 +27,7 @@ Design (see REFERENCE.md for the sources behind every number):
   membrane across the north — this is the surface the app's camera actually
   sees;
 * night state: the tower crown fins as the hero, two of the five monitors lit
-  from within, a restrained scatter of lit window segments and the entrance.
+  from within, the entrance, and 80% of the bays lit on every glazed band.
   Glow surfaces are thin shells proud of the opaque glazing (the app renders
   _Glow in a separate layer that is ~12% alpha by day — never author a primary
   surface as glow).
@@ -389,7 +389,7 @@ def pier_positions(edge):
 
 def glazing_band(tag, edge, z0, z1, mats, lit=()):
     """Continuous recessed steel-sash band running the whole elevation behind
-    the piers: a dark reveal, the glass proud of it, and optional glow shells.
+    the piers: a dark reveal, the glass proud of it, and per-bay glow shells.
 
     `lit` is a list of (u_centre, width) segments that light at night.
     """
@@ -411,11 +411,30 @@ def glazing_band(tag, edge, z0, z1, mats, lit=()):
             f"{tag}_glow{i}",
             edge,
             u,
-            rect_profile(w, z0 + 0.42, z1 - 0.42),
+            rect_profile(w, z0 + 0.30, z1 - 0.30),
             GLASS_D - 0.03,
             GLASS_D + 0.05,
             glow,
         )
+
+
+def lit_bays(edge, band_index, keep=0.8):
+    """Deterministic per-bay night lighting: `keep` of the bays on this band are
+    lit, the dark ones staggered floor to floor so they never line up into a
+    dead column. One glow shell per bay, so "80% of the windows" is literally
+    80% of the bays this elevation has.
+    """
+    us, _length = pier_positions(edge)
+    step = max(1, round(1.0 / max(1e-6, 1.0 - keep)))   # 0.8 -> every 5th dark
+    out = []
+    for j in range(len(us) - 1):
+        if (j + band_index * 2 + edge) % step == 0:
+            continue
+        centre = (us[j] + us[j + 1]) / 2.0
+        width = (us[j + 1] - us[j]) - PIER_W - 0.55
+        if width > 0.4:
+            out.append((centre, width))
+    return out
 
 
 def rollup_door(tag, edge, u, w, height, steel, ink):
@@ -454,20 +473,17 @@ def build():
         (Z_GROUND_TOP + FLOOR + 0.60, Z_GROUND_TOP + 2 * FLOOR - 0.50),
         (Z_GROUND_TOP + 2 * FLOOR + 0.60, Z_DECK - 0.50),
     ]
-    # Restrained night scatter: a handful of segments on the two street
-    # elevations only, never a fully lit floor (style bible s.11).
-    lit_west = {2: [(11.0, 4.6), (33.5, 4.6)], 3: [(22.0, 4.6)]}
-    lit_south = {1: [(28.0, 5.0)], 2: [(11.0, 5.0), (50.0, 5.0)], 3: [(39.0, 5.0)]}
+    # Night lighting: 80% of the bays on every glazed band, per David's
+    # direction on approval (12 Aug 2026). This is a deliberate step past the
+    # style bible's "small clusters of life" restraint — a working building at
+    # dusk rather than a few lit offices — and it makes the two lit sawtooth
+    # monitors and the tower crown read as part of one lit interior rather than
+    # as isolated accents.
     for edge, tag in ((EDGE_WEST, "w"), (EDGE_SOUTH, "s"), (EDGE_EAST, "e"), (EDGE_NORTH, "n")):
         for bi, (z0, z1) in enumerate(bands):
             if edge == EDGE_NORTH and bi == 0:
                 continue  # blank service wall at ground level on the rear
-            lit = ()
-            if edge == EDGE_WEST:
-                lit = lit_west.get(bi, ())
-            elif edge == EDGE_SOUTH:
-                lit = lit_south.get(bi, ())
-            glazing_band(f"{tag}b{bi}", edge, z0, z1, (ink, glass, gglow), lit)
+            glazing_band(f"{tag}b{bi}", edge, z0, z1, (ink, glass, gglow), lit_bays(edge, bi))
 
     # --- expressed piers: the bay rhythm ------------------------------------
     for edge, tag in ((EDGE_WEST, "w"), (EDGE_SOUTH, "s"), (EDGE_EAST, "e"), (EDGE_NORTH, "n")):

@@ -11,14 +11,14 @@ Built from `docs/asset-plans/375-alabama.md` (Part 1) under
 
 | | |
 |---|---|
-| Triangles | **10,176** (cap 14,000) |
-| Objects | 226 |
+| Triangles | **11,604** (cap 14,000) |
+| Objects | 345 |
 | Dimensions (XY bbox / Z) | 67.32 x 61.61 x 22.50 m |
 | Building itself | 61.10 x 54.63 m footprint — the larger XY bbox is the 4.32° heading, not a scale error |
 | min Z | 0.0000 |
 | XY centre offset | 0.038, −0.002 m |
 | Materials | 12, all `Toy_*`, all flat, no textures, no alpha |
-| Glow groups | 3 — `Toy_trim_Glow` (tower crown + entrance), `Toy_glass_Glow` (window scatter), `Toy_glassl_Glow` (two lit monitors) |
+| Glow groups | 3 — `Toy_trim_Glow` (tower crown + entrance), `Toy_glass_Glow` (125 lit bays), `Toy_glassl_Glow` (two lit monitors) |
 | Anchor | `-122.4118477, 37.7645633` |
 | targetHeightM | 22.5 (stair-tower crown, normalised exactly — loader scale lands at 1.000) |
 | Validation | `validation.json` — **overall PASS**, all 16 checks |
@@ -58,7 +58,7 @@ deliberate decision, not a slip.
 4. **Medallions are not bevelled.** 23 bevelled 24-gon cogs cost 6,500 triangles — over a
    third of the entire asset — to soften an edge that is a fraction of a pixel from the app's
    camera. The first build came in at 17,900 triangles, over the cap, almost entirely because
-   of this. Unbevelled, the whole asset is 10,176.
+   of this. Unbevelled, that build came down to 10,176.
 5. **The sawtooth monitors are trapezoids with a flat 0.8 m ridge cap**, not the plan's
    triangles. Bevelled, a single ridge vertex rounded into a barrel and the whole roof read as
    five fat white tubes from the aerial. The flat cap also gives the near-vertical north face
@@ -75,11 +75,16 @@ deliberate decision, not a slip.
    as an orange billboard and became the loudest thing on a cream building whose only intended
    accent is the ornament. Off-palette is a WARN, not a FAIL (contract rule 7). Recorded here
    as the plan §2.8 note anticipated.
-8. **The night state was retuned after the first night render.** Two monitors lit end to end
-   over their whole glazed face read as fluorescent light bars and flattened the tower's hero
-   glow. As shipped, each lit monitor glows over a 19 m stretch of the 51 m ridge and only the
-   top third of its glazed face, and the tower crown glow starts lower (18.2 m) and is wider,
-   so the hierarchy is tower first, monitors second, window scatter third.
+8. **The night state was retuned twice.** First: two monitors lit end to end over their whole
+   glazed face read as fluorescent light bars and flattened the tower's hero glow, so each lit
+   monitor now glows over a 19 m stretch of the 51 m ridge and only the top third of its glazed
+   face, and the tower crown glow starts lower (18.2 m) and is wider. Second: **on approval
+   David asked for 80% of the windows lit**, which replaced the plan's six-segment scatter with
+   one glow shell per bay — 125 of the 157 bays across all four elevations, the dark ones
+   staggered floor to floor so they never line up into a dead column. This is a deliberate step
+   past the style bible's "small clusters of life" restraint (§11): the building now reads as a
+   working factory at dusk rather than a few lit offices, and the lit monitors and tower crown
+   read as part of one lit interior. Cost: +1,428 triangles, still 2,396 under the cap.
 9. **Orientation deviates from the contract's "front faces −Y" rule, as every plan in this
    set does.** The asset is authored in true world orientation (`+Y` = north) because
    `placeGeneric()` applies no rotation; the address front faces **west, 265.7°**. Real-world
@@ -101,10 +106,10 @@ deliberate decision, not a slip.
 | No textures / transparency | PASS | 0 image textures, 0 transparent materials |
 | `_Glow` only on night surfaces | PASS | 3 glow materials, all thin shells proud of opaque glazing |
 | No `Toy_body` | PASS | — |
-| Triangle budget | PASS | 10,176 / 14,000 (PERF-PLAN hard limit 30,000) |
+| Triangle budget | PASS | 11,604 / 14,000 (PERF-PLAN hard limit 30,000) |
 | No cameras / lights / animation / armatures / constraints | PASS | all zero |
 | Transforms applied, no negative scales | PASS | — |
-| Outward normals | PASS | 226/226 objects positive signed volume; 0 non-unit loop normals; 31,500-ray visibility test residual 0 |
+| Outward normals | PASS | 345/345 objects positive signed volume; 0 non-unit loop normals; 31,500-ray visibility test residual 0 |
 | No degenerate geometry | PASS | 0 degenerate triangles |
 | No foreign / leaked geometry | PASS | fresh-scene re-import contains only the asset |
 
@@ -158,5 +163,11 @@ are only ~20 m wide.
 
 ## Approval
 
-Not yet approved. Stage 3 of `ADDRESS-TO-ASSET.md` is a human gate; the user's approval is
-quoted here verbatim, with its date, before stage 4 (optimize) runs.
+**Approved 12 August 2026 by David (davidfromkansas), verbatim:**
+
+> "i approve lets proceed -- can you also light up 80% of the windows? thanks proceed and im
+> waiting to see your PR"
+
+The window request was executed as deviation 8 above and the asset re-rendered, re-validated
+(overall PASS, 16/16) and re-committed before stage 4 began. The same message authorises the
+push and pull request that stage 5 otherwise stops to ask for.
