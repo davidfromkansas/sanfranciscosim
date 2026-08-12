@@ -61,8 +61,9 @@ route, and the park plans depend on it (§E8 of the parks README).
 | [375 Alabama Street (Ames Harris Neville Co.)](./375-alabama.md) | `375-alabama` | 22.5 m | new landmark |
 | [1008 General Kennedy Avenue](./1008-general-kennedy.md) | `1008-general-kennedy` | 11.9 m | new landmark |
 | [Letterman Digital Arts Center](./letterman-digital-arts-center.md) | `letterman` | ~22 m (estimated) | new landmark |
+| [543 Presidio Blvd](./543-presidio-blvd.md) | `543-presidio-blvd` | 9.55 m | new landmark |
 
-## Shared contract (all 24)
+## Shared contract (all 25)
 
 - Style: `docs/styles/miniature-toy.md` (authoritative for artistic decisions)
 - Technical contract: `.agents/skills/sf-asset-check/SKILL.md` (authoritative for the GLB)
@@ -107,7 +108,10 @@ labelled *inferred* or *estimated* and is called out again in each plan's sectio
 Mary's 18.9 m, Cal Academy 11 m, de Young 13 m) and must never be used as the
 architectural target height. 550 Third Street is the sharpest case: its OSM
 `height=7` and the 2010 city LiDAR agree, and both are wrong, because they
-predate the rooftop penthouse that gives the building its crest.
+predate the rooftop penthouse that gives the building its crest. 543 Presidio
+Blvd is the second sharpest: its OSM `height=8` is neither eave nor crest but the
+LiDAR *median* height over a hipped roof, which by construction falls between the
+two — the crest is 9.55 m.
 
 The executing agent is expected to re-verify height, anchor, footprint and
 orientation before modelling — the dossier is a head start, not a citation.
