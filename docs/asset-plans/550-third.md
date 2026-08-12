@@ -516,9 +516,13 @@ radius costs nothing.
   of ~12 m therefore removes this building's baked footprint while staying well
   inside the two long party walls; anything approaching 26 m would take the
   neighbours at 560 3rd and 521–527 3rd with it and open holes in the block.
-  **Start at `exclude: 12` and verify visually** that (a) the baked 550 Third is
-  gone and (b) both neighbours survive intact. If 12 is not enough to clear the
-  bake, raise it in 1 m steps and re-check the neighbours rather than jumping.
+  **Measured during the build (supersedes the 12 m estimate above): use
+  `exclude: 8`.** Against the actual bake-side geometry — DataSF footprints
+  simplified at the pipeline's 0.6 m tolerance, `ringCentroid` — this building's
+  ring centroid is 0.96 m from the anchor, and the nearest *neighbour* vertex is
+  11.17 m (SF3776007), with SF3776008 at 12.19 m. The window that drops only this
+  building is 0.96 < r <= 11.17, so 12 would have deleted the neighbour. Still
+  verify visually that the baked 550 Third is gone and both neighbours survive.
 - Manifest id `550-third` maps to registry id `550Third`.
 - No camera preset key. At 11 m this is a texture in the block, not a destination
   — quiet placement is correct, and the key row should stay reserved for
