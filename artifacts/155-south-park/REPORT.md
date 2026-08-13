@@ -186,3 +186,61 @@ stage 0/1 gate report, not a review of these specific renders. Recorded here as 
 gate-3 approval so the provenance is honest: **no one has looked at these images
 but the authoring agent.** If the building is later judged wrong, this is the gate
 that was taken on trust.
+
+## 8. Integration (gate 5) — batch mode
+
+Run 13 August 2026 per `docs/asset-plans/INTEGRATION-PROMPT.md`, **Case B**
+(new landmark: registry entry + tile re-bake). `BATCH: yes`, so the bake was run for
+the QA below and then discarded; this branch commits source only.
+
+| Check | Result |
+|---|---|
+| Re-validation of the shipped GLB in a fresh Blender scene | **PASS**, 16/16 |
+| Manifest entry | appended, 36 entries, JSON valid |
+| `camelId('155-south-park')` → `155SouthPark` round-trips to the registry id | **PASS** |
+| Loader merge line | `sf-assets: 155-south-park merged 17 objects / 13 materials -> batched (2156 tris body); uniform x1.0000 at 3808, -1205` |
+| Loader scale | **x1.0000** — authored height and `targetHeightM` agree exactly |
+| Exactly one building on the site, no procedural twin, no z-fighting | **PASS** |
+| Orientation — front onto South Park, rear onto Varney Place | **PASS** |
+| Terrain seating | **PASS**, no float, no sink |
+| Night — only the intended `_Glow` surfaces light | **PASS** |
+| Draw calls at the site | **93** (iron rule < 300) |
+| `node pipeline/audit.mjs` check 1.6 | **PASS** — 42 landmarks clear |
+| `node pipeline/verify-rebake.mjs` | **PASS** — only cell 23_13 moved, 233 → 232 |
+| Fallback drill | **PASS** — see below |
+
+**Exclusion radius: 3 m, and it had to be measured.** This is a party-wall row, so
+`excluded()`'s "centroid OR any ring vertex" rule binds on the neighbours' vertices.
+Decoded from the committed tile `23_13.bin`: this footprint's centroid is 0.48 m from
+the anchor, 159 South Park's nearest vertex is 5.42 m and 147 South Park's is
+12.30 m. Safe band 0.5–5.4 m. **The plan's suggested 6 m would have deleted 159 South
+Park** and punched a hole in the row. `verify-rebake` confirms the nearest surviving
+footprint is 7.2 m away.
+
+**Re-bake diff.** Exactly one of 585 `buildings/*.bin` files changed, and its count
+went 233 → 232. The rest of the churn is the expected `ctx/*.json` renumber (564
+sidecars) plus `context/` and `api/_data` stats, because `ctx` keys buildings by
+global index. Notably there was **no data-vintage drift at all** on this run — the
+`pipeline/data` snapshot shared in from the `101-grove` worktree reproduces main's
+tiles exactly, so the usual ~520 tiles of sub-quantum vertex jitter did not appear.
+
+**Fallback drill (mandatory).** With `155-south-park.glb` moved aside: the app boots,
+the whole area renders, the entry lands in `failed: 1` and every other landmark is
+unaffected; draw calls 77. As expected for Case B, the site is **empty ground inside
+the exclusion zone** — the procedural footprint has been carved out, so there is a gap
+in the row rather than a stand-in. The file was restored byte-identical afterwards.
+
+One honest caveat on the local QA: the browser pane was hidden for most of the
+session, which throttles `requestAnimationFrame`, so the render loop — and with it the
+landmark streaming scan — does not advance on its own. Every streaming check above was
+driven by calling `SF.assets.update(SF.camera.position, dt)` explicitly and rendering
+with `renderer.render()` directly. The lifecycle logic is therefore verified; the
+*cadence* of the automatic scan is not, and neither is the LOD cross-fade, which never
+completes while frames are throttled.
+
+**Batch handoff.** `git diff --name-only origin/main` lists nothing under
+`app/public/tiles/` or `api/_data/`. The branch carries only the GLB, the manifest
+entry, the `pipeline/lib/landmarks.mjs` entry, the plan and `artifacts/155-south-park/`
+— all append-only, all mechanically mergeable. The city gets baked once for the whole
+batch by `docs/asset-pipeline/BATCH-INTEGRATE.md`, which is also where the PR is
+opened. **Not pushed, no PR, not deployed.**
