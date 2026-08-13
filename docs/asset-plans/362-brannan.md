@@ -535,13 +535,24 @@ entrance and water table ~1.5k; Varney doors ~0.7k; roof furniture ~1.3k.
 - **New landmark.** Add a `pipeline/lib/landmarks.mjs` entry (`id: '362Brannan'` — the
   registry uses camelCase ids while the manifest uses kebab-case) and re-bake the affected
   tiles, or the baked procedural building on this exact footprint will intersect the GLB.
-- **Exclusion radius: 8 m.** Measured from the DataSF footprints: this building's own
-  centroid sits 3.53 m from the anchor, and the nearest **neighbour** centroid is
-  SF3775017 at 12.95 m (then SF3775020 at 14.76 m). The safe band is therefore
-  `3.6 < r < 12.9`; 8 m is the middle of it. Do not raise it past 12 — this is a mid-block
-  site with party walls on both flanks and a generous radius eats the neighbours, exactly
-  as documented for `380Brannan` four doors away. Re-run the audit 1.6 check to confirm
-  exactly one building is dropped.
+- **Exclusion radius: 8 m.** `excluded()` in `pipeline/buildings.mjs` drops a footprint
+  when its centroid **or any of its ring vertices** falls inside the radius — the vertex
+  test is what makes a generous radius dangerous on a party-wall site, and it is why a
+  centroid-only reading of the safe band is far too optimistic.
+
+  Measured by streaming `pipeline/data/buildings_datasf.geojson` — the file the bake
+  actually reads — and applying that rule for real:
+
+  | radius | rings dropped |
+  |---|---|
+  | 6, 8, 9, 10 | **1** (this building; its centroid is 3.49 m from the anchor) |
+  | 11 and up | 2 — eats 370 Brannan, whose nearest **vertex** is 10.00 m away |
+
+  So the safe band is `3.5 < r <= 10`, and 8 m is the middle of it. **Do not raise it past
+  10** — the neighbours share party walls with this building, so their vertices are far
+  closer than their centroids (370 Brannan's centroid is 13.33 m but its nearest vertex is
+  10.00 m). Re-run the audit 1.6 check after the bake to confirm exactly one building is
+  dropped.
 - `camera`: required, not optional — `context.mjs` bakes it straight into
   `context/landmarks.json` and `camera.js` reads `preset.yaw` unconditionally, so omitting
   it makes the whole city fail to boot. Mirror the neighbour:
