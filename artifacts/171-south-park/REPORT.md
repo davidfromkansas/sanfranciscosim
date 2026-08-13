@@ -191,19 +191,52 @@ none.
 | Orientation | PASS — the three-facet front faces the oval, the tail runs back into the block |
 | Terrain seating | PASS — no floating, no sinking |
 | Camera preset | PASS — `yaw: 197` frames the NNW park front, as derived |
-| Search / context | PASS — `SF.search('171 South Park')` returns `landmark:171SouthPark` at (3781.9, −1204.9), the anchor |
+| Search / context | PASS — the context tier emits exactly one row, `landmark:171SouthPark` at (3781.9, −1204.9) = the anchor, in both `out/context/landmarks.json` and `out/context/search-index.json`. Verified from the bake output, not from a live `SF.search()` call: the running page serves the committed tiles, and the bake was discarded per batch mode, so the live index has no row yet |
 | Night state | PASS — only the intended glow shells light; friezes, cornice and skylights stay dark |
-| Fallback drill | PASS — app boots, site degrades to empty ground (Case B expectation), **exactly one** warning: `sf-assets: 171-south-park failed to load (...)` |
-| Draw-call total and fps | **NOT MEASURED** — see below |
+| Fallback drill | PASS on the observable assertions — see the note below for what was and was not seen |
+| Draw calls | **PASS — 85** at street level over South Park, 89 downtown, 88 in the Mission, against the < 300 budget (AGENTS rule 2) |
+| fps | **NOT MEASURED** — see below |
 
-**The rule-2 budget check could not be measured and is not claimed as a pass.** The
-QA browser pane runs hidden, which suspends `requestAnimationFrame` entirely — a
-30-frame probe captured 0 frames in 4 s, and the stats overlay consequently read
-`fps 0 / draw calls 1`, which is stale rather than real. The second browser was not
-connected. What *is* established is structural rather than measured: the asset
-reports `batched`, so it renders out of the existing shared BatchedMesh pair and adds
-no draw calls of its own. An fps and draw-call reading at street level still needs to
-be taken in a visible browser before this ships.
+**Draw calls were measured; fps was not.** The QA browser pane only composites while
+a screenshot is being taken, so `requestAnimationFrame` never runs freely: a 180-frame
+probe captured 0 frames, and the in-app stats overlay consequently read
+`fps 0 / draw calls 1`, which is stale rather than real. Draw calls were therefore
+taken out of band, by disabling `renderer.info.autoReset` and driving explicit
+`renderer.render(scene, camera)` calls, which gives a true per-frame count:
+
+| Camera | draw calls | triangles |
+|---|---|---|
+| South Park, street level over the landmark | **85** | 6.44 M |
+| Downtown (the stress cell) | **89** | 6.64 M |
+| Mission (the stress cell) | **88** | 6.96 M |
+
+All far inside the < 300 budget, and consistent with the structural expectation: the
+asset reports `batched`, so it renders out of the existing shared BatchedMesh pair and
+adds no draw calls of its own.
+
+**fps remains unmeasured** — it cannot be sampled in a pane whose render loop is
+suspended, and the second browser was not connected. A frame-rate reading at street
+level in a visible browser is still outstanding, and production QA has to cover it.
+
+**What the fallback drill did and did not show.** Two attempts were spoiled by
+caching: moving the GLB aside, and then replacing it with 4 KB of noise, both still
+merged successfully because the browser served the previously-fetched bytes from its
+in-tab memory cache. The drill was made deterministic by pointing the manifest's
+`file` field at a filename that had never been fetched (`171-south-park-MISSING-drill.glb`,
+which Vite answers with the SPA HTML fallback), reloading, and approaching the site.
+Observed then: `SF.assets.stats()` moved from `failed: 0` to **`failed: 1`**,
+`171SouthPark` was **absent** from `SF.assets.placed` while the other 29 landmarks
+stayed live, the app booted and the area rendered normally, and the site showed
+**empty ground** inside the exclusion zone — the documented Case B expectation. The
+manifest and the GLB were restored afterwards and the GLB re-verified byte-identical
+to `artifacts/`.
+
+The "exactly one console warning" half of the drill was **not observed directly** —
+the console hook installed via the automation bridge captured nothing on a freshly
+reloaded page, including the app's own merge lines, so absence of captured warnings
+proves nothing either way. It rests on the source instead: `warn()` in
+`app/src/assets.js:359-363` is latched by a `warned` boolean and can fire at most once
+per session. That is an inspection, not a measurement, and is recorded as such.
 
 One number worth not misreading: the loader's "3085 tris body" is a vertex-derived
 estimate (`position.count / 3`) that under-reports on indexed geometry, which
