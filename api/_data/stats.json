@@ -1,6 +1,6 @@
 {
- "generated": "2026-08-13T00:43:48.743Z",
- "buildings": 174757,
+ "generated": "2026-08-13T03:43:38.539Z",
+ "buildings": 174755,
  "cells": 596,
  "categories": [
   {
@@ -42,7 +42,7 @@
    "cat": 5,
    "id": "restaurant_cafe",
    "label": "Restaurant / Café",
-   "count": 2845,
+   "count": 2844,
    "night": 1
   },
   {
@@ -112,7 +112,7 @@
    "cat": 15,
    "id": "library",
    "label": "Library",
-   "count": 50,
+   "count": 49,
    "night": 1
   },
   {
@@ -126,14 +126,14 @@
    "cat": 17,
    "id": "theater_cinema",
    "label": "Theater / Cinema",
-   "count": 277,
+   "count": 276,
    "night": 1
   },
   {
    "cat": 18,
    "id": "government",
    "label": "Government",
-   "count": 429,
+   "count": 430,
    "night": 2
   },
   {
@@ -275,7 +275,7 @@
   {
    "sub": "civic_office",
    "label": "Civic office",
-   "count": 357
+   "count": 358
   },
   {
    "sub": "trade_school",
@@ -298,14 +298,14 @@
    "count": 229
   },
   {
-   "sub": "theater",
-   "label": "Theater",
-   "count": 226
-  },
-  {
    "sub": "hardware_store",
    "label": "Hardware store",
    "count": 226
+  },
+  {
+   "sub": "theater",
+   "label": "Theater",
+   "count": 225
   },
   {
    "sub": "grocery",
@@ -365,7 +365,7 @@
   {
    "sub": "pizzeria",
    "label": "Pizzeria",
-   "count": 125
+   "count": 124
   },
   {
    "sub": "university",
@@ -460,7 +460,7 @@
   {
    "sub": "library",
    "label": "Library",
-   "count": 50
+   "count": 49
   },
   {
    "sub": "nightclub",
@@ -657,15 +657,15 @@
   "landuse": 140690,
   "business": 10213,
   "heuristic": 7280,
-  "osm": 8625,
-  "overture": 6662,
+  "osm": 8624,
+  "overture": 6661,
   "datasf": 1287
  },
  "confidence": [
   147970,
-  15332,
-  4498,
-  6957
+  15330,
+  4497,
+  6958
  ],
  "streets": {
   "named": 2509,

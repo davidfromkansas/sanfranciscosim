@@ -1,0 +1,452 @@
+{
+  "asset": "101-grove.glb",
+  "validator": "Blender 5.2.0 LTS",
+  "fresh_isolated_scene": true,
+  "reimported_final_glb": true,
+  "object_count": 13,
+  "mesh_object_count": 13,
+  "triangle_count": 17648,
+  "triangle_budget": 22000,
+  "dimensions_m": [
+    70.5084,
+    47.4977,
+    21.4
+  ],
+  "bbox_min_m": [
+    -35.2576,
+    -23.7911,
+    0.0
+  ],
+  "bbox_max_m": [
+    35.2509,
+    23.7066,
+    21.4
+  ],
+  "min_z_m": 0.0,
+  "max_z_m": 21.4,
+  "loader_scale_factor": 1.0,
+  "xy_center_offset_m": [
+    -0.0034,
+    -0.0423
+  ],
+  "materials": [
+    "Toy_glass",
+    "Toy_glassl",
+    "Toy_glassl_Glow",
+    "Toy_gold",
+    "Toy_gold_Glow",
+    "Toy_ink",
+    "Toy_navy",
+    "Toy_roofd",
+    "Toy_sand",
+    "Toy_steel",
+    "Toy_stone",
+    "Toy_trim",
+    "Toy_white"
+  ],
+  "material_details": [
+    {
+      "name": "Toy_glass",
+      "image_texture_nodes": [],
+      "alpha": 1.0,
+      "roughness": 0.85,
+      "glow": false
+    },
+    {
+      "name": "Toy_glassl",
+      "image_texture_nodes": [],
+      "alpha": 1.0,
+      "roughness": 0.85,
+      "glow": false
+    },
+    {
+      "name": "Toy_glassl_Glow",
+      "image_texture_nodes": [],
+      "alpha": 1.0,
+      "roughness": 0.85,
+      "glow": true
+    },
+    {
+      "name": "Toy_gold",
+      "image_texture_nodes": [],
+      "alpha": 1.0,
+      "roughness": 0.85,
+      "glow": false
+    },
+    {
+      "name": "Toy_gold_Glow",
+      "image_texture_nodes": [],
+      "alpha": 1.0,
+      "roughness": 0.85,
+      "glow": true
+    },
+    {
+      "name": "Toy_ink",
+      "image_texture_nodes": [],
+      "alpha": 1.0,
+      "roughness": 0.85,
+      "glow": false
+    },
+    {
+      "name": "Toy_navy",
+      "image_texture_nodes": [],
+      "alpha": 1.0,
+      "roughness": 0.85,
+      "glow": false
+    },
+    {
+      "name": "Toy_roofd",
+      "image_texture_nodes": [],
+      "alpha": 1.0,
+      "roughness": 0.85,
+      "glow": false
+    },
+    {
+      "name": "Toy_sand",
+      "image_texture_nodes": [],
+      "alpha": 1.0,
+      "roughness": 0.85,
+      "glow": false
+    },
+    {
+      "name": "Toy_steel",
+      "image_texture_nodes": [],
+      "alpha": 1.0,
+      "roughness": 0.85,
+      "glow": false
+    },
+    {
+      "name": "Toy_stone",
+      "image_texture_nodes": [],
+      "alpha": 1.0,
+      "roughness": 0.85,
+      "glow": false
+    },
+    {
+      "name": "Toy_trim",
+      "image_texture_nodes": [],
+      "alpha": 1.0,
+      "roughness": 0.85,
+      "glow": false
+    },
+    {
+      "name": "Toy_white",
+      "image_texture_nodes": [],
+      "alpha": 1.0,
+      "roughness": 0.85,
+      "glow": false
+    }
+  ],
+  "image_texture_count": 0,
+  "textured_materials": [],
+  "transparent_materials": [],
+  "camera_count": 0,
+  "light_count": 0,
+  "animation_fcurve_count": 0,
+  "armature_count": 0,
+  "constraint_count": 0,
+  "transforms_applied": true,
+  "negative_scales": false,
+  "degenerate_triangle_count": 0,
+  "invalid_or_nonunit_loop_normal_count": 0,
+  "inverted_signed_volume_objects": [],
+  "normal_ray_cast_first_hits": 31500,
+  "normal_ray_cast_flipped_visible_faces": 0,
+  "normal_ray_cast_residual": 0.0,
+  "normal_ray_cast_residual_gate": 0.0015,
+  "normal_orientation_status": "PASS",
+  "normal_orientation_method": "All source meshes run bmesh.ops.recalc_face_normals before export. Per-object signed volume is authoritative for this union of closed solids and must be positive for every object; 31,500 deterministic visibility rays from nine interior targets must leave a residual of at most 0.15%, which is the share of first hits that legitimately land on a face buried inside a neighbouring solid.",
+  "unexpected_geometry_or_objects": [],
+  "material_contract_violations": [],
+  "glow_materials": [
+    "Toy_glassl_Glow",
+    "Toy_gold_Glow"
+  ],
+  "anchor_lonlat": [
+    -122.4186747,
+    37.7781359
+  ],
+  "long_axis_heading_deg_true": 80.6,
+  "front_normal_heading_deg_true": 350.6,
+  "entrance_bay_normal_heading_deg_true": 34.4,
+  "object_details": [
+    {
+      "name": "grp_Toy_glass",
+      "triangles": 1860,
+      "signed_volume_m3": 62.76354,
+      "location": [
+        0.0,
+        0.0,
+        0.0
+      ],
+      "rotation_euler": [
+        0.0,
+        0.0,
+        0.0
+      ],
+      "scale": [
+        1.0,
+        1.0,
+        1.0
+      ]
+    },
+    {
+      "name": "grp_Toy_glassl_Glow",
+      "triangles": 192,
+      "signed_volume_m3": 2.85084,
+      "location": [
+        0.0,
+        0.0,
+        0.0
+      ],
+      "rotation_euler": [
+        0.0,
+        0.0,
+        0.0
+      ],
+      "scale": [
+        1.0,
+        1.0,
+        1.0
+      ]
+    },
+    {
+      "name": "grp_Toy_gold",
+      "triangles": 1060,
+      "signed_volume_m3": 2.07467,
+      "location": [
+        0.0,
+        0.0,
+        0.0
+      ],
+      "rotation_euler": [
+        0.0,
+        0.0,
+        0.0
+      ],
+      "scale": [
+        1.0,
+        1.0,
+        1.0
+      ]
+    },
+    {
+      "name": "grp_Toy_gold_Glow",
+      "triangles": 88,
+      "signed_volume_m3": 0.08109,
+      "location": [
+        0.0,
+        0.0,
+        0.0
+      ],
+      "rotation_euler": [
+        0.0,
+        0.0,
+        0.0
+      ],
+      "scale": [
+        1.0,
+        1.0,
+        1.0
+      ]
+    },
+    {
+      "name": "grp_Toy_ink",
+      "triangles": 2400,
+      "signed_volume_m3": 79.85996,
+      "location": [
+        0.0,
+        0.0,
+        0.0
+      ],
+      "rotation_euler": [
+        0.0,
+        0.0,
+        0.0
+      ],
+      "scale": [
+        1.0,
+        1.0,
+        1.0
+      ]
+    },
+    {
+      "name": "grp_Toy_navy",
+      "triangles": 2052,
+      "signed_volume_m3": 8.06303,
+      "location": [
+        0.0,
+        0.0,
+        0.0
+      ],
+      "rotation_euler": [
+        0.0,
+        0.0,
+        0.0
+      ],
+      "scale": [
+        1.0,
+        1.0,
+        1.0
+      ]
+    },
+    {
+      "name": "grp_Toy_roofd",
+      "triangles": 552,
+      "signed_volume_m3": 56.17365,
+      "location": [
+        0.0,
+        0.0,
+        0.0
+      ],
+      "rotation_euler": [
+        0.0,
+        0.0,
+        0.0
+      ],
+      "scale": [
+        1.0,
+        1.0,
+        1.0
+      ]
+    },
+    {
+      "name": "grp_Toy_sand",
+      "triangles": 2808,
+      "signed_volume_m3": 374.70643,
+      "location": [
+        0.0,
+        0.0,
+        0.0
+      ],
+      "rotation_euler": [
+        0.0,
+        0.0,
+        0.0
+      ],
+      "scale": [
+        1.0,
+        1.0,
+        1.0
+      ]
+    },
+    {
+      "name": "grp_Toy_steel",
+      "triangles": 1104,
+      "signed_volume_m3": 78.02526,
+      "location": [
+        0.0,
+        0.0,
+        0.0
+      ],
+      "rotation_euler": [
+        0.0,
+        0.0,
+        0.0
+      ],
+      "scale": [
+        1.0,
+        1.0,
+        1.0
+      ]
+    },
+    {
+      "name": "grp_Toy_stone",
+      "triangles": 356,
+      "signed_volume_m3": 44051.08864,
+      "location": [
+        0.0,
+        0.0,
+        0.0
+      ],
+      "rotation_euler": [
+        0.0,
+        0.0,
+        0.0
+      ],
+      "scale": [
+        1.0,
+        1.0,
+        1.0
+      ]
+    },
+    {
+      "name": "grp_Toy_trim",
+      "triangles": 4916,
+      "signed_volume_m3": 449.14654,
+      "location": [
+        0.0,
+        0.0,
+        0.0
+      ],
+      "rotation_euler": [
+        0.0,
+        0.0,
+        0.0
+      ],
+      "scale": [
+        1.0,
+        1.0,
+        1.0
+      ]
+    },
+    {
+      "name": "penthouse_sky",
+      "triangles": 12,
+      "signed_volume_m3": 2.70009,
+      "location": [
+        0.0,
+        0.0,
+        0.0
+      ],
+      "rotation_euler": [
+        0.0,
+        0.0,
+        0.0
+      ],
+      "scale": [
+        1.0,
+        1.0,
+        1.0
+      ]
+    },
+    {
+      "name": "roof",
+      "triangles": 248,
+      "signed_volume_m3": 564.96902,
+      "location": [
+        0.0,
+        0.0,
+        0.0
+      ],
+      "rotation_euler": [
+        0.0,
+        0.0,
+        0.0
+      ],
+      "scale": [
+        1.0,
+        1.0,
+        1.0
+      ]
+    }
+  ],
+  "checks": {
+    "meters_and_plausible_dimensions": true,
+    "base_at_z_zero": true,
+    "crest_is_target_height": true,
+    "centered_xy": true,
+    "under_triangle_budget": true,
+    "no_image_textures": true,
+    "no_transparency": true,
+    "materials_follow_contract": true,
+    "no_cameras_or_lights": true,
+    "no_animation_skin_or_constraints": true,
+    "transforms_applied": true,
+    "no_negative_scales": true,
+    "normals_outward": true,
+    "no_degenerate_geometry": true,
+    "no_unexpected_objects": true
+  },
+  "overall": "PASS"
+}

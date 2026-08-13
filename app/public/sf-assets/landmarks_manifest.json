@@ -552,5 +552,100 @@
     ],
     "tris": 18774,
     "loadRadius": 2500
+  },
+  {
+    "id": "herbst-theatre",
+    "file": "herbst-theatre.glb",
+    "anchor": [
+      -122.4210157,
+      37.7795789
+    ],
+    "targetHeightM": 31,
+    "cat": 17,
+    "name": "Herbst Theatre (War Memorial Veterans Building)",
+    "estimated": true,
+    "dims": [
+      92.5318,
+      70.7108,
+      31.0
+    ],
+    "tris": 9821,
+    "loadRadius": 2500
+  },
+  {
+    "id": "davies-symphony-hall",
+    "file": "davies-symphony-hall.glb",
+    "anchor": [
+      -122.420603,
+      37.7776227
+    ],
+    "targetHeightM": 35,
+    "cat": 17,
+    "name": "Davies Symphony Hall",
+    "estimated": false,
+    "dims": [
+      124.747,
+      95.0375,
+      35
+    ],
+    "tris": 9518,
+    "loadRadius": 2500
+  },
+  {
+    "id": "101-grove",
+    "file": "101-grove.glb",
+    "anchor": [
+      -122.4186747,
+      37.7781359
+    ],
+    "targetHeightM": 21.4,
+    "cat": 18,
+    "name": "101 Grove Street (Public Health Building)",
+    "estimated": true,
+    "dims": [
+      70.5084,
+      47.4977,
+      21.4
+    ],
+    "tris": 17648,
+    "loadRadius": 2500
+  },
+  {
+    "id": "1008-general-kennedy",
+    "file": "1008-general-kennedy.glb",
+    "anchor": [
+      -122.4514809,
+      37.8007878
+    ],
+    "targetHeightM": 11.9,
+    "cat": 3,
+    "name": "1008 General Kennedy Avenue",
+    "estimated": true,
+    "dims": [
+      55.131,
+      35.473,
+      11.9
+    ],
+    "tris": 5688,
+    "loadRadius": 2500
+  },
+  {
+    "id": "asian-art-museum",
+    "file": "asian-art-museum.glb",
+    "anchor": [
+      -122.4159859,
+      37.7802817
+    ],
+    "targetHeightM": 28.1,
+    "cat": 16,
+    "name": "Asian Art Museum",
+    "estimated": false,
+    "dims": [
+      115.31,
+      65.18,
+      28.1
+    ],
+    "tris": 13176,
+    "loadRadius": 2500
   }
 ]

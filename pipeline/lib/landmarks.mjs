@@ -193,6 +193,33 @@ export const LANDMARKS = [
     exclude: 62,
     camera: { distance: 700, yaw: 90, pitch: 18 },
   },
+  // Fills its own Civic Center block with no attached neighbours, so a plain
+  // radius works. Half the 122.6 m envelope is 61 m, but the block's south edge
+  // is only ~40 m from this anchor and Hayes Street is ~20 m wide — 62 m would
+  // reach real buildings on the far side. 55 m clears the Davies footprint (its
+  // centroid sits ~5 m from the anchor) and leaves the Hayes and Grove
+  // frontages alone.
+  {
+    id: 'daviesSymphonyHall',
+    name: 'Davies Symphony Hall',
+    lon: -122.4206030,
+    lat: 37.7776227,
+    height: 35,
+    exclude: 55,
+    camera: { distance: 620, yaw: 45, pitch: 18 },
+  },
+  {
+    // The Veterans Building, the Opera House's twin across the memorial court.
+    // Exclusion 58 m covers the 83 x 67 m footprint plus a margin (the Opera
+    // House uses 62 for its larger 104 x 73 m plan).
+    id: 'herbstTheatre',
+    name: 'Herbst Theatre',
+    lon: -122.4210157,
+    lat: 37.7795789,
+    height: 31,
+    exclude: 58,
+    camera: { distance: 700, yaw: 90, pitch: 18 },
+  },
   {
     id: 'fishermansWharf',
     name: "Pier 39 / Fisherman's Wharf",
@@ -433,6 +460,79 @@ export const LANDMARKS = [
     height: 27,
     exclude: 13.5,
     camera: { distance: 420, yaw: 126, pitch: 26 },
+  },
+  {
+    // Civic Center corner block on Grove at Polk, 63 x 37 m, facing City Hall.
+    // `excluded()` drops a footprint when its centroid OR any of its vertices
+    // lands in the zone, and here it is the CENTROID test that does the work:
+    // this block's centroid sits on the anchor while its own corners are
+    // 28.5-34.2 m out. The vertex window is closed from the other side —
+    // DataSF's nearest foreign vertex is 29.45 m away (OSM agrees: 30.1 m,
+    // way/940206561 "The Civic" across Polk and way/35176282 immediately
+    // south, then 31.5 and 31.9 m) — so a radius wide enough to also catch
+    // this building's own corners would start taking neighbours.
+    // 24 m verified against the re-bake: cell 19_14 goes 80 -> 79 buildings,
+    // zero footprints left with a vertex inside the zone, nearest surviving
+    // vertex 29.45 m. Exactly one building dropped, and it is this one.
+    id: '101Grove',
+    name: '101 Grove Street (Public Health Building)',
+    lon: -122.4186747,
+    lat: 37.7781359,
+    height: 21.4,
+    exclude: 24,
+    camera: { distance: 300, yaw: 35, pitch: 22 },
+  },
+  {
+    // Letterman Hospital ward, 1930s, now part of the Thoreau Center. DataSF
+    // stores the WHOLE campus — twelve surviving buildings — as ONE 159x147 m
+    // comb-shaped footprint, so there is no radius that clears 1008 alone: its
+    // nearest vertex is 4.70 m from the anchor while the ring's centroid is
+    // 41.2 m away. Dropping that one footprint therefore removes the whole
+    // campus, which is the deliberate, approved trade (David, 12 Aug 2026) —
+    // the alternative was leaving this asset buried inside a 16.5 m procedural
+    // mass. The next separate footprint is 51.52 m out, so anything from ~5 to
+    // ~51 m does the same job. 34 m is chosen because `exclude` is reused as the
+    // radius for BOTH the tree-clear circle below and the runtime street-furniture
+    // exclusion, and the model's own half-diagonal is 32.8 m (55.13 x 35.47) — a
+    // radius under that leaves trees and lamps standing inside the building. 34 m
+    // covers the shell with margin and is still 17 m clear of the neighbours.
+    //
+    // Note this sits inside `letterman`'s 185 m zone, which is fine: exclusion
+    // circles union, and that asset's grounds stop short of this ward.
+    id: '1008GeneralKennedy',
+    name: '1008 General Kennedy Avenue',
+    lon: -122.4514809,
+    lat: 37.8007878,
+    height: 11.9,
+    exclude: 34,
+    // Parkland site: without this the Presidio canopy scatters straight through
+    // the ward, because dropping the campus footprint also removed its tree veto.
+    clearTrees: true,
+    camera: { distance: 200, yaw: 150, pitch: 28 },
+  },
+  {
+    // Civic Center is the tightest site in the registry, so this radius is
+    // measured, not guessed. excluded() drops a footprint when ANY vertex
+    // falls inside, and around this anchor the vertex distances are:
+    //   18.3 m  the museum's own footprint (Overture; 18.9 m DataSF)
+    //   42.7 m  a 4 m utility structure at the block's north-east corner,
+    //           outside this asset's outline and worth keeping
+    //   50.2 m  the Abigail Hotel — the nearest real neighbour
+    // 40 m therefore drops the museum in both sources with a 22 m margin,
+    // and clears the utility structure by 2.7 m and every real building by
+    // 10 m. Anything near the 70 m half-diagonal the plan first suggested
+    // would have deleted the new Main Library and UC Law across the street.
+    //
+    // Note the baked city currently renders this building 46 m tall, because
+    // Overture carries the same height=46 tag that is really the NAVD88 roof
+    // elevation. Excluding it fixes that too.
+    id: 'asianArtMuseum',
+    name: 'Asian Art Museum',
+    lon: -122.4159859,
+    lat: 37.7802817,
+    height: 28.1,
+    exclude: 40,
+    camera: { distance: 600, yaw: 268, pitch: 20 },
   },
 ];
 
