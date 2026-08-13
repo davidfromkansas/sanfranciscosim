@@ -2,9 +2,9 @@
 
 A working 24-hour Shell filling station on the north-east side of 3rd Street,
 mid-block between South Park and Brannan. It is the first asset in the set that
-is not a building: the landmark is a **forecourt** — an 807 m² lot holding a
-two-wing steel canopy over three fuelling lanes, a small 2000-built kiosk at the
-north-west end, and a lot of asphalt. It is also the set's strongest night
+is not a building: the landmark is a **forecourt** — an 807 m² lot holding two
+octagonal umbrella canopies over three fuelling lanes, a small 2000-built kiosk
+at the south-east end, and a lot of asphalt. It is also the set's strongest night
 subject, because a service station at night is one bright ceiling plane and a
 red-and-yellow lightbar, and nothing else on this block does that.
 
@@ -67,19 +67,21 @@ as a whole from directly above before you judge any part of it.
 
 ## Must capture
 
-- The two-wing flat steel canopy floating over the forecourt on slim columns —
-  the single strongest cue from any angle
-- Its fascia band in Shell red over yellow, wrapping all four sides of both
-  wings, with the illuminated lightbar and the pecten (scallop) disc that crowns
-  it — this is the identity of the asset and its entire night state
-- The pump islands with their dispensers, bollards and hose reels, standing on
-  low raised curbs
-- The 2000-built single-storey kiosk at the north-west end of the lot: a flat
-  parapet box with a glazed shopfront facing the forecourt
+- The two octagonal umbrella canopies floating over the forecourt, each on a
+  single central column, touching at a pinched waist — the single strongest cue
+  from any angle, and the reason this asset exists
+- The radial ribs on each deck, converging on the column
+- The fascia band in Shell red over yellow, ringing all eight sides of both
+  octagons, with the illuminated lightbar and the pecten (scallop) disc that
+  crowns it — this is the identity of the asset and its entire night state
+- The two pump islands, one under each umbrella, with their dispensers,
+  bollards and hose reels on low raised curbs
+- The 2000-built single-storey kiosk at the south-east end of the lot, toward
+  Brannan: a flat parapet box with a glazed shopfront facing the forecourt
 - The asphalt apron with painted lane markings, the two curb cuts, and the
   perimeter kerb and bollard line along 3rd Street
 - The small forecourt furniture that makes it read as a working station: air and
-  water station, waste bins, a windscreen-squeegee stand, the price sign
+  water station, waste bins, a windscreen-squeegee stand
 
 ## Research 551 Third Street independently
 
@@ -93,15 +95,16 @@ orientation, and gather references covering:
 - Ground-level views under the canopy
 - Day and night appearance (night is unusually important for this asset)
 - Publicly available drawings, plans or diagrams
-- **The number, position and orientation of the pump islands and dispensers,
-  which this dossier only infers** from three mapped covered lanes. Aerial
-  imagery settles it; count the dispensers before you model them.
+- **The dispenser count per island.** The 2025 aerial (2.2) settles the canopy
+  form and shows one island under each umbrella, but at 0.34 m it cannot count
+  dispensers; the dossier assumes two per island. A ground-level view settles it.
 - **Whether a freestanding price pylon exists on the 3rd Street frontage.** Two
   separate permits to erect a double-faced freestanding electric sign (2000 and
-  2001) both expired without completion, so the dossier cannot confirm one.
-- The canopy's exact wing geometry — this dossier reads the OSM outline as two
-  parallel wings with an open slot between them, which is unusual and should be
-  confirmed against imagery before it is modelled
+  2001) both expired without completion, and nothing pylon-shaped is legible in
+  the 2025 aerial, so the dossier leaves it out.
+- The fascia livery and the pecten placement, which are described from permits
+  (2003–04 LED lightbar, repainted red-striped fascia) rather than observed —
+  a ground-level view is the only way to confirm how the bands and the disc sit
 
 **A dated-source trap specific to this site.** Between 2018 and 2024 this was
 San Francisco's first public hydrogen station: two H70 hydrogen dispensers under
@@ -151,9 +154,12 @@ covered space, not as a solid slab, from a camera 30-50 degrees above the
 horizon. Keep the columns slim, keep the clearance generous, and make the
 underside a deliberately designed surface.
 
-Resist two failure modes specific to this subject: a canopy so thick it becomes a
-building, and an apron so empty it becomes a parking lot. The fascia band and the
-island cluster are what stop both.
+Resist three failure modes specific to this subject: a canopy so thick it becomes
+a building, an apron so empty it becomes a parking lot, and corner posts under
+the umbrellas. The fascia band and the island cluster stop the first two; the
+single central column is what makes an umbrella an umbrella, and adding supports
+at the octagon vertices would throw away the only interesting structural idea on
+the site.
 
 The finished asset must be immediately recognizable as a Shell service station at
 this address, consistent with the real site from all four sides and above,
@@ -231,8 +237,8 @@ a night render `551-third-night.png`.
 
 The four elevations must share scale, framing, lighting, exposure and
 projection; use orthographic or long-lens cameras; label directions from the
-researched orientation; the top view must clearly show the two canopy wings, the
-lane and island layout beneath them, the kiosk and the apron markings; the aerial
+researched orientation; the top view must clearly show both octagons and their
+ribs, the two islands beneath them, the kiosk and the apron markings; the aerial
 view uses the style bible's camera assumptions (30-50 degrees down, long lens).
 
 **The night render is a hero image for this asset, not a checkbox** — it is the
@@ -306,7 +312,7 @@ must re-verify anything it relies on.
 | Use | Filling / service station, continuously since at least 1998 | DBI permits, all 26 records 1998–2025 |
 | Operator / brand | Shell, `brand:wikidata` Q110716465; open 24/7; self-service | OSM, surveyed `check_date` 2026-04-26 |
 | Fuels | Diesel, octane 87 / 89 / 91 | OSM (surveyed 2026-04-26). No `fuel:H2` — see the hydrogen row |
-| Canopy | `building=roof`, 151 m2 polygon, 16 vertices, two wings | OSM way/124889461 (measured) |
+| Canopy | `building=roof`, 151 m2 polygon, 16 vertices — **two octagonal umbrellas** ~11 m across, each on one central column, touching at a waist | OSM way/124889461 (measured); form read from the 2025-08-29 aerial (observed) |
 | Canopy deck top | **5.10 m** above grade | SF 2010 LiDAR footprint SF3775025 / 201006.0050940, `hgt_majoritycm` 510, `hgt_mediancm` 509, std 0.42 m over 601 cells (measured) |
 | Canopy crest | **6.64 m** above grade | same record, `hgt_maxcm` 664 — a real feature at >3σ, attributed to the illuminated lightbar / pecten crown (*attribution inferred*, see 2.15) |
 | Canopy clearance | ~4.3 m to the underside | *inferred* from the 0.8 m fascia the 2003–04 permits describe, and standard CA forecourt clearance |
@@ -354,9 +360,12 @@ must re-verify anything it relies on.
   station's opening and Shell's light-duty hydrogen closure notice
 - https://find.shell.com/us/fuel/10008255-551-3rd-st/en_US — Shell's own current
   site listing
-- Aerial/satellite imagery — **not yet consulted for this dossier**; the island
-  layout in 2.4 and 2.7 is derived from the OSM lane geometry alone and is the
-  weakest part of it
+- Esri World Imagery (Vivid Premium, Vantor), **captured 2025-08-29**, 0.34 m
+  native — fetched at z20 and reprojected into the site-aligned frame of 2.3 to
+  register it against the OSM, parcel and LiDAR geometry above. This is the
+  source for the canopy form, the island count and the kiosk position, and its
+  date matters: it is four days *after* the hydrogen demolition completed, so it
+  shows the current station.
 
 ### 2.3 Orientation and placement
 
@@ -376,12 +385,16 @@ positive toward 45 deg (north-east, into the lot away from 3rd Street). Metres.
 
 ```
 Parcel        u -21.1 .. +18.6   v -11.4 .. +9.0     (39.7 x 20.4 m, 807 m2)
-Canopy        u  -2.9 .. + 8.0   v -13.2 .. +5.6     (two wings, 151 m2)
-  wing S      u  -2.9 .. + 8.0   v -13.2 .. -4.5     (10.9 x 8.7 m)
-  wing N      u  -2.8 .. + 7.9   v  +0.7 .. +5.6     (10.8 x 4.9 m)
+Canopy        u  -2.9 .. + 8.0   v -13.2 .. +5.6     (two octagons, 151 m2)
+  octagon N   centre u +2.1  v +2.0    ~11.1 m across u, ~10.0 m across v
+  octagon S   centre u +2.1  v -7.5    ~11.1 m across u, ~10.0 m across v
 Kiosk         u -21.5 .. -14.3   v  -5.0 .. +8.0     (7.2 x 13.0 m)
-Fuel lanes    v = -9.85, -4.55, +4.00, each running in u, ~7-9 m long
+Fuel lanes    v = +4.00, -4.55, -9.85, each running in u, ~7-9 m long
 ```
+
+Positive **u** is north-west, so the kiosk's negative-u position puts it at the
+**south-east end of the lot, toward Brannan**. The canopy sits north-west of it
+with a strip of open apron between.
 
 | Lot edge | Length | Outward normal (true) | What it is |
 |---|---|---|---|
@@ -393,6 +406,15 @@ Fuel lanes    v = -9.85, -4.55, +4.00, each running in u, ~7-9 m long
 Author `+Y` = north and place the lot exactly as measured. The contract's "front
 faces −Y" cannot be met — the frontage faces south-west — so real-world
 orientation wins per the README orientation note and AGENTS rule 5.
+
+**The canopy is not a rectangular slab.** The 2025 aerial resolves the 16-vertex
+OSM outline into **two octagonal "umbrella" canopies**, each about 11 m across,
+each with radial ribs converging on a single central column, touching at a pinched
+waist around v = -2.7. They are stacked perpendicular to 3rd Street, not along it.
+Each umbrella stands over one pump island at its centre, and the three drive lanes
+thread between and around them — lane +4.00 on the far side of the north island,
+lane -4.55 through the waist serving both, lane -9.85 on the street side of the
+south island. This is the asset's whole character and it is worth the triangles.
 
 Note that the canopy overhangs the mapped 3rd Street lot line by ~1.8 m at
 v = -13.2. That is normal for a forecourt canopy over a sidewalk setback, but it
@@ -408,41 +430,43 @@ which the station reads as a gap in the block — 550 Third opposite is a solid
 48 m wall of warehouse, and this side of the street simply stops. That contrast
 is the asset's placement value.
 
-**North-west (toward South Park).** The kiosk end. A blank painted side wall,
+**South-east (toward Brannan).** The kiosk end. A blank painted side wall,
 service door, bins, and the edge of the apron.
 
 **North-east (rear).** The back of the lot, hard against the 14.2 m flank of
 181 South Park, which towers over the whole composition. Perimeter wall, a
 line of parked-service clutter, the air/water point.
 
-**South-east (toward Brannan).** Open asphalt and the lot line; the canopy's
-south wing fascia is the dominant object.
+**North-west (toward South Park).** Open asphalt and the lot line; the north
+umbrella's fascia is the dominant object.
 
 **Top — the primary facade.** From above the composition is, north-west to
 south-east:
 
-1. the kiosk's flat parapet roof with its small mechanical plant;
-2. a strip of open apron;
-3. the small canopy wing (10.8 x 4.9 m) over one fuelling lane;
-4. a ~5 m open slot between the wings — this is the unusual feature and the one
-   most in need of verification;
-5. the large canopy wing (10.9 x 8.7 m) over two fuelling lanes and the island
-   between them;
-6. the 3rd Street apron with lane markings and the two curb cuts.
+1. open apron across the north-west third of the lot, with the north umbrella
+   standing near its south-east edge;
+2. the **two octagons**, each ~11 m across with radial ribs converging on a
+   central point, touching at a pinched waist — an unmistakable figure-of-eight
+   in plan and the single reason this asset is worth building;
+3. a strip of open apron;
+4. the kiosk's flat roof with one small rooftop plant unit near its centre;
+5. along the whole south-west edge, the 3rd Street apron with lane markings and
+   the two curb cuts.
 
-The canopy decks are plain light plates; their whole graphic job from above is
-the **fascia band** visible on all four edges of each wing, and the pecten disc.
+The octagon decks are plain light plates; their graphic job from above is the
+radial rib pattern, the **fascia band** ringing all eight edges of each, and the
+pecten disc.
 
-*The number and position of the pump islands is inferred from the three mapped
-lanes and is the least reliable statement in this dossier.* Two islands (one
-under each wing) is the reading that fits the lane spacing (5.3 m and 8.55 m);
-three is possible. Count them from imagery.
+**Two pump islands**, one under each umbrella at its centre where the column
+lands, verified from the 2025 aerial. Three drive lanes, so the middle lane is
+shared between the two islands.
 
 ### 2.5 Recognition cues (ranked)
 
-1. **The floating canopy** — a bright plate held ~4.3 m above a dark apron on
-   slim columns. Read from any angle and at any distance, and unique on this
-   block.
+1. **The twin octagonal umbrellas** — two bright ribbed plates held ~4.3 m above
+   a dark apron, each balanced on one central column, touching at a waist.
+   Readable from any angle at any distance, and there is nothing else like it in
+   the city model.
 2. **The red-over-yellow fascia band and the pecten disc.** The only saturated
    brand colour in a district of cream and brick.
 3. **The hole in the street wall.** An open asphalt lot where every neighbour is
@@ -456,17 +480,25 @@ three is possible. Count them from imagery.
 
 **Preserve**
 
-- The true lot rectangle and the canopy's two-wing plan
+- The true lot rectangle and the twin-octagon canopy plan, including the waist
+- The single central column under each umbrella — this is the structural idea
+  and it is what makes the canopy look light
+- The radial rib pattern on each deck (it is the top view's only ornament)
 - The 4.3 m clearance — the gap is the composition; do not shrink it
 - Deck at 5.10 m, kiosk parapet at 3.91 m, crest at 6.6 m
-- The three-lane rhythm and the island positions between them
-- The kiosk's setback at the north-west end, and the open apron between it and
+- The three-lane rhythm and the two islands at the umbrella centres
+- The kiosk's position at the south-east end, and the open apron between it and
   the canopy
 
 **Simplify / exaggerate**
 
 - The fascia band goes **thicker and bolder** than reality (style bible §8) —
   it is the identity and it must survive at city distance
+- The octagons become regular 8-gons even though the surveyed outline is
+  slightly irregular; a regular figure reads as designed, a wonky one as an
+  error (style bible §22, rebuild from confident volumes)
+- The ribs become eight shallow raised spokes per deck, not a truss — pattern,
+  not structure
 - The pecten becomes a chunky low-segment scalloped disc, oversized, one per
   visible canopy face at most; do not model brand typography
 - Dispensers become chunky beveled boxes with a `Toy_ink` face panel and a short
@@ -476,8 +508,8 @@ three is possible. Count them from imagery.
 - The kiosk shopfront becomes one wide `Toy_glass` band in an `Toy_ink` frame
   with a single door — no product displays
 - Bollards become a repeated capsule, 8-segment
-- Canopy columns: square, slim, `Toy_steel`, one per wing corner plus a mid pair
-  under the large wing
+- Canopy columns: exactly two, one at each octagon's centre, square and slim in
+  `Toy_steel` with a short flared capital
 
 **Do not add** a car wash, a service bay, vehicles, fuel-price digits, people, or
 any hydrogen equipment. Do not thicken the canopy into a building, and do not
@@ -498,33 +530,38 @@ the island layout.
    u ≈ +9 and u ≈ -6, *inferred*).
 3. **Lane markings:** three flat `Toy_trim` stripes 0.25 m wide inset into the
    apron top along v = -9.85, -4.55, +4.00.
-4. **Canopy wing S:** deck slab u -2.9..8.0, v -13.2..-4.5, underside at
-   z=4.30, deck top at **z=5.10**; `Toy_white` soffit and top, with the fascia
-   as a separate 0.80 m band wrapping all four edges (see step 6).
-5. **Canopy wing N:** deck slab u -2.8..7.9, v 0.7..5.6, same z profile.
-6. **Fascia bands:** on both wings, z=4.30..5.10, 0.12 m proud of the deck edge.
-   Lower 0.45 m `Toy_mustard`, upper 0.35 m `Toy_red` — the classic Shell
-   two-band livery. A thin `Toy_mustard_Glow` shell 0.02 m proud of the yellow
-   band is the lightbar (see 2.8).
+4. **Canopy octagons:** two regular 8-gons, circumradius 5.5 m, centred at
+   (u,v) = (+2.1, +2.0) and (+2.1, -7.5), flat-side-to-flat-side across the
+   v axis so they meet at the waist. Deck underside at z=4.30, deck top at
+   **z=5.10**; `Toy_white` soffit and top.
+5. **Ribs:** eight shallow `Toy_white` spokes per deck, 0.35 m wide and 0.10 m
+   proud of the deck top, running from the centre to each vertex.
+6. **Fascia bands:** ringing all eight edges of both octagons, z=4.30..5.10,
+   0.12 m proud of the deck edge. Lower 0.45 m `Toy_mustard`, upper 0.35 m
+   `Toy_red` — the classic Shell two-band livery. A thin `Toy_mustard_Glow`
+   shell 0.02 m proud of the yellow band is the lightbar (see 2.8).
 7. **Pecten crown:** a scalloped disc 1.8 m across, `Toy_mustard` face on a
    `Toy_red` backing ring, 0.25 m thick, standing above the fascia on the
-   south-west face of wing S, top at **z=6.60** — the crest. 12-segment scallop
-   at most.
-8. **Columns:** 0.42 m square `Toy_steel`, z=0.14..4.30. Four at the corners of
-   wing S plus a mid pair on its long edges; four at the corners of wing N.
+   south-west face of the south octagon, top at **z=6.60** — the crest.
+   12-segment scallop at most.
+8. **Columns:** one per umbrella, at its centre — 0.55 m square `Toy_steel`,
+   z=0.14..4.30, with a short flared capital under the deck. Two columns in the
+   whole model; do not add corner posts, they are the thing that would turn the
+   umbrellas back into slabs.
 9. **Pump islands:** raised curbs 0.20 m tall, `Toy_stone`, 1.2 m wide, running
-   in u. One under wing S at v ≈ -7.2, one under wing N at v ≈ +1.5 (*both
-   inferred — verify*). Length ~7 m each.
+   in u, centred on each umbrella's column at v = +2.0 and v = -7.5. Length
+   ~7 m each.
 10. **Dispensers:** two per island, chunky boxes 1.1 x 0.7 x 1.9 m, `Toy_trim`
     body with an `Toy_ink` face panel and a `Toy_red` cap band; a short
     `Toy_ink` hose loop on each side.
 11. **Bollards:** `Toy_mustard` capsules 0.22 m across, 1.0 m tall, at both ends
     of every island and in a line of six along the 3rd Street kerb.
 12. **Kiosk:** box u -21.1..-14.3, v -5.0..8.0, z=0.14 to **3.91**, `Toy_cream`
-    walls under a 0.35 m `Toy_ink` parapet cap. Shopfront on the south-east face
-    (toward the forecourt): one `Toy_glass` band 1.0..2.6 m in an `Toy_ink`
-    frame, with a 1.1 m door. A `Toy_red` sign panel over the door. Flat
-    `Toy_stone` roof with two small `Toy_roofd` plant boxes.
+    walls under a 0.35 m `Toy_ink` parapet cap. Shopfront on the north-west face
+    (the one looking back at the forecourt and the umbrellas): one `Toy_glass`
+    band 1.0..2.6 m in an `Toy_ink` frame, with a 1.1 m door. A `Toy_red` sign
+    panel over the door. Flat `Toy_stone` roof with one small `Toy_roofd` plant
+    box near its centre, as the aerial shows.
 13. **Price sign:** *only if verified* — a 0.35 m thick `Toy_ink` blade on a
     single post near the 3rd Street kerb at u ≈ +14, with `Toy_red` and
     `Toy_mustard` panels. If it is built and reaches above 6.6 m, the crest
@@ -558,7 +595,7 @@ Flat colors only, from the `sf-asset-check` palette.
 
 **Night state.** This is the asset's best view and its composition is unusually
 simple: **one big hero plane** — the canopy soffit, lit like a ceiling — with the
-fascia lightbar drawing the wing outlines in yellow around it, the pecten as a
+fascia lightbar drawing both octagon outlines in yellow around it, the pecten as a
 single bright disc, and the kiosk shopfront as a small warm ground cue. Nothing
 else lights: not the apron, not the dispensers, not the kerb.
 
@@ -577,17 +614,17 @@ white and the yellow lightbar will be lost.
 
 The canopy decks are the top surface and they are deliberately plain: two light
 plates, each ringed by its fascia band. The design work from above is not on the
-decks but *between and around* them — the open slot between the wings, the lane
-markings and islands visible through it and around the wings, the kiosk roof, and
-the apron. This asset is the set's clearest case of §10 mattering for what a roof
+decks but *between and around* them — the waist where the two octagons meet, the
+lane markings and islands visible around their edges, the kiosk roof, and the
+apron. This asset is the set's clearest case of §10 mattering for what a roof
 *reveals* rather than what it carries. Resist decorating the decks; if the top
 view looks empty, the fault is a canopy that is too large or an apron that is too
 bare, not a deck that needs pattern.
 
 ### 2.10 Scope
 
-**In the GLB:** the apron and its kerbs and markings, the two canopy wings with
-columns, fascia and pecten, the pump islands and dispensers, the bollards, the
+**In the GLB:** the apron and its kerbs and markings, the two octagonal canopies
+with their ribs, central columns, fascia and pecten, the pump islands and dispensers, the bollards, the
 kiosk, the forecourt furniture, and the price sign if verified
 
 **Not in the GLB:** 3rd Street, the public sidewalk, 550 3rd Street, 181 South
@@ -598,14 +635,15 @@ equipment, plinths, cameras or lights
 
 Cap 12,000 — below 550 Third's 14,000, because the massing is simpler and the
 detail is repetitive rather than varied. Suggested split: apron, kerbs and
-markings ~1.2k; two canopy decks and soffits ~1.5k; fascia bands ~1.5k; pecten
-~0.8k; columns ~0.8k; islands, dispensers and hoses ~2.5k; bollards ~1k; kiosk
-shell, shopfront and roof ~1.8k; forecourt furniture and price sign ~0.6k; spare
-~0.3k.
+markings ~1.2k; two octagon decks and soffits ~1.2k; ribs ~1.2k; fascia bands
+~1.5k; pecten ~0.8k; two columns and capitals ~0.5k; islands, dispensers and
+hoses ~2.5k; bollards ~1k; kiosk shell, shopfront and roof ~1.8k; forecourt
+furniture ~0.3k.
 
 Beware the bollards and the pecten: a capsule at default resolution and a
 smooth-scalloped disc will each eat a third of the budget alone. 8-segment
-capsules, 12-segment scallop.
+capsules, 12-segment scallop. The octagons are cheap — eight sides is eight
+sides — so spend the saving on the ribs, which are what make the decks read.
 
 ### 2.12 Draft manifest entry
 
@@ -729,19 +767,22 @@ Other notes:
   is inference, not observation. Because `targetHeightM` is the crest, getting
   it wrong rescales the entire station. Verify from imagery; if nothing above
   the deck can be confirmed, set the crest to 5.10 m and say so.
-- **The pump island layout is inferred from three mapped lanes and nothing
-  else.** No source consulted here states how many islands or dispensers exist.
-  This is the single most likely thing to be wrong, and it is in the middle of
-  the composition.
-- **The two-wing canopy with an open slot is an unusual form** read off one OSM
-  outline traced from Bing. It could equally be a single canopy with a
-  re-entrant corner, or two independent canopies. Confirm before modelling.
+- **The canopy form and the island count are now verified**, not inferred: the
+  2025-08-29 aerial in 2.2 resolves the twin octagons, their radial ribs, their
+  single central columns, and one island under each. What it does *not* resolve
+  at 0.34 m is the dispenser count per island — two per island is still an
+  assumption, and it is the remaining soft spot in the middle of the
+  composition.
 - **No freestanding price pylon is confirmed.** Both permits to erect one (2000,
-  2001) expired. If one exists and is tall, it becomes the crest.
-- **Dated sources are actively misleading for this site.** 2018–2025 imagery and
-  articles show a hydrogen installation demolished in August 2025. 2010 LiDAR
-  and Bing-traced OSM predate it entirely and are therefore *safer* here than
-  recent photography — the opposite of the usual situation.
+  2001) expired, and nothing pylon-shaped is legible on the 3rd Street kerb in
+  the 2025 aerial. It is left out of the model. If a ground view later shows one
+  and it clears 6.6 m, it becomes the crest and `targetHeightM` moves.
+- **Dated sources are actively misleading for this site**, with one exception.
+  2018–2025 imagery and articles show a hydrogen installation demolished in
+  August 2025. The 2025-08-29 aerial post-dates the demolition by four days and
+  is therefore the one modern source that can be trusted here; 2010 LiDAR and
+  Bing-traced OSM predate the hydrogen chapter entirely and are also safe.
+  Anything in between is not.
 - **The exclusion zone cannot be solved with the current pipeline** without
   either a code change or an accepted defect (2.13). Do not start integration
   assuming it is routine.
