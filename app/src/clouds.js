@@ -34,12 +34,18 @@ export const CLOUD_CAPS = { ultra: 160, high: 160, medium: 96, low: 48 };
 // covered 8.7% of it. Real clouds are kilometres wide, and an overcast marine
 // layer has to close over the city, so the low deck is both bigger and packed
 // into a tighter box than the decorative layers above it.
-// One ceiling, not three decks: David asked for every cloud at the altitude the
-// highest band used to sit at. The bands still differ in size, spread and which
-// part of the field they read — only their height is now shared, and the
+// One ceiling, not three decks: every cloud shares an altitude, and the
 // per-instance jitter is off, so this is a genuine single plane rather than a
-// scatter around one.
-const DECK_ALTITUDE = 8400;
+// scatter around one. The bands still differ in size, spread and which part of
+// the weather field they read.
+//
+// The height is pinned just UNDER the camera's own ceiling, so you can always
+// climb above the deck but normally fly beneath it. Diorama mode clamps the
+// orbit distance to 8000 m at a locked 42 degree pitch (see DIORAMA in
+// camera.js), which puts the camera at most 8000 * sin(42) = ~5350 m over its
+// pivot. 4600 leaves roughly 750 m of headroom. If that clamp ever changes,
+// change this with it.
+const DECK_ALTITUDE = 4600;
 const LAYERS = [
   { key: 'low', altitude: DECK_ALTITUDE, scale: 720, spread: 0.7 },
   { key: 'mid', altitude: DECK_ALTITUDE, scale: 1100, spread: 1.2 },
