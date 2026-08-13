@@ -932,5 +932,24 @@
     ],
     "tris": 9384,
     "loadRadius": 2500
+  },
+  {
+    "id": "civic-center-plaza",
+    "file": "civic-center-plaza.glb",
+    "anchor": [
+      -122.4176184,
+      37.7794818
+    ],
+    "targetHeightM": 30.48,
+    "cat": 0,
+    "name": "Civic Center Plaza",
+    "estimated": true,
+    "dims": [
+      145.612,
+      192.624,
+      30.48
+    ],
+    "tris": 17703,
+    "loadRadius": 2500
   }
 ]

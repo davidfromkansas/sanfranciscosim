@@ -27,6 +27,11 @@ plans reference the landmark plans here (de Young, Cal Academy, Conservatory,
 Painted Ladies, Mission Dolores Basilica, Palace of Fine Arts) rather than
 duplicating them.
 
+[**civic-center-plaza.md**](./civic-center-plaza.md) is the exception to that rule:
+a designed hardscape with a fixed surveyed layout and no natural component, planned
+as a single landmark GLB on the same argument that made the Palace of Fine Arts
+grounds a landmark. See its §2.15 risk 5.
+
 [**flora-kit.md**](./flora-kit.md) is the one plan here that is not a landmark:
 an authored Blender kit of tree species and landscape props to replace the single
 procedural lollipop that all 289,741 of the city's baked trees currently share.
@@ -88,8 +93,9 @@ route, and the park plans depend on it (§E8 of the parks README).
 | [234 Van Ness Avenue (The Kelsey Civic Center)](./234-van-ness.md) | `234-van-ness` | 30.12 m | new landmark |
 | [500 Third Street](./500-third.md) | `500-third` | 26.5 m | new landmark |
 | [599 Third Street](./599-third.md) | `599-third` | 18.3 m | new landmark |
+| [Civic Center Plaza](./civic-center-plaza.md) | `civic-center-plaza` | 30.48 m (flagpole crest) | new landmark |
 
-## Shared contract (all 51)
+## Shared contract (all 52)
 
 - Style: `docs/styles/miniature-toy.md` (authoritative for artistic decisions)
 - Technical contract: `.agents/skills/sf-asset-check/SKILL.md` (authoritative for the GLB)
