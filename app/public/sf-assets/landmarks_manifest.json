@@ -970,5 +970,24 @@
     ],
     "tris": 18540,
     "loadRadius": 2500
+  },
+  {
+    "id": "574-third",
+    "file": "574-third.glb",
+    "anchor": [
+      -122.3950551,
+      37.7801937
+    ],
+    "targetHeightM": 15.4,
+    "cat": 2,
+    "name": "574 Third Street",
+    "estimated": false,
+    "dims": [
+      64.9494,
+      60.1454,
+      15.4
+    ],
+    "tris": 9856,
+    "loadRadius": 2500
   }
 ]
