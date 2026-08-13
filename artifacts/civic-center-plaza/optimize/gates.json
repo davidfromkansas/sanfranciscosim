@@ -1,0 +1,120 @@
+{
+ "input": {
+  "tris": 17820,
+  "verts": 33336,
+  "objects": 94,
+  "primitives": 100,
+  "materials": [
+   "Toy_coral",
+   "Toy_coral_Glow",
+   "Toy_cream",
+   "Toy_cream_Glow",
+   "Toy_gold",
+   "Toy_gold_Glow",
+   "Toy_ink",
+   "Toy_mint",
+   "Toy_navy",
+   "Toy_red",
+   "Toy_roofd",
+   "Toy_sand",
+   "Toy_steel",
+   "Toy_stone",
+   "Toy_teal",
+   "Toy_teal_Glow",
+   "Toy_trim",
+   "Toy_verdigris",
+   "Toy_white"
+  ],
+  "bbox_dims": [
+   145.61227,
+   192.62416,
+   30.48
+  ],
+  "bbox_min": [
+   -72.80614,
+   -96.31208,
+   0.0
+  ],
+  "center_xy": [
+   0.0,
+   0.0
+  ]
+ },
+ "output": {
+  "tris": 17703,
+  "verts": 32312,
+  "objects": 19,
+  "primitives": 25,
+  "materials": [
+   "Toy_coral",
+   "Toy_coral_Glow",
+   "Toy_cream",
+   "Toy_cream_Glow",
+   "Toy_gold",
+   "Toy_gold_Glow",
+   "Toy_ink",
+   "Toy_mint",
+   "Toy_navy",
+   "Toy_red",
+   "Toy_roofd",
+   "Toy_sand",
+   "Toy_steel",
+   "Toy_stone",
+   "Toy_teal",
+   "Toy_teal_Glow",
+   "Toy_trim",
+   "Toy_verdigris",
+   "Toy_white"
+  ],
+  "bbox_dims": [
+   145.61227,
+   192.62416,
+   30.48
+  ],
+  "bbox_min": [
+   -72.80614,
+   -96.31208,
+   0.0
+  ],
+  "center_xy": [
+   0.0,
+   0.0
+  ]
+ },
+ "output_signed_volumes": {
+  "flagpoles": 211.814979,
+  "gravel_court": 95.502644,
+  "grp_Toy_cream": 370.895165,
+  "grp_Toy_cream_Glow": 91.891947,
+  "grp_Toy_ink": 99.919012,
+  "grp_Toy_mint": 848.433431,
+  "grp_Toy_roofd": 70.84859,
+  "grp_Toy_steel": 10.024475,
+  "grp_Toy_stone": 6196.702551,
+  "grp_Toy_white": 324.42493,
+  "kiosk_cafe": 122.617554,
+  "kiosk_garage": 270.837223,
+  "people": 16.484167,
+  "play_glow_playground_n": 1.928731,
+  "play_glow_playground_s": 1.900211,
+  "play_pad_playground_n": 100.073677,
+  "play_pad_playground_s": 98.431982,
+  "trees": 28856.445587,
+  "us_pole_glow": 0.477979
+ },
+ "inverted_solids": [],
+ "ray_test_output": {
+  "rays": 22500,
+  "hits": 13096,
+  "flipped": 0,
+  "flipped_fraction": 0.0
+ },
+ "gates": {
+  "G1_materials_identical": true,
+  "G2_bbox_ok": true,
+  "G2_origin_ok": true,
+  "G2_volumes_positive": true,
+  "G2_ray_flip_ok": true,
+  "G5_primitives_ok": true
+ }
+}
