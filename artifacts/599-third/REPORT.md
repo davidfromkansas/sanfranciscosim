@@ -12,8 +12,9 @@ were made before modelling and are recorded in §1.
 
 | | |
 |---|---|
-| Asset | `artifacts/599-third/599-third.glb` |
-| Objects / triangles | 376 / **9,384** (cap 15,000; contract ceiling 27,000) |
+| Asset | `artifacts/599-third/599-third.glb` (post-optimize; pre-optimize original archived at `optimize/input/`) |
+| File size | **240,704 bytes** raw, meshopt-compressed (was 658,108 as authored) |
+| Objects / triangles | **12** / **9,384** (cap 15,000; contract ceiling 27,000) — 376 objects as authored, joined per material by stage 4 |
 | Dimensions (x, y, z) | 43.151 × 42.853 × **18.300** m |
 | min Z / max Z | 0.000 / 18.300 |
 | Loader scale factor | **1.000000** (`targetHeightM` 18.3 ÷ measured 18.3) |
@@ -109,6 +110,9 @@ isolated Blender 5.2.0 scene (never the authoring scene).
 | `crest_is_target_height` | PASS (max Z 18.300) |
 | `centered_xy` | PASS (−0.002, −0.009) |
 | `under_triangle_budget` | PASS (9,384 / 15,000) |
+
+Re-run against the **shipped** (post-optimize) GLB: still PASS on all 15, now at
+12 objects instead of 376. Stage 4 details: `optimize/REPORT.md`.
 | `no_image_textures` | PASS |
 | `no_transparency` | PASS |
 | `materials_follow_contract` | PASS (12 `Toy_*`, no `Toy_body`) |
