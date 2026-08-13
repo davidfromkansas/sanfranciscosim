@@ -534,6 +534,53 @@ export const LANDMARKS = [
     exclude: 40,
     camera: { distance: 600, yaw: 268, pitch: 20 },
   },
+  {
+    // A 5-acre PLAZA, not a building, and the exclusion has to do two different
+    // jobs at two different radii — which is why this is the first entry to
+    // carry `clearTreesRadius`.
+    //
+    // `exclude: 95` is the buildings job. Three single-storey structures stand
+    // inside the plaza (the garage kiosk, the Grove-corner cafe and the Pit
+    // Stop) and the procedural builder extrudes all three to 22-23 m, so
+    // without the exclusion three phantom towers stand on the plaza. Measured
+    // against the committed bake input (buildings/19_13.bin, 19_14.bin),
+    // nearest VERTEX not centroid, per the method 505VanNess established:
+    //   garage kiosk       67.8 m   (88 m2, baked top 23.4 m)
+    //   Grove-corner cafe  74.2 m   (93 m2, baked top 22.0 m)
+    //   Pit Stop           83.5 m   (10 m2, baked top 22.5 m)
+    //   first neighbour   109.9 m   (6,165 m2, baked top 62.0 m)  <- must survive
+    // The window is 83.5 < r < 109.9 and 95 sits in the middle of it.
+    //
+    // `clearTreesRadius: 110` is the trees job, and it has to be BIGGER — it
+    // covers the plaza's 107.6 m half-diagonal. The plaza is leisure=park, so
+    // the landcover scatter drops procedural trees across it that stand among
+    // the 190 hand-placed pollards looking like a different world.
+    //
+    // This was first set to 60 m on the theory that a wider circle would eat
+    // real street trees on Larkin, McAllister and Grove. That theory was never
+    // measured and it was wrong. Counted against the baked landcover:
+    //   radius   left INSIDE the plaza   cut OUTSIDE the plaza
+    //     60 m        109                       0
+    //     80 m         34                       7
+    //     95 m          6                      10
+    //    110 m          0                      14
+    // The blocks around the plaza are civic buildings with almost no mapped
+    // street trees, so covering the whole plaza costs 14 of them and removes
+    // 109 lollipops from a hero landmark. Measure the tree radius against the
+    // bake the same way the building radius is measured; do not reason about it.
+    id: 'civicCenterPlaza',
+    name: 'Civic Center Plaza',
+    lon: -122.4176184,
+    lat: 37.7794818,
+    height: 30.48,
+    exclude: 95,
+    clearTrees: true,
+    clearTreesRadius: 110,
+    // Looks WEST along the central court so the fly-to lands on the plaza's own
+    // axis with City Hall filling the far end — the one composition that
+    // explains what this place is.
+    camera: { distance: 620, yaw: 90, pitch: 30 },
+  },
 ];
 
 // Parks/green spaces the landcover bake must match at least one source polygon

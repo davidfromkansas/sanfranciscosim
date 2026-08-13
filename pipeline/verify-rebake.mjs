@@ -157,8 +157,37 @@ if (!added.length) {
   process.exit(0);
 }
 
-const targetCells = new Map(added.map((l) => [cellOf(l.lon, l.lat), l.id]));
-console.log(`new since ${ref}: ${added.map((l) => `${l.id} @ ${cellOf(l.lon, l.lat)}`).join(', ')}\n`);
+// Every cell the exclusion CIRCLE touches, not just the one holding the anchor.
+// A landmark bigger than its distance to a cell seam legitimately rewrites both
+// sides of it: Civic Center Plaza is 192 m long and straddles z = -1000, so its
+// three excluded kiosks land in 19_13 and 19_14. Attributing only the anchor
+// cell reported the second one as a stray and turned a correct re-bake into a
+// FAIL. Anything still unattributed after this is a real stray.
+const cellsWithin = (lon, lat, radius) => {
+  const [x, z] = project(lon, lat);
+  const r = radius ?? 0;
+  const out = [];
+  const c0 = Math.floor((x - r - ORIGIN) / CELL);
+  const c1 = Math.floor((x + r - ORIGIN) / CELL);
+  const r0 = Math.floor((z - r - ORIGIN) / CELL);
+  const r1 = Math.floor((z + r - ORIGIN) / CELL);
+  for (let cx = c0; cx <= c1; cx++) {
+    for (let cz = r0; cz <= r1; cz++) out.push(`${cx}_${cz}`);
+  }
+  return out;
+};
+
+const targetCells = new Map();
+for (const l of added) {
+  for (const cell of cellsWithin(l.lon, l.lat, l.exclude)) {
+    if (!targetCells.has(cell)) targetCells.set(cell, l.id);
+  }
+}
+console.log(
+  `new since ${ref}: ${added
+    .map((l) => `${l.id} @ ${cellsWithin(l.lon, l.lat, l.exclude).join('+')}`)
+    .join(', ')}\n`
+);
 
 // ---------------------------------------------------------------- counts
 const reference = readTiles(ref, PUBLISHED);

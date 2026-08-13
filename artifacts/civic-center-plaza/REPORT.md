@@ -219,7 +219,7 @@ Registry entry for `pipeline/lib/landmarks.mjs`:
   height: 30.48,
   exclude: 95,
   clearTrees: true,
-  clearTreesRadius: 60,
+  clearTreesRadius: 110,
   camera: { distance: 620, yaw: 90, pitch: 30 },
 }
 ```
@@ -278,3 +278,72 @@ approval. proceed w everything", 2026-08-13), so the pipeline advanced without a
 approval round. The review set was still produced and reviewed, and four defects were
 found in it — the east-west mirror, the lollipop trees, the illegible gravel court and the
 over-bright playground glow — each fixed and re-rendered before the asset was frozen.
+
+
+## 10. Stage 5 — integration (batch mode)
+
+Case B. Source-only branch; the bake was run, QA'd, and discarded per
+`ADDRESS-TO-ASSET.md` batch mode.
+
+| Item | Result |
+|---|---|
+| Re-validation of the shipping GLB | **PASS** 19/19 |
+| GLB dropped in `app/public/sf-assets/landmarks/` | 479,064 bytes, already meshopt-compressed at stage 4 |
+| Manifest entry | added; JSON valid, 36 entries |
+| id mapping | `civic-center-plaza` -> `civicCenterPlaza`, matches the registry |
+| Registry entry | added: `exclude: 95`, `clearTrees`, `clearTreesRadius: 110`, camera yaw 90 |
+| Re-bake | full chain ran; only 8 of 3,312 generated files differ, all in cells 19_13/19_14 |
+| audit 1.6 | **PASS** — 42 landmarks clear |
+| `verify-rebake` | **PASS** — 583/585 cells unchanged, nearest survivor 109.8 m vs 95 m |
+| Footprints removed | exactly the 3 phantom kiosk towers (68.8 / 73.3 / 82.9 m; 88 / 93 / 10 m2; baked tops 22-23.4 m) |
+| Single building at the site | PASS — no procedural twin, no baked block poking through |
+| Scale factor | **x1.0000** — `sf-assets: civic-center-plaza merged 25 objects / 19 materials -> batched (10529 tris body); uniform x1.0000 at 1749, -1048` |
+| Placement | (1749, -1048) vs plaza OBB centre (1749.6, -1049.2) |
+| Orientation | PASS — playgrounds on the Larkin (east) side, court on the City Hall axis |
+| Terrain seating | PASS — no floating, no sinking |
+| Night glow | PASS — lit walk grid on a dark field; playground frames; lawns and bosques dark; nothing else lights |
+| Fallback drill | **PASS** — exactly one warning, no crash, 26 other landmarks still live |
+| Draw calls < 300 | **NOT MEASURED LOCALLY** — see below |
+| lint / build | PASS / PASS |
+
+### The tree radius was wrong, and only measuring caught it
+
+`clearTreesRadius` shipped at 60 m on the theory that a wider circle would eat real
+street trees on Larkin, McAllister and Grove. The first in-app screenshot showed **109
+procedural lollipop trees still standing inside the plaza**, among the 190 hand-placed
+pollards, looking like a different world. Counting against the baked landcover:
+
+| radius | left inside the plaza | cut outside it |
+|---:|---:|---:|
+| 60 m | 109 | 0 |
+| 80 m | 34 | 7 |
+| 95 m | 6 | 10 |
+| 110 m | **0** | **14** |
+
+The blocks around the plaza are civic buildings with almost no mapped street trees, so
+the feared regression was 14 trees, not hundreds. Set to 110 m; the re-bake dropped the
+city tree count 178,282 -> 178,160, i.e. 122 trees, matching 109 + 14 (± sampling).
+
+The lesson is the one `505VanNess` already taught for buildings and this asset had to
+learn again for trees: **size the radius by counting against the real bake input, not by
+reasoning about what a circle probably overlaps.** Both the registry comment and
+`treeblockers.mjs` now say so.
+
+### Draw calls — not measured locally, and why
+
+The Browser pane stops its `requestAnimationFrame` loop between tool calls, so the
+in-app stats overlay reports `fps 0 / draw calls 1` regardless of the scene. The tool
+built for this is `pipeline/landmark-streaming-check.mjs`, which drives a headless
+Chrome where rendering runs continuously; it needs a second preview server and this
+session was already at the Browser pane's per-folder limit. **Run it against a
+`vite preview` of the build before shipping.** The architectural expectation is that
+this asset costs nothing extra: it merges into the shared landmark `BatchedMesh` pair
+(2 draw calls for all landmarks, no matter how many), which the merge line confirms with
+`-> batched`.
+
+### Not done, deliberately
+
+Push, PR and deployed production QA. `ADDRESS-TO-ASSET.md` replaces the
+INTEGRATION-PROMPT's Step 7 with a stop, and batch mode ends at a source-only branch;
+the city is baked once for the whole batch by `docs/asset-pipeline/BATCH-INTEGRATE.md`,
+which is also where the single PR is opened.
