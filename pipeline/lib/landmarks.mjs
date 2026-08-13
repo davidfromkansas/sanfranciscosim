@@ -1149,6 +1149,30 @@ export const LANDMARKS = [
     exclude: 12,
     camera: { distance: 420, yaw: 183, pitch: 20 },
   },
+  {
+    // The Corinthian, 1915: apartments over a bank/retail base at the NE corner
+    // of Van Ness and McAllister. 500 Van Ness is the retail address; the
+    // assessor files the parcel as 512 Van Ness (Block 0766, Lot 006).
+    //
+    // This entry deletes nothing, and that is deliberate. Measured against the
+    // committed tiles (buildings/19_13.bin + its eight neighbours):
+    //   no footprint covers this anchor at all — civicCenterCourthouse's
+    //     exclude: 52 reaches to within 7.5 m of it and already took this block
+    //   32.8 m  nearest SURVIVING footprint vertex (1,148 m2, 14.3 m tall,
+    //     the office block north of us); its centroid is 47.1 m out
+    //   25.4 m  this building's own furthest ring vertex
+    // So 28 m covers our own footprint on its own merits — the entry stays
+    // correct if the courthouse radius is ever tightened — while leaving 4.8 m
+    // of margin to the neighbour. Sizing this off OSM rings instead of the bake
+    // suggested a 10-17 m window; the bake's footprints are not OSM's.
+    id: '500VanNess',
+    name: '500 Van Ness Avenue (The Corinthian)',
+    lon: -122.419922,
+    lat: 37.7804082,
+    height: 17,
+    exclude: 28,
+    camera: { distance: 320, yaw: 232, pitch: 24 },
+  },
 ];
 
 // Parks/green spaces the landcover bake must match at least one source polygon
