@@ -686,6 +686,53 @@ export const LANDMARKS = [
     // from. 150 m suits an 8.5 m building (cf. 543 Presidio at 120 for 9.55 m).
     camera: { distance: 150, yaw: 225, pitch: 26 },
   },
+  {
+    // The tightest site in the registry: a 6.2 m frontage in an unbroken
+    // party-wall row on the south rim of South Park. Two things are unusual and
+    // both are deliberate.
+    //
+    // 1. THE lon/lat BELOW IS NOT THE MANIFEST ANCHOR, and must not be
+    //    "corrected" to match it. These fields are independent: placeGeneric()
+    //    in app/src/assets.js positions the GLB from the manifest anchor alone
+    //    (-122.3943764, 37.7808599 — the surveyed parcel's centroid, where the
+    //    building actually stands), while this lon/lat is only the centre of
+    //    the exclusion circle. They sit 1.4 m apart because from the manifest
+    //    anchor NO radius works at all: 159 South Park's footprint shares a
+    //    party-wall vertex 0.50 m away, exactly as close as this building's own
+    //    nearest vertex, so every circle that drops one drops both. Centring
+    //    the circle on the DataSF LiDAR footprint's area centroid instead opens
+    //    the only viable window.
+    //
+    // 2. THE WINDOW IS 0.4 m WIDE. excluded() drops a footprint when its
+    //    centroid OR any vertex is inside the radius. Measured from this point
+    //    against the two sources the bake actually reads
+    //    (pipeline/data/buildings_datasf.geojson and
+    //    overture_buildings.geojsonseq, 13 Aug 2026):
+    //
+    //          polygon              DataSF    Overture
+    //          165-167 (this)         0.00 m    1.08 m
+    //          159 South Park         1.49 m    2.33 m
+    //          171 South Park         3.34 m    4.15 m
+    //
+    //    So r must EXCEED 1.08 (or the Overture gap-fill re-adds this building
+    //    after the DataSF footprint is dropped — addBuilding() returns null on
+    //    exclusion, so markOccupied() never runs and occupiedFraction() cannot
+    //    be relied on to block it) and stay UNDER 1.49 (or 159 disappears and
+    //    leaves a hole where a real building stands, an AGENTS rule 5
+    //    violation). 1.3 keeps 0.22 m and 0.19 m of margin. Do not round it.
+    //
+    // No clearTrees: the crape myrtle on the sidewalk in front is real and
+    // should stay, and at 1.3 m this radius clears no street furniture anyway —
+    // which is correct here, since South Park's furniture sits along the street
+    // well outside a 6 m lot.
+    id: '165SouthPark',
+    name: '165-167 South Park',
+    lon: -122.3943963,
+    lat: 37.7808764,
+    height: 9.0,
+    exclude: 1.3,
+    camera: { distance: 160, yaw: 350, pitch: 26 },
+  },
 ];
 
 // Parks/green spaces the landcover bake must match at least one source polygon
