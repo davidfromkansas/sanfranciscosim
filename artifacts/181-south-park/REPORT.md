@@ -203,6 +203,56 @@ One street-level photograph would settle all of it. Until then this asset is
 honest about being a well-measured massing with an inferred skin, and the plan's
 Part 1 photo gate stays open for whoever gets there first.
 
+## 6b. Integration QA (stage 5, batch mode)
+
+Run locally against `npm run dev` on the re-baked tree. Batch mode: the bake was
+run for this QA and then discarded, and the branch commits source only.
+
+| Check | Result |
+|---|---|
+| Manifest entry / `camelId` round trip | PASS — `181-south-park` -> `181SouthPark`, matches `pipeline/lib/landmarks.mjs` |
+| Loader merge line | `sf-assets: 181-south-park merged 9 objects / 9 materials -> batched (3109 tris body); uniform x1.0000 at 3783, -1189` |
+| **Scale** | **x1.0000** — authored height and `targetHeightM` agree exactly |
+| Exactly one building on the site | PASS — no procedural twin, no baked block poking through, no z-fighting |
+| Terrain seating | PASS — placed at y 7.3835, the sampled ground there; no float, no sink |
+| Orientation | PASS — long axis parallel to the block, hipped end toward South Park, garage end toward Varney Place |
+| Night glow | PASS — only the intended `_Glow` surfaces light: a scatter of SW-flank windows, two roof glazing slots, storefront and canopy. Alley end and party wall stay dark |
+| Draw calls | PASS — peak 86 at this station, budget < 300 (AGENTS rule 2) |
+| `pipeline/audit.mjs` check 1.6 | PASS — no procedural footprint inside a bespoke landmark exclusion zone, 42 landmarks clear |
+| `pipeline/verify-rebake.mjs` | PASS — 584/585 cells unchanged; only 23_13 moved, 233 -> 232 buildings; nearest surviving footprint 7.6 m against a 5 m radius |
+| **Fallback drill** | PASS — see below |
+
+**Re-bake attribution.** Exactly one building tile changed (`23_13.bin`, this
+landmark's cell) and its count dropped by exactly one. Terrain, landcover and
+street tiers came out byte-identical to `origin/main`, so the seeded
+`pipeline/data/` snapshot matches the vintage that baked main and there is no
+drift to attribute — unusual for this pipeline, and worth knowing the check came
+out clean. The other 580 changed files are the context/ctx tier and `api/_data`,
+which `validate.mjs` and `context.mjs` republish wholesale every run.
+
+`audit.mjs` reports 3 unrelated failures — 1.2b (citywide p95 building height),
+1.3c (Telegraph Hill terrain elevation vs the Terrarium DEM) and 1.7b (one of
+793 sampled trees offshore). None of them is this landmark's: 1.3c and 1.7b read
+terrain and landcover tiles that this bake left byte-identical to `origin/main`,
+and 1.2b is a percentile over 174,754 buildings that removing one 14 m footprint
+cannot move.
+
+**Fallback drill (AGENTS rule 3).** With
+`app/public/sf-assets/landmarks/181-south-park.glb` renamed away and the page
+reloaded: the app boots normally, the whole area renders (streets, trees,
+neighbours, traffic), and the console carries exactly one warning —
+
+```
+sf-assets: 181-south-park failed to load (Unexpected token '<', "<!doctype "... is not valid JSON)
+```
+
+— which is the streamed-asset path's per-asset warning (the dev server answers a
+missing `.glb` with `index.html`; in production it is a 404). The site is empty
+ground inside the exclusion zone. That is the expected Case B outcome, not a
+regression: there is no procedural stand-in to fall back to, because the
+exclusion removed it. No crash, no hole in the terrain, no missing tiles. File
+restored afterwards and verified byte-identical to the artifact.
+
 ## 7. Approval
 
 Stage 3 of the pipeline is the human gate. The user's instruction for this
