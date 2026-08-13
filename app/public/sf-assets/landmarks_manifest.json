@@ -951,5 +951,24 @@
     ],
     "tris": 17703,
     "loadRadius": 2500
+  },
+  {
+    "id": "earl-warren-building",
+    "file": "earl-warren-building.glb",
+    "anchor": [
+      -122.4178413,
+      37.7806865
+    ],
+    "targetHeightM": 27.0,
+    "cat": 18,
+    "name": "Earl Warren Building",
+    "estimated": false,
+    "dims": [
+      118.94,
+      50.03,
+      27.0
+    ],
+    "tris": 18540,
+    "loadRadius": 2500
   }
 ]
