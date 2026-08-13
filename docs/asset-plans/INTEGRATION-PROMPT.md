@@ -145,13 +145,13 @@ building on that footprint, so the GLB will intersect it. You must also:
      && npm run notables && npm run context && npm run muni-shapes
    # or just: npm run all (same order, includes the downloads)
    ```
-   **`muni-shapes` belongs on that line too.** The publish step deletes
-   `app/public/tiles/muni-shapes.bin` like everything else it does not find in
-   `out/`, and `muni-shapes.mjs` only regenerates it when `MUNI_511_KEY` is set —
-   without the key it prints "leaving the committed file as is" and exits, by
-   which point the publish step has already removed it. Symptom: a
-   `sf-muni: no route shapes (shapes bad magic)` console warning and buses that
-   dead-reckon. Without the key, restore it instead:
+   **`muni-shapes` belongs on that line too**, though without `MUNI_511_KEY` it
+   only prints "leaving the committed file as is" and exits. That used to be a
+   trap: the publish step wiped `app/public/tiles/` wholesale, so the committed
+   `muni-shapes.bin` was already gone by then and nothing restored it. `validate`
+   now clears only the tiers it owns. If the file does go missing, the symptom is
+   a `sf-muni: no route shapes (shapes bad magic)` console warning and buses that
+   dead-reckon; put it back with
    `git checkout origin/main -- app/public/tiles/muni-shapes.bin`.
    **Run the whole chain — stopping at `toy` is a trap.** `context.mjs` imports
    `LANDMARKS`, so the context tier owns your landmark's pick box, its
