@@ -1,0 +1,88 @@
+{
+  "asset": "551-third",
+  "glb": "551-third.glb",
+  "objects": 147,
+  "meshes": 147,
+  "triangles": 10100,
+  "triangle_cap": 12000,
+  "dims_m": [
+    41.807,
+    41.807,
+    6.6
+  ],
+  "bbox_min": [
+    -20.9036,
+    -20.9036,
+    0.0
+  ],
+  "bbox_max": [
+    20.9036,
+    20.9036,
+    6.6
+  ],
+  "min_z": 0.0,
+  "center_xy": [
+    0.0,
+    0.0
+  ],
+  "target_height_m": 6.6,
+  "materials": [
+    "Toy_cream",
+    "Toy_glass",
+    "Toy_glassl_Glow",
+    "Toy_ink",
+    "Toy_mustard",
+    "Toy_mustard_Glow",
+    "Toy_red",
+    "Toy_roofd",
+    "Toy_steel",
+    "Toy_stone",
+    "Toy_teal",
+    "Toy_trim",
+    "Toy_trim_Glow",
+    "Toy_white"
+  ],
+  "glow_materials": [
+    "Toy_glassl_Glow",
+    "Toy_mustard_Glow",
+    "Toy_trim_Glow"
+  ],
+  "non_toy_materials": [],
+  "off_palette_materials": [],
+  "textured_materials": [],
+  "animated_objects": [],
+  "negative_scale_objects": [],
+  "unapplied_transform_objects": [],
+  "inverted_volume_objects": [],
+  "ray_test": {
+    "directions": 26,
+    "rays_cast": 1274,
+    "hits": 292,
+    "back_facing_first_hits": 0,
+    "residual_pct": 0.0,
+    "threshold_pct": 0.15
+  },
+  "checks": {
+    "fresh_scene_reimport": true,
+    "min_z_at_zero": true,
+    "xy_centred": true,
+    "bbox_top_is_target_height": true,
+    "triangles_within_cap": true,
+    "all_materials_toy": true,
+    "materials_on_palette": true,
+    "no_toy_body": true,
+    "no_image_textures": true,
+    "glow_set_as_planned": true,
+    "no_cameras": true,
+    "no_lights": true,
+    "no_animation": true,
+    "no_armatures": true,
+    "no_negative_scale": true,
+    "transforms_applied": true,
+    "normals_signed_volume": true,
+    "normals_ray_residual": true,
+    "ray_coverage_meaningful": true
+  },
+  "result": "PASS",
+  "failed_checks": []
+}
