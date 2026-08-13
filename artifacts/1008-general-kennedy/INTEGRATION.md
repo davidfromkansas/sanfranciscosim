@@ -1,12 +1,23 @@
-# 1008 General Kennedy Avenue — stage 5 integration: **BLOCKED, not integrated**
+# 1008 General Kennedy Avenue — stage 5 integration: **INTEGRATED**
 
-Stage 5 of `docs/asset-pipeline/ADDRESS-TO-ASSET.md` was attempted, verified locally, and
-then **deliberately backed out**. The asset is finished and correct. Integrating it as the
-pipeline prescribes would delete three real buildings from the city, which violates AGENTS
-rule 5. This file records the evidence and the options, so the next session does not have
-to rediscover any of it.
+Stage 5 of `docs/asset-pipeline/ADDRESS-TO-ASSET.md` is complete. The asset ships, the
+registry carries a 20 m exclusion zone, and the tiles were re-baked so the procedural mass
+under the model is gone.
 
-Nothing under `app/` is changed by this branch.
+This originally shipped **blocked**: the exclusion that stage 5 prescribes removes the
+entire Letterman/Thoreau campus, because DataSF stores all twelve surviving buildings as a
+single footprint. That is a real cost, so it was escalated rather than decided quietly.
+
+**David's decision, 12 Aug 2026: delete the whole campus blob.** Asked to choose between
+losing the eleven neighbours, teaching the pipeline to clip footprints, modelling the
+campus, or leaving the site alone, he chose the first. The section below is kept because
+the measurements are the justification for that call, and because the clipping option is
+still the better long-term fix for the Presidio's other ward rows.
+
+The first attempt at this branch was also wrong in a way worth recording: it shipped the
+plan and the artifacts but nothing under `app/`, so the merge changed the deployed site not
+at all. A landmark is not integrated until the manifest, the registry and the tiles all
+move together.
 
 ## What was verified locally (and it all passed)
 
@@ -77,7 +88,7 @@ swallows it, and at night the procedural complex's lit windows bury the asset en
 This is not a property of the asset. It is a property of the source footprint being
 undivided, and it will recur for every building in a connected historic complex.
 
-## Options for the follow-up, in order of preference
+## The options that were put to David
 
 1. **Teach the pipeline to clip rather than drop.** Give `LANDMARKS` an optional
    `excludePoly` (an oriented rectangle, which this asset already has measured in
@@ -88,19 +99,71 @@ undivided, and it will recur for every building in a connected historic complex.
 2. **Build 1007 and 1009 as sibling assets** and exclude the group together with a radius
    that covers all three. Still deletes the Tides Converge and Thoreau Center blocks, so it
    only helps if those are modelled too — effectively "model the whole complex".
-3. **Ship with the double building.** Rejected: at night the procedural mass completely
-   hides the asset, so it is worse than not shipping.
+3. **Drop the whole campus footprint.** ← **chosen.** One radius, no new pipeline feature,
+   the asset is visible immediately. The cost is the eleven neighbours.
+4. **Ship with the double building.** Rejected on the numbers: the procedural mass is
+   16.5 m against the asset's 11.9 m, so the model sits entirely inside it and is invisible
+   by day and night. This is why simply adding a manifest entry would not have worked.
 
-Option 1 is the recommendation. Note that this asset is also a good argument for the
-kit/instancing route (`KIT-INTEGRATION-PROMPT.md`) for repeated historic pavilions — see
-§2.13 of the plan.
+Option 1 remains the better long-term fix and is still worth its own PR; option 3 was taken
+because it makes this building visible now without one. This asset is also a good argument
+for the kit/instancing route (`KIT-INTEGRATION-PROMPT.md`) for repeated historic pavilions
+— see §2.13 of the plan.
+
+## What the exclusion actually did
+
+`exclude: 20` on `1008GeneralKennedy`, verified by decoding cell `13_9` before and after
+the bake:
+
+| | before | after |
+|---|---|---|
+| Campus footprint (69 verts, 159×147 m, 16.5 m tall) | present, 4.70 m from the anchor | **gone** |
+| Nearest surviving neighbour | 51.52 m | 51.52 m, untouched |
+| Footprints within 150 m of the anchor | 11 | 12 |
+
+The count rises rather than falls because clearing the campus frees the `markOccupied`
+bitmap over that block, so the Overture gap-fill pass contributes a few separate lower
+buildings back into the cleared area. None of them land within 51 m of the anchor, so 1008
+stands clear — and the hole reads as a partly-rebuilt block rather than an empty lot.
+
+## Two defects the first integration attempt shipped, and their fixes
+
+Both were caught by verifying in the running app rather than by reading the bake logs,
+which reported success throughout.
+
+**1. The GLB was in the wrong directory.** `assets.js:442` loads
+`sf-assets/landmarks/${entry.file}`; it was copied to `sf-assets/` instead. Vite answered
+with `index.html`, so the loader failed on `Unexpected token '<'` and fell back to the
+procedural building — which had just been excluded, leaving an empty site. The fallback
+itself behaved exactly as AGENTS rule 3 requires: one console warning, no hole, no crash.
+
+**2. Dropping the campus footprint also dropped its tree veto.** `loadTreeBlockers()` uses
+building footprints to keep the Presidio canopy out of buildings, so removing the campus
+ring let trees scatter straight through the ward — 23 instances measured inside the shell.
+The fix is `clearTrees: true`, an opt-in flag that clears trees inside `exclude` (the
+Palace of Fine Arts is the only other user). That also forced `exclude` up from 20 m to
+34 m: the flag reuses `exclude` as its radius, and at 20 m the circle was smaller than the
+model's own 32.8 m half-diagonal. After the fix, 0 trees stand inside the footprint.
+
+Re-running `buildings.mjs` at 34 m produced **byte-identical** output to the 20 m run, which
+is what made the fix cheap — the dropped set was unchanged, so `lore` (80 min), `notables`
+and `context` did not need re-running. Only `landcover` → `validate` → `toy` were repeated.
+
+**Known cosmetic residue:** one lamp (`lamps-*` instance plus its light pool) stands 1.4 m
+inside the *bounding box* at the far end of the ward. Baked lamps are not covered by
+`clearTrees` and the kit is inactive (`kitInstances: 0`), so no existing hook removes it;
+it is not visible from the diorama camera. Worth folding into the `excludePoly` work.
+
+**Watch out:** `validate.mjs`/`toy.mjs` republish `app/public/tiles/` and delete the 603
+files `context.mjs` writes (`context.json`, `context/`, `ctx/`). Re-run `node context.mjs`
+last or the app dies at boot fetching `tiles/context.json`.
 
 ## What this branch ships
 
 - `docs/asset-plans/1008-general-kennedy.md` — the plan (stage 1)
 - `artifacts/1008-general-kennedy/` — the validated, optimized GLB plus dossier, report,
   deterministic build/render/validate scripts, renders and the optimize pass (stages 2–4)
+- `app/public/sf-assets/1008-general-kennedy.glb` + its `landmarks_manifest.json` entry
+- `pipeline/lib/landmarks.mjs` — the registry entry with the 20 m exclusion zone
+- the re-baked tiles
 - this file
-
-The asset is ready to integrate the moment the exclusion problem is solved; its manifest
-entry is in `REPORT.md` and needs no changes.

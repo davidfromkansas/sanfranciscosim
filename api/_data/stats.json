@@ -1,5 +1,5 @@
 {
- "generated": "2026-08-12T17:42:21.179Z",
+ "generated": "2026-08-13T00:04:03.200Z",
  "buildings": 174788,
  "cells": 596,
  "categories": [
@@ -28,7 +28,7 @@
    "cat": 3,
    "id": "office",
    "label": "Office",
-   "count": 2760,
+   "count": 2761,
    "night": 3
   },
   {
@@ -140,7 +140,7 @@
    "cat": 19,
    "id": "industrial",
    "label": "Industrial",
-   "count": 2032,
+   "count": 2031,
    "night": 3
   },
   {
@@ -200,7 +200,7 @@
   {
    "sub": "office",
    "label": "Office",
-   "count": 1892
+   "count": 1893
   },
   {
    "sub": "restaurant",
@@ -428,11 +428,6 @@
    "count": 57
   },
   {
-   "sub": "museum",
-   "label": "Museum",
-   "count": 56
-  },
-  {
    "sub": "bookstore",
    "label": "Bookstore",
    "count": 56
@@ -440,6 +435,11 @@
   {
    "sub": "self_storage",
    "label": "Self storage",
+   "count": 56
+  },
+  {
+   "sub": "museum",
+   "label": "Museum",
    "count": 56
   },
   {
@@ -468,11 +468,6 @@
    "count": 48
   },
   {
-   "sub": "workshop",
-   "label": "Workshop",
-   "count": 47
-  },
-  {
    "sub": "dispensary",
    "label": "Dispensary",
    "count": 47
@@ -480,6 +475,11 @@
   {
    "sub": "thrift_store",
    "label": "Thrift store",
+   "count": 47
+  },
+  {
+   "sub": "workshop",
+   "label": "Workshop",
    "count": 47
   },
   {
@@ -493,8 +493,8 @@
    "count": 43
   },
   {
-   "sub": "college",
-   "label": "College",
+   "sub": "warehouse",
+   "label": "Warehouse",
    "count": 40
   },
   {
@@ -503,13 +503,13 @@
    "count": 40
   },
   {
-   "sub": "warehouse",
-   "label": "Warehouse",
+   "sub": "event_venue",
+   "label": "Event venue",
    "count": 40
   },
   {
-   "sub": "event_venue",
-   "label": "Event venue",
+   "sub": "college",
+   "label": "College",
    "count": 40
   },
   {
@@ -533,13 +533,13 @@
    "count": 32
   },
   {
-   "sub": "ice_cream",
-   "label": "Ice cream shop",
+   "sub": "wine_bar",
+   "label": "Wine bar",
    "count": 31
   },
   {
-   "sub": "wine_bar",
-   "label": "Wine bar",
+   "sub": "ice_cream",
+   "label": "Ice cream shop",
    "count": 31
   },
   {
@@ -654,18 +654,18 @@
   }
  ],
  "sources": {
-  "landuse": 140707,
+  "landuse": 140706,
   "business": 10215,
   "heuristic": 7280,
-  "datasf": 1288,
-  "overture": 6668,
-  "osm": 8630
+  "osm": 8630,
+  "overture": 6669,
+  "datasf": 1288
  },
  "confidence": [
-  147987,
+  147986,
   15338,
   4499,
-  6964
+  6965
  ],
  "streets": {
   "named": 2509,
