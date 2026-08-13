@@ -840,6 +840,33 @@ export const LANDMARKS = [
     exclude: 5,
     camera: { distance: 190, yaw: 255, pitch: 24 },
   },
+  {
+    // The new Main Library, one block south of the Old Main across Fulton, on a
+    // near-identical 106 x 57 m block. Same radius rule as its neighbour and for
+    // the same reason: excluded() drops a footprint when its centroid OR ANY ring
+    // vertex falls inside, so the circle has to clear this building's NEAREST
+    // vertex while staying inside the nearest neighbour's. Measured from this
+    // anchor against the actual bake input:
+    //   28.9 m  this footprint's nearest vertex (Overture; 30.7 m in DataSF)
+    //   30.3 m  a 1.2 m site structure inside the block (DataSF only) - fine to drop
+    //   50.6 m  the nearest REAL neighbour, the 9 m and 15.9 m buildings across
+    //           Hyde towards Market, agreed by both sources
+    //   60.3 m  the OBB half-diagonal - too large, it would eat that frontage
+    // 40 m drops the library in both sources with a 9.3 m margin and clears every
+    // real neighbour by 10.6 m. The Asian Art Museum's own 40 m circle sits 92 m
+    // away, so the two do not overlap.
+    //
+    // Overture carries height=46 for this footprint - the NAVD88 roof elevation,
+    // the same tag error as the museum - so the baked city renders it 46 m tall
+    // and it reads as a Civic Center mid-rise. Excluding it fixes that too.
+    id: 'sfMainLibrary',
+    name: 'San Francisco Main Public Library',
+    lon: -122.4157709,
+    lat: 37.7791281,
+    height: 28.98,
+    exclude: 40,
+    camera: { distance: 600, yaw: 268, pitch: 20 },
+  },
 ];
 
 // Parks/green spaces the landcover bake must match at least one source polygon

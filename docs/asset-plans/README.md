@@ -84,8 +84,9 @@ route, and the park plans depend on it (§E8 of the parks README).
 | [135 South Park](./135-south-park.md) | `135-south-park` | 8.5 m (LiDAR-derived) | new landmark |
 | [165–167 South Park](./165-south-park.md) | `165-south-park` | 9.0 m (estimated) | new landmark |
 | [181 South Park](./181-south-park.md) | `181-south-park` | 16.5 m (LiDAR-derived) | new landmark |
+| [San Francisco Main Public Library](./sf-main-library.md) | `sf-main-library` | 28.98 m | new landmark |
 
-## Shared contract (all 47)
+## Shared contract (all 48)
 
 - Style: `docs/styles/miniature-toy.md` (authoritative for artistic decisions)
 - Technical contract: `.agents/skills/sf-asset-check/SKILL.md` (authoritative for the GLB)
@@ -143,6 +144,10 @@ nastiest so far: its OSM `height=6` and the 2010 LiDAR median (5.56 m) agree wit
 other and are both *correct for 2010* — they simply predate the second storey the building
 has today, so every published height for that lot is stale rather than mismeasured. Check
 the LiDAR's vintage against the permit history before believing a small number.
+
+The new Main Library across Fulton Street carries the *same* `height=46` as the Asian
+Art Museum, for the same reason, and is really 28.98 m — so that tag has now caught two
+adjacent Civic Center blocks.
 
 350 Brannan Street is a different kind of failure: not a wrong height but a missing
 *building*. Nominatim resolves the address onto the Brannan Street roadway by TIGER
