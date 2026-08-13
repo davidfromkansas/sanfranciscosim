@@ -9,18 +9,22 @@ the plan wherever the two disagree.**
 
 | | |
 |---|---|
-| File | `101-grove.glb` (binary glTF) |
+| File | `101-grove.glb` (binary glTF, meshopt-compressed) |
+| Size | **421,008 bytes** shipped (1,166,344 pre-optimize) |
 | Triangles | **17,648** (budget 22,000; hard gate 30,000) |
-| Objects | 611 closed solids |
+| Objects / draw submeshes | **13** after the stage-4 join (611 closed solids as authored) |
 | Dimensions | 70.508 × 47.498 × **21.400** m |
 | Crest | balustrade top rail, exactly 21.40 m → loader scale factor **1.000000** |
 | Min Z | 0.0 m; XY centre offset (−0.003, −0.042) m |
 | Materials | 13, all `Toy_*`, no `Toy_body` |
 | Glow materials | `Toy_gold_Glow`, `Toy_glassl_Glow` |
-| Normals | 611/611 positive signed volume; 31,500-ray residual **0.0032 %** (gate 0.15 %) |
-| Validation | `validation.json` — **PASS**, 15/15 checks |
+| Normals | all groups positive signed volume; ray residual **0.000 %** shipped (0.0032 % as authored; gate 0.15 %) |
+| Validation | `validation.json` — **PASS**, 15/15 checks, re-run against the shipped file |
 
-Pre-optimize file size is recorded in the stage-4 section below.
+Stage 4 changed no geometry: 17,648 triangles in, 17,648 out, bbox identical to five
+decimal places. It joined 611 objects into 13 per-material groups and
+meshopt-packed the result — full metrics and gate results in
+`optimize/REPORT.md`.
 
 ## Reproduce
 
