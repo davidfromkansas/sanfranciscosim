@@ -58,6 +58,7 @@ route, and the park plans depend on it (§E8 of the parks README).
 | [Herbst Theatre (War Memorial Veterans Building)](./herbst-theatre.md) | `herbst-theatre` | ~31 m (estimated) | new landmark |
 | [Fairmont San Francisco](./fairmont-san-francisco.md) | `fairmont` | 99 m | new landmark |
 | [350 Brannan Street](./350-brannan.md) | `350-brannan` | 13.85 m | new landmark |
+| [362 Brannan Street](./362-brannan.md) | `362-brannan` | 8.6 m | new landmark |
 | [380 Brannan Street](./380-brannan.md) | `380-brannan` | 12.6 m | new landmark |
 | [550 Third Street](./550-third.md) | `550-third` | 11 m | new landmark |
 | [375 Alabama Street (Ames Harris Neville Co.)](./375-alabama.md) | `375-alabama` | 22.5 m | new landmark |
@@ -77,13 +78,14 @@ route, and the park plans depend on it (§E8 of the parks README).
 | [171 South Park Street](./171-south-park.md) | `171-south-park` | 12.6 m | new landmark |
 | [101 South Park](./101-south-park.md) | `101-south-park` | 10.9 m (estimated) | new landmark |
 
-## Shared contract (all 41)
+## Shared contract (all 42)
 | [155 – 157 South Park Street](./155-south-park.md) | `155-south-park` | 10.1 m | new landmark |
 
-## Shared contract (all 41)
+## Shared contract (all 42)
 | [135 South Park](./135-south-park.md) | `135-south-park` | 8.5 m (LiDAR-derived) | new landmark |
 
-## Shared contract (all 41)
+## Shared contract (all 42)
+## Shared contract (all 42)
 
 - Style: `docs/styles/miniature-toy.md` (authoritative for artistic decisions)
 - Technical contract: `.agents/skills/sf-asset-check/SKILL.md` (authoritative for the GLB)
@@ -153,6 +155,11 @@ that could plausibly be a sea-level datum. 135 South Park is the opposite proble
 LiDAR-only and its facade is openly a typological reconstruction; that plan's 2.15 leads
 with the admission rather than burying it, and its Part 1 tells the executing agent to
 read 2.15 before starting.
+that could plausibly be a sea-level datum. 362 Brannan Street is a fifth variety and the
+most ordinary-looking one: its OSM `height=6` is neither eave nor crest nor datum, it is
+simply the *other part of the building* — the one-storey block that covers about four
+fifths of the plan — while the crest, on a set-back sloped roof over a two-storey front
+bay, is 8.58 m. A tag can be an honest measurement of the wrong feature.
 
 The executing agent is expected to re-verify height, anchor, footprint and
 orientation before modelling — the dossier is a head start, not a citation.
