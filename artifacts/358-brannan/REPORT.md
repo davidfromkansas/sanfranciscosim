@@ -16,16 +16,18 @@ they disagree. Two things did disagree — see §3.
 | Target height | **9.60 m**, the bay cornice cap — the export's bounding-box top |
 | Brannan front heading | 135.3° true (SE); Varney Place rear 315.3° (NW) |
 | Footprint | 6.93 m x 25.20 m, authored on the measured rectangle |
-| Objects / triangles | 55 / 3,860 (cap 7,000) |
+| Objects / triangles | 12 / 3,860 (cap 7,000) — 55 objects before the stage-4 per-material join |
 | AABB | 22.932 x 23.061 x 9.600 m |
 | min Z / XY centre | 0.000 / (−0.014, 0.014) |
-| Materials | 10 opaque + 2 `_Glow` |
+| Materials | 9 opaque + 2 `_Glow` |
+| File on disk | 109,200 B meshopt-compressed (230,456 B pre-optimize) |
 
 ## 2. Contract compliance
 
 `validate_358_brannan.py` re-imports the exported GLB into a factory-reset scene and
 checks the whole contract; `validation.json` is its output. Every check passed on the
-first run and again after each revision:
+first run, again after each revision, and again on the **shipped** stage-4 file — the
+table below is the shipped run:
 
 | Check | Result |
 |---|---|
@@ -38,7 +40,7 @@ first run and again after each revision:
 | All materials `Toy_*`, no `Toy_body` | PASS |
 | No cameras, lights, animation, armatures, constraints | PASS |
 | Transforms applied, no negative scales | PASS |
-| Normals outward — per-object signed volume | PASS (55/55 positive, `inverted_solids: []`) |
+| Normals outward — per-object signed volume | PASS (12/12 positive, `inverted_solids: []`) |
 | Normals outward — 31,500-ray visibility test | PASS (residual within the 0.15% tolerance) |
 | No degenerate geometry | PASS (0) |
 | No foreign or unexpected objects | PASS |
@@ -135,7 +137,20 @@ building, so the pipeline continued from the validated asset to optimize and
 integration without a separate review round. No design feedback was received, so
 there are no revision iterations to log beyond the two self-caught ones in §3.
 
-## 8. Draft manifest entry
+## 8. Optimize (stage 4)
+
+Run per `docs/asset-pipeline/GLB-OPTIMIZE-PROMPT.md`; full write-up in
+`optimize/REPORT.md`. Headline: **230,456 → 109,200 bytes (−52.6%)**, 57 → 13 draw
+submeshes, 7,768 → 6,426 vertices, triangles and bounding box unchanged, all gates
+PASS (G6 lands short of the 60% target because Phase B could not remove a single
+triangle — the remainder is silhouette geometry, argued in that report's §7). Mean
+pixel delta across day/night × near/far is at most 0.09%.
+
+The optimized file is the shipping file; the pre-optimize original is archived at
+`optimize/input/358-brannan.glb`. The numbers in §1 and the manifest entry below are
+the shipped ones.
+
+## 9. Draft manifest entry
 
 Written from the measurements above, not from the plan. `estimated` is **true**: no
 published height exists for this building and 9.60 m is photogrammetric (see
