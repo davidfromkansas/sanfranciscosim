@@ -203,3 +203,113 @@ the radius has to clear ~21.9 m without taking the neighbours.
 | `599-third-{top,north,east,south,west,aerial,night}.png` | review renders |
 | `599-third-contact-sheet.png` | the review sheet |
 | `REFERENCE.md` / `validation.json` | dossier / validator output |
+
+---
+
+## 10. Stage 5 — integration (batch mode)
+
+Run 13 August 2026 per `docs/asset-plans/INTEGRATION-PROMPT.md` Part 1, Case **B**
+(new landmark), with `BATCH: yes` — so the bake was run and QA'd, then discarded,
+and this branch ships **source only**.
+
+### 10.1 Exclusion radius — measured, and the plan was wrong
+
+The plan's §2.13 suggested starting at `exclude: 22`, derived from this
+building's **OSM** corner vertices (21.78–21.92 m). The bake reads **DataSF**
+footprints, so that estimate was measuring the wrong polygon. Streaming the real
+bake input through `geojsonStream` + `ringCentroid` and applying the actual
+`excluded()` rule (drop on centroid **or any vertex** inside the radius):
+
+| Ring | centroid → anchor | nearest vertex → anchor |
+|---|---|---|
+| **599 Third** (area 874 m², bbox 42.9 × 42.7, `hgt_mediancm` 1562 — confirmed ours) | **2.08 m** | 15.56 m |
+| nearest neighbour | 20.56 m | **17.24 m** |
+
+Window that drops exactly one ring: **2.08 < r ≤ 17.24**. Shipped **`exclude: 10`**,
+the middle of that band. `exclude: 22` would have deleted **three** neighbours.
+Recorded in the registry comment so it is not re-derived.
+
+### 10.2 The 522-tile diff is drift, not this landmark
+
+Re-baking **with** and **without** the `599Third` entry and diffing both against
+`HEAD`:
+
+| | tiles differing | count changes | buildings baked |
+|---|---|---|---|
+| with entry | 522 / 585 | **1** (`23_13`, 233 → 232) | 174,754 |
+| without entry | 522 / 585 | **0** | 174,755 |
+
+The two differing-tile sets are identical (symmetric difference empty both ways),
+so the churn is `pipeline/data/` vintage drift — sub-quantum vertex jitter from a
+newer Overture/DataSF snapshot than `main`'s tiles were baked from. This
+landmark's whole footprint in the bake is **one dropped ring in one cell**. It
+also confirms the radius: −1 building, and the Overture gap-fill did not re-add
+anything into the freed area.
+
+### 10.3 A crash this integration caused and fixed
+
+Omitting `camera` from the registry entry booted the whole city to
+**"Cannot read properties of undefined (reading 'yaw')"**. `main.js` maps *every*
+manifest landmark into `presets`, and `camera.js` reads `preset.yaw`
+unconditionally. The repo already documents this at `542PresidioBlvd`; the plan's
+"no camera preset" note was right about the number **key** and wrong about the
+**object**. Added `camera: { distance: 240, yaw: 0, pitch: 26 }` — yaw 0 stands
+the camera due south (app yaw = 180 − true bearing), the bisector of the two
+designed street elevations.
+
+### 10.4 Local QA
+
+| Check | Result |
+|---|---|
+| Re-validation of the shipped GLB | **PASS** 15/15 (`validation.json`) |
+| Manifest entry | **PASS** — append-only, 19 insertions, 0 deletions |
+| id mapping `599-third` → `599Third` | **PASS** — verified against `camelId()` in `app/src/assets.js` |
+| Case B registry entry | **PASS** — `exclude: 10`, measured |
+| Re-bake | **PASS** — `verify-rebake.mjs`: "only the new landmarks' cells moved, and every asset has clear ground under it" |
+| Audit check 1.6 | **PASS** — "42 landmarks clear" |
+| Console merge line | **PASS** — `sf-assets: 599-third merged 12 objects / 12 materials -> batched (5254 tris body); uniform x1.0000 at 3804, -1155` |
+| Scale factor | **PASS** — exactly **1.0000** |
+| Single building, no procedural twin | **PASS** — visually one building; bake count −1 in `23_13` |
+| Orientation | **PASS** — entry + café face 3rd Street (SW), long face on Brannan (SE) |
+| Terrain seating | **PASS** — seated at y **7.76 m**; LiDAR ground mean 7.90 m |
+| Night glow | **PASS** — warm lit-loft scatter, cool skylights, white shopfront; nothing else lights |
+| Draw calls | **PASS** — **83–86** at the site (budget < 300) |
+
+Audit failures 1.2b, 1.3c and 1.7b are **pre-existing on `main`** and unrelated.
+
+### 10.5 Fallback drill (mandatory)
+
+Parked `app/public/sf-assets/landmarks/599-third.glb`, hard-reloaded:
+
+- the app **booted and rendered normally**, draw calls 83, no crash;
+- `599Third` **absent** from `assets.placed`;
+- the site degraded to **empty ground with every neighbour intact** — the correct
+  Case B outcome (there is no procedural version to fall back to, because the
+  exclusion removed the baked footprint);
+- the request returned **HTTP 200 `text/html`, 2,365 bytes**, not a 404 — Vite's
+  dev server answers a missing `public/` path with the SPA shell, so GLTFLoader
+  sees a parse failure. Expected and documented.
+
+**Honest limitation:** I could not isolate the single
+`sf-assets: … — keeping the code-built landmark` warning line. The browser
+console buffer is cumulative across navigations and the loader does not retry an
+entry once it has failed, so the only 599 line retrievable was a stale merge from
+before the drill. The degrade was therefore verified **behaviourally** (absent
+from `placed`, empty ground, app healthy) rather than by reading that string.
+
+Restored afterwards and confirmed byte-identical to `artifacts/599-third/599-third.glb`;
+the app re-merged it with `uniform x1.0000 at 3804, -1155`.
+
+### 10.6 Batch hand-off
+
+The bake was discarded after QA (`git checkout -- app/public/tiles api/_data`,
+1,986 generated files returned to `HEAD`). This branch commits **source only**:
+the GLB, the manifest entry, the registry entry, the asset plan and
+`artifacts/599-third/`. The city is rebuilt once for the whole batch by
+`docs/asset-pipeline/BATCH-INTEGRATE.md`.
+
+Sanity check required by the pipeline — `git diff --name-only origin/main` lists
+nothing under `app/public/tiles/` or `api/_data/`: **confirmed, 0 files**.
+
+**Not pushed, no PR, not deployed** — the pipeline ends at a local verified
+integration and asks.

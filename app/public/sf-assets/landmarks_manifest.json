@@ -647,5 +647,24 @@
     ],
     "tris": 13176,
     "loadRadius": 2500
+  },
+  {
+    "id": "599-third",
+    "file": "599-third.glb",
+    "anchor": [
+      -122.3942739,
+      37.7804504
+    ],
+    "targetHeightM": 18.3,
+    "cat": 2,
+    "name": "599 Third Street",
+    "estimated": false,
+    "dims": [
+      43.151,
+      42.853,
+      18.3
+    ],
+    "tris": 9384,
+    "loadRadius": 2500
   }
 ]

@@ -556,7 +556,17 @@ beyond the radius costs nothing.
   are wide, so a radius in the low-to-mid 20s reaches open roadway on two of four
   sides. The party wall to 551 3rd (NW) is the tight one, and 380 Brannan to the
   NE is an already-integrated landmark whose own baked footprint must not be
-  taken as collateral. Start the check at `exclude: 22`.
+  taken as collateral. ~~Start the check at `exclude: 22`.~~
+  **Measured during integration (supersedes the 22 m estimate above): use
+  `exclude: 10`.** The estimate was derived from this building's *OSM* corner
+  vertices (21.78–21.92 m) and is wrong, because the bake reads *DataSF*
+  footprints. Streamed through `geojsonStream` + `ringCentroid` exactly as
+  `buildings.mjs` does, the DataSF ring for this building is a 16-vertex outline
+  with area 874 m² and bbox 42.9 × 42.7 m, whose centroid is **2.08 m** from the
+  anchor and whose nearest vertex is **15.56 m**. The nearest *neighbour* vertex
+  is **17.24 m**. Since `excluded()` drops a ring on centroid **or** any vertex,
+  the window that drops exactly this building is `2.08 < r <= 17.24`, and 22
+  would have deleted three neighbours. 10 is the middle of the real band.
 - Manifest id `599-third` maps to registry id `599Third`.
 - No camera preset key. At 18.3 m this is a block texture, not a destination.
 - The building sits on flat made ground (LiDAR ground mean 7.90 m NAVD88).
