@@ -270,6 +270,31 @@ export const LANDMARKS = [
     exclude: 9,
     camera: { distance: 220, yaw: 45, pitch: 24 },
   },
+  // Full-lot corner building two lots northeast of 380, so the same TIGHT-radius
+  // logic applies for the same reason. Measured against the 943 baked footprints
+  // in the 3x3 cell block around 23_13:
+  //
+  //   target (23_13, 537 m2, h 13.7 m) centroid sits 0.01 m from this anchor
+  //   nearest NEIGHBOUR: centroid 14.42 m, nearest vertex 16.21 m (165 m2, h 11.2 m)
+  //
+  //   exclude  6-14 m -> drops 1 building  (correct: the target only)
+  //   exclude 16 m    -> drops 2  (eats that neighbour on its centroid)
+  //   exclude 20 m    -> drops 3
+  //
+  // The binding limit is the neighbour's CENTROID at 14.42 m, not its nearest
+  // vertex — excluded() tests centroid OR any ring vertex, so the centroid is
+  // what bites first here. 8 m is the middle of the safe band. An independent
+  // estimate off the OSM/DataSF footprints put the nearest neighbour at 13.79 m,
+  // which agrees within 0.6 m. Do not raise past 12 without re-running the check.
+  {
+    id: '350Brannan',
+    name: '350 Brannan Street',
+    lon: -122.3935234,
+    lat: 37.7810229,
+    height: 13.85,
+    exclude: 8,
+    camera: { distance: 230, yaw: 80, pitch: 26 },
+  },
   {
     // Through lot with party walls on both long sides, so the exclusion window
     // is narrow: this footprint's simplified ring centroid sits 0.96 m from the

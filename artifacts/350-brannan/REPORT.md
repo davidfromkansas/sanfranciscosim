@@ -225,7 +225,45 @@ returning to a gate. It is **not** taken as authorisation to push, open a PR, or
 `AGENTS.md` and stage 5 of the pipeline both require an explicit instruction for those,
 and in batch mode the PR belongs to `docs/asset-pipeline/BATCH-INTEGRATE.md` anyway.
 
-## 9. Files
+## 9. Stage 5 — integration QA (Case B, batch mode)
+
+Local verification against a full re-bake with the exclusion applied. Per batch mode the
+bake was then discarded and only source committed.
+
+| Check | Result | Evidence |
+|---|---|---|
+| Re-validation before touching the app | **PASS** | 16/16, `validation.json`, run on the shipped optimized GLB |
+| Manifest entry | **PASS** | 36 entries, valid JSON, formatting matches |
+| id mapping | **PASS** | `camelId('350-brannan')` → `350Brannan`, matches the registry |
+| Registry entry (Case B) | **PASS** | `pipeline/lib/landmarks.mjs`, `exclude: 8`, `camera { 230, yaw 80, pitch 26 }` |
+| Exclusion radius sizing | **PASS** | measured against 943 baked footprints: our centroid 0.01 m from anchor, nearest neighbour centroid 14.42 m; 6–14 m drops exactly one building |
+| Re-bake | **PASS** | full chain terrain→muni-shapes; Overture added 3,354, tallest 244 m (not the degraded 175 m failure mode) |
+| audit 1.6 | **PASS** | "no procedural footprint inside a bespoke landmark exclusion zone — 42 landmarks clear" |
+| verify-rebake | **PASS** | 584/585 cells unchanged; 23_13 233→232; nearest survivor 16.2 m vs 8 m radius |
+| Single building at the site | **PASS** | no procedural twin, no z-fighting |
+| Scale factor | **PASS** | `uniform x1.0000` — authored height and `targetHeightM` agree exactly |
+| Merge line | **PASS** | `350-brannan merged 12 objects / 10 materials -> batched (4139 tris body); uniform x1.0000 at 3870, -1218` |
+| Orientation | **PASS** | Brannan front faces the real Brannan Street; alley elevation faces Jack London Alley |
+| Terrain seating | **PASS** | placed at sampled elevation 10.72 m; DataSF LiDAR ground is 10.55 m NAVD88 |
+| Night glow | **PASS** | only the two portals and the scattered lit windows light; body, roof and parapet stay dark |
+| Draw calls | **PASS** | 91 at street level with 1,685 cells loaded; harness measured 162 hero / 97 near-landmark, all < 300 |
+| Fallback drill | **PASS** | asset hidden → app boots, site is empty ground (expected for Case B), exactly one warning: `sf-assets: 350-brannan failed to load (…)`, `failed: 1`, every other landmark unaffected. Restored byte-identical. |
+| `landmark-streaming-check.mjs` | **PASS** | all 6 checks: boot/approach/depart/re-approach/2 budget |
+| lint + build | **PASS** | `eslint src` clean; `vite build` ok; tiles compressed 56.3 → 31.6 MB |
+| Batch-mode sanity | **PASS** | `git diff --name-only origin/main` lists **0** files under `app/public/tiles/` or `api/_data/` |
+
+Two notes for whoever runs the batch bake:
+
+- The first `landmark-streaming-check.mjs` run failed with `boot: timed out … loading: 1`.
+  It was CPU contention from other sessions baking concurrently (load average ~1000), not a
+  defect: the identical command passed all six checks on a re-run. Do not chase it.
+- The in-editor preview pane stalls `requestAnimationFrame` whenever it is hidden, which
+  freezes the render loop and therefore all landmark streaming — assets sit at `far`
+  forever and `assets.update` is never called. That is a harness artifact, not an app bug.
+  The streaming check drives its own headless Chrome for exactly this reason (its header
+  says so); trust it over the pane.
+
+## 10. Files
 
 | File | What it is |
 |---|---|
