@@ -11,6 +11,11 @@ optimized landmark in the scene:
   the intake shrink pass every shipped GLB goes through (meshopt + geometry
   cleanup, 4–6× smaller, appearance-gated). Generic scripts in
   [`tools/glb-optimize/`](../../tools/glb-optimize/).
+- [**BATCH-INTEGRATE.md**](./BATCH-INTEGRATE.md) — stage 5 for several landmarks
+  at once. Building more than one landmark at a time? Each session stops at a
+  source-only branch (ADDRESS-TO-ASSET stage 5, "Batch mode") and this bakes the
+  city once for all of them. A per-landmark bake rewrites ~600 generated files,
+  so branches that each commit one cannot be merged.
 
 The stages delegate to the existing authoritative docs rather than duplicating
 them: plans per `docs/asset-plans/README.md`, the build contract per
