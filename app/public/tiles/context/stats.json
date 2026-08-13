@@ -1,6 +1,6 @@
 {
- "generated": "2026-08-12T19:22:21.488Z",
- "buildings": 174770,
+ "generated": "2026-08-13T00:43:11.820Z",
+ "buildings": 174769,
  "cells": 596,
  "categories": [
   {
@@ -112,7 +112,7 @@
    "cat": 15,
    "id": "library",
    "label": "Library",
-   "count": 50,
+   "count": 49,
    "night": 1
   },
   {
@@ -428,11 +428,6 @@
    "count": 57
   },
   {
-   "sub": "museum",
-   "label": "Museum",
-   "count": 56
-  },
-  {
    "sub": "bookstore",
    "label": "Bookstore",
    "count": 56
@@ -440,6 +435,11 @@
   {
    "sub": "self_storage",
    "label": "Self storage",
+   "count": 56
+  },
+  {
+   "sub": "museum",
+   "label": "Museum",
    "count": 56
   },
   {
@@ -460,17 +460,12 @@
   {
    "sub": "library",
    "label": "Library",
-   "count": 50
+   "count": 49
   },
   {
    "sub": "nightclub",
    "label": "Nightclub",
    "count": 48
-  },
-  {
-   "sub": "workshop",
-   "label": "Workshop",
-   "count": 47
   },
   {
    "sub": "dispensary",
@@ -480,6 +475,11 @@
   {
    "sub": "thrift_store",
    "label": "Thrift store",
+   "count": 47
+  },
+  {
+   "sub": "workshop",
+   "label": "Workshop",
    "count": 47
   },
   {
@@ -493,8 +493,8 @@
    "count": 43
   },
   {
-   "sub": "college",
-   "label": "College",
+   "sub": "warehouse",
+   "label": "Warehouse",
    "count": 40
   },
   {
@@ -503,13 +503,13 @@
    "count": 40
   },
   {
-   "sub": "warehouse",
-   "label": "Warehouse",
+   "sub": "event_venue",
+   "label": "Event venue",
    "count": 40
   },
   {
-   "sub": "event_venue",
-   "label": "Event venue",
+   "sub": "college",
+   "label": "College",
    "count": 40
   },
   {
@@ -657,13 +657,13 @@
   "landuse": 140698,
   "business": 10214,
   "heuristic": 7280,
-  "datasf": 1288,
-  "overture": 6663,
-  "osm": 8627
+  "osm": 8627,
+  "overture": 6662,
+  "datasf": 1288
  },
  "confidence": [
   147978,
-  15334,
+  15333,
   4498,
   6960
  ],

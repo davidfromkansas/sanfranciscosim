@@ -419,5 +419,24 @@
     ],
     "tris": 11291,
     "loadRadius": 2500
+  },
+  {
+    "id": "asian-art-museum",
+    "file": "asian-art-museum.glb",
+    "anchor": [
+      -122.4159859,
+      37.7802817
+    ],
+    "targetHeightM": 28.1,
+    "cat": 16,
+    "name": "Asian Art Museum",
+    "estimated": false,
+    "dims": [
+      115.31,
+      65.18,
+      28.1
+    ],
+    "tris": 13176,
+    "loadRadius": 2500
   }
 ]

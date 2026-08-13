@@ -306,6 +306,30 @@ export const LANDMARKS = [
     exclude: 78,
     camera: { distance: 850, yaw: 250, pitch: 20 },
   },
+  {
+    // Civic Center is the tightest site in the registry, so this radius is
+    // measured, not guessed. excluded() drops a footprint when ANY vertex
+    // falls inside, and around this anchor the vertex distances are:
+    //   18.3 m  the museum's own footprint (Overture; 18.9 m DataSF)
+    //   42.7 m  a 4 m utility structure at the block's north-east corner,
+    //           outside this asset's outline and worth keeping
+    //   50.2 m  the Abigail Hotel — the nearest real neighbour
+    // 40 m therefore drops the museum in both sources with a 22 m margin,
+    // and clears the utility structure by 2.7 m and every real building by
+    // 10 m. Anything near the 70 m half-diagonal the plan first suggested
+    // would have deleted the new Main Library and UC Law across the street.
+    //
+    // Note the baked city currently renders this building 46 m tall, because
+    // Overture carries the same height=46 tag that is really the NAVD88 roof
+    // elevation. Excluding it fixes that too.
+    id: 'asianArtMuseum',
+    name: 'Asian Art Museum',
+    lon: -122.4159859,
+    lat: 37.7802817,
+    height: 28.1,
+    exclude: 40,
+    camera: { distance: 600, yaw: 268, pitch: 20 },
+  },
 ];
 
 // Parks/green spaces the landcover bake must match at least one source polygon
