@@ -2,10 +2,12 @@
 
 A 2002 four-storey live/work loft building on the south-west rim of South Park, and one of
 the strangest lots in SoMa: a 43 m long, 13.8 m wide slab that runs the full depth of the
-block from the park frontage back to the Varney Place alley. It is the tallest thing on its
-side of the oval by about 5 m, and it is the building Instagram was working out of on the
-day Facebook bought them. Not a monument — a *character* building, and its character is
-its proportion: a thin, tall sliver seen end-on from the park and broadside from above.
+block from the park frontage back to the Varney Place alley, under a long ridged
+standing-seam metal roof. It is the tallest thing on its side of the oval by about 5 m,
+and it is the building Instagram was working out of on the day Facebook bought them. Not a
+monument — a *character* building, with two things to carry: its proportion (a thin, tall
+sliver seen end-on from the park and broadside from above) and the fact that it is the one
+roof on this block that is not flat.
 
 **Deliverable:** a validated miniature GLB plus dossier, renders and report under
 `artifacts/181-south-park/`. This document is the plan only: Part 1 is the runnable task
@@ -16,7 +18,7 @@ prompt, Part 2 is the research and design dossier behind it.
 | Manifest id | `181-south-park` |
 | Existing procedural builder | none — new landmark (needs a `pipeline/lib/landmarks.mjs` entry and a re-bake, see 2.13) |
 | WGS84 anchor | `-122.3945113, 37.7807582` (oriented-bounding-box centre, measured) |
-| Target height | **16.5 m** to the roof crest; main roof/parapet 14.3 m; roof deck ~14.2 m |
+| Target height | **16.5 m** to the roof ridge; eaves ~11.8 m (derived, see 2.1) |
 | Footprint | 43.31 m (deep, NW–SE) x 13.85 m (wide); 599.9 m2, measured — a plain rectangle at bearing 135.2° |
 | Triangle cap | 9,000 |
 | Category | `2` (apartments — live/work lofts over ground-floor commercial) |
@@ -49,8 +51,9 @@ Before any research or modeling, read in this order:
 5. `.agents/skills/sf-asset-check/SKILL.md`
 6. `app/public/sf-assets/landmarks_manifest.json`
 7. `artifacts/380-brannan/` — the closest reference implementation in scale, character and
-   neighbourhood (a secondary SoMa street building one block west, same detail tier, same
-   flat-roof-with-designed-furniture problem)
+   neighbourhood (a secondary SoMa street building one block west, same detail tier). Note
+   that its roof is flat and this one is not, so take its detail budget and its facade
+   discipline, not its roof approach
 8. `docs/asset-plans/181-south-park.md` — this plan, whose dossier is your research
    starting point, not a substitute for your own verification
 
@@ -61,21 +64,26 @@ and do not copy visual instructions from unrelated prompts.
 
 ## Photo research is a hard gate on this one — do it before you model
 
-The dossier below is unusually strong on geometry and unusually weak on appearance,
-because no street-level or aerial photography could be consulted while it was written.
-Every statement in 2.4 (what each side shows) and 2.8 (palette) is *inferred* and must be
-replaced with observed fact before you build anything. In particular you must resolve, from
-imagery, the question in 2.15 that the whole silhouette hangs on:
+The dossier below is strong on geometry, has one good aerial observation, and is weak on
+everything at street level: no street-level photography could be consulted while it was
+written. The roof (2.4 "Top", 2.9) was read from 2026 Vexcel aerial imagery and is
+reliable in form; the four *elevations* in 2.4 and the palette in 2.8 are *inferred* and
+must be replaced with observed fact before you build anything.
 
-> The roof is flat at ~14.2 m over most of the footprint, and something reaches 16.5 m.
-> Is that (a) a stair/elevator penthouse on a flat roof, or (b) a barrel-vaulted roof over
-> the top-floor lofts? Listing copy for the units mentions "arched high ceilings", which
-> hints at (b); the LiDAR height spread is easier to explain with (a).
+What you must still settle from imagery, in priority order:
 
-Both readings give the same 16.5 m crest, so the target height is safe either way — but
-they produce completely different buildings from the app's aerial camera, which is the
-view that matters most. Settle it from an aerial/satellite image before modelling, and
-record which you found and how in `REFERENCE.md` and `REPORT.md`.
+1. **Barrel vault or low gable?** The roof is a ridged standing-seam metal roof — that much
+   is observed. Whether its section is a shallow segmental arc or a straight-pitched gable
+   was not resolvable at the available resolution, and it changes the silhouette from every
+   angle. The unit listings' "arched hardwood high ceilings" argue for the arc.
+2. **Where the eave line actually sits.** 2.1 derives ~11.8 m from the LiDAR height
+   distribution rather than measuring it, and the storey reading in 2.4 depends on it.
+3. **The facade** — material, colour, window rhythm, bay count, whether there is a
+   signature accent. Nothing here is observed.
+4. **The lower element at the Varney end** (2.15), which the aerial hints at but does not
+   confirm.
+
+Record what you found and how in `REFERENCE.md` and `REPORT.md`.
 
 ## Must capture
 
@@ -86,7 +94,8 @@ record which you found and how in `REFERENCE.md` and `REPORT.md`.
 - Tall steel-sash loft windows in a regular bay rhythm on the long flanks
 - A ground-floor commercial storefront at the South Park (NW) end and the residential entry
 - The garage door at the Varney Place (SE) end
-- The crest feature at 16.5 m, in whichever of the two forms your research establishes
+- **The ridged metal roof running the length of the building** — the one non-flat roof on
+  this side of the oval, and the thing that will make the model findable from the air
 - A deliberately designed roof — the camera looks down and this roof is 43 m long
 
 ## Research 181 South Park independently
@@ -98,8 +107,10 @@ orientation, and gather references covering:
 - All four elevations. Note that two of them are *ends*: the 13.8 m wide NW face onto
   South Park and the 13.8 m wide SE face onto Varney Place. The long faces are the
   43 m flanks.
-- Aerial and roof views — this is where the crest question gets settled
-- Ground-level views from South Park and from Varney Place
+- Aerial and roof views at higher resolution than 2.4 could reach — this is where the
+  barrel-versus-gable question gets settled
+- Ground-level views from South Park and from Varney Place, which is where the eave line
+  and the whole facade reading get settled
 - Day and night appearance
 - The bay count and window rhythm of the long flanks — the dossier's 10-bay reading is
   *inferred* and is the weakest number in it
@@ -113,7 +124,8 @@ visual inference; if sources disagree, document the disagreement and decide.
 
 **One source conflict is already known and resolved in 2.1 — re-check it, do not silently
 re-inherit the wrong value:** OSM tags `height=14` on this building, which is the LiDAR
-*median* roof height, not the crest. The crest is 16.5 m. The assessor roll is also useless
+*median* roof height. On a ridged roof that median is a mid-slope value matching no physical
+line on the building: the ridge is 16.5 m and the eave is lower still. The assessor roll is also useless
 for storeys here (it records the seven condominium units separately, at 0, 1 and 2 storeys
 each); the 2000 construction permit says **four storeys** and is authoritative.
 
@@ -147,7 +159,7 @@ low-poly, and never accurate in one view while invented in the others.
 ## Scope of the exported asset
 
 Export the single 2002 loft block: body, all four elevations' openings, the roof and its
-furniture, the crest feature, and the ground-floor storefront and garage door.
+furniture, the ridged roof, and the ground-floor storefront and garage door.
 
 Do not include unrelated surrounding city geometry: South Park itself, the park's trees or
 lawn, Varney Place, 171 South Park next door, the Shell station across the flank, the
@@ -173,7 +185,7 @@ axis-aligned box and rotating it. The contract's "front faces −Y" cannot be ho
 literally here; real-world orientation wins (AGENTS rule 5) and the deviation goes in
 `REPORT.md`.
 
-**Height normalization:** the tallest geometry in the export (the crest feature) must
+**Height normalization:** the tallest geometry in the export (the roof ridge) must
 land at exactly **16.5 m** so the loader's `targetHeightM / measuredHeight` scale is 1.0.
 
 ## Reproducible Blender workflow
@@ -196,8 +208,8 @@ Render the exact final geometry from controlled cameras:
 
 The four elevations must share scale, framing, lighting, exposure and
 projection; use orthographic or long-lens cameras; label directions from the
-researched orientation; the top view must clearly show the full 43 m roof — its parapet
-ring, its crest feature and its mechanical layout; the aerial view uses the style bible's
+researched orientation; the top view must clearly show the full 43 m roof — its ridge
+line, its glazing and its mechanical layout; the aerial view uses the style bible's
 camera assumptions (30-50 degrees down, long lens). Simple tabletop lighting, neutral warm
 background, minimal depth of field, and every image must depict the same exported model.
 
@@ -256,13 +268,14 @@ Compiled 12 August 2026 from the sources in 2.2. Values marked *inferred* are vi
 derived estimates, not published figures — the executing agent must re-verify
 anything it relies on.
 
-**A warning specific to this dossier.** No street-level or aerial imagery could be
-consulted while writing it: Google Maps and Street View were unreachable from the
-authoring session, and no open street-imagery substitute covered the block. Everything
-geometric here is measured from survey data and is solid. Everything *visual* — facade
-material, colour, window rhythm, roof furniture, the form of the crest — is inference from
-permit records and listing copy and is flagged as such. Section 2.4 in particular is a
-hypothesis, not an observation. Treat photo research as gate zero of stage 2.
+**A warning specific to this dossier.** Its evidence is uneven and it says so line by line.
+Everything geometric is measured from survey data and is solid. The **roof** was read from
+2026 Vexcel aerial imagery (Bing Maps satellite) and is an observation. Everything at
+street level — facade material, colour, window rhythm, bay count, storey line — is
+inference from permit records and listing copy, because no street-level imagery could be
+reached from the authoring session: Google Maps and Street View were blocked and no open
+substitute covered the block. The four elevations in 2.4 and the palette in 2.8 are
+hypotheses, not observations. Treat street-level photo research as gate zero of stage 2.
 
 ### 2.1 Verified facts
 
@@ -282,8 +295,10 @@ hypothesis, not an observation. Treat photo research as gate zero of stage 2.
 | Block / lot | 3775 / 172 (map block lot) | SF Assessor, DataSF parcels, DataSF footprint `mblr = SF3775172` |
 | Footprint | 43.31 m x 13.85 m, 599.9 m2, a plain rectangle at bearing 135.2° | OSM way/124889463, reprojected — **measured** |
 | DataSF footprint (cross-check) | 42.35 x 13.66 m OBB, 535.3 m2 polygon | DataSF LiDAR footprint SF3775172 — agrees within ~1 m per side; its 42 vertices are LiDAR edge jitter on the same rectangle |
-| Main roof height | 14.18 m above ground (median), 14.28 m (majority of cells) | DataSF LiDAR `hgt_mediancm` / `hgt_majoritycm` — **measured** |
-| Maximum feature height | 16.54 m above ground | DataSF LiDAR `hgt_maxcm` — **measured**; its *form* is unresolved, see 2.15 |
+| Roof form | ridged standing-seam metal roof, ridge along the long NW–SE axis, running most of the length; sloped/hipped toward the NW end | Vexcel 2026 aerial imagery — **observed**; barrel vs low gable unresolved, see 2.15 |
+| Roof ridge height | 16.54 m above ground | DataSF LiDAR `hgt_maxcm` — **measured** |
+| Median / modal roof height | 14.18 m (median), 14.28 m (majority of cells) | DataSF LiDAR — **measured**; on a ridged roof these are mid-slope values, not the eave and not the ridge |
+| Eave height | ~11.8 m | **derived**: a symmetric ridged roof gives a height distribution roughly uniform between eave and ridge, so eave ≈ 2 × median − ridge = 2(14.18) − 16.54 = 11.82 m. Consistent with the modal 14.28 m. Not measured — see 2.15 |
 | Ground elevation | 6.84 m (NAVD88) | DataSF LiDAR `gnd_min_m` — app terrain handles this, not the asset |
 | Height above neighbours | ~5 m: 171 South Park 11 m, 167 unknown, 159 5 m, Shell canopy 4 m, 147 12 m | OSM `height` tags on the neighbouring ways |
 | Notable occupant | Instagram, 2012 — the office they were in when Facebook announced the acquisition on 9 April 2012 | Getty Images news photo, 9 April 2012; commercial listing copy |
@@ -299,6 +314,9 @@ hypothesis, not an observation. Treat photo research as gate zero of stage 2.
 - `https://data.sfgov.org/resource/i98e-djp9` (SF Building Permits) — the 2000 four-storey five-unit construction permit, the demolition it replaced, the roof-deck-to-unoccupied-roof revision, the Varney garage exit, the ground-floor change of use, and the 2006–2022 four-storey record
 - https://www.gettyimages.com/detail/news-photo/instagrams-new-office-is-seen-at-181-south-park-avenue-on-news-photo/142617135 — Instagram at this address, 9 April 2012
 - Commercial and residential listing copy (Zillow, Redfin, Homes.com "Park 181", ApartmentList) — 5 loft units, 2002, "arched hardwood high ceilings", "towering steel-framed windows", downtown skyline views, former Instagram offices
+- Bing Maps satellite, Vexcel 2026 imagery, nadir, ~0.1 m/px — the only imagery consulted:
+  the ridged metal roof, its ridge line and hipped NW end, the roof monitors and the
+  mechanical grouping. Street-level and oblique imagery were **not** available
 
 ### 2.3 Orientation and placement
 
@@ -337,11 +355,12 @@ Edges, with outward normals:
 
 Because of the 45° heading the axis-aligned bounding box is ~40 x 40 m. That is correct.
 
-### 2.4 What each side shows — *inferred, verify before modelling*
+### 2.4 What each side shows
 
-Nothing in this section is observed. It is the most probable reading of a 2002 SoMa
-live/work loft building given the permit record, the programme and the neighbourhood, and
-it exists so that stage 2 has something specific to confirm or overturn.
+**Top** is observed from aerial imagery. **The four elevations are not observed** — they
+are the most probable reading of a 2002 SoMa live/work loft building given the permit
+record, the programme and the neighbourhood, and they exist so that stage 2 has something
+specific to confirm or overturn.
 
 **Northwest (South Park front)** — The address elevation and the only one the park sees:
 13.85 m wide and 16.5 m tall, so a distinctly vertical face. Expect a ground-floor
@@ -366,20 +385,26 @@ The app's camera sees it plainly from the north-east, so it must be built as a f
 wall with a sparse, honest window scatter in the part that clears 171 — not a full grid,
 and not a blank slab either.
 
-**Top** — 43 x 13.8 m of unoccupied roof at ~14.2 m, plus whatever reaches 16.5 m. No roof
-deck (permit 200108166212), so no railings, planters or paving: a membrane roof with a
-parapet ring, mechanical units, and the crest feature. This is the most-seen surface in the
-app and it is a long one — it needs a deliberate composition along its length, not one
-object dropped in the middle.
+**Top — observed.** Not a flat roof. A light-grey **standing-seam metal roof, ridged along
+the building's long NW–SE axis**, with the seams running across the width and a clear ridge
+line carried most of the length; it slopes or hips down toward the NW (South Park) end
+rather than ending in a flat gable wall. Sitting on it: two or three raised roof
+monitors / skylight boxes along the ridge, a white cylindrical or box plant unit and a
+group of darker mechanical units in the SE (Varney) third, and what appears to be a lower,
+flatter roof section at the extreme Varney end. No roof deck (permit 200108166212), so no
+railings, planters or paving. This is the most-seen surface in the app, it is 43 m long,
+and it is the building's strongest single feature from the air — every other roof on this
+side of the oval is flat.
 
 ### 2.5 Recognition cues (ranked)
 
 1. **The proportion** — a 43 x 13.8 m slab, 3.1:1, running the whole depth of the block
    from the park to the alley. Nothing else on this side of South Park is shaped like it.
-2. **The extra storey** — four storeys where the neighbours are two and three, standing
+2. **The long ridged metal roof** — the only non-flat roof on this side of the oval, and
+   the cue the app's aerial camera will actually read.
+3. **The extra storey** — four storeys where the neighbours are two and three, standing
    about 5 m proud of the roofline on both sides.
-3. Tall steel-sash loft windows in a regular bay rhythm along the long flanks.
-4. The crest feature at 16.5 m breaking an otherwise flat 43 m roof.
+4. Tall steel-sash loft windows in a regular bay rhythm along the long flanks.
 5. Ground-floor commercial storefront on the park end; garage door on the alley end.
 
 ### 2.6 Miniature translation
@@ -387,6 +412,7 @@ object dropped in the middle.
 **Preserve**
 
 - The 3.1:1 slab proportion and the real 135.2° heading, exactly
+- The ridged roof running the full length, and its seam direction across the width
 - The four-storey height standing proud of the neighbours — this is what makes it findable
 - The two-different-ends story: shopfront and entry at the park, garage at the alley
 - The long flanks' window rhythm as a rhythm, not as individual windows
@@ -397,39 +423,48 @@ object dropped in the middle.
 - Steel sashes become a single chunky frame band per opening; no mullion grids
 - The storefront becomes one wide glazed opening plus one recessed entry, not a shopfitted
   facade
-- Roof clutter becomes a small, composed set: two HVAC blocks, one vent cluster, the crest
-  feature, and a continuous parapet ring
-- The vertical proportion of the NW end is the one place semantic exaggeration is spent:
-  keep the storey bands crisp and let the face read as tall and thin
+- Roof clutter becomes a small, composed set: two HVAC blocks, one vent cluster and two
+  roof monitors on the ridge
+- The metal roof's seams become a low-frequency rhythm or nothing at all — do not model
+  individual standing seams, they are far below a pixel
+- The roof's rise is the one place semantic exaggeration is spent: the real ridge is a
+  shallow 4.7 m over a 13.85 m span, and it may need a little help to read from the air.
+  Push it if the aerial render demands it, but the ridge must still land on 16.5 m — take
+  the exaggeration out of the eave line, not out of the target height, and record it
 
 ### 2.7 Massing recipe
 
 Build order for the deterministic script; dimensions are the starting point, not
-a straitjacket — adjust after the first aerial review render, and after the 2.15 crest
-question is settled.
+a straitjacket — adjust after the first aerial review render, and after the 2.15
+barrel-versus-gable question is settled.
 
-1. Body: extrude the 2.3 rectangle from z=0 to z=14.2, `Toy_stone`.
-2. Ground floor, z=0 to z=4.3: on the NW end, one 6.0 m wide glazed storefront and one
+1. Body: extrude the 2.3 rectangle from z=0 to the eave line z=11.8, `Toy_stone`.
+2. Ground floor, z=0 to z=4.0: on the NW end, one 6.0 m wide glazed storefront and one
    1.4 m recessed residential entry; on the SE end, one 3.6 m garage door (`Toy_ink`) and
    one 1.0 m pedestrian door; on the SW flank, two or three small openings only.
-3. Floor band: 0.18 m `Toy_trim` course at z=4.3, carried around all four faces — it is
+3. Floor band: 0.18 m `Toy_trim` course at z=4.0, carried around all four faces — it is
    what separates the commercial base from the lofts at a glance.
-4. Loft levels, three of them, z=4.9 to z=13.9: on each long flank, 10 bays of
+4. Wall levels, two of them, z=4.6 to z=11.5: on each long flank, 10 bays of
    1.5 x 2.6 m openings recessed 0.18 m, `Toy_glass`, with a 0.12 m `Toy_steel` frame band.
    On the NW end, 2 bays per floor, same size. On the NE flank, use the same rhythm but
    only above z=11 (below that it is a party wall against 171) — below, leave it blind.
-5. Parapet: z=14.2 to z=14.3 following the footprint, 0.3 m thick, `Toy_trim` cap.
-6. Roof deck at z=14.2, `Toy_roofd`. Two HVAC blocks (2.2 x 1.6 x 0.9 m and
-   1.6 x 1.2 x 0.7 m) `Toy_steel`, placed off-centre and well apart along the 43 m length;
-   one vent cluster near the SE third.
-7. **Crest feature to z=16.5** — the exact geometry depends on 2.15:
-   - if a penthouse: a 4.0 x 3.2 m box from z=14.2 to z=16.5, `Toy_roofd`, sitting toward
-     the NW third of the roof;
-   - if a barrel vault: a low 8-to-10-segment arc spanning the 13.85 m width, springing at
-     z=14.2 and crowning at z=16.5, running along part or all of the length, `Toy_roofd`.
+5. Eave: a 0.3 m `Toy_trim` fascia band at z=11.5 to z=11.8, all four faces.
+6. **Roof, z=11.8 to z=16.5** — the top-floor lofts live inside it, which is what the
+   listings' "arched hardwood high ceilings" describes. Its section depends on 2.15:
+   - barrel: a 10-to-12-segment arc spanning the 13.85 m width, springing at z=11.8 and
+     crowning at z=16.5;
+   - low gable: two straight slopes from z=11.8 to a ridge at z=16.5 (a ~34° pitch).
 
-   Whichever it is, its top must land exactly on 16.5.
-8. Bevel 0.12 m, 2 segments.
+   Either way it runs the full 43.31 m length, `Toy_steel` (light grey standing-seam),
+   with the NW end sloped or hipped down rather than closed by a flat gable wall, and the
+   ridge must land exactly on 16.5.
+7. Dormer glazing: on each long roof slope, 4 flush glazed panels 1.6 x 1.2 m, `Toy_glass`,
+   in line with the wall bays below — this is what lights lofts that sit inside a roof, and
+   it gives the night state somewhere to live above the eave.
+8. Roof furniture: two roof monitors on the ridge (2.4 x 1.4 x 0.5 m, `Toy_glassl`), one
+   HVAC pair (2.2 x 1.6 x 0.9 m and 1.6 x 1.2 x 0.7 m, `Toy_steel`) and one vent cluster,
+   all grouped in the SE third as observed.
+9. Bevel 0.12 m, 2 segments.
 
 ### 2.8 Materials and palette — *inferred, confirm from photography*
 
@@ -438,10 +473,11 @@ Flat colors only, from the `sf-asset-check` palette.
 | Material | Hex | Used for |
 |---|---|---|
 | `Toy_stone` | `#d9d2c2` | main body walls |
-| `Toy_trim` | `#f3efe6` | floor band, parapet cap, entry surround |
-| `Toy_glass` | `#2a4d73` | loft windows and storefront glazing |
-| `Toy_steel` | `#9aa0a6` | window frame bands, HVAC blocks |
-| `Toy_roofd` | `#45454a` | roof deck, crest feature |
+| `Toy_trim` | `#f3efe6` | floor band, eave fascia, entry surround |
+| `Toy_glass` | `#2a4d73` | loft windows, roof glazing and storefront glazing |
+| `Toy_glassl` | `#6f95b8` | roof monitors (lighter, reads as up-facing glazing) |
+| `Toy_steel` | `#9aa0a6` | **the standing-seam metal roof** (observed light grey), window frame bands, HVAC blocks |
+| `Toy_roofd` | `#45454a` | the lower roof section at the Varney end, if it is confirmed |
 | `Toy_ink` | `#3a3530` | garage door, door recesses |
 | `Toy_glass_Glow` | `#2a4d73` | lit loft windows at night |
 | `Toy_trim_Glow` | `#f3efe6` | storefront spill at the park end |
@@ -455,37 +491,44 @@ invent one.
 
 **Night state (required).** Glow surfaces must be thin shells proud of the opaque glazing —
 the app renders `_Glow` in a separate layer that is ~12% alpha by day, so a primary surface
-must never be authored as glow. Hero glow: a scatter of lit loft windows on the exposed
-south-west flank, where the long rhythm reads best — five or six of the thirty, not all.
-Supporting accent: the storefront glazing at the South Park end. The north-east flank stays
-dark below 11 m (it is a party wall) and the alley end stays dark entirely; a service alley
-that glows would misread.
+must never be authored as glow. Hero glow: a scatter of lit windows on the exposed
+south-west flank, where the long rhythm reads best — five or six of the twenty, not all —
+plus one or two of that flank's roof glazing panels, which is the payoff for putting lofts
+inside the roof. Supporting accent: the storefront glazing at the South Park end. The
+north-east flank stays dark below 11 m (it is a party wall) and the alley end stays dark
+entirely; a service alley that glows would misread. The metal roof itself does not glow.
 
 ### 2.9 Top surface
 
-43 x 13.8 m of unoccupied membrane roof at 14.2 m, in a district the camera flies over
-constantly, and long enough that a single centred object would look accidental. Compose
-along the length: parapet ring continuous, mechanical grouped in one place, the crest
-feature somewhere off-centre, and a clear darker deck value so the parapet ring reads from
-above. No deck furniture — the roof-deck permit was revoked by revision in 2001 and railings
-or planters would be a fabrication.
+43 x 13.8 m of ridged standing-seam metal roof rising from an ~11.8 m eave to a 16.5 m
+ridge, in a district the camera flies over constantly. This is the asset's best feature and
+the composition problem is restraint, not invention: the ridge does the work, so the
+furniture should stay quiet and grouped where it was observed — monitors on the ridge, the
+mechanical cluster in the SE third, nothing scattered down the middle. Keep the roof value
+clearly lighter than the walls so the ridge line reads as a highlight from above, which is
+how it reads in the real aerial. No deck furniture — the roof-deck permit was revoked by
+revision in 2001, and railings or planters would be a fabrication.
 
 ### 2.10 Scope
 
 **In the GLB:** the single 2002 loft block — body, all four elevations' openings, storefront
-and residential entry, garage door, parapet, roof deck, roof furniture and the crest feature
+and residential entry, garage door, eave fascia, the ridged roof with its glazing, and the
+roof furniture
 
 **Not in the GLB:** South Park, its trees or lawn, Varney Place, 171 South Park, the Shell
 station, the sidewalk, vehicles, people, plinths, cameras or lights
 
 ### 2.11 Triangle budget
 
-Cap 9,000 — a secondary building, and the cap should bind. Suggested split: body, parapet
-and floor band ~2k; the two 10-bay flanks ~3.5k; the NW end's storefront, entry and loft
-bays ~1.5k; the SE end's garage and door ~0.5k; roof furniture and crest ~1.5k.
+Cap 9,000 — a secondary building, and the cap should bind. Suggested split: body, eave and
+floor band ~1.5k; the two 10-bay flanks ~3k; the NW end's storefront, entry and bays ~1.2k;
+the SE end's garage and door ~0.5k; the roof shell ~1.5k; roof glazing and furniture ~1.3k.
 
-The long flanks are where this budget gets spent, so keep each bay to a simple recessed box
-with one frame band. Twenty bays of a fussy window will not fit and will not read.
+Two places this budget can run away. The long flanks: keep each bay to a simple recessed box
+with one frame band — twenty bays of a fussy window will not fit and will not read. And the
+roof, if it is a barrel: a 43 m sweep at 12 segments with a bevel is already ~1.5k
+triangles, and going to 20 segments to make the curve smoother buys nothing at the app's
+camera distance while costing most of the flanks' budget.
 
 ### 2.12 Draft manifest entry
 
@@ -549,51 +592,53 @@ with one frame band. Twenty bays of a fussy window will not fit and will not rea
 
 - [ ] Fresh-scene re-import of the exported GLB (never validate the authoring scene)
 - [ ] `min Z` within 0.5 m of 0, XY center offset within ~1 m
-- [ ] Bounding-box top exactly 16.5 m (loader scale lands at 1.0)
+- [ ] Bounding-box top exactly 16.5 m — the roof ridge, not a roof monitor (loader scale lands at 1.0)
 - [ ] Dimensions plausible in meters and consistent with 2.1 (XY bbox ~40 x 40 m is expected)
 - [ ] The slab is still 3.1:1 in plan — measure it, do not eyeball it
 - [ ] Triangles at or under 9,000
 - [ ] Materials all `Toy_*`, flat, no textures, no alpha, no `Toy_body`
-- [ ] `_Glow` only on the lit loft windows and the storefront; glow shells proud of opaque glazing
+- [ ] `_Glow` only on the lit loft windows, the roof glazing and the storefront; glow shells proud of opaque glazing
 - [ ] No cameras, lights, animations, armatures, constraints
 - [ ] Applied transforms, no negative scales, outward normals (per-object signed volume for the union of solids; ray test residual <= 0.15%)
 - [ ] No foreign/leaked geometry from other Blender scenes
 - [ ] Six review renders + contact sheet + night render regenerated from the final export
 - [ ] `REFERENCE.md`, `REPORT.md`, `validation.json` committed
-- [ ] The 2.15 crest question answered in `REPORT.md`, with the source that answered it
+- [ ] The 2.15 barrel-versus-gable question answered in `REPORT.md`, with the source that answered it
+- [ ] The eave line either measured or, if it stayed derived, said so plainly in `REPORT.md`
 
 ### 2.15 Open questions and risks
 
-- **The crest at 16.5 m has an unresolved form, and it is the biggest risk in this plan.**
-  The LiDAR is unambiguous that the main roof is at 14.18 m (median) / 14.28 m (majority)
-  and that something reaches 16.54 m. What that something *is* was not established. Two
-  readings fit:
-  (a) a stair/elevator penthouse — a 2.3 m overrun is exactly standard for a four-storey
-  building with a lift, and the height histogram's tight majority at 14.28 m with a thin
-  tail above it is what a small penthouse looks like;
-  (b) a barrel-vaulted roof over the top-floor lofts — the unit listings describe "arched
-  hardwood high ceilings", and an arched ceiling on the top floor of a loft building is
-  usually the underside of an arched roof.
-  Against (b): a vault spanning the full 13.85 m width would put the *mean* cell height
-  near 15.7 m, and the measured mean is 13.15 m. In favour of (b): the same measured mean
-  is below the median either way, which means a genuinely low element exists somewhere in
-  the footprint and the height statistics are not clean enough to arbitrate on their own.
-  **Settle it from an aerial image before modelling.**
-- **A low element exists somewhere in the footprint.** LiDAR mean 13.15 m against median
+- **Barrel or low gable? Unresolved, and it is the biggest remaining risk.** The roof is
+  ridged and metal — that is observed. Its *section* was not resolvable at the imagery
+  resolution available. The unit listings' "arched hardwood high ceilings" point to a
+  shallow segmental barrel; the aerial's crisp ridge line and the visible hip at the NW end
+  read more like a low gable. A 34° straight pitch and a 4.7 m-rise arc over the same
+  13.85 m span are noticeably different silhouettes from the app's three-quarter camera.
+  Settle it at higher resolution or from a street-level view before modelling.
+- **The eave line is derived, not measured.** ~11.8 m comes from treating the LiDAR height
+  distribution as uniform between eave and ridge (2 × 14.18 − 16.54). That is a sound model
+  for a symmetric ridged roof and it is corroborated by the modal 14.28 m, but it is
+  arithmetic, not observation, and it drives the whole storey layout in 2.7: it implies two
+  full storeys of wall above the commercial ground floor with the top-floor lofts living
+  inside the roof. If the eave is really at 13 m, the building has three wall storeys and a
+  shallower roof, and 2.7 is wrong. One street-level photograph settles it.
+- **A low element probably exists at the Varney end.** LiDAR mean 13.15 m against median
   14.18 m and minimum 0.04 m says roughly a sixth of the footprint sits well below the main
-  roof. Candidates: a lightwell or setback breaking the 43 m depth (which a floor plate
-  this deep needs), a single-storey rear element at the Varney end, or LiDAR shadow cast by
-  171 South Park along the party wall. The first would change the massing materially. Look
-  for it in the aerial.
-- **OSM `height=14` is the roof, not the crest.** It matches the LiDAR median almost
-  exactly, which makes it look trustworthy — the same trap the plans README documents. The
-  crest is 16.5 m.
+  roof, and the aerial shows what looks like a lower flat roof section at the extreme SE
+  end. Other candidates that would change the massing more: a lightwell breaking the 43 m
+  depth, or LiDAR shadow cast by 171 South Park along the party wall. Confirm which.
+- **OSM `height=14` is neither eave nor ridge.** It matches the LiDAR median almost exactly,
+  which makes it look trustworthy — the same trap the plans README documents, and worse
+  here, because on a ridged roof the median is a mid-slope value that corresponds to no
+  physical line on the building at all. The ridge is 16.5 m.
 - **The assessor roll cannot be used for storeys here.** It records the seven condominium
   lots separately at 0, 1 and 2 storeys each; none of those is the building. The 2000
   construction permit and every permit since say four.
-- **The entire visual reading in 2.4 and the palette in 2.8 are unverified.** No photography
-  was available to the author. Facade material, colour, window rhythm, bay count, whether
-  there is a signature accent, and what the roof actually carries are all open.
+- **The four elevations in 2.4 and the palette in 2.8 are unverified.** Only nadir aerial
+  imagery was available to the author, so the roof is observed and nothing below it is.
+  Facade material, colour, window rhythm, bay count, and whether there is a signature
+  accent are all open. The one wall colour with any evidence behind it is the roof's, and
+  that is the roof.
 - The 10-bay flank rhythm is a proportion guess (43.31 m / 10 ≈ 4.3 m centres, which is a
   plausible loft bay) and nothing more.
 - No architect is recorded for the 2002 building in any source consulted, so there is no

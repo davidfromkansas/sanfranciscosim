@@ -132,11 +132,13 @@ that could plausibly be a sea-level datum. 181 South Park is a fifth: its `heigh
 matches the LiDAR median to within 0.2 m, which makes it look corroborated rather than
 merely repeated, and the crest is still 2.3 m above it.
 
-One plan, [181 South Park](./181-south-park.md), was written without any street-level or
-aerial imagery available to its author. Its geometry is measured and solid; its entire
-visual reading is explicitly marked as inference, and photo research is written into
-Part 1 as a gate that must clear before modelling starts. Read that plan's Part 2 preamble
-before executing it.
+One plan, [181 South Park](./181-south-park.md), was written with nadir aerial imagery but
+no street-level imagery available to its author. Its geometry is measured, its roof is
+observed, and its four elevations are explicitly marked as inference; street-level photo
+research is written into Part 1 as a gate that must clear before modelling starts. It is
+also the set's clearest case of an OSM `height` tag that is neither eave nor crest: on a
+ridged roof the LiDAR median it matches corresponds to no physical line on the building.
+Read that plan's Part 2 preamble before executing it.
 
 The executing agent is expected to re-verify height, anchor, footprint and
 orientation before modelling — the dossier is a head start, not a citation.
