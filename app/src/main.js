@@ -36,6 +36,7 @@ import { createFocusOverlay } from './focus.js';
 import { createContextCard, createSearch } from './cards.js';
 import { createConcierge } from './concierge.js';
 import { createSkyClock } from './sky-clock.js';
+import { createWeather } from './weather.js';
 import { localDayStart, moonPosition, skySnapshot, sunPosition } from '../../api/_lib/astro.mjs';
 
 const canvas = document.getElementById('view');
@@ -111,6 +112,9 @@ async function boot() {
   const agents = createAgents(scene, data, city);
   // Real WETA vessels from /api/ferries; falls back to the procedural ferries.
   const ferries = createLiveFerries(scene, data, agents);
+  // The live weather field. Created before the clock so the card can read it
+  // on its very first render.
+  const weather = createWeather({ project: data.project });
   // Real Muni buses from /api/muni; when the feed is away this layer is simply
   // empty — the procedural road traffic never depended on it.
   const muni = createLiveMuni(scene, data);
@@ -252,7 +256,7 @@ async function boot() {
     }
   }
   tickSky();
-  const skyClock = createSkyClock({ read: () => sky });
+  const skyClock = createSkyClock({ read: () => sky, readWeather: () => weather });
 
   const ui = createUI({
     presets,
@@ -578,6 +582,19 @@ async function boot() {
     get sky() {
       return sky;
     },
+    // The eased weather state. Debug only, exactly like setClock: no UI, no
+    // URL parameter, and the model can never set it.
+    get weather() {
+      return weather.snapshot();
+    },
+    // A partial patch merges onto the live field; null returns to live.
+    // SF.setWeather({ preset: 'karl' | 'storm' | 'clear' | 'smoke' }) gives the
+    // canonical demo states, which is how the rare ones get QA'd at all.
+    setWeather(patch) {
+      weather.setOverride(patch === undefined ? null : patch);
+      skyClock.update();
+      return weather.snapshot();
+    },
     // null resumes live San Francisco time; a number is epoch ms, a string is
     // anything Date.parse understands ('2026-08-10T02:00:00-07:00').
     setClock(value) {
@@ -657,6 +674,9 @@ async function boot() {
     city.update(dt, pivotWorld, camera.position, quality);
     agents.update(dt, pivotWorld, camera.position);
     ferries.update(dt);
+    // Weather eases on wall time for the same reason the clouds do: the
+    // simulation clamp would stall the transition below 20 fps.
+    weather.update(Math.min(1, elapsed));
     muni.update(dt, camera);
     trackVessel(dt);
     landmarks.update();

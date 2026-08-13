@@ -40,6 +40,18 @@ export const shared = {
   uCloudDrift: { value: new Vector2(0, 0) },
   // 1 in diorama mode: materials go bright and flat and drop the weather.
   uToy: { value: 0 },
+  // Live weather, sampled as a field rather than as one citywide number, so the
+  // Sunset can be socked in while the Mission is clear. Written by weather.js;
+  // see docs/plans/WEATHER-PLAN.md. R fog, G low cloud, B rain, A high cloud.
+  uWeatherField: { value: null },
+  // World-space bbox of that field: uv = (worldXZ - origin) * scale.
+  uWeatherOrigin: { value: new Vector2() },
+  uWeatherScale: { value: new Vector2(1, 1) },
+  // Where the wind is blowing TO, in m/s, in world axes.
+  uWind: { value: new Vector2() },
+  // Citywide means, for the systems that do not need the whole field.
+  uRain: { value: 0 },
+  uSmoke: { value: 0 },
 };
 
 const CLOUD_WIND = [0.0042, 0.0016];
