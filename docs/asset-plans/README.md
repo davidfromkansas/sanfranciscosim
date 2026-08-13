@@ -95,8 +95,9 @@ route, and the park plans depend on it (§E8 of the parks README).
 | [599 Third Street](./599-third.md) | `599-third` | 18.3 m | new landmark |
 | [Civic Center Plaza](./civic-center-plaza.md) | `civic-center-plaza` | 30.48 m (flagpole crest) | new landmark |
 | [250 Van Ness Avenue (171–195 Grove Street)](./250-van-ness.md) | `250-van-ness` | 10.0 m (estimated) | new landmark |
+| [574 Third Street (566–586 Third)](./574-third.md) | `574-third` | 15.4 m | new landmark |
 
-## Shared contract (all 53)
+## Shared contract (all 54)
 
 - Style: `docs/styles/miniature-toy.md` (authoritative for artistic decisions)
 - Technical contract: `.agents/skills/sf-asset-check/SKILL.md` (authoritative for the GLB)
