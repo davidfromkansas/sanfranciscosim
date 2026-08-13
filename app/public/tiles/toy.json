@@ -6,7 +6,7 @@
   "cols": 32,
   "rows": 32
  },
- "generated": "2026-08-12T23:32:12.635Z",
+ "generated": "2026-08-13T00:02:01.632Z",
  "dev": null,
  "palette": [
   {
@@ -332,17 +332,17 @@
   }
  ],
  "stats": {
-  "baseBuildings": 174766,
-  "records": 230854,
-  "pitched": 149392,
-  "garnish": 56088,
+  "baseBuildings": 174762,
+  "records": 230851,
+  "pitched": 149388,
+  "garnish": 56089,
   "helipads": 6,
   "tallest": 200,
-  "trees": 271886,
+  "trees": 271884,
   "bytes": {
-   "buildings": 12229688,
+   "buildings": 12229384,
    "streets": 8576096,
-   "landcover": 5637280
+   "landcover": 5637268
   }
  },
  "cells": [
@@ -1018,8 +1018,8 @@
    "cz": 10,
    "originX": -1500,
    "originZ": -3000,
-   "buildings": 98,
-   "bytes": 5220
+   "buildings": 96,
+   "bytes": 5118
   },
   {
    "key": "13_11",
@@ -1225,8 +1225,8 @@
    "cz": 9,
    "originX": -1500,
    "originZ": -3500,
-   "buildings": 29,
-   "bytes": 2212
+   "buildings": 27,
+   "bytes": 2110
   },
   {
    "key": "14_10",
@@ -3529,8 +3529,8 @@
    "cz": 16,
    "originX": 4000,
    "originZ": 0,
-   "buildings": 69,
-   "bytes": 5032
+   "buildings": 70,
+   "bytes": 4932
   },
   {
    "key": "24_17",
@@ -11050,8 +11050,8 @@
    "originX": -1500,
    "originZ": -3000,
    "triangles": 1599,
-   "trees": 2644,
-   "bytes": 34984
+   "trees": 2636,
+   "bytes": 34928
   },
   {
    "key": "13_11",
@@ -11250,8 +11250,8 @@
    "originX": -1500,
    "originZ": -3500,
    "triangles": 6011,
-   "trees": 1283,
-   "bytes": 71984
+   "trees": 1289,
+   "bytes": 72028
   },
   {
    "key": "14_10",

@@ -18,7 +18,8 @@
     "notables": "node notables.mjs",
     "context": "node context.mjs",
     "audit": "node audit.mjs",
-    "all": "npm run download && npm run loredata && npm run terrain && npm run bridges && npm run buildings && npm run streets && npm run landcover && npm run validate && npm run lore && npm run toy && npm run notables && npm run context"
+    "all": "npm run download && npm run loredata && npm run terrain && npm run bridges && npm run buildings && npm run streets && npm run landcover && npm run validate && npm run lore && npm run toy && npm run notables && npm run context && npm run muni-shapes",
+    "muni-shapes": "node muni-shapes.mjs"
   },
   "dependencies": {
     "earcut": "2.2.4",

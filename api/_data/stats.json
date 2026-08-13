@@ -1,6 +1,6 @@
 {
- "generated": "2026-08-12T23:32:27.142Z",
- "buildings": 174766,
+ "generated": "2026-08-13T00:02:03.449Z",
+ "buildings": 174762,
  "cells": 596,
  "categories": [
   {
@@ -21,7 +21,7 @@
    "cat": 2,
    "id": "apartments",
    "label": "Apartments",
-   "count": 14021,
+   "count": 14017,
    "night": 0
   },
   {
@@ -49,7 +49,7 @@
    "cat": 6,
    "id": "bar",
    "label": "Bar",
-   "count": 523,
+   "count": 524,
    "night": 1
   },
   {
@@ -168,7 +168,7 @@
    "cat": 23,
    "id": "parking_garage",
    "label": "Parking garage",
-   "count": 1849,
+   "count": 1848,
    "night": 3
   },
   {
@@ -230,7 +230,7 @@
   {
    "sub": "parking_garage",
    "label": "Parking garage",
-   "count": 900
+   "count": 899
   },
   {
    "sub": "community_center",
@@ -535,7 +535,7 @@
   {
    "sub": "wine_bar",
    "label": "Wine bar",
-   "count": 31
+   "count": 32
   },
   {
    "sub": "ice_cream",
@@ -654,15 +654,15 @@
   }
  ],
  "sources": {
-  "landuse": 140697,
+  "landuse": 140693,
   "business": 10214,
   "heuristic": 7280,
-  "osm": 8624,
-  "overture": 6663,
+  "osm": 8625,
+  "overture": 6662,
   "datasf": 1288
  },
  "confidence": [
-  147977,
+  147973,
   15333,
   4498,
   6958
