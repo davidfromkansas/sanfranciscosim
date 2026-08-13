@@ -12,10 +12,10 @@ Stage 2 of `docs/asset-pipeline/ADDRESS-TO-ASSET.md`, run against
 | Asset | `artifacts/165-south-park/165-south-park.glb` |
 | Validation | **all-PASS** (`validation.json`, Blender 5.2.0 LTS, fresh-scene re-import) |
 | Triangles | **2,008** (cap 6,000) |
-| Objects | 25 |
+| Objects | 8 (25 pre-optimize) |
 | Dimensions | 19.097 × 21.910 × **9.000** m |
 | min Z / XY centre offset | 0.000 m / (0.000, 0.000) m |
-| File | 121.9 KB raw, **30.0 KB gzip** (budget ≤ 500 KB compressed) |
+| File | **53.5 KB raw, 38.9 KB gzip** after stage 4 (was 119.0 KB / 29.9 KB) — budget ≤ 500 KB compressed |
 | Materials | `Toy_glass`, `Toy_glass_Glow`, `Toy_ink`, `Toy_roofd`, `Toy_sky`, `Toy_steel`, `Toy_trim`, `Toy_trim_Glow` |
 | Manifest anchor | **-122.3943764, 37.7808599** |
 | Target height | **9.0 m**, `"estimated": true` |
@@ -170,6 +170,32 @@ DataSF footprint triggers at 1.49 m. The full measurement table and the Overture
 gap-fill risk are in the plan's 2.13, and both must be re-verified against the real
 `pipeline/data/overture_buildings.geojsonseq` at stage 5.
 
+## Stage 4 — optimize
+
+**All gates PASS.** 121,884 → 54,760 raw bytes (−55%), 25 → 8 objects, 26 → 9 draw
+submeshes, triangles unchanged at 2,008, bbox and origin unchanged, material set
+identical, 0/14,801 flipped rays, byte-identical on re-run. Appearance delta ≤ 0.08%
+mean across day/night × near/far and all four elevations.
+
+Note that **gzipped bytes went UP** (29.9 → 38.9 KB): meshopt output is already
+entropy-coded and does not gzip further. It ships regardless — meshopt is mandatory at
+intake per AGENTS.md and the structural wins (draw submeshes, welded verts) are the
+point at this size. Full accounting in `optimize/REPORT.md`.
+
+The optimized file was re-run through this stage's own contract validator after the
+swap: all 16 checks still PASS.
+
 ## Stage 3 — approval
 
-Pending. Not yet presented.
+**APPROVED, 13 August 2026.** David, verbatim:
+
+> "approve pls continue proceeding. no more approvals needed from me"
+
+Presented: the contact sheet, the aerial day and night renders, and the numbers
+(2,008 tris / 19.10 x 21.91 x 9.000 m / 8 materials / 2 glow groups / 120 KB raw,
+30 KB gzip). Both open judgement calls — the off-palette siding and the unmodelled roof
+bulkhead — were named explicitly in the presentation and neither was overruled.
+
+The second clause also waives the remaining stage gates for this session, so stages 4 and
+5 proceed without further approval. Stage 5 still ends at a local commit and a ship
+question, per ADDRESS-TO-ASSET: that is a push/deploy decision, not a pipeline gate.

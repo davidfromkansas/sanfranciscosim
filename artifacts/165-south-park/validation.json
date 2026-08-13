@@ -3,8 +3,8 @@
   "validator": "Blender 5.2.0 LTS",
   "fresh_isolated_scene": true,
   "reimported_final_glb": true,
-  "object_count": 25,
-  "mesh_object_count": 25,
+  "object_count": 8,
+  "mesh_object_count": 8,
   "triangle_count": 2008,
   "triangle_budget": 6000,
   "dimensions_m": [
@@ -125,202 +125,12 @@
   "front_heading_deg_true": 349.73,
   "long_axis_heading_deg_true": 135.3,
   "target_height_m": 9.0,
-  "signed_volume_outward_objects": 25,
+  "signed_volume_outward_objects": 8,
   "signed_volume_inverted_objects": [],
   "object_details": [
     {
-      "name": "base_band",
-      "triangles": 360,
-      "location": [
-        0.0,
-        0.0,
-        0.0
-      ],
-      "rotation_euler": [
-        0.0,
-        0.0,
-        0.0
-      ],
-      "scale": [
-        1.0,
-        1.0,
-        1.0
-      ]
-    },
-    {
       "name": "body",
       "triangles": 164,
-      "location": [
-        0.0,
-        0.0,
-        0.0
-      ],
-      "rotation_euler": [
-        0.0,
-        0.0,
-        0.0
-      ],
-      "scale": [
-        1.0,
-        1.0,
-        1.0
-      ]
-    },
-    {
-      "name": "cornice",
-      "triangles": 84,
-      "location": [
-        0.0,
-        0.0,
-        0.0
-      ],
-      "rotation_euler": [
-        0.0,
-        0.0,
-        0.0
-      ],
-      "scale": [
-        1.0,
-        1.0,
-        1.0
-      ]
-    },
-    {
-      "name": "cornice_return_e",
-      "triangles": 84,
-      "location": [
-        0.0,
-        0.0,
-        0.0
-      ],
-      "rotation_euler": [
-        0.0,
-        0.0,
-        0.0
-      ],
-      "scale": [
-        1.0,
-        1.0,
-        1.0
-      ]
-    },
-    {
-      "name": "cornice_return_w",
-      "triangles": 108,
-      "location": [
-        0.0,
-        0.0,
-        0.0
-      ],
-      "rotation_euler": [
-        0.0,
-        0.0,
-        0.0
-      ],
-      "scale": [
-        1.0,
-        1.0,
-        1.0
-      ]
-    },
-    {
-      "name": "floor_line",
-      "triangles": 192,
-      "location": [
-        0.0,
-        0.0,
-        0.0
-      ],
-      "rotation_euler": [
-        0.0,
-        0.0,
-        0.0
-      ],
-      "scale": [
-        1.0,
-        1.0,
-        1.0
-      ]
-    },
-    {
-      "name": "gate",
-      "triangles": 84,
-      "location": [
-        0.0,
-        0.0,
-        0.0
-      ],
-      "rotation_euler": [
-        0.0,
-        0.0,
-        0.0
-      ],
-      "scale": [
-        1.0,
-        1.0,
-        1.0
-      ]
-    },
-    {
-      "name": "gate_bar_0",
-      "triangles": 12,
-      "location": [
-        0.0,
-        0.0,
-        0.0
-      ],
-      "rotation_euler": [
-        0.0,
-        0.0,
-        0.0
-      ],
-      "scale": [
-        1.0,
-        1.0,
-        1.0
-      ]
-    },
-    {
-      "name": "gate_bar_1",
-      "triangles": 12,
-      "location": [
-        0.0,
-        0.0,
-        0.0
-      ],
-      "rotation_euler": [
-        0.0,
-        0.0,
-        0.0
-      ],
-      "scale": [
-        1.0,
-        1.0,
-        1.0
-      ]
-    },
-    {
-      "name": "gate_bar_2",
-      "triangles": 12,
-      "location": [
-        0.0,
-        0.0,
-        0.0
-      ],
-      "rotation_euler": [
-        0.0,
-        0.0,
-        0.0
-      ],
-      "scale": [
-        1.0,
-        1.0,
-        1.0
-      ]
-    },
-    {
-      "name": "gate_bar_3",
-      "triangles": 12,
       "location": [
         0.0,
         0.0,
@@ -357,8 +167,84 @@
       ]
     },
     {
-      "name": "gate_recess",
-      "triangles": 108,
+      "name": "grp_Toy_glass",
+      "triangles": 48,
+      "location": [
+        0.0,
+        0.0,
+        0.0
+      ],
+      "rotation_euler": [
+        0.0,
+        0.0,
+        0.0
+      ],
+      "scale": [
+        1.0,
+        1.0,
+        1.0
+      ]
+    },
+    {
+      "name": "grp_Toy_glass_Glow",
+      "triangles": 24,
+      "location": [
+        0.0,
+        0.0,
+        0.0
+      ],
+      "rotation_euler": [
+        0.0,
+        0.0,
+        0.0
+      ],
+      "scale": [
+        1.0,
+        1.0,
+        1.0
+      ]
+    },
+    {
+      "name": "grp_Toy_ink",
+      "triangles": 552,
+      "location": [
+        0.0,
+        0.0,
+        0.0
+      ],
+      "rotation_euler": [
+        0.0,
+        0.0,
+        0.0
+      ],
+      "scale": [
+        1.0,
+        1.0,
+        1.0
+      ]
+    },
+    {
+      "name": "grp_Toy_sky",
+      "triangles": 132,
+      "location": [
+        0.0,
+        0.0,
+        0.0
+      ],
+      "rotation_euler": [
+        0.0,
+        0.0,
+        0.0
+      ],
+      "scale": [
+        1.0,
+        1.0,
+        1.0
+      ]
+    },
+    {
+      "name": "grp_Toy_trim",
+      "triangles": 644,
       "location": [
         0.0,
         0.0,
@@ -378,215 +264,6 @@
     {
       "name": "parapet",
       "triangles": 432,
-      "location": [
-        0.0,
-        0.0,
-        0.0
-      ],
-      "rotation_euler": [
-        0.0,
-        0.0,
-        0.0
-      ],
-      "scale": [
-        1.0,
-        1.0,
-        1.0
-      ]
-    },
-    {
-      "name": "rear_door",
-      "triangles": 84,
-      "location": [
-        0.0,
-        0.0,
-        0.0
-      ],
-      "rotation_euler": [
-        0.0,
-        0.0,
-        0.0
-      ],
-      "scale": [
-        1.0,
-        1.0,
-        1.0
-      ]
-    },
-    {
-      "name": "win_hi_0_fill",
-      "triangles": 12,
-      "location": [
-        0.0,
-        0.0,
-        0.0
-      ],
-      "rotation_euler": [
-        0.0,
-        0.0,
-        0.0
-      ],
-      "scale": [
-        1.0,
-        1.0,
-        1.0
-      ]
-    },
-    {
-      "name": "win_hi_0_glow",
-      "triangles": 12,
-      "location": [
-        0.0,
-        0.0,
-        0.0
-      ],
-      "rotation_euler": [
-        0.0,
-        0.0,
-        0.0
-      ],
-      "scale": [
-        1.0,
-        1.0,
-        1.0
-      ]
-    },
-    {
-      "name": "win_hi_0_sill",
-      "triangles": 44,
-      "location": [
-        0.0,
-        0.0,
-        0.0
-      ],
-      "rotation_euler": [
-        0.0,
-        0.0,
-        0.0
-      ],
-      "scale": [
-        1.0,
-        1.0,
-        1.0
-      ]
-    },
-    {
-      "name": "win_hi_1_fill",
-      "triangles": 12,
-      "location": [
-        0.0,
-        0.0,
-        0.0
-      ],
-      "rotation_euler": [
-        0.0,
-        0.0,
-        0.0
-      ],
-      "scale": [
-        1.0,
-        1.0,
-        1.0
-      ]
-    },
-    {
-      "name": "win_hi_1_glow",
-      "triangles": 12,
-      "location": [
-        0.0,
-        0.0,
-        0.0
-      ],
-      "rotation_euler": [
-        0.0,
-        0.0,
-        0.0
-      ],
-      "scale": [
-        1.0,
-        1.0,
-        1.0
-      ]
-    },
-    {
-      "name": "win_hi_1_sill",
-      "triangles": 44,
-      "location": [
-        0.0,
-        0.0,
-        0.0
-      ],
-      "rotation_euler": [
-        0.0,
-        0.0,
-        0.0
-      ],
-      "scale": [
-        1.0,
-        1.0,
-        1.0
-      ]
-    },
-    {
-      "name": "win_lo_0_fill",
-      "triangles": 12,
-      "location": [
-        0.0,
-        0.0,
-        0.0
-      ],
-      "rotation_euler": [
-        0.0,
-        0.0,
-        0.0
-      ],
-      "scale": [
-        1.0,
-        1.0,
-        1.0
-      ]
-    },
-    {
-      "name": "win_lo_0_sill",
-      "triangles": 44,
-      "location": [
-        0.0,
-        0.0,
-        0.0
-      ],
-      "rotation_euler": [
-        0.0,
-        0.0,
-        0.0
-      ],
-      "scale": [
-        1.0,
-        1.0,
-        1.0
-      ]
-    },
-    {
-      "name": "win_lo_1_fill",
-      "triangles": 12,
-      "location": [
-        0.0,
-        0.0,
-        0.0
-      ],
-      "rotation_euler": [
-        0.0,
-        0.0,
-        0.0
-      ],
-      "scale": [
-        1.0,
-        1.0,
-        1.0
-      ]
-    },
-    {
-      "name": "win_lo_1_sill",
-      "triangles": 44,
       "location": [
         0.0,
         0.0,
