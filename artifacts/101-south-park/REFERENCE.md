@@ -34,6 +34,7 @@ inferred.
 | [Office Snapshots, "South Park Venture Capital Firm Offices"](https://officesnapshots.com/2026/02/03/south-park-venture-capital-firm-offices-san-francisco/) | Perkins&Will, 2023, 16,420 sq ft, and the exterior sentences that do **not** match the photographs (§6) |
 | Google Street View, South Park pano, capture **January 2025**; Google place record "101 S Park St" | The front elevation in §4, and the address confirmation |
 | Google Maps satellite (Vexcel imagery, 2026) | The roof layout in §4 |
+| [Kleiner Perkins brand assets](https://www.kleinerperkins.com/brand-assets/) | The published logo set is white / black / stacked / wordmark only — the identity is **monochrome**, with no brand colour to apply |
 | OSM way [24052083](https://www.openstreetmap.org/way/24052083) (South Park) | Which way the building faces: the park's long axis runs at bearing 45.0° and its centroid lies 41 m to the north-northwest |
 
 ## 3. Verified dimensions, location and orientation
@@ -111,6 +112,10 @@ this building.
 
 ## 5. Recognition cues, ranked
 
+0. **It is the Kleiner Perkins office**, and the wall sign is the thing a person points at.
+   SF permit 2018 records exactly one single-faced, non-illuminated wall sign reading
+   "kleiner perkins"; the January 2025 pano shows it as a small plaque beside the entrance,
+   alongside a `101` street-number plate over the door.
 1. The row of **warm-oak shopfront windows on a charcoal wall** — the only warmth on the
    building and what identifies it at a glance
 2. The **recessed dark upper storey** behind a plain parapet frame: solid band, shadow band,

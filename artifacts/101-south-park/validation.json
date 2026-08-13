@@ -3,9 +3,9 @@
   "validator": "Blender 5.2.0 LTS",
   "fresh_isolated_scene": true,
   "reimported_final_glb": true,
-  "object_count": 84,
-  "mesh_object_count": 84,
-  "triangle_count": 4872,
+  "object_count": 86,
+  "mesh_object_count": 86,
+  "triangle_count": 7534,
   "triangle_budget": 9000,
   "dimensions_m": [
     30.5306,
@@ -37,6 +37,7 @@
     "Toy_rust",
     "Toy_rust_Glow",
     "Toy_steel",
+    "Toy_trim",
     "Toy_white"
   ],
   "material_details": [
@@ -104,6 +105,13 @@
       "glow": false
     },
     {
+      "name": "Toy_trim",
+      "image_texture_nodes": [],
+      "alpha": 1.0,
+      "roughness": 0.85,
+      "glow": false
+    },
+    {
       "name": "Toy_white",
       "image_texture_nodes": [],
       "alpha": 1.0,
@@ -141,7 +149,7 @@
   "front_heading_deg_true": 318.3,
   "target_height_m": 10.9,
   "parapet_crest_m": 10.0,
-  "signed_volume_outward_objects": 84,
+  "signed_volume_outward_objects": 86,
   "signed_volume_inverted_objects": [],
   "object_details": [
     {
@@ -1133,6 +1141,25 @@
       ]
     },
     {
+      "name": "plate_101",
+      "triangles": 727,
+      "location": [
+        0.0,
+        0.0,
+        0.0
+      ],
+      "rotation_euler": [
+        0.0,
+        0.0,
+        0.0
+      ],
+      "scale": [
+        1.0,
+        1.0,
+        1.0
+      ]
+    },
+    {
       "name": "rear_door",
       "triangles": 84,
       "location": [
@@ -1724,6 +1751,25 @@
     {
       "name": "vent_b",
       "triangles": 108,
+      "location": [
+        0.0,
+        0.0,
+        0.0
+      ],
+      "rotation_euler": [
+        0.0,
+        0.0,
+        0.0
+      ],
+      "scale": [
+        1.0,
+        1.0,
+        1.0
+      ]
+    },
+    {
+      "name": "wordmark",
+      "triangles": 1935,
       "location": [
         0.0,
         0.0,

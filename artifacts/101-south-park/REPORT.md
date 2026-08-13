@@ -2,7 +2,10 @@
 
 Miniature GLB for SF-SIM, built 12–13 August 2026 from `docs/asset-plans/101-south-park.md`
 via the address-to-asset pipeline (`docs/asset-pipeline/ADDRESS-TO-ASSET.md`), invoked with
-`BUILDING: 101 S Park St, San Francisco, CA 94107`, `BATCH: yes`, `STOP_AFTER: 3`.
+`BUILDING: 101 S Park St, San Francisco, CA 94107`, `BATCH: yes`. The session was
+opened with `STOP_AFTER: 3`; at gate 3 the owner approved, asked for the Kleiner Perkins
+identity to be modelled, and lifted the remaining approval gates, so the run continues
+through stages 4 and 5.
 
 **This report beats the plan.** Where the dossier in the plan file and this report disagree,
 this report and `REFERENCE.md` are correct.
@@ -11,14 +14,14 @@ this report and `REFERENCE.md` are correct.
 
 | | As built (pre-optimize) |
 |---|---|
-| Triangles | 4,872 (cap 9,000) |
-| Objects | 84 |
+| Triangles | 7,534 (cap 9,000) |
+| Objects | 86 |
 | Dimensions (AABB) | 30.5306 x 29.8696 x 10.90 m |
 | Min Z | 0.0 |
 | XY centre offset | (−0.003, −0.172) m |
-| Materials | 10, all `Toy_*`, flat, opaque, untextured |
+| Materials | 12, all `Toy_*`, flat, opaque, untextured |
 | Glow materials | `Toy_rust_Glow`, `Toy_glass_Glow` |
-| File, raw | 293,584 B |
+| File, raw | see `validation.json` / §1 note |
 | Contract validation | **PASS on all 16 checks** (`validation.json`) |
 | Anchor | `-122.3937582, 37.7812624` (footprint OBB centre) |
 | Target height | 10.9 m — bbox top normalized exactly, so loader scale = 1.0 |
@@ -28,7 +31,7 @@ this report and `REFERENCE.md` are correct.
 The AABB is ~30.5 x 29.9 m for a 13.1 x 29.7 m building. That is the expected consequence of
 authoring at the real 44.5° SoMa heading, not a scale error.
 
-Stage 4 (optimize) has not run — this session stopped at gate 3 by request.
+Stage 4 (optimize) numbers are recorded in `optimize/REPORT.md` once that stage runs.
 
 ## 2. Corrections to the dossier made during the build
 
@@ -103,6 +106,28 @@ shows charcoal stucco and rectangular oak-framed openings. See `REFERENCE.md` §
   down all 29.6 m, still weighted to the front third where the satellite shows the real
   density. The penthouse sets the 10.9 m crest.
 
+- **The Kleiner Perkins wordmark is real geometry, and it is deliberately
+  oversized.** The pipeline has no textures, so a wordmark either exists as
+  extruded letterforms or it does not exist at all. What is faithful: SF permit
+  2018 records exactly one single-faced, **non-illuminated** wall sign reading
+  "kleiner perkins", and KP's published brand assets are monochrome wordmarks
+  with no brand colour — so the sign is off-white `Toy_trim` on charcoal and it
+  does **not** glow at night. What is exaggerated: the real sign is a small
+  plaque beside the entrance, which at city scale is far under a pixel. It is
+  moved up onto the header band between the ribbon and the parapet and set at a
+  0.75 m cap height so it reads from the app's downward camera. Exaggerating an
+  identity feature in *authoring* is what AGENTS rule 5 and style bible §22
+  permit; the building itself is not moved or rescaled. The street number over
+  the entrance is modelled at its real position and size.
+
+- **Glyph cost is welded, not decimated.** Font outlines are far denser than a
+  three-quarter-metre letter needs, and the cost is driven entirely by the
+  outline vertex count — a limited dissolve does nothing, because a triangulated
+  simple polygon already costs exactly n−2 triangles for n outline vertices.
+  Welding at a fixed *fraction* of cap height (9%) is the lever that works, and
+  keeping it proportional makes glyph cost scale-invariant: the wordmark can be
+  resized without re-tuning the budget.
+
 - **Orientation deviates from the contract's "front faces −Y", deliberately.** The asset is
   authored in true-world orientation (`+Y` = north) because `placeGeneric()` in
   `app/src/assets.js` applies no rotation. The South Park front faces **318.3°**. This is the
@@ -116,6 +141,8 @@ shows charcoal stucco and rectangular oak-framed openings. See `REFERENCE.md` §
 | 2 | Aerial cropped the 29.7 m depth; ground-floor bays collapsed into dark holes | Beauty camera 105→78 mm at radius ×3.4; ground-floor glazing navy → `Toy_glassl` |
 | 3 | Camera square onto the front hid both 29.6 m flanks edge-on | Beauty azimuth 318° → 5°, pitch 38° → 32° — between the front normal and the alley-flank normal, so both read |
 | 4 | Rear third of the roof was an empty tray; flank windows read as flat pasted-on rectangles; night glow blew out to pure white | Roof furniture redistributed over the full depth; flank openings given a `Toy_ink` ring; night-rig emission strength 6.0 → 3.0 so the warm oak survives |
+| 5 | Kleiner Perkins lettering added on request. First pass cost 6,312 triangles — over budget on its own; the `101` plate exported inside-out | Glyph outlines welded at 9% of cap height; glyph sheets now explicitly oriented outward before extruding (a sheet whose normals happened to face into the wall extruded backwards and inverted the solid), sliver faces dropped after triangulation |
+| 6 | Wordmark legible but too small to earn its place | Cap height 0.50 → 0.75 m; weld made proportional so the enlargement cost nothing |
 
 ## 5. Validation
 
@@ -128,7 +155,7 @@ GLB imported — never the authoring scene.
 | Crest normalized to 10.9 m target | PASS (loader scale = 1.0) |
 | Base at z = 0 | PASS (min Z 0.0) |
 | Centred in XY | PASS (−0.003, −0.172) |
-| Under triangle budget | PASS (4,872 / 9,000) |
+| Under triangle budget | PASS (7,534 / 9,000) |
 | No image textures | PASS |
 | No transparency | PASS |
 | Materials follow contract | PASS (10 materials, all `Toy_*`, no `Toy_body`) |
@@ -180,7 +207,7 @@ GLB imported — never the authoring scene.
     29.8696,
     10.9
   ],
-  "tris": 4872,
+  "tris": 7534,
   "loadRadius": 2500
 }
 ```
@@ -197,4 +224,7 @@ only.
 
 ## 8. Approval
 
-Pending. Stage 3 has not been granted.
+Granted 13 August 2026: *"can you update the 3d model to reflect that including its
+lettering and design? … you can proceed without any approvals needed from me moving
+forward."* — David, in session. The approval came with the revision request recorded in §3
+and §4 (iterations 5–6); the wordmark was added before the pipeline advanced past gate 3.

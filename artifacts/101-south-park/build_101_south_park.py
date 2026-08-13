@@ -41,7 +41,7 @@ import sys
 
 import bmesh
 import bpy
-from mathutils import Vector
+from mathutils import Matrix, Vector
 
 # ---------------------------------------------------------------- parameters
 
@@ -103,8 +103,10 @@ PALETTE_HEX = {
     "Toy_steel": "9aa0a6",
     "Toy_roofd": "45454a",
     "Toy_ink": "3a3530",
+    "Toy_trim": "f3efe6",     # the Kleiner Perkins wordmark and the 101 plate
     "Toy_rust_Glow": "c08a5a",
     "Toy_glass_Glow": "6f95b8",
+    "Toy_trim_Glow": "f3efe6",
 }
 
 
@@ -297,6 +299,97 @@ def roof_box(name, u, v, z0, z1, su, sv, mat):
     return box(name, cx, cy, z0, z1, su, sv, mat, yaw=math.atan2(t[1], t[0]))
 
 
+def lettering(name, edge, u_centre, z_base, text, cap_h, d0, d1, mat, weld_frac=0.09):
+    """Extruded letterforms lying in the plane of wall `edge`, standing proud
+    from offset d0 to d1.
+
+    Real signage, not a decal: the app has no textures, so a wordmark either
+    exists as geometry or it does not exist. `resolution_u = 1` keeps the font
+    curves coarse, which is both cheap and correct for the miniature — chunky
+    letterforms, no hairline serif detail (style bible s.4).
+    """
+    curve = bpy.data.curves.new(f"{name}_curve", "FONT")
+    curve.body = text
+    curve.size = cap_h
+    curve.align_x = "CENTER"
+    curve.align_y = "CENTER"
+    curve.resolution_u = 1
+    weld = cap_h * weld_frac
+    curve.offset = 0.0
+    ob = bpy.data.objects.new(name, curve)
+    bpy.context.collection.objects.link(ob)
+
+    # Text is authored in its own XY plane extruding along +Z. Stand it up in
+    # the wall: local +X -> wall tangent, local +Y -> world up, local +Z -> the
+    # wall's outward normal.
+    a, _length, t, n = poly_edge(edge)
+    basis = Matrix(
+        (
+            (t[0], 0.0, n[0], 0.0),
+            (t[1], 0.0, n[1], 0.0),
+            (0.0, 1.0, 0.0, 0.0),
+            (0.0, 0.0, 0.0, 1.0),
+        )
+    )
+    origin = Vector(
+        (
+            a[0] + t[0] * u_centre + n[0] * d0,
+            a[1] + t[1] * u_centre + n[1] * d0,
+            z_base,
+        )
+    )
+    ob.matrix_world = Matrix.Translation(origin) @ basis
+
+    depsgraph = bpy.context.evaluated_depsgraph_get()
+    mesh = bpy.data.meshes.new_from_object(ob.evaluated_get(depsgraph))
+    bpy.data.objects.remove(ob)
+    bpy.data.curves.remove(curve)
+
+    solid = bpy.data.objects.new(name, mesh)
+    bpy.context.collection.objects.link(solid)
+    mesh.transform(Matrix.Translation(origin) @ basis)
+
+    # Give the flat glyph outlines real thickness, then close them into solids.
+    normal = Vector((n[0], n[1], 0.0))
+    bm = bmesh.new()
+    bm.from_mesh(mesh)
+    bmesh.ops.recalc_face_normals(bm, faces=bm.faces)
+    # recalc_face_normals only guarantees CONSISTENCY on an open sheet, not
+    # direction. If the glyph faces came out pointing into the wall, extruding
+    # along +n would push the letters backwards and leave the finished solid
+    # inside-out — which is exactly how the "101" plate failed its signed-volume
+    # check the first time. Flip the sheet to face outward before extruding.
+    if bm.faces and bm.faces[0].normal.dot(normal) < 0.0:
+        bmesh.ops.reverse_faces(bm, faces=list(bm.faces))
+    extrude = bmesh.ops.extrude_face_region(bm, geom=list(bm.faces))
+    moved = [e for e in extrude["geom"] if isinstance(e, bmesh.types.BMVert)]
+    bmesh.ops.translate(bm, verts=moved, vec=normal * (d1 - d0))
+    bmesh.ops.recalc_face_normals(bm, faces=bm.faces)
+    # Font outlines are far denser than a half-metre letter needs, and the cost
+    # is driven entirely by the outline vertex count. Welding at a fixed
+    # FRACTION of the cap height is the lever that actually reduces it, and
+    # keeping it proportional makes the cost scale-invariant — a limited dissolve does not,
+    # because a triangulated simple polygon already costs exactly n-2 triangles
+    # for n outline vertices.
+    bmesh.ops.remove_doubles(bm, verts=list(bm.verts), dist=weld)
+    bmesh.ops.dissolve_degenerate(bm, dist=weld, edges=list(bm.edges))
+    bmesh.ops.triangulate(bm, faces=list(bm.faces))
+    slivers = [f for f in bm.faces if f.calc_area() < 1e-7]
+    if slivers:
+        bmesh.ops.delete(bm, geom=slivers, context="FACES_ONLY")
+    bmesh.ops.recalc_face_normals(bm, faces=bm.faces)
+    volume = sum(
+        f.verts[0].co.dot(f.verts[1].co.cross(f.verts[2].co)) / 6.0 for f in bm.faces
+    )
+    if volume < 0.0:
+        bmesh.ops.reverse_faces(bm, faces=list(bm.faces))
+    bm.to_mesh(mesh)
+    bm.free()
+    mesh.materials.append(mat)
+    mesh.shade_flat()
+    return solid
+
+
 def material(name):
     mat = bpy.data.materials.get(name)
     if mat:
@@ -381,6 +474,7 @@ def build():
     scene = bpy.context.scene
 
     charcoal = material("Toy_charcoal")
+    trim = material("Toy_trim")
     oak = material("Toy_rust")
     glass = material("Toy_glass")
     glassl = material("Toy_glassl")
@@ -459,8 +553,27 @@ def build():
     for i, u in enumerate((3.55, 5.75, 7.95, 10.15)):
         oak_bay(f"gbay{i}", EDGE_FRONT, u, 1.90, Z_GWIN0, Z_GWIN1, oak, glassl, oglow,
                 base=RECESS)
-    # the small dark 101 plate above the door, and the two gooseneck lamps,
-    # are deliberately dropped: both are sub-pixel at city scale (s.22).
+    # --- the Kleiner Perkins identity ---------------------------------------
+    # The building's tenant is the reason anyone points at it, and with no
+    # textures in this pipeline a wordmark has to be geometry or nothing.
+    #
+    # Faithful to: SF permit 2018 records exactly ONE single-faced,
+    # NON-ILLUMINATED wall sign reading "kleiner perkins", and KP's published
+    # brand assets are monochrome wordmarks with no brand colour — so the sign
+    # is off-white on charcoal and does not glow.
+    #
+    # Exaggerated: the real sign is a small plaque beside the entrance, which at
+    # city scale is well under a pixel. It is moved up onto the header band
+    # between the ribbon and the parapet and scaled to a 0.5 m cap height so it
+    # reads from the app's downward camera. Semantic exaggeration of an identity
+    # feature in AUTHORING is exactly what AGENTS rule 5 and style bible s.22
+    # allow; the building is not moved or rescaled.
+    lettering(
+        "wordmark", EDGE_FRONT, len_front / 2.0, 9.20,
+        "Kleiner Perkins", 0.75, RECESS, RECESS + 0.09, trim,
+    )
+    # the street number over the entrance, at its real position and size
+    lettering("plate_101", EDGE_FRONT, 1.35, 3.34, "101", 0.30, RECESS, RECESS + 0.05, trim)
 
     # --- Jack London Alley flank: quiet, regular, genuinely visible ---------
     for i in range(6):
