@@ -231,12 +231,23 @@ stayed live, the app booted and the area rendered normally, and the site showed
 manifest and the GLB were restored afterwards and the GLB re-verified byte-identical
 to `artifacts/`.
 
-The "exactly one console warning" half of the drill was **not observed directly** —
-the console hook installed via the automation bridge captured nothing on a freshly
-reloaded page, including the app's own merge lines, so absence of captured warnings
-proves nothing either way. It rests on the source instead: `warn()` in
-`app/src/assets.js:359-363` is latched by a `warned` boolean and can fire at most once
-per session. That is an inspection, not a measurement, and is recorded as such.
+**The console warning was observed**, verbatim, on the attempt where the file was
+genuinely unreachable:
+
+```
+[warn] sf-assets: 171-south-park failed to load (Unexpected token '<', "<!doctype "... is not valid JSON)
+```
+
+`<!doctype` is Vite's SPA fallback answering for the absent file; a 404 in production
+takes the same path. Note this is **not** the latched `warn()` at
+`app/src/assets.js:359-363` — that one is gated by a `warned` boolean and ends with
+"keeping the code-built landmark". A streamed landmark like this one fails through the
+un-latched `console.warn` in `scan()` (`assets.js:557-561`), which the code comments
+call out deliberately: "Not the single-shot warn: each streamed asset that fails is its
+own finding". The "exactly one" property therefore comes from the state machine rather
+than from a latch — `place()` sets `status = 'failed'`, and no branch in `scan()`
+matches `'failed'`, so the asset is never retried. One failure, one warning. Corroborated
+by `SF.assets.stats()` moving to `failed: 1` and staying there.
 
 One number worth not misreading: the loader's "3085 tris body" is a vertex-derived
 estimate (`position.count / 3`) that under-reports on indexed geometry, which
