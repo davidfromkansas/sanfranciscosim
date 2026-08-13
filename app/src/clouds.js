@@ -34,13 +34,16 @@ export const CLOUD_CAPS = { ultra: 160, high: 160, medium: 96, low: 48 };
 // covered 8.7% of it. Real clouds are kilometres wide, and an overcast marine
 // layer has to close over the city, so the low deck is both bigger and packed
 // into a tighter box than the decorative layers above it.
-// Altitudes raised 40% from the first cut (620/2000/6000). The low deck still
-// clears Twin Peaks (~280 m) and Sutro Tower (~370 m) comfortably, which is
-// what stops a marine layer sitting through a hilltop.
+// One ceiling, not three decks: David asked for every cloud at the altitude the
+// highest band used to sit at. The bands still differ in size, spread and which
+// part of the field they read — only their height is now shared, and the
+// per-instance jitter is off, so this is a genuine single plane rather than a
+// scatter around one.
+const DECK_ALTITUDE = 8400;
 const LAYERS = [
-  { key: 'low', altitude: 868, scale: 720, spread: 0.7 },
-  { key: 'mid', altitude: 2800, scale: 1100, spread: 1.2 },
-  { key: 'high', altitude: 8400, scale: 2000, spread: 1.6 },
+  { key: 'low', altitude: DECK_ALTITUDE, scale: 720, spread: 0.7 },
+  { key: 'mid', altitude: DECK_ALTITUDE, scale: 1100, spread: 1.2 },
+  { key: 'high', altitude: DECK_ALTITUDE, scale: 2000, spread: 1.6 },
 ];
 
 // How squat a cloud is: 1.0 would be as tall as it is wide. Clouds are wide
@@ -165,7 +168,8 @@ export function createClouds(scene, { sampleAt }) {
       z: (hash(i, 2) - 0.5) * 2 * EXTENT * layer.spread,
       size: 0.65 + hash(i, 3) * 0.7,
       spin: hash(i, 4) * Math.PI * 2,
-      lift: (hash(i, 5) - 0.5) * 140,
+      // Vertical jitter is 0: a single ceiling means a single ceiling.
+      lift: 0,
     });
   }
 
