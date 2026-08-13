@@ -1,6 +1,6 @@
 {
- "generated": "2026-08-13T01:03:40.394Z",
- "buildings": 174761,
+ "generated": "2026-08-13T03:43:38.539Z",
+ "buildings": 174755,
  "cells": 596,
  "categories": [
   {
@@ -21,7 +21,7 @@
    "cat": 2,
    "id": "apartments",
    "label": "Apartments",
-   "count": 14017,
+   "count": 14016,
    "night": 0
   },
   {
@@ -42,7 +42,7 @@
    "cat": 5,
    "id": "restaurant_cafe",
    "label": "Restaurant / Café",
-   "count": 2845,
+   "count": 2844,
    "night": 1
   },
   {
@@ -126,7 +126,7 @@
    "cat": 17,
    "id": "theater_cinema",
    "label": "Theater / Cinema",
-   "count": 277,
+   "count": 276,
    "night": 1
   },
   {
@@ -168,7 +168,7 @@
    "cat": 23,
    "id": "parking_garage",
    "label": "Parking garage",
-   "count": 1848,
+   "count": 1845,
    "night": 3
   },
   {
@@ -230,7 +230,7 @@
   {
    "sub": "parking_garage",
    "label": "Parking garage",
-   "count": 899
+   "count": 898
   },
   {
    "sub": "community_center",
@@ -298,14 +298,14 @@
    "count": 229
   },
   {
-   "sub": "theater",
-   "label": "Theater",
-   "count": 226
-  },
-  {
    "sub": "hardware_store",
    "label": "Hardware store",
    "count": 226
+  },
+  {
+   "sub": "theater",
+   "label": "Theater",
+   "count": 225
   },
   {
    "sub": "grocery",
@@ -365,7 +365,7 @@
   {
    "sub": "pizzeria",
    "label": "Pizzeria",
-   "count": 125
+   "count": 124
   },
   {
    "sub": "university",
@@ -654,17 +654,17 @@
   }
  ],
  "sources": {
-  "landuse": 140693,
-  "business": 10214,
+  "landuse": 140690,
+  "business": 10213,
   "heuristic": 7280,
-  "osm": 8625,
+  "osm": 8624,
   "overture": 6661,
-  "datasf": 1288
+  "datasf": 1287
  },
  "confidence": [
-  147973,
-  15332,
-  4498,
+  147970,
+  15330,
+  4497,
   6958
  ],
  "streets": {

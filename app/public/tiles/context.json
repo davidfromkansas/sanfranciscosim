@@ -7,7 +7,7 @@
   "rows": 32
  },
  "stats": {
-  "sidecarBytes": 18360857,
+  "sidecarBytes": 18360095,
   "cells": 596
  },
  "cells": [
@@ -309,7 +309,7 @@
    "originZ": -1500,
    "buildings": 511,
    "streets": 26,
-   "bytes": 61670
+   "bytes": 61662
   },
   {
    "key": "11_14",
@@ -997,9 +997,9 @@
    "cz": 9,
    "originX": -1500,
    "originZ": -3500,
-   "buildings": 19,
+   "buildings": 20,
    "streets": 25,
-   "bytes": 4201
+   "bytes": 4402
   },
   {
    "key": "14_10",
@@ -1309,7 +1309,7 @@
    "originZ": -500,
    "buildings": 368,
    "streets": 24,
-   "bytes": 41984
+   "bytes": 41976
   },
   {
    "key": "15_16",
@@ -1989,7 +1989,7 @@
    "originZ": -3500,
    "buildings": 592,
    "streets": 31,
-   "bytes": 69493
+   "bytes": 69485
   },
   {
    "key": "18_10",
@@ -2027,9 +2027,9 @@
    "cz": 13,
    "originX": 1000,
    "originZ": -1500,
-   "buildings": 97,
+   "buildings": 96,
    "streets": 34,
-   "bytes": 13893
+   "bytes": 13721
   },
   {
    "key": "18_14",
@@ -2037,9 +2037,9 @@
    "cz": 14,
    "originX": 1000,
    "originZ": -1000,
-   "buildings": 290,
+   "buildings": 289,
    "streets": 57,
-   "bytes": 40591
+   "bytes": 40478
   },
   {
    "key": "18_15",
@@ -2119,7 +2119,7 @@
    "originZ": 3000,
    "buildings": 587,
    "streets": 50,
-   "bytes": 62018
+   "bytes": 62010
   },
   {
    "key": "18_23",
@@ -2239,7 +2239,7 @@
    "originZ": -3500,
    "buildings": 445,
    "streets": 44,
-   "bytes": 55584
+   "bytes": 55576
   },
   {
    "key": "19_10",
@@ -2287,9 +2287,9 @@
    "cz": 14,
    "originX": 1500,
    "originZ": -1000,
-   "buildings": 80,
+   "buildings": 75,
    "streets": 40,
-   "bytes": 13782
+   "bytes": 13168
   },
   {
    "key": "19_15",
@@ -2569,7 +2569,7 @@
    "originZ": -1000,
    "buildings": 355,
    "streets": 40,
-   "bytes": 46352
+   "bytes": 46344
   },
   {
    "key": "20_15",
@@ -5199,7 +5199,7 @@
    "originZ": -1500,
    "buildings": 599,
    "streets": 19,
-   "bytes": 68215
+   "bytes": 68207
   },
   {
    "key": "7_14",
@@ -5759,7 +5759,7 @@
    "originZ": -1500,
    "buildings": 497,
    "streets": 30,
-   "bytes": 54368
+   "bytes": 54360
   },
   {
    "key": "9_14",
