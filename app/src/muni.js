@@ -81,16 +81,22 @@ const BADGE_Y = 8.6;
 // kilometre away is drawn a kilometre-sized, which is what makes them legible
 // from up high. Density is then bounded by MAX_BADGES, not by the radius.
 const BADGE_RADIUS_MIN = 300;
-const BADGE_RADIUS_MAX = 2600;
-const BADGE_RADIUS_PER_M = 1.15; // radius per metre of camera height
-// Above this camera height the whole city is on screen and bubbles would be
-// pixel soup: the layer switches off entirely.
-const BADGE_CEILING_Y = 3400;
+// Reaches the far side of the city from the hero view. The camera tops out at
+// 8000 m of orbit (~5350 m of height) where the visible ground spans roughly
+// 15 km, so a 2600 m cap left the whole skyline unlabelled — MAX_BADGES is what
+// bounds clutter, not the radius, so the radius may as well cover what is on
+// screen.
+const BADGE_RADIUS_MAX = 11000;
+const BADGE_RADIUS_PER_M = 2.2; // radius per metre of camera height
 // Camera distance at which a bubble is drawn at its authored size; scale is
 // proportional to distance either side of it, so screen size stays put.
 const BADGE_REF_DIST = 420;
 const BADGE_SCALE_MIN = 0.85;
-const BADGE_SCALE_MAX = 9;
+// Room to stay legible all the way out to the hero view: at 8000 m a bubble
+// needs ~19x its authored size to hold the same size on screen. Capping this
+// at 9 was the second reason the high view looked empty — the bubbles were
+// there, drawn at half the size they needed, i.e. a few pixels.
+const BADGE_SCALE_MAX = 26;
 // Hard ceiling on how many shout at once, whatever the radius.
 const MAX_BADGES = 18;
 
@@ -718,12 +724,7 @@ export function createLiveMuni(scene, data) {
     // Camera height stands in for zoom: the rig is pitch-locked, so height and
     // orbit distance move together and this needs no extra plumbing.
     const camY = camera.position.y;
-    const badgesOn = camY < BADGE_CEILING_Y;
     const zoomRadius = Math.max(BADGE_RADIUS_MIN, Math.min(BADGE_RADIUS_MAX, camY * BADGE_RADIUS_PER_M));
-    const badgeScale = Math.max(
-      BADGE_SCALE_MIN,
-      Math.min(BADGE_SCALE_MAX, Math.max(camY, 120) / BADGE_REF_DIST),
-    );
 
     for (const state of buses.values()) {
       if (now - state.lastFixAt > STALE_MS) {
@@ -779,16 +780,17 @@ export function createLiveMuni(scene, data) {
       // skipped bubble costs an instance rather than leaving a hole.
       const dist = Math.hypot(state.x - camX, state.z - camZ);
       const near = badgeRadius * 0.72; // fade over the outer quarter of the ring
-      if (badgesOn && dist < badgeRadius) {
+      if (dist < badgeRadius) {
         eligible++;
         if (badgeCount < MAX_BADGES) {
           const fade = dist < near ? 1 : Math.max(0, 1 - (dist - near) / Math.max(1, badgeRadius - near));
           const rect = atlas.rect(state.route);
-          dummy.position.set(state.x, y + BADGE_Y * badgeScale, state.z);
+          // Proportional to THIS bubble's distance => constant size on screen,
+          // which is the whole point: a bubble 6 km away is drawn 6 km-sized.
+          const scaleAt = Math.max(BADGE_SCALE_MIN, Math.min(BADGE_SCALE_MAX, dist / BADGE_REF_DIST));
+          dummy.position.set(state.x, y + BADGE_Y * scaleAt, state.z);
           dummy.quaternion.copy(camQ);
-          // Proportional to distance => constant on screen. Anchored so the
-          // tail still meets the roof: BADGE_Y scales with the bubble.
-          dummy.scale.setScalar(badgeScale * fade);
+          dummy.scale.setScalar(scaleAt * fade);
           dummy.updateMatrix();
           badge.mesh.setMatrixAt(badgeCount, dummy.matrix);
           badge.uvRect.setXYZW(badgeCount, rect[0], rect[1], rect[2], rect[3]);

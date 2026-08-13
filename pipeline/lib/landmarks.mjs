@@ -306,6 +306,101 @@ export const LANDMARKS = [
     exclude: 78,
     camera: { distance: 850, yaw: 250, pitch: 20 },
   },
+  // ---------------------------------------------------------------------
+  // Presidio Boulevard row, Bldgs. 540-543. Four of the twelve near-identical
+  // WWI-era officers' family quarters (540-551) that step down the hill from
+  // Lombard Gate, integrated together so the row reads as a row. Every radius
+  // below was sized against the metric `excluded()` actually uses — centroid OR
+  // any ring vertex inside the circle — and every one is small enough to drop
+  // only its own baked footprint. That is what keeps the four consistent: the
+  // circles do not reach each other, so each house is replaced independently
+  // and 544 onward stay baked. Do NOT widen any of them to the 70-120 m typical
+  // of the standalone landmarks; on a row spaced ~25 m apart that punches a
+  // hole where neighbours have no GLB to replace them.
+  // ---------------------------------------------------------------------
+  {
+    id: '540PresidioBlvd',
+    name: '540 Presidio Boulevard',
+    lon: -122.4519224,
+    lat: 37.7966667,
+    height: 11.5,
+    // The house's own footprint reaches 12.2 m from the anchor (14.47 x 19.72 m
+    // OBB, half-diagonal), so the radius has to clear that. 541's nearest vertex
+    // is 19.1 m away — measured out of the shipped tile
+    // app/public/tiles/buildings/13_10.bin, where this house is building 33 and
+    // 541 is building 39. 15 m sits in the middle of that 12.2-19.1 m window.
+    exclude: 15,
+    // camera.js places the eye at target + distance*(sin yaw, ., cos yaw) with
+    // +x east and +z south, so yaw 52 stands east-south-east of the house —
+    // the three-quarter that shows the porch front and the south hip together,
+    // matching the asset's beauty render.
+    camera: { distance: 120, yaw: 52, pitch: 20 },
+  },
+  {
+    // Sized on OSM rings measured against this anchor: 541's own centroid is
+    // 0.36 m out and its nearest vertex 6.15 m, while the nearest NEIGHBOUR
+    // vertices are 18.86 m (540) and 20.43 m (542). The safe window is
+    // (0.36, 18.86) m; 12 m leaves 6.9 m of headroom before 540 is at risk —
+    // margin that matters because the baked ring comes from DataSF/Overture,
+    // not OSM, and may differ by a metre or two.
+    id: '541Presidio',
+    name: '541 Presidio Boulevard',
+    lon: -122.4518601,
+    lat: 37.7969312,
+    height: 10,
+    exclude: 12,
+    // Deliberately NO clearTrees, unlike Letterman: this asset has no
+    // hand-modelled grounds, and the baked cypress/eucalyptus scatter around it
+    // IS the East Housing character. The Presidio PARK_COVER entry should keep
+    // running right up to the house.
+    camera: { distance: 170, yaw: 300, pitch: 22 },
+  },
+  {
+    // Mid-row, with the narrowest window of the four: measured from the anchor,
+    // 542's own footprint reaches 11.3 m, while the nearest neighbour vertex
+    // (543, way/288361199) is 18.1 m and 541 is 20.2 m. 14 leaves ~2.7 m over
+    // its own ring and ~4.1 m of clearance to 543.
+    id: '542PresidioBlvd',
+    name: '542 Presidio Boulevard',
+    lon: -122.4516862,
+    lat: 37.7971579,
+    height: 10.6,
+    exclude: 14,
+    // `camera` is NOT optional, even for a building too small to deserve a
+    // fly-to preset: context.mjs bakes `camera: l.camera` straight into
+    // context/landmarks.json, and camera.js reads `preset.yaw` unconditionally,
+    // so omitting it ships a landmark whose preset is undefined and the whole
+    // city fails to boot with "Cannot read properties of undefined (reading
+    // 'yaw')". Verified by doing exactly that first.
+    // yaw 30 puts the camera to the SSE, looking at the ESE entrance front and
+    // the SSW hip end; 200 m suits a 10.6 m house (cf. 380Brannan at 220).
+    camera: { distance: 200, yaw: 30, pitch: 26 },
+  },
+  {
+    // This house's own footprint reaches 10.1 m from the anchor, and the nearest
+    // neighbouring DataSF footprint (201006.0016579, the larger duplex type)
+    // reaches 15.9 m. The window is 10.1 < r < 15.9 and 12 m sits in the middle
+    // of it. Anything past ~15.5 m deletes the neighbour.
+    id: '543PresidioBlvd',
+    name: '543 Presidio Blvd',
+    lon: -122.4515766,
+    lat: 37.7973711,
+    height: 9.55,
+    exclude: 12,
+    camera: { distance: 120, yaw: 130, pitch: 28 },
+  },
+  {
+    id: 'civicCenterCourthouse',
+    name: 'Civic Center Courthouse',
+    lon: -122.4192537,
+    lat: 37.7804897,
+    height: 29.6,
+    // Footprint 83.5 x 37 m at 81.22 deg; half-diagonal 45.6 m, so 52 m clears
+    // it with a small margin. City Hall's 110 m zone (132 m away) already
+    // overlaps part of this block - that is pre-existing and harmless.
+    exclude: 52,
+    camera: { distance: 420, yaw: 135, pitch: 20 },
+  },
   {
     // Civic Center is the tightest site in the registry, so this radius is
     // measured, not guessed. excluded() drops a footprint when ANY vertex
