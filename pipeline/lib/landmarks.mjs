@@ -534,6 +534,31 @@ export const LANDMARKS = [
     exclude: 40,
     camera: { distance: 600, yaw: 268, pitch: 20 },
   },
+  // Kleiner Perkins' office on the South Park oval. The exclusion window here is
+  // the tightest in this file, because 117 South Park is ATTACHED: the two
+  // footprints share their party-wall vertices, and `excluded()` drops a
+  // footprint when any RING VERTEX — not just its centroid — falls inside the
+  // radius. Measured from this anchor against the DataSF footprints:
+  //
+  //   own ring area centroid            0.26 m  (OSM cross-check 1.54 m)
+  //   shared party-wall vertex, no. 117 6.40 m  <- the ceiling
+  //   no. 117's own centroid           10.59 m
+  //   next neighbour vertex (no. 123)  13.17 m
+  //
+  // So the safe band is 1.6-6.4 m and the exclusion has to work through the
+  // centroid test — this building's own vertices sit at 6.40 m, outside any
+  // radius that spares the neighbour. 4 m is the middle of that band. Do NOT
+  // raise it: at 6.5 m this deletes a real building that has no hand-built
+  // replacement. Same situation as 550Third's through-lot note above.
+  {
+    id: '101SouthPark',
+    name: 'Kleiner Perkins (101 South Park)',
+    lon: -122.3937582,
+    lat: 37.7812624,
+    height: 10.9,
+    exclude: 4,
+    camera: { distance: 200, yaw: 318, pitch: 26 },
+  },
 ];
 
 // Parks/green spaces the landcover bake must match at least one source polygon

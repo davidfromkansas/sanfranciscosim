@@ -647,5 +647,24 @@
     ],
     "tris": 13176,
     "loadRadius": 2500
+  },
+  {
+    "id": "101-south-park",
+    "file": "101-south-park.glb",
+    "anchor": [
+      -122.3937582,
+      37.7812624
+    ],
+    "targetHeightM": 10.9,
+    "cat": 3,
+    "name": "Kleiner Perkins (101 South Park)",
+    "estimated": true,
+    "dims": [
+      30.53,
+      29.87,
+      10.9
+    ],
+    "tris": 7502,
+    "loadRadius": 2500
   }
 ]

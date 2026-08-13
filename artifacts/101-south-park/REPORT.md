@@ -193,7 +193,7 @@ GLB imported — never the authoring scene.
    what was built — but if the real structure is a through-block building, this asset is
    short at the rear.
 
-## 7. Draft manifest entry (do not apply here — stage 5 owns it)
+## 7. Manifest entry (applied in stage 5)
 
 ```json
 {
@@ -205,11 +205,11 @@ GLB imported — never the authoring scene.
   ],
   "targetHeightM": 10.9,
   "cat": 3,
-  "name": "101 South Park",
+  "name": "Kleiner Perkins (101 South Park)",
   "estimated": true,
   "dims": [
-    30.5306,
-    29.8696,
+    30.53,
+    29.87,
     10.9
   ],
   "tris": 7502,
@@ -227,14 +227,62 @@ case and will hide an exclusion-zone mistake rather than reveal it. Do the bake 
 judging. `BATCH: yes` applies: bake, QA the bake, then discard the bake and commit source
 only.
 
-## 8. Approval
+## 8. Stage 5 — integration QA (batch mode, source-only branch)
+
+Bake run 13 August 2026 on this branch: `terrain → bridges → buildings → streets →
+landcover → validate → lore → toy → notables → context → muni-shapes`, with
+`pipeline/data/` symlinked from a sibling worktree (removed again before committing —
+note that `.gitignore` lists `pipeline/data/` with a trailing slash, which does **not**
+match a symlink, so git offers it as untracked).
+
+| Check | Result |
+|---|---|
+| `verify-rebake.mjs` — only new landmarks' cells moved | **PASS** — 584 of 585 cells unchanged; cell `23_13` went 233 → 232 |
+| `verify-rebake.mjs` — nothing surviving inside the radius | **PASS** — nearest surviving footprint 6.4 m vs the 4 m radius (that is 117 South Park, the attached neighbour, correctly kept) |
+| `audit.mjs` check 1.6 — no procedural footprint inside a bespoke exclusion zone | **PASS** — 42 landmarks clear |
+| Loader merge line | **PASS** — `sf-assets: 101-south-park merged 12 objects / 11 materials -> batched (3686 tris body); uniform x1.0000 at 3849, -1245` |
+| Uniform scale ≈ 1.0 | **PASS** — exactly `x1.0000`, so the authored crest matches `targetHeightM` |
+| Placed at the real anchor | **PASS** — `3849, -1245` is the projection of `-122.3937582, 37.7812624` |
+| `camelId()` round trip | **PASS** — `101-south-park` → `101SouthPark`, which is the registry id, so no double building |
+| Draw calls | **PASS by construction** — the log says `batched`, i.e. it joined the shared landmark `BatchedMesh` pair, so it adds **0** draw calls no matter how many landmarks exist |
+| Single building on the footprint, correct seating and orientation | **PASS** — day screenshots show one building on the site, front onto the park, no procedural block poking through |
+| Night `_Glow` layer renders | **PASS (partial)** — the glow layer is live and emissive in-app; see the honest note below |
+| Fallback drill | **PASS** — see below |
+
+**Fallback drill.** With `app/public/sf-assets/landmarks/101-south-park.glb` moved aside
+and the page reloaded, the app logged exactly one warning —
+`sf-assets: 101-south-park failed to load (...)` — `stats()` reported `failed: 1` with
+every other landmark unaffected, and the app kept rendering with no crash and no error
+cascade. Restoring the file and reloading brought the asset straight back. Note that with
+Case B the site degrades to a **gap**, not to a procedural building, because the re-bake
+deliberately removed the procedural footprint. That is the documented consequence of an
+exclusion zone, not a fallback failure.
+
+### Honest limitations of this QA pass
+
+- **Frame rate and draw-call totals were not measurable here.** The browser pane runs
+  hidden in this environment, so `requestAnimationFrame` is throttled to a few frames per
+  screenshot; the in-app stats overlay consequently reads `fps 0 · draw calls 1`. The
+  draw-call claim above rests on the architecture (the asset batches, adding zero calls),
+  not on a measurement. **A real fps/draw-call reading against AGENTS rule 2 still has to
+  be taken on a visible browser**, and it is the one QA item this session could not close.
+- **The night state was confirmed to render but not fully judged in-app.** The glow layer
+  is emissive and the rear elevation is correctly dark, but the diorama camera locks to a
+  42° downward view, so the front elevation — where all the glow lives — is hard to see
+  square-on. The full night appearance was judged from the authoring rig
+  (`101-south-park-aerial-night.png`) instead.
+- The dev server initially came up in the shared main checkout rather than this worktree,
+  which made the served manifest look like it had 6 entries. Worth knowing before
+  concluding an integration has failed.
+
+## 9. Approval
 
 Granted 13 August 2026: *"can you update the 3d model to reflect that including its
 lettering and design? … you can proceed without any approvals needed from me moving
 forward."* — David, in session. The approval came with the revision request recorded in §3
 and §4 (iterations 5–6); the wordmark was added before the pipeline advanced past gate 3.
 
-## 9. Exclusion radius — measured, and much tighter than the plan assumed
+## 10. Exclusion radius — measured, and much tighter than the plan assumed
 
 The plan's §2.13 proposed `exclude: ~16`, reasoning from the footprint's half-diagonal.
 That is the wrong model of what `excluded()` in `pipeline/buildings.mjs` does: it drops a
