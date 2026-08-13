@@ -124,7 +124,18 @@ minutes per image on CPU versus well under two), falling back silently to CPU; a
 aerial lens dropped from 105 mm to 70 mm at a longer radius, because this asset is 25 m
 long on the diagonal inside a 23 m axis-aligned box and the framing heuristic cropped it.
 
-## 7. Draft manifest entry
+## 7. Approval (stage 3)
+
+Approved by David on 13 August 2026, verbatim:
+
+> Yes confirm -- proceed fully. no need to ask for approval
+
+That instruction was given at Gate 0 and explicitly waives the stage-3 hold for this
+building, so the pipeline continued from the validated asset to optimize and
+integration without a separate review round. No design feedback was received, so
+there are no revision iterations to log beyond the two self-caught ones in §3.
+
+## 8. Draft manifest entry
 
 Written from the measurements above, not from the plan. `estimated` is **true**: no
 published height exists for this building and 9.60 m is photogrammetric (see
