@@ -3,8 +3,8 @@
   "validator": "Blender 5.2.0 LTS",
   "fresh_isolated_scene": true,
   "reimported_final_glb": true,
-  "object_count": 28,
-  "mesh_object_count": 28,
+  "object_count": 11,
+  "mesh_object_count": 11,
   "triangle_count": 1428,
   "triangle_budget": 7000,
   "dimensions_m": [
@@ -140,7 +140,7 @@
   ],
   "front_heading_deg_true": 134.9,
   "target_height_m": 7.63,
-  "signed_volume_outward_objects": 28,
+  "signed_volume_outward_objects": 11,
   "signed_volume_inverted_objects": [],
   "object_details": [
     {
@@ -182,25 +182,6 @@
       ]
     },
     {
-      "name": "door_frame",
-      "triangles": 28,
-      "location": [
-        0.0,
-        0.0,
-        0.0
-      ],
-      "rotation_euler": [
-        0.0,
-        0.0,
-        0.0
-      ],
-      "scale": [
-        1.0,
-        1.0,
-        1.0
-      ]
-    },
-    {
       "name": "door_glow",
       "triangles": 12,
       "location": [
@@ -220,8 +201,8 @@
       ]
     },
     {
-      "name": "frame_band",
-      "triangles": 28,
+      "name": "grp_Toy_glass",
+      "triangles": 48,
       "location": [
         0.0,
         0.0,
@@ -239,8 +220,8 @@
       ]
     },
     {
-      "name": "frame_pier_ne",
-      "triangles": 28,
+      "name": "grp_Toy_glassl",
+      "triangles": 324,
       "location": [
         0.0,
         0.0,
@@ -258,8 +239,8 @@
       ]
     },
     {
-      "name": "frame_pier_sw",
-      "triangles": 28,
+      "name": "grp_Toy_greige",
+      "triangles": 372,
       "location": [
         0.0,
         0.0,
@@ -277,8 +258,8 @@
       ]
     },
     {
-      "name": "mullion0",
-      "triangles": 12,
+      "name": "grp_Toy_ink",
+      "triangles": 92,
       "location": [
         0.0,
         0.0,
@@ -296,8 +277,8 @@
       ]
     },
     {
-      "name": "mullion1",
-      "triangles": 12,
+      "name": "grp_Toy_roofd",
+      "triangles": 120,
       "location": [
         0.0,
         0.0,
@@ -315,8 +296,8 @@
       ]
     },
     {
-      "name": "mullion2",
-      "triangles": 12,
+      "name": "grp_Toy_stone",
+      "triangles": 216,
       "location": [
         0.0,
         0.0,
@@ -334,312 +315,8 @@
       ]
     },
     {
-      "name": "parapet",
-      "triangles": 288,
-      "location": [
-        0.0,
-        0.0,
-        0.0
-      ],
-      "rotation_euler": [
-        0.0,
-        0.0,
-        0.0
-      ],
-      "scale": [
-        1.0,
-        1.0,
-        1.0
-      ]
-    },
-    {
-      "name": "rdoor_fill",
-      "triangles": 12,
-      "location": [
-        0.0,
-        0.0,
-        0.0
-      ],
-      "rotation_euler": [
-        0.0,
-        0.0,
-        0.0
-      ],
-      "scale": [
-        1.0,
-        1.0,
-        1.0
-      ]
-    },
-    {
-      "name": "rdoor_frame",
-      "triangles": 28,
-      "location": [
-        0.0,
-        0.0,
-        0.0
-      ],
-      "rotation_euler": [
-        0.0,
-        0.0,
-        0.0
-      ],
-      "scale": [
-        1.0,
-        1.0,
-        1.0
-      ]
-    },
-    {
-      "name": "roof_hatch",
-      "triangles": 108,
-      "location": [
-        0.0,
-        0.0,
-        0.0
-      ],
-      "rotation_euler": [
-        0.0,
-        0.0,
-        0.0
-      ],
-      "scale": [
-        1.0,
-        1.0,
-        1.0
-      ]
-    },
-    {
-      "name": "rooflight",
-      "triangles": 108,
-      "location": [
-        0.0,
-        0.0,
-        0.0
-      ],
-      "rotation_euler": [
-        0.0,
-        0.0,
-        0.0
-      ],
-      "scale": [
-        1.0,
-        1.0,
-        1.0
-      ]
-    },
-    {
-      "name": "rwin0_fill",
-      "triangles": 12,
-      "location": [
-        0.0,
-        0.0,
-        0.0
-      ],
-      "rotation_euler": [
-        0.0,
-        0.0,
-        0.0
-      ],
-      "scale": [
-        1.0,
-        1.0,
-        1.0
-      ]
-    },
-    {
-      "name": "rwin0_frame",
-      "triangles": 28,
-      "location": [
-        0.0,
-        0.0,
-        0.0
-      ],
-      "rotation_euler": [
-        0.0,
-        0.0,
-        0.0
-      ],
-      "scale": [
-        1.0,
-        1.0,
-        1.0
-      ]
-    },
-    {
-      "name": "rwin1_fill",
-      "triangles": 12,
-      "location": [
-        0.0,
-        0.0,
-        0.0
-      ],
-      "rotation_euler": [
-        0.0,
-        0.0,
-        0.0
-      ],
-      "scale": [
-        1.0,
-        1.0,
-        1.0
-      ]
-    },
-    {
-      "name": "rwin1_frame",
-      "triangles": 28,
-      "location": [
-        0.0,
-        0.0,
-        0.0
-      ],
-      "rotation_euler": [
-        0.0,
-        0.0,
-        0.0
-      ],
-      "scale": [
-        1.0,
-        1.0,
-        1.0
-      ]
-    },
-    {
-      "name": "skylight0",
-      "triangles": 108,
-      "location": [
-        0.0,
-        0.0,
-        0.0
-      ],
-      "rotation_euler": [
-        0.0,
-        0.0,
-        0.0
-      ],
-      "scale": [
-        1.0,
-        1.0,
-        1.0
-      ]
-    },
-    {
-      "name": "skylight1",
-      "triangles": 108,
-      "location": [
-        0.0,
-        0.0,
-        0.0
-      ],
-      "rotation_euler": [
-        0.0,
-        0.0,
-        0.0
-      ],
-      "scale": [
-        1.0,
-        1.0,
-        1.0
-      ]
-    },
-    {
-      "name": "skylight_kerb0",
-      "triangles": 108,
-      "location": [
-        0.0,
-        0.0,
-        0.0
-      ],
-      "rotation_euler": [
-        0.0,
-        0.0,
-        0.0
-      ],
-      "scale": [
-        1.0,
-        1.0,
-        1.0
-      ]
-    },
-    {
-      "name": "skylight_kerb1",
-      "triangles": 108,
-      "location": [
-        0.0,
-        0.0,
-        0.0
-      ],
-      "rotation_euler": [
-        0.0,
-        0.0,
-        0.0
-      ],
-      "scale": [
-        1.0,
-        1.0,
-        1.0
-      ]
-    },
-    {
-      "name": "store_fill",
-      "triangles": 12,
-      "location": [
-        0.0,
-        0.0,
-        0.0
-      ],
-      "rotation_euler": [
-        0.0,
-        0.0,
-        0.0
-      ],
-      "scale": [
-        1.0,
-        1.0,
-        1.0
-      ]
-    },
-    {
-      "name": "store_frame",
-      "triangles": 28,
-      "location": [
-        0.0,
-        0.0,
-        0.0
-      ],
-      "rotation_euler": [
-        0.0,
-        0.0,
-        0.0
-      ],
-      "scale": [
-        1.0,
-        1.0,
-        1.0
-      ]
-    },
-    {
-      "name": "upper_fill",
-      "triangles": 12,
-      "location": [
-        0.0,
-        0.0,
-        0.0
-      ],
-      "rotation_euler": [
-        0.0,
-        0.0,
-        0.0
-      ],
-      "scale": [
-        1.0,
-        1.0,
-        1.0
-      ]
-    },
-    {
-      "name": "upper_frame",
-      "triangles": 28,
+      "name": "grp_Toy_trim",
+      "triangles": 112,
       "location": [
         0.0,
         0.0,
