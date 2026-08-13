@@ -608,6 +608,34 @@ export const LANDMARKS = [
     camera: { distance: 300, yaw: 35, pitch: 22 },
   },
   {
+    // The Kelsey Civic Center, 2025 (WRNS Studio + Santos Prescott). An
+    // eight-storey L that wraps the 171 Grove corner lot rather than holding
+    // the corner itself.
+    //
+    // 14 m sits in the 12-17 m band that drops exactly the three DataSF
+    // footprints on and beside the site and nothing else. Measured against
+    // pipeline/data/buildings_datasf.geojson with the real rule (centroid OR
+    // any ring vertex inside the radius), nearest vertex to this anchor:
+    //   SF0811019  6.14 m  demolished 2023 for this building
+    //   SF0811020  6.14 m  171 Grove, STILL STANDING - unavoidable collateral
+    //   SF0811018 11.67 m  demolished 2023 for this building
+    //   SF0811001 17.49 m  101 Grove, already excluded by its own entry above
+    //   next      30.11 m  200-214 Van Ness
+    // The two demolished footprints and the standing corner building share a
+    // party-wall vertex at exactly the same 6.14 m, so NO radius removes the
+    // stale pair without also removing 171 Grove. Shipping the drop is the
+    // lesser error: the alternative is leaving two demolished buildings
+    // standing inside a 2025 landmark. See docs/asset-plans/234-van-ness.md
+    // 2.12. A follow-up 171 Grove asset would close the gap.
+    id: '234VanNess',
+    name: 'The Kelsey Civic Center (234 Van Ness Avenue)',
+    lon: -122.4193071,
+    lat: 37.7780541,
+    height: 30.12,
+    exclude: 14,
+    camera: { distance: 320, yaw: 225, pitch: 30 },
+  },
+  {
     // Letterman Hospital ward, 1930s, now part of the Thoreau Center. DataSF
     // stores the WHOLE campus — twelve surviving buildings — as ONE 159x147 m
     // comb-shaped footprint, so there is no radius that clears 1008 alone: its

@@ -875,5 +875,24 @@
     ],
     "tris": 10168,
     "loadRadius": 2500
+  },
+  {
+    "id": "234-van-ness",
+    "file": "234-van-ness.glb",
+    "anchor": [
+      -122.4193071,
+      37.7780541
+    ],
+    "targetHeightM": 30.12,
+    "cat": 2,
+    "name": "The Kelsey Civic Center (234 Van Ness Avenue)",
+    "estimated": false,
+    "dims": [
+      56.278,
+      46.4274,
+      30.12
+    ],
+    "tris": 11656,
+    "loadRadius": 2500
   }
 ]
