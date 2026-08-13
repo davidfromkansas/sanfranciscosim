@@ -86,8 +86,9 @@ route, and the park plans depend on it (§E8 of the parks README).
 | [181 South Park](./181-south-park.md) | `181-south-park` | 16.5 m (LiDAR-derived) | new landmark |
 | [San Francisco Main Public Library](./sf-main-library.md) | `sf-main-library` | 28.98 m | new landmark |
 | [234 Van Ness Avenue (The Kelsey Civic Center)](./234-van-ness.md) | `234-van-ness` | 30.12 m | new landmark |
+| [500 Third Street](./500-third.md) | `500-third` | 26.5 m | new landmark |
 
-## Shared contract (all 49)
+## Shared contract (all 50)
 
 - Style: `docs/styles/miniature-toy.md` (authoritative for artistic decisions)
 - Technical contract: `.agents/skills/sf-asset-check/SKILL.md` (authoritative for the GLB)
