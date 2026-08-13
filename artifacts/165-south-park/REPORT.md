@@ -199,3 +199,57 @@ bulkhead — were named explicitly in the presentation and neither was overruled
 The second clause also waives the remaining stage gates for this session, so stages 4 and
 5 proceed without further approval. Stage 5 still ends at a local commit and a ship
 question, per ADDRESS-TO-ASSET: that is a push/deploy decision, not a pipeline gate.
+
+## Stage 5 — integrate (Case B, BATCH mode)
+
+Local QA, dev server on :5341, `pipeline/data` shared by symlink from another worktree
+(raw source data; `pipeline/out` regenerated from THIS branch's code, never seeded across
+branches). Symlink removed before commit — `pipeline/data` is not gitignored.
+
+| Check | Result | Evidence |
+|---|---|---|
+| Re-validation before app copy | **PASS** | all 16 contract checks, fresh-scene re-import of the shipped (optimized) GLB |
+| Manifest entry | **PASS** | 36 entries, clean append, valid JSON |
+| id mapping | **PASS** | `camelId('165-south-park')` → `165SouthPark`, matches the registry entry |
+| Registry + re-bake | **PASS** | full chain `terrain`…`context` + `muni-shapes` |
+| Audit 1.6 | **PASS** | "no procedural footprint inside a bespoke landmark exclusion zone — 42 landmarks clear" |
+| `verify-rebake.mjs` | **PASS** | **584 of 585 cells unchanged**; cell `23_13` 233 → 232 buildings; nearest surviving footprint **1.5 m vs 1.3 m radius** |
+| Single building, no twin | **PASS** | picker rays from crest to base all return `landmark:165SouthPark`; net −1 footprint in the cell, so the Overture gap-fill did **not** re-add |
+| Merge line | **PASS** | `sf-assets: 165-south-park merged 9 objects / 8 materials -> batched (1017 tris body); uniform x1.0000 at 3795, -1200` |
+| Scale factor | **PASS** | **exactly 1.0000** — authored crest and `targetHeightM` agree |
+| Placement | **PASS** | world translation (3794.69, 8.006, −1200.45) vs projected anchor (3794.9, −1200.5); matrix scale 1/1/1 |
+| Terrain seating | **PASS** | base y **8.006 m** against DataSF ground median 7.78 m — 0.23 m, no float, no sink |
+| Orientation | **PASS** | authored in true-world orientation, no `yawDeg` override; facade 349.73° |
+| Search / pick / card | **PASS** | `landmark:165SouthPark` returned for "165" and "South Park"; pick returns title, height 9, and the registry camera preset |
+| Night glow | **PASS** | restrained as designed — two upper windows and the passage lamp; nothing else lights |
+| Draw calls | **PASS** | **83** at street level in South Park (budget < 300) |
+| Fallback drill | **PASS** | GLB renamed → app boots, **exactly one** warning `sf-assets: 165-south-park failed to load`, other 29 landmarks still merged, site degrades to empty ground (expected for Case B). File restored. |
+| `npm run lint` | **PASS** | clean |
+| `npm run build` | **PASS** | built in 3.6 s; 3315 tiles 56.3 → 31.6 MB |
+
+**Batch mode.** The bake was run in full and used for the QA above, then discarded
+(`git checkout -- app/public/tiles api/_data`) and only source committed: the GLB, its
+manifest entry, its `pipeline/lib/landmarks.mjs` entry, the plan and `artifacts/`.
+Sanity check passes — `git diff --name-only origin/main` lists **nothing** under
+`app/public/tiles/` or `api/_data/`. The city is baked once for the whole batch by
+`docs/asset-pipeline/BATCH-INTEGRATE.md`.
+
+**The plan's open Overture risk (2.13) is closed with real data.** Measured from the
+registry anchor against `pipeline/data/overture_buildings.geojsonseq` and
+`buildings_datasf.geojson` — the two files the bake actually reads:
+
+| polygon | Overture | DataSF |
+|---|---|---|
+| 165-167 (this) | **1.08 m** | **0.00 m** |
+| 159 South Park | 2.33 m | **1.49 m** |
+| 171 South Park | 4.15 m | 3.34 m |
+
+`exclude: 1.3` is the only value that drops both encodings of this building while sparing
+159, and the re-bake confirmed it empirically: net −1 footprint in the cell.
+
+Three audit checks fail (1.2b p95 height band, 1.3c Telegraph Hill DEM, 1.7b one offshore
+tree). All three **fail on `main` already** and are unrelated to this change.
+
+## Ship decision
+
+Pending. Local integration verified; nothing pushed, no PR, no deploy.
