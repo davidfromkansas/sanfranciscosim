@@ -9,7 +9,7 @@ so every image depicts exactly the geometry that ships. The four elevations
 share one camera rig (same orthographic scale, framing, lighting, exposure and
 projection) and differ only in azimuth; directions are true compass directions
 (north = Blender +Y), which is how the asset is authored - the plaza's long axis
-runs 189.06 deg toward Grove Street.
+runs 170.94 deg toward Grove Street.
 
 Two subject-specific views beyond the standard set:
 
@@ -285,8 +285,8 @@ def main():
     r2 = span * 1.30
     axis.location = Vector(
         (
-            center.x + r2 * math.cos(apitch) * math.sin(math.radians(99.06)),
-            center.y + r2 * math.cos(apitch) * math.cos(math.radians(99.06)),
+            center.x + r2 * math.cos(apitch) * math.sin(math.radians(80.94)),
+            center.y + r2 * math.cos(apitch) * math.cos(math.radians(80.94)),
             mn.z + r2 * math.sin(apitch),
         )
     )

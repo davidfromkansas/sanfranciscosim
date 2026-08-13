@@ -5,21 +5,21 @@
   "reimported_final_glb": true,
   "object_count": 19,
   "mesh_object_count": 19,
-  "triangle_count": 17703,
+  "triangle_count": 17728,
   "triangle_budget": 18000,
   "dimensions_m": [
-    145.6123,
-    192.6242,
+    146.5287,
+    192.3451,
     30.48
   ],
   "bbox_min_m": [
-    -72.8061,
-    -96.3121,
+    -73.2643,
+    -96.1726,
     0.0
   ],
   "bbox_max_m": [
-    72.8061,
-    96.3121,
+    73.2643,
+    96.1726,
     30.48
   ],
   "min_z_m": 0.0,
@@ -195,9 +195,9 @@
   "negative_scales": false,
   "degenerate_triangle_count": 0,
   "invalid_or_nonunit_loop_normal_count": 0,
-  "normal_ray_cast_first_hits": 27670,
-  "normal_ray_cast_flipped_visible_faces": 0,
-  "normal_ray_cast_flipped_fraction": 0.0,
+  "normal_ray_cast_first_hits": 27940,
+  "normal_ray_cast_flipped_visible_faces": 1,
+  "normal_ray_cast_flipped_fraction": 3.6e-05,
   "normal_orientation_status": "PASS",
   "normal_orientation_method": "All source meshes run bmesh.ops.recalc_face_normals before export; reimported loop normals must be finite/unit; per-object signed volume is authoritative for this union of solids; 31,500 deterministic visibility rays test the first visible face from nine interior targets, with a 0.15% residual allowed at coincident faces.",
   "unexpected_geometry_or_objects": [],
@@ -209,15 +209,15 @@
     "Toy_teal_Glow"
   ],
   "anchor_lonlat": [
-    -122.4176184,
-    37.7794818
+    -122.41761,
+    37.7794895
   ],
-  "front_heading_deg_true": 189.06,
+  "front_heading_deg_true": 170.94,
   "target_height_m": 30.48,
   "height_datum": "US flagpole finial (OSM node 7797674733, height=30.48)",
   "height_datum_vertex_object": "flagpoles",
   "tree_count": 190,
-  "tree_positions_max_error_m": 0.0206,
+  "tree_positions_max_error_m": 0.0221,
   "flagpole_counts": {
     "expected_historic": 18,
     "expected_pride": 16,
@@ -248,7 +248,7 @@
     },
     {
       "name": "gravel_court",
-      "triangles": 52,
+      "triangles": 56,
       "location": [
         0.0,
         0.0,
@@ -381,7 +381,7 @@
     },
     {
       "name": "grp_Toy_stone",
-      "triangles": 923,
+      "triangles": 944,
       "location": [
         0.0,
         0.0,

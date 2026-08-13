@@ -1,7 +1,7 @@
 {
  "input": {
   "tris": 17820,
-  "verts": 33336,
+  "verts": 33335,
   "objects": 94,
   "primitives": 100,
   "materials": [
@@ -26,13 +26,13 @@
    "Toy_white"
   ],
   "bbox_dims": [
-   145.61227,
-   192.62416,
+   146.52869,
+   192.34511,
    30.48
   ],
   "bbox_min": [
-   -72.80614,
-   -96.31208,
+   -73.26434,
+   -96.17255,
    0.0
   ],
   "center_xy": [
@@ -41,8 +41,8 @@
   ]
  },
  "output": {
-  "tris": 17703,
-  "verts": 32312,
+  "tris": 17728,
+  "verts": 32376,
   "objects": 19,
   "primitives": 25,
   "materials": [
@@ -67,13 +67,13 @@
    "Toy_white"
   ],
   "bbox_dims": [
-   145.61227,
-   192.62416,
+   146.52869,
+   192.34511,
    30.48
   ],
   "bbox_min": [
-   -72.80614,
-   -96.31208,
+   -73.26434,
+   -96.17255,
    0.0
   ],
   "center_xy": [
@@ -82,30 +82,30 @@
   ]
  },
  "output_signed_volumes": {
-  "flagpoles": 211.814979,
-  "gravel_court": 95.502644,
-  "grp_Toy_cream": 370.895165,
-  "grp_Toy_cream_Glow": 91.891947,
-  "grp_Toy_ink": 99.919012,
-  "grp_Toy_mint": 848.433431,
-  "grp_Toy_roofd": 70.84859,
-  "grp_Toy_steel": 10.024475,
-  "grp_Toy_stone": 6196.702551,
-  "grp_Toy_white": 324.42493,
-  "kiosk_cafe": 122.617554,
-  "kiosk_garage": 270.837223,
-  "people": 16.484167,
-  "play_glow_playground_n": 1.928731,
-  "play_glow_playground_s": 1.900211,
-  "play_pad_playground_n": 100.073677,
-  "play_pad_playground_s": 98.431982,
-  "trees": 28856.445587,
-  "us_pole_glow": 0.477979
+  "flagpoles": 211.817008,
+  "gravel_court": 95.50266,
+  "grp_Toy_cream": 370.895343,
+  "grp_Toy_cream_Glow": 91.892115,
+  "grp_Toy_ink": 99.918677,
+  "grp_Toy_mint": 848.433079,
+  "grp_Toy_roofd": 70.84883,
+  "grp_Toy_steel": 10.022912,
+  "grp_Toy_stone": 6198.039319,
+  "grp_Toy_white": 324.42422,
+  "kiosk_cafe": 122.617783,
+  "kiosk_garage": 270.837718,
+  "people": 16.485001,
+  "play_glow_playground_n": 1.928654,
+  "play_glow_playground_s": 1.900083,
+  "play_pad_playground_n": 100.073627,
+  "play_pad_playground_s": 98.431979,
+  "trees": 28856.443543,
+  "us_pole_glow": 0.476669
  },
  "inverted_solids": [],
  "ray_test_output": {
   "rays": 22500,
-  "hits": 13096,
+  "hits": 13012,
   "flipped": 0,
   "flipped_fraction": 0.0
  },
