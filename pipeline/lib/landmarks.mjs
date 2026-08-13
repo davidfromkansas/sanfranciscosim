@@ -968,6 +968,42 @@ export const LANDMARKS = [
     camera: { distance: 240, yaw: 0, pitch: 26 },
   },
   {
+    // 590 Third Street — the two-storey 1905-ish commercial corner block on the
+    // WEST corner of 3rd and Brannan, directly across 3rd from 599Third. Between
+    // them the intersection reads "shops below, homes above".
+    //
+    // exclude: 7 is MEASURED against the bake's own input (DataSF ynuv-fyni
+    // footprints reprojected with the app's tangent projection), not derived
+    // from OSM. Around this anchor:
+    //   this building's ring centroid          0.88 m
+    //   this building's nearest vertex        11.24 m
+    //   nearest NEIGHBOUR vertex (SF3776008)  13.82 m  <- must survive
+    //   second neighbour vertex (SF3776011)   15.08 m
+    // excluded() drops a ring on centroid OR any vertex, so the window that
+    // drops exactly this building is 0.88 < r <= 13.82. The upper end is thin
+    // because SF3776008 is the 1,906 m² brick warehouse sharing this building's
+    // NW party wall — and it is TALLER than the asset (LiDAR median 11.05 m vs
+    // 9.5 m), so swallowing it would leave a very visible hole. 7 sits clear of
+    // both ends and in line with the neighbours already integrated (550Third 8,
+    // 551Third 8, 380Brannan 9, 599Third 10).
+    id: '590Third',
+    name: '590 Third Street',
+    lon: -122.3946749,
+    lat: 37.7800837,
+    height: 9.5,
+    exclude: 7,
+    // `camera` is mandatory even without a number `key` — main.js maps EVERY
+    // manifest landmark into `presets` and camera.js reads `preset.yaw`
+    // unconditionally, so omitting it boots to "Cannot read properties of
+    // undefined (reading 'yaw')". See the note on 599Third.
+    // yaw 90 stands the camera due east (app yaw = 180 − true bearing), the
+    // bisector of the 3rd Street front (normal 45.2°) and the Brannan front
+    // (135.1°) — the one angle where both designed elevations and the raised
+    // corner parapet over them read at once. 180 m suits a 9.5 m block
+    // (cf. 550Third 190 at 11 m, 380Brannan 220 at 12.6 m).
+    camera: { distance: 180, yaw: 90, pitch: 30 },
+  },
+  {
     // A 5-acre PLAZA, not a building, and the exclusion has to do two different
     // jobs at two different radii — which is why this is the first entry to
     // carry `clearTreesRadius`.
