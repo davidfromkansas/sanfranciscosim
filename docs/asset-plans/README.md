@@ -73,8 +73,9 @@ route, and the park plans depend on it (§E8 of the parks README).
 | [Louise M. Davies Symphony Hall](./davies-symphony-hall.md) | `davies-symphony-hall` | 35 m | new landmark |
 | [101 Grove Street (Public Health Building)](./101-grove.md) | `101-grove` | 21.4 m | new landmark |
 | [Asian Art Museum (Old Main Library)](./asian-art-museum.md) | `asian-art-museum` | 28.1 m | new landmark |
+| [San Francisco Main Public Library](./sf-main-library.md) | `sf-main-library` | 28.98 m | new landmark |
 
-## Shared contract (all 36)
+## Shared contract (all 37)
 
 - Style: `docs/styles/miniature-toy.md` (authoritative for artistic decisions)
 - Technical contract: `.agents/skills/sf-asset-check/SKILL.md` (authoritative for the GLB)
@@ -127,7 +128,9 @@ the LiDAR *median* height over a hipped roof, which by construction falls betwee
 the two — the crest is 9.55 m. The Asian Art Museum is a fourth: its OSM
 `height=46` is not a height at all but the NAVD88 roof *elevation* (152.93 ft),
 1.6x the real 28.1 m crest — see that plan's 2.3 before trusting any `height` tag
-that could plausibly be a sea-level datum.
+that could plausibly be a sea-level datum. The new Main Library across Fulton Street
+carries the *same* `height=46` for the same reason and is really 28.98 m, so that
+tag has now caught two adjacent Civic Center blocks.
 
 The executing agent is expected to re-verify height, anchor, footprint and
 orientation before modelling — the dossier is a head start, not a citation.
