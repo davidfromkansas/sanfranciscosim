@@ -9,19 +9,24 @@ overrides `docs/asset-plans/asian-art-museum.md` wherever the two disagree.
 
 ## Numbers
 
-| | Pre-optimize (this stage) |
-|---|---|
-| Objects | 163 |
-| Triangles | **13,176** (budget 24,000) |
-| Dimensions | 115.31 × 65.18 × **28.10** m |
-| Bbox min / max Z | 0.000 / 28.100 |
-| XY centre offset | (0.000, 0.000) m |
-| Loader scale (`targetHeightM / measuredHeight`) | **1.000** |
-| Materials | 11, all `Toy_*`, all flat, 0 textures, 0 transparency |
-| Glow groups | 2 — `Toy_white_Glow`, `Toy_gold_Glow` |
-| File size | 718,620 B raw / 120,507 B gzip |
-| Normals | PASS — 163/163 closed solids with positive signed volume; ray residual **0.0** |
-| Cameras / lights / animation / armatures | 0 / 0 / 0 / 0 |
+| | Authored (stage 2) | **Shipped (after stage 4)** |
+|---|---|---|
+| Objects / draw submeshes | 163 | **11** |
+| Triangles | 13,176 | **13,176** (budget 24,000) |
+| Vertices | 25,686 | **6,910** |
+| Dimensions | 115.31 × 65.18 × 28.10 m | **115.31 × 65.18 × 28.10 m** |
+| Bbox min / max Z | 0.000 / 28.100 | **0.000 / 28.100** |
+| XY centre offset | (0.000, 0.000) m | **(0.000, 0.000) m** |
+| Loader scale (`targetHeightM / measuredHeight`) | 1.000 | **1.000** |
+| Materials | 11, all `Toy_*`, flat, 0 textures, 0 transparency | **identical set** |
+| Glow groups | 2 — `Toy_white_Glow`, `Toy_gold_Glow` | **2, preserved separately** |
+| File size | 718,620 B raw | **323,984 B raw** (−54.9%) |
+| Normals | positive signed volume, ray residual 0.0 | **ray residual 0.0** |
+| Cameras / lights / animation / armatures | 0 / 0 / 0 / 0 | 0 / 0 / 0 / 0 |
+
+The shipped file is the stage-4 output (`optimize/REPORT.md`: all gates G1–G6, G8
+PASS; the authored original is archived at `optimize/input/`). Geometry is
+unchanged — the whole saving is node and vertex overhead, not detail.
 
 `validation.json` holds the full machine-readable report from a fresh-scene
 re-import of the exported GLB (never the authoring scene). Overall: **PASS**.
@@ -112,6 +117,8 @@ Approved by David, 12 August 2026, verbatim:
   "loadRadius": 2500
 }
 ```
+
+Measured from the **shipped** file (`validation.json`, fresh-scene re-import).
 
 `cat` 16 = Museum (`CATEGORY_LABELS` in `app/src/context.js`). `loadRadius` is the
 default rule `max(2500, 28.1 × 30)` = 2500; this is a low, wide building with no
