@@ -1004,6 +1004,55 @@ export const LANDMARKS = [
     camera: { distance: 180, yaw: 90, pitch: 30 },
   },
   {
+    // 592 Third Street — the 1905 two-storey loft on the WEST corner of 3rd and
+    // Brannan, directly across 3rd from 599Third. Kinoko Real Estate, Cafe
+    // Buenos Aires and four Brannan-side tenants under one black shopfront band.
+    //
+    // The exclusion here is doing more than tidying: Overture gives this
+    // footprint a top of 16.7 m over a base of 6.5 m, so the baked procedural
+    // block is 10.2 m tall against the asset's 8.2 m. Without the exclusion the
+    // GLB is not merely intersected, it is entirely INSIDE a taller block and
+    // invisible. Anyone judging this landmark on an unbaked tree sees nothing
+    // wrong with a building that is not there.
+    //
+    // exclude: 6 is MEASURED two ways, both against rings excluded() actually
+    // consumes. Against the committed bake (app/public/tiles/buildings/23_13.bin):
+    // this footprint's ring centroid is 1.64 m from the anchor and the nearest
+    // NEIGHBOUR vertex is 12.87 m (SF3776008, the 11 m building on the NW party
+    // wall). Against the raw DataSF LiDAR polygons: 0.90 m and 12.20 m. Since
+    // excluded() drops a ring on centroid OR any vertex, the window that drops
+    // exactly this building is 1.7 < r < 12.2; 6 sits in the middle with better
+    // than 5 m of margin at both ends. Note this building's OWN nearest vertex
+    // is 10.2 m out, so the exclusion fires on the centroid test, not the vertex
+    // test — do not shrink r below 2 thinking the vertices will catch it.
+    //
+    // targetHeight is the parapet crest, LiDAR-derived rather than published:
+    // the roof-deck mode is 7.82 m and the parapet adds ~0.38 m. The LiDAR
+    // hgt_max of 11.65 m on this footprint is NOT the crest — it is the two
+    // street trees overhanging the 3rd Street parapet, a 6-sigma outlier on a
+    // roof whose height std is 0.64 m. See docs/asset-plans/592-third.md 2.15.
+    id: '592Third',
+    name: '592 Third Street',
+    lon: -122.3946805,
+    lat: 37.780091,
+    height: 8.2,
+    exclude: 6,
+    // `camera` is mandatory even without a number `key` — main.js maps every
+    // manifest landmark into `presets` and camera.js reads `preset.yaw`
+    // unconditionally (see the note on 542PresidioBlvd and 599Third).
+    // App yaw = 180 − true bearing. The bisector of the 3rd Street front
+    // (normal 45.1°) and the Brannan front (135.2°) is 90.2°, so the camera
+    // wants app yaw 180 − 90.2 = 90: due east of the building, the one angle
+    // where both designed elevations and the corner between them read at once
+    // (the same construction 599Third used to arrive at its yaw 0).
+    // Verified in the local QA, not derived on paper: yaw 315 was tried first
+    // and puts the camera to the SOUTH-WEST, staring at the two blank party
+    // walls. On a corner building the yaw is worth rendering before believing.
+    // 200 m suits an 8.2 m building (cf. 370Brannan 150 at 7.63 m, 550Third
+    // 190 at 11 m).
+    camera: { distance: 200, yaw: 90, pitch: 26 },
+  },
+  {
     // A 5-acre PLAZA, not a building, and the exclusion has to do two different
     // jobs at two different radii — which is why this is the first entry to
     // carry `clearTreesRadius`.

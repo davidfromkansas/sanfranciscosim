@@ -98,6 +98,7 @@ route, and the park plans depend on it (§E8 of the parks README).
 | [Earl Warren Building](./earl-warren-building.md) | `earl-warren-building` | 27.0 m | new landmark |
 | [574 Third Street (566–586 Third)](./574-third.md) | `574-third` | 15.4 m | new landmark |
 | [590 Third Street](./590-third.md) | `590-third` | 9.5 m (estimated) | new landmark |
+| [592 Third Street](./592-third.md) | `592-third` | 8.2 m (estimated) | new landmark |
 
 ## Shared contract (all 54)
 
@@ -223,6 +224,13 @@ penthouse.
 Overture — the pipeline's own bake input — carries 12.4 m, because both the LiDAR max
 (13.0 m) and the LiDAR min (2.5 m) on that footprint are street-tree canopy, not
 building. A height read off a raster statistic is only as good as the raster's edges.
+592 Third Street is the same trap at a larger ratio: its LiDAR `hgt_max` of 11.65 m is
+3.8 m above a roof-deck mode of 7.82 m on a footprint whose height standard deviation is
+0.64 m — a 6σ outlier that is simply the two street trees overhanging the 3rd Street
+parapet, with the 2.40 m `hgt_min` as the matching artifact at the other end. Where 370
+Brannan could legitimately take `hgt_max` as its crest (0.6 m above the median), doing
+the same here would build a three-storey building. Check the max against the standard
+deviation before believing it.
 
 The Earl Warren Building is another variety again: its OSM `height` is fine, but the
 LiDAR record's `hgt_maxcm` (46.39 m) sits 19 m above its own roof plane, because the

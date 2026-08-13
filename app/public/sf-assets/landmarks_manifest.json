@@ -1008,5 +1008,24 @@
     ],
     "tris": 5312,
     "loadRadius": 2500
+  },
+  {
+    "id": "592-third",
+    "file": "592-third.glb",
+    "anchor": [
+      -122.3946805,
+      37.780091
+    ],
+    "targetHeightM": 8.2,
+    "cat": 3,
+    "name": "592 Third Street",
+    "estimated": true,
+    "dims": [
+      31.2145,
+      32.2102,
+      8.2
+    ],
+    "tris": 3352,
+    "loadRadius": 2500
   }
 ]
