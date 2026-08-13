@@ -1,0 +1,614 @@
+{
+ "file_bytes": {
+  "raw": 247776,
+  "gzip9": 57678
+ },
+ "objects": 65,
+ "total_tris": 4016,
+ "total_verts": 7810,
+ "primitives_est": 66,
+ "top20": [
+  {
+   "name": "coping",
+   "tris": 720,
+   "verts": 1280,
+   "dims": [
+    34.453,
+    25.95,
+    0.15
+   ],
+   "materials": [
+    "Toy_trim"
+   ]
+  },
+  {
+   "name": "parapet",
+   "tris": 720,
+   "verts": 1268,
+   "dims": [
+    34.193,
+    25.69,
+    0.75
+   ],
+   "materials": [
+    "Toy_rust"
+   ]
+  },
+  {
+   "name": "body",
+   "tris": 276,
+   "verts": 532,
+   "dims": [
+    34.193,
+    25.69,
+    7.0
+   ],
+   "materials": [
+    "Toy_roofd",
+    "Toy_rust"
+   ]
+  },
+  {
+   "name": "vent_cowl",
+   "tris": 276,
+   "verts": 540,
+   "dims": [
+    0.757,
+    0.761,
+    0.55
+   ],
+   "materials": [
+    "Toy_steel"
+   ]
+  },
+  {
+   "name": "fr_canopy",
+   "tris": 108,
+   "verts": 216,
+   "dims": [
+    2.605,
+    2.589,
+    0.22
+   ],
+   "materials": [
+    "Toy_trim"
+   ]
+  },
+  {
+   "name": "hvac_a",
+   "tris": 108,
+   "verts": 216,
+   "dims": [
+    2.163,
+    2.163,
+    0.8
+   ],
+   "materials": [
+    "Toy_steel"
+   ]
+  },
+  {
+   "name": "hvac_b",
+   "tris": 108,
+   "verts": 216,
+   "dims": [
+    1.456,
+    1.456,
+    0.6
+   ],
+   "materials": [
+    "Toy_steel"
+   ]
+  },
+  {
+   "name": "monitor_base",
+   "tris": 108,
+   "verts": 216,
+   "dims": [
+    11.131,
+    11.134,
+    0.16
+   ],
+   "materials": [
+    "Toy_trim"
+   ]
+  },
+  {
+   "name": "monitor_body",
+   "tris": 108,
+   "verts": 216,
+   "dims": [
+    10.647,
+    10.65,
+    1.18
+   ],
+   "materials": [
+    "Toy_glassl"
+   ]
+  },
+  {
+   "name": "monitor_cap",
+   "tris": 108,
+   "verts": 216,
+   "dims": [
+    11.131,
+    11.134,
+    0.16
+   ],
+   "materials": [
+    "Toy_roofd"
+   ]
+  },
+  {
+   "name": "roof_hatch",
+   "tris": 108,
+   "verts": 216,
+   "dims": [
+    1.598,
+    1.598,
+    0.5
+   ],
+   "materials": [
+    "Toy_roofd"
+   ]
+  },
+  {
+   "name": "fr_freight_frame",
+   "tris": 52,
+   "verts": 112,
+   "dims": [
+    2.85,
+    2.807,
+    3.447
+   ],
+   "materials": [
+    "Toy_trim"
+   ]
+  },
+  {
+   "name": "fr_gw0_frame",
+   "tris": 52,
+   "verts": 112,
+   "dims": [
+    1.211,
+    1.193,
+    2.095
+   ],
+   "materials": [
+    "Toy_trim"
+   ]
+  },
+  {
+   "name": "fr_gw1_frame",
+   "tris": 52,
+   "verts": 112,
+   "dims": [
+    1.211,
+    1.193,
+    2.095
+   ],
+   "materials": [
+    "Toy_trim"
+   ]
+  },
+  {
+   "name": "re_door_frame",
+   "tris": 52,
+   "verts": 112,
+   "dims": [
+    2.103,
+    2.14,
+    3.247
+   ],
+   "materials": [
+    "Toy_trim"
+   ]
+  },
+  {
+   "name": "sw_gw0_frame",
+   "tris": 52,
+   "verts": 112,
+   "dims": [
+    1.131,
+    1.132,
+    2.095
+   ],
+   "materials": [
+    "Toy_trim"
+   ]
+  },
+  {
+   "name": "wg_gw0_frame",
+   "tris": 52,
+   "verts": 112,
+   "dims": [
+    1.131,
+    1.132,
+    2.095
+   ],
+   "materials": [
+    "Toy_trim"
+   ]
+  },
+  {
+   "name": "wg_gw1_frame",
+   "tris": 52,
+   "verts": 112,
+   "dims": [
+    1.131,
+    1.132,
+    2.095
+   ],
+   "materials": [
+    "Toy_trim"
+   ]
+  },
+  {
+   "name": "bw_up0_frame",
+   "tris": 28,
+   "verts": 64,
+   "dims": [
+    1.14,
+    1.123,
+    2.0
+   ],
+   "materials": [
+    "Toy_trim"
+   ]
+  },
+  {
+   "name": "bw_up1_frame",
+   "tris": 28,
+   "verts": 64,
+   "dims": [
+    1.14,
+    1.123,
+    2.0
+   ],
+   "materials": [
+    "Toy_trim"
+   ]
+  }
+ ],
+ "vertex_attrs": [
+  "NORMAL"
+ ],
+ "materials": [
+  {
+   "name": "Toy_glass",
+   "glow": false,
+   "user_objects": 20
+  },
+  {
+   "name": "Toy_glass_Glow",
+   "glow": true,
+   "user_objects": 4
+  },
+  {
+   "name": "Toy_glassl",
+   "glow": false,
+   "user_objects": 1
+  },
+  {
+   "name": "Toy_glassl_Glow",
+   "glow": true,
+   "user_objects": 4
+  },
+  {
+   "name": "Toy_ink",
+   "glow": false,
+   "user_objects": 1
+  },
+  {
+   "name": "Toy_roofd",
+   "glow": false,
+   "user_objects": 5
+  },
+  {
+   "name": "Toy_rust",
+   "glow": false,
+   "user_objects": 2
+  },
+  {
+   "name": "Toy_steel",
+   "glow": false,
+   "user_objects": 3
+  },
+  {
+   "name": "Toy_trim",
+   "glow": false,
+   "user_objects": 26
+  }
+ ],
+ "textures": [],
+ "bbox": {
+  "dims": [
+   34.4526,
+   25.9498,
+   8.5
+  ],
+  "min": [
+   -16.2586,
+   -12.3078,
+   0.0
+  ],
+  "origin_offset_xy": [
+   0.9677,
+   0.6671
+  ],
+  "base_z": 0.0
+ },
+ "duplicate_mesh_groups": [
+  {
+   "signature": {
+    "verts": 216,
+    "tris": 108,
+    "dims": [
+     11.1308,
+     11.1343,
+     0.16
+    ]
+   },
+   "objects": [
+    "monitor_base",
+    "monitor_cap"
+   ]
+  },
+  {
+   "signature": {
+    "verts": 64,
+    "tris": 28,
+    "dims": [
+     1.4251,
+     1.4039,
+     2.0
+    ]
+   },
+   "objects": [
+    "fr_up0_frame",
+    "fr_up1_frame",
+    "fr_up2_frame",
+    "fr_up3_frame",
+    "fr_up4_frame"
+   ]
+  },
+  {
+   "signature": {
+    "verts": 64,
+    "tris": 28,
+    "dims": [
+     1.2019,
+     1.2023,
+     2.0
+    ]
+   },
+   "objects": [
+    "wg_up0_frame",
+    "wg_up1_frame",
+    "wg_up2_frame",
+    "wg_up3_frame"
+   ]
+  },
+  {
+   "signature": {
+    "verts": 112,
+    "tris": 52,
+    "dims": [
+     1.2114,
+     1.1934,
+     2.0949
+    ]
+   },
+   "objects": [
+    "fr_gw0_frame",
+    "fr_gw1_frame"
+   ]
+  },
+  {
+   "signature": {
+    "verts": 112,
+    "tris": 52,
+    "dims": [
+     1.1312,
+     1.1316,
+     2.0946
+    ]
+   },
+   "objects": [
+    "wg_gw0_frame",
+    "wg_gw1_frame"
+   ]
+  },
+  {
+   "signature": {
+    "verts": 64,
+    "tris": 28,
+    "dims": [
+     1.2013,
+     1.2029,
+     2.0
+    ]
+   },
+   "objects": [
+    "sw_up0_frame",
+    "sw_up1_frame",
+    "sw_up2_frame"
+   ]
+  },
+  {
+   "signature": {
+    "verts": 24,
+    "tris": 12,
+    "dims": [
+     1.2598,
+     1.2433,
+     1.64
+    ]
+   },
+   "objects": [
+    "fr_up0_fill",
+    "fr_up1_fill",
+    "fr_up2_fill",
+    "fr_up3_fill",
+    "fr_up4_fill"
+   ]
+  },
+  {
+   "signature": {
+    "verts": 64,
+    "tris": 28,
+    "dims": [
+     1.14,
+     1.1233,
+     2.0
+    ]
+   },
+   "objects": [
+    "bw_up0_frame",
+    "bw_up1_frame"
+   ]
+  },
+  {
+   "signature": {
+    "verts": 42,
+    "tris": 24,
+    "dims": [
+     1.0175,
+     1.0047,
+     1.82
+    ]
+   },
+   "objects": [
+    "fr_gw0_fill",
+    "fr_gw1_fill"
+   ]
+  },
+  {
+   "signature": {
+    "verts": 24,
+    "tris": 12,
+    "dims": [
+     1.0182,
+     1.0041,
+     1.36
+    ]
+   },
+   "objects": [
+    "fr_up0_glow",
+    "fr_up1_glow",
+    "fr_up3_glow",
+    "fr_up4_glow"
+   ]
+  },
+  {
+   "signature": {
+    "verts": 42,
+    "tris": 24,
+    "dims": [
+     0.9403,
+     0.9406,
+     1.82
+    ]
+   },
+   "objects": [
+    "wg_gw0_fill",
+    "wg_gw1_fill"
+   ]
+  },
+  {
+   "signature": {
+    "verts": 24,
+    "tris": 12,
+    "dims": [
+     1.0393,
+     1.0396,
+     1.64
+    ]
+   },
+   "objects": [
+    "wg_up0_fill",
+    "wg_up1_fill",
+    "wg_up2_fill",
+    "wg_up3_fill"
+   ]
+  },
+  {
+   "signature": {
+    "verts": 24,
+    "tris": 12,
+    "dims": [
+     1.0389,
+     1.04,
+     1.64
+    ]
+   },
+   "objects": [
+    "sw_up0_fill",
+    "sw_up1_fill",
+    "sw_up2_fill"
+   ]
+  },
+  {
+   "signature": {
+    "verts": 24,
+    "tris": 12,
+    "dims": [
+     0.9748,
+     0.9627,
+     1.64
+    ]
+   },
+   "objects": [
+    "bw_up0_fill",
+    "bw_up1_fill"
+   ]
+  },
+  {
+   "signature": {
+    "verts": 24,
+    "tris": 12,
+    "dims": [
+     7.3442,
+     7.3494,
+     0.86
+    ]
+   },
+   "objects": [
+    "monitor_glow_ne",
+    "monitor_glow_sw"
+   ]
+  },
+  {
+   "signature": {
+    "verts": 24,
+    "tris": 12,
+    "dims": [
+     2.5394,
+     2.5376,
+     0.86
+    ]
+   },
+   "objects": [
+    "monitor_glow_nw",
+    "monitor_glow_se"
+   ]
+  }
+ ],
+ "dup_redundant_tris": 720,
+ "join_candidates": {
+  "Toy_glass": 20,
+  "Toy_glass_Glow": 4,
+  "Toy_glassl_Glow": 4,
+  "Toy_roofd": 5,
+  "Toy_rust": 2,
+  "Toy_steel": 3,
+  "Toy_trim": 26
+ },
+ "degenerate_tris": 0,
+ "coincident_vert_pairs": 5676,
+ "over_tess": {
+  "near_distance_m": 51.68,
+  "one_px_world_m": 0.0348,
+  "note": "cylinders whose chord error < one_px_world_m can halve segments"
+ }
+}

@@ -77,10 +77,13 @@ route, and the park plans depend on it (§E8 of the parks README).
 | [171 South Park Street](./171-south-park.md) | `171-south-park` | 12.6 m | new landmark |
 | [101 South Park](./101-south-park.md) | `101-south-park` | 10.9 m (estimated) | new landmark |
 
-## Shared contract (all 40)
+## Shared contract (all 41)
 | [155 – 157 South Park Street](./155-south-park.md) | `155-south-park` | 10.1 m | new landmark |
 
-## Shared contract (all 40)
+## Shared contract (all 41)
+| [135 South Park](./135-south-park.md) | `135-south-park` | 8.5 m (LiDAR-derived) | new landmark |
+
+## Shared contract (all 41)
 
 - Style: `docs/styles/miniature-toy.md` (authoritative for artistic decisions)
 - Technical contract: `.agents/skills/sf-asset-check/SKILL.md` (authoritative for the GLB)
@@ -145,6 +148,11 @@ interpolation, and no footprint on that block is tagged `addr:housenumber=350`. 
 resolution runs address -> DataSF parcel APN -> parcel centroid -> the footprint containing
 it. When a geocoder returns `osm_type: way` for an address, check whether that way is a
 building before believing it.
+that could plausibly be a sea-level datum. 135 South Park is the opposite problem — no
+`height` tag at all and no photograph of its street elevation anywhere, so its height is
+LiDAR-only and its facade is openly a typological reconstruction; that plan's 2.15 leads
+with the admission rather than burying it, and its Part 1 tells the executing agent to
+read 2.15 before starting.
 
 The executing agent is expected to re-verify height, anchor, footprint and
 orientation before modelling — the dossier is a head start, not a citation.
