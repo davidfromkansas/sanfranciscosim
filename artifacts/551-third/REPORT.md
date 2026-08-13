@@ -10,16 +10,17 @@ stage 2 of `docs/asset-pipeline/ADDRESS-TO-ASSET.md`.
 
 | | |
 |---|---|
-| File | `551-third.glb` |
-| Objects | 147 |
-| Triangles | **10,100** / 12,000 cap |
+| File | `551-third.glb` (post-stage-4, meshopt) |
+| Objects / draw submeshes | 14 (147 before optimize) |
+| Triangles | **9,541** / 12,000 cap (10,100 before optimize) |
+| File size | 252,408 B raw · 168,664 B gzip |
 | Dimensions (world AABB) | 41.81 x 41.81 x 6.60 m |
 | min Z | 0.0000 |
 | XY centre offset | 0.000, 0.000 |
 | Crest | **6.600 m** exactly — loader scale factor 1.0 |
 | Materials | 14, all `Toy_*`, all on palette |
 | Glow set | `Toy_trim_Glow`, `Toy_mustard_Glow`, `Toy_glassl_Glow` |
-| Validation | **PASS**, 19/19 checks (`validation.json`) |
+| Validation | **PASS**, 19/19 checks (`validation.json`), re-run against the shipped file |
 
 The 41.81 m square AABB is the 39.7 x 20.4 m lot standing on the 45-degree SoMa
 grid: a rotated rectangle's world-axis bounding box is necessarily square-ish and
@@ -155,7 +156,7 @@ Do not apply this here — integration is stage 5.
     41.81,
     6.6
   ],
-  "tris": 10100,
+  "tris": 9541,
   "loadRadius": 2500
 }
 ```
@@ -174,4 +175,23 @@ routine.
 
 ## Gate 2
 
-`validation.json` — **PASS**, all 19 checks. Ready for stage 3 (approval).
+`validation.json` — **PASS**, all 19 checks.
+
+## Gate 4 — optimize
+
+Stage 4 ran per `docs/asset-pipeline/GLB-OPTIMIZE-PROMPT.md`; full write-up in
+`optimize/REPORT.md`. Headline: **613,056 → 252,408 bytes (−58.8%)** and
+**147 → 14 draw submeshes**, all eight gates PASS, pixel deltas 0.02% by day and
+1.2–1.4% at night (sampling noise in a dark frame). The optimized file is now the
+shipping `551-third.glb`; the pre-optimize original is archived at
+`optimize/input/551-third.glb`. The stage-2 contract validator was re-run against
+the shipped file and still passes 19/19.
+
+## Gate 3 — approval
+
+Approved by David on **13 August 2026**, verbatim:
+
+> approved, continue
+
+Presented at approval: the contact sheet, the aerial and night renders, and the
+shipped numbers above. No revision iterations were requested.

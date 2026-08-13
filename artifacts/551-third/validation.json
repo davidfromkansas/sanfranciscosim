@@ -1,9 +1,9 @@
 {
   "asset": "551-third",
   "glb": "551-third.glb",
-  "objects": 147,
-  "meshes": 147,
-  "triangles": 10100,
+  "objects": 14,
+  "meshes": 14,
+  "triangles": 9541,
   "triangle_cap": 12000,
   "dims_m": [
     41.807,
