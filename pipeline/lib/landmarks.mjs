@@ -246,6 +246,33 @@ export const LANDMARKS = [
     exclude: 45,
     camera: { distance: 500, yaw: 90, pitch: 16 },
   },
+  // A 7.00 x 23.83 m sliver two doors NE of 380Brannan on the same block face,
+  // with party walls on both long sides. This is the TIGHTEST exclusion radius
+  // in the registry and it has to be: 372-374 next door (DataSF SF3775021) is
+  // itself a 7 m sliver, so its footprint centroid sits only 6.57 m from this
+  // anchor. Measured from this anchor against the DataSF footprints excluded()
+  // consumes:
+  //
+  //   own footprint centroid        0.59 m
+  //   SF3775021 (372-374) centroid  6.57 m   <- the binding constraint
+  //   nearest ring vertex, anything 11.98 m
+  //
+  //   exclude 1-6 m  -> drops 1 building (correct: this one only)
+  //   exclude 7 m    -> drops 2 (eats 372-374, which has no GLB to replace it)
+  //   exclude 9 m    -> what 380Brannan uses 60 m away; here it eats a neighbour
+  //
+  // 3 m sits in the middle of the (0.6, 6.5) window and also catches the
+  // Overture/OSM gap-fill footprint for this parcel, whose centroid is 1.4 m
+  // from the anchor. Do NOT raise it without re-running that measurement.
+  {
+    id: '370Brannan',
+    name: '370 Brannan Street',
+    lon: -122.3938572,
+    lat: 37.7807602,
+    height: 7.63,
+    exclude: 3,
+    camera: { distance: 150, yaw: 45, pitch: 28 },
+  },
   // Mid-block in SoMa with neighbours a few metres off both flanks, so this
   // exclusion radius is deliberately TIGHT rather than generous. excluded() drops
   // a footprint if its centroid OR any ring vertex falls inside the radius.
