@@ -139,5 +139,11 @@ historic contributors from the baked city.
 
 ## 9. Approval
 
-Awaiting the user's stage-3 decision. Nothing beyond this artifact folder has been
-touched: no manifest entry, no registry entry, no app code, no tiles.
+**Approved 13 August 2026.** Presented at the stage-3 gate (contact sheet, aerial
+day and night, and the numbers above, together with the two judgement calls in §3
+and §5 and the integration hazard in §8). David's reply, verbatim:
+
+> proceed
+
+That advances the pipeline to stage 4 (optimize) and stage 5 (integrate, batch
+mode).
