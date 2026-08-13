@@ -209,8 +209,18 @@ def bevel(obj, width=0.12, segments=2):
         affect="EDGES",
         clamp_overlap=True,
     )
-    bmesh.ops.remove_doubles(bm, verts=list(bm.verts), dist=1e-4)
-    bmesh.ops.dissolve_degenerate(bm, dist=1e-4, edges=list(bm.edges))
+    # 1 mm, not 0.1 mm. offset_polygon() miters the parapet band inward across
+    # this footprint's two sub-metre survey jogs, where the inner and outer
+    # loops end up ~0.24 mm apart — close enough to spawn 23 m long, 0.24 mm
+    # wide sliver triangles at z=Z_DECK. They are invisible and they pass an
+    # area-based degeneracy test, but their shared vertex sits between faces
+    # with opposing normals, so its averaged vertex normal collapses to zero
+    # and the stage-2 contract validator fails on a non-unit loop normal once
+    # gltfpack re-emits the stored normals. 1 mm is the same tolerance Phase B
+    # of the optimize pass welds at, and it is three orders of magnitude below
+    # any authored feature here.
+    bmesh.ops.remove_doubles(bm, verts=list(bm.verts), dist=1e-3)
+    bmesh.ops.dissolve_degenerate(bm, dist=1e-3, edges=list(bm.edges))
     bmesh.ops.recalc_face_normals(bm, faces=bm.faces)
     bm.to_mesh(obj.data)
     bm.free()

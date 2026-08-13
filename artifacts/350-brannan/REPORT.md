@@ -13,11 +13,11 @@ disagree, this file is what was built and why.
 | Anchor (WGS84) | `-122.3935234, 37.7810229` |
 | Target height | **13.85 m** (roof-penthouse crest; bbox top lands exactly on it) |
 | Front heading | SE, outward normal **135.8°** true |
-| Triangles | **6,776** / 10,000 budget |
-| Objects | 133 |
+| Triangles | **6,770** / 10,000 budget |
+| Objects | 11 (133 before stage 4) |
 | Dimensions | 33.27 × 33.30 × 13.85 m (AABB; the building is 21.6 × 24.2 m at 45°) |
 | Materials | 10, all `Toy_*`, 2 of them `_Glow` |
-| File size | 412 KB raw / 72 KB gzip (pre-optimize; budget is 500 KB compressed) |
+| File size | **191 KB raw** / 120 KB gzip, meshopt-compressed (was 412 KB raw pre-optimize) |
 | Validation | `validation.json` — **PASS**, all 16 checks |
 | Blender | 5.2.0 LTS |
 
@@ -111,7 +111,13 @@ single identity feature was invisible.
 6. **Validation** — fresh-scene re-import, 16/16 checks PASS.
 
 Triangle count did not change between v1 and v2 (6,776): the fixes were dimensional and
-material, not topological.
+material, not topological. A later 1 mm weld fix in stage 4 took it to 6,770 — see below.
+
+7. **Stage 4 (optimize)** — reverted the shared pass's limited-dissolve step and raised
+   `bevel()`'s weld from 0.1 mm to 1 mm, both to kill invisible sliver triangles whose
+   averaged vertex normals collapsed to zero and failed the contract validator. Final
+   shipped asset: 6,770 tris, 11 objects, 12 draw submeshes, 191 KB. Full account in
+   `optimize/REPORT.md` §3.
 
 **Two judgement calls worth recording.**
 
@@ -194,7 +200,7 @@ Not applied — integration is a separate job (`docs/asset-plans/INTEGRATION-PRO
     33.2958,
     13.85
   ],
-  "tris": 6776,
+  "tris": 6770,
   "loadRadius": 2500
 }
 ```
@@ -208,8 +214,16 @@ applies; see `docs/asset-plans/350-brannan.md` §2.13.
 
 ## 8. Approval
 
-Pending — presented at stage 3 of `docs/asset-pipeline/ADDRESS-TO-ASSET.md`. The
-approval quote and date go here verbatim before stage 4 begins.
+Presented at stage 3 of `docs/asset-pipeline/ADDRESS-TO-ASSET.md` on **13 August 2026**
+(contact sheet, day aerial, night aerial, and the numbers line). Approved by David,
+verbatim:
+
+> please keep proceeding you dont need approvals from me
+
+Recorded as a standing approval to run stages 4 (optimize) and 5 (integrate) without
+returning to a gate. It is **not** taken as authorisation to push, open a PR, or deploy:
+`AGENTS.md` and stage 5 of the pipeline both require an explicit instruction for those,
+and in batch mode the PR belongs to `docs/asset-pipeline/BATCH-INTEGRATE.md` anyway.
 
 ## 9. Files
 
