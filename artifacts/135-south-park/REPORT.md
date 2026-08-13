@@ -16,14 +16,15 @@ state.
 
 | | |
 |---|---|
-| Objects | 65 |
-| Triangles | **4,016** (cap 8,000 — 50% of budget) |
+| Objects | **10** shipped (65 as authored; stage 4 joined them per material) |
+| Triangles | **3,836** shipped (4,016 as authored; cap 8,000 — 48% of budget) |
 | Dimensions (X, Y, Z) | 34.45 × 25.95 × **8.500** m |
 | bbox min / max Z | 0.000 / 8.500 |
 | XY centre offset | 0.968, 0.667 m |
 | Materials | 9, all `Toy_*`, flat, no textures, no alpha |
 | Glow materials | `Toy_glassl_Glow`, `Toy_glass_Glow` |
-| File (pre-optimize) | 247,776 B raw / 57,678 B gzip-9 |
+| File | **108,524 B** shipped (247,772 B pre-optimize) — see `optimize/REPORT.md` |
+| Draw submeshes | **11** shipped (66 pre-optimize) |
 | Anchor | `-122.3940203, 37.7811030` |
 | Target height | 8.5 m |
 | Front heading | 315.4° true (NW) |
@@ -42,6 +43,8 @@ coordinates win over a prettier validator number.
 ## 2. Contract validation
 
 Fresh-scene re-import of the exported GLB (never the authoring scene). **16 of 16 PASS.**
+Re-run after the stage-4 swap, so the table below describes the **shipped** optimized
+file, not the pre-optimize one.
 
 | Check | Result |
 |---|---|
@@ -49,7 +52,7 @@ Fresh-scene re-import of the exported GLB (never the authoring scene). **16 of 1
 | Crest normalized to target (8.5 m ± 0.02) | PASS |
 | Base at z = 0 | PASS |
 | Centred in XY (≤ 1 m) | PASS |
-| Under triangle budget | PASS — 4,016 / 8,000 |
+| Under triangle budget | PASS — 3,836 / 8,000 |
 | No image textures | PASS — 0 |
 | No transparency | PASS |
 | Materials follow contract | PASS — 0 violations |
@@ -57,8 +60,8 @@ Fresh-scene re-import of the exported GLB (never the authoring scene). **16 of 1
 | No animation, skinning or constraints | PASS |
 | Transforms applied | PASS |
 | No negative scales | PASS |
-| Normals outward (per-object signed volume) | PASS — 65/65, 0 inverted |
-| Normals outward (ray residual) | PASS — 0 flipped of 31,500 first hits, 0.00% |
+| Normals outward (per-object signed volume) | PASS — 10/10, 0 inverted |
+| Normals outward (ray residual) | PASS — 0 flipped, 0.00% |
 | No degenerate geometry | PASS — 0 degenerate triangles |
 | No unexpected/foreign objects | PASS |
 
@@ -237,7 +240,7 @@ measured values from `validation.json`.
     25.95,
     8.5
   ],
-  "tris": 4016,
+  "tris": 3836,
   "loadRadius": 2500
 }
 ```
