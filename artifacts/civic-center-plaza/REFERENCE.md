@@ -48,8 +48,8 @@ The plaza sits on the Civic Center grid, 9.06° off north. The build authors eve
 local frame and maps to world once:
 
 ```
-u  = long axis, POSITIVE TOWARD THE SOUTH (Grove Street), bearing 189.06° true
-v  = short axis, POSITIVE TOWARD THE WEST (City Hall),    bearing 279.06° true
+u  = long axis, POSITIVE TOWARD THE SOUTH (Grove Street), bearing 170.94° true
+v  = short axis, POSITIVE TOWARD THE WEST (City Hall),    bearing 260.94° true
 u ∈ [−88.9, +88.9]   v ∈ [−60.7, +60.7]
 ```
 

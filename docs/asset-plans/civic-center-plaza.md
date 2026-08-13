@@ -211,10 +211,18 @@ dependencies; at most 18,000 triangles.
 **Orientation:** author with Blender `+Y` = true north, `+X` = east, so the model
 drops into the city at its real-world heading — the loader applies no rotation
 (`placeGeneric` in `app/src/assets.js` only scales and positions). The plaza's long axis
-runs **9.06° / 189.06°** (north–south, matching the Civic Center street grid) and its
-cross axis **99.06° / 279.06°** (the Fulton/City Hall axis). Build directly in the
+runs **350.94° / 170.94°** (north–south, matching the Civic Center street grid) and its
+cross axis **80.94° / 260.94°** (the Fulton/City Hall axis). Build directly in the
 measured `(u, v)` plaza frame given in 2.3 and map to world X/Y once, rather than
 modelling an axis-aligned rectangle and rotating it.
+
+> **The grid leans 9.06° EAST of north, so the southward bearing is 170.94°
+> (= 180 − 9.06), not 189.06° (= 180 + 9.06).** Those two are mirror images about
+> north, and every bounding-box measurement reads the same 9.06° for both — the
+> first build shipped 189.06° and put the plaza 18.12° out of true against its own
+> block while the report still validated. Only a SIGNED angle catches it. If you
+> change anything here, check the sign against the neighbours (City Hall 9.62°,
+> Main Library 9.06°, Bill Graham 9.31°) rather than against a bbox.
 
 **Height normalization:** the tallest geometry in the export (the US flagpole finial) must
 land at exactly **30.48 m** so the loader's `targetHeightM / measuredHeight` scale is 1.0.
@@ -385,7 +393,9 @@ in a local `(u, v)` frame and mapped to world once:
 
 ```
 u  = along the long (north–south) axis, POSITIVE TOWARD THE SOUTH  (Grove Street)
+     bearing 170.94 deg true  — NOT 189.06; see the orientation note in Part 1
 v  = along the short (east–west) axis,  POSITIVE TOWARD THE WEST   (City Hall)
+     bearing 260.94 deg true
 u ∈ [−88.9, +88.9]   v ∈ [−60.7, +60.7]
 world_x =  u·sin(9.06°) − v·cos(9.06°)
 world_y = −u·cos(9.06°) − v·sin(9.06°)      (Blender +Y = north)
