@@ -57,6 +57,7 @@ route, and the park plans depend on it (§E8 of the parks README).
 | [War Memorial Opera House](./war-memorial-opera-house.md) | `opera-house` | 44 m | new landmark |
 | [Herbst Theatre (War Memorial Veterans Building)](./herbst-theatre.md) | `herbst-theatre` | ~31 m (estimated) | new landmark |
 | [Fairmont San Francisco](./fairmont-san-francisco.md) | `fairmont` | 99 m | new landmark |
+| [350 Brannan Street](./350-brannan.md) | `350-brannan` | 13.85 m | new landmark |
 | [380 Brannan Street](./380-brannan.md) | `380-brannan` | 12.6 m | new landmark |
 | [550 Third Street](./550-third.md) | `550-third` | 11 m | new landmark |
 | [375 Alabama Street (Ames Harris Neville Co.)](./375-alabama.md) | `375-alabama` | 22.5 m | new landmark |
@@ -74,7 +75,7 @@ route, and the park plans depend on it (§E8 of the parks README).
 | [101 Grove Street (Public Health Building)](./101-grove.md) | `101-grove` | 21.4 m | new landmark |
 | [Asian Art Museum (Old Main Library)](./asian-art-museum.md) | `asian-art-museum` | 28.1 m | new landmark |
 
-## Shared contract (all 36)
+## Shared contract (all 37)
 
 - Style: `docs/styles/miniature-toy.md` (authoritative for artistic decisions)
 - Technical contract: `.agents/skills/sf-asset-check/SKILL.md` (authoritative for the GLB)
@@ -128,6 +129,13 @@ the two — the crest is 9.55 m. The Asian Art Museum is a fourth: its OSM
 `height=46` is not a height at all but the NAVD88 roof *elevation* (152.93 ft),
 1.6x the real 28.1 m crest — see that plan's 2.3 before trusting any `height` tag
 that could plausibly be a sea-level datum.
+
+350 Brannan Street is a different kind of failure: not a wrong height but a missing
+*building*. Nominatim resolves the address onto the Brannan Street roadway by TIGER
+interpolation, and no footprint on that block is tagged `addr:housenumber=350`. The
+resolution runs address -> DataSF parcel APN -> parcel centroid -> the footprint containing
+it. When a geocoder returns `osm_type: way` for an address, check whether that way is a
+building before believing it.
 
 The executing agent is expected to re-verify height, anchor, footprint and
 orientation before modelling — the dossier is a head start, not a citation.
