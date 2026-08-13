@@ -2,6 +2,13 @@
 // procedural footprints from fighting the hand-built model, and the camera
 // preset the runtime flies to. Consumed by buildings.mjs (exclusion) and
 // emitted to the app as landmarks.json (presets + placement).
+//
+// A landmark is normally one circle around its anchor. A site whose lot carries
+// more than one baked footprint can declare `extraExclusions: [{lon, lat, r}]`
+// for the ones a single radius cannot reach without eating a neighbour — see
+// 551Third. Build the zone list with exclusionZones() below rather than reading
+// `exclude` directly, so the bake and audit 1.6 can never disagree about what
+// is cleared.
 
 export const LANDMARKS = [
   {
@@ -246,6 +253,33 @@ export const LANDMARKS = [
     exclude: 45,
     camera: { distance: 500, yaw: 90, pitch: 16 },
   },
+  // A 7.00 x 23.83 m sliver two doors NE of 380Brannan on the same block face,
+  // with party walls on both long sides. This is the TIGHTEST exclusion radius
+  // in the registry and it has to be: 372-374 next door (DataSF SF3775021) is
+  // itself a 7 m sliver, so its footprint centroid sits only 6.57 m from this
+  // anchor. Measured from this anchor against the DataSF footprints excluded()
+  // consumes:
+  //
+  //   own footprint centroid        0.59 m
+  //   SF3775021 (372-374) centroid  6.57 m   <- the binding constraint
+  //   nearest ring vertex, anything 11.98 m
+  //
+  //   exclude 1-6 m  -> drops 1 building (correct: this one only)
+  //   exclude 7 m    -> drops 2 (eats 372-374, which has no GLB to replace it)
+  //   exclude 9 m    -> what 380Brannan uses 60 m away; here it eats a neighbour
+  //
+  // 3 m sits in the middle of the (0.6, 6.5) window and also catches the
+  // Overture/OSM gap-fill footprint for this parcel, whose centroid is 1.4 m
+  // from the anchor. Do NOT raise it without re-running that measurement.
+  {
+    id: '370Brannan',
+    name: '370 Brannan Street',
+    lon: -122.3938572,
+    lat: 37.7807602,
+    height: 7.63,
+    exclude: 3,
+    camera: { distance: 150, yaw: 45, pitch: 28 },
+  },
   // Mid-block in SoMa with neighbours a few metres off both flanks, so this
   // exclusion radius is deliberately TIGHT rather than generous. excluded() drops
   // a footprint if its centroid OR any ring vertex falls inside the radius.
@@ -261,6 +295,51 @@ export const LANDMARKS = [
   //
   // 9 m is the middle of the safe band. Do not raise it past 12 without re-running
   // that check — on a mid-block site a generous radius removes the neighbours.
+  // 362 Brannan St (Standard Sheet Metal & Marine Plumbing, 1925) — a through lot
+  // four doors northeast of 380, party walls on both flanks. `excluded()` in
+  // buildings.mjs tests every ring VERTEX as well as the centroid, which is what
+  // makes a generous radius dangerous here; measured against the real bake input
+  // (data/buildings_datasf.geojson):
+  //
+  //   exclude  6-10 m -> drops 1  (correct: this building, centroid 3.49 m)
+  //   exclude 11 m    -> drops 2  (eats 370 Brannan, nearest VERTEX 10.00 m)
+  //
+  // 8 m is the middle of the safe band. Do not raise it past 10. Note that
+  // 370 Brannan's centroid is 13.33 m away — reasoning from centroids alone would
+  // wrongly license 12 and delete it.
+  {
+    id: '362Brannan',
+    name: '362 Brannan Street',
+    lon: -122.393745,
+    lat: 37.780843,
+    height: 8.6,
+    exclude: 8,
+    camera: { distance: 200, yaw: 45, pitch: 24 },
+  },
+  // 358 Brannan, three lots northeast, is the tightest site in this registry: a
+  // single 25-foot lot, 6.93 m wide, with both neighbours' walls ON the property
+  // line. Measured against the committed tile 23_13 (233 footprints):
+  //
+  //   target #98 (the through-lot itself, h 11.2 m): centroid 4.06 m from the
+  //   anchor, nearest ring vertex 2.47 m
+  //   nearest neighbour #63 (350 Brannan, h 13.7 m): nearest vertex 12.01 m
+  //
+  //   exclude  3-12 m -> drops 1 building  (correct: #98 only)
+  //   exclude 13-16 m -> drops 3  (eats BOTH party-wall neighbours)
+  //   exclude 20 m    -> drops 5
+  //
+  // 7 m is the middle of the safe band. The baked footprint is TALLER than the
+  // asset (11.2 m vs 9.6 m), so shipping the manifest entry without this
+  // exclusion would hide the GLB completely rather than merely clash with it.
+  {
+    id: '358Brannan',
+    name: '358 Brannan Street',
+    lon: -122.3936350,
+    lat: 37.7809258,
+    height: 9.6,
+    exclude: 7,
+    camera: { distance: 190, yaw: 315, pitch: 26 },
+  },
   {
     id: '380Brannan',
     name: '380 Brannan Street',
@@ -269,6 +348,31 @@ export const LANDMARKS = [
     height: 12.6,
     exclude: 9,
     camera: { distance: 220, yaw: 45, pitch: 24 },
+  },
+  // Full-lot corner building two lots northeast of 380, so the same TIGHT-radius
+  // logic applies for the same reason. Measured against the 943 baked footprints
+  // in the 3x3 cell block around 23_13:
+  //
+  //   target (23_13, 537 m2, h 13.7 m) centroid sits 0.01 m from this anchor
+  //   nearest NEIGHBOUR: centroid 14.42 m, nearest vertex 16.21 m (165 m2, h 11.2 m)
+  //
+  //   exclude  6-14 m -> drops 1 building  (correct: the target only)
+  //   exclude 16 m    -> drops 2  (eats that neighbour on its centroid)
+  //   exclude 20 m    -> drops 3
+  //
+  // The binding limit is the neighbour's CENTROID at 14.42 m, not its nearest
+  // vertex — excluded() tests centroid OR any ring vertex, so the centroid is
+  // what bites first here. 8 m is the middle of the safe band. An independent
+  // estimate off the OSM/DataSF footprints put the nearest neighbour at 13.79 m,
+  // which agrees within 0.6 m. Do not raise past 12 without re-running the check.
+  {
+    id: '350Brannan',
+    name: '350 Brannan Street',
+    lon: -122.3935234,
+    lat: 37.7810229,
+    height: 13.85,
+    exclude: 8,
+    camera: { distance: 230, yaw: 80, pitch: 26 },
   },
   {
     // Through lot with party walls on both long sides, so the exclusion window
@@ -282,6 +386,27 @@ export const LANDMARKS = [
     height: 11,
     exclude: 8,
     camera: { distance: 190, yaw: 260, pitch: 34 },
+  },
+  {
+    // Shell service station, across 3rd Street from 550 Third. The asset is a
+    // forecourt, not a building, and the lot carries TWO baked footprints — the
+    // canopy at the anchor and the kiosk 19.7 m away at the Brannan end. No
+    // single radius takes both: reaching the kiosk needs r > 16.40 m, and 181
+    // South Park's footprint behind the lot comes within 16.37 m. Hence the
+    // second zone on the kiosk, which drops it by the centroid test with 2.9 m
+    // of clearance to that neighbour. See docs/asset-plans/551-third.md 2.13.
+    id: '551Third',
+    name: '551 Third Street (Shell Station)',
+    lon: -122.3946431,
+    lat: 37.7806625,
+    height: 6.6,
+    exclude: 8,
+    extraExclusions: [{ lon: -122.3944594, lat: 37.7805609, r: 4 }],
+    // Camera offset is (sin yaw east, cos yaw south), so yaw 315 puts the eye
+    // south-west of the site: the 3rd Street frontage, with the umbrellas
+    // reading in front of the kiosk. No `key` — at 6.6 m this is texture in the
+    // block, not a destination, and the number keys stay for skyline pieces.
+    camera: { distance: 170, yaw: 315, pitch: 32 },
   },
   {
     // Ames Harris Neville Co. Building, 1926 — a whole block corner, so the
@@ -534,10 +659,205 @@ export const LANDMARKS = [
     exclude: 40,
     camera: { distance: 600, yaw: 268, pitch: 20 },
   },
+  {
+    // The tightest exclusion window in this file, and the failure mode is
+    // silent. `excluded()` drops a footprint when its ring centroid OR any
+    // vertex lands inside the radius, and measured against the rings the bake
+    // actually sees (DataSF, after simplifyRing(0.6)) from this anchor:
+    // this building's own ring triggers at 0.57 m, 165-167 South Park
+    // (SF3775028) at 3.83 m, 181 (SF3775172) at 3.92 m, 159 (SF3775029) at
+    // 11.02 m. So the window is (0.6, 3.8) m and 2 sits in the middle of it.
+    // Anything from 4 m up deletes two party-wall historic contributors from
+    // the baked city and nothing crashes to tell you.
+    //
+    // This is also why the anchor is the footprint's AREA CENTROID rather than
+    // its OBB centre: at the OBB centre the nearest neighbour vertex is 2.74 m
+    // and the window nearly closes.
+    id: '171SouthPark',
+    name: '171 South Park Street',
+    lon: -122.3945219,
+    lat: 37.7809,
+    height: 12.6,
+    exclude: 2,
+    // Camera bearing = 180 - yaw (camera.js apply(): offset is
+    // (sin yaw, ., cos yaw) and +z is south), so yaw 197 stands the camera at
+    // 343 deg = NNW, square onto the three-facet park front. Cross-checked
+    // against 380Brannan, whose SE-facing front carries yaw 45 = bearing 135.
+    camera: { distance: 200, yaw: 197, pitch: 26 },
+  },
+  // Kleiner Perkins' office on the South Park oval. The exclusion window here is
+  // the tightest in this file, because 117 South Park is ATTACHED: the two
+  // footprints share their party-wall vertices, and `excluded()` drops a
+  // footprint when any RING VERTEX — not just its centroid — falls inside the
+  // radius. Measured from this anchor against the DataSF footprints:
+  //
+  //   own ring area centroid            0.26 m  (OSM cross-check 1.54 m)
+  //   shared party-wall vertex, no. 117 6.40 m  <- the ceiling
+  //   no. 117's own centroid           10.59 m
+  //   next neighbour vertex (no. 123)  13.17 m
+  //
+  // So the safe band is 1.6-6.4 m and the exclusion has to work through the
+  // centroid test — this building's own vertices sit at 6.40 m, outside any
+  // radius that spares the neighbour. 4 m is the middle of that band. Do NOT
+  // raise it: at 6.5 m this deletes a real building that has no hand-built
+  // replacement. Same situation as 550Third's through-lot note above.
+  {
+    id: '101SouthPark',
+    name: 'Kleiner Perkins (101 South Park)',
+    lon: -122.3937582,
+    lat: 37.7812624,
+    height: 10.9,
+    exclude: 4,
+    camera: { distance: 200, yaw: 318, pitch: 26 },
+  },
+  {
+    // Party-wall row on the South Park oval, so this is the tightest exclusion
+    // zone in the registry. Measured against the committed tile 23_13 rather
+    // than guessed, because `excluded()` drops a footprint whose centroid OR any
+    // ring vertex is inside the radius, and on a row the neighbours' vertices
+    // are what bind:
+    //
+    //   this footprint (#94)   centroid  0.48 m   -> dropped by anything > 0.5
+    //   159 South Park (#164)  vertex    5.42 m   -> the binding constraint
+    //   147 South Park (#80)   vertex   12.30 m
+    //
+    // Safe band 0.5-5.4 m; 3 m is the middle of it. The plan's suggested 6 m
+    // would have taken 159 South Park out with it and punched a hole in the row.
+    // Do not raise this without re-decoding the tile.
+    id: '155SouthPark',
+    name: '155 South Park',
+    lon: -122.3942202,
+    lat: 37.7808993,
+    height: 10.1,
+    exclude: 3,
+    camera: { distance: 170, yaw: 147, pitch: 26 },
+  },
+  {
+    // The tightest exclusion window in this registry, so the radius is derived
+    // rather than guessed. `excluded()` in pipeline/buildings.mjs drops a
+    // footprint when its centroid OR any ring vertex falls inside the circle,
+    // and the bake reads DataSF first then gap-fills from Overture (which
+    // carries OSM geometry), so both sources bind. Measured from this anchor:
+    //
+    //                                  nearest vertex   centroid
+    //   own footprint (OSM)                  1.03 m       3.04 m
+    //   own footprint (DataSF SF3775033)     4.68 m       3.29 m
+    //   nearest neighbour (OSM way/1311547493, the rear building)
+    //                                        6.18 m      12.96 m
+    //   nearest neighbour (DataSF SF3775036)
+    //                                       10.32 m      15.37 m
+    //
+    // So the safe window is 4.68 < r < 6.18 if the rear building arrives via
+    // Overture, and 3.29 < r < 10.32 if it arrives via DataSF. 5 satisfies
+    // both, with 0.3 m of headroom over our own DataSF ring and 1.2 m below the
+    // nearest neighbour. Do NOT raise it: at 7 the rear building vanishes and
+    // leaves a hole no GLB fills, and at 11 so does 123 South Park — which
+    // shares this building's north-east party wall at a 0.0 m gap.
+    id: '135SouthPark',
+    name: '135 South Park',
+    lon: -122.3940203,
+    lat: 37.781103,
+    height: 8.5,
+    exclude: 5,
+    // camera.js puts the eye at target + distance*(sin yaw, ., cos yaw) with +x
+    // east and +z south, so yaw 225 stands north-west of the building — square
+    // onto the South Park front, which is also the side the roof monitor reads
+    // from. 150 m suits an 8.5 m building (cf. 543 Presidio at 120 for 9.55 m).
+    camera: { distance: 150, yaw: 225, pitch: 26 },
+  },
+  {
+    // The tightest site in the registry: a 6.2 m frontage in an unbroken
+    // party-wall row on the south rim of South Park. Two things are unusual and
+    // both are deliberate.
+    //
+    // 1. THE lon/lat BELOW IS NOT THE MANIFEST ANCHOR, and must not be
+    //    "corrected" to match it. These fields are independent: placeGeneric()
+    //    in app/src/assets.js positions the GLB from the manifest anchor alone
+    //    (-122.3943764, 37.7808599 — the surveyed parcel's centroid, where the
+    //    building actually stands), while this lon/lat is only the centre of
+    //    the exclusion circle. They sit 1.4 m apart because from the manifest
+    //    anchor NO radius works at all: 159 South Park's footprint shares a
+    //    party-wall vertex 0.50 m away, exactly as close as this building's own
+    //    nearest vertex, so every circle that drops one drops both. Centring
+    //    the circle on the DataSF LiDAR footprint's area centroid instead opens
+    //    the only viable window.
+    //
+    // 2. THE WINDOW IS 0.4 m WIDE. excluded() drops a footprint when its
+    //    centroid OR any vertex is inside the radius. Measured from this point
+    //    against the two sources the bake actually reads
+    //    (pipeline/data/buildings_datasf.geojson and
+    //    overture_buildings.geojsonseq, 13 Aug 2026):
+    //
+    //          polygon              DataSF    Overture
+    //          165-167 (this)         0.00 m    1.08 m
+    //          159 South Park         1.49 m    2.33 m
+    //          171 South Park         3.34 m    4.15 m
+    //
+    //    So r must EXCEED 1.08 (or the Overture gap-fill re-adds this building
+    //    after the DataSF footprint is dropped — addBuilding() returns null on
+    //    exclusion, so markOccupied() never runs and occupiedFraction() cannot
+    //    be relied on to block it) and stay UNDER 1.49 (or 159 disappears and
+    //    leaves a hole where a real building stands, an AGENTS rule 5
+    //    violation). 1.3 keeps 0.22 m and 0.19 m of margin. Do not round it.
+    //
+    // No clearTrees: the crape myrtle on the sidewalk in front is real and
+    // should stay, and at 1.3 m this radius clears no street furniture anyway —
+    // which is correct here, since South Park's furniture sits along the street
+    // well outside a 6 m lot.
+    id: '165SouthPark',
+    name: '165-167 South Park',
+    lon: -122.3943963,
+    lat: 37.7808764,
+    height: 9.0,
+    exclude: 1.3,
+    camera: { distance: 160, yaw: 350, pitch: 26 },
+  },
+  {
+    // A 43.2 x 13.8 m slab running the full depth of the block, from the South
+    // Park oval back to the Varney Place alley, sharing a party wall with 171
+    // South Park. That party wall makes the exclusion radius unusually
+    // constrained on BOTH sides, so this number is measured, not guessed.
+    // excluded() drops a footprint when its centroid OR any ring vertex falls
+    // inside the radius. Measured against the Overture footprints the bake
+    // actually consumes (not OSM — the two differ here and it matters):
+    //    4.05 m  this building's own footprint, via its centroid — the trigger
+    //            that removes the procedural slab
+    //    7.00 m  171 South Park, via a ring vertex that is a node SHARED with
+    //            this building's own outline
+    //    9.17 m  the Shell canopy at 551 Third Street
+    //   12.32 m  167 South Park
+    // So the whole safe window is (4.06, 7.00) — 2.9 m wide, one of the
+    // tightest in this registry. 5 sits in it with 0.95 m of margin below and
+    // 2.00 m above. Below 4.06 the procedural slab survives and pokes through
+    // the model; at 7.00 the re-bake punches a hole where 171 should be.
+    // Verified on the re-bake: exactly one footprint dropped, 23 kept within
+    // 60 m. Do not widen this without re-running that check.
+    id: '181SouthPark',
+    name: '181 South Park',
+    lon: -122.3945113,
+    lat: 37.7807582,
+    height: 16.5,
+    exclude: 5,
+    camera: { distance: 190, yaw: 255, pitch: 24 },
+  },
 ];
 
 // Parks/green spaces the landcover bake must match at least one source polygon
 // for; validate.mjs fails if any of these come up empty.
+// Every circle the bake clears, one row per zone. A landmark contributes its
+// own `exclude` circle plus any `extraExclusions`; `id`/`name` stay attached so
+// audit 1.6 can name the landmark responsible for an intrusion.
+export function exclusionZones() {
+  const zones = [];
+  for (const l of LANDMARKS) {
+    if (l.exclude) zones.push({ id: l.id, name: l.name, lon: l.lon, lat: l.lat, r: l.exclude });
+    for (const e of l.extraExclusions ?? []) {
+      zones.push({ id: l.id, name: l.name, lon: e.lon, lat: e.lat, r: e.r });
+    }
+  }
+  return zones;
+}
+
 export const NAMED_PARKS = [
   { id: 'goldenGatePark', name: 'Golden Gate Park', lon: -122.4862, lat: 37.7694 },
   { id: 'presidio', name: 'Presidio', lon: -122.4662, lat: 37.7989 },

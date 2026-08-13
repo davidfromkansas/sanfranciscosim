@@ -57,8 +57,13 @@ route, and the park plans depend on it (§E8 of the parks README).
 | [War Memorial Opera House](./war-memorial-opera-house.md) | `opera-house` | 44 m | new landmark |
 | [Herbst Theatre (War Memorial Veterans Building)](./herbst-theatre.md) | `herbst-theatre` | ~31 m (estimated) | new landmark |
 | [Fairmont San Francisco](./fairmont-san-francisco.md) | `fairmont` | 99 m | new landmark |
+| [350 Brannan Street](./350-brannan.md) | `350-brannan` | 13.85 m | new landmark |
+| [362 Brannan Street](./362-brannan.md) | `362-brannan` | 8.6 m | new landmark |
+| [370 Brannan Street](./370-brannan.md) | `370-brannan` | 7.63 m | new landmark |
+| [358 Brannan Street](./358-brannan.md) | `358-brannan` | 9.6 m (estimated) | new landmark |
 | [380 Brannan Street](./380-brannan.md) | `380-brannan` | 12.6 m | new landmark |
 | [550 Third Street](./550-third.md) | `550-third` | 11 m | new landmark |
+| [551 Third Street (Shell Service Station)](./551-third.md) | `551-third` | 6.6 m | new landmark |
 | [375 Alabama Street (Ames Harris Neville Co.)](./375-alabama.md) | `375-alabama` | 22.5 m | new landmark |
 | [1008 General Kennedy Avenue](./1008-general-kennedy.md) | `1008-general-kennedy` | 11.9 m | new landmark |
 | [Letterman Digital Arts Center](./letterman-digital-arts-center.md) | `letterman` | ~22 m (estimated) | new landmark |
@@ -73,8 +78,14 @@ route, and the park plans depend on it (§E8 of the parks README).
 | [Louise M. Davies Symphony Hall](./davies-symphony-hall.md) | `davies-symphony-hall` | 35 m | new landmark |
 | [101 Grove Street (Public Health Building)](./101-grove.md) | `101-grove` | 21.4 m | new landmark |
 | [Asian Art Museum (Old Main Library)](./asian-art-museum.md) | `asian-art-museum` | 28.1 m | new landmark |
+| [171 South Park Street](./171-south-park.md) | `171-south-park` | 12.6 m | new landmark |
+| [101 South Park](./101-south-park.md) | `101-south-park` | 10.9 m (estimated) | new landmark |
+| [155 – 157 South Park Street](./155-south-park.md) | `155-south-park` | 10.1 m | new landmark |
+| [135 South Park](./135-south-park.md) | `135-south-park` | 8.5 m (LiDAR-derived) | new landmark |
+| [165–167 South Park](./165-south-park.md) | `165-south-park` | 9.0 m (estimated) | new landmark |
+| [181 South Park](./181-south-park.md) | `181-south-park` | 16.5 m (LiDAR-derived) | new landmark |
 
-## Shared contract (all 36)
+## Shared contract (all 47)
 
 - Style: `docs/styles/miniature-toy.md` (authoritative for artistic decisions)
 - Technical contract: `.agents/skills/sf-asset-check/SKILL.md` (authoritative for the GLB)
@@ -127,7 +138,62 @@ the LiDAR *median* height over a hipped roof, which by construction falls betwee
 the two — the crest is 9.55 m. The Asian Art Museum is a fourth: its OSM
 `height=46` is not a height at all but the NAVD88 roof *elevation* (152.93 ft),
 1.6x the real 28.1 m crest — see that plan's 2.3 before trusting any `height` tag
-that could plausibly be a sea-level datum.
+that could plausibly be a sea-level datum. 101 South Park is a fifth variety and the
+nastiest so far: its OSM `height=6` and the 2010 LiDAR median (5.56 m) agree with each
+other and are both *correct for 2010* — they simply predate the second storey the building
+has today, so every published height for that lot is stale rather than mismeasured. Check
+the LiDAR's vintage against the permit history before believing a small number.
+
+350 Brannan Street is a different kind of failure: not a wrong height but a missing
+*building*. Nominatim resolves the address onto the Brannan Street roadway by TIGER
+interpolation, and no footprint on that block is tagged `addr:housenumber=350`. The
+resolution runs address -> DataSF parcel APN -> parcel centroid -> the footprint containing
+it. When a geocoder returns `osm_type: way` for an address, check whether that way is a
+building before believing it.
+that could plausibly be a sea-level datum. 135 South Park is the opposite problem — no
+`height` tag at all and no photograph of its street elevation anywhere, so its height is
+LiDAR-only and its facade is openly a typological reconstruction; that plan's 2.15 leads
+with the admission rather than burying it, and its Part 1 tells the executing agent to
+read 2.15 before starting.
+that could plausibly be a sea-level datum. 362 Brannan Street is a fifth variety and the
+most ordinary-looking one: its OSM `height=6` is neither eave nor crest nor datum, it is
+simply the *other part of the building* — the one-storey block that covers about four
+fifths of the plan — while the crest, on a set-back sloped roof over a two-storey front
+bay, is 8.58 m. A tag can be an honest measurement of the wrong feature.
+
+165–167 South Park is the one plan here whose footprint is **not** measured from OSM, and
+it is the case that shows why the default has limits. No OSM way carries its address at
+all: the building sits inside a Bing trace tagged `167` that is larger than the whole lot
+and overlaps its neighbour. That plan's geometry comes from the surveyed DataSF parcel
+(`acdm-wktn`), with the DataSF LiDAR footprint (`ynuv-fyni`) supplying only the built depth
+— and even those two disagree by 3.7 m, which its 2.3 reconciles. On dense narrow-lot
+blocks, prefer the parcel layer and treat OSM as a cross-check.
+
+358 Brannan Street breaks the pattern: there the bad number is not a height but the
+**footprint**. Its OSM way (`source=Bing`) traces a 115 m2 stub, wide and shallow,
+where the building is in fact a 166 m2 through-lot 6.9 m wide and 25.2 m deep — the
+DataSF LiDAR footprint and the Assessor's lot area agree with each other against OSM.
+Where a plan cites a DataSF `mblr`/`sf16_bldgid` footprint, that is the survey; OSM
+geometry on small SoMa lots is a Bing trace and should be treated as a cross-check
+only. Getting from an address to the right DataSF polygon goes through the parcels
+dataset (`acdm-wktn`, `blklot` -> address range), not through a spatial guess.
+that could plausibly be a sea-level datum. 181 South Park is a fifth: its `height=14`
+matches the LiDAR median to within 0.2 m, which makes it look corroborated rather than
+merely repeated, and the crest is still 2.3 m above it.
+
+One plan, [181 South Park](./181-south-park.md), was written with nadir aerial imagery but
+no street-level imagery available to its author. Its geometry is measured, its roof is
+observed, and its four elevations are explicitly marked as inference; street-level photo
+research is written into Part 1 as a gate that must clear before modelling starts. It is
+also the set's clearest case of an OSM `height` tag that is neither eave nor crest: on a
+ridged roof the LiDAR median it matches corresponds to no physical line on the building.
+Read that plan's Part 2 preamble before executing it.
+
+551 Third Street is the odd one out in a different way: it is a *site*, not a
+building — a service-station forecourt whose asset is a canopy, two pump islands,
+a kiosk and the asphalt they stand on. Its `targetHeightM` is a thin crest above
+a measured canopy deck, and its exclusion zone cannot be solved with one circle;
+see that plan's 2.13 and 2.15 before treating it as routine.
 
 The executing agent is expected to re-verify height, anchor, footprint and
 orientation before modelling — the dossier is a head start, not a citation.

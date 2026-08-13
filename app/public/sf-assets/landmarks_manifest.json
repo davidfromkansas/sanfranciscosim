@@ -326,6 +326,25 @@
     "tris": 10412
   },
   {
+    "id": "362-brannan",
+    "file": "362-brannan.glb",
+    "anchor": [
+      -122.393745,
+      37.780843
+    ],
+    "targetHeightM": 8.6,
+    "cat": 19,
+    "name": "362 Brannan Street",
+    "estimated": false,
+    "dims": [
+      31.2274,
+      30.835,
+      8.6
+    ],
+    "tris": 5904,
+    "loadRadius": 2500
+  },
+  {
     "id": "380-brannan",
     "file": "380-brannan.glb",
     "anchor": [
@@ -361,6 +380,25 @@
       11.0
     ],
     "tris": 6244,
+    "loadRadius": 2500
+  },
+  {
+    "id": "551-third",
+    "file": "551-third.glb",
+    "anchor": [
+      -122.3946431,
+      37.7806625
+    ],
+    "targetHeightM": 6.6,
+    "cat": 21,
+    "name": "551 Third Street (Shell Station)",
+    "estimated": false,
+    "dims": [
+      41.81,
+      41.81,
+      6.6
+    ],
+    "tris": 9541,
     "loadRadius": 2500
   },
   {
@@ -646,6 +684,177 @@
       28.1
     ],
     "tris": 13176,
+    "loadRadius": 2500
+  },
+  {
+    "id": "350-brannan",
+    "file": "350-brannan.glb",
+    "anchor": [
+      -122.3935234,
+      37.7810229
+    ],
+    "targetHeightM": 13.85,
+    "cat": 3,
+    "name": "350 Brannan Street",
+    "estimated": false,
+    "dims": [
+      33.2738,
+      33.2958,
+      13.85
+    ],
+    "tris": 6770,
+    "loadRadius": 2500
+  },
+  {
+    "id": "171-south-park",
+    "file": "171-south-park.glb",
+    "anchor": [
+      -122.3945219,
+      37.7809
+    ],
+    "targetHeightM": 12.6,
+    "cat": 2,
+    "name": "171 South Park Street",
+    "estimated": false,
+    "dims": [
+      19.2565,
+      18.497,
+      12.6
+    ],
+    "tris": 5808,
+    "loadRadius": 2500
+  },
+  {
+    "id": "101-south-park",
+    "file": "101-south-park.glb",
+    "anchor": [
+      -122.3937582,
+      37.7812624
+    ],
+    "targetHeightM": 10.9,
+    "cat": 3,
+    "name": "Kleiner Perkins (101 South Park)",
+    "estimated": true,
+    "dims": [
+      30.53,
+      29.87,
+      10.9
+    ],
+    "tris": 7502,
+    "loadRadius": 2500
+  },
+  {
+    "id": "155-south-park",
+    "file": "155-south-park.glb",
+    "anchor": [
+      -122.3942202,
+      37.7808993
+    ],
+    "targetHeightM": 10.1,
+    "cat": 1,
+    "name": "155 South Park",
+    "estimated": false,
+    "dims": [
+      25.5223,
+      28.2942,
+      10.1
+    ],
+    "tris": 4048,
+    "loadRadius": 2500
+  },
+  {
+    "id": "135-south-park",
+    "file": "135-south-park.glb",
+    "anchor": [
+      -122.3940203,
+      37.781103
+    ],
+    "targetHeightM": 8.5,
+    "cat": 3,
+    "name": "135 South Park",
+    "estimated": false,
+    "dims": [
+      34.45,
+      25.95,
+      8.5
+    ],
+    "tris": 3836,
+    "loadRadius": 2500
+  },
+  {
+    "id": "165-south-park",
+    "file": "165-south-park.glb",
+    "anchor": [
+      -122.3943764,
+      37.7808599
+    ],
+    "targetHeightM": 9.0,
+    "cat": 1,
+    "name": "165-167 South Park",
+    "estimated": true,
+    "dims": [
+      19.0972,
+      21.9096,
+      9.0
+    ],
+    "tris": 2008,
+    "loadRadius": 2500
+  },
+  {
+    "id": "370-brannan",
+    "file": "370-brannan.glb",
+    "anchor": [
+      -122.3938572,
+      37.7807602
+    ],
+    "targetHeightM": 7.63,
+    "cat": 3,
+    "name": "370 Brannan Street",
+    "estimated": false,
+    "dims": [
+      21.8727,
+      21.7057,
+      7.63
+    ],
+    "tris": 1428,
+    "loadRadius": 2500
+  },
+  {
+    "id": "358-brannan",
+    "file": "358-brannan.glb",
+    "anchor": [
+      -122.393635,
+      37.7809258
+    ],
+    "targetHeightM": 9.6,
+    "cat": 19,
+    "name": "358 Brannan Street",
+    "estimated": true,
+    "dims": [
+      22.9316,
+      23.0609,
+      9.6
+    ],
+    "tris": 3860,
+    "loadRadius": 2500
+  },
+  {
+    "id": "181-south-park",
+    "file": "181-south-park.glb",
+    "anchor": [
+      -122.3945113,
+      37.7807582
+    ],
+    "targetHeightM": 16.5,
+    "cat": 2,
+    "name": "181 South Park",
+    "estimated": false,
+    "dims": [
+      40.8359,
+      40.5282,
+      16.5
+    ],
+    "tris": 4200,
     "loadRadius": 2500
   }
 ]

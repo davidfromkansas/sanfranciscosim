@@ -85,6 +85,29 @@ predicted savings before executing.
    sharp. NOT 0.5°: dissolve merges transitively, and on curved shells a
    0.5° chain accumulates twisted ngons that re-triangulate with flipped
    windings. Savings at 0.05° are nearly identical.
+
+   **Skip this step entirely on assets with large coplanar ring bands** — a
+   parapet, coping, string course or cornice that follows the footprint all the
+   way round. Their top and bottom faces are perfectly coplanar annuli, so even
+   a strictly-coplanar dissolve merges each ring into one annulus ngon, and
+   re-triangulating an annulus emits slivers. Measured on `350-brannan`
+   (13 Aug 2026): 7 triangles up to **24.35 m long** with areas of
+   0.003–0.016 m², i.e. ~0.24 mm wide.
+
+   These are invisible and they pass an **area-based** degeneracy test, so
+   nothing in Phase B or E catches them. What catches them is the stage-2
+   contract validator, two steps later and after the shipping swap: a sliver's
+   shared vertex sits between faces with opposing normals, so its averaged
+   vertex normal collapses to ~0 (measured length 4.8e-05). Blender recomputes
+   loop normals on import and hides this, but gltfpack re-emits the STORED
+   normals, so the failure appears only in the packed file, as
+   `invalid_or_nonunit_loop_normal_count`. Do not go looking for it in
+   gltfpack — `-vn` is ignored under `-noq` and the encoder is not at fault.
+
+   On that asset the dissolve was worth 30 triangles (6,770 → 6,740, 0.4%), so
+   it was reverted under §11 rather than worked around. Weigh it the same way:
+   this step is the cheapest one in Phase B and the only one that can
+   manufacture new degenerate geometry.
 4. **Retessellate over-segmented curves** (halve segments while chord error
    < 1 px at near distance). Skip silhouette-defining curved shells — note
    the skip in the report.

@@ -1,6 +1,6 @@
 {
- "generated": "2026-08-13T03:43:38.539Z",
- "buildings": 174755,
+ "generated": "2026-08-13T16:46:13.679Z",
+ "buildings": 174743,
  "cells": 596,
  "categories": [
   {
@@ -28,21 +28,21 @@
    "cat": 3,
    "id": "office",
    "label": "Office",
-   "count": 2757,
+   "count": 2751,
    "night": 3
   },
   {
    "cat": 4,
    "id": "retail",
    "label": "Retail",
-   "count": 8042,
+   "count": 8041,
    "night": 1
   },
   {
    "cat": 5,
    "id": "restaurant_cafe",
    "label": "Restaurant / Café",
-   "count": 2844,
+   "count": 2843,
    "night": 1
   },
   {
@@ -56,7 +56,7 @@
    "cat": 7,
    "id": "hotel",
    "label": "Hotel",
-   "count": 1461,
+   "count": 1460,
    "night": 0
   },
   {
@@ -119,7 +119,7 @@
    "cat": 16,
    "id": "museum",
    "label": "Museum",
-   "count": 233,
+   "count": 232,
    "night": 1
   },
   {
@@ -140,7 +140,7 @@
    "cat": 19,
    "id": "industrial",
    "label": "Industrial",
-   "count": 2030,
+   "count": 2029,
    "night": 3
   },
   {
@@ -154,7 +154,7 @@
    "cat": 21,
    "id": "gas_station",
    "label": "Gas station",
-   "count": 116,
+   "count": 115,
    "night": 1
   },
   {
@@ -200,17 +200,17 @@
   {
    "sub": "office",
    "label": "Office",
-   "count": 1889
+   "count": 1887
   },
   {
    "sub": "restaurant",
    "label": "Restaurant",
-   "count": 1827
+   "count": 1826
   },
   {
    "sub": "hotel",
    "label": "Hotel",
-   "count": 1308
+   "count": 1307
   },
   {
    "sub": "salon",
@@ -240,7 +240,7 @@
   {
    "sub": "factory",
    "label": "Factory",
-   "count": 689
+   "count": 688
   },
   {
    "sub": "church",
@@ -290,7 +290,7 @@
   {
    "sub": "corner_store",
    "label": "Corner store",
-   "count": 281
+   "count": 280
   },
   {
    "sub": "muni_station",
@@ -335,7 +335,7 @@
   {
    "sub": "gallery",
    "label": "Gallery",
-   "count": 170
+   "count": 169
   },
   {
    "sub": "bakery",
@@ -390,7 +390,7 @@
   {
    "sub": "gas_station",
    "label": "Gas station",
-   "count": 101
+   "count": 100
   },
   {
    "sub": "middle_school",
@@ -654,17 +654,17 @@
   }
  ],
  "sources": {
-  "landuse": 140690,
-  "business": 10213,
+  "landuse": 140686,
+  "business": 10211,
   "heuristic": 7280,
-  "osm": 8624,
-  "overture": 6661,
+  "osm": 8622,
+  "overture": 6657,
   "datasf": 1287
  },
  "confidence": [
-  147970,
-  15330,
-  4497,
+  147966,
+  15324,
+  4495,
   6958
  ],
  "streets": {

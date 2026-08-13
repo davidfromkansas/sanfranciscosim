@@ -8,7 +8,7 @@ import { readFile, readdir, writeFile } from 'node:fs/promises';
 import { existsSync } from 'node:fs';
 import { EXTENT, hash01, project, unproject } from './lib/geo.mjs';
 import { loadHeightmap } from './lib/heightmap.mjs';
-import { LANDMARKS, NAMED_PARKS } from './lib/landmarks.mjs';
+import { LANDMARKS, NAMED_PARKS, exclusionZones } from './lib/landmarks.mjs';
 import { STREET_CLASSES } from './lib/classes.mjs';
 import { readBuildingsBlob, readLandcoverBlob, readStreetsBlob } from './lib/blobread.mjs';
 import { loadTreeBlockers } from './lib/treeblockers.mjs';
@@ -185,8 +185,9 @@ check('1.5b', 'sampled surface-street points within 0.5 m of terrain', worstStre
 
 // ------------------------------------------------ 1.6 landmark exclusion -----
 const intrusions = [];
-for (const l of LANDMARKS) {
-  const [lx, lz] = project(l.lon, l.lat);
+const zones = exclusionZones();
+for (const zone of zones) {
+  const [lx, lz] = project(zone.lon, zone.lat);
   let worst = null;
   for (const b of buildings) {
     // Footprint intrusion, not just centroid: nearest ring vertex to the anchor.
@@ -195,11 +196,11 @@ for (const l of LANDMARKS) {
       const d = Math.hypot(b.ring[i] - lx, b.ring[i + 1] - lz);
       if (d < nearest) nearest = d;
     }
-    if (nearest < l.exclude && (!worst || nearest < worst.d)) worst = { d: nearest, cell: b.cell, height: (b.topY - b.baseY).toFixed(0) };
+    if (nearest < zone.r && (!worst || nearest < worst.d)) worst = { d: nearest, cell: b.cell, height: (b.topY - b.baseY).toFixed(0) };
   }
-  if (worst) intrusions.push(`${l.name}: footprint ${worst.d.toFixed(0)} m from anchor (r=${l.exclude} m, ${worst.height} m tall, cell ${worst.cell})`);
+  if (worst) intrusions.push(`${zone.name}: footprint ${worst.d.toFixed(0)} m from zone centre (r=${zone.r} m, ${worst.height} m tall, cell ${worst.cell})`);
 }
-check('1.6', 'no procedural footprint inside a bespoke landmark exclusion zone', intrusions.length === 0, intrusions.length ? intrusions.join('; ') : `${LANDMARKS.length} landmarks clear`);
+check('1.6', 'no procedural footprint inside a bespoke landmark exclusion zone', intrusions.length === 0, intrusions.length ? intrusions.join('; ') : `${zones.length} zones over ${LANDMARKS.length} landmarks clear`);
 
 // --------------------------------------- 1.7 buildings in open water sweep ---
 // Same definition the runtime terrain uses: elevation below sea level AND

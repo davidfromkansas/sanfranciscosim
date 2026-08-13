@@ -33,7 +33,7 @@ import { existsSync, readFileSync, readdirSync } from 'node:fs';
 import { fileURLToPath } from 'node:url';
 
 import { project } from './lib/geo.mjs';
-import { LANDMARKS } from './lib/landmarks.mjs';
+import { LANDMARKS, exclusionZones } from './lib/landmarks.mjs';
 
 const REPO = fileURLToPath(new URL('..', import.meta.url));
 const PUBLISHED = 'app/public/tiles/buildings';
@@ -151,6 +151,7 @@ const refIds = new Set(
   ),
 );
 const added = LANDMARKS.filter((l) => !refIds.has(l.id));
+const extraZones = exclusionZones().filter((z) => LANDMARKS.some((l) => l.id === z.id && l.lon !== z.lon));
 
 if (!added.length) {
   console.log(`no landmarks added since ${ref} — nothing to verify`);
@@ -222,6 +223,34 @@ for (const l of added) {
     `  ${ok ? 'ok  ' : 'FAIL'} ${l.id.padEnd(22)} ${best.toFixed(1)} m vs ${l.exclude} m radius` +
       (nearest ? `  (nearest is ${nearest.height.toFixed(1)} m tall)` : ''),
   );
+  // A landmark may declare extra zones away from its anchor (551Third's kiosk).
+  // The anchor check above cannot see them, so each one is measured on its own.
+  for (const zone of extraZones.filter((z) => z.id === l.id)) {
+    const [zx, zz] = project(zone.lon, zone.lat);
+    let zBest = Infinity;
+    let zNearest = null;
+    for (let dc = -1; dc <= 1; dc++) {
+      for (let dr = -1; dr <= 1; dr++) {
+        const path = `${src}${col + dc}_${row + dr}.bin`;
+        if (!existsSync(path)) continue;
+        for (const b of footprints(readFileSync(path))) {
+          for (const [x, z] of b.ring) {
+            const d = Math.hypot(x - zx, z - zz);
+            if (d < zBest) {
+              zBest = d;
+              zNearest = b;
+            }
+          }
+        }
+      }
+    }
+    const zOk = zBest > zone.r;
+    if (!zOk) tooClose.push(`${l.id}+extra`);
+    console.log(
+      `  ${zOk ? 'ok  ' : 'FAIL'} ${(l.id + ' extra').padEnd(22)} ${zBest.toFixed(1)} m vs ${zone.r} m radius` +
+        (zNearest ? `  (nearest is ${zNearest.height.toFixed(1)} m tall)` : ''),
+    );
+  }
 }
 
 // ------------------------------------------------------------------ verdict

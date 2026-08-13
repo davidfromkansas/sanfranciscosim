@@ -21,7 +21,7 @@ import {
 } from './lib/geo.mjs';
 import { ringArea, ringBBox, ringCentroid, simplifyRing } from './lib/poly.mjs';
 import { loadHeightmap } from './lib/heightmap.mjs';
-import { LANDMARKS } from './lib/landmarks.mjs';
+import { exclusionZones } from './lib/landmarks.mjs';
 import { PALETTE, makeDistrictLookup } from './lib/districts.mjs';
 import { writeBuildingsBlob } from './lib/binio.mjs';
 
@@ -37,9 +37,9 @@ const OCC_RES = 5; // occupancy raster resolution in meters
 const { sampleElevation } = await loadHeightmap();
 const paletteAt = makeDistrictLookup(project);
 
-const exclusions = LANDMARKS.map((l) => {
-  const [x, z] = project(l.lon, l.lat);
-  return { x, z, r2: l.exclude * l.exclude, id: l.id };
+const exclusions = exclusionZones().map((zone) => {
+  const [x, z] = project(zone.lon, zone.lat);
+  return { x, z, r2: zone.r * zone.r, id: zone.id };
 });
 
 // A bridge is a kilometres-long structure, so a circle around its anchor only

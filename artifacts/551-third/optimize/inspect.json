@@ -1,0 +1,945 @@
+{
+ "file_bytes": {
+  "raw": 613056,
+  "gzip9": 96373
+ },
+ "objects": 147,
+ "total_tris": 10100,
+ "total_verts": 20508,
+ "primitives_est": 147,
+ "top20": [
+  {
+   "name": "kerb_boll_0",
+   "tris": 220,
+   "verts": 432,
+   "dims": [
+    0.204,
+    0.204,
+    0.985
+   ],
+   "materials": [
+    "Toy_mustard"
+   ]
+  },
+  {
+   "name": "kerb_boll_1",
+   "tris": 220,
+   "verts": 432,
+   "dims": [
+    0.201,
+    0.201,
+    0.985
+   ],
+   "materials": [
+    "Toy_mustard"
+   ]
+  },
+  {
+   "name": "kerb_boll_2",
+   "tris": 220,
+   "verts": 432,
+   "dims": [
+    0.201,
+    0.198,
+    0.985
+   ],
+   "materials": [
+    "Toy_mustard"
+   ]
+  },
+  {
+   "name": "kerb_boll_3",
+   "tris": 220,
+   "verts": 432,
+   "dims": [
+    0.198,
+    0.204,
+    0.985
+   ],
+   "materials": [
+    "Toy_mustard"
+   ]
+  },
+  {
+   "name": "kerb_boll_4",
+   "tris": 220,
+   "verts": 432,
+   "dims": [
+    0.198,
+    0.198,
+    0.985
+   ],
+   "materials": [
+    "Toy_mustard"
+   ]
+  },
+  {
+   "name": "kerb_boll_5",
+   "tris": 220,
+   "verts": 432,
+   "dims": [
+    0.198,
+    0.198,
+    0.985
+   ],
+   "materials": [
+    "Toy_mustard"
+   ]
+  },
+  {
+   "name": "nw_boll_0",
+   "tris": 220,
+   "verts": 432,
+   "dims": [
+    0.201,
+    0.198,
+    0.985
+   ],
+   "materials": [
+    "Toy_mustard"
+   ]
+  },
+  {
+   "name": "nw_boll_1",
+   "tris": 220,
+   "verts": 432,
+   "dims": [
+    0.198,
+    0.201,
+    0.985
+   ],
+   "materials": [
+    "Toy_mustard"
+   ]
+  },
+  {
+   "name": "nw_boll_2",
+   "tris": 220,
+   "verts": 432,
+   "dims": [
+    0.198,
+    0.201,
+    0.985
+   ],
+   "materials": [
+    "Toy_mustard"
+   ]
+  },
+  {
+   "name": "umb0_boll0",
+   "tris": 220,
+   "verts": 432,
+   "dims": [
+    0.201,
+    0.204,
+    0.985
+   ],
+   "materials": [
+    "Toy_mustard"
+   ]
+  },
+  {
+   "name": "umb0_boll1",
+   "tris": 220,
+   "verts": 432,
+   "dims": [
+    0.198,
+    0.198,
+    0.985
+   ],
+   "materials": [
+    "Toy_mustard"
+   ]
+  },
+  {
+   "name": "umb0_deck",
+   "tris": 220,
+   "verts": 432,
+   "dims": [
+    9.829,
+    9.829,
+    0.69
+   ],
+   "materials": [
+    "Toy_stone"
+   ]
+  },
+  {
+   "name": "umb1_boll0",
+   "tris": 220,
+   "verts": 432,
+   "dims": [
+    0.204,
+    0.204,
+    0.985
+   ],
+   "materials": [
+    "Toy_mustard"
+   ]
+  },
+  {
+   "name": "umb1_boll1",
+   "tris": 220,
+   "verts": 432,
+   "dims": [
+    0.201,
+    0.201,
+    0.985
+   ],
+   "materials": [
+    "Toy_mustard"
+   ]
+  },
+  {
+   "name": "umb1_deck",
+   "tris": 220,
+   "verts": 432,
+   "dims": [
+    9.829,
+    9.829,
+    0.69
+   ],
+   "materials": [
+    "Toy_stone"
+   ]
+  },
+  {
+   "name": "air_water",
+   "tris": 108,
+   "verts": 216,
+   "dims": [
+    0.787,
+    0.787,
+    1.281
+   ],
+   "materials": [
+    "Toy_teal"
+   ]
+  },
+  {
+   "name": "bin_a",
+   "tris": 108,
+   "verts": 216,
+   "dims": [
+    0.795,
+    0.795,
+    1.034
+   ],
+   "materials": [
+    "Toy_ink"
+   ]
+  },
+  {
+   "name": "bin_b",
+   "tris": 108,
+   "verts": 216,
+   "dims": [
+    0.795,
+    0.795,
+    1.034
+   ],
+   "materials": [
+    "Toy_ink"
+   ]
+  },
+  {
+   "name": "kiosk_body",
+   "tris": 108,
+   "verts": 216,
+   "dims": [
+    13.726,
+    13.726,
+    3.369
+   ],
+   "materials": [
+    "Toy_cream"
+   ]
+  },
+  {
+   "name": "kiosk_cap_ne",
+   "tris": 108,
+   "verts": 216,
+   "dims": [
+    4.543,
+    4.543,
+    0.345
+   ],
+   "materials": [
+    "Toy_ink"
+   ]
+  }
+ ],
+ "vertex_attrs": [
+  "NORMAL"
+ ],
+ "materials": [
+  {
+   "name": "Toy_cream",
+   "glow": false,
+   "user_objects": 1
+  },
+  {
+   "name": "Toy_glass",
+   "glow": false,
+   "user_objects": 1
+  },
+  {
+   "name": "Toy_glassl_Glow",
+   "glow": true,
+   "user_objects": 1
+  },
+  {
+   "name": "Toy_ink",
+   "glow": false,
+   "user_objects": 26
+  },
+  {
+   "name": "Toy_mustard",
+   "glow": false,
+   "user_objects": 28
+  },
+  {
+   "name": "Toy_mustard_Glow",
+   "glow": true,
+   "user_objects": 15
+  },
+  {
+   "name": "Toy_red",
+   "glow": false,
+   "user_objects": 20
+  },
+  {
+   "name": "Toy_roofd",
+   "glow": false,
+   "user_objects": 2
+  },
+  {
+   "name": "Toy_steel",
+   "glow": false,
+   "user_objects": 7
+  },
+  {
+   "name": "Toy_stone",
+   "glow": false,
+   "user_objects": 11
+  },
+  {
+   "name": "Toy_teal",
+   "glow": false,
+   "user_objects": 2
+  },
+  {
+   "name": "Toy_trim",
+   "glow": false,
+   "user_objects": 15
+  },
+  {
+   "name": "Toy_trim_Glow",
+   "glow": true,
+   "user_objects": 2
+  },
+  {
+   "name": "Toy_white",
+   "glow": false,
+   "user_objects": 16
+  }
+ ],
+ "textures": [],
+ "bbox": {
+  "dims": [
+   41.8071,
+   41.8071,
+   6.6
+  ],
+  "min": [
+   -20.9036,
+   -20.9036,
+   0.0
+  ],
+  "origin_offset_xy": [
+   0.0,
+   0.0
+  ],
+  "base_z": 0.0
+ },
+ "duplicate_mesh_groups": [
+  {
+   "signature": {
+    "verts": 432,
+    "tris": 220,
+    "dims": [
+     0.1981,
+     0.1981,
+     0.9851
+    ]
+   },
+   "objects": [
+    "kerb_boll_4",
+    "kerb_boll_5",
+    "umb0_boll1"
+   ]
+  },
+  {
+   "signature": {
+    "verts": 432,
+    "tris": 220,
+    "dims": [
+     0.2036,
+     0.2036,
+     0.9851
+    ]
+   },
+   "objects": [
+    "kerb_boll_0",
+    "umb1_boll0"
+   ]
+  },
+  {
+   "signature": {
+    "verts": 432,
+    "tris": 220,
+    "dims": [
+     0.2008,
+     0.2008,
+     0.9851
+    ]
+   },
+   "objects": [
+    "kerb_boll_1",
+    "umb1_boll1"
+   ]
+  },
+  {
+   "signature": {
+    "verts": 432,
+    "tris": 220,
+    "dims": [
+     0.1981,
+     0.2008,
+     0.9851
+    ]
+   },
+   "objects": [
+    "nw_boll_1",
+    "nw_boll_2"
+   ]
+  },
+  {
+   "signature": {
+    "verts": 432,
+    "tris": 220,
+    "dims": [
+     9.829,
+     9.829,
+     0.6896
+    ]
+   },
+   "objects": [
+    "umb0_deck",
+    "umb1_deck"
+   ]
+  },
+  {
+   "signature": {
+    "verts": 216,
+    "tris": 108,
+    "dims": [
+     1.2048,
+     1.2048,
+     1.8716
+    ]
+   },
+   "objects": [
+    "umb0_disp0",
+    "umb0_disp1",
+    "umb1_disp0",
+    "umb1_disp1"
+   ]
+  },
+  {
+   "signature": {
+    "verts": 216,
+    "tris": 108,
+    "dims": [
+     1.2966,
+     1.2966,
+     0.1576
+    ]
+   },
+   "objects": [
+    "umb0_disp0_cap",
+    "umb0_disp1_cap",
+    "umb1_disp0_cap",
+    "umb1_disp1_cap"
+   ]
+  },
+  {
+   "signature": {
+    "verts": 96,
+    "tris": 44,
+    "dims": [
+     0.1811,
+     0.1811,
+     0.8866
+    ]
+   },
+   "objects": [
+    "umb0_disp0_hose0",
+    "umb0_disp0_hose1",
+    "umb0_disp1_hose0",
+    "umb0_disp1_hose1",
+    "umb1_disp0_hose0",
+    "umb1_disp0_hose1",
+    "umb1_disp1_hose0",
+    "umb1_disp1_hose1"
+   ]
+  },
+  {
+   "signature": {
+    "verts": 96,
+    "tris": 44,
+    "dims": [
+     2.9558,
+     2.9558,
+     0.3448
+    ]
+   },
+   "objects": [
+    "umb0_fascia_hi1",
+    "umb0_fascia_hi3",
+    "umb0_fascia_hi5",
+    "umb0_fascia_hi7",
+    "umb1_fascia_hi1",
+    "umb1_fascia_hi3",
+    "umb1_fascia_hi5",
+    "umb1_fascia_hi7"
+   ]
+  },
+  {
+   "signature": {
+    "verts": 96,
+    "tris": 44,
+    "dims": [
+     2.9558,
+     2.9558,
+     0.4433
+    ]
+   },
+   "objects": [
+    "umb0_fascia_lo1",
+    "umb0_fascia_lo3",
+    "umb0_fascia_lo5",
+    "umb0_fascia_lo7",
+    "umb1_fascia_lo1",
+    "umb1_fascia_lo3",
+    "umb1_fascia_lo5",
+    "umb1_fascia_lo7"
+   ]
+  },
+  {
+   "signature": {
+    "verts": 96,
+    "tris": 44,
+    "dims": [
+     2.275,
+     4.8873,
+     0.0985
+    ]
+   },
+   "objects": [
+    "umb0_rib0",
+    "umb0_rib1",
+    "umb0_rib4",
+    "umb0_rib5",
+    "umb1_rib0",
+    "umb1_rib1",
+    "umb1_rib4",
+    "umb1_rib5"
+   ]
+  },
+  {
+   "signature": {
+    "verts": 96,
+    "tris": 44,
+    "dims": [
+     4.8873,
+     2.275,
+     0.0985
+    ]
+   },
+   "objects": [
+    "umb0_rib2",
+    "umb0_rib3",
+    "umb0_rib6",
+    "umb0_rib7",
+    "umb1_rib2",
+    "umb1_rib3",
+    "umb1_rib6",
+    "umb1_rib7"
+   ]
+  },
+  {
+   "signature": {
+    "verts": 216,
+    "tris": 108,
+    "dims": [
+     0.7951,
+     0.7951,
+     1.0343
+    ]
+   },
+   "objects": [
+    "bin_a",
+    "bin_b"
+   ]
+  },
+  {
+   "signature": {
+    "verts": 216,
+    "tris": 108,
+    "dims": [
+     4.5425,
+     4.5425,
+     0.3448
+    ]
+   },
+   "objects": [
+    "kiosk_cap_ne",
+    "kiosk_cap_sw"
+   ]
+  },
+  {
+   "signature": {
+    "verts": 216,
+    "tris": 108,
+    "dims": [
+     9.502,
+     9.502,
+     0.3448
+    ]
+   },
+   "objects": [
+    "kiosk_cap_nw",
+    "kiosk_cap_se"
+   ]
+  },
+  {
+   "signature": {
+    "verts": 216,
+    "tris": 108,
+    "dims": [
+     1.9014,
+     1.9014,
+     0.2955
+    ]
+   },
+   "objects": [
+    "umb0_capital",
+    "umb1_capital"
+   ]
+  },
+  {
+   "signature": {
+    "verts": 216,
+    "tris": 108,
+    "dims": [
+     0.7254,
+     0.7254,
+     3.8024
+    ]
+   },
+   "objects": [
+    "umb0_col",
+    "umb1_col"
+   ]
+  },
+  {
+   "signature": {
+    "verts": 216,
+    "tris": 108,
+    "dims": [
+     5.6709,
+     5.6709,
+     0.197
+    ]
+   },
+   "objects": [
+    "umb0_island",
+    "umb1_island"
+   ]
+  },
+  {
+   "signature": {
+    "verts": 94,
+    "tris": 44,
+    "dims": [
+     0.5851,
+     0.5851,
+     0.7881
+    ]
+   },
+   "objects": [
+    "umb0_disp1_face0",
+    "umb1_disp1_face0",
+    "umb1_disp1_face1"
+   ]
+  },
+  {
+   "signature": {
+    "verts": 24,
+    "tris": 12,
+    "dims": [
+     2.961,
+     2.961,
+     0.2955
+    ]
+   },
+   "objects": [
+    "umb0_lightbar1",
+    "umb0_lightbar3",
+    "umb0_lightbar5",
+    "umb0_lightbar7",
+    "umb1_lightbar1",
+    "umb1_lightbar3",
+    "umb1_lightbar5",
+    "umb1_lightbar7"
+   ]
+  },
+  {
+   "signature": {
+    "verts": 96,
+    "tris": 44,
+    "dims": [
+     14.3629,
+     14.3629,
+     0.1773
+    ]
+   },
+   "objects": [
+    "kerb_nw",
+    "kerb_se"
+   ]
+  },
+  {
+   "signature": {
+    "verts": 96,
+    "tris": 44,
+    "dims": [
+     0.2647,
+     0.2647,
+     2.5415
+    ]
+   },
+   "objects": [
+    "kiosk_mull0",
+    "kiosk_mull1"
+   ]
+  },
+  {
+   "signature": {
+    "verts": 96,
+    "tris": 44,
+    "dims": [
+     0.5851,
+     0.5851,
+     0.7881
+    ]
+   },
+   "objects": [
+    "umb0_disp0_face0",
+    "umb0_disp1_face1"
+   ]
+  },
+  {
+   "signature": {
+    "verts": 96,
+    "tris": 44,
+    "dims": [
+     4.1391,
+     0.1092,
+     0.3448
+    ]
+   },
+   "objects": [
+    "umb0_fascia_hi0",
+    "umb0_fascia_hi4"
+   ]
+  },
+  {
+   "signature": {
+    "verts": 96,
+    "tris": 44,
+    "dims": [
+     4.1391,
+     0.1092,
+     0.4433
+    ]
+   },
+   "objects": [
+    "umb0_fascia_lo0",
+    "umb0_fascia_lo4"
+   ]
+  },
+  {
+   "signature": {
+    "verts": 96,
+    "tris": 44,
+    "dims": [
+     4.1392,
+     0.1092,
+     0.3448
+    ]
+   },
+   "objects": [
+    "umb1_fascia_hi0",
+    "umb1_fascia_hi4"
+   ]
+  },
+  {
+   "signature": {
+    "verts": 96,
+    "tris": 44,
+    "dims": [
+     4.1392,
+     0.1092,
+     0.4433
+    ]
+   },
+   "objects": [
+    "umb1_fascia_lo0",
+    "umb1_fascia_lo4"
+   ]
+  },
+  {
+   "signature": {
+    "verts": 36,
+    "tris": 20,
+    "dims": [
+     2.3404,
+     2.3404,
+     0.0148
+    ]
+   },
+   "objects": [
+    "chev_0_0",
+    "chev_0_1",
+    "chev_1_0",
+    "chev_1_1"
+   ]
+  },
+  {
+   "signature": {
+    "verts": 48,
+    "tris": 28,
+    "dims": [
+     9.4649,
+     9.4649,
+     0.0296
+    ]
+   },
+   "objects": [
+    "umb0_soffit_glow",
+    "umb1_soffit_glow"
+   ]
+  },
+  {
+   "signature": {
+    "verts": 24,
+    "tris": 12,
+    "dims": [
+     4.1768,
+     0.0182,
+     0.2955
+    ]
+   },
+   "objects": [
+    "umb0_lightbar0",
+    "umb0_lightbar4",
+    "umb1_lightbar0",
+    "umb1_lightbar4"
+   ]
+  },
+  {
+   "signature": {
+    "verts": 24,
+    "tris": 12,
+    "dims": [
+     25.7376,
+     25.7376,
+     0.0148
+    ]
+   },
+   "objects": [
+    "lane_0",
+    "lane_1",
+    "lane_2"
+   ]
+  },
+  {
+   "signature": {
+    "verts": 24,
+    "tris": 12,
+    "dims": [
+     26.4133,
+     26.4133,
+     0.0148
+    ]
+   },
+   "objects": [
+    "edge_ne",
+    "edge_sw"
+   ]
+  },
+  {
+   "signature": {
+    "verts": 24,
+    "tris": 12,
+    "dims": [
+     12.9698,
+     12.9698,
+     0.0148
+    ]
+   },
+   "objects": [
+    "edge_nw",
+    "edge_se"
+   ]
+  },
+  {
+   "signature": {
+    "verts": 24,
+    "tris": 12,
+    "dims": [
+     0.0182,
+     4.1768,
+     0.2955
+    ]
+   },
+   "objects": [
+    "umb0_lightbar2",
+    "umb1_lightbar6"
+   ]
+  }
+ ],
+ "dup_redundant_tris": 4820,
+ "join_candidates": {
+  "Toy_ink": 26,
+  "Toy_mustard": 28,
+  "Toy_mustard_Glow": 15,
+  "Toy_red": 20,
+  "Toy_roofd": 2,
+  "Toy_steel": 7,
+  "Toy_stone": 11,
+  "Toy_teal": 2,
+  "Toy_trim": 15,
+  "Toy_trim_Glow": 2,
+  "Toy_white": 16
+ },
+ "degenerate_tris": 544,
+ "coincident_vert_pairs": 15436,
+ "over_tess": {
+  "near_distance_m": 62.71,
+  "one_px_world_m": 0.0423,
+  "note": "cylinders whose chord error < one_px_world_m can halve segments"
+ }
+}
