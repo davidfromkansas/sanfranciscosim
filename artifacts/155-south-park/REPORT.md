@@ -9,27 +9,36 @@ disagree, this report and `REFERENCE.md` are correct.
 
 ## 1. Headline numbers
 
-| | As built |
-|---|---|
-| Triangles | 4,048 (cap 7,000) |
-| Objects | 63 |
-| Dimensions (AABB) | 25.5223 x 28.2942 x 10.10 m |
-| Min Z | 0.0 |
-| XY centre offset | (0.230, 0.537) m |
-| Materials | 13, all `Toy_*`, flat, opaque |
-| Glow materials | `Toy_gold_Glow`, `Toy_glass_Glow` |
-| File, raw | 243,456 B |
-| Contract validation | **PASS on all 16 checks** |
-| Anchor | `-122.3942202, 37.7808993` |
-| Target height | 10.1 m (bbox top normalized exactly, so loader scale = 1.0) |
-| Front heading | 327.2° true (NNW), authored in true-world orientation |
+Both columns are real: the asset was built, approved, then optimized in stage 4
+(`optimize/REPORT.md`). **The shipped column is what the manifest describes.**
+
+| | As built | **Shipped (post-optimize)** |
+|---|---|---|
+| Triangles | 4,048 (cap 7,000) | **4,048** |
+| Objects | 63 | 15 |
+| Vertices | 8,088 | 2,144 |
+| Draw submeshes | 65 | **17** |
+| Dimensions (AABB) | 25.5223 x 28.2942 x 10.10 m | identical to 1e-5 m |
+| Min Z | 0.0 | 0.0 |
+| XY centre offset | (0.230, 0.537) m | unchanged |
+| Materials | 13, all `Toy_*`, flat, opaque | 13, identical set |
+| Glow materials | `Toy_gold_Glow`, `Toy_glass_Glow` | identical |
+| File, raw | 243,456 B | **113,664 B** (−53.3%) |
+| Contract validation | **PASS on all 16 checks** | **PASS on all 16 checks** |
+| Anchor | `-122.3942202, 37.7808993` | unchanged |
+| Target height | 10.1 m (bbox top normalized exactly, so loader scale = 1.0) | unchanged |
+| Front heading | 327.2° true (NNW), authored in true-world orientation | unchanged |
+
+Compression is `EXT_meshopt_compression` without `KHR_mesh_quantization`, matching
+`pipeline/compress-assets.mjs`.
 
 The AABB is ~25.5 x 28.3 m for an 8.2 x 31.2 m building. That is the expected
 consequence of authoring at the real 41.4° SoMa heading, not a scale error.
 
-Normal orientation: 63 of 63 objects enclose positive signed volume, and 0 of
-31,500 deterministic visibility rays hit an inward-facing first surface (residual
-0.000%, tolerance 0.15%).
+Normal orientation: as built, 63 of 63 objects enclose positive signed volume and 0
+of 31,500 deterministic visibility rays hit an inward-facing first surface (residual
+0.000%, tolerance 0.15%). After optimize, 15 of 15 joined objects are still closed
+(tested on a welded copy) with the same 0.000% residual.
 
 ## 2. Dossier corrections and decisions made during the build
 
@@ -129,11 +138,12 @@ correctly via `fade_glow()`.
 |---|---|
 | `build_155_south_park.py` | deterministic Blender 5.2 build, world-space metres, true-world heading |
 | `155-south-park.blend` | authoring scene |
-| `155-south-park.glb` | the shipping asset |
+| `155-south-park.glb` | the shipping asset (post-optimize; the pre-optimize original is archived at `optimize/input/`) |
 | `render_155_south_park.py` | controlled review rig; always re-imports the exported GLB |
 | `make_contact_sheet.py` | contact sheet assembly |
 | `validate_155_south_park.py` | fresh-scene contract validation |
-| `validation.json` | machine-readable validation result, all 16 checks PASS |
+| `validation.json` | machine-readable validation result on the shipped file, all 16 checks PASS |
+| `optimize/` | stage-4 shrink pass: scripts, A/B renders, gate results, and the archived pre-optimize GLB |
 | `155-south-park-{north,east,south,west}.png` | four elevations, one rig, identical everything but azimuth |
 | `155-south-park-top.png` | both roofs, the step, the deck and the screen |
 | `155-south-park-aerial.png` | beauty render from the app's camera band |
