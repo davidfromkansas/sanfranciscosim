@@ -666,5 +666,24 @@
     ],
     "tris": 6770,
     "loadRadius": 2500
+  },
+  {
+    "id": "171-south-park",
+    "file": "171-south-park.glb",
+    "anchor": [
+      -122.3945219,
+      37.7809
+    ],
+    "targetHeightM": 12.6,
+    "cat": 2,
+    "name": "171 South Park Street",
+    "estimated": false,
+    "dims": [
+      19.2565,
+      18.497,
+      12.6
+    ],
+    "tris": 5808,
+    "loadRadius": 2500
   }
 ]

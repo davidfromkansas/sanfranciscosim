@@ -559,6 +559,32 @@ export const LANDMARKS = [
     exclude: 40,
     camera: { distance: 600, yaw: 268, pitch: 20 },
   },
+  {
+    // The tightest exclusion window in this file, and the failure mode is
+    // silent. `excluded()` drops a footprint when its ring centroid OR any
+    // vertex lands inside the radius, and measured against the rings the bake
+    // actually sees (DataSF, after simplifyRing(0.6)) from this anchor:
+    // this building's own ring triggers at 0.57 m, 165-167 South Park
+    // (SF3775028) at 3.83 m, 181 (SF3775172) at 3.92 m, 159 (SF3775029) at
+    // 11.02 m. So the window is (0.6, 3.8) m and 2 sits in the middle of it.
+    // Anything from 4 m up deletes two party-wall historic contributors from
+    // the baked city and nothing crashes to tell you.
+    //
+    // This is also why the anchor is the footprint's AREA CENTROID rather than
+    // its OBB centre: at the OBB centre the nearest neighbour vertex is 2.74 m
+    // and the window nearly closes.
+    id: '171SouthPark',
+    name: '171 South Park Street',
+    lon: -122.3945219,
+    lat: 37.7809,
+    height: 12.6,
+    exclude: 2,
+    // Camera bearing = 180 - yaw (camera.js apply(): offset is
+    // (sin yaw, ., cos yaw) and +z is south), so yaw 197 stands the camera at
+    // 343 deg = NNW, square onto the three-facet park front. Cross-checked
+    // against 380Brannan, whose SE-facing front carries yaw 45 = bearing 135.
+    camera: { distance: 200, yaw: 197, pitch: 26 },
+  },
 ];
 
 // Parks/green spaces the landcover bake must match at least one source polygon
