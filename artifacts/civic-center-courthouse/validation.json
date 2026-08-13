@@ -1,0 +1,331 @@
+{
+  "asset": "civic-center-courthouse.glb",
+  "validator": "Blender 5.2.0 LTS",
+  "fresh_isolated_scene": true,
+  "reimported_final_glb": true,
+  "object_count": 9,
+  "mesh_object_count": 9,
+  "triangle_count": 4712,
+  "triangle_budget": 22000,
+  "dimensions_m": [
+    91.0774,
+    51.3031,
+    29.6
+  ],
+  "bbox_min_m": [
+    -45.5387,
+    -25.6515,
+    0.0
+  ],
+  "bbox_max_m": [
+    45.5387,
+    25.6515,
+    29.6
+  ],
+  "min_z_m": 0.0,
+  "xy_center_offset_m": [
+    0.0,
+    0.0
+  ],
+  "heading_deg_cw_from_north": 81.22,
+  "materials": [
+    "Toy_glass",
+    "Toy_ink",
+    "Toy_mustard_Glow",
+    "Toy_roofd",
+    "Toy_steel",
+    "Toy_stone",
+    "Toy_trim",
+    "Toy_white",
+    "Toy_white_Glow"
+  ],
+  "material_details": [
+    {
+      "name": "Toy_glass",
+      "image_texture_nodes": [],
+      "alpha": 1.0,
+      "roughness": 0.85,
+      "emission_strength": 0.0,
+      "glow": false
+    },
+    {
+      "name": "Toy_ink",
+      "image_texture_nodes": [],
+      "alpha": 1.0,
+      "roughness": 0.85,
+      "emission_strength": 0.0,
+      "glow": false
+    },
+    {
+      "name": "Toy_mustard_Glow",
+      "image_texture_nodes": [],
+      "alpha": 1.0,
+      "roughness": 0.85,
+      "emission_strength": 0.0,
+      "glow": true
+    },
+    {
+      "name": "Toy_roofd",
+      "image_texture_nodes": [],
+      "alpha": 1.0,
+      "roughness": 0.85,
+      "emission_strength": 0.0,
+      "glow": false
+    },
+    {
+      "name": "Toy_steel",
+      "image_texture_nodes": [],
+      "alpha": 1.0,
+      "roughness": 0.85,
+      "emission_strength": 0.0,
+      "glow": false
+    },
+    {
+      "name": "Toy_stone",
+      "image_texture_nodes": [],
+      "alpha": 1.0,
+      "roughness": 0.85,
+      "emission_strength": 0.0,
+      "glow": false
+    },
+    {
+      "name": "Toy_trim",
+      "image_texture_nodes": [],
+      "alpha": 1.0,
+      "roughness": 0.85,
+      "emission_strength": 0.0,
+      "glow": false
+    },
+    {
+      "name": "Toy_white",
+      "image_texture_nodes": [],
+      "alpha": 1.0,
+      "roughness": 0.85,
+      "emission_strength": 0.0,
+      "glow": false
+    },
+    {
+      "name": "Toy_white_Glow",
+      "image_texture_nodes": [],
+      "alpha": 1.0,
+      "roughness": 0.85,
+      "emission_strength": 0.0,
+      "glow": true
+    }
+  ],
+  "image_texture_count": 0,
+  "textured_materials": [],
+  "transparent_materials": [],
+  "camera_count": 0,
+  "light_count": 0,
+  "animation_fcurve_count": 0,
+  "armature_count": 0,
+  "constraint_count": 0,
+  "transforms_applied": true,
+  "negative_scales": false,
+  "degenerate_triangle_count": 0,
+  "invalid_or_nonunit_loop_normal_count": 0,
+  "normal_ray_cast_first_hits": 22500,
+  "normal_ray_cast_flipped_visible_faces": 0,
+  "inverted_solids": [],
+  "ray_flipped_fraction": 0.0,
+  "normal_orientation_status": "PASS",
+  "normal_orientation_method": "Authoritative gate: per-object signed volume must be positive (all faces wound outward) - this asset is a union of overlapping solids, so a small residual of visibility-ray 'flipped' first hits is legitimate (rays entering the union interior through an overlap); the 22,500-ray test is kept as a supplementary metric with a 0.1% tolerance. Loop normals must be finite/unit.",
+  "glow_materials": [
+    "Toy_mustard_Glow",
+    "Toy_white_Glow"
+  ],
+  "unexpected_geometry_or_objects": [],
+  "material_contract_violations": [],
+  "object_details": [
+    {
+      "name": "ent_soffit_glow",
+      "triangles": 12,
+      "location": [
+        0.0,
+        0.0,
+        0.0
+      ],
+      "rotation_euler": [
+        0.0,
+        0.0,
+        0.0
+      ],
+      "scale": [
+        1.0,
+        1.0,
+        1.0
+      ]
+    },
+    {
+      "name": "grp_Toy_glass",
+      "triangles": 1152,
+      "location": [
+        0.0,
+        0.0,
+        0.0
+      ],
+      "rotation_euler": [
+        0.0,
+        0.0,
+        0.0
+      ],
+      "scale": [
+        1.0,
+        1.0,
+        1.0
+      ]
+    },
+    {
+      "name": "grp_Toy_ink",
+      "triangles": 724,
+      "location": [
+        0.0,
+        0.0,
+        0.0
+      ],
+      "rotation_euler": [
+        0.0,
+        0.0,
+        0.0
+      ],
+      "scale": [
+        1.0,
+        1.0,
+        1.0
+      ]
+    },
+    {
+      "name": "grp_Toy_mustard_Glow",
+      "triangles": 688,
+      "location": [
+        0.0,
+        0.0,
+        0.0
+      ],
+      "rotation_euler": [
+        0.0,
+        0.0,
+        0.0
+      ],
+      "scale": [
+        1.0,
+        1.0,
+        1.0
+      ]
+    },
+    {
+      "name": "grp_Toy_steel",
+      "triangles": 316,
+      "location": [
+        0.0,
+        0.0,
+        0.0
+      ],
+      "rotation_euler": [
+        0.0,
+        0.0,
+        0.0
+      ],
+      "scale": [
+        1.0,
+        1.0,
+        1.0
+      ]
+    },
+    {
+      "name": "grp_Toy_stone",
+      "triangles": 264,
+      "location": [
+        0.0,
+        0.0,
+        0.0
+      ],
+      "rotation_euler": [
+        0.0,
+        0.0,
+        0.0
+      ],
+      "scale": [
+        1.0,
+        1.0,
+        1.0
+      ]
+    },
+    {
+      "name": "grp_Toy_trim",
+      "triangles": 1052,
+      "location": [
+        0.0,
+        0.0,
+        0.0
+      ],
+      "rotation_euler": [
+        0.0,
+        0.0,
+        0.0
+      ],
+      "scale": [
+        1.0,
+        1.0,
+        1.0
+      ]
+    },
+    {
+      "name": "grp_Toy_white",
+      "triangles": 492,
+      "location": [
+        0.0,
+        0.0,
+        0.0
+      ],
+      "rotation_euler": [
+        0.0,
+        0.0,
+        0.0
+      ],
+      "scale": [
+        1.0,
+        1.0,
+        1.0
+      ]
+    },
+    {
+      "name": "ph_deck",
+      "triangles": 12,
+      "location": [
+        0.0,
+        0.0,
+        0.0
+      ],
+      "rotation_euler": [
+        0.0,
+        0.0,
+        0.0
+      ],
+      "scale": [
+        1.0,
+        1.0,
+        1.0
+      ]
+    }
+  ],
+  "checks": {
+    "meters_and_plausible_dimensions": true,
+    "base_at_z_zero": true,
+    "centered_xy": true,
+    "under_triangle_budget": true,
+    "no_image_textures": true,
+    "no_transparency": true,
+    "materials_follow_contract": true,
+    "no_cameras_or_lights": true,
+    "no_animation_skin_or_constraints": true,
+    "transforms_applied": true,
+    "no_negative_scales": true,
+    "normals_outward": true,
+    "no_degenerate_geometry": true,
+    "no_unexpected_objects": true,
+    "glow_set_is_night_only": true
+  },
+  "overall": "PASS"
+}
