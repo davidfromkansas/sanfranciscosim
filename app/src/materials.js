@@ -37,11 +37,20 @@ const DITHER = /* glsl */ `
 `;
 
 // Cloud shadows: two scrolling value-noise octaves in world XZ, sampled per
-// fragment, so soft shadow blankets drift across the city with the wind.
+// fragment, so soft shadow blankets drift across the city with the real wind.
+// How dark a fully overcast cell may go. The toy city has to stay a painted
+// object, so this is deliberately well short of 1.0 — it is an art call, not a
+// physical one.
+export const CLOUD_MAX_SHADE = 0.45;
+
 const CLOUDS = /* glsl */ `
-  uniform float uCloudCover;
+  // uNight is declared by the host shader (every one that injects this block
+  // already had it) — declaring it here too is a GLSL redefinition error.
   uniform vec2 uCloudDrift;
   uniform float uToy;
+  uniform sampler2D uWeatherField;
+  uniform vec2 uWeatherOrigin;
+  uniform vec2 uWeatherScale;
 
   float cloudNoise(vec2 p) {
     vec2 i = floor(p);
@@ -55,21 +64,34 @@ const CLOUDS = /* glsl */ `
   }
 
   float cloudShadow(vec2 world) {
-    // The diorama multiplies the result to 1.0 anyway — skip the two noise
-    // evaluations instead of computing a no-op per fragment.
-    if (uToy > 0.5) return 1.0;
+    // Cover comes from the sky, shape comes from the noise. The field is
+    // sampled by world position, so an overcast Sunset darkens while a clear
+    // Mission does not — a single citywide number cannot do that.
+    // (Weather used to be switched off entirely in diorama mode: "no weather on
+    // the tabletop". David reversed that deliberately — see
+    // docs/plans/WEATHER-PLAN.md §0. Do not put the uToy kill back.)
+    vec2 uv = (world - uWeatherOrigin) * uWeatherScale;
+    float cover = texture2D(uWeatherField, clamp(uv, 0.0, 1.0)).g;
+    // No cloud, no work: skip the two noise evaluations entirely.
+    if (cover < 0.01) return 1.0;
+
     vec2 p = world * 0.00055 + uCloudDrift;
     float n = cloudNoise(p) * 0.65 + cloudNoise(p * 2.3 + 11.0) * 0.35;
     float shade = smoothstep(0.42, 0.72, n);
-    // The diorama is lit like a model on a table: no weather on the tabletop.
-    return 1.0 - shade * uCloudCover * (1.0 - uToy);
+    // MAX_SHADE caps how dark it can ever get: a fully shadowed toy city is a
+    // grey city, and the model has to keep its painted look. uNight fades the
+    // whole term out — cloud shade only means anything while there is sun.
+    return 1.0 - shade * cover * ${CLOUD_MAX_SHADE.toFixed(2)} * (1.0 - uNight * 0.85);
   }
 `;
 
 const CLOUD_UNIFORMS = () => ({
-  uCloudCover: shared.uCloudCover,
   uCloudDrift: shared.uCloudDrift,
   uToy: shared.uToy,
+  uNight: shared.uNight,
+  uWeatherField: shared.uWeatherField,
+  uWeatherOrigin: shared.uWeatherOrigin,
+  uWeatherScale: shared.uWeatherScale,
 });
 
 const HASH = /* glsl */ `
@@ -495,7 +517,7 @@ export function createCloudShadedMaterial() {
         vCloudWorld = (modelMatrix * vec4(transformed, 1.0)).xz;`
       );
     shader.fragmentShader = shader.fragmentShader
-      .replace('#include <common>', `#include <common>\n        varying vec2 vCloudWorld;\n        ${CLOUDS}`)
+      .replace('#include <common>', `#include <common>\n        uniform float uNight;\n        varying vec2 vCloudWorld;\n        ${CLOUDS}`)
       .replace(
         '#include <color_fragment>',
         `#include <color_fragment>

@@ -34,9 +34,9 @@ export const shared = {
   uSunColor: { value: new Color(1.0, 0.78, 0.5) },
   uSkyColor: { value: new Color(0.42, 0.56, 0.72) },
   uNight: { value: 0 },
-  // Drifting cloud shadows: cover fades out as night falls, drift is advanced
-  // every frame by the prevailing westerly.
-  uCloudCover: { value: 0.32 },
+  // Drifting cloud shadows. Cover now comes from the live weather field (see
+  // weather.js); this is only the scroll offset of the shadow noise, advanced
+  // every frame by the real wind.
   uCloudDrift: { value: new Vector2(0, 0) },
   // 1 in diorama mode: materials go bright and flat and drop the weather.
   uToy: { value: 0 },
@@ -54,7 +54,10 @@ export const shared = {
   uSmoke: { value: 0 },
 };
 
-const CLOUD_WIND = [0.0042, 0.0016];
+// Noise-space drift per (m/s of wind) per second. The shadow noise samples
+// world * 0.00055, so this is calibrated to reproduce the old hand-tuned drift
+// rate at a typical San Francisco westerly (~6.7 m/s), and to scale from there.
+const CLOUD_DRIFT_PER_MS = 0.00067;
 
 const SKY_VERT = /* glsl */ `
   varying vec3 vDir;
@@ -484,8 +487,6 @@ export function createEnvironment(scene) {
     shared.uSunColor.value.copy(sun.color);
     shared.uSkyColor.value.copy(hemi.color);
     scene.fog.color.copy(DAY.fog).lerp(state.toy ? TOY_NIGHT.fog : NIGHT.fog, night);
-    // Overcast reads as shade only while there is sun to block.
-    shared.uCloudCover.value = 0.32 * (1 - night * 0.85);
   }
 
   // The deprecated 0 to 1 sweep, kept only so the old SF.setTime alias and the
@@ -515,9 +516,13 @@ export function createEnvironment(scene) {
     halo.lookAt(camera.position);
   }
 
+  // Shadows travel downwind. The noise is sampled as `world * k + drift`, so a
+  // feature sits where world = (p - drift) / k: the offset must DECREASE along
+  // the wind for the blanket to move with it, not against it.
   function updateClouds(dt) {
-    shared.uCloudDrift.value.x += CLOUD_WIND[0] * dt;
-    shared.uCloudDrift.value.y += CLOUD_WIND[1] * dt;
+    const wind = shared.uWind.value;
+    shared.uCloudDrift.value.x -= wind.x * CLOUD_DRIFT_PER_MS * dt;
+    shared.uCloudDrift.value.y -= wind.y * CLOUD_DRIFT_PER_MS * dt;
   }
 
   // Keep the shadow frustum tight around the camera pivot: at street level it

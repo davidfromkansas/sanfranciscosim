@@ -220,6 +220,23 @@ export function createWeather({ project }) {
     if (moved) uploadTexture();
   }
 
+  // Jump straight to the target field, skipping the 60 s ease. For screenshots
+  // and automated checks: nobody wants to wait out a transition to take a
+  // picture, and a headless check has no frame loop to ease with.
+  function settle() {
+    for (const key of ['cloudLow', 'cloudHigh', 'fog', 'precip']) current[key].set(target[key]);
+    scalars.current.windSpeed = scalars.target.windSpeed;
+    scalars.current.windDir = scalars.target.windDir;
+    scalars.current.aqi = scalars.target.aqi;
+    windVector(scalars.current.windDir, scalars.current.windSpeed, wind);
+    shared.uWind.value.copy(wind);
+    let rain = 0;
+    for (let i = 0; i < CELLS; i++) rain += current.precip[i];
+    shared.uRain.value = rain / CELLS;
+    shared.uSmoke.value = clamp01((scalars.current.aqi - 80) / 170);
+    uploadTexture();
+  }
+
   // Sample the eased field at a world position — for the UI and the concierge,
   // which cannot read a texture. Bilinear, matching what the GPU does.
   function sampleAt(x, z, key = 'fog') {
@@ -246,6 +263,7 @@ export function createWeather({ project }) {
 
   return {
     update,
+    settle,
     dispose() {
       clearInterval(timer);
     },

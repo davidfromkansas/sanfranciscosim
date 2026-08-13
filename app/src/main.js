@@ -37,6 +37,7 @@ import { createContextCard, createSearch } from './cards.js';
 import { createConcierge } from './concierge.js';
 import { createSkyClock } from './sky-clock.js';
 import { createWeather } from './weather.js';
+import { createClouds } from './clouds.js';
 import { localDayStart, moonPosition, skySnapshot, sunPosition } from '../../api/_lib/astro.mjs';
 
 const canvas = document.getElementById('view');
@@ -115,6 +116,9 @@ async function boot() {
   // The live weather field. Created before the clock so the card can read it
   // on its very first render.
   const weather = createWeather({ project: data.project });
+  // Toy clouds read the same field the shadows do, so what floats overhead and
+  // what darkens the ground always agree.
+  const clouds = createClouds(scene, { sampleAt: weather.sampleAt });
   // Real Muni buses from /api/muni; when the feed is away this layer is simply
   // empty — the procedural road traffic never depended on it.
   const muni = createLiveMuni(scene, data);
@@ -178,6 +182,7 @@ async function boot() {
     water.setQuality(key);
     agents.setQuality(key);
     terrain.setQuality(key);
+    clouds.setQuality(key);
     post.setSamples(quality.samples);
     renderer.setSize(window.innerWidth, window.innerHeight, false);
     post.setSize();
@@ -556,6 +561,7 @@ async function boot() {
     city,
     agents,
     ferries,
+    clouds,
     muni,
     governor,
     boot: bootScreen,
@@ -585,6 +591,20 @@ async function boot() {
     // The eased weather state. Debug only, exactly like setClock: no UI, no
     // URL parameter, and the model can never set it.
     get weather() {
+      return weather.snapshot();
+    },
+    // Read the eased field at a world position, the same way the shaders do.
+    // The orientation of that lookup is the easiest thing in this feature to
+    // get silently wrong, so it is checkable: sampleWeather at the Sunset and
+    // at Bayview must disagree the way the feed's districts do.
+    sampleWeather(x, z, key = 'fog') {
+      return weather.sampleAt(x, z, key);
+    },
+    // Skip the 60 s ease and jump to the incoming field — for screenshots and
+    // automated checks, which have no time (or no frame loop) to wait it out.
+    settleWeather() {
+      weather.settle();
+      skyClock.update();
       return weather.snapshot();
     },
     // A partial patch merges onto the live field; null returns to live.
@@ -677,6 +697,7 @@ async function boot() {
     // Weather eases on wall time for the same reason the clouds do: the
     // simulation clamp would stall the transition below 20 fps.
     weather.update(Math.min(1, elapsed));
+    clouds.update(Math.min(1, elapsed));
     muni.update(dt, camera);
     trackVessel(dt);
     landmarks.update();

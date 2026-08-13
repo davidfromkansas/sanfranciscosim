@@ -268,7 +268,15 @@ per the style bible, not a gradient.
 - At Quality=Low, cap 24 instances. At night, tint them to the night palette
   and drop opacity — a cloudy night sky is darker, not full of white blobs.
 
-## 2.3 Wind everywhere
+## 2.3 Wind everywhere — CUT
+
+David cut this section on 2026-08-13: wind drives the clouds and their shadows
+(§2.1, §2.2) and nothing else. Water chop, ferry wakes, flag flutter and tree
+sway are all **not** part of this work. Tree sway in particular was judged the
+riskiest item for the least return — a windy day very easily reads as an
+earthquake — so if it is ever revisited it starts as its own reviewed change.
+
+The original scope, kept only so nobody re-derives it from scratch:
 
 The wind vector is live; spend it on things that already animate:
 
