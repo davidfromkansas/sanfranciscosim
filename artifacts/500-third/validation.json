@@ -11107,5 +11107,47 @@
     "no_degenerate_geometry": true,
     "no_unexpected_objects": true
   },
-  "overall": "PASS"
+  "overall": "PASS",
+  "shipped": {
+    "note": "The packed, meshopt-compressed file produced by stage 4. The checks above validate the AUTHORED asset; the packed file is gated by optimize/validation.json and optimize/g3check.",
+    "file_bytes_raw": 183916,
+    "file_bytes_gzip": 90750,
+    "triangles": 17320,
+    "vertices": 31545,
+    "objects": 13,
+    "draw_primitives": 14,
+    "materials": [
+      "Toy_glass",
+      "Toy_glassl",
+      "Toy_glassl_Glow",
+      "Toy_ink",
+      "Toy_navy",
+      "Toy_red",
+      "Toy_roofd",
+      "Toy_sand",
+      "Toy_steel",
+      "Toy_stone",
+      "Toy_trim",
+      "Toy_white",
+      "Toy_white_Glow"
+    ],
+    "dimensions_m": [
+      75.2378,
+      76.2383,
+      26.50169
+    ],
+    "bbox_min": [
+      -37.61869,
+      -38.11882,
+      0.0
+    ],
+    "gates": {
+      "G1_materials_identical": true,
+      "G2_bbox_ok": true,
+      "G2_origin_ok": true,
+      "G2_volumes_positive": true,
+      "G2_ray_flip_ok": true,
+      "G5_primitives_ok": true
+    }
+  }
 }

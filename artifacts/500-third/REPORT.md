@@ -15,9 +15,9 @@ was measured.
 | | |
 |---|---|
 | File | `500-third.glb` |
-| Raw / gzipped | 1,159,624 B / see the optimize report for the shipped numbers |
-| Triangles | **17,320** (cap 22,000) |
-| Objects | 546 as authored |
+| Raw / gzipped | **183,916 B / 90,750 B** shipped (1,151,788 / 167,849 as authored — stage 4 cut it 6.3x, see `optimize/REPORT.md`) |
+| Triangles | **17,320** (cap 22,000), unchanged by the optimize pass |
+| Objects | 13 shipped (546 as authored; joined per material), 14 draw primitives |
 | Dimensions (m) | 75.239 × 76.238 × **26.500** |
 | min Z | 0.000 |
 | XY centre offset | (0.000, 0.000) m |
@@ -33,7 +33,10 @@ was measured.
 
 The X/Y dimensions are the axis-aligned bounding box, not the building: the
 block is 58.59 × 47.68 m sitting at 45° to the compass, so its AABB is the
-diagonal envelope. `validation.json` is the machine-readable version.
+diagonal envelope. `validation.json` is the machine-readable version: overall **PASS**, all 15
+authoring checks, plus a `shipped` block carrying the packed file's numbers. The
+packed file's own gates are in `optimize/validation.json` (G1/G2/G5) and
+`optimize/g3check`.
 
 ## Orientation — a documented contract deviation
 
