@@ -27,12 +27,12 @@ Research: `REFERENCE.md` in this folder.
 
 | | |
 |---|---|
-| Objects | 83 |
+| Objects | 13 shipped (83 as built, joined per material at stage 4) |
 | Triangles | **5,904** (cap 8,000) |
 | Dimensions (x, y, z) | 31.227 x 30.835 x **8.600** m |
 | Min Z | 0.000 |
 | XY centre offset | (−0.21, +0.28) m |
-| File size | 344,668 bytes raw / 62,423 gzipped (pre-optimize) |
+| File size | **155,844 bytes raw** / 112,206 gzipped (shipped, post-optimize; 344,668 / 61,949 as built) |
 | Materials | 11, all `Toy_*` |
 | Textures / animations / cameras / lights / skins | 0 / 0 / 0 / 0 / 0 |
 
@@ -143,8 +143,10 @@ Not applied here — stage 5 owns the manifest.
 }
 ```
 
-`dims` and `tris` will be re-measured at stage 5 from the **optimized** GLB and
-must be updated to those values, not these.
+`dims` and `tris` above are measured from the **shipped (optimized)** GLB — stage 4
+is complete and `362-brannan.glb` in this folder is the optimized file. The
+pre-optimize original is archived at `optimize/input/362-brannan.glb`. Stage 4's own
+report is `optimize/REPORT.md`.
 
 `estimated: false` — the height is DataSF LiDAR `hgt_maxcm`, a measurement, not an
 inference. The 7.1 m eave beneath it is inferred, but it is not the manifest's
