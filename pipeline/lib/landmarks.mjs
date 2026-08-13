@@ -387,6 +387,56 @@ export const LANDMARKS = [
     exclude: 8,
     camera: { distance: 190, yaw: 260, pitch: 34 },
   },
+  // 574 Third (the 1907 apartment block at 566-586 Third), the largest footprint
+  // in this family at 1,906 m2 — which is exactly why the tight 8-12 m radii used
+  // on the small Brannan lots do not transfer. THREE footprints stand on this
+  // plan: DataSF SF3776008 (97.9% of it, centroid 2.10 m) and two Overture
+  // pieces that split the same mass (50.8% and 40.3% cover, nearest vertices
+  // 6.84 m). Measured against the real bake input:
+  //
+  //   exclude  6 m    -> drops 1  (both Overture halves survive)
+  //   exclude 8-16 m  -> drops 3  (correct: all three, zero collateral)
+  //   exclude 18 m    -> drops 5  (eats 560 Third, SF3776007, vertex 16.35 m)
+  //
+  // 12 m is the middle of the safe band. Note the unusually wide window: it
+  // exists because this building's own ring reaches ~30 m from the anchor while
+  // its neighbours' nearest vertices are 16 m away, so the radius never has to
+  // reach the ring to catch the footprint — the centroid test does it.
+  {
+    id: '574Third',
+    name: '574 Third Street',
+    lon: -122.3950551,
+    lat: 37.7801937,
+    height: 15.4,
+    exclude: 12,
+    camera: { distance: 260, yaw: 45, pitch: 28 },
+  },
+  // The corner block at Third and Brannan (also 590 Third). Sized by AREA
+  // COVERAGE against the real bake input rather than by nearest-neighbour
+  // distance, because on this block every neighbour shares a party-wall vertex
+  // with this footprint and a vertex-distance reading says "collateral" for
+  // buildings that are only touching. Two footprints actually stand on this
+  // plan — DataSF SF3776114 (98.5% of it, centroid 8.70 m from this anchor) and
+  // the Overture gap-fill 80ad8a83 (87.7%, centroid 4.72 m) — and both have to
+  // go or the GLB shares its site with a procedural twin:
+  //
+  //   exclude  8 m    -> drops 1 (SF3776114 survives on its 8.70 m centroid)
+  //   exclude 10-12 m -> drops 2  (correct: both, nothing else)
+  //   exclude 14 m    -> drops 4  (starts eating 574 Third's footprints)
+  //   exclude 16 m    -> drops 5  (eats 414 Brannan, SF3776011)
+  //
+  // 11 m is the middle of the safe band. The binding limit at the bottom is
+  // SF3776114's CENTROID, not any vertex — this footprint is an L and its
+  // centroid sits well off the anchor.
+  {
+    id: '400Brannan',
+    name: '400 Brannan Street',
+    lon: -122.3946805,
+    lat: 37.7800981,
+    height: 8.8,
+    exclude: 11,
+    camera: { distance: 170, yaw: 90, pitch: 26 },
+  },
   {
     // Shell service station, across 3rd Street from 550 Third. The asset is a
     // forecourt, not a building, and the lot carries TWO baked footprints — the
@@ -944,6 +994,91 @@ export const LANDMARKS = [
     camera: { distance: 240, yaw: 0, pitch: 26 },
   },
   {
+    // 590 Third Street — the two-storey 1905-ish commercial corner block on the
+    // WEST corner of 3rd and Brannan, directly across 3rd from 599Third. Between
+    // them the intersection reads "shops below, homes above".
+    //
+    // exclude: 7 is MEASURED against the bake's own input (DataSF ynuv-fyni
+    // footprints reprojected with the app's tangent projection), not derived
+    // from OSM. Around this anchor:
+    //   this building's ring centroid          0.88 m
+    //   this building's nearest vertex        11.24 m
+    //   nearest NEIGHBOUR vertex (SF3776008)  13.82 m  <- must survive
+    //   second neighbour vertex (SF3776011)   15.08 m
+    // excluded() drops a ring on centroid OR any vertex, so the window that
+    // drops exactly this building is 0.88 < r <= 13.82. The upper end is thin
+    // because SF3776008 is the 1,906 m² brick warehouse sharing this building's
+    // NW party wall — and it is TALLER than the asset (LiDAR median 11.05 m vs
+    // 9.5 m), so swallowing it would leave a very visible hole. 7 sits clear of
+    // both ends and in line with the neighbours already integrated (550Third 8,
+    // 551Third 8, 380Brannan 9, 599Third 10).
+    id: '590Third',
+    name: '590 Third Street',
+    lon: -122.3946749,
+    lat: 37.7800837,
+    height: 9.5,
+    exclude: 7,
+    // `camera` is mandatory even without a number `key` — main.js maps EVERY
+    // manifest landmark into `presets` and camera.js reads `preset.yaw`
+    // unconditionally, so omitting it boots to "Cannot read properties of
+    // undefined (reading 'yaw')". See the note on 599Third.
+    // yaw 90 stands the camera due east (app yaw = 180 − true bearing), the
+    // bisector of the 3rd Street front (normal 45.2°) and the Brannan front
+    // (135.1°) — the one angle where both designed elevations and the raised
+    // corner parapet over them read at once. 180 m suits a 9.5 m block
+    // (cf. 550Third 190 at 11 m, 380Brannan 220 at 12.6 m).
+    camera: { distance: 180, yaw: 90, pitch: 30 },
+  },
+  {
+    // 592 Third Street — the 1905 two-storey loft on the WEST corner of 3rd and
+    // Brannan, directly across 3rd from 599Third. Kinoko Real Estate, Cafe
+    // Buenos Aires and four Brannan-side tenants under one black shopfront band.
+    //
+    // The exclusion here is doing more than tidying: Overture gives this
+    // footprint a top of 16.7 m over a base of 6.5 m, so the baked procedural
+    // block is 10.2 m tall against the asset's 8.2 m. Without the exclusion the
+    // GLB is not merely intersected, it is entirely INSIDE a taller block and
+    // invisible. Anyone judging this landmark on an unbaked tree sees nothing
+    // wrong with a building that is not there.
+    //
+    // exclude: 6 is MEASURED two ways, both against rings excluded() actually
+    // consumes. Against the committed bake (app/public/tiles/buildings/23_13.bin):
+    // this footprint's ring centroid is 1.64 m from the anchor and the nearest
+    // NEIGHBOUR vertex is 12.87 m (SF3776008, the 11 m building on the NW party
+    // wall). Against the raw DataSF LiDAR polygons: 0.90 m and 12.20 m. Since
+    // excluded() drops a ring on centroid OR any vertex, the window that drops
+    // exactly this building is 1.7 < r < 12.2; 6 sits in the middle with better
+    // than 5 m of margin at both ends. Note this building's OWN nearest vertex
+    // is 10.2 m out, so the exclusion fires on the centroid test, not the vertex
+    // test — do not shrink r below 2 thinking the vertices will catch it.
+    //
+    // targetHeight is the parapet crest, LiDAR-derived rather than published:
+    // the roof-deck mode is 7.82 m and the parapet adds ~0.38 m. The LiDAR
+    // hgt_max of 11.65 m on this footprint is NOT the crest — it is the two
+    // street trees overhanging the 3rd Street parapet, a 6-sigma outlier on a
+    // roof whose height std is 0.64 m. See docs/asset-plans/592-third.md 2.15.
+    id: '592Third',
+    name: '592 Third Street',
+    lon: -122.3946805,
+    lat: 37.780091,
+    height: 8.2,
+    exclude: 6,
+    // `camera` is mandatory even without a number `key` — main.js maps every
+    // manifest landmark into `presets` and camera.js reads `preset.yaw`
+    // unconditionally (see the note on 542PresidioBlvd and 599Third).
+    // App yaw = 180 − true bearing. The bisector of the 3rd Street front
+    // (normal 45.1°) and the Brannan front (135.2°) is 90.2°, so the camera
+    // wants app yaw 180 − 90.2 = 90: due east of the building, the one angle
+    // where both designed elevations and the corner between them read at once
+    // (the same construction 599Third used to arrive at its yaw 0).
+    // Verified in the local QA, not derived on paper: yaw 315 was tried first
+    // and puts the camera to the SOUTH-WEST, staring at the two blank party
+    // walls. On a corner building the yaw is worth rendering before believing.
+    // 200 m suits an 8.2 m building (cf. 370Brannan 150 at 7.63 m, 550Third
+    // 190 at 11 m).
+    camera: { distance: 200, yaw: 90, pitch: 26 },
+  },
+  {
     // A 5-acre PLAZA, not a building, and the exclusion has to do two different
     // jobs at two different radii — which is why this is the first entry to
     // carry `clearTreesRadius`.
@@ -989,6 +1124,54 @@ export const LANDMARKS = [
     // axis with City Hall filling the far end — the one composition that
     // explains what this place is.
     camera: { distance: 620, yaw: 90, pitch: 30 },
+  },
+  // A PARTY-WALL site, so this radius is far tighter than the usual
+  // half-diagonal rule. The Earl Warren Building shares its block with the
+  // 54 m Hiram W. Johnson State Office Building, whose wall is a few metres
+  // off this building's north wings. Measured against the real bake input
+  // (`pipeline/data/overture_buildings.geojsonseq`) with the metric
+  // `excluded()` uses — centroid OR any ring vertex inside the radius — over
+  // the 13 footprints in the surrounding bbox:
+  //
+  //   exclude  6-20 m -> drops 1  (correct: the Earl Warren footprint, whose
+  //                                nearest point is 5.1 m from this anchor)
+  //   exclude 22-40 m -> drops 2  (eats the Hiram W. Johnson slab at 20.2 m)
+  //   exclude 60 m    -> drops 3  (also the Civic Center Plaza Garage kiosk)
+  //
+  // 12 m is the middle of the safe band. The 59.9 m OBB half-diagonal that
+  // most entries here use would have punched a 54 m building out of the block.
+  {
+    id: 'earlWarrenBuilding',
+    name: 'Earl Warren Building',
+    lon: -122.4178413,
+    lat: 37.7806865,
+    height: 27.0,
+    exclude: 12,
+    camera: { distance: 420, yaw: 183, pitch: 20 },
+  },
+  {
+    // The Corinthian, 1915: apartments over a bank/retail base at the NE corner
+    // of Van Ness and McAllister. 500 Van Ness is the retail address; the
+    // assessor files the parcel as 512 Van Ness (Block 0766, Lot 006).
+    //
+    // This entry deletes nothing, and that is deliberate. Measured against the
+    // committed tiles (buildings/19_13.bin + its eight neighbours):
+    //   no footprint covers this anchor at all — civicCenterCourthouse's
+    //     exclude: 52 reaches to within 7.5 m of it and already took this block
+    //   32.8 m  nearest SURVIVING footprint vertex (1,148 m2, 14.3 m tall,
+    //     the office block north of us); its centroid is 47.1 m out
+    //   25.4 m  this building's own furthest ring vertex
+    // So 28 m covers our own footprint on its own merits — the entry stays
+    // correct if the courthouse radius is ever tightened — while leaving 4.8 m
+    // of margin to the neighbour. Sizing this off OSM rings instead of the bake
+    // suggested a 10-17 m window; the bake's footprints are not OSM's.
+    id: '500VanNess',
+    name: '500 Van Ness Avenue (The Corinthian)',
+    lon: -122.419922,
+    lat: 37.7804082,
+    height: 17,
+    exclude: 28,
+    camera: { distance: 320, yaw: 232, pitch: 24 },
   },
 ];
 

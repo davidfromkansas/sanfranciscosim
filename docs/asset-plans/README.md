@@ -80,6 +80,7 @@ route, and the park plans depend on it (§E8 of the parks README).
 | [San Francisco Civic Center Courthouse](./civic-center-courthouse.md) | `civic-center-courthouse` | 29.6 m | new landmark |
 | [Bill Graham Civic Auditorium](./bill-graham-civic-auditorium.md) | `bill-graham-civic-auditorium` | 37 m | new landmark |
 | [505 Van Ness Avenue (Edmund G. "Pat" Brown Building)](./505-van-ness.md) | `505-van-ness` | 27 m (estimated) | new landmark |
+| [500 Van Ness Avenue (The Corinthian)](./500-van-ness.md) | `500-van-ness` | 17 m (estimated) | new landmark |
 | [Louise M. Davies Symphony Hall](./davies-symphony-hall.md) | `davies-symphony-hall` | 35 m | new landmark |
 | [101 Grove Street (Public Health Building)](./101-grove.md) | `101-grove` | 21.4 m | new landmark |
 | [Asian Art Museum (Old Main Library)](./asian-art-museum.md) | `asian-art-museum` | 28.1 m | new landmark |
@@ -95,8 +96,13 @@ route, and the park plans depend on it (§E8 of the parks README).
 | [599 Third Street](./599-third.md) | `599-third` | 18.3 m | new landmark |
 | [Civic Center Plaza](./civic-center-plaza.md) | `civic-center-plaza` | 30.48 m (flagpole crest) | new landmark |
 | [250 Van Ness Avenue (171–195 Grove Street)](./250-van-ness.md) | `250-van-ness` | 10.0 m (estimated) | new landmark |
+| [Earl Warren Building](./earl-warren-building.md) | `earl-warren-building` | 27.0 m | new landmark |
+| [574 Third Street (566–586 Third)](./574-third.md) | `574-third` | 15.4 m | new landmark |
+| [590 Third Street](./590-third.md) | `590-third` | 9.5 m (estimated) | new landmark |
+| [592 Third Street](./592-third.md) | `592-third` | 8.2 m (estimated) | new landmark |
+| [400 Brannan Street](./400-brannan.md) | `400-brannan` | 8.8 m | new landmark |
 
-## Shared contract (all 53)
+## Shared contract (all 59)
 
 - Style: `docs/styles/miniature-toy.md` (authoritative for artistic decisions)
 - Technical contract: `.agents/skills/sf-asset-check/SKILL.md` (authoritative for the GLB)
@@ -220,6 +226,20 @@ penthouse.
 Overture — the pipeline's own bake input — carries 12.4 m, because both the LiDAR max
 (13.0 m) and the LiDAR min (2.5 m) on that footprint are street-tree canopy, not
 building. A height read off a raster statistic is only as good as the raster's edges.
+592 Third Street is the same trap at a larger ratio: its LiDAR `hgt_max` of 11.65 m is
+3.8 m above a roof-deck mode of 7.82 m on a footprint whose height standard deviation is
+0.64 m — a 6σ outlier that is simply the two street trees overhanging the 3rd Street
+parapet, with the 2.40 m `hgt_min` as the matching artifact at the other end. Where 370
+Brannan could legitimately take `hgt_max` as its crest (0.6 m above the median), doing
+the same here would build a three-storey building. Check the max against the standard
+deviation before believing it.
+
+The Earl Warren Building is another variety again: its OSM `height` is fine, but the
+LiDAR record's `hgt_maxcm` (46.39 m) sits 19 m above its own roof plane, because the
+footprint shares a party wall with the 54 m Hiram W. Johnson slab and a 0.5 m cell on
+that boundary samples the tower. Treat a single-cell `hgt_max` on a party wall as
+unusable. That plan's 2.14 is also the set's clearest exclusion-radius trap: the usual
+half-diagonal would have deleted the neighbour.
 
 The executing agent is expected to re-verify height, anchor, footprint and
 orientation before modelling — the dossier is a head start, not a citation.

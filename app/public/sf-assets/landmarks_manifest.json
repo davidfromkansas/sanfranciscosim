@@ -951,5 +951,119 @@
     ],
     "tris": 17703,
     "loadRadius": 2500
+  },
+  {
+    "id": "earl-warren-building",
+    "file": "earl-warren-building.glb",
+    "anchor": [
+      -122.4178413,
+      37.7806865
+    ],
+    "targetHeightM": 27.0,
+    "cat": 18,
+    "name": "Earl Warren Building",
+    "estimated": false,
+    "dims": [
+      118.94,
+      50.03,
+      27.0
+    ],
+    "tris": 18540,
+    "loadRadius": 2500
+  },
+  {
+    "id": "574-third",
+    "file": "574-third.glb",
+    "anchor": [
+      -122.3950551,
+      37.7801937
+    ],
+    "targetHeightM": 15.4,
+    "cat": 2,
+    "name": "574 Third Street",
+    "estimated": false,
+    "dims": [
+      64.9494,
+      60.1454,
+      15.4
+    ],
+    "tris": 9856,
+    "loadRadius": 2500
+  },
+  {
+    "id": "590-third",
+    "file": "590-third.glb",
+    "anchor": [
+      -122.3946749,
+      37.7800837
+    ],
+    "targetHeightM": 9.5,
+    "cat": 4,
+    "name": "590 Third Street",
+    "estimated": true,
+    "dims": [
+      31.913,
+      31.531,
+      9.5
+    ],
+    "tris": 5312,
+    "loadRadius": 2500
+  },
+  {
+    "id": "592-third",
+    "file": "592-third.glb",
+    "anchor": [
+      -122.3946805,
+      37.780091
+    ],
+    "targetHeightM": 8.2,
+    "cat": 3,
+    "name": "592 Third Street",
+    "estimated": true,
+    "dims": [
+      31.2145,
+      32.2102,
+      8.2
+    ],
+    "tris": 3352,
+    "loadRadius": 2500
+  },
+  {
+    "id": "400-brannan",
+    "file": "400-brannan.glb",
+    "anchor": [
+      -122.3946805,
+      37.7800981
+    ],
+    "targetHeightM": 8.8,
+    "cat": 3,
+    "name": "400 Brannan Street",
+    "estimated": false,
+    "dims": [
+      31.4004,
+      33.7824,
+      8.8
+    ],
+    "tris": 3896,
+    "loadRadius": 2500
+  },
+  {
+    "id": "500-van-ness",
+    "file": "500-van-ness.glb",
+    "anchor": [
+      -122.419922,
+      37.7804082
+    ],
+    "targetHeightM": 17.0,
+    "cat": 2,
+    "name": "500 Van Ness Avenue",
+    "estimated": true,
+    "dims": [
+      43.286,
+      45.097,
+      17.0
+    ],
+    "tris": 9512,
+    "loadRadius": 2500
   }
 ]
