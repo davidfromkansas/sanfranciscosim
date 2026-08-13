@@ -3,7 +3,8 @@
 Four-storey 1915 apartment building over a ground-floor bank/retail base, at the
 north-east corner of Van Ness Avenue and McAllister Street, San Francisco Civic
 Center. Slug `500-van-ness`, manifest id `500-van-ness`, runtime status
-**new landmark** (Case B: registry entry + tile re-bake required).
+**new landmark** (Case B: registry entry required; the usual re-bake is *not*
+needed to clear the site — see §2.12, the procedural block there is already gone).
 
 > **Address note, read this first.** `500 Van Ness Ave` is the *retail* address of
 > a single building that spans **500–524 Van Ness Avenue**; the assessor and OSM
@@ -80,7 +81,7 @@ simplified at ε = 0.3 m.
 | Measured ring | 14 vertices, area **1,231.9 m²** |
 | Simplified ring (modelled) | 8 vertices, area **1,230.1 m²** (−0.15 %) |
 | Minimum-area OBB | 34.8 × 37.0 m at −171.22° |
-| Axis-aligned extent | **40.0 m (E–W) × 41.8 m (N–S)** |
+| Axis-aligned extent | **40.0 m (E–W) × 41.8 m (N–S)** (the asset bbox is 43.3 × 45.1 m: the cornice overhangs 1.45 m) |
 | Parcel cross-check | assessor lot area 13,076 sq ft = **1,215 m²**; 2010 LiDAR footprint 4,853 cells × 0.25 m² = **1,213 m²** |
 | **Anchor (model origin = ring bbox centre)** | **lon −122.4199220, lat 37.7804082** |
 
@@ -241,7 +242,7 @@ bays (four of them curved) and the parapet finials; everything else is planar.
 { "id": "500-van-ness", "file": "500-van-ness.glb",
   "anchor": [-122.4199220, 37.7804082], "targetHeightM": 17.0,
   "cat": 2, "name": "500 Van Ness Avenue", "estimated": true,
-  "dims": [40.0, 41.8, 17.0], "tris": 0, "loadRadius": 2500 }
+  "dims": [43.29, 45.10, 17.0], "tris": 9522, "loadRadius": 2500 }
 ```
 
 `cat` 2 = *Apartments* in `CATEGORY_LABELS` (`app/src/context.js`) — the parcel is
@@ -255,27 +256,40 @@ No `500-van-ness` id exists in `pipeline/lib/landmarks.mjs` or
 `app/src/landmarks.js`, so integration needs a registry entry **and a re-bake of
 the affected tiles**, or the baked procedural block will intersect the GLB.
 Proposed entry: `id: '500VanNess'`, lon/lat as above, `height: 17`,
-**`exclude: 16`**.
+**`exclude: 28`**.
 
-That radius needs its own justification, because this is a **tight-neighbour
-site** and `excluded()` in `pipeline/buildings.mjs` drops a footprint when *any*
-of its ring vertices — not just its centroid — falls inside the radius:
+That radius was **measured against the committed bake**
+(`app/public/tiles/buildings/19_13.bin` and its eight neighbours), not against
+the OSM rings above, because `excluded()` in `pipeline/buildings.mjs` drops a
+footprint when its centroid **or any ring vertex** lands in the zone, and the
+bake's footprints are not the same polygons as OSM's:
 
-| Distance from anchor | What is there |
+| Distance from anchor, in the bake | What is there |
 |---|---|
-| 10.3 m | our own nearest ring vertex (the entrance-court corner) → we are excluded ✓ |
-| **17.7 m** | the **Courthouse**'s nearest surveyed vertex — the east party wall |
-| 25.4 m | our own furthest ring vertex |
-| 31.4 m | the next-nearest neighbouring building |
+| — | **no footprint covers the anchor at all**, and none has a vertex closer than 32.8 m |
+| **32.8 m** | nearest surviving footprint (1,148 m², 14.3 m tall, centroid −122.42001/37.78083 — the office block north of us) |
+| 25.4 m | our own furthest *modelled* ring vertex, for reference |
 
-So the radius must sit **above ~10.3 m and below 17.7 m**. 16 m clears our own
-footprint through its centroid and its two court vertices while leaving the
-Courthouse block — which has no GLB of its own on `main` — standing. Sizing off
-centroids instead would have deleted the Courthouse and left a hole where a 25 m
-government building belongs. **Re-measure this against the actual bake input
-before committing the registry entry** (the pipeline bakes Overture/OSM
-footprints, which are not necessarily the ring measured here), and confirm with
-`node pipeline/verify-rebake.mjs` + `node pipeline/audit.mjs`.
+The surprise this turned up: **the procedural building on this site has already
+been deleted**, by `civicCenterCourthouse`'s existing `exclude: 52` (its anchor
+is 59.5 m away, so its zone reaches to within 7.5 m of ours and swallows our
+east vertices). The site is empty ground in the shipped city today.
+
+Two consequences:
+
+1. `exclude: 28` is chosen to cover our own footprint on its own merits (25.4 m
+   furthest vertex + margin) while staying 4.8 m clear of the nearest surviving
+   neighbour — so it removes **nothing that is not already gone**, and the entry
+   stays correct if the courthouse radius is ever tightened.
+2. **No re-bake is needed to make the asset visible.** The usual Case B risk —
+   a procedural block standing inside the GLB — is already absent and provable
+   from the committed tiles. The registry entry is still required, for the
+   landmark's pick box, search-index row and `context/landmarks.json` identity,
+   and those come from the `lore` → `toy` → `context` chain. In batch mode that
+   chain is run once by `docs/asset-pipeline/BATCH-INTEGRATE.md`; this branch
+   ships source only and records the measurement above so the batch bake can be
+   verified with `node pipeline/verify-rebake.mjs` and `node pipeline/audit.mjs`
+   (check 1.6).
 
 ### 2.13 Open risks / what is not verified
 
@@ -289,6 +303,6 @@ footprints, which are not necessarily the ring measured here), and confirm with
 4. **The architect and the building's history** were not found. Nothing in the
    model depends on them; REFERENCE.md carries the gap explicitly rather than
    repeating an unsourced attribution.
-5. **`exclude: 16`** has only 1.7 m of margin to the Courthouse. It is the one
-   number in this plan that must be re-measured against the bake input rather
-   than trusted (see §2.12).
+5. **`exclude: 28`** was measured against the committed tiles and has 4.8 m of
+   margin (§2.12). It must still be re-confirmed after the batch bake, because
+   the bake regenerates footprints from a fresh Overture/OSM snapshot.
