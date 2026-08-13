@@ -15,3 +15,4 @@ pipeline/out/
 __pycache__/
 *.blend1
 render.log
+pipeline/bake.log
