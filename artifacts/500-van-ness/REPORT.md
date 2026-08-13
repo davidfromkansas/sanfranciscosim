@@ -3,13 +3,15 @@
 Stage 2 of `docs/asset-pipeline/ADDRESS-TO-ASSET.md`, run from
 `docs/asset-plans/500-van-ness.md` Part 1.
 
-Toolchain: Blender 5.2.0 LTS (headless), Cycles CPU, python3 + Pillow.
+Toolchain: Blender 5.2.0 LTS (headless), Cycles (Metal GPU via the review
+script's opt-in `--gpu` flag; same integrator and sample count as the CPU
+default), python3 + Pillow.
 
 ```
 B=/Applications/Blender.app/Contents/MacOS/Blender
 $B -b --python build_500_van_ness.py
-$B -b --python render_500_van_ness.py
-$B -b --python render_500_van_ness.py -- --night
+$B -b --python render_500_van_ness.py -- --gpu
+$B -b --python render_500_van_ness.py -- --night --gpu
 $B -b --python validate_500_van_ness.py
 python3 make_contact_sheet.py
 ```
@@ -18,8 +20,9 @@ python3 make_contact_sheet.py
 
 | | value |
 |---|---|
-| Triangles | **9,522** (budget 14,000; landmark cap 27,000) |
-| Mesh objects | 190 |
+| Triangles | **9,512** shipped (9,522 pre-optimize; budget 14,000, landmark cap 27,000) |
+| Mesh objects | 12 shipped (190 pre-optimize) |
+| File size | **247,576 bytes** raw (budget 500 KB) |
 | Materials | 11, all `Toy_*`, 2 of them `_Glow` |
 | Bbox | **43.286 × 45.097 × 17.000 m** |
 | min z | 0.000 |
@@ -95,6 +98,15 @@ the plan as well.
    `estimated: true`.
 3. The second interior light well is designed from one aerial image, not
    surveyed. Only the roof reads it.
+
+## Stage 4 — optimize
+
+Run and reported in `optimize/REPORT.md`. All gates PASS: raw 574,548 →
+**247,576 bytes** (−56.9 %), 190 → **12** objects / 13 draw primitives, vertices
+−72.4 %, triangles 9,522 → 9,512, bbox and origin identical, max A/B pixel delta
+0.1223 % against a 2 % gate. The optimized file is now
+`artifacts/500-van-ness/500-van-ness.glb` and `validation.json` above was re-run
+against it.
 
 ## Stage 3 — approval
 

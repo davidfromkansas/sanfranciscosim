@@ -27,8 +27,33 @@ center = (mins + maxs) / 2
 long_axis = max(maxs - mins)
 NEAR, FAR = 1.5 * long_axis, 6.0 * long_axis
 
+# Per-asset adaptation (GLB-OPTIMIZE-PROMPT s.0 allows adapting the copied
+# scripts): opt into Metal/CUDA compute so the A/B pass does not queue behind
+# other Blender sessions on a shared CPU. Same integrator, same 64 samples,
+# denoising still off — the pixel deltas the gate measures are unaffected.
+def _enable_gpu():
+    prefs = bpy.context.preferences.addons.get("cycles")
+    if not prefs:
+        return False
+    cprefs = prefs.preferences
+    for kind in ("METAL", "OPTIX", "CUDA", "HIP", "ONEAPI"):
+        try:
+            cprefs.compute_device_type = kind
+        except TypeError:
+            continue
+        cprefs.get_devices()
+        if not [d for d in cprefs.devices if d.type != "CPU"]:
+            continue
+        for d in cprefs.devices:
+            d.use = d.type != "CPU"
+        print(f"[ab] GPU compute: {kind}", flush=True)
+        return True
+    return False
+
+
 scene = bpy.context.scene
 scene.render.engine = "CYCLES"
+scene.cycles.device = "GPU" if _enable_gpu() else "CPU"
 scene.cycles.samples = 64
 scene.cycles.use_denoising = False
 scene.render.resolution_x, scene.render.resolution_y = RES
