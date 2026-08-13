@@ -1,6 +1,6 @@
 {
- "generated": "2026-08-13T18:22:07.058Z",
- "buildings": 174734,
+ "generated": "2026-08-13T21:43:09.596Z",
+ "buildings": 174731,
  "cells": 596,
  "categories": [
   {
@@ -21,7 +21,7 @@
    "cat": 2,
    "id": "apartments",
    "label": "Apartments",
-   "count": 14016,
+   "count": 14015,
    "night": 0
   },
   {
@@ -35,7 +35,7 @@
    "cat": 4,
    "id": "retail",
    "label": "Retail",
-   "count": 8041,
+   "count": 8040,
    "night": 1
   },
   {
@@ -168,7 +168,7 @@
    "cat": 23,
    "id": "parking_garage",
    "label": "Parking garage",
-   "count": 1845,
+   "count": 1844,
    "night": 3
   },
   {
@@ -190,7 +190,7 @@
   {
    "sub": "apartments",
    "label": "Apartments",
-   "count": 5321
+   "count": 5320
   },
   {
    "sub": "shop",
@@ -215,7 +215,7 @@
   {
    "sub": "salon",
    "label": "Salon",
-   "count": 1029
+   "count": 1028
   },
   {
    "sub": "clinic",
@@ -230,7 +230,7 @@
   {
    "sub": "parking_garage",
    "label": "Parking garage",
-   "count": 898
+   "count": 897
   },
   {
    "sub": "community_center",
@@ -655,16 +655,16 @@
  ],
  "sources": {
   "landuse": 140684,
-  "business": 10211,
+  "business": 10210,
   "heuristic": 7280,
   "osm": 8617,
-  "overture": 6656,
-  "datasf": 1286
+  "overture": 6655,
+  "datasf": 1285
  },
  "confidence": [
   147964,
-  15324,
-  4493,
+  15322,
+  4492,
   6953
  ],
  "streets": {
