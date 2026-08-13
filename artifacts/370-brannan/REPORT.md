@@ -170,3 +170,52 @@ Registry entry added to `pipeline/lib/landmarks.mjs` as `370Brannan`
 for that radius — the tightest in the registry — is in the comment above the
 entry: 372–374 next door is itself a 7 m sliver whose footprint centroid is
 only 6.57 m from this anchor, so the entire safe window is (0.6, 6.5) m.
+
+## Local QA (gate 5, batch mode)
+
+Run 13 August 2026 against a production build (`npm run build`) served
+statically, because the Vite 8 dev server in this environment returns the SPA
+fallback for `.glb` requests — it does that for every landmark GLB including
+ones already on `main`, so it is an environment quirk, not a regression.
+
+| Check | Result | Evidence |
+|---|---|---|
+| Re-validation of the shipped GLB | **PASS** | `validation.json` overall PASS, 16/16 checks, against the post-optimize file |
+| Manifest entry | **PASS** | 36 entries parsed, `entries: 36` in `SF.assets.stats()` |
+| id mapping (`camelId`) | **PASS** | `370-brannan` → `370Brannan`, matches the registry entry |
+| Registry entry + re-bake | **PASS** | see below |
+| Audit check 1.6 | **PASS** | `node pipeline/audit.mjs` — "no procedural footprint inside a bespoke landmark exclusion zone, 42 landmarks clear" |
+| `verify-rebake` | **PASS** | "only the new landmarks' cells moved, and every asset has clear ground under it"; nearest surviving footprint 12.4 m vs the 3 m radius |
+| Exactly one footprint dropped | **PASS** | cell 23_13 233 → 232; all other 584 cells unchanged in building count |
+| Merge line + scale | **PASS** | `sf-assets: 370-brannan merged 12 objects / 10 materials -> batched (809 tris body); uniform x1.0000 at 3840, -1189` |
+| Anchor placement | **PASS** | placed at local (3840, −1189), which is the projected anchor to the metre |
+| Draw calls for landmarks | **PASS** | `SF.assets.group` children are `landmark-bodies` + `landmark-glow` — 2 draw calls for all 36 generic landmarks |
+| Neighbour unaffected | **PASS** | `380-brannan merged … uniform x1.0000 at 3826, -1175` in the same session |
+| Fallback drill | **PASS** | with the GLB renamed: network log shows `GET …/370-brannan.glb → 404` while `380-brannan.glb → 200`; exactly one warning, `sf-assets: 370-brannan failed to load (… responded with 404 …)`; the app booted, streamed all 1,656 cells and rendered the block with no hole and no crash. File restored afterwards. |
+| Lint / build | **PASS** | `npm run build` clean (`✓ built in 5.00s`) |
+| **In-situ beauty screenshot, terrain seating, night glow in scene, stats-overlay draw calls / fps** | **NOT VERIFIED** | see below |
+
+**What could not be verified, honestly.** The app's tile LOD cross-fade
+(hashed-alpha discard with distance hysteresis) never completed in this QA
+session: the far shells kept drawing over the near tier indefinitely, so every
+close-range screenshot shows both tiers superimposed. It affects the whole
+city, not this asset — the same double-draw appears in blocks nowhere near
+Brannan Street, and it appeared in the run where this GLB was 404 and absent
+from the batch. The likely cause is the QA method (teleporting the camera with
+`SF.goTo` plus direct `rig.state` mutation on a machine running ~10 competing
+Blender jobs) rather than anything in the change, but that is a hypothesis, not
+a measurement. Consequently there is **no clean in-situ day/night screenshot,
+no terrain-seating check and no stats-overlay draw-call or fps reading** in this
+report. Those should be picked up in the batch integration run
+(`docs/asset-pipeline/BATCH-INTEGRATE.md`) on a quiet machine before the PR.
+
+The functional evidence above — merge line, scale 1.0000, correct anchor, two
+draw calls, one footprint dropped, clear ground, fallback drill — is
+independent of that rendering issue and stands.
+
+**Batch mode.** Per `ADDRESS-TO-ASSET.md` the bake was run and used for the QA
+above, then discarded (`git checkout -- app/public/tiles api/_data`). The branch
+carries source only: the GLB, its manifest entry, its
+`pipeline/lib/landmarks.mjs` entry, the plan and `artifacts/370-brannan/`.
+`git diff --name-only origin/main` lists nothing under `app/public/tiles/` or
+`api/_data/`.
