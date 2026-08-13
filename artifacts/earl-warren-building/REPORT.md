@@ -123,3 +123,62 @@ from City Hall would out-shout the dome.
 | 6 | flagpoles dropped | at 0.26 m radius they are sub-pixel in the app and read as scratches across the arcade in review renders |
 | 7 | **deck decomposition rebuilt, one slab per plan region; everything standing on the deck embedded 0.2 m into it; lantern cornice and laylight curbs restacked** | **a real defect: the deck slabs overlapped the south bar at both recessed corners, and the lantern cornice's top face was exactly coplanar with the lantern's own top. Coincident coplanar faces z-fight, and Cycles rendered the acne as solid black — black patches on the courtroom lantern and at both north corners of the roof.** |
 </content>
+
+## Stage 5 — local QA (batch mode)
+
+Case B. Registry entry `earlWarrenBuilding`, `exclude: 12`. Bake run for QA and
+then discarded per `ADDRESS-TO-ASSET.md` "Batch mode"; this branch commits source
+only.
+
+| Check | Result |
+|---|---|
+| Asset re-validated after the stage-4 swap | **PASS** — 15/15, `overall: PASS` |
+| `compress-assets.mjs` | **PASS** — `skip (already compressed)`, `EXT_meshopt_compression` present |
+| Loader merge | `earl-warren-building merged 9 objects / 9 materials -> batched (9422 tris body); uniform x1.0000 at 1730, -1181` |
+| Scale ≈ 1.0 | **1.0000 exactly** |
+| Placement | x 1729.88, z −1181.29 — the projected anchor to 2 dp |
+| Terrain seating | y 20.77 m, sitting on sampled terrain; no float, no sink |
+| Orientation | arcade and entrance portals face south onto McAllister / Civic Center Plaza |
+| One building, no procedural twin | **PASS** — see the exclusion test below, and `earl-warren-building-in-scene.png` |
+| Draw calls | **91** (budget < 300) |
+| Night glow | `landmark-glow` layer live, opacity 1.0; gold portals + white courtroom laylights |
+| `audit.mjs` check 1.6 | **PASS** — "no procedural footprint inside a bespoke landmark exclusion zone — 42 landmarks clear" |
+| Fallback drill | **PASS** — exactly one warning, no error, no crash, no hole |
+
+### The exclusion test
+
+`verify-rebake.mjs` flagged two cells changed outside the new landmark (19_14,
+23_13) and reported cell 19_13 going 103 → 104 — a count going *up*, which is not
+what an exclusion does. Both were resolved with the control test the tool itself
+prescribes: remove the entry, re-bake `buildings`, compare.
+
+| | 19_13 building count | global count |
+|---|---|---|
+| Control — no registry entry, current data | **105** | 174,755 |
+| With `exclude: 12` | **104** | 174,754 |
+| `origin/main` — older data snapshot | 103 | — |
+
+Exactly **one** footprint dropped, in exactly **one** cell (a byte-level diff of
+all 585 tiles between the control and with-landmark bakes shows `19_13.bin` as the
+only difference). The control bake — with no Earl Warren entry at all — already
+differs from `origin/main` in all three cells, so the "stray cells" are data-vintage
+drift between this `pipeline/data/` snapshot and the one `origin/main` was baked
+from, not this radius. Re-running `buildings` reproduced the output byte-identically,
+confirming determinism.
+
+`verify-rebake` also reports the nearest surviving footprint at **55.3 m** and
+**59.4 m tall** — the Hiram W. Johnson slab, still standing. Visible behind the
+model in `earl-warren-building-in-scene.png`.
+
+### Fallback drill detail
+
+Renaming the GLB away produced:
+
+```
+[warn] sf-assets: earl-warren-building failed to load (Unexpected token '<', "<!doctype "... is not valid JSON)
+```
+
+One warning, no error. The other 28 landmarks placed normally and the scene kept
+rendering. Note this exercises the **parse-failure** path, not a 404: the Vite dev
+server answers a missing asset with `index.html` and HTTP 200. Restoring the file
+recovered the landmark on the next load with no further action.

@@ -990,6 +990,30 @@ export const LANDMARKS = [
     // explains what this place is.
     camera: { distance: 620, yaw: 90, pitch: 30 },
   },
+  // A PARTY-WALL site, so this radius is far tighter than the usual
+  // half-diagonal rule. The Earl Warren Building shares its block with the
+  // 54 m Hiram W. Johnson State Office Building, whose wall is a few metres
+  // off this building's north wings. Measured against the real bake input
+  // (`pipeline/data/overture_buildings.geojsonseq`) with the metric
+  // `excluded()` uses — centroid OR any ring vertex inside the radius — over
+  // the 13 footprints in the surrounding bbox:
+  //
+  //   exclude  6-20 m -> drops 1  (correct: the Earl Warren footprint, whose
+  //                                nearest point is 5.1 m from this anchor)
+  //   exclude 22-40 m -> drops 2  (eats the Hiram W. Johnson slab at 20.2 m)
+  //   exclude 60 m    -> drops 3  (also the Civic Center Plaza Garage kiosk)
+  //
+  // 12 m is the middle of the safe band. The 59.9 m OBB half-diagonal that
+  // most entries here use would have punched a 54 m building out of the block.
+  {
+    id: 'earlWarrenBuilding',
+    name: 'Earl Warren Building',
+    lon: -122.4178413,
+    lat: 37.7806865,
+    height: 27.0,
+    exclude: 12,
+    camera: { distance: 420, yaw: 183, pitch: 20 },
+  },
 ];
 
 // Parks/green spaces the landcover bake must match at least one source polygon
