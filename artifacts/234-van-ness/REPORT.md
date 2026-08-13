@@ -81,17 +81,22 @@ not architecture, and the L is what the eye reads.
    The east wall against 101 Grove now carries three high openings; the two
    lot-line walls facing the open sliver lots carry a staggered scatter on the
    upper floors only. This removed 142 objects.
-3. **Render engines are split, and that is a compromise, not a preference.** The
-   six day views are **Blender Workbench** — the sanctioned headless path
-   (`sf-asset-check`: "no GPU, so use Workbench or CPU Cycles") — because this
-   machine was running five other landmark sessions' renders concurrently at
-   load averages between 100 and 750, and the CPU-Cycles rig could not complete
-   a single frame. The night aerial is **Cycles**, because Workbench does not
-   render emission and a Workbench "night" image would have been the day image
-   with a dark background, which is worse than useless. Every image depicts the
-   same exported GLB, and the four elevations share one rig. The rig still
-   supports the full Cycles pass (`render_234_van_ness.py` with no `--workbench`
-   flag, `--samples` to taste); it is worth re-running when the machine is idle.
+3. **A Workbench detour, since resolved.** The committed renders are the full
+   **CPU-Cycles rig at 64 samples** — day, night and contact sheet — which is
+   what the pipeline asks for. Getting there took a detour worth recording: for
+   most of this session the machine was running five other landmark sessions'
+   Blender jobs at load averages between 100 and 770, and the Cycles rig could
+   not complete a single frame. The iteration passes in §4 were therefore judged
+   on **Blender Workbench** renders — the sanctioned headless path
+   (`sf-asset-check`: "no GPU, so use Workbench or CPU Cycles") — and the design
+   decisions there were made against flat rasterized images. Two consequences:
+   Workbench renders `Toy_white` noticeably greyer than Cycles does, so the
+   asset reads warmer in the shipped images than it did while being corrected;
+   and Workbench cannot render emission at all, so the night state was only
+   truly verifiable once Cycles became available. Both were re-checked against
+   the final Cycles pass and neither changed a design decision. The rig keeps
+   the `--workbench` and `--samples` flags for the next time the machine is
+   busy.
 
 ## 4. Iteration log
 
