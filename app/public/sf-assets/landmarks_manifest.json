@@ -364,6 +364,25 @@
     "loadRadius": 2500
   },
   {
+    "id": "551-third",
+    "file": "551-third.glb",
+    "anchor": [
+      -122.3946431,
+      37.7806625
+    ],
+    "targetHeightM": 6.6,
+    "cat": 21,
+    "name": "551 Third Street (Shell Station)",
+    "estimated": false,
+    "dims": [
+      41.81,
+      41.81,
+      6.6
+    ],
+    "tris": 9541,
+    "loadRadius": 2500
+  },
+  {
     "id": "375-alabama",
     "file": "375-alabama.glb",
     "anchor": [

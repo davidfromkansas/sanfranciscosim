@@ -165,6 +165,49 @@ Do not apply this here — integration is stage 5.
 21 (`mustard`), so no app change is needed, but nothing in the manifest has
 exercised that row before and the card should be looked at once.
 
+## Gate 5 — integration (batch mode)
+
+Case B. Source-only branch per `ADDRESS-TO-ASSET.md` batch mode: the bake was run
+in full and QA'd on it, then discarded before committing.
+`git diff --name-only origin/main` lists **nothing** under `app/public/tiles/` or
+`api/_data/`.
+
+| Check | Result | Evidence |
+|---|---|---|
+| Re-validation before integration | PASS | 19/19 against the shipped file |
+| Manifest entry | PASS | clean 19-line insertion beside `550-third` |
+| id mapping | PASS | `camelId('551-third')` -> `551Third`, matches the registry; `SF.assets.placed` is keyed `551Third` |
+| Registry entry + re-bake | PASS | full chain, exit 0 |
+| audit 1.6 | PASS | "43 zones over 42 landmarks clear" |
+| verify-rebake | PASS | 584/585 cells unchanged; only `23_13`, 233 -> 231 |
+| Exclusion, zone 1 | PASS | nearest surviving footprint 16.4 m vs 8 m radius |
+| Exclusion, zone 2 (kiosk) | PASS | nearest surviving footprint 6.9 m vs 4 m radius |
+| Single building, no z-fighting | PASS | one station on a cleared lot (screenshot) |
+| Scale factor | PASS | `uniform x1.0000` in the merge line |
+| Merge / batching | PASS | `merged 14 objects / 14 materials -> batched (5238 tris body)` |
+| Orientation | PASS | frontage reads to 3rd Street from the SW camera |
+| Terrain seating | PASS | apron sits flush, no floating or sinking |
+| Night glow | PASS | only the fascia lightbar rings and the pecten light |
+| Draw calls | PASS | hero 162/frame, near streamed landmarks 65/frame, both < 300 |
+| Streaming | PASS | `landmark-streaming-check.mjs` all 6 checks, 36 entries, 0 failed |
+| Fallback drill | PASS | one warning, app keeps running, site degrades to empty ground |
+| lint / build | PASS | eslint clean; vite build + compress-tiles OK |
+| Frame rate | **NOT MEASURED** | the review harness throttles the browser pane, so rAF is paused and both `renderer.info` and the in-app stats overlay read fps 0 / 1 draw call. Draw calls were measured instead by `landmark-streaming-check.mjs`, which drives its own headless Chrome. An fps reading needs an interactive session. |
+
+Two findings from the QA worth carrying:
+
+- **`context.mjs` writes `camera: l.camera` straight through, and `main.js`
+  dereferences `landmark.camera.yaw` with no guard**, so a registry entry without
+  a camera preset takes the whole app down at boot with
+  `Cannot read properties of undefined (reading 'yaw')`. Mine was the only one of
+  42 without one. Adding the preset fixed it; the missing guard is still there.
+- **The integration prompt's Step 6 expects the warning
+  `sf-assets: ... — keeping the code-built landmark`.** That is the *resident*
+  asset path's single-shot `warn()`. Anything with a `loadRadius` — which is now
+  every new landmark — fails through `scan()` instead and logs
+  `sf-assets: <id> failed to load (...)`, one per asset, by design and with a
+  comment saying so. The drill passes; the prompt's expected text is stale.
+
 ## Carried forward to integration
 
 `docs/asset-plans/551-third.md` §2.13 describes an exclusion-zone problem this
