@@ -14,3 +14,4 @@ pipeline/out/
 # Blender/Python build litter from artifacts/
 __pycache__/
 *.blend1
+render.log
