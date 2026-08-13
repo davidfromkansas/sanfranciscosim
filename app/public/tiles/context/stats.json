@@ -1,6 +1,6 @@
 {
- "generated": "2026-08-13T00:02:03.449Z",
- "buildings": 174762,
+ "generated": "2026-08-13T00:44:01.229Z",
+ "buildings": 174763,
  "cells": 596,
  "categories": [
   {
@@ -28,7 +28,7 @@
    "cat": 3,
    "id": "office",
    "label": "Office",
-   "count": 2757,
+   "count": 2758,
    "night": 3
   },
   {
@@ -200,7 +200,7 @@
   {
    "sub": "office",
    "label": "Office",
-   "count": 1889
+   "count": 1890
   },
   {
    "sub": "restaurant",
@@ -658,14 +658,14 @@
   "business": 10214,
   "heuristic": 7280,
   "osm": 8625,
-  "overture": 6662,
+  "overture": 6663,
   "datasf": 1288
  },
  "confidence": [
   147973,
   15333,
   4498,
-  6958
+  6959
  ],
  "streets": {
   "named": 2509,
