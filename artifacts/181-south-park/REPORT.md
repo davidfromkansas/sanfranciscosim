@@ -15,7 +15,8 @@ question and how it was closed; section 6 records what is still unverified.
 | | |
 |---|---|
 | Triangles | 4,200 (budget 9,000) |
-| Objects | 121 |
+| Objects | 9 (121 before the stage-4 optimize pass) |
+| File | 139,356 B raw / 86,139 B gzip −9 (290,832 B raw pre-optimize, −52.1%) |
 | Dimensions | 40.836 x 40.528 x 16.5 m |
 | Bounding-box top | 16.5 m exactly — the roof ridge; loader scale lands on 1.0 |
 | min Z | 0.0 |
@@ -24,7 +25,7 @@ question and how it was closed; section 6 records what is still unverified.
 | Glow materials | `Toy_glass_Glow`, `Toy_trim_Glow` |
 | Anchor | `-122.3945113, 37.7807582` |
 | Front heading | 315.2° true (NW, onto South Park) |
-| Validation | all 16 contract checks PASS (`validation.json`) |
+| Validation | all 16 contract checks PASS (`validation.json`), re-run against the shipped optimized file |
 | Renderer | EEVEE, 128 samples — see below |
 
 **The committed renders are EEVEE, not Cycles.** These materials are flat,
@@ -133,6 +134,20 @@ Each iteration is a review of the high three-quarter aerial, per stage 2 of
    which is also what the app does — its night layer is an unlit overlay drawn at
    the material's own baked colour. **`artifacts/380-brannan/` still carries the
    uncorrected rig and its committed night render should be re-checked.**
+
+## 4b. Optimize pass (stage 4)
+
+`optimize/REPORT.md` has the full record. Headline: 121 draw submeshes → 9,
+8,680 verts → 2,336, raw file −52.1%, triangles unchanged because every triangle
+in this asset is on a visible surface. All eight gates pass; the A/B pixel delta
+is 0.0002% at the near day camera.
+
+One finding worth carrying to other assets: the generic Phase-B weld averages
+loop normals at welded seams and put a visible-under-amplification smooth
+gradient across this building's roof slopes. A flat-shading re-assert after the
+weld restores the authored state and takes the delta to zero. It is generic, not
+asset-specific, and belongs in `tools/glb-optimize/optimize.py` once a second
+asset confirms it.
 
 ## 5. Design decisions worth recording
 
