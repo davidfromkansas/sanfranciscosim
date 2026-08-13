@@ -1,6 +1,6 @@
 {
- "generated": "2026-08-12T23:43:37.216Z",
- "buildings": 174766,
+ "generated": "2026-08-13T00:43:48.743Z",
+ "buildings": 174757,
  "cells": 596,
  "categories": [
   {
@@ -21,21 +21,21 @@
    "cat": 2,
    "id": "apartments",
    "label": "Apartments",
-   "count": 14017,
+   "count": 14016,
    "night": 0
   },
   {
    "cat": 3,
    "id": "office",
    "label": "Office",
-   "count": 2758,
+   "count": 2757,
    "night": 3
   },
   {
    "cat": 4,
    "id": "retail",
    "label": "Retail",
-   "count": 8043,
+   "count": 8042,
    "night": 1
   },
   {
@@ -133,7 +133,7 @@
    "cat": 18,
    "id": "government",
    "label": "Government",
-   "count": 431,
+   "count": 429,
    "night": 2
   },
   {
@@ -168,7 +168,7 @@
    "cat": 23,
    "id": "parking_garage",
    "label": "Parking garage",
-   "count": 1849,
+   "count": 1845,
    "night": 3
   },
   {
@@ -200,7 +200,7 @@
   {
    "sub": "office",
    "label": "Office",
-   "count": 1890
+   "count": 1889
   },
   {
    "sub": "restaurant",
@@ -230,7 +230,7 @@
   {
    "sub": "parking_garage",
    "label": "Parking garage",
-   "count": 899
+   "count": 898
   },
   {
    "sub": "community_center",
@@ -275,7 +275,7 @@
   {
    "sub": "civic_office",
    "label": "Civic office",
-   "count": 358
+   "count": 357
   },
   {
    "sub": "trade_school",
@@ -325,7 +325,7 @@
   {
    "sub": "bank",
    "label": "Bank",
-   "count": 187
+   "count": 186
   },
   {
    "sub": "taqueria",
@@ -578,14 +578,14 @@
    "count": 15
   },
   {
-   "sub": "consulate",
-   "label": "Consulate",
-   "count": 15
-  },
-  {
    "sub": "synagogue",
    "label": "Synagogue",
    "count": 15
+  },
+  {
+   "sub": "consulate",
+   "label": "Consulate",
+   "count": 14
   },
   {
    "sub": "dormitory",
@@ -654,18 +654,18 @@
   }
  ],
  "sources": {
-  "landuse": 140694,
-  "business": 10214,
+  "landuse": 140690,
+  "business": 10213,
   "heuristic": 7280,
-  "osm": 8627,
-  "overture": 6663,
-  "datasf": 1288
+  "osm": 8625,
+  "overture": 6662,
+  "datasf": 1287
  },
  "confidence": [
-  147974,
-  15334,
+  147970,
+  15332,
   4498,
-  6960
+  6957
  ],
  "streets": {
   "named": 2509,
