@@ -95,8 +95,9 @@ route, and the park plans depend on it (§E8 of the parks README).
 | [599 Third Street](./599-third.md) | `599-third` | 18.3 m | new landmark |
 | [Civic Center Plaza](./civic-center-plaza.md) | `civic-center-plaza` | 30.48 m (flagpole crest) | new landmark |
 | [250 Van Ness Avenue (171–195 Grove Street)](./250-van-ness.md) | `250-van-ness` | 10.0 m (estimated) | new landmark |
+| [Earl Warren Building](./earl-warren-building.md) | `earl-warren-building` | 27.0 m | new landmark |
 
-## Shared contract (all 53)
+## Shared contract (all 54)
 
 - Style: `docs/styles/miniature-toy.md` (authoritative for artistic decisions)
 - Technical contract: `.agents/skills/sf-asset-check/SKILL.md` (authoritative for the GLB)
@@ -220,6 +221,13 @@ penthouse.
 Overture — the pipeline's own bake input — carries 12.4 m, because both the LiDAR max
 (13.0 m) and the LiDAR min (2.5 m) on that footprint are street-tree canopy, not
 building. A height read off a raster statistic is only as good as the raster's edges.
+
+The Earl Warren Building is another variety again: its OSM `height` is fine, but the
+LiDAR record's `hgt_maxcm` (46.39 m) sits 19 m above its own roof plane, because the
+footprint shares a party wall with the 54 m Hiram W. Johnson slab and a 0.5 m cell on
+that boundary samples the tower. Treat a single-cell `hgt_max` on a party wall as
+unusable. That plan's 2.14 is also the set's clearest exclusion-radius trap: the usual
+half-diagonal would have deleted the neighbour.
 
 The executing agent is expected to re-verify height, anchor, footprint and
 orientation before modelling — the dossier is a head start, not a citation.
