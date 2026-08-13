@@ -108,6 +108,45 @@ Run and reported in `optimize/REPORT.md`. All gates PASS: raw 574,548 →
 `artifacts/500-van-ness/500-van-ness.glb` and `validation.json` above was re-run
 against it.
 
+## Stage 5 — integration (batch mode)
+
+Run of `docs/asset-plans/INTEGRATION-PROMPT.md` Part 1 with the batch-mode
+amendment from `ADDRESS-TO-ASSET.md`: the branch ships **source only**, and the
+city is baked once for the whole batch by `BATCH-INTEGRATE.md`.
+
+| Check | Result | Evidence |
+|---|---|---|
+| Re-validation of the shipped GLB | **PASS** | `validation.json` all-PASS, 9,512 tris, 43.286 × 45.097 × 17.000 m, min z 0, 11 `Toy_*` materials |
+| GLB dropped in | **PASS** | `app/public/sf-assets/landmarks/500-van-ness.glb`, 247,576 bytes, byte-identical to the artifacts copy; already meshopt-compressed, so `compress-assets.mjs` skips it |
+| Manifest entry | **PASS** | appended; served correctly (`fetch` from the running app returns the entry) |
+| id round trip | **PASS** | `camelId('500-van-ness')` → `500VanNess`, matching the registry entry |
+| Registry entry (Case B) | **PASS** | `pipeline/lib/landmarks.mjs`, `exclude: 28`, camera preset `{320, 232, 24}` |
+| Exclusion re-measured after the batch re-bake | **PASS** | re-run against `origin/main` **after** PR #117's re-bake: still no footprint covering the anchor, nearest surviving vertex **32.8 m** vs `exclude: 28` — 4.8 m margin, and the entry removes nothing |
+| Single building on the site | **PASS** | one building in the frame, no procedural twin, no baked block poking through |
+| Scale factor | **PASS** | console: `uniform x1.0000`; placement matrix diagonal is exactly 1 |
+| Position | **PASS** | placed at 1547, −1151 = the projected anchor |
+| Orientation | **PASS** | placement matrix has no rotation; the long show face runs along McAllister and the two-pavilion front along Van Ness, as built |
+| Terrain seating | **PASS** | placement y = 22.06 m = `sampleElevation` at the anchor; no float, no sink |
+| Night glow | **PASS** | at `night 1.00` only the sign fascia (cyan line along the plinth) and the scattered warm apartment windows light; walls, roof and parapet stay dark |
+| Draw calls | **PASS (architectural)** | the merge line reports `batched` — the asset joins the shared `landmark-bodies` / `landmark-glow` pair (28 instances each), so it adds **zero** draw calls. A live fps / draw-call reading was **not obtainable**: the QA ran in a background browser pane where rAF is throttled, so the stats overlay reads `fps 0 / draw calls 1` between forced frames. Flagged rather than hidden. |
+| Fallback drill | **PASS** | with the GLB renamed away: app boots, area renders, **exactly one** warning — `sf-assets: 500-van-ness failed to load (Unexpected token '<', "<!doctype "... is not valid JSON)` — and the site is empty ground, which is the expected Case B outcome here. (Vite answers a missing GLB with `200 text/html`, so the failure surfaces as a parse error, not a 404.) File restored byte-identical afterwards. |
+| lint / build | **PASS** | `npm run lint` clean; `npm run build` succeeded |
+| Batch-mode sanity | **PASS** | `git diff --name-only origin/main` lists nothing under `app/public/tiles/` or `api/_data/` from this branch |
+
+**Not done, deliberately:** no bake was run on this branch, and no push / PR /
+deploy. Per batch mode the bake and the single PR belong to
+`docs/asset-pipeline/BATCH-INTEGRATE.md`. The one thing the batch bake still owes
+this landmark is its identity data — pick box, `search-index` row and
+`context/landmarks.json` entry — which come from the `lore → toy → context`
+chain. The building itself is already visible without it, because the site was
+cleared long ago by the Courthouse exclusion.
+
+**Note for the batch:** `origin/main` moved during this session (PR #117 re-baked
+the city for five Civic Center / SoMa landmarks, taking the registry from 47 to
+57 entries). This branch is still based on 82252e5d. `landmarks.mjs` and
+`landmarks_manifest.json` are both append-only lists, so the merge is mechanical,
+but it has not been performed here.
+
 ## Stage 3 — approval
 
 Pre-approved by the user before the build, verbatim:
