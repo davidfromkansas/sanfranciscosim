@@ -514,5 +514,43 @@
     ],
     "tris": 4712,
     "loadRadius": 2500
+  },
+  {
+    "id": "bill-graham-civic-auditorium",
+    "file": "bill-graham-civic-auditorium.glb",
+    "anchor": [
+      -122.4173309,
+      37.7780621
+    ],
+    "targetHeightM": 37,
+    "cat": 17,
+    "name": "Bill Graham Civic Auditorium",
+    "estimated": false,
+    "dims": [
+      140.836,
+      100.144,
+      37.0
+    ],
+    "tris": 6396,
+    "loadRadius": 2500
+  },
+  {
+    "id": "505-van-ness",
+    "file": "505-van-ness.glb",
+    "anchor": [
+      -122.4212915,
+      37.7804835
+    ],
+    "targetHeightM": 27.0,
+    "cat": 18,
+    "name": "505 Van Ness Avenue",
+    "estimated": true,
+    "dims": [
+      124.2265,
+      95.3195,
+      27.0
+    ],
+    "tris": 18774,
+    "loadRadius": 2500
   }
 ]

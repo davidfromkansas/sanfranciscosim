@@ -401,6 +401,39 @@ export const LANDMARKS = [
     exclude: 52,
     camera: { distance: 420, yaw: 135, pitch: 20 },
   },
+  {
+    id: 'billGrahamCivicAuditorium',
+    name: 'Bill Graham Civic Auditorium',
+    lon: -122.4173309,
+    lat: 37.7780621,
+    height: 37,
+    // Footprint 128 x 78.6 m at 80.69 deg; half-diagonal 75.1 m, so 80 m clears
+    // it. Checked against the neighbours: City Hall is 228 m away (110 m zone)
+    // and the Opera House 322 m (62 m zone) - neither zone is touched.
+    exclude: 80,
+    camera: { distance: 700, yaw: 200, pitch: 24 },
+  },
+  {
+    // Governor Edmund G. "Pat" Brown Building — California PUC headquarters.
+    // The radius looks absurdly small for a 113 x 93 m building, and it has to
+    // be: excluded() drops a whole footprint when its centroid OR ANY ring
+    // vertex is inside the radius, and this block has a close neighbour.
+    // Measured against the committed tile (buildings/18_13.bin):
+    //   this footprint  (6,339 m2, matches the 6,263 m2 survey) nearest vertex 12.7 m
+    //   SW neighbour    (1,296 m2, a separate building)          nearest vertex 14.4 m
+    //   City Hall                                                nearest vertex 58.2 m
+    // So 12.7 < r < 14.4 is the ONLY window that clears this building and
+    // spares the neighbour; a centroid-only reading (12.0 m vs 36.3 m) would
+    // suggest a comfortable 30 m and silently delete a real building. One
+    // vertex inside is enough to remove all 6,339 m2, so 13.5 does the full job.
+    id: '505VanNess',
+    name: '505 Van Ness Avenue',
+    lon: -122.4212915,
+    lat: 37.7804835,
+    height: 27,
+    exclude: 13.5,
+    camera: { distance: 420, yaw: 126, pitch: 26 },
+  },
 ];
 
 // Parks/green spaces the landcover bake must match at least one source polygon

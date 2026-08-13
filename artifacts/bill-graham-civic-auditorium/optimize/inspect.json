@@ -1,0 +1,979 @@
+{
+ "file_bytes": {
+  "raw": 420840,
+  "gzip9": 61178
+ },
+ "objects": 209,
+ "total_tris": 6408,
+ "total_verts": 12690,
+ "primitives_est": 209,
+ "top20": [
+  {
+   "name": "cornice",
+   "tris": 108,
+   "verts": 216,
+   "dims": [
+    131.823,
+    41.86,
+    1.4
+   ],
+   "materials": [
+    "Toy_white"
+   ]
+  },
+  {
+   "name": "front_base",
+   "tris": 108,
+   "verts": 216,
+   "dims": [
+    130.313,
+    40.556,
+    5.0
+   ],
+   "materials": [
+    "Toy_stone"
+   ]
+  },
+  {
+   "name": "front_range",
+   "tris": 108,
+   "verts": 216,
+   "dims": [
+    129.474,
+    40.418,
+    15.0
+   ],
+   "materials": [
+    "Toy_trim"
+   ]
+  },
+  {
+   "name": "hall",
+   "tris": 108,
+   "verts": 216,
+   "dims": [
+    138.958,
+    98.266,
+    18.0
+   ],
+   "materials": [
+    "Toy_sand"
+   ]
+  },
+  {
+   "name": "hall_base",
+   "tris": 108,
+   "verts": 216,
+   "dims": [
+    139.877,
+    99.185,
+    5.0
+   ],
+   "materials": [
+    "Toy_stone"
+   ]
+  },
+  {
+   "name": "marquee",
+   "tris": 108,
+   "verts": 216,
+   "dims": [
+    78.784,
+    17.978,
+    0.8
+   ],
+   "materials": [
+    "Toy_white"
+   ]
+  },
+  {
+   "name": "pav_attic_e",
+   "tris": 108,
+   "verts": 216,
+   "dims": [
+    25.68,
+    25.713,
+    5.5
+   ],
+   "materials": [
+    "Toy_trim"
+   ]
+  },
+  {
+   "name": "pav_attic_w",
+   "tris": 108,
+   "verts": 216,
+   "dims": [
+    25.68,
+    25.713,
+    5.5
+   ],
+   "materials": [
+    "Toy_trim"
+   ]
+  },
+  {
+   "name": "pav_base_e",
+   "tris": 108,
+   "verts": 216,
+   "dims": [
+    28.487,
+    28.52,
+    5.0
+   ],
+   "materials": [
+    "Toy_stone"
+   ]
+  },
+  {
+   "name": "pav_base_w",
+   "tris": 108,
+   "verts": 216,
+   "dims": [
+    28.487,
+    28.52,
+    5.0
+   ],
+   "materials": [
+    "Toy_stone"
+   ]
+  },
+  {
+   "name": "pav_cornice_e",
+   "tris": 108,
+   "verts": 216,
+   "dims": [
+    30.038,
+    30.071,
+    1.4
+   ],
+   "materials": [
+    "Toy_white"
+   ]
+  },
+  {
+   "name": "pav_cornice_w",
+   "tris": 108,
+   "verts": 216,
+   "dims": [
+    30.038,
+    30.071,
+    1.4
+   ],
+   "materials": [
+    "Toy_white"
+   ]
+  },
+  {
+   "name": "pav_e",
+   "tris": 108,
+   "verts": 216,
+   "dims": [
+    27.511,
+    27.544,
+    17.9
+   ],
+   "materials": [
+    "Toy_trim"
+   ]
+  },
+  {
+   "name": "pav_w",
+   "tris": 108,
+   "verts": 216,
+   "dims": [
+    27.511,
+    27.544,
+    17.9
+   ],
+   "materials": [
+    "Toy_trim"
+   ]
+  },
+  {
+   "name": "dome_ring",
+   "tris": 92,
+   "verts": 192,
+   "dims": [
+    63.086,
+    63.086,
+    1.5
+   ],
+   "materials": [
+    "Toy_white"
+   ]
+  },
+  {
+   "name": "lantern",
+   "tris": 92,
+   "verts": 192,
+   "dims": [
+    8.938,
+    8.938,
+    0.5
+   ],
+   "materials": [
+    "Toy_steel"
+   ]
+  },
+  {
+   "name": "arch0",
+   "tris": 56,
+   "verts": 90,
+   "dims": [
+    10.968,
+    2.47,
+    10.7
+   ],
+   "materials": [
+    "Toy_glass"
+   ]
+  },
+  {
+   "name": "arch0_lit",
+   "tris": 56,
+   "verts": 90,
+   "dims": [
+    8.807,
+    2.174,
+    9.523
+   ],
+   "materials": [
+    "Toy_mustard_Glow"
+   ]
+  },
+  {
+   "name": "arch0_rev",
+   "tris": 56,
+   "verts": 90,
+   "dims": [
+    12.489,
+    2.96,
+    11.85
+   ],
+   "materials": [
+    "Toy_ink"
+   ]
+  },
+  {
+   "name": "arch1",
+   "tris": 56,
+   "verts": 90,
+   "dims": [
+    10.968,
+    2.47,
+    10.7
+   ],
+   "materials": [
+    "Toy_glass"
+   ]
+  }
+ ],
+ "vertex_attrs": [
+  "NORMAL"
+ ],
+ "materials": [
+  {
+   "name": "Toy_glass",
+   "glow": false,
+   "user_objects": 100
+  },
+  {
+   "name": "Toy_ink",
+   "glow": false,
+   "user_objects": 19
+  },
+  {
+   "name": "Toy_mustard_Glow",
+   "glow": true,
+   "user_objects": 3
+  },
+  {
+   "name": "Toy_roofd",
+   "glow": false,
+   "user_objects": 7
+  },
+  {
+   "name": "Toy_sand",
+   "glow": false,
+   "user_objects": 3
+  },
+  {
+   "name": "Toy_steel",
+   "glow": false,
+   "user_objects": 11
+  },
+  {
+   "name": "Toy_stone",
+   "glow": false,
+   "user_objects": 6
+  },
+  {
+   "name": "Toy_trim",
+   "glow": false,
+   "user_objects": 9
+  },
+  {
+   "name": "Toy_white",
+   "glow": false,
+   "user_objects": 50
+  },
+  {
+   "name": "Toy_white_Glow",
+   "glow": true,
+   "user_objects": 1
+  }
+ ],
+ "textures": [],
+ "bbox": {
+  "dims": [
+   140.8355,
+   100.144,
+   37.0
+  ],
+  "min": [
+   -70.4177,
+   -50.072,
+   0.0
+  ],
+  "origin_offset_xy": [
+   0.0,
+   0.0
+  ],
+  "base_z": 0.0
+ },
+ "duplicate_mesh_groups": [
+  {
+   "signature": {
+    "verts": 24,
+    "tris": 12,
+    "dims": [
+     0.7057,
+     1.8442,
+     2.6
+    ]
+   },
+   "objects": [
+    "hall_swin_e0_0",
+    "hall_swin_e0_1",
+    "hall_swin_e0_2",
+    "hall_swin_e0_3",
+    "hall_swin_e0_4",
+    "hall_swin_e0_5",
+    "hall_swin_e1_0",
+    "hall_swin_e1_1",
+    "hall_swin_e1_2",
+    "hall_swin_e1_3",
+    "hall_swin_e1_4",
+    "hall_swin_e1_5",
+    "hall_swin_w0_0",
+    "hall_swin_w0_1",
+    "hall_swin_w0_2",
+    "hall_swin_w0_3",
+    "hall_swin_w0_4",
+    "hall_swin_w0_5",
+    "hall_swin_w1_0",
+    "hall_swin_w1_1",
+    "hall_swin_w1_2",
+    "hall_swin_w1_3",
+    "hall_swin_w1_4",
+    "hall_swin_w1_5"
+   ]
+  },
+  {
+   "signature": {
+    "verts": 24,
+    "tris": 12,
+    "dims": [
+     0.8,
+     2.2438,
+     3.0
+    ]
+   },
+   "objects": [
+    "pav_swin_e0_0",
+    "pav_swin_e0_1",
+    "pav_swin_e0_2",
+    "pav_swin_e0_3",
+    "pav_swin_e1_0",
+    "pav_swin_e1_1",
+    "pav_swin_e1_2",
+    "pav_swin_e1_3",
+    "pav_swin_e2_0",
+    "pav_swin_e2_1",
+    "pav_swin_e2_2",
+    "pav_swin_e2_3",
+    "pav_swin_w0_0",
+    "pav_swin_w0_1",
+    "pav_swin_w0_2",
+    "pav_swin_w0_3",
+    "pav_swin_w1_0",
+    "pav_swin_w1_1",
+    "pav_swin_w1_2",
+    "pav_swin_w1_3",
+    "pav_swin_w2_0",
+    "pav_swin_w2_1",
+    "pav_swin_w2_2",
+    "pav_swin_w2_3"
+   ]
+  },
+  {
+   "signature": {
+    "verts": 72,
+    "tris": 44,
+    "dims": [
+     2.7486,
+     0.9499,
+     2.3
+    ]
+   },
+   "objects": [
+    "link_wreath_e",
+    "link_wreath_w",
+    "wreath0",
+    "wreath1",
+    "wreath2",
+    "wreath3"
+   ]
+  },
+  {
+   "signature": {
+    "verts": 60,
+    "tris": 36,
+    "dims": [
+     1.5395,
+     1.5421,
+     11.3
+    ]
+   },
+   "objects": [
+    "col0_e",
+    "col0_w",
+    "col1_e",
+    "col2_e",
+    "col2_w",
+    "col3_e",
+    "col3_w"
+   ]
+  },
+  {
+   "signature": {
+    "verts": 96,
+    "tris": 44,
+    "dims": [
+     3.2517,
+     1.1891,
+     0.6
+    ]
+   },
+   "objects": [
+    "pav_ped_head_e0",
+    "pav_ped_head_e1",
+    "pav_ped_head_e2",
+    "pav_ped_head_w0",
+    "pav_ped_head_w2"
+   ]
+  },
+  {
+   "signature": {
+    "verts": 24,
+    "tris": 12,
+    "dims": [
+     1.8442,
+     0.7057,
+     2.6
+    ]
+   },
+   "objects": [
+    "hall_rwin0_0",
+    "hall_rwin0_1",
+    "hall_rwin0_2",
+    "hall_rwin0_3",
+    "hall_rwin0_4",
+    "hall_rwin0_5",
+    "hall_rwin0_6",
+    "hall_rwin0_7",
+    "hall_rwin0_8",
+    "hall_rwin1_0",
+    "hall_rwin1_1",
+    "hall_rwin1_2",
+    "hall_rwin1_3",
+    "hall_rwin1_4",
+    "hall_rwin1_5",
+    "hall_rwin1_6",
+    "hall_rwin1_7",
+    "hall_rwin1_8"
+   ]
+  },
+  {
+   "signature": {
+    "verts": 216,
+    "tris": 108,
+    "dims": [
+     25.6799,
+     25.7129,
+     5.5
+    ]
+   },
+   "objects": [
+    "pav_attic_e",
+    "pav_attic_w"
+   ]
+  },
+  {
+   "signature": {
+    "verts": 216,
+    "tris": 108,
+    "dims": [
+     28.4875,
+     28.5205,
+     5.0
+    ]
+   },
+   "objects": [
+    "pav_base_e",
+    "pav_base_w"
+   ]
+  },
+  {
+   "signature": {
+    "verts": 216,
+    "tris": 108,
+    "dims": [
+     30.0381,
+     30.0711,
+     1.4
+    ]
+   },
+   "objects": [
+    "pav_cornice_e",
+    "pav_cornice_w"
+   ]
+  },
+  {
+   "signature": {
+    "verts": 216,
+    "tris": 108,
+    "dims": [
+     27.5112,
+     27.5442,
+     17.9
+    ]
+   },
+   "objects": [
+    "pav_e",
+    "pav_w"
+   ]
+  },
+  {
+   "signature": {
+    "verts": 24,
+    "tris": 12,
+    "dims": [
+     2.2438,
+     0.8,
+     3.0
+    ]
+   },
+   "objects": [
+    "pav_win_e0_0",
+    "pav_win_e0_1",
+    "pav_win_e0_2",
+    "pav_win_e1_0",
+    "pav_win_e1_1",
+    "pav_win_e1_2",
+    "pav_win_e2_0",
+    "pav_win_e2_1",
+    "pav_win_e2_2",
+    "pav_win_w0_0",
+    "pav_win_w0_1",
+    "pav_win_w0_2",
+    "pav_win_w1_0",
+    "pav_win_w1_1",
+    "pav_win_w1_2",
+    "pav_win_w2_0",
+    "pav_win_w2_1",
+    "pav_win_w2_2"
+   ]
+  },
+  {
+   "signature": {
+    "verts": 96,
+    "tris": 44,
+    "dims": [
+     6.0083,
+     2.7906,
+     1.5
+    ]
+   },
+   "objects": [
+    "colcap0",
+    "colcap1",
+    "colcap2",
+    "colcap3"
+   ]
+  },
+  {
+   "signature": {
+    "verts": 96,
+    "tris": 44,
+    "dims": [
+     1.5644,
+     0.8548,
+     15.0
+    ]
+   },
+   "objects": [
+    "link_pil_e0",
+    "link_pil_e1",
+    "link_pil_w0",
+    "link_pil_w1"
+   ]
+  },
+  {
+   "signature": {
+    "verts": 96,
+    "tris": 44,
+    "dims": [
+     2.9605,
+     2.9605,
+     2.0
+    ]
+   },
+   "objects": [
+    "pav_ped_e0",
+    "pav_ped_e1",
+    "pav_ped_w0",
+    "pav_ped_w1"
+   ]
+  },
+  {
+   "signature": {
+    "verts": 96,
+    "tris": 44,
+    "dims": [
+     4.4715,
+     3.9764,
+     1.8
+    ]
+   },
+   "objects": [
+    "pav_plant_e0",
+    "pav_plant_e1",
+    "pav_plant_w0",
+    "pav_plant_w1"
+   ]
+  },
+  {
+   "signature": {
+    "verts": 96,
+    "tris": 44,
+    "dims": [
+     5.9436,
+     2.3959,
+     2.2
+    ]
+   },
+   "objects": [
+    "ped0",
+    "ped1",
+    "ped2",
+    "ped3"
+   ]
+  },
+  {
+   "signature": {
+    "verts": 90,
+    "tris": 56,
+    "dims": [
+     10.9683,
+     2.4703,
+     10.7
+    ]
+   },
+   "objects": [
+    "arch0",
+    "arch1",
+    "arch2"
+   ]
+  },
+  {
+   "signature": {
+    "verts": 90,
+    "tris": 56,
+    "dims": [
+     8.807,
+     2.1736,
+     9.523
+    ]
+   },
+   "objects": [
+    "arch0_lit",
+    "arch1_lit",
+    "arch2_lit"
+   ]
+  },
+  {
+   "signature": {
+    "verts": 90,
+    "tris": 56,
+    "dims": [
+     12.489,
+     2.9597,
+     11.85
+    ]
+   },
+   "objects": [
+    "arch0_rev",
+    "arch1_rev",
+    "arch2_rev"
+   ]
+  },
+  {
+   "signature": {
+    "verts": 24,
+    "tris": 12,
+    "dims": [
+     4.2417,
+     1.2716,
+     3.55
+    ]
+   },
+   "objects": [
+    "door0",
+    "door1",
+    "door2",
+    "door3",
+    "door4",
+    "door5",
+    "door6",
+    "door7",
+    "door8"
+   ]
+  },
+  {
+   "signature": {
+    "verts": 72,
+    "tris": 44,
+    "dims": [
+     5.8368,
+     1.6291,
+     4.4
+    ]
+   },
+   "objects": [
+    "cartouche_e",
+    "cartouche_w"
+   ]
+  },
+  {
+   "signature": {
+    "verts": 72,
+    "tris": 44,
+    "dims": [
+     1.6291,
+     5.8368,
+     4.4
+    ]
+   },
+   "objects": [
+    "cartouche_side_e",
+    "cartouche_side_w"
+   ]
+  },
+  {
+   "signature": {
+    "verts": 96,
+    "tris": 44,
+    "dims": [
+     140.1864,
+     99.4948,
+     0.35
+    ]
+   },
+   "objects": [
+    "hall_course0",
+    "hall_course1"
+   ]
+  },
+  {
+   "signature": {
+    "verts": 96,
+    "tris": 44,
+    "dims": [
+     7.6908,
+     43.4981,
+     17.0
+    ]
+   },
+   "objects": [
+    "hall_pil_e",
+    "hall_pil_w"
+   ]
+  },
+  {
+   "signature": {
+    "verts": 96,
+    "tris": 44,
+    "dims": [
+     26.4936,
+     26.5266,
+     0.5
+    ]
+   },
+   "objects": [
+    "pav_attic_cap_e",
+    "pav_attic_cap_w"
+   ]
+  },
+  {
+   "signature": {
+    "verts": 96,
+    "tris": 44,
+    "dims": [
+     11.1301,
+     9.48,
+     2.9
+    ]
+   },
+   "objects": [
+    "plant_e0",
+    "plant_w0"
+   ]
+  },
+  {
+   "signature": {
+    "verts": 96,
+    "tris": 44,
+    "dims": [
+     8.8329,
+     7.1828,
+     2.2
+    ]
+   },
+   "objects": [
+    "plant_e1",
+    "plant_w1"
+   ]
+  },
+  {
+   "signature": {
+    "verts": 96,
+    "tris": 44,
+    "dims": [
+     6.3578,
+     9.658,
+     1.8
+    ]
+   },
+   "objects": [
+    "plant_e2",
+    "plant_w2"
+   ]
+  },
+  {
+   "signature": {
+    "verts": 96,
+    "tris": 44,
+    "dims": [
+     6.6975,
+     5.8724,
+     3.6
+    ]
+   },
+   "objects": [
+    "stair_ph_e",
+    "stair_ph_w"
+   ]
+  },
+  {
+   "signature": {
+    "verts": 24,
+    "tris": 12,
+    "dims": [
+     2.6466,
+     0.914,
+     3.4
+    ]
+   },
+   "objects": [
+    "pav_gdoor_e0",
+    "pav_gdoor_e1",
+    "pav_gdoor_e2",
+    "pav_gdoor_w0",
+    "pav_gdoor_w1",
+    "pav_gdoor_w2"
+   ]
+  },
+  {
+   "signature": {
+    "verts": 24,
+    "tris": 12,
+    "dims": [
+     0.914,
+     2.6466,
+     3.4
+    ]
+   },
+   "objects": [
+    "pav_sdoor_e0",
+    "pav_sdoor_e1",
+    "pav_sdoor_e2",
+    "pav_sdoor_w0",
+    "pav_sdoor_w1",
+    "pav_sdoor_w2"
+   ]
+  },
+  {
+   "signature": {
+    "verts": 24,
+    "tris": 12,
+    "dims": [
+     2.4412,
+     0.8323,
+     3.4
+    ]
+   },
+   "objects": [
+    "link_win_e0",
+    "link_win_e1",
+    "link_win_w0",
+    "link_win_w1"
+   ]
+  },
+  {
+   "signature": {
+    "verts": 24,
+    "tris": 12,
+    "dims": [
+     26.1717,
+     26.2047,
+     0.15
+    ]
+   },
+   "objects": [
+    "pav_deck_e",
+    "pav_deck_w"
+   ]
+  }
+ ],
+ "dup_redundant_tris": 3660,
+ "join_candidates": {
+  "Toy_glass": 100,
+  "Toy_ink": 19,
+  "Toy_mustard_Glow": 3,
+  "Toy_roofd": 7,
+  "Toy_sand": 3,
+  "Toy_steel": 11,
+  "Toy_stone": 6,
+  "Toy_trim": 9,
+  "Toy_white": 50
+ },
+ "degenerate_tris": 0,
+ "coincident_vert_pairs": 9068,
+ "over_tess": {
+  "near_distance_m": 211.25,
+  "one_px_world_m": 0.1424,
+  "note": "cylinders whose chord error < one_px_world_m can halve segments"
+ }
+}
