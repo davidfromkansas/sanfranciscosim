@@ -1,0 +1,102 @@
+{
+ "input": {
+  "tris": 18238,
+  "verts": 34958,
+  "objects": 197,
+  "primitives": 215,
+  "materials": [
+   "Toy_brick",
+   "Toy_cream",
+   "Toy_glass",
+   "Toy_gold_Glow",
+   "Toy_mint",
+   "Toy_roofd",
+   "Toy_rust",
+   "Toy_sky",
+   "Toy_stone",
+   "Toy_trim",
+   "Toy_verdigris",
+   "Toy_white_Glow"
+  ],
+  "bbox_dims": [
+   312.22183,
+   298.16455,
+   22.0
+  ],
+  "bbox_min": [
+   -156.11092,
+   -149.08228,
+   0.0
+  ],
+  "center_xy": [
+   0.0,
+   0.0
+  ]
+ },
+ "output": {
+  "tris": 18238,
+  "verts": 29412,
+  "objects": 14,
+  "primitives": 20,
+  "materials": [
+   "Toy_brick",
+   "Toy_cream",
+   "Toy_glass",
+   "Toy_gold_Glow",
+   "Toy_mint",
+   "Toy_roofd",
+   "Toy_rust",
+   "Toy_sky",
+   "Toy_stone",
+   "Toy_trim",
+   "Toy_verdigris",
+   "Toy_white_Glow"
+  ],
+  "bbox_dims": [
+   312.22183,
+   298.15726,
+   21.99255
+  ],
+  "bbox_min": [
+   -156.11092,
+   -149.07498,
+   0.0
+  ],
+  "center_xy": [
+   0.0,
+   0.00365
+  ]
+ },
+ "output_signed_volumes": {},
+ "inverted_solids": [],
+ "open_shell_groups": [
+  "Mesh_0",
+  "Mesh_1",
+  "Mesh_2",
+  "Mesh_3",
+  "Mesh_4",
+  "Mesh_5",
+  "Mesh_6",
+  "Mesh_7",
+  "Mesh_8",
+  "Mesh_9",
+  "Mesh_10",
+  "Mesh_11",
+  "Mesh_12",
+  "Mesh_13"
+ ],
+ "ray_test_output": {
+  "rays": 22500,
+  "hits": 16657,
+  "flipped": 1,
+  "flipped_fraction": 6e-05
+ },
+ "gates": {
+  "G1_materials_identical": true,
+  "G2_bbox_ok": true,
+  "G2_origin_ok": true,
+  "G2_volumes_positive": true,
+  "G2_ray_flip_ok": true,
+  "G5_primitives_ok": true
+ }
+}

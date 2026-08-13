@@ -139,10 +139,30 @@ building on that footprint, so the GLB will intersect it. You must also:
    gitignored, so a clean machine needs the download step first:
    ```
    cd pipeline && npm install
-   npm run download   # hundreds of MB; only if pipeline/data/ is absent
-   npm run buildings && npm run streets && npm run landcover && npm run validate && npm run toy
+   npm run download && npm run loredata   # ~700 MB; only if pipeline/data/ is absent
+   npm run terrain && npm run bridges && npm run buildings && npm run streets \
+     && npm run landcover && npm run validate && npm run lore && npm run toy \
+     && npm run notables && npm run context && npm run muni-shapes
+   # or just: npm run all (same order, includes the downloads)
    ```
-   Commit the regenerated files under `app/public/tiles/` that actually changed.
+   **`muni-shapes` belongs on that line too.** The publish step deletes
+   `app/public/tiles/muni-shapes.bin` like everything else it does not find in
+   `out/`, and `muni-shapes.mjs` only regenerates it when `MUNI_511_KEY` is set —
+   without the key it prints "leaving the committed file as is" and exits, by
+   which point the publish step has already removed it. Symptom: a
+   `sf-muni: no route shapes (shapes bad magic)` console warning and buses that
+   dead-reckon. Without the key, restore it instead:
+   `git checkout origin/main -- app/public/tiles/muni-shapes.bin`.
+   **Run the whole chain — stopping at `toy` is a trap.** `context.mjs` imports
+   `LANDMARKS`, so the context tier owns your landmark's pick box, its
+   `search-index` entry and its `context/landmarks.json` row; and the publish step
+   in `validate.mjs` drops `app/public/tiles/ctx/` and `context/`, so stopping
+   early silently deletes ~550 committed files and breaks search and the
+   concierge. `lore` must run before `context`, or `context` fails its own
+   "every building has a pick box and an identity" check against a stale join.
+   `context` also rewrites `api/_data/`.
+   Commit the regenerated files under `app/public/tiles/` and `api/_data/` that
+   actually changed.
 3. Confirm with `node pipeline/audit.mjs` that check 1.6 (no procedural footprint
    inside a bespoke landmark exclusion zone) passes.
 

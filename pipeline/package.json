@@ -6,14 +6,20 @@
   "description": "Offline geodata pipeline that bakes San Francisco open data into binary tiles for the Three.js runtime",
   "scripts": {
     "download": "node download.mjs",
+    "loredata": "node loredata.mjs",
     "terrain": "node terrain.mjs",
     "bridges": "node bridges.mjs",
     "buildings": "node buildings.mjs",
     "streets": "node streets.mjs",
     "landcover": "node landcover.mjs",
     "validate": "node validate.mjs",
+    "lore": "node lore.mjs",
     "toy": "node toy.mjs",
-    "all": "npm run download && npm run terrain && npm run bridges && npm run buildings && npm run streets && npm run landcover && npm run validate && npm run toy"
+    "notables": "node notables.mjs",
+    "context": "node context.mjs",
+    "audit": "node audit.mjs",
+    "all": "npm run download && npm run loredata && npm run terrain && npm run bridges && npm run buildings && npm run streets && npm run landcover && npm run validate && npm run lore && npm run toy && npm run notables && npm run context && npm run muni-shapes",
+    "muni-shapes": "node muni-shapes.mjs"
   },
   "dependencies": {
     "earcut": "2.2.4",
