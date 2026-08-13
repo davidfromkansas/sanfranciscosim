@@ -1,13 +1,13 @@
 {
- "generated": "2026-08-13T16:46:13.679Z",
- "buildings": 174743,
+ "generated": "2026-08-13T18:22:07.058Z",
+ "buildings": 174734,
  "cells": 596,
  "categories": [
   {
    "cat": 0,
    "id": "misc",
    "label": "Building",
-   "count": 10533,
+   "count": 10531,
    "night": 3
   },
   {
@@ -28,7 +28,7 @@
    "cat": 3,
    "id": "office",
    "label": "Office",
-   "count": 2751,
+   "count": 2748,
    "night": 3
   },
   {
@@ -42,7 +42,7 @@
    "cat": 5,
    "id": "restaurant_cafe",
    "label": "Restaurant / Café",
-   "count": 2843,
+   "count": 2841,
    "night": 1
   },
   {
@@ -126,14 +126,14 @@
    "cat": 17,
    "id": "theater_cinema",
    "label": "Theater / Cinema",
-   "count": 276,
+   "count": 275,
    "night": 1
   },
   {
    "cat": 18,
    "id": "government",
    "label": "Government",
-   "count": 430,
+   "count": 429,
    "night": 2
   },
   {
@@ -200,12 +200,12 @@
   {
    "sub": "office",
    "label": "Office",
-   "count": 1887
+   "count": 1885
   },
   {
    "sub": "restaurant",
    "label": "Restaurant",
-   "count": 1826
+   "count": 1825
   },
   {
    "sub": "hotel",
@@ -235,7 +235,7 @@
   {
    "sub": "community_center",
    "label": "Community center",
-   "count": 702
+   "count": 701
   },
   {
    "sub": "factory",
@@ -250,7 +250,7 @@
   {
    "sub": "cafe",
    "label": "Café",
-   "count": 527
+   "count": 526
   },
   {
    "sub": "preschool",
@@ -275,7 +275,7 @@
   {
    "sub": "civic_office",
    "label": "Civic office",
-   "count": 358
+   "count": 357
   },
   {
    "sub": "trade_school",
@@ -305,7 +305,7 @@
   {
    "sub": "theater",
    "label": "Theater",
-   "count": 225
+   "count": 224
   },
   {
    "sub": "grocery",
@@ -654,18 +654,18 @@
   }
  ],
  "sources": {
-  "landuse": 140686,
+  "landuse": 140684,
   "business": 10211,
   "heuristic": 7280,
-  "osm": 8622,
-  "overture": 6657,
-  "datasf": 1287
+  "osm": 8617,
+  "overture": 6656,
+  "datasf": 1286
  },
  "confidence": [
-  147966,
+  147964,
   15324,
-  4495,
-  6958
+  4493,
+  6953
  ],
  "streets": {
   "named": 2509,
