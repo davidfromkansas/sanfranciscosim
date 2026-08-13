@@ -160,7 +160,15 @@ const manifest = {
   },
 };
 
-await rm(APP_TILES, { recursive: true, force: true });
+// Clear only the tiers this stage republishes, so a cell that no longer exists
+// cannot survive as a stale file. It used to wipe app/public/tiles/ wholesale,
+// which also deleted output this stage does not own: `toy`/`context` re-publish
+// theirs later in the chain and so never noticed, but `muni-shapes.bin` has no
+// later stage to restore it — `muni-shapes.mjs` needs MUNI_511_KEY and no-ops
+// without one, by which point this had already removed the committed file. The
+// symptom was a `sf-muni: no route shapes (shapes bad magic)` warning and buses
+// that dead-reckon, and it took a hand-restore twice (e7ed9a46, and again
+// during the five-landmark batch in #113) before the cause was found here.
 await mkdir(APP_TILES, { recursive: true });
 await writeFile(new URL('manifest.json', APP_TILES), JSON.stringify(manifest));
 await copyFile(new URL('terrain.bin', OUT), new URL('terrain.bin', APP_TILES));
@@ -168,6 +176,7 @@ await copyFile(new URL('landuse.bin', OUT), new URL('landuse.bin', APP_TILES));
 for (const name of ['buildings', 'streets', 'landcover']) {
   const src = new URL(`${name}/`, OUT);
   const dst = new URL(`${name}/`, APP_TILES);
+  await rm(dst, { recursive: true, force: true });
   await mkdir(dst, { recursive: true });
   const files = await readdir(src);
   for (const f of files) await copyFile(new URL(f, src), new URL(f, dst));
