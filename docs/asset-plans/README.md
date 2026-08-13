@@ -60,6 +60,7 @@ route, and the park plans depend on it (§E8 of the parks README).
 | [350 Brannan Street](./350-brannan.md) | `350-brannan` | 13.85 m | new landmark |
 | [362 Brannan Street](./362-brannan.md) | `362-brannan` | 8.6 m | new landmark |
 | [370 Brannan Street](./370-brannan.md) | `370-brannan` | 7.63 m | new landmark |
+| [358 Brannan Street](./358-brannan.md) | `358-brannan` | 9.6 m (estimated) | new landmark |
 | [380 Brannan Street](./380-brannan.md) | `380-brannan` | 12.6 m | new landmark |
 | [550 Third Street](./550-third.md) | `550-third` | 11 m | new landmark |
 | [375 Alabama Street (Ames Harris Neville Co.)](./375-alabama.md) | `375-alabama` | 22.5 m | new landmark |
@@ -79,18 +80,19 @@ route, and the park plans depend on it (§E8 of the parks README).
 | [171 South Park Street](./171-south-park.md) | `171-south-park` | 12.6 m | new landmark |
 | [101 South Park](./101-south-park.md) | `101-south-park` | 10.9 m (estimated) | new landmark |
 
-## Shared contract (all 44)
+## Shared contract (all 45)
 | [155 – 157 South Park Street](./155-south-park.md) | `155-south-park` | 10.1 m | new landmark |
 
-## Shared contract (all 44)
+## Shared contract (all 45)
 | [135 South Park](./135-south-park.md) | `135-south-park` | 8.5 m (LiDAR-derived) | new landmark |
 
-## Shared contract (all 44)
-## Shared contract (all 44)
+## Shared contract (all 45)
+## Shared contract (all 45)
 | [165–167 South Park](./165-south-park.md) | `165-south-park` | 9.0 m (estimated) | new landmark |
 
-## Shared contract (all 44)
-## Shared contract (all 44)
+## Shared contract (all 45)
+## Shared contract (all 45)
+## Shared contract (all 45)
 
 - Style: `docs/styles/miniature-toy.md` (authoritative for artistic decisions)
 - Technical contract: `.agents/skills/sf-asset-check/SKILL.md` (authoritative for the GLB)
@@ -173,6 +175,15 @@ and overlaps its neighbour. That plan's geometry comes from the surveyed DataSF 
 (`acdm-wktn`), with the DataSF LiDAR footprint (`ynuv-fyni`) supplying only the built depth
 — and even those two disagree by 3.7 m, which its 2.3 reconciles. On dense narrow-lot
 blocks, prefer the parcel layer and treat OSM as a cross-check.
+
+358 Brannan Street breaks the pattern: there the bad number is not a height but the
+**footprint**. Its OSM way (`source=Bing`) traces a 115 m2 stub, wide and shallow,
+where the building is in fact a 166 m2 through-lot 6.9 m wide and 25.2 m deep — the
+DataSF LiDAR footprint and the Assessor's lot area agree with each other against OSM.
+Where a plan cites a DataSF `mblr`/`sf16_bldgid` footprint, that is the survey; OSM
+geometry on small SoMa lots is a Bing trace and should be treated as a cross-check
+only. Getting from an address to the right DataSF polygon goes through the parcels
+dataset (`acdm-wktn`, `blklot` -> address range), not through a spatial guess.
 
 The executing agent is expected to re-verify height, anchor, footprint and
 orientation before modelling — the dossier is a head start, not a citation.
