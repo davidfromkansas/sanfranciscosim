@@ -387,6 +387,30 @@ export const LANDMARKS = [
     exclude: 8,
     camera: { distance: 190, yaw: 260, pitch: 34 },
   },
+  // 574 Third (the 1907 apartment block at 566-586 Third), the largest footprint
+  // in this family at 1,906 m2 — which is exactly why the tight 8-12 m radii used
+  // on the small Brannan lots do not transfer. THREE footprints stand on this
+  // plan: DataSF SF3776008 (97.9% of it, centroid 2.10 m) and two Overture
+  // pieces that split the same mass (50.8% and 40.3% cover, nearest vertices
+  // 6.84 m). Measured against the real bake input:
+  //
+  //   exclude  6 m    -> drops 1  (both Overture halves survive)
+  //   exclude 8-16 m  -> drops 3  (correct: all three, zero collateral)
+  //   exclude 18 m    -> drops 5  (eats 560 Third, SF3776007, vertex 16.35 m)
+  //
+  // 12 m is the middle of the safe band. Note the unusually wide window: it
+  // exists because this building's own ring reaches ~30 m from the anchor while
+  // its neighbours' nearest vertices are 16 m away, so the radius never has to
+  // reach the ring to catch the footprint — the centroid test does it.
+  {
+    id: '574Third',
+    name: '574 Third Street',
+    lon: -122.3950551,
+    lat: 37.7801937,
+    height: 15.4,
+    exclude: 12,
+    camera: { distance: 260, yaw: 45, pitch: 28 },
+  },
   {
     // Shell service station, across 3rd Street from 550 Third. The asset is a
     // forecourt, not a building, and the lot carries TWO baked footprints — the
