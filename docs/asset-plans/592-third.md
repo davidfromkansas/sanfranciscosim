@@ -614,15 +614,17 @@ published or directly measured figure (2.1, 2.15).
   bake before committing.
 - `loadRadius`: the skill's default formula gives `max(2500, 8.2 × 30) = 2500` m.
   Take the default.
-- Camera preset: `{ distance: 200, yaw: 315, pitch: 26 }`. `camera` is
+- Camera preset: `{ distance: 200, yaw: 90, pitch: 26 }`. `camera` is
   **mandatory** even for a landmark with no number key — `main.js` maps every
   manifest landmark into `presets` and `camera.js` reads `preset.yaw`
-  unconditionally (see the note on `599Third`). App yaw = 180 − true bearing, so
-  yaw 315 stands the camera off the east corner at true bearing 225°, the one
-  angle where both designed elevations and the corner between them read at once
-  — the same reasoning that put 599 Third's camera on its own corner bisector.
-  200 m suits an 8.2 m building (cf. 370Brannan 150 at 7.63 m, 550Third 190 at
-  11 m).
+  unconditionally (see the note on `599Third`). App yaw = 180 − true bearing;
+  the bisector of the 3rd Street front (normal 45.1°) and the Brannan front
+  (135.2°) is 90.2°, so the camera wants yaw 90 — due east of the building, the
+  one angle where both designed elevations and the corner between them read at
+  once. **Render it before believing it:** yaw 315 was tried first, from the
+  same construction done carelessly, and puts the camera to the south-west
+  staring at the two blank party walls. 200 m suits an 8.2 m building (cf.
+  370Brannan 150 at 7.63 m, 550Third 190 at 11 m).
 - **This makes four manifest landmarks on one intersection** — 592 Third, 599
   Third, 551 Third and 550 Third — with the Brannan block face south-west of 592
   left procedural. Check in the local QA that 592's parapet meets its baked

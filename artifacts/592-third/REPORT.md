@@ -164,6 +164,60 @@ wall; west shows the two party walls and is correctly almost blank.
 `estimated: true` because the 8.20 m crest is a derived parapet allowance, not a
 published or directly measured figure.
 
+## Stage 5 — integration (batch mode, local)
+
+Case **B** (new landmark). Registry entry `592Third` added to
+`pipeline/lib/landmarks.mjs` with `exclude: 6`; manifest entry appended; GLB
+copied to `app/public/sf-assets/landmarks/592-third.glb`. The city was re-baked
+for the QA and then discarded per the batch rule in `ADDRESS-TO-ASSET.md` — this
+branch commits source only.
+
+| QA item | Result |
+|---|---|
+| Re-validation of the shipped GLB | **PASS** — 16/16 contract checks |
+| Manifest entry | **PASS** — `592-third`, cat 3, `estimated: true`, `loadRadius` 2500 |
+| id mapping | **PASS** — `camelId('592-third')` = `592Third`, matches the registry |
+| Registry + re-bake | **PASS** |
+| `audit.mjs` check 1.6 | **PASS** — 59 zones over 58 landmarks clear |
+| `verify-rebake.mjs` | **PASS** — 584/585 cells unchanged; `23_13` 219 → 218; nearest survivor 12.9 m vs the 6 m radius |
+| Single building at the site | **PASS** — no surviving baked ring has a vertex or centroid inside the footprint; nearest is 12.9 m out (the 14.1 m neighbour on the NW party wall) |
+| Merge line | **PASS** — `sf-assets: 592-third merged 11 objects / 9 materials -> batched (2145 tris body); uniform x1.0000 at 3768, -1115` |
+| Scale factor | **PASS** — exactly **1.0000** |
+| Orientation | **PASS** — both street elevations meet the real streets at the east corner |
+| Terrain seating | **PASS** — base y 7.00 m against a LiDAR ground mean of 7.25 m |
+| Night glow | **PASS** — the shopfront band lights and wraps the corner; upper storey dark; two skylights faintly lit |
+| Draw calls | **PASS** — 91 at the site; 88–145/frame in the headless acceptance run (budget 300) |
+| `landmark-streaming-check.mjs` | **PASS** — all 6 checks, **0 failed** across boot / approach / depart / re-approach |
+| Fallback drill | **PASS** — one warning, `sf-assets: 592-third failed to load (Unexpected token '<', "<!doctype "...)`; app boots, everything else renders, the site is empty ground inside the exclusion zone (expected for Case B) |
+| `npm run lint` / `npm run build` | **PASS** |
+| Batch sanity | **PASS** — `git diff --name-only origin/main` lists nothing under `app/public/tiles/` or `api/_data/` |
+
+### One correction found during the QA
+
+**The camera preset yaw was wrong and the render caught it.** The registry first
+carried `yaw: 315`, from the corner-bisector construction done carelessly. App
+yaw = 180 − true bearing, and the bisector of the 3rd Street front (45.1°) and
+the Brannan front (135.2°) is 90.2°, so the correct value is **`yaw: 90`** —
+due east. 315 puts the camera to the south-west, staring at the two blank party
+walls: the one angle at which this asset shows nothing it was built for. Fixed
+in the registry and in the plan's 2.13.
+
+### Note on the local QA rig
+
+The Browser pane runs with `document.hidden === true`, so `requestAnimationFrame`
+never fires and the app's own frame loop does not advance. Everything above was
+driven by hand — `SF.rig.update`, `SF.city.update(dt, target, cameraPos, quality)`
+and `SF.assets.update(cameraPos, dt)` on a `setInterval` pump — and captured by
+rendering into an explicit `WebGLRenderTarget` and reading it back, because
+`readPixels` on the default framebuffer returns `INVALID_OPERATION` while the
+page is not composited. Two traps worth recording: `city.update` takes a
+**quality object**, not a tier name (passing `'high'` makes `quality.nearScale`
+undefined, every near-chunk test false, and the city silently never leaves its
+core massing tier); and a partially-pumped frame renders stale LOD cross-fade
+state that looks like broken geometry but is not. The headless
+`landmark-streaming-check.mjs` run is the trustworthy counterpart — it drives a
+real Chrome where rendering is continuous.
+
 ## Approval
 
 Approved in advance by the owner for this batch run, quoted verbatim:
