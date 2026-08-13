@@ -72,8 +72,9 @@ route, and the park plans depend on it (§E8 of the parks README).
 | [505 Van Ness Avenue (Edmund G. "Pat" Brown Building)](./505-van-ness.md) | `505-van-ness` | 27 m (estimated) | new landmark |
 | [Louise M. Davies Symphony Hall](./davies-symphony-hall.md) | `davies-symphony-hall` | 35 m | new landmark |
 | [101 Grove Street (Public Health Building)](./101-grove.md) | `101-grove` | 21.4 m | new landmark |
+| [Asian Art Museum (Old Main Library)](./asian-art-museum.md) | `asian-art-museum` | 28.1 m | new landmark |
 
-## Shared contract (all 35)
+## Shared contract (all 36)
 
 - Style: `docs/styles/miniature-toy.md` (authoritative for artistic decisions)
 - Technical contract: `.agents/skills/sf-asset-check/SKILL.md` (authoritative for the GLB)
@@ -123,7 +124,10 @@ the inverse case — three published figures (structural 31.755 m, OSM 38.1 m,
 facade crest 40.84 m) each measure a different thing; see that plan's 2.1. 543
 Presidio Blvd is a third variety: its OSM `height=8` is neither eave nor crest but
 the LiDAR *median* height over a hipped roof, which by construction falls between
-the two — the crest is 9.55 m.
+the two — the crest is 9.55 m. The Asian Art Museum is a fourth: its OSM
+`height=46` is not a height at all but the NAVD88 roof *elevation* (152.93 ft),
+1.6x the real 28.1 m crest — see that plan's 2.3 before trusting any `height` tag
+that could plausibly be a sea-level datum.
 
 The executing agent is expected to re-verify height, anchor, footprint and
 orientation before modelling — the dossier is a head start, not a citation.

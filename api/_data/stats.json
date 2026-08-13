@@ -1,6 +1,6 @@
 {
- "generated": "2026-08-13T00:44:01.229Z",
- "buildings": 174763,
+ "generated": "2026-08-13T01:03:40.394Z",
+ "buildings": 174761,
  "cells": 596,
  "categories": [
   {
@@ -28,7 +28,7 @@
    "cat": 3,
    "id": "office",
    "label": "Office",
-   "count": 2758,
+   "count": 2757,
    "night": 3
   },
   {
@@ -112,7 +112,7 @@
    "cat": 15,
    "id": "library",
    "label": "Library",
-   "count": 50,
+   "count": 49,
    "night": 1
   },
   {
@@ -200,7 +200,7 @@
   {
    "sub": "office",
    "label": "Office",
-   "count": 1890
+   "count": 1889
   },
   {
    "sub": "restaurant",
@@ -460,7 +460,7 @@
   {
    "sub": "library",
    "label": "Library",
-   "count": 50
+   "count": 49
   },
   {
    "sub": "nightclub",
@@ -658,14 +658,14 @@
   "business": 10214,
   "heuristic": 7280,
   "osm": 8625,
-  "overture": 6663,
+  "overture": 6661,
   "datasf": 1288
  },
  "confidence": [
   147973,
-  15333,
+  15332,
   4498,
-  6959
+  6958
  ],
  "streets": {
   "named": 2509,
