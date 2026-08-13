@@ -214,6 +214,37 @@ responses to review.
 the 2,500 m floor applies. A 26 m block is illegible long before that, and the
 exclusion hole it leaves behind is invisible at that range.
 
+## Stage 5 — local verification (batch mode)
+
+Run 13 August 2026 against a full local bake with the registry entry applied,
+then discarded per `BATCH: yes`.
+
+| Check | Result |
+|---|---|
+| Merge line | `sf-assets: 500-third merged 14 objects / 13 materials -> batched (10355 tris body); uniform x0.9999 at 3667, -1197` |
+| Loader scale | **x0.9999** — the authored height and `targetHeightM` agree |
+| Exactly one building | PASS — `verify-rebake` reports cell 23_13 going 233 -> 232 footprints, and only that cell moved out of 585 |
+| Exclusion clearance | PASS — nearest surviving footprint 35.6 m from the anchor against the 20 m radius (nearest neighbour is 10.6 m tall) |
+| Audit 1.6 | PASS — 42 landmarks clear of procedural footprints |
+| Footprint / orientation | PASS — fills its quarter block, 3rd Street front on 3rd Street, Bryant front on Bryant |
+| Terrain seating | PASS — sits flush; the site is flat made ground |
+| Night glow | PASS — only the crown sign band, the scattered lit bays and the entry light |
+| Draw calls | PASS — 103 from the aerial camera, 130 at street level (budget < 300) |
+| Fallback drill | PASS — with the GLB renamed: exactly one warning (`sf-assets: 500-third failed to load (Unexpected token '<', "<!doctype "... is not valid JSON)` — Vite answers a missing asset with index.html, so the failure surfaces as a parse error rather than a 404), the app still boots, and the site is bare ground inside the exclusion zone as Case B expects |
+| `npm run lint` / `npm run build` | PASS |
+
+**Batch mode.** The bake was run for this QA and then discarded
+(`git checkout -- app/public/tiles api/_data`); `git diff --name-only origin/main`
+lists nothing under either path. The city gets baked once for the whole batch by
+`docs/asset-pipeline/BATCH-INTEGRATE.md`.
+
+**One observation for a future pass, not a defect.** From the app's aerial camera
+the building reads darker than the real one: the window grid covers enough of
+each bay that the warm-grey concrete frame recedes. The real building reads
+mid-grey with a strong dark window pattern. Widening the pilasters and the
+spandrel bands by ~0.2 m would recover it. Left alone here because it is a style
+judgement on an approved asset, not a contract or accuracy failure.
+
 ## Integration notes
 
 - **Case B** — new landmark. `pipeline/lib/landmarks.mjs` needs

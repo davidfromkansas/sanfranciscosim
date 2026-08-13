@@ -534,6 +534,23 @@ export const LANDMARKS = [
     exclude: 40,
     camera: { distance: 600, yaw: 268, pitch: 20 },
   },
+  {
+    // 1927 concrete loft filling the quarter block at 3rd and Bryant. Unusually
+    // forgiving exclusion window, measured against the bake input (DataSF
+    // footprints, projected + simplified at the 0.6 m tolerance): this
+    // footprint's ring centroid sits 0.93 m from the anchor and the nearest
+    // NEIGHBOUR vertex is 35.59 m (SF3776100), so anything from ~1 to ~35 m
+    // drops this building alone. 20 m sits in the middle of that window.
+    // targetHeight is the rooftop bulkhead (LiDAR max 26.62 m), not the 23 m
+    // parapet that OSM and the LiDAR median both describe.
+    id: '500Third',
+    name: '500 Third Street',
+    lon: -122.3958224,
+    lat: 37.7808279,
+    height: 26.5,
+    exclude: 20,
+    camera: { distance: 240, yaw: 25, pitch: 26 },
+  },
 ];
 
 // Parks/green spaces the landcover bake must match at least one source polygon
