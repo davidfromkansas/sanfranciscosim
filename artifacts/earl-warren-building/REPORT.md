@@ -103,8 +103,8 @@ from City Hall would out-shout the dome.
   "cat": 18,
   "name": "Earl Warren Building",
   "estimated": false,
-  "dims": [x, y, z],
-  "tris": N,
+  "dims": [118.94, 50.03, 27.0],
+  "tris": 18540,
   "loadRadius": 2500
 }
 ```
