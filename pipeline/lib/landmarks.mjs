@@ -389,6 +389,18 @@ export const LANDMARKS = [
     exclude: 12,
     camera: { distance: 120, yaw: 130, pitch: 28 },
   },
+  {
+    id: 'civicCenterCourthouse',
+    name: 'Civic Center Courthouse',
+    lon: -122.4192537,
+    lat: 37.7804897,
+    height: 29.6,
+    // Footprint 83.5 x 37 m at 81.22 deg; half-diagonal 45.6 m, so 52 m clears
+    // it with a small margin. City Hall's 110 m zone (132 m away) already
+    // overlaps part of this block - that is pre-existing and harmless.
+    exclude: 52,
+    camera: { distance: 420, yaw: 135, pitch: 20 },
+  },
 ];
 
 // Parks/green spaces the landcover bake must match at least one source polygon
