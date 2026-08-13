@@ -194,6 +194,18 @@ export const LANDMARKS = [
     camera: { distance: 700, yaw: 90, pitch: 18 },
   },
   {
+    // The Veterans Building, the Opera House's twin across the memorial court.
+    // Exclusion 58 m covers the 83 x 67 m footprint plus a margin (the Opera
+    // House uses 62 for its larger 104 x 73 m plan).
+    id: 'herbstTheatre',
+    name: 'Herbst Theatre',
+    lon: -122.4210157,
+    lat: 37.7795789,
+    height: 31,
+    exclude: 58,
+    camera: { distance: 700, yaw: 90, pitch: 18 },
+  },
+  {
     id: 'fishermansWharf',
     name: "Pier 39 / Fisherman's Wharf",
     lon: -122.4098,

@@ -552,5 +552,24 @@
     ],
     "tris": 18774,
     "loadRadius": 2500
+  },
+  {
+    "id": "herbst-theatre",
+    "file": "herbst-theatre.glb",
+    "anchor": [
+      -122.4210157,
+      37.7795789
+    ],
+    "targetHeightM": 31,
+    "cat": 17,
+    "name": "Herbst Theatre (War Memorial Veterans Building)",
+    "estimated": true,
+    "dims": [
+      92.5318,
+      70.7108,
+      31.0
+    ],
+    "tris": 9821,
+    "loadRadius": 2500
   }
 ]

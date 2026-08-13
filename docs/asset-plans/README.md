@@ -55,6 +55,7 @@ route, and the park plans depend on it (§E8 of the parks README).
 | [de Young Museum](./de-young.md) | `de-young` | 44 m | new landmark |
 | [Conservatory of Flowers](./conservatory-of-flowers.md) | `conservatory-of-flowers` | 18.3 m | new landmark |
 | [War Memorial Opera House](./war-memorial-opera-house.md) | `opera-house` | 44 m | new landmark |
+| [Herbst Theatre (War Memorial Veterans Building)](./herbst-theatre.md) | `herbst-theatre` | ~31 m (estimated) | new landmark |
 | [Fairmont San Francisco](./fairmont-san-francisco.md) | `fairmont` | 99 m | new landmark |
 | [380 Brannan Street](./380-brannan.md) | `380-brannan` | 12.6 m | new landmark |
 | [550 Third Street](./550-third.md) | `550-third` | 11 m | new landmark |
@@ -70,7 +71,7 @@ route, and the park plans depend on it (§E8 of the parks README).
 | [Bill Graham Civic Auditorium](./bill-graham-civic-auditorium.md) | `bill-graham-civic-auditorium` | 37 m | new landmark |
 | [505 Van Ness Avenue (Edmund G. "Pat" Brown Building)](./505-van-ness.md) | `505-van-ness` | 27 m (estimated) | new landmark |
 
-## Shared contract (all 32)
+## Shared contract (all 33)
 
 - Style: `docs/styles/miniature-toy.md` (authoritative for artistic decisions)
 - Technical contract: `.agents/skills/sf-asset-check/SKILL.md` (authoritative for the GLB)
