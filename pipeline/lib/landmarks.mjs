@@ -534,6 +534,28 @@ export const LANDMARKS = [
     exclude: 40,
     camera: { distance: 600, yaw: 268, pitch: 20 },
   },
+  {
+    // Party-wall row on the South Park oval, so this is the tightest exclusion
+    // zone in the registry. Measured against the committed tile 23_13 rather
+    // than guessed, because `excluded()` drops a footprint whose centroid OR any
+    // ring vertex is inside the radius, and on a row the neighbours' vertices
+    // are what bind:
+    //
+    //   this footprint (#94)   centroid  0.48 m   -> dropped by anything > 0.5
+    //   159 South Park (#164)  vertex    5.42 m   -> the binding constraint
+    //   147 South Park (#80)   vertex   12.30 m
+    //
+    // Safe band 0.5-5.4 m; 3 m is the middle of it. The plan's suggested 6 m
+    // would have taken 159 South Park out with it and punched a hole in the row.
+    // Do not raise this without re-decoding the tile.
+    id: '155SouthPark',
+    name: '155 South Park',
+    lon: -122.3942202,
+    lat: 37.7808993,
+    height: 10.1,
+    exclude: 3,
+    camera: { distance: 170, yaw: 147, pitch: 26 },
+  },
 ];
 
 // Parks/green spaces the landcover bake must match at least one source polygon
