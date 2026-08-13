@@ -1,6 +1,6 @@
 {
- "generated": "2026-08-13T00:02:56.151Z",
- "buildings": 174762,
+ "generated": "2026-08-13T00:43:33.855Z",
+ "buildings": 174758,
  "cells": 596,
  "categories": [
   {
@@ -28,14 +28,14 @@
    "cat": 3,
    "id": "office",
    "label": "Office",
-   "count": 2758,
+   "count": 2757,
    "night": 3
   },
   {
    "cat": 4,
    "id": "retail",
    "label": "Retail",
-   "count": 8043,
+   "count": 8042,
    "night": 1
   },
   {
@@ -133,7 +133,7 @@
    "cat": 18,
    "id": "government",
    "label": "Government",
-   "count": 430,
+   "count": 429,
    "night": 2
   },
   {
@@ -168,7 +168,7 @@
    "cat": 23,
    "id": "parking_garage",
    "label": "Parking garage",
-   "count": 1847,
+   "count": 1846,
    "night": 3
   },
   {
@@ -200,7 +200,7 @@
   {
    "sub": "office",
    "label": "Office",
-   "count": 1890
+   "count": 1889
   },
   {
    "sub": "restaurant",
@@ -325,7 +325,7 @@
   {
    "sub": "bank",
    "label": "Bank",
-   "count": 187
+   "count": 186
   },
   {
    "sub": "taqueria",
@@ -578,14 +578,14 @@
    "count": 15
   },
   {
-   "sub": "consulate",
-   "label": "Consulate",
-   "count": 15
-  },
-  {
    "sub": "synagogue",
    "label": "Synagogue",
    "count": 15
+  },
+  {
+   "sub": "consulate",
+   "label": "Consulate",
+   "count": 14
   },
   {
    "sub": "dormitory",
@@ -654,18 +654,18 @@
   }
  ],
  "sources": {
-  "landuse": 140691,
+  "landuse": 140690,
   "business": 10214,
   "heuristic": 7280,
-  "osm": 8627,
-  "overture": 6663,
+  "osm": 8625,
+  "overture": 6662,
   "datasf": 1287
  },
  "confidence": [
-  147971,
-  15334,
+  147970,
+  15333,
   4498,
-  6959
+  6957
  ],
  "streets": {
   "named": 2509,
