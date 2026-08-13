@@ -58,11 +58,16 @@ across the field smooth instead of blocky.
 |---|---|---|
 | 1 — Feed & readout | `/api/weather`, weather chip on the clock card, concierge tool | None |
 | 2 — Cloud & wind | Toy cloud meshes, real cloud shadows, real wind everywhere | Moderate |
-| 3 — Karl & rain | Spatial height fog, rain, wet streets, storms, smoke | High |
+| 3a — Karl & rain | Spatial height fog, rain, wet streets, storms, smoke | High |
+| 3b — Fog banks | Procedural fog bank meshes for silhouette | High, and gated |
 
 Do not start a stage before the previous one is deployed and David has signed
 it off. Stage 1 is provably-correct data with nothing to argue about; that is
 the point.
+
+Stage 3b is conditional on the depth-fade prototype in §3.1b passing the perf
+budget. Run that prototype early — it is cheap, and it is the only experiment
+in this plan whose result can cancel a stage.
 
 ---
 
@@ -291,10 +296,43 @@ debug hook.
 
 # STAGE 3 — Karl, rain, storms, smoke
 
-## 3.1 Karl the Fog
+## 3.1 Karl the Fog — two layers, both procedural
 
 The headline. Real marine layer, spatially placed, genuinely swallowing the
 west side while downtown stays clear.
+
+Karl is **two systems**, because fog does two visually distinct things and no
+single technique does both:
+
+| Layer | Job | Technique | Stage |
+|---|---|---|---|
+| **3.1a Dissolution** | The city fades to grey with distance | Spatial height fog in the material fragment stage | 3a |
+| **3.1b Form** | A wall of fog pours through the Gate and over the hills | Procedural fog bank meshes, instanced, field-driven | 3b |
+
+Shader fog has no silhouette — it can only be seen *through*, never seen. That
+gets you an atmospheric grey-out but never the rolling wall, which is the image
+that makes Karl a character rather than a visibility number. The banks supply
+the edge; the shader supplies the depth. Ship 3a first, judge it, then 3b.
+
+**Both layers are generated in code. Blender is not in the loop.** This was
+considered and rejected, and the reasoning matters enough to record so nobody
+re-opens it: glTF has no volume primitive, so Blender's Principled Volume,
+smoke sims and OpenVDB cannot be exported to GLB at all — the exporter drops
+volume objects silently. (`KHR_materials_volume` is refraction through glass,
+not participating media.) The remaining Blender option — hand-sculpted bank
+*meshes* — would need a transparent material, which the asset contract bans
+(`.agents/skills/sf-asset-check/SKILL.md` rule 4) and the loader rejects
+outright (`app/src/assets.js`, the `material.transparent || material.map`
+violation check). That ban applies only to imported GLBs; code-built meshes
+have never been subject to it, and `env.js` already ships two transparent
+custom-shader meshes (the moon and its additive halo). Generating the banks in
+JS therefore costs a contract exception of zero, a new loader path of zero, and
+an authoring round-trip of zero — and a fog bank is lumpy, soft-edged and
+near-featureless, the one class of object where procedural generation gives up
+nothing to hand-modelling. Unlike a landmark, no real-world information is
+being carried.
+
+### 3.1a Dissolution — spatial height fog
 
 Implement as **height fog in the materials' fragment stage**, not as
 `scene.fog`. `FogExp2` is uniform and global — it cannot do "fogged Sunset,
@@ -332,6 +370,42 @@ hand-rolled fog uniforms in `water.js` that must be switched to the field.
 Quality=Low, and at night, verify street level in the Mission and downtown
 stays readable at 100 % fog. If it does not, `uFogMax` comes down. The
 tilt-shift grade in `toypost.js` is not the lever — do not touch it.
+
+### 3.1b Form — procedural fog banks
+
+Ground-level cousins of the Stage 2 cloud meshes, and they **reuse that
+generator**: the same lumpy merged-icosahedron blob, flattened hard on Y and
+scaled wide, so there is one shape generator in the codebase and not two.
+
+- **One** `InstancedMesh`, one draw call, cap **48 instances** (24 at
+  Quality=Medium, **0 at Quality=Low** — the banks are the first thing to go).
+- Soft, near-flat, translucent toy material: a flat cream-grey, opacity ~0.5,
+  `depthWrite: false`, sorted back-to-front. No texture, no noise sampling in
+  the fragment stage — the *silhouette* carries the read, exactly as the toy
+  clouds do.
+- Placement is driven by the field: an instance spawns only where local
+  visibility is low, sits between `uFogBase` and `uFogTop`, and scales with
+  local density. They drift on the real wind vector and wrap at the bbox, the
+  same code path as the clouds.
+- Because they are placed by the same field that drives 3.1a, the two layers
+  agree automatically — banks appear exactly where the shader is already
+  thickening. If they ever disagree visually, the bug is in the world→UV
+  mapping, not in the art.
+
+**The depth-fade gate.** A bank intersecting Twin Peaks or a tower produces a
+hard geometric seam that instantly reads as a bug. The fix is a soft-particle
+depth fade: fade the bank's alpha as its fragment approaches the depth already
+in the buffer. That needs a **readable depth texture**, and `toypost.js`
+currently allocates its render target with `depthBuffer: true` but no
+`DepthTexture` — and it is an MSAA target, so attaching one costs a resolve.
+
+This is the single highest technical risk in the whole plan, and it is the only
+thing that could force a rethink of 3.1b. **Prototype it before building any of
+Stage 3b**: attach a `DepthTexture` to the post target, measure the resolve
+cost against the `PERF-PLAN.md` matrix, and confirm a test blob fades cleanly
+against terrain. If the cost fails the budget, 3.1b is cancelled and 3.1a ships
+alone — which is a perfectly good feature on its own. Do not build the banks
+and then discover this.
 
 ## 3.2 Rain
 
@@ -378,11 +452,16 @@ both depend on it.
 
 ## 3.6 Stage 3 QA
 
+0. **(3b only, run first)** Depth-fade prototype passes: `DepthTexture` on the
+   MSAA post target, resolve cost inside the `PERF-PLAN.md` budget, a test blob
+   fading cleanly against terrain with no seam. FAIL here cancels 3b and ships
+   3a alone — that is an acceptable outcome, not a defeat.
 1. `SF.setWeather({preset:'karl'})` — fog sits over the west side, downtown
    clear, Twin Peaks and Sutro above the layer. Screenshot from the hero aerial
    and from the Golden Gate.
 2. Fly the camera into the bank — surroundings readable, city dissolves. Never
-   a flat grey frame.
+   a flat grey frame. With 3b in, no bank clips visibly through terrain or a
+   tower from any angle.
 3. 100 % fog × Quality=Low × night × street level in the Mission and downtown:
    readable. This is the gate; if it fails, lower `uFogMax` and re-run.
 4. Rain: streaks visible, streets wet and drying slowly after
@@ -399,9 +478,12 @@ both depend on it.
 ## 4. What NOT to do
 
 - No paid keys, no npm packages, no `three/examples` post-processing additions.
-- No `scene.fog` for Karl — it cannot be spatial (§3.1).
-- No second render pass, no volumetric raymarching, no new shadow-casting
-  lights. One extra draw call for clouds, one for rain. That is the budget.
+- No `scene.fog` for Karl — it cannot be spatial (§3.1a).
+- **No Blender assets for weather.** Clouds, fog banks and rain are all
+  generated in code. See §3.1 for why; do not re-open it by authoring a GLB.
+- No second render pass, no volumetric raymarching, no baking OpenVDB to a
+  `Data3DTexture`, no new shadow-casting lights. One extra draw call each for
+  clouds, fog banks and rain. That is the budget.
 - No user-facing weather control (no picker, no URL parameter) — debug only.
 - No touching `toypost.js`, the camera rig, tiles, the pipeline or any GLB.
 - Do not weaken the night usability floor in `env.js` — fog stacks *on top of*
