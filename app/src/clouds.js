@@ -34,11 +34,18 @@ export const CLOUD_CAPS = { ultra: 160, high: 160, medium: 96, low: 48 };
 // covered 8.7% of it. Real clouds are kilometres wide, and an overcast marine
 // layer has to close over the city, so the low deck is both bigger and packed
 // into a tighter box than the decorative layers above it.
+// Altitudes raised 40% from the first cut (620/2000/6000). The low deck still
+// clears Twin Peaks (~280 m) and Sutro Tower (~370 m) comfortably, which is
+// what stops a marine layer sitting through a hilltop.
 const LAYERS = [
-  { key: 'low', altitude: 620, scale: 720, spread: 0.7 },
-  { key: 'mid', altitude: 2000, scale: 1100, spread: 1.2 },
-  { key: 'high', altitude: 6000, scale: 2000, spread: 1.6 },
+  { key: 'low', altitude: 868, scale: 720, spread: 0.7 },
+  { key: 'mid', altitude: 2800, scale: 1100, spread: 1.2 },
+  { key: 'high', altitude: 8400, scale: 2000, spread: 1.6 },
 ];
+
+// How squat a cloud is: 1.0 would be as tall as it is wide. Clouds are wide
+// and flat, so the deck sits well under that.
+const BASE_FLATTEN = 0.42;
 
 // The city, plus margin so clouds exist beyond the visible edge.
 const EXTENT = 9000;
@@ -166,7 +173,7 @@ export function createClouds(scene, { sampleAt }) {
   // Live tuning knobs. Cloud size and density are pure art calls that can only
   // be judged against the running scene, so they are adjustable at runtime
   // rather than only by redeploying: SF.clouds.tune({ size: 1.4 }).
-  const tuning = { size: 1, density: 1, opacity: CLOUD_OPACITY };
+  const tuning = { size: 1, density: 1, opacity: CLOUD_OPACITY, thickness: 1, altitude: 1 };
 
   function setQuality(key) {
     activeCap = CLOUD_CAPS[key] ?? cap;
@@ -175,6 +182,8 @@ export function createClouds(scene, { sampleAt }) {
   function tune(patch = {}) {
     if (Number.isFinite(patch.size)) tuning.size = Math.max(0.1, patch.size);
     if (Number.isFinite(patch.density)) tuning.density = Math.max(0, Math.min(1.5, patch.density));
+    if (Number.isFinite(patch.thickness)) tuning.thickness = Math.max(0.05, Math.min(4, patch.thickness));
+    if (Number.isFinite(patch.altitude)) tuning.altitude = Math.max(0.1, Math.min(5, patch.altitude));
     if (Number.isFinite(patch.opacity)) {
       tuning.opacity = Math.max(0.02, Math.min(1, patch.opacity));
       material.opacity = tuning.opacity;
@@ -236,9 +245,9 @@ export function createClouds(scene, { sampleAt }) {
       drawn++;
       const size = slot.layer.scale * slot.size * (0.55 + 0.45 * presence) * tuning.size;
       slot.lastSize = size;
-      _position.set(slot.x, slot.layer.altitude + slot.lift, slot.z);
+      _position.set(slot.x, slot.layer.altitude * tuning.altitude + slot.lift, slot.z);
       _quaternion.setFromAxisAngle(UP, slot.spin);
-      _scale.set(size, size * 0.42, size);
+      _scale.set(size, size * BASE_FLATTEN * tuning.thickness, size);
       _matrix.compose(_position, _quaternion, _scale);
       mesh.setMatrixAt(i, _matrix);
     }
