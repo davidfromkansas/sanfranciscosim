@@ -143,7 +143,76 @@ window (`0.59 m < exclude < 3.83 m`, use `exclude: 2`), which is the tightest in
 the registry and whose failure mode is the silent deletion of two neighbouring
 historic contributors from the baked city.
 
-## 9. Approval
+## 9. Stage 5 — integration (batch mode)
+
+Integrated locally on `pipeline/171-south-park`. **Source only**: the Case B bake was
+run and QA'd, then discarded. 594 generated files under `app/public/tiles/` and
+`api/_data/` were dirty and are not in the commit — a re-bake rewrites ~600 files
+whatever landmark triggered it, so committing them would make this branch unmergeable
+with its siblings. `git diff --name-only origin/main` lists nothing generated.
+
+### The bake
+
+`pipeline/data/` was seeded as an APFS clone from a sibling worktree (raw downloads
+only, never `pipeline/out/`), which is why the bake reproduced `origin/main` exactly
+except for this landmark's own cell. `verify-rebake.mjs --out`:
+
+```
+584 of 585 cells unchanged
+23_13    233 -> 232  <- 171SouthPark
+ok   171SouthPark   3.8 m vs 2 m radius  (nearest is 9.9 m tall)
+PASS  only the new landmarks' cells moved, and every asset has clear ground under it
+```
+
+Exactly one footprint removed. Both party-wall neighbours survive, and the nearest
+surviving footprint sits at 3.8 m — matching the 3.83 m predicted for 165–167 South
+Park from the DataSF rings before any bake ran.
+
+`audit.mjs` check **1.6 PASS** — "no procedural footprint inside a bespoke landmark
+exclusion zone — 42 landmarks clear". The audit's three failures (1.2b, 1.3c, 1.7b)
+are pre-existing baseline failures of the data sources: identical on four sibling
+worktrees, and none of them concerns landmarks or exclusion zones.
+
+**A duplicate `171SouthPark` registry entry was found and removed** during this stage
+(same id, coords and exclusion; different camera preset). Harmless for the exclusion,
+but it would have emitted two identically-named presets into `landmarks.json` and two
+rows from `context.mjs`. The whole registry was checked for other duplicate ids —
+none.
+
+### Local QA
+
+| Check | Result |
+|---|---|
+| Loader merge line | `sf-assets: 171-south-park merged 12 objects / 12 materials -> batched (3085 tris body); uniform x1.0000 at 3782, -1205` |
+| Scale | **x1.0000** — authored height and `targetHeightM` agree exactly |
+| Batching | `batched` — joins the shared BatchedMesh pair, so it adds **no new draw calls** |
+| One building on the lot | PASS — no procedural twin, no z-fighting, no baked block poking through |
+| Footprint vs neighbours | PASS — reads as a small wedge at the correct scale among its SoMa neighbours |
+| Orientation | PASS — the three-facet front faces the oval, the tail runs back into the block |
+| Terrain seating | PASS — no floating, no sinking |
+| Camera preset | PASS — `yaw: 197` frames the NNW park front, as derived |
+| Search / context | PASS — `SF.search('171 South Park')` returns `landmark:171SouthPark` at (3781.9, −1204.9), the anchor |
+| Night state | PASS — only the intended glow shells light; friezes, cornice and skylights stay dark |
+| Fallback drill | PASS — app boots, site degrades to empty ground (Case B expectation), **exactly one** warning: `sf-assets: 171-south-park failed to load (...)` |
+| Draw-call total and fps | **NOT MEASURED** — see below |
+
+**The rule-2 budget check could not be measured and is not claimed as a pass.** The
+QA browser pane runs hidden, which suspends `requestAnimationFrame` entirely — a
+30-frame probe captured 0 frames in 4 s, and the stats overlay consequently read
+`fps 0 / draw calls 1`, which is stale rather than real. The second browser was not
+connected. What *is* established is structural rather than measured: the asset
+reports `batched`, so it renders out of the existing shared BatchedMesh pair and adds
+no draw calls of its own. An fps and draw-call reading at street level still needs to
+be taken in a visible browser before this ships.
+
+One number worth not misreading: the loader's "3085 tris body" is a vertex-derived
+estimate (`position.count / 3`) that under-reports on indexed geometry, which
+meshopt produces. The shipped file is 5,808 triangles (5,664 body + 144 glow) and the
+loader's 12 objects / 12 materials match the file exactly, so nothing is missing. The
+same under-report shows on known-good assets — `380-brannan` reports 4,496 against a
+manifest of 7,760.
+
+## 10. Approval
 
 **Approved 13 August 2026.** Presented at the stage-3 gate (contact sheet, aerial
 day and night, and the numbers above, together with the two judgement calls in §3
