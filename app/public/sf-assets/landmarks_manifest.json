@@ -590,5 +590,24 @@
     ],
     "tris": 9518,
     "loadRadius": 2500
+  },
+  {
+    "id": "101-grove",
+    "file": "101-grove.glb",
+    "anchor": [
+      -122.4186747,
+      37.7781359
+    ],
+    "targetHeightM": 21.4,
+    "cat": 18,
+    "name": "101 Grove Street (Public Health Building)",
+    "estimated": true,
+    "dims": [
+      70.5084,
+      47.4977,
+      21.4
+    ],
+    "tris": 17648,
+    "loadRadius": 2500
   }
 ]
