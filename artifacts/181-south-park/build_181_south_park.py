@@ -449,7 +449,7 @@ def build():
     for fi, (za, zb) in enumerate(((Z_W1A, Z_W1B), (Z_W2A, Z_W2B))):
         for i, u in enumerate((4.15, 9.69)):
             rect_opening(
-                f"nw{fi}_{i}", EDGE_FRONT, u, 3.4, za, zb, steel, glass,
+                f"nw{fi}_{i}", EDGE_FRONT, u, 2.9, za, zb, steel, glass,
                 gglow if (fi, i) == (1, 0) else None,
             )
 
@@ -458,7 +458,7 @@ def build():
     rect_opening("backdoor", EDGE_REAR, 7.3, 1.0, 0.0, 2.5, ink, roofd)
     for fi, (za, zb) in enumerate(((Z_W1A, Z_W1B), (Z_W2A, Z_W2B))):
         for i, u in enumerate((4.15, 9.69)):
-            rect_opening(f"se{fi}_{i}", EDGE_REAR, u, 2.6, za, zb, steel, glass)
+            rect_opening(f"se{fi}_{i}", EDGE_REAR, u, 2.1, za, zb, steel, glass)
 
     # --- exposed SW flank: the building's window rhythm ---------------------
     # 10 bays at 4.32 m centres. This is the largest surface the app's aerial
@@ -469,17 +469,22 @@ def build():
         for i in range(BAYS):
             u = len_flank / (2.0 * BAYS) + i * (len_flank / BAYS)
             rect_opening(
-                f"sw{fi}_{i}", EDGE_SW, u, 2.5, za, zb, steel, glass,
+                f"sw{fi}_{i}", EDGE_SW, u, 1.95, za, zb, steel, glass,
                 gglow if (fi, i) in LIT else None,
             )
-    # three service openings in the commercial base, not a full ground rhythm
-    for i, u in enumerate((7.0, 21.6, 36.2)):
-        rect_opening(f"swg{i}", EDGE_SW, u, 2.0, 0.8, 3.2, steel, glass)
+    # The commercial base: five openings, not the three of the first iteration,
+    # which left 43 m of blank plinth under the loft rhythm. Still not a shopfront
+    # — this flank faces a filling-station forecourt, not a street.
+    # On the bay grid (every other bay), not on their own spacing: the first
+    # attempt used round numbers and the ground openings sat visibly between the
+    # loft bays above them.
+    for i, u in enumerate((2.16, 10.80, 19.44, 28.08, 36.72)):
+        rect_opening(f"swg{i}", EDGE_SW, u, 3.0, 0.75, 3.25, steel, glass)
 
     # --- NE flank: party wall against 171 South Park ------------------------
     for i in range(BAYS):
         u = len_flank / (2.0 * BAYS) + i * (len_flank / BAYS)
-        blind_bay(f"ne{i}", EDGE_NE, u, 2.5, Z_W1A, Z_W2B, stone)
+        blind_bay(f"ne{i}", EDGE_NE, u, 1.95, Z_W1A, Z_W2B, stone)
 
     # --- roof ---------------------------------------------------------------
     # Gable, not barrel: the LiDAR height distribution (median 14.18 m against a
@@ -490,15 +495,21 @@ def build():
 
     # roof glazing: what lights lofts that sit inside a roof. Flush panels on
     # both slopes, lined up with the wall bays below.
-    for i, u in enumerate((-14.0, -7.0, 0.0, 7.0)):
-        slope_slab(f"rooflight_sw{i}", u - 1.6, u + 1.6, 1.9, 4.6, -1, 0.0, 0.10, glassl)
-        slope_slab(f"rooflight_ne{i}", u - 1.6, u + 1.6, 1.9, 4.6, +1, 0.0, 0.10, glassl)
-    for i, u in enumerate((-7.0, 0.0)):
-        slope_slab(f"rooflight_glow{i}", u - 1.4, u + 1.4, 2.1, 4.4, -1, 0.08, 0.15, gglow)
+    ROOF_U = (-15.1, -10.8, -6.5, -2.2, 2.1, 6.4)
+    for i, u in enumerate(ROOF_U):
+        slope_slab(f"rooflight_sw{i}", u - 0.65, u + 0.65, 2.0, 4.1, -1, 0.0, 0.09, glassl)
+        slope_slab(f"rooflight_ne{i}", u - 0.65, u + 0.65, 2.0, 4.1, +1, 0.0, 0.09, glassl)
+    for i in (1, 4):
+        u = ROOF_U[i]
+        slope_slab(f"rooflight_glow{i}", u - 0.5, u + 0.5, 2.2, 3.9, -1, 0.07, 0.14, gglow)
 
     # two monitors straddling the ridge, the only things allowed to break it
-    for i, u in enumerate((-10.5, 3.5)):
-        uv_box(f"monitor{i}", u, 0.0, Z_RIDGE - 0.55, Z_RIDGE - 0.05, 2.4, 1.5, glassl)
+    # Flush with the ridge cap, never above it: the bbox top must be the ridge,
+    # so the loader's targetHeightM / measuredHeight lands on 1.0. At 0.95 m wide
+    # against a 0.30 m cap they still stand ~0.22 m proud of the slopes, which is
+    # what makes them read from above.
+    for i, u in enumerate((-12.9, -0.05, 5.9)):
+        uv_box(f"ridge_vent{i}", u, 0.0, Z_RIDGE - 0.50, Z_RIDGE, 3.2, 0.95, steel)
 
     # --- Varney-end mechanical roof -----------------------------------------
     # The LiDAR mean sits a metre below its median, so a sixth of the footprint

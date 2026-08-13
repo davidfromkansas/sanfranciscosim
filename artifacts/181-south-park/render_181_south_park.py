@@ -40,8 +40,12 @@ VIEWS = [
 ]
 
 
-SAMPLES = 64
-ENGINE = "CYCLES"
+# The committed images are EEVEE at 128 samples, not Cycles. These materials are
+# flat, untextured and opaque, so the two engines are visually equivalent here,
+# and this machine runs several batch sessions at once — Cycles CPU could not
+# finish the rig. Pass --engine CYCLES to reproduce in Cycles.
+SAMPLES = 128
+ENGINE = "EEVEE"
 
 
 def clear():
@@ -64,7 +68,7 @@ def import_glb(path):
 
 def setup_world(night=False):
     scene = bpy.context.scene
-    scene.render.engine = "BLENDER_EEVEE_NEXT" if ENGINE == "EEVEE" else "CYCLES"
+    scene.render.engine = "BLENDER_EEVEE" if ENGINE == "EEVEE" else "CYCLES"
     if ENGINE == "EEVEE":
         scene.eevee.taa_render_samples = SAMPLES
     else:
@@ -137,10 +141,22 @@ def glow_materials():
 
 
 def light_glow():
-    """Preview the app's night pass: emission up on every _Glow material."""
+    """Preview the app's night pass.
+
+    Drive emission from Base Color, never from the imported emission. glTF writes
+    emissiveFactor = 0 when the authored emission strength is 0, so a re-imported
+    _Glow material carries a DEFAULT WHITE emission colour and raising its
+    strength renders every glow surface as a white slab — which is what the first
+    night render of this asset did. Copying Base Color across at strength 1.0 is
+    also exactly what the app does: its night layer is an unlit overlay drawn at
+    the material's own baked colour. See docs/asset-plans/README.md.
+    """
     for mat, bsdf in glow_materials():
-        if bsdf:
-            bsdf.inputs["Emission Strength"].default_value = 6.0
+        if not bsdf:
+            continue
+        base = bsdf.inputs["Base Color"].default_value
+        bsdf.inputs["Emission Color"].default_value = (base[0], base[1], base[2], 1.0)
+        bsdf.inputs["Emission Strength"].default_value = 1.0
 
 
 def fade_glow():
@@ -224,8 +240,8 @@ def main():
         aer.data.lens = 90.0
         span = max(width, height)
         pitch = math.radians(35)
-        az = math.radians(225)  # from the SW: the exposed flank and the ridge together
-        r = span * 3.1
+        az = math.radians(255)  # three-quarter, same as the day aerial
+        r = span * 4.4
         aer.location = Vector(
             (
                 center.x + r * math.cos(pitch) * math.sin(az),
@@ -265,9 +281,12 @@ def main():
     aer.data.type = "PERSP"
     aer.data.lens = 105.0  # long lens, restrained perspective (style bible §18)
     pitch = math.radians(38)  # 30-50 deg downward
-    az = math.radians(225)  # from the SW — the exposed flank, the ridge and the
-    # South Park end all at once, which is the view the app's camera gets
-    r = span * 3.1
+    # 225 deg looks square onto the SW slope and the gable vanishes — the roof
+    # reads as flat. 255 is a true three-quarter to the building's own 135 deg
+    # axis: the exposed flank, the ridge silhouette and the South Park end all
+    # read at once, which is what the app's camera actually gets.
+    az = math.radians(255)
+    r = span * 4.4
     aer.location = Vector(
         (
             center.x + r * math.cos(pitch) * math.sin(az),
