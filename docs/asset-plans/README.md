@@ -27,6 +27,11 @@ plans reference the landmark plans here (de Young, Cal Academy, Conservatory,
 Painted Ladies, Mission Dolores Basilica, Palace of Fine Arts) rather than
 duplicating them.
 
+[**civic-center-plaza.md**](./civic-center-plaza.md) is the exception to that rule:
+a designed hardscape with a fixed surveyed layout and no natural component, planned
+as a single landmark GLB on the same argument that made the Palace of Fine Arts
+grounds a landmark. See its §2.15 risk 5.
+
 [**flora-kit.md**](./flora-kit.md) is the one plan here that is not a landmark:
 an authored Blender kit of tree species and landscape props to replace the single
 procedural lollipop that all 289,741 of the city's baked trees currently share.
@@ -84,8 +89,14 @@ route, and the park plans depend on it (§E8 of the parks README).
 | [135 South Park](./135-south-park.md) | `135-south-park` | 8.5 m (LiDAR-derived) | new landmark |
 | [165–167 South Park](./165-south-park.md) | `165-south-park` | 9.0 m (estimated) | new landmark |
 | [181 South Park](./181-south-park.md) | `181-south-park` | 16.5 m (LiDAR-derived) | new landmark |
+| [San Francisco Main Public Library](./sf-main-library.md) | `sf-main-library` | 28.98 m | new landmark |
+| [234 Van Ness Avenue (The Kelsey Civic Center)](./234-van-ness.md) | `234-van-ness` | 30.12 m | new landmark |
+| [500 Third Street](./500-third.md) | `500-third` | 26.5 m | new landmark |
+| [599 Third Street](./599-third.md) | `599-third` | 18.3 m | new landmark |
+| [Civic Center Plaza](./civic-center-plaza.md) | `civic-center-plaza` | 30.48 m (flagpole crest) | new landmark |
+| [250 Van Ness Avenue (171–195 Grove Street)](./250-van-ness.md) | `250-van-ness` | 10.0 m (estimated) | new landmark |
 
-## Shared contract (all 47)
+## Shared contract (all 53)
 
 - Style: `docs/styles/miniature-toy.md` (authoritative for artistic decisions)
 - Technical contract: `.agents/skills/sf-asset-check/SKILL.md` (authoritative for the GLB)
@@ -144,6 +155,10 @@ other and are both *correct for 2010* — they simply predate the second storey 
 has today, so every published height for that lot is stale rather than mismeasured. Check
 the LiDAR's vintage against the permit history before believing a small number.
 
+The new Main Library across Fulton Street carries the *same* `height=46` as the Asian
+Art Museum, for the same reason, and is really 28.98 m — so that tag has now caught two
+adjacent Civic Center blocks.
+
 350 Brannan Street is a different kind of failure: not a wrong height but a missing
 *building*. Nominatim resolves the address onto the Brannan Street roadway by TIGER
 interpolation, and no footprint on that block is tagged `addr:housenumber=350`. The
@@ -194,6 +209,17 @@ building — a service-station forecourt whose asset is a canopy, two pump islan
 a kiosk and the asphalt they stand on. Its `targetHeightM` is a thin crest above
 a measured canopy deck, and its exclusion zone cannot be solved with one circle;
 see that plan's 2.13 and 2.15 before treating it as routine.
+
+599 Third Street is the reassuring counter-example: its OSM `height=16` and the LiDAR
+median (15.62 m) agree on the parapet and both are right — the tag is only untrustworthy
+by default, not always wrong. There the open question is the other end, the LiDAR
+`hgt_max` of 18.34 m, which is a single maximum and could be a mast rather than the
+penthouse.
+
+250 Van Ness is a different trap again: OSM and the LiDAR *mode* agree on ~10 m while
+Overture — the pipeline's own bake input — carries 12.4 m, because both the LiDAR max
+(13.0 m) and the LiDAR min (2.5 m) on that footprint are street-tree canopy, not
+building. A height read off a raster statistic is only as good as the raster's edges.
 
 The executing agent is expected to re-verify height, anchor, footprint and
 orientation before modelling — the dossier is a head start, not a citation.

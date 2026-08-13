@@ -856,5 +856,100 @@
     ],
     "tris": 4200,
     "loadRadius": 2500
+  },
+  {
+    "id": "sf-main-library",
+    "file": "sf-main-library.glb",
+    "anchor": [
+      -122.4157709,
+      37.7791281
+    ],
+    "targetHeightM": 28.98,
+    "cat": 15,
+    "name": "San Francisco Main Public Library",
+    "estimated": false,
+    "dims": [
+      116.2429,
+      74.506,
+      28.98
+    ],
+    "tris": 10168,
+    "loadRadius": 2500
+  },
+  {
+    "id": "234-van-ness",
+    "file": "234-van-ness.glb",
+    "anchor": [
+      -122.4193071,
+      37.7780541
+    ],
+    "targetHeightM": 30.12,
+    "cat": 2,
+    "name": "The Kelsey Civic Center (234 Van Ness Avenue)",
+    "estimated": false,
+    "dims": [
+      56.278,
+      46.4274,
+      30.12
+    ],
+    "tris": 11656,
+    "loadRadius": 2500
+  },
+  {
+    "id": "500-third",
+    "file": "500-third.glb",
+    "anchor": [
+      -122.3958224,
+      37.7808279
+    ],
+    "targetHeightM": 26.5,
+    "cat": 3,
+    "name": "500 Third Street",
+    "estimated": false,
+    "dims": [
+      75.2378,
+      76.2383,
+      26.5017
+    ],
+    "tris": 17320,
+    "loadRadius": 2500
+  },
+  {
+    "id": "599-third",
+    "file": "599-third.glb",
+    "anchor": [
+      -122.3942739,
+      37.7804504
+    ],
+    "targetHeightM": 18.3,
+    "cat": 2,
+    "name": "599 Third Street",
+    "estimated": false,
+    "dims": [
+      43.151,
+      42.853,
+      18.3
+    ],
+    "tris": 9384,
+    "loadRadius": 2500
+  },
+  {
+    "id": "civic-center-plaza",
+    "file": "civic-center-plaza.glb",
+    "anchor": [
+      -122.4176184,
+      37.7794818
+    ],
+    "targetHeightM": 30.48,
+    "cat": 0,
+    "name": "Civic Center Plaza",
+    "estimated": true,
+    "dims": [
+      145.612,
+      192.624,
+      30.48
+    ],
+    "tris": 17703,
+    "loadRadius": 2500
   }
 ]

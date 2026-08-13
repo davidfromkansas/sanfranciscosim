@@ -167,9 +167,20 @@ export async function loadTreeBlockers({ sampleElevation, out = new URL('../out/
   // hand-modelled and have their own trees, if any. The base tree scatter would
   // poke through the model, so landmarks can opt in to a clear zone matching
   // their existing exclusion radius.
+  //
+  // `clearTreesRadius` overrides that radius when the two jobs want different
+  // sizes, in either direction. `exclude` is sized to delete procedural
+  // BUILDINGS without touching the nearest real neighbour, which has nothing to
+  // do with how much ground the asset's own trees cover. Civic Center Plaza is
+  // the case: exclude 95 m is set by a neighbour at 109.9 m, while the plaza
+  // itself reaches 107.6 m to its corners and needs 110 m of tree clearance.
+  // Size this radius by COUNTING trees in the baked landcover at candidate
+  // radii — inside the asset's own footprint versus outside it — not by
+  // reasoning about what a circle probably overlaps. Defaults to `exclude`, so
+  // every existing landmark is unaffected.
   const treeClearCircles = LANDMARKS.filter((l) => l.clearTrees).map((l) => {
     const [x, z] = project(l.lon, l.lat);
-    return { x, z, r: l.exclude, id: l.id };
+    return { x, z, r: l.clearTreesRadius ?? l.exclude, id: l.id };
   });
   const inLandmarkClear = (x, z) => {
     for (const c of treeClearCircles) {

@@ -608,6 +608,34 @@ export const LANDMARKS = [
     camera: { distance: 300, yaw: 35, pitch: 22 },
   },
   {
+    // The Kelsey Civic Center, 2025 (WRNS Studio + Santos Prescott). An
+    // eight-storey L that wraps the 171 Grove corner lot rather than holding
+    // the corner itself.
+    //
+    // 14 m sits in the 12-17 m band that drops exactly the three DataSF
+    // footprints on and beside the site and nothing else. Measured against
+    // pipeline/data/buildings_datasf.geojson with the real rule (centroid OR
+    // any ring vertex inside the radius), nearest vertex to this anchor:
+    //   SF0811019  6.14 m  demolished 2023 for this building
+    //   SF0811020  6.14 m  171 Grove, STILL STANDING - unavoidable collateral
+    //   SF0811018 11.67 m  demolished 2023 for this building
+    //   SF0811001 17.49 m  101 Grove, already excluded by its own entry above
+    //   next      30.11 m  200-214 Van Ness
+    // The two demolished footprints and the standing corner building share a
+    // party-wall vertex at exactly the same 6.14 m, so NO radius removes the
+    // stale pair without also removing 171 Grove. Shipping the drop is the
+    // lesser error: the alternative is leaving two demolished buildings
+    // standing inside a 2025 landmark. See docs/asset-plans/234-van-ness.md
+    // 2.12. A follow-up 171 Grove asset would close the gap.
+    id: '234VanNess',
+    name: 'The Kelsey Civic Center (234 Van Ness Avenue)',
+    lon: -122.4193071,
+    lat: 37.7780541,
+    height: 30.12,
+    exclude: 14,
+    camera: { distance: 320, yaw: 225, pitch: 30 },
+  },
+  {
     // Letterman Hospital ward, 1930s, now part of the Thoreau Center. DataSF
     // stores the WHOLE campus — twelve surviving buildings — as ONE 159x147 m
     // comb-shaped footprint, so there is no radius that clears 1008 alone: its
@@ -839,6 +867,128 @@ export const LANDMARKS = [
     height: 16.5,
     exclude: 5,
     camera: { distance: 190, yaw: 255, pitch: 24 },
+  },
+  {
+    // The new Main Library, one block south of the Old Main across Fulton, on a
+    // near-identical 106 x 57 m block. Same radius rule as its neighbour and for
+    // the same reason: excluded() drops a footprint when its centroid OR ANY ring
+    // vertex falls inside, so the circle has to clear this building's NEAREST
+    // vertex while staying inside the nearest neighbour's. Measured from this
+    // anchor against the actual bake input:
+    //   28.9 m  this footprint's nearest vertex (Overture; 30.7 m in DataSF)
+    //   30.3 m  a 1.2 m site structure inside the block (DataSF only) - fine to drop
+    //   50.6 m  the nearest REAL neighbour, the 9 m and 15.9 m buildings across
+    //           Hyde towards Market, agreed by both sources
+    //   60.3 m  the OBB half-diagonal - too large, it would eat that frontage
+    // 40 m drops the library in both sources with a 9.3 m margin and clears every
+    // real neighbour by 10.6 m. The Asian Art Museum's own 40 m circle sits 92 m
+    // away, so the two do not overlap.
+    //
+    // Overture carries height=46 for this footprint - the NAVD88 roof elevation,
+    // the same tag error as the museum - so the baked city renders it 46 m tall
+    // and it reads as a Civic Center mid-rise. Excluding it fixes that too.
+    id: 'sfMainLibrary',
+    name: 'San Francisco Main Public Library',
+    lon: -122.4157709,
+    lat: 37.7791281,
+    height: 28.98,
+    exclude: 40,
+    camera: { distance: 600, yaw: 268, pitch: 20 },
+  },
+  {
+    // 1927 concrete loft filling the quarter block at 3rd and Bryant. Unusually
+    // forgiving exclusion window, measured against the bake input (DataSF
+    // footprints, projected + simplified at the 0.6 m tolerance): this
+    // footprint's ring centroid sits 0.93 m from the anchor and the nearest
+    // NEIGHBOUR vertex is 35.59 m (SF3776100), so anything from ~1 to ~35 m
+    // drops this building alone. 20 m sits in the middle of that window.
+    // targetHeight is the rooftop bulkhead (LiDAR max 26.62 m), not the 23 m
+    // parapet that OSM and the LiDAR median both describe.
+    id: '500Third',
+    name: '500 Third Street',
+    lon: -122.3958224,
+    lat: 37.7808279,
+    height: 26.5,
+    exclude: 20,
+    camera: { distance: 240, yaw: 25, pitch: 26 },
+  },
+  {
+    // 599 Third Street — 4-storey live/work lofts on the north corner of 3rd
+    // and Brannan, completing that corner alongside 550 Third and 380 Brannan.
+    //
+    // exclude: 10 is MEASURED against the bake's own input (DataSF footprints
+    // streamed through geojsonStream + ringCentroid), not derived from the OSM
+    // polygon. The asset plan's estimate of 22 came from this building's OSM
+    // corner vertices and is wrong: the DataSF ring is a 16-vertex outline
+    // whose centroid sits 2.08 m from the anchor and whose nearest vertex is
+    // 15.56 m, while the nearest NEIGHBOUR vertex is only 17.24 m away. Since
+    // excluded() drops a ring on centroid OR any-vertex, the window that drops
+    // exactly this building is 2.08 < r <= 17.24; 22 would have taken three
+    // neighbours with it. 10 sits in the middle of the real band.
+    id: '599Third',
+    name: '599 Third Street',
+    lon: -122.3942739,
+    lat: 37.7804504,
+    height: 18.3,
+    exclude: 10,
+    // `camera` is mandatory even though this building gets no number `key` —
+    // see the note on 542PresidioBlvd. main.js maps EVERY manifest landmark
+    // into `presets`, and camera.js reads `preset.yaw` unconditionally, so
+    // omitting it boots to "Cannot read properties of undefined (reading
+    // 'yaw')". Verified by doing exactly that here too.
+    // yaw 0 stands the camera due south (app yaw = 180 − true bearing), which
+    // is the bisector of the 3rd Street front (normal 224.8°) and the Brannan
+    // front (135.2°) — the one angle where both designed elevations and the
+    // corner between them read at once. 240 m suits an 18.3 m block (cf.
+    // 380Brannan 220 at 12.6 m, 550Third 190 at 11 m).
+    camera: { distance: 240, yaw: 0, pitch: 26 },
+  },
+  {
+    // A 5-acre PLAZA, not a building, and the exclusion has to do two different
+    // jobs at two different radii — which is why this is the first entry to
+    // carry `clearTreesRadius`.
+    //
+    // `exclude: 95` is the buildings job. Three single-storey structures stand
+    // inside the plaza (the garage kiosk, the Grove-corner cafe and the Pit
+    // Stop) and the procedural builder extrudes all three to 22-23 m, so
+    // without the exclusion three phantom towers stand on the plaza. Measured
+    // against the committed bake input (buildings/19_13.bin, 19_14.bin),
+    // nearest VERTEX not centroid, per the method 505VanNess established:
+    //   garage kiosk       67.8 m   (88 m2, baked top 23.4 m)
+    //   Grove-corner cafe  74.2 m   (93 m2, baked top 22.0 m)
+    //   Pit Stop           83.5 m   (10 m2, baked top 22.5 m)
+    //   first neighbour   109.9 m   (6,165 m2, baked top 62.0 m)  <- must survive
+    // The window is 83.5 < r < 109.9 and 95 sits in the middle of it.
+    //
+    // `clearTreesRadius: 110` is the trees job, and it has to be BIGGER — it
+    // covers the plaza's 107.6 m half-diagonal. The plaza is leisure=park, so
+    // the landcover scatter drops procedural trees across it that stand among
+    // the 190 hand-placed pollards looking like a different world.
+    //
+    // This was first set to 60 m on the theory that a wider circle would eat
+    // real street trees on Larkin, McAllister and Grove. That theory was never
+    // measured and it was wrong. Counted against the baked landcover:
+    //   radius   left INSIDE the plaza   cut OUTSIDE the plaza
+    //     60 m        109                       0
+    //     80 m         34                       7
+    //     95 m          6                      10
+    //    110 m          0                      14
+    // The blocks around the plaza are civic buildings with almost no mapped
+    // street trees, so covering the whole plaza costs 14 of them and removes
+    // 109 lollipops from a hero landmark. Measure the tree radius against the
+    // bake the same way the building radius is measured; do not reason about it.
+    id: 'civicCenterPlaza',
+    name: 'Civic Center Plaza',
+    lon: -122.4176184,
+    lat: 37.7794818,
+    height: 30.48,
+    exclude: 95,
+    clearTrees: true,
+    clearTreesRadius: 110,
+    // Looks WEST along the central court so the fly-to lands on the plaza's own
+    // axis with City Hall filling the far end — the one composition that
+    // explains what this place is.
+    camera: { distance: 620, yaw: 90, pitch: 30 },
   },
 ];
 
