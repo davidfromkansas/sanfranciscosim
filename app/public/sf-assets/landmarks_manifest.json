@@ -647,5 +647,24 @@
     ],
     "tris": 13176,
     "loadRadius": 2500
+  },
+  {
+    "id": "sf-main-library",
+    "file": "sf-main-library.glb",
+    "anchor": [
+      -122.4157709,
+      37.7791281
+    ],
+    "targetHeightM": 28.98,
+    "cat": 15,
+    "name": "San Francisco Main Public Library",
+    "estimated": false,
+    "dims": [
+      116.2429,
+      74.506,
+      28.98
+    ],
+    "tris": 10168,
+    "loadRadius": 2500
   }
 ]

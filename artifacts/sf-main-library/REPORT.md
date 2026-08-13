@@ -11,9 +11,10 @@ in §4.
 
 | | |
 |---|---|
-| File | `sf-main-library.glb` |
+| File | `sf-main-library.glb` (post stage-4 optimize) |
+| File bytes | **256,072 B** raw (633,248 B pre-optimize; budget 500 KB) |
 | Triangles | **10,168** (cap 26,000) |
-| Mesh objects | 257 |
+| Mesh objects | **10** (257 pre-optimize; joined per material) |
 | Dimensions (m) | 116.243 x 74.506 x **28.980** |
 | bbox min / max | (−58.121, −37.253, 0.000) / (58.121, 37.253, 28.980) |
 | min Z | 0.000 |
@@ -26,7 +27,8 @@ in §4.
 | Non-manifold objects | 0 |
 | Inverted solids | 0 |
 | Normal ray-cast residual | **0.000000** (tolerance 0.15%) |
-| Validation | `validation.json` — **overall PASS**, run with `--closed-solids` |
+| Validation | `validation.json` — **overall PASS** (shipped file; `--closed-solids` passed on the pre-optimize export) |
+| Optimize | `optimize/REPORT.md` — gates G1–G6, G8 **PASS** |
 
 The XY bbox is 116.24 x 74.51 m rather than 106.42 x 56.88 m because the
 surveyed envelope is rotated 9.06 deg onto the Civic Center grid; the rotated
@@ -136,6 +138,18 @@ glTF writes `emissiveFactor = 0` when the authored strength is 0, so a re-import
 `_Glow` material carries a default white emission. See the note at the end of
 `docs/asset-plans/README.md`.
 
+## 7a. Approval (gate 3)
+
+Approved in advance by David on **13 August 2026**, at the top of the pipeline
+session, verbatim:
+
+> "I approve everything -- go ahead and do your thing. you dont need to ask for
+> stage 3 approval. proceed w everything"
+
+The contact sheet, the aerial day and night renders and the numbers in §1 were
+still produced and reviewed before the pipeline advanced, and four revision
+passes (§5) were made off those reviews.
+
 ## 8. Renders
 
 All images are rendered from the **re-imported exported GLB**, never from the
@@ -145,6 +159,15 @@ Directions are true compass directions.
 
 `sf-main-library-{north,east,south,west,top,aerial,night,night-larkin}.png` plus
 `sf-main-library-contact-sheet.png`.
+
+**One artifact worth naming rather than hiding.** In the true-world orthographic
+elevations, the Fulton order appears as a striped band at the north edge of the
+*west* view, and the Grove windows likewise at the south edge of the *east* view.
+That is the building's 9.06 deg grid rotation projecting into an axis-aligned
+camera — the north wall's pilasters spread 16.8 m in screen-x once the block is
+rotated — not a modelling error. Every asset in this family authored on the Civic
+Center grid has the same property. The rig was left honest rather than
+axis-aligned to the building.
 
 Rendered with Cycles CPU at 16 samples with denoising rather than the usual 64:
 several other agent sessions were rendering on this machine concurrently and a
@@ -186,3 +209,62 @@ New landmark: no procedural builder, no registry entry. Integration needs a
 **40 m**, measured rather than guessed — see `docs/asset-plans/sf-main-library.md`
 §2.14 for the vertex-distance table. Do not use the OBB half-diagonal (60.33 m):
 it would eat the Hyde/Market frontage.
+
+
+## 11. Local QA (gate 5)
+
+Run against `npm run dev` in this worktree after the Case B re-bake, with the
+tile bake applied. The Browser pane runs with rAF suspended, so `SF.assets.update`
+was driven by hand with a non-zero `dt` (a zero `dt` never decrements the scan
+cooldown and the streaming scan never fires — worth knowing for the next session).
+
+| Check | Result |
+|---|---|
+| Loader merge line | `sf-assets: sf-main-library merged 10 objects / 10 materials -> batched (5659 tris body); uniform x1.0000 at 1912, -1009` |
+| Scale | **x1.0000** — authored crest and `targetHeightM` agree exactly |
+| Placement | seated at (1912.07, −1009.02), matching the projected anchor to 1 cm; terrain height 16.0 m |
+| Streaming | `loadRadius: 2500` — asset goes live on approach; 36 manifest entries, 29 live near Civic Center, **0 failed** |
+| One building, no twin | PASS — `verify-rebake` shows cell 19_13 dropped exactly one footprint (105 → 104) and nothing survives inside the radius |
+| Orientation | west front faces Larkin / Civic Center Plaza, long axis on the Civic Center grid |
+| Terrain seating | PASS — no floating, no sinking |
+| Night | PASS — only the roof glazing (oculus cone + both sheds) and the Larkin doorways light; the glazed pyramid stays dark |
+| Draw calls | **96–109** worst case at street level in Civic Center (budget < 300) |
+| Fallback drill | PASS — see below |
+
+**Fallback drill.** With `app/public/sf-assets/landmarks/sf-main-library.glb`
+renamed away: the app boots, the area renders, the block is empty ground (the
+expected Case B result, because the baked footprint was excluded), and exactly
+**one** warning appears:
+
+```
+sf-assets: sf-main-library failed to load (Unexpected token '<', "<!doctype "... is not valid JSON)
+```
+
+Note the failure is a **parse error, not a 404** — Vite serves `index.html` with
+status 200 for a missing asset path, so the loader gets HTML where it expected a
+GLB. All 28 other landmarks merged normally through the drill. File restored and
+re-verified afterwards.
+
+## 12. Bake verification (Case B)
+
+```
+node pipeline/verify-rebake.mjs
+  new since origin/main: sfMainLibrary @ 19_13
+  584 of 585 cells unchanged
+  19_13    105 -> 104  <- sfMainLibrary
+  ok   sfMainLibrary          50.6 m vs 40 m radius  (nearest is 17.0 m tall)
+  PASS  only the new landmarks' cells moved, and every asset has clear ground under it
+
+node pipeline/audit.mjs
+  1.6    PASS    no procedural footprint inside a bespoke landmark exclusion zone   42 landmarks clear
+```
+
+The 50.6 m figure is exactly the nearest-neighbour distance measured in the plan's
+§2.14 before anything was built — the exclusion radius behaved as designed, with
+10.6 m of margin.
+
+Checks 1.2b, 1.3c and 1.7b FAIL; they are pre-existing on `origin/main` and
+documented as such in `docs/asset-pipeline/BATCH-INTEGRATE.md`.
+
+**Batch mode:** the bake was run for this QA and then discarded
+(`git checkout -- app/public/tiles api/_data`). This branch commits source only.
