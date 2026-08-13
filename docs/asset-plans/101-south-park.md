@@ -17,7 +17,7 @@ prompt, Part 2 is the research and design dossier behind it.
 | Manifest id | `101-south-park` |
 | Existing procedural builder | none — new landmark (needs a `pipeline/lib/landmarks.mjs` entry and a re-bake, see 2.13) |
 | WGS84 anchor | `-122.3937582, 37.7812624` |
-| Target height | **10.0 m** to the parapet crest — *estimated*, see 2.1 and 2.15; the single weakest number in this dossier |
+| Target height | **10.9 m** to the tallest roof feature (parapet crest 10.0 m) — *estimated*, see 2.1 and 2.15; the weakest number in this dossier |
 | Footprint | 13.07 m (South Park frontage, NW) x 29.7 m deep; 380.1 m2, measured |
 | Triangle cap | 9,000 |
 | Category | `3` (office) |
@@ -177,7 +177,7 @@ contract's "front faces −Y" rule cannot be honoured literally here, real-world
 wins, and the deviation must be recorded in `REPORT.md` along with the measured heading.
 
 **Height normalization:** the tallest geometry in the export must land at exactly the
-height you verify (this plan's estimate is **10.0 m**) so the loader's
+height you verify (this plan's estimate is **10.9 m** to the tallest roof feature; the parapet crest sits at 10.0 m) so the loader's
 `targetHeightM / measuredHeight` scale is 1.0. If your research moves the height, move both
 the model and the draft manifest entry together and say so in `REPORT.md`.
 
@@ -237,7 +237,7 @@ entry in `REPORT.md`. Do not edit the production manifest in this task.
     -122.3937582,
     37.7812624
   ],
-  "targetHeightM": 10.0,
+  "targetHeightM": 10.9,
   "cat": 3,
   "name": "101 South Park",
   "estimated": true,
@@ -283,7 +283,7 @@ working office block, and the primary evidence is city data plus photography.
 | Roof height, 2010 LiDAR **median** | 5.56 m | DataSF `hgt_median_m` — measured, but **describes the pre-renovation building, see 2.15** |
 | Roof height, 2010 LiDAR **maximum** | 10.92 m | DataSF `hgt_maxcm` — measured, over a small part of the footprint |
 | Ground elevation | 10.09 m (NAVD88) | DataSF `gnd_min_m` — the app's terrain handles this, not the asset |
-| Parapet crest today | **~10.0 m** | *estimated*: photogrammetric from the Jan 2025 South Park pano, scaling the facade against a ~3.2 m ground-floor window opening; ±0.8 m |
+| Parapet crest today | **~10.0 m**; tallest roof feature **~10.9 m** (the model's crest) | *estimated*: photogrammetric from the Jan 2025 South Park pano, scaling the facade against a ~3.2 m ground-floor window opening; ±0.8 m |
 | Frontage heading | front faces 318.3° (NW, toward the park); rear faces 138.3° (SE) | measured from the footprint polygon |
 
 ### 2.2 Sources
@@ -415,7 +415,7 @@ for which the evidence is good.
 
 Build order for the deterministic script; dimensions are the starting point, not a
 straitjacket — adjust after the first aerial review render, and adjust *all* of them if the
-verified height differs from 10.0 m.
+verified height differs from 10.9 m.
 
 1. Body: extrude the 2.3 footprint from z=0 to z=9.4, `Toy_ink` (see 2.8 on the body
    colour). This is the charcoal shell that all four elevations show.
@@ -513,7 +513,7 @@ furniture ~1.5k.
     -122.3937582,
     37.7812624
   ],
-  "targetHeightM": 10.0,
+  "targetHeightM": 10.9,
   "cat": 3,
   "name": "101 South Park",
   "estimated": true,
@@ -544,7 +544,7 @@ executing agent establishes the height from a citable source.
   proves nothing — the procedural block is *shorter* than the asset here, which is the
   inverse of the usual case and will hide an exclusion-zone mistake rather than reveal it.
   Do the bake before judging.
-- `loadRadius`: the default formula gives `max(2500, 10.0 * 30) = 2500` m. Take the default.
+- `loadRadius`: the default formula gives `max(2500, 10.9 * 30) = 2500` m. Take the default.
 - This is the second one-off SoMa street building in the landmark manifest after
   380 Brannan. The question that plan raised stands: if the intent is to keep doing
   individual South Park / SoMa blocks, the kit/instancing route

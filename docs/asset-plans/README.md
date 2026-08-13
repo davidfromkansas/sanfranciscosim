@@ -73,7 +73,7 @@ route, and the park plans depend on it (§E8 of the parks README).
 | [Louise M. Davies Symphony Hall](./davies-symphony-hall.md) | `davies-symphony-hall` | 35 m | new landmark |
 | [101 Grove Street (Public Health Building)](./101-grove.md) | `101-grove` | 21.4 m | new landmark |
 | [Asian Art Museum (Old Main Library)](./asian-art-museum.md) | `asian-art-museum` | 28.1 m | new landmark |
-| [101 South Park](./101-south-park.md) | `101-south-park` | 10.0 m (estimated) | new landmark |
+| [101 South Park](./101-south-park.md) | `101-south-park` | 10.9 m (estimated) | new landmark |
 
 ## Shared contract (all 37)
 
