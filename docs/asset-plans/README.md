@@ -57,6 +57,7 @@ route, and the park plans depend on it (§E8 of the parks README).
 | [War Memorial Opera House](./war-memorial-opera-house.md) | `opera-house` | 44 m | new landmark |
 | [Herbst Theatre (War Memorial Veterans Building)](./herbst-theatre.md) | `herbst-theatre` | ~31 m (estimated) | new landmark |
 | [Fairmont San Francisco](./fairmont-san-francisco.md) | `fairmont` | 99 m | new landmark |
+| [358 Brannan Street](./358-brannan.md) | `358-brannan` | 9.6 m (estimated) | new landmark |
 | [380 Brannan Street](./380-brannan.md) | `380-brannan` | 12.6 m | new landmark |
 | [550 Third Street](./550-third.md) | `550-third` | 11 m | new landmark |
 | [375 Alabama Street (Ames Harris Neville Co.)](./375-alabama.md) | `375-alabama` | 22.5 m | new landmark |
@@ -74,7 +75,7 @@ route, and the park plans depend on it (§E8 of the parks README).
 | [101 Grove Street (Public Health Building)](./101-grove.md) | `101-grove` | 21.4 m | new landmark |
 | [Asian Art Museum (Old Main Library)](./asian-art-museum.md) | `asian-art-museum` | 28.1 m | new landmark |
 
-## Shared contract (all 36)
+## Shared contract (all 37)
 
 - Style: `docs/styles/miniature-toy.md` (authoritative for artistic decisions)
 - Technical contract: `.agents/skills/sf-asset-check/SKILL.md` (authoritative for the GLB)
@@ -128,6 +129,15 @@ the two — the crest is 9.55 m. The Asian Art Museum is a fourth: its OSM
 `height=46` is not a height at all but the NAVD88 roof *elevation* (152.93 ft),
 1.6x the real 28.1 m crest — see that plan's 2.3 before trusting any `height` tag
 that could plausibly be a sea-level datum.
+
+358 Brannan Street breaks the pattern: there the bad number is not a height but the
+**footprint**. Its OSM way (`source=Bing`) traces a 115 m2 stub, wide and shallow,
+where the building is in fact a 166 m2 through-lot 6.9 m wide and 25.2 m deep — the
+DataSF LiDAR footprint and the Assessor's lot area agree with each other against OSM.
+Where a plan cites a DataSF `mblr`/`sf16_bldgid` footprint, that is the survey; OSM
+geometry on small SoMa lots is a Bing trace and should be treated as a cross-check
+only. Getting from an address to the right DataSF polygon goes through the parcels
+dataset (`acdm-wktn`, `blklot` -> address range), not through a spatial guess.
 
 The executing agent is expected to re-verify height, anchor, footprint and
 orientation before modelling — the dossier is a head start, not a citation.
