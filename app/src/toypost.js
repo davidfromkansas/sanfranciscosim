@@ -4,6 +4,8 @@
 // triangle-pair, created once and reused across every toggle.
 
 import {
+  DepthTexture,
+  UnsignedIntType,
   LinearFilter,
   Mesh,
   OrthographicCamera,
@@ -73,6 +75,21 @@ export function createToyPost(renderer) {
     samples: 4,
   });
 
+  // Scene depth, readable as a texture, for soft-particle fades (fog banks must
+  // fade against terrain instead of slicing through it — WEATHER-PLAN 3.1b).
+  // Attached lazily: on a multisampled target the depth attachment has to be
+  // resolved, which is not free, so nothing pays for it until something asks.
+  let depthTexture = null;
+  function enableDepth() {
+    if (depthTexture) return depthTexture;
+    depthTexture = new DepthTexture(target.width, target.height);
+    depthTexture.type = UnsignedIntType;
+    target.depthTexture = depthTexture;
+    target.dispose(); // force the framebuffer to rebuild with the attachment
+    setSize();
+    return depthTexture;
+  }
+
   const material = new ShaderMaterial({
     uniforms: {
       tDiffuse: { value: target.texture },
@@ -101,6 +118,7 @@ export function createToyPost(renderer) {
     const s = renderer.getSize(new Vector2());
     const ratio = renderer.getPixelRatio();
     target.setSize(Math.max(1, s.x * ratio), Math.max(1, s.y * ratio));
+    if (depthTexture) depthTexture.image = { width: target.width, height: target.height };
     material.uniforms.uTexel.value.set(1 / target.width, 1 / target.height);
   }
 
@@ -113,6 +131,10 @@ export function createToyPost(renderer) {
       if (enabled) setSize();
     },
     setSize,
+    enableDepth,
+    get depthTexture() {
+      return depthTexture;
+    },
     setSamples(n) {
       if (target.samples === n) return;
       target.samples = n;

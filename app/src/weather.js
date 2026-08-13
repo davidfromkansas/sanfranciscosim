@@ -20,6 +20,13 @@ const RETRY_MS = 60 * 1000;
 // A 5-minute poll that teleports the fog in one frame looks broken; the same
 // change eased over a minute looks like weather.
 const EASE_S = 60;
+// Ground wets fast and dries slow. A street that dries the moment the shower
+// stops looks wrong; ninety seconds of drying is most of what sells rain.
+const WET_UP_S = 12;
+const WET_DOWN_S = 90;
+// Storms only: a flash every 8-25 s, two frames long.
+const FLASH_MIN_S = 8;
+const FLASH_MAX_S = 25;
 
 const W = 6;
 const H = 6;
@@ -102,6 +109,10 @@ export function createWeather({ project }) {
   // next poll lands (up to a minute later).
   let lastPayload = null;
   let nextPollAt = 0;
+  let wetness = 0;
+  let flashUntil = 0;
+  let nextFlashAt = 0;
+  let flashSeed = 1;
   let warned = false;
   let grid = null;
 
@@ -218,8 +229,31 @@ export function createWeather({ project }) {
     // Mean rain and smoke, for the systems that do not need the field.
     let rain = 0;
     for (let i = 0; i < CELLS; i++) rain += current.precip[i];
-    shared.uRain.value = rain / CELLS;
+    const meanRain = rain / CELLS;
+    shared.uRain.value = meanRain;
     shared.uSmoke.value = clamp01((s.aqi - 80) / 170);
+
+    // Wetness chases the rain up quickly and falls away slowly.
+    const wetTarget = clamp01(meanRain * 1.6);
+    const wetK = 1 - Math.exp(-dt / (wetTarget > wetness ? WET_UP_S : WET_DOWN_S));
+    wetness += (wetTarget - wetness) * wetK;
+    shared.uWetness.value = wetness;
+
+    // Lightning, storms only. Deterministic-ish jitter from a rolling seed so
+    // there is no Math.random in the frame path.
+    const now2 = shared.uTime.value;
+    if (meanRain > 0.55) {
+      if (now2 > flashUntil && now2 > nextFlashAt) {
+        flashSeed = (flashSeed * 16807) % 2147483647;
+        const jitter = flashSeed / 2147483647;
+        nextFlashAt = now2 + FLASH_MIN_S + jitter * (FLASH_MAX_S - FLASH_MIN_S);
+        flashUntil = now2 + 0.12;
+      }
+      shared.uFlash.value = now2 < flashUntil ? 0.85 : 0;
+    } else {
+      shared.uFlash.value = 0;
+      flashUntil = 0;
+    }
 
     // 36 texels is free, but not free enough to upload for nothing.
     if (moved) uploadTexture();

@@ -51,7 +51,26 @@ export const shared = {
   uWind: { value: new Vector2() },
   // Citywide means, for the systems that do not need the whole field.
   uRain: { value: 0 },
+  // How wet the ground is. Follows the rain up quickly and down slowly -- a
+  // street that dries the instant the shower stops looks wrong, and the slow
+  // dry-out is most of what sells rain in the first place.
+  uWetness: { value: 0 },
+  // One-frame lightning flash, 0..1. Storms only.
+  uFlash: { value: 0 },
   uSmoke: { value: 0 },
+  // Karl. Warm grey by day, navy at night (written by setSky), so a foggy night
+  // is still the painted-object-in-a-dark-room look rather than a grey wall.
+  uFogColor: { value: new Color(0xdfe3e6) },
+  // The marine layer is a LAYER: roughly sea level to here, which is what lets
+  // Twin Peaks (~280 m) and Sutro (~370 m) stand out of the top of it.
+  uFogTop: { value: 340 },
+  // Clear radius around the camera. Fly into a bank and your surroundings stay
+  // readable while the city dissolves behind them.
+  uFogClear: { value: 150 },
+  // How opaque the thickest fog may ever get. Deliberately short of 1 so a
+  // landmark always ghosts through -- the diorama has to stay readable.
+  uFogMax: { value: 0.78 },
+  uSmokeColor: { value: new Color(0xd08a4a) },
 };
 
 // Noise-space drift per (m/s of wind) per second. The shadow noise samples
@@ -174,6 +193,9 @@ const TOY_NIGHT = {
   hemiIntensity: 1.15,
   fog: new Color(0x1e2740),
 };
+// Karl by day: a warm grey, not white. White fog on a cream diorama reads as a
+// blown-out render; this keeps the paper warmth of the model.
+const FOG_DAY = new Color(0xdfe3e6);
 const STAR_COUNT = 2000;
 
 // The usability floor. The plan asks for at least 0.25 key and 0.42 hemisphere;
@@ -487,6 +509,10 @@ export function createEnvironment(scene) {
     shared.uSunColor.value.copy(sun.color);
     shared.uSkyColor.value.copy(hemi.color);
     scene.fog.color.copy(DAY.fog).lerp(state.toy ? TOY_NIGHT.fog : NIGHT.fog, night);
+    // Karl's colour tracks the hour: warm grey by day, the night palette's navy
+    // after dark, so a foggy night stays the painted-object-in-a-dark-room look
+    // instead of turning into a grey wall.
+    shared.uFogColor.value.copy(FOG_DAY).lerp(TOY_NIGHT.fog, night);
   }
 
   // The deprecated 0 to 1 sweep, kept only so the old SF.setTime alias and the

@@ -85,6 +85,56 @@ const CLOUDS = /* glsl */ `
   }
 `;
 
+// Karl. Spatial height fog evaluated per fragment: density from the weather
+// field at the fragment's own world position, so the Sunset can be socked in
+// while the Mission stays clear. scene.fog cannot do this -- FogExp2 is uniform
+// over the whole scene, and "fogged over there" is the entire feature.
+//
+// Three separate falloffs multiply together:
+//   density  the field, sampled by world XZ
+//   height   a LAYER, not a soup -- Twin Peaks and Sutro poke out of the top
+//   bubble   a clear radius around the camera, so flying into a bank never
+//            blinds you (David's call; the diorama must stay readable)
+const FOG = /* glsl */ `
+  uniform vec3 uFogColor;
+  uniform float uFogTop;
+  uniform float uFogClear;
+  uniform float uFogMax;
+  uniform float uSmoke;
+  uniform vec3 uSmokeColor;
+  uniform float uWetness;
+  uniform float uFlash;
+
+  float weatherFog(vec3 worldPos) {
+    vec2 uv = (worldPos.xz - uWeatherOrigin) * uWeatherScale;
+    float density = texture2D(uWeatherField, clamp(uv, 0.0, 1.0)).r;
+    density = max(density, uSmoke * 0.55);
+    if (density < 0.01) return 0.0;
+
+    float height = 1.0 - smoothstep(0.0, uFogTop, max(worldPos.y, 0.0));
+    if (height <= 0.001) return 0.0;
+
+    float dist = distance(worldPos, cameraPosition);
+    float bubble = smoothstep(0.0, uFogClear, dist);
+    float k = density * 0.00042;
+    float f = 1.0 - exp(-k * k * dist * dist);
+    return clamp(f * height * bubble * uFogMax, 0.0, 1.0);
+  }
+
+  // A lightning flash lifts the whole frame for a frame or two. Cheap, and the
+  // flash IS the effect -- there is no bolt geometry anywhere.
+  vec3 applyFlash(vec3 color) {
+    return color + vec3(0.55, 0.6, 0.75) * uFlash;
+  }
+
+  vec3 applyWeatherFog(vec3 color, vec3 worldPos) {
+    // Wildfire smoke rides the same machinery: it is a colour and a floor on
+    // density, never a second system.
+    vec3 tint = mix(uFogColor, uSmokeColor, clamp(uSmoke, 0.0, 1.0));
+    return applyFlash(mix(color, tint, weatherFog(worldPos)));
+  }
+`;
+
 const CLOUD_UNIFORMS = () => ({
   uCloudDrift: shared.uCloudDrift,
   uToy: shared.uToy,
@@ -92,6 +142,14 @@ const CLOUD_UNIFORMS = () => ({
   uWeatherField: shared.uWeatherField,
   uWeatherOrigin: shared.uWeatherOrigin,
   uWeatherScale: shared.uWeatherScale,
+  uFogColor: shared.uFogColor,
+  uFogTop: shared.uFogTop,
+  uFogClear: shared.uFogClear,
+  uFogMax: shared.uFogMax,
+  uSmoke: shared.uSmoke,
+  uSmokeColor: shared.uSmokeColor,
+  uWetness: shared.uWetness,
+  uFlash: shared.uFlash,
 });
 
 const HASH = /* glsl */ `
@@ -151,7 +209,8 @@ export function createBuildingMaterial({ windows = 1 } = {}) {
         varying float vLocalY;
         ${DITHER}
         ${HASH}
-        ${CLOUDS}`
+        ${CLOUDS}
+        ${FOG}`
       )
       .replace(
         '#include <clipping_planes_fragment>',
@@ -199,6 +258,13 @@ export function createBuildingMaterial({ windows = 1 } = {}) {
         }
         diffuseColor.rgb *= cloudShadow(vCityWorld.xz);
         totalEmissiveRadiance += emissive;`
+      )
+      .replace(
+        '#include <fog_fragment>',
+        `#include <fog_fragment>
+        // Karl goes on AFTER lighting: fog is atmosphere between the eye and
+        // the surface, not pigment on it.
+        gl_FragColor.rgb = applyWeatherFog(gl_FragColor.rgb, vCityWorld);`
       );
   };
 
@@ -224,7 +290,7 @@ const FLAG_DECODE = /* glsl */ `
 
 export function createToyBuildingMaterial() {
   const material = new MeshLambertMaterial({ vertexColors: true, dithering: true });
-  material.uniformsHolder = { uFade: { value: 1 }, uFloor: { value: 3.5 }, uNight: shared.uNight };
+  material.uniformsHolder = { uFade: { value: 1 }, uFloor: { value: 3.5 }, uNight: shared.uNight, ...CLOUD_UNIFORMS() };
 
   material.onBeforeCompile = function patchToy(shader) {
     Object.assign(shader.uniforms, this.uniformsHolder);
@@ -259,6 +325,8 @@ export function createToyBuildingMaterial() {
         varying vec3 vToyNormal;
         varying float vToyWall;
         varying float vFlag;
+        ${CLOUDS}
+        ${FOG}
         ${DITHER}
         ${HASH}`
       )
@@ -297,7 +365,13 @@ export function createToyBuildingMaterial() {
             totalEmissiveRadiance += diffuseColor.rgb * glowProp * uNight * 1.35;
             diffuseColor.rgb *= mix(1.0, 0.72, uNight);
           }
-        }`
+        }
+        diffuseColor.rgb *= cloudShadow(vToyPos.xz);`
+      )
+      .replace(
+        '#include <fog_fragment>',
+        `#include <fog_fragment>
+        gl_FragColor.rgb = applyWeatherFog(gl_FragColor.rgb, vToyPos);`
       );
   };
 
@@ -465,12 +539,12 @@ export function createGroundMaterial() {
         `#include <common>
         attribute float aKind;
         varying float vKind;
-        varying vec2 vGroundWorld;`
+        varying vec3 vGroundWorld;`
       )
       .replace(
         '#include <worldpos_vertex>',
         `#include <worldpos_vertex>
-        vGroundWorld = (modelMatrix * vec4(transformed, 1.0)).xz;`
+        vGroundWorld = (modelMatrix * vec4(transformed, 1.0)).xyz;`
       )
       .replace(
         '#include <begin_vertex>',
@@ -483,8 +557,9 @@ export function createGroundMaterial() {
         `#include <common>
         uniform float uNight;
         varying float vKind;
-        varying vec2 vGroundWorld;
-        ${CLOUDS}`
+        varying vec3 vGroundWorld;
+        ${CLOUDS}
+        ${FOG}`
       )
       .replace(
         '#include <color_fragment>',
@@ -493,9 +568,19 @@ export function createGroundMaterial() {
         // warm sodium sheen at night, and the paint stays crisp on top of it.
         float asphalt = step(63.5, vKind) * step(vKind, 64.5);
         float marking = step(65.5, vKind);
-        diffuseColor.rgb *= cloudShadow(vGroundWorld);
+        diffuseColor.rgb *= cloudShadow(vGroundWorld.xz);
+        // Wet ground: darker and slightly cooler, the way tarmac actually goes.
+        diffuseColor.rgb *= mix(1.0, 0.62, uWetness * asphalt);
+        diffuseColor.rgb = mix(diffuseColor.rgb, diffuseColor.rgb * vec3(0.86, 0.92, 1.06), uWetness * asphalt);
         totalEmissiveRadiance += vec3(1.0, 0.72, 0.42) * asphalt * uNight * 0.06;
         totalEmissiveRadiance += vec3(0.85, 0.86, 0.82) * marking * uNight * 0.1;`
+      )
+      .replace(
+        '#include <fog_fragment>',
+        `#include <fog_fragment>
+        // Karl goes on AFTER lighting: fog is atmosphere between the eye and
+        // the surface, not pigment on it.
+        gl_FragColor.rgb = applyWeatherFog(gl_FragColor.rgb, vGroundWorld);`
       );
   };
 
@@ -510,18 +595,26 @@ export function createCloudShadedMaterial() {
   material.onBeforeCompile = function patchCloudShaded(shader) {
     Object.assign(shader.uniforms, this.uniformsHolder);
     shader.vertexShader = shader.vertexShader
-      .replace('#include <common>', `#include <common>\n        varying vec2 vCloudWorld;`)
+      .replace('#include <common>', `#include <common>\n        varying vec3 vCloudWorld;`)
       .replace(
         '#include <worldpos_vertex>',
         `#include <worldpos_vertex>
-        vCloudWorld = (modelMatrix * vec4(transformed, 1.0)).xz;`
+        vCloudWorld = (modelMatrix * vec4(transformed, 1.0)).xyz;`
       );
     shader.fragmentShader = shader.fragmentShader
-      .replace('#include <common>', `#include <common>\n        uniform float uNight;\n        varying vec2 vCloudWorld;\n        ${CLOUDS}`)
+      .replace('#include <common>', `#include <common>\n        uniform float uNight;\n        varying vec3 vCloudWorld;\n        ${CLOUDS}
+        ${FOG}`)
       .replace(
         '#include <color_fragment>',
         `#include <color_fragment>
-        diffuseColor.rgb *= cloudShadow(vCloudWorld);`
+        diffuseColor.rgb *= cloudShadow(vCloudWorld.xz);`
+      .replace(
+        '#include <fog_fragment>',
+        `#include <fog_fragment>
+        // Karl goes on AFTER lighting: fog is atmosphere between the eye and
+        // the surface, not pigment on it.
+        gl_FragColor.rgb = applyWeatherFog(gl_FragColor.rgb, vCloudWorld);`
+      )
       );
   };
   return material;

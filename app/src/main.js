@@ -38,6 +38,7 @@ import { createConcierge } from './concierge.js';
 import { createSkyClock } from './sky-clock.js';
 import { createWeather } from './weather.js';
 import { createClouds } from './clouds.js';
+import { createRain } from './rain.js';
 import { localDayStart, moonPosition, skySnapshot, sunPosition } from '../../api/_lib/astro.mjs';
 
 const canvas = document.getElementById('view');
@@ -119,6 +120,8 @@ async function boot() {
   // Toy clouds read the same field the shadows do, so what floats overhead and
   // what darkens the ground always agree.
   const clouds = createClouds(scene, { sampleAt: weather.sampleAt });
+  // Rain falls where the field says it is raining, in a box around the camera.
+  const rain = createRain(scene, { sampleAt: weather.sampleAt });
   // Real Muni buses from /api/muni; when the feed is away this layer is simply
   // empty — the procedural road traffic never depended on it.
   const muni = createLiveMuni(scene, data);
@@ -183,6 +186,7 @@ async function boot() {
     agents.setQuality(key);
     terrain.setQuality(key);
     clouds.setQuality(key);
+    rain.setQuality(key);
     post.setSamples(quality.samples);
     renderer.setSize(window.innerWidth, window.innerHeight, false);
     post.setSize();
@@ -562,6 +566,7 @@ async function boot() {
     agents,
     ferries,
     clouds,
+    rain,
     muni,
     governor,
     boot: bootScreen,
@@ -708,6 +713,7 @@ async function boot() {
     // simulation clamp would stall the transition below 20 fps.
     weather.update(Math.min(1, elapsed));
     clouds.update(Math.min(1, elapsed));
+    rain.update(dt, camera.position);
     muni.update(dt, camera);
     trackVessel(dt);
     landmarks.update();
