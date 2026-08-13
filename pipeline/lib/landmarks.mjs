@@ -387,6 +387,32 @@ export const LANDMARKS = [
     exclude: 8,
     camera: { distance: 190, yaw: 260, pitch: 34 },
   },
+  // The corner block at Third and Brannan (also 590 Third). Sized by AREA
+  // COVERAGE against the real bake input rather than by nearest-neighbour
+  // distance, because on this block every neighbour shares a party-wall vertex
+  // with this footprint and a vertex-distance reading says "collateral" for
+  // buildings that are only touching. Two footprints actually stand on this
+  // plan — DataSF SF3776114 (98.5% of it, centroid 8.70 m from this anchor) and
+  // the Overture gap-fill 80ad8a83 (87.7%, centroid 4.72 m) — and both have to
+  // go or the GLB shares its site with a procedural twin:
+  //
+  //   exclude  8 m    -> drops 1 (SF3776114 survives on its 8.70 m centroid)
+  //   exclude 10-12 m -> drops 2  (correct: both, nothing else)
+  //   exclude 14 m    -> drops 4  (starts eating 574 Third's footprints)
+  //   exclude 16 m    -> drops 5  (eats 414 Brannan, SF3776011)
+  //
+  // 11 m is the middle of the safe band. The binding limit at the bottom is
+  // SF3776114's CENTROID, not any vertex — this footprint is an L and its
+  // centroid sits well off the anchor.
+  {
+    id: '400Brannan',
+    name: '400 Brannan Street',
+    lon: -122.3946805,
+    lat: 37.7800981,
+    height: 8.8,
+    exclude: 11,
+    camera: { distance: 170, yaw: 90, pitch: 26 },
+  },
   {
     // Shell service station, across 3rd Street from 550 Third. The asset is a
     // forecourt, not a building, and the lot carries TWO baked footprints — the
