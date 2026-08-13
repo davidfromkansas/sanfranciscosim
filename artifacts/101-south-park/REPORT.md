@@ -12,26 +12,31 @@ this report and `REFERENCE.md` are correct.
 
 ## 1. Headline numbers
 
-| | As built (pre-optimize) |
-|---|---|
-| Triangles | 7,534 (cap 9,000) |
-| Objects | 86 |
-| Dimensions (AABB) | 30.5306 x 29.8696 x 10.90 m |
-| Min Z | 0.0 |
-| XY centre offset | (−0.003, −0.172) m |
-| Materials | 12, all `Toy_*`, flat, opaque, untextured |
-| Glow materials | `Toy_rust_Glow`, `Toy_glass_Glow` |
-| File, raw | see `validation.json` / §1 note |
-| Contract validation | **PASS on all 16 checks** (`validation.json`) |
-| Anchor | `-122.3937582, 37.7812624` (footprint OBB centre) |
-| Target height | 10.9 m — bbox top normalized exactly, so loader scale = 1.0 |
-| Parapet crest | 10.0 m |
-| Front heading | 318.3° true (northwest, onto South Park) |
+Both columns are real: the asset was built, approved, then optimized in stage 4
+(`optimize/REPORT.md`). **The shipped column is what the manifest describes.**
+
+| | As built | **Shipped (post-optimize)** |
+|---|---|---|
+| Triangles | 7,534 (cap 9,000) | **7,502** |
+| Objects | 86 | 11 |
+| Draw submeshes | 87 | **12** |
+| Dimensions (AABB) | 30.5306 x 29.8696 x 10.90 m | identical |
+| Min Z | 0.0 | 0.0 |
+| XY centre offset | (−0.003, −0.172) m | identical |
+| Materials | 11, all `Toy_*`, flat, opaque, untextured | 11, identical set |
+| Glow materials | `Toy_rust_Glow`, `Toy_glass_Glow` | identical |
+| File, raw | 479,732 B | **191,700 B (−60.0%)** |
+| Contract validation | PASS on all 16 checks | **PASS on all 16 checks** |
+| Anchor | `-122.3937582, 37.7812624` (footprint OBB centre) | unchanged |
+| Target height | 10.9 m — bbox top normalized exactly, so loader scale = 1.0 | unchanged |
+| Parapet crest | 10.0 m | unchanged |
+| Front heading | 318.3° true (northwest, onto South Park) | unchanged |
 
 The AABB is ~30.5 x 29.9 m for a 13.1 x 29.7 m building. That is the expected consequence of
 authoring at the real 44.5° SoMa heading, not a scale error.
 
-Stage 4 (optimize) numbers are recorded in `optimize/REPORT.md` once that stage runs.
+Compression is `EXT_meshopt_compression` without `KHR_mesh_quantization`, matching
+`pipeline/compress-assets.mjs`. Full stage-4 detail in `optimize/REPORT.md`.
 
 ## 2. Corrections to the dossier made during the build
 
@@ -155,7 +160,7 @@ GLB imported — never the authoring scene.
 | Crest normalized to 10.9 m target | PASS (loader scale = 1.0) |
 | Base at z = 0 | PASS (min Z 0.0) |
 | Centred in XY | PASS (−0.003, −0.172) |
-| Under triangle budget | PASS (7,534 / 9,000) |
+| Under triangle budget | PASS (7,502 / 9,000) |
 | No image textures | PASS |
 | No transparency | PASS |
 | Materials follow contract | PASS (10 materials, all `Toy_*`, no `Toy_body`) |
@@ -207,7 +212,7 @@ GLB imported — never the authoring scene.
     29.8696,
     10.9
   ],
-  "tris": 7534,
+  "tris": 7502,
   "loadRadius": 2500
 }
 ```
@@ -215,8 +220,8 @@ GLB imported — never the authoring scene.
 `estimated: true` because the target height is not a published figure.
 
 Integration is **Case B**: no entry exists in `pipeline/lib/landmarks.mjs` or
-`app/src/landmarks.js`, so stage 5 needs a registry entry (`exclude: ~16`) and a tile
-re-bake. Note that the baked procedural stand-in here is **6 m tall and this asset is
+`app/src/landmarks.js`, so stage 5 needs a registry entry and a tile re-bake. **The
+exclusion radius is 4 m, not the ~16 m the plan guessed** — see §9. Note that the baked procedural stand-in here is **6 m tall and this asset is
 10.9 m** — the asset is *taller* than what it replaces, which is the inverse of the usual
 case and will hide an exclusion-zone mistake rather than reveal it. Do the bake before
 judging. `BATCH: yes` applies: bake, QA the bake, then discard the bake and commit source
@@ -228,3 +233,34 @@ Granted 13 August 2026: *"can you update the 3d model to reflect that including 
 lettering and design? … you can proceed without any approvals needed from me moving
 forward."* — David, in session. The approval came with the revision request recorded in §3
 and §4 (iterations 5–6); the wordmark was added before the pipeline advanced past gate 3.
+
+## 9. Exclusion radius — measured, and much tighter than the plan assumed
+
+The plan's §2.13 proposed `exclude: ~16`, reasoning from the footprint's half-diagonal.
+That is the wrong model of what `excluded()` in `pipeline/buildings.mjs` does: it drops a
+procedural footprint when its ring centroid **or any of its ring vertices** falls inside the
+radius. 117 South Park is *attached* to this building, so the two footprints share their
+party-wall vertices — and those shared vertices sit **6.40 m** from this anchor. A 16 m
+radius would have deleted a real neighbour that has no hand-built replacement, leaving a
+hole in the block face.
+
+Measured against the DataSF footprints:
+
+| | Distance from anchor |
+|---|---|
+| This building's ring **area** centroid (DataSF) | 0.26 m |
+| This building's ring area centroid (OSM cross-check) | 1.54 m |
+| Nearest shared party-wall vertex, 117 South Park | **6.40 m** |
+| 117 South Park's own centroid | 10.59 m |
+| Next nearest neighbour vertex (123 South Park) | 13.17 m |
+
+So the safe band is **1.6 m – 6.4 m**, and the exclusion has to work through the *centroid*
+test — the building's own ring vertices are at 6.40 m, outside any radius that spares the
+neighbour. **`exclude: 4`** sits in the middle with ~2.4 m of margin either side.
+
+This is the same structural situation 550 Third documents ("through lot with party walls on
+both long sides, so the exclusion window is narrow"), and the reason both it and 380 Brannan
+use single-digit radii. `pipeline/verify-rebake.mjs` is what proves it after the bake:
+it reports the distance from each new landmark's anchor to the nearest *surviving* footprint
+vertex and fails if anything survives inside the radius, or if any cell outside the new
+landmarks changed its building count.
