@@ -245,3 +245,109 @@ input at integration.
 | `validation.json` | validation report |
 | `REFERENCE.md` | sources and observations |
 | `optimize/` | stage 4 — scripts, A/B renders, diffs, gate results (`optimize/REPORT.md`) |
+
+## 10. Stage 5 — integration (batch mode)
+
+`BATCH: yes`, so this branch is **source-only**: the city bake was run, used for the
+QA below, and then thrown away. `docs/asset-pipeline/BATCH-INTEGRATE.md` bakes the
+whole batch once.
+
+Files this branch actually changes:
+`app/public/sf-assets/landmarks/590-third.glb`,
+`app/public/sf-assets/landmarks_manifest.json`,
+`pipeline/lib/landmarks.mjs`, `docs/asset-plans/590-third.md`,
+`docs/asset-plans/README.md`, and `artifacts/590-third/`.
+`git diff --name-only origin/main` lists **nothing** under `app/public/tiles/` or
+`api/_data/`.
+
+### 10.1 Exclusion radius — measured, and the plan was right
+
+The plan's `exclude: 7` was derived from the bake's own source before the bake ran,
+and the bake confirmed it exactly. `node pipeline/verify-rebake.mjs`:
+
+```
+new since origin/main: 590Third @ 23_13
+
+per-cell building counts vs origin/main
+  584 of 585 cells unchanged
+  23_13    219 -> 218  <- 590Third
+
+nearest surviving footprint vs exclusion radius
+  ok   590Third               13.8 m vs 7 m radius  (nearest is 14.1 m tall)
+
+PASS  only the new landmarks' cells moved, and every asset has clear ground under it
+```
+
+**One footprint removed, in one cell, and the nearest survivor is 13.8 m out** —
+the predicted window was `0.88 < r <= 13.82`, and the bake measured the neighbour at
+13.8 m. This is the 1,906 m² brick warehouse sharing the NW party wall, and it is
+14.1 m tall, so a radius that had swallowed it would have left an obvious hole beside
+a 9.5 m asset.
+
+`node pipeline/audit.mjs` check **1.6 PASS** — "no procedural footprint inside a
+bespoke landmark exclusion zone: 59 zones over 58 landmarks clear". The audit's two
+standing failures (1.3c Telegraph Hill terrain 90.5 m vs the surveyed 84 m, from the
+Terrarium DEM; 1.7b one sampled tree 30 m offshore) are pre-existing and unrelated to
+this landmark.
+
+### 10.2 The bake reproduced main exactly
+
+584 of 585 building cells came back byte-identical to `origin/main`. That is unusual
+— the data-vintage note from earlier batches predicted ~520 churned tiles — and it
+happened because `pipeline/data/` was seeded by APFS-cloning the raw download from a
+sibling worktree (`sf-worktrees/550-third`) rather than re-downloading, so the bake
+ran against exactly the vintage `origin/main` was baked from. Raw `pipeline/data/` is
+source data and is safe to clone this way; `pipeline/out/` is not, and was not.
+
+### 10.3 Local QA
+
+Dev server on `localhost:5390` from this worktree, clock pinned to
+`2026-08-01T13:00` and `22:00` America/Los_Angeles.
+
+| Item | Result |
+|---|---|
+| Loader merge line | **PASS** — `sf-assets: 590-third merged 14 objects / 11 materials -> batched (2962 tris body); uniform x1.0000 at 3768, -1115` |
+| Scale factor | **PASS** — x1.0000 |
+| Placed at the anchor | **PASS** — (3768, −1115) is the projected anchor to the metre |
+| Exactly one building on the site | **PASS** — no procedural twin, no baked block poking through, no z-fighting |
+| Footprint size vs neighbours | **PASS** — reads as a 21 × 23 m corner block against 599 Third across 3rd Street |
+| Orientation | **PASS** — the black shopfront band faces 3rd Street and Brannan Street; the raised parapet sits over the real corner |
+| Terrain seating | **PASS** — flush, no floating or sinking (LiDAR ground range over the footprint is 0.52 m) |
+| Night | **PASS** — the shopfront ribbon glows around the corner, two upper windows warm, the café panel blue; walls, roof and parapets stay dark |
+| Draw calls | **PASS** — 91 day / 96 night at street level on the corner (budget < 300) |
+| Lint + build | **PASS** — `eslint src` clean, `vite build` clean |
+
+One caveat on how the QA was driven: the Browser pane throttles `requestAnimationFrame`
+when hidden, so `SF.assets.update()` and `SF.renderer.render()` were pumped by hand
+between screenshots. That is a harness artifact, not an app behaviour — the same
+counters and console lines are what the app produces on its own.
+
+A `GL_INVALID_OPERATION: glDrawArraysInstanced: Vertex buffer is not big enough`
+warning appears repeatedly in this environment. It fires **before** this landmark
+loads (first seen right after `555-california`), so it is not caused by this change;
+it is noted here rather than chased.
+
+### 10.4 Fallback drill (mandatory)
+
+`app/public/sf-assets/landmarks/590-third.glb` renamed to `.bak`, page reloaded:
+
+- the app **boots** and the whole city renders (hero view, then the 3rd/Brannan
+  corner) — **PASS**
+- **exactly one** warning, and it is this landmark's:
+  `sf-assets: 590-third failed to load (Unexpected token '<', "<!doctype "... is not valid JSON)`
+  — **PASS**. Note the *shape* of it: Vite answers a missing public file with
+  `index.html` at **200**, so the drill surfaces as a glTF parse failure, never as a
+  404. Checked directly:
+  `curl -w '%{http_code} %{content_type}'` on the missing GLB returns
+  `200 text/html`.
+- every other landmark still placed (45 of 46, `599Third` included) — **PASS**
+- Case B: the site is **empty ground** inside the exclusion zone, as expected for a
+  new landmark whose baked footprint has been carved out — **PASS**
+- file restored and byte-compared against `artifacts/590-third/590-third.glb`:
+  identical.
+
+### 10.5 Batch hand-off
+
+Gate 5 deliverable is this source-only branch plus the evidence above. Not pushed,
+no PR, not deployed — awaiting the user's ship decision, and the city bake belongs to
+`BATCH-INTEGRATE.md`.
