@@ -7,7 +7,14 @@ adds no new rules of its own; it sequences the authoritative ones and defines
 the gates between them.
 
 **Invocation:** give the agent this file plus one line:
-`BUILDING: <address or colloquial name>`. Optional: `STOP_AFTER: <stage>`.
+`BUILDING: <address or colloquial name>`. Optional: `STOP_AFTER: <stage>` and
+`BATCH: yes`.
+
+`BATCH: yes` means other landmarks are being built alongside this one, and
+changes stage 5 only: the session ends at a source-only branch and the city is
+baked once for the whole batch afterwards (see "Batch mode" in stage 5). Say it
+whenever you are working through a list — leaving it off is what makes two
+landmark branches unmergeable.
 
 **Session ground rules (read before stage 0):**
 
