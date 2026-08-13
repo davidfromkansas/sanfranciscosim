@@ -16,12 +16,14 @@ via `docs/asset-pipeline/ADDRESS-TO-ASSET.md`. Research behind every number is i
 | Anchor (WGS84) | `-122.3945219, 37.7809000` — the footprint's **area centroid** |
 | Target height | **12.60 m** (crowning cornice) |
 | Dimensions | 19.257 × 18.497 × 12.600 m |
-| Triangles | **5,816** (cap 8,000) |
-| Objects | 100 |
+| Triangles | **5,808** (cap 8,000) — 5,816 as built, −8 from the optimize pass |
+| Objects | 11 (100 as built; joined per material in stage 4) |
 | Materials | 12, all `Toy_*`, flat, no textures, no alpha |
 | Glow groups | 2 (`Toy_glass_Glow`, `Toy_trim_Glow`) |
 | min Z | 0.000 |
-| Validation | **PASS** — all 16 checks, see `validation.json` |
+| Validation | **PASS** — all 16 checks on the shipped file, see `validation.json` |
+| File size | 155,596 B raw (360,248 B as built, −56.8%) — meshopt-compressed |
+| Optimize pass | stage 4 complete, all 8 gates PASS — see [`optimize/REPORT.md`](./optimize/REPORT.md) |
 
 Reproduce with:
 
@@ -95,6 +97,10 @@ check carries a 2 m budget for this reason instead of the usual 1 m
    Kerbs and hatch stay `Toy_roofd` so they read as objects on a pale deck.
 3. **Validation** — all-PASS on the re-imported GLB, first run, no conform pass
    needed.
+4. **Stage 4 optimize** — 100 objects joined to 11, 11,804 verts welded to 3,104,
+   meshopt-packed. 360,248 → 155,596 B (−56.8%). Worst A/B pixel delta 0.050%
+   against a 2%/4% budget. The shipped GLB re-passes all 16 stage-2 contract
+   checks. Details in `optimize/REPORT.md`.
 
 ## 7. Night state
 
@@ -127,7 +133,7 @@ studio). Glow shells are thin panels proud of the opaque glazing, as the app's
     18.497,
     12.6
   ],
-  "tris": 5816,
+  "tris": 5808,
   "loadRadius": 2500
 }
 ```
