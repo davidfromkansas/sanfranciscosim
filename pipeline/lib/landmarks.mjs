@@ -482,6 +482,7 @@ export const LANDMARKS = [
     exclude: 24,
     camera: { distance: 300, yaw: 35, pitch: 22 },
   },
+  {
     // Letterman Hospital ward, 1930s, now part of the Thoreau Center. DataSF
     // stores the WHOLE campus — twelve surviving buildings — as ONE 159x147 m
     // comb-shaped footprint, so there is no radius that clears 1008 alone: its
@@ -509,6 +510,7 @@ export const LANDMARKS = [
     clearTrees: true,
     camera: { distance: 200, yaw: 150, pitch: 28 },
   },
+  {
     // Civic Center is the tightest site in the registry, so this radius is
     // measured, not guessed. excluded() drops a footprint when ANY vertex
     // falls inside, and around this anchor the vertex distances are:
