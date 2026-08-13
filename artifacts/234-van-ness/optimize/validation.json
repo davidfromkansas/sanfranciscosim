@@ -1,0 +1,119 @@
+{
+ "input": {
+  "tris": 11656,
+  "verts": 23280,
+  "objects": 790,
+  "primitives": 797,
+  "materials": [
+   "Toy_coral",
+   "Toy_cream",
+   "Toy_glass",
+   "Toy_glassl",
+   "Toy_glassl_Glow",
+   "Toy_ink",
+   "Toy_ioorange",
+   "Toy_mint",
+   "Toy_mustard",
+   "Toy_roofd",
+   "Toy_rust",
+   "Toy_sand",
+   "Toy_sky",
+   "Toy_steel",
+   "Toy_stone",
+   "Toy_trim",
+   "Toy_trim_Glow",
+   "Toy_white"
+  ],
+  "bbox_dims": [
+   56.27799,
+   46.42741,
+   30.12
+  ],
+  "bbox_min": [
+   -28.13899,
+   -23.81323,
+   0.0
+  ],
+  "center_xy": [
+   0.0,
+   -0.59953
+  ]
+ },
+ "output": {
+  "tris": 11656,
+  "verts": 22308,
+  "objects": 20,
+  "primitives": 22,
+  "materials": [
+   "Toy_coral",
+   "Toy_cream",
+   "Toy_glass",
+   "Toy_glassl",
+   "Toy_glassl_Glow",
+   "Toy_ink",
+   "Toy_ioorange",
+   "Toy_mint",
+   "Toy_mustard",
+   "Toy_roofd",
+   "Toy_rust",
+   "Toy_sand",
+   "Toy_sky",
+   "Toy_steel",
+   "Toy_stone",
+   "Toy_trim",
+   "Toy_trim_Glow",
+   "Toy_white"
+  ],
+  "bbox_dims": [
+   56.27799,
+   46.42741,
+   30.12
+  ],
+  "bbox_min": [
+   -28.13899,
+   -23.81323,
+   0.0
+  ],
+  "center_xy": [
+   0.0,
+   -0.59953
+  ]
+ },
+ "output_signed_volumes": {
+  "corner_bay": 454.968389,
+  "gallery_screen": 11.437595,
+  "grp_Toy_coral": 31.215788,
+  "grp_Toy_cream": 70.66234,
+  "grp_Toy_glass": 95.522166,
+  "grp_Toy_glassl": 40.127456,
+  "grp_Toy_glassl_Glow": 2.418112,
+  "grp_Toy_ink": 141.08631,
+  "grp_Toy_mint": 119.545388,
+  "grp_Toy_mustard": 36.52041,
+  "grp_Toy_roofd": 77.437947,
+  "grp_Toy_rust": 68.718958,
+  "grp_Toy_sand": 16.259592,
+  "grp_Toy_sky": 36.240121,
+  "grp_Toy_steel": 48.466855,
+  "grp_Toy_stone": 4833.406248,
+  "grp_Toy_stone_Toy_white": 21947.237347,
+  "grp_Toy_trim": 130.499996,
+  "grp_Toy_trim_Glow": 21.174937,
+  "grp_Toy_white": 153.032979
+ },
+ "inverted_solids": [],
+ "ray_test_output": {
+  "rays": 22500,
+  "hits": 17919,
+  "flipped": 0,
+  "flipped_fraction": 0.0
+ },
+ "gates": {
+  "G1_materials_identical": true,
+  "G2_bbox_ok": true,
+  "G2_origin_ok": true,
+  "G2_volumes_positive": true,
+  "G2_ray_flip_ok": true,
+  "G5_primitives_ok": true
+ }
+}

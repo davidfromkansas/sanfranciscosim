@@ -9,8 +9,10 @@ against the plan in `docs/asset-plans/234-van-ness.md`.
 
 | | |
 |---|---|
-| File | `234-van-ness.glb` |
-| Objects / triangles | 790 / **11,656** (cap 24,000) |
+| File | `234-van-ness.glb` — **the stage-4 optimized build is the shipping file** |
+| File size | **306,900 bytes** raw (pre-optimize 985,244; −68.9 %), well inside the 500 KB budget |
+| Objects / triangles | **20** / **11,656** (cap 24,000) — 790 authored objects joined per material in stage 4 |
+| Draw primitives | **22** (pre-optimize 797) |
 | Dimensions (m) | **56.278 × 46.427 × 30.120** |
 | min Z | 0.0000 |
 | XY centre offset | (0.0000, −0.5995) — within the 1.0 m tolerance |
@@ -19,14 +21,21 @@ against the plan in `docs/asset-plans/234-van-ness.md`.
 | Image textures / transparency | none / none |
 | Cameras / lights / animation / armatures / constraints | 0 / 0 / 0 / 0 / 0 |
 | Degenerate triangles | 0 |
-| Inverted objects (signed volume) | 0 of 790 |
-| Normal ray residual | **0.0000 %** (31,500 rays from 9 interior targets) |
+| Inverted objects (signed volume) | 0 of 20 |
+| Normal ray residual | **0.0035 %** (31,500 rays from 9 interior targets; tolerance 0.15 %) |
 | Anchor | `−122.4193071, 37.7780541` |
 | Front heading | 261.8° true — Van Ness Avenue, facing west |
 | Target height | **30.120 m**, so `targetHeightM / measuredHeight` = 1.000 |
 
-`validation.json` carries the full machine-readable report; every entry in its
-`checks` block is `true` and `overall` is `PASS`.
+`validation.json` carries the full machine-readable report, **re-run against the
+shipped optimized GLB**; every entry in its `checks` block is `true` and
+`overall` is `PASS`. The stage-4 pass is written up separately in
+`optimize/REPORT.md`; the pre-optimize build is archived byte-for-byte at
+`optimize/input/234-van-ness.glb`.
+
+The numbers below were the same before optimization except where noted — stage 4
+changed bytes and object count, not geometry: triangles, bbox, origin and the
+material set are bit-identical either side of it.
 
 ## 2. Dossier verification — the plan held
 
