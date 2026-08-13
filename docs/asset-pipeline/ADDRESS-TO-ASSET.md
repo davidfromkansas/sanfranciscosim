@@ -150,6 +150,37 @@ Two pipeline-specific amendments:
 
 **Gate 5:** local QA PASS table + the user's ship decision.
 
+### Batch mode — when other landmarks are in flight
+
+**Default to this whenever more than one landmark is being built.** A Case B
+re-bake rewrites ~600 generated files under `app/public/tiles/` and `api/_data/`
+whatever the landmark was, so two branches that each commit one collide even
+when their buildings are on opposite sides of the city. Five such branches were
+mutually unmergeable in August 2026 for exactly this reason (PRs #107-#112,
+resolved by hand into #113).
+
+Stage 5 runs the same way, with one change at the end:
+
+- **Still run the bake**, and still do the full Step 5/6 QA on it. A Case B
+  landmark cannot be judged without its exclusion applied — the procedural block
+  is often taller than the asset, so an unbaked check shows nothing wrong with a
+  building that is in fact invisible. Debugging one building at a time is the
+  point of keeping sessions separate.
+- **Then throw the bake away** before committing:
+  `git checkout -- app/public/tiles api/_data`
+- **Commit source only:** the GLB, its `landmarks_manifest.json` entry, its
+  `pipeline/lib/landmarks.mjs` entry, the asset plan and `artifacts/<slug>/`.
+  Those are the only files a landmark shares with its siblings, and all three
+  shared ones are append-only lists that merge mechanically.
+
+The gate-5 deliverable becomes a source-only branch plus the QA evidence, rather
+than an integrated tree. The city gets rebuilt once for the whole batch by
+`docs/asset-pipeline/BATCH-INTEGRATE.md`, which is also where the single PR is
+opened.
+
+Sanity check before handing off: `git diff --name-only origin/main` must list
+nothing under `app/public/tiles/` or `api/_data/`.
+
 ## Final report
 
 One table, one row per stage: PASS/FAIL, artifact paths, commits. Then the

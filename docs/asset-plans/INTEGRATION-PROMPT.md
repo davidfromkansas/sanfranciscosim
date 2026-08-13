@@ -162,9 +162,17 @@ building on that footprint, so the GLB will intersect it. You must also:
    "every building has a pick box and an identity" check against a stale join.
    `context` also rewrites `api/_data/`.
    Commit the regenerated files under `app/public/tiles/` and `api/_data/` that
-   actually changed.
+   actually changed — **unless this landmark is part of a batch**, in which case
+   run the bake for the Step 5/6 QA and then discard it
+   (`git checkout -- app/public/tiles api/_data`), committing source only. A
+   bake rewrites ~600 generated files regardless of which landmark triggered it,
+   so two landmark branches that each commit one cannot be merged. The batch is
+   baked once by `docs/asset-pipeline/BATCH-INTEGRATE.md`. If you do not know
+   whether other landmarks are in flight, assume they are.
 3. Confirm with `node pipeline/audit.mjs` that check 1.6 (no procedural footprint
-   inside a bespoke landmark exclusion zone) passes.
+   inside a bespoke landmark exclusion zone) passes, and with
+   `node pipeline/verify-rebake.mjs` that only your landmark's cell changed and
+   that nothing is left standing inside its exclusion radius.
 
 Never hand-edit anything under `app/public/tiles/` — it is generated.
 
