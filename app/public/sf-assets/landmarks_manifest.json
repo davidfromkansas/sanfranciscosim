@@ -609,5 +609,24 @@
     ],
     "tris": 17648,
     "loadRadius": 2500
+  },
+  {
+    "id": "1008-general-kennedy",
+    "file": "1008-general-kennedy.glb",
+    "anchor": [
+      -122.4514809,
+      37.8007878
+    ],
+    "targetHeightM": 11.9,
+    "cat": 3,
+    "name": "1008 General Kennedy Avenue",
+    "estimated": true,
+    "dims": [
+      55.131,
+      35.473,
+      11.9
+    ],
+    "tris": 5688,
+    "loadRadius": 2500
   }
 ]

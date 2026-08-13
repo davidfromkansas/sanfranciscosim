@@ -482,6 +482,33 @@ export const LANDMARKS = [
     exclude: 24,
     camera: { distance: 300, yaw: 35, pitch: 22 },
   },
+    // Letterman Hospital ward, 1930s, now part of the Thoreau Center. DataSF
+    // stores the WHOLE campus — twelve surviving buildings — as ONE 159x147 m
+    // comb-shaped footprint, so there is no radius that clears 1008 alone: its
+    // nearest vertex is 4.70 m from the anchor while the ring's centroid is
+    // 41.2 m away. Dropping that one footprint therefore removes the whole
+    // campus, which is the deliberate, approved trade (David, 12 Aug 2026) —
+    // the alternative was leaving this asset buried inside a 16.5 m procedural
+    // mass. The next separate footprint is 51.52 m out, so anything from ~5 to
+    // ~51 m does the same job. 34 m is chosen because `exclude` is reused as the
+    // radius for BOTH the tree-clear circle below and the runtime street-furniture
+    // exclusion, and the model's own half-diagonal is 32.8 m (55.13 x 35.47) — a
+    // radius under that leaves trees and lamps standing inside the building. 34 m
+    // covers the shell with margin and is still 17 m clear of the neighbours.
+    //
+    // Note this sits inside `letterman`'s 185 m zone, which is fine: exclusion
+    // circles union, and that asset's grounds stop short of this ward.
+    id: '1008GeneralKennedy',
+    name: '1008 General Kennedy Avenue',
+    lon: -122.4514809,
+    lat: 37.8007878,
+    height: 11.9,
+    exclude: 34,
+    // Parkland site: without this the Presidio canopy scatters straight through
+    // the ward, because dropping the campus footprint also removed its tree veto.
+    clearTrees: true,
+    camera: { distance: 200, yaw: 150, pitch: 28 },
+  },
 ];
 
 // Parks/green spaces the landcover bake must match at least one source polygon

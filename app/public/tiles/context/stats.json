@@ -1,6 +1,6 @@
 {
- "generated": "2026-08-13T00:39:04.829Z",
- "buildings": 174769,
+ "generated": "2026-08-13T00:44:01.229Z",
+ "buildings": 174763,
  "cells": 596,
  "categories": [
   {
@@ -21,21 +21,21 @@
    "cat": 2,
    "id": "apartments",
    "label": "Apartments",
-   "count": 14021,
+   "count": 14017,
    "night": 0
   },
   {
    "cat": 3,
    "id": "office",
    "label": "Office",
-   "count": 2757,
+   "count": 2758,
    "night": 3
   },
   {
    "cat": 4,
    "id": "retail",
    "label": "Retail",
-   "count": 8043,
+   "count": 8042,
    "night": 1
   },
   {
@@ -91,7 +91,7 @@
    "cat": 12,
    "id": "clinic",
    "label": "Clinic",
-   "count": 1388,
+   "count": 1387,
    "night": 2
   },
   {
@@ -133,7 +133,7 @@
    "cat": 18,
    "id": "government",
    "label": "Government",
-   "count": 431,
+   "count": 430,
    "night": 2
   },
   {
@@ -200,7 +200,7 @@
   {
    "sub": "office",
    "label": "Office",
-   "count": 1889
+   "count": 1890
   },
   {
    "sub": "restaurant",
@@ -220,7 +220,7 @@
   {
    "sub": "clinic",
    "label": "Clinic",
-   "count": 961
+   "count": 960
   },
   {
    "sub": "house",
@@ -325,7 +325,7 @@
   {
    "sub": "bank",
    "label": "Bank",
-   "count": 187
+   "count": 186
   },
   {
    "sub": "taqueria",
@@ -578,14 +578,14 @@
    "count": 15
   },
   {
-   "sub": "consulate",
-   "label": "Consulate",
-   "count": 15
-  },
-  {
    "sub": "synagogue",
    "label": "Synagogue",
    "count": 15
+  },
+  {
+   "sub": "consulate",
+   "label": "Consulate",
+   "count": 14
   },
   {
    "sub": "dormitory",
@@ -654,18 +654,18 @@
   }
  ],
  "sources": {
-  "landuse": 140697,
+  "landuse": 140693,
   "business": 10214,
   "heuristic": 7280,
-  "osm": 8626,
+  "osm": 8625,
   "overture": 6663,
-  "datasf": 1289
+  "datasf": 1288
  },
  "confidence": [
-  147977,
-  15334,
+  147973,
+  15333,
   4498,
-  6960
+  6959
  ],
  "streets": {
   "named": 2509,
