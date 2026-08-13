@@ -72,16 +72,16 @@ must be replaced with observed fact before you build anything.
 
 What you must still settle from imagery, in priority order:
 
-1. **Barrel vault or low gable?** The roof is a ridged standing-seam metal roof — that much
-   is observed. Whether its section is a shallow segmental arc or a straight-pitched gable
-   was not resolvable at the available resolution, and it changes the silhouette from every
-   angle. The unit listings' "arched hardwood high ceilings" argue for the arc.
-2. **Where the eave line actually sits.** 2.1 derives ~11.8 m from the LiDAR height
+1. **Where the eave line actually sits.** 2.1 derives ~11.8 m from the LiDAR height
    distribution rather than measuring it, and the storey reading in 2.4 depends on it.
-3. **The facade** — material, colour, window rhythm, bay count, whether there is a
+2. **The facade** — material, colour, window rhythm, bay count, whether there is a
    signature accent. Nothing here is observed.
-4. **The lower element at the Varney end** (2.15), which the aerial hints at but does not
+3. **The lower element at the Varney end** (2.15), which the aerial hints at but does not
    confirm.
+
+The roof's section is no longer on this list: 2.15 settles it as a straight gable from the
+LiDAR height distribution. Confirm it if a photograph turns up, but do not reopen it
+without one.
 
 Record what you found and how in `REFERENCE.md` and `REPORT.md`.
 
@@ -608,13 +608,18 @@ camera distance while costing most of the flanks' budget.
 
 ### 2.15 Open questions and risks
 
-- **Barrel or low gable? Unresolved, and it is the biggest remaining risk.** The roof is
-  ridged and metal — that is observed. Its *section* was not resolvable at the imagery
-  resolution available. The unit listings' "arched hardwood high ceilings" point to a
-  shallow segmental barrel; the aerial's crisp ridge line and the visible hip at the NW end
-  read more like a low gable. A 34° straight pitch and a 4.7 m-rise arc over the same
-  13.85 m span are noticeably different silhouettes from the app's three-quarter camera.
-  Settle it at higher resolution or from a street-level view before modelling.
+- **Barrel or low gable? Resolved: gable.** Settled during stage 2 from the LiDAR
+  height distribution rather than from imagery, and worth recording because the
+  method generalises. A roof's height distribution over its footprint has a shape
+  set by its section, so the gap between the median height and the maximum
+  identifies the section: a straight gable puts the median at half the rise, a
+  parabolic arc at 0.75 of it, a circular barrel at 0.866. Working backwards from
+  the measured median (14.18 m) and ridge (16.54 m), the implied eave is 11.82 m
+  for a gable, 7.10 m for a parabola and −1.07 m for a circle. A curved roof
+  drags the median toward the crown, so only the straight slope closes on a
+  possible eave for a four-storey building. The listings' "arched hardwood high
+  ceilings" is an interior ceiling hung inside that roof, not the roof's section
+  — both facts hold at once.
 - **The eave line is derived, not measured.** ~11.8 m comes from treating the LiDAR height
   distribution as uniform between eave and ridge (2 × 14.18 − 16.54). That is a sound model
   for a symmetric ridged roof and it is corroborated by the modal 14.28 m, but it is
