@@ -1,7 +1,7 @@
 # 592 Third Street — SF-SIM asset plan
 
 A 1905 two-storey industrial loft holding the **west corner of 3rd and Brannan**,
-one lot deep and filling it completely: a 24 m × 23 m near-square on the 45° SoMa
+one lot deep and filling it completely: a 22 m × 23 m near-square on the 45° SoMa
 grid with two full street elevations and two party walls. Today it is a pale
 warm-grey stucco box over a continuous **near-black shopfront band** that turns
 the corner unbroken — flat black awnings, big plate-glass bays, Kinoko Real
@@ -25,9 +25,9 @@ task prompt, Part 2 is the research and design dossier behind it.
 |---|---|
 | Manifest id | `592-third` |
 | Existing procedural builder | none — new landmark (needs a `pipeline/lib/landmarks.mjs` entry and a re-bake, see 2.13) |
-| WGS84 anchor | `-122.3946805, 37.7800981` (footprint AABB centre, measured) |
+| WGS84 anchor | `-122.3946805, 37.7800910` (footprint AABB centre, measured) |
 | Target height | **8.2 m** to the parapet crest (*estimated*); roof deck 7.8 m (LiDAR-measured) |
-| Footprint | 23.90 m (3rd Street, NE) × 23.07 m (Brannan, SE), 489 m²; a near-square quadrilateral, measured |
+| Footprint | 21.67 m (3rd Street, NE) × 23.07 m (Brannan, SE), 488.7 m²; a near-square quadrilateral, measured — see the spike note in 2.3 |
 | Triangle cap | 9,000 |
 | Category | `3` (commercial / office) |
 
@@ -78,7 +78,7 @@ and do not copy visual instructions from unrelated prompts.
 ## Must capture
 
 - The **corner condition**: two designed street elevations of almost equal
-  length (23.9 m on 3rd, 23.1 m on Brannan) meeting at a sharp 90° east corner.
+  length (21.7 m on 3rd, 23.1 m on Brannan) meeting at a sharp 90° east corner.
   Both get full treatment; neither is a blind wall.
 - The **continuous near-black shopfront band** that wraps the corner without a
   break — flat black awnings, large plate-glass bays, a dark recessed entry
@@ -247,8 +247,8 @@ per-material contract compliance. Render at least one review image from the
 re-imported asset. Write `artifacts/592-third/validation.json` and
 `artifacts/592-third/REPORT.md`.
 
-Note that the axis-aligned XY bounding box will be roughly **31.0 × 33.2 m** even
-though the building is 23.9 × 23.1 m — that is the expected consequence of a ~45°
+Note that the axis-aligned XY bounding box will be roughly **31.0 × 31.6 m** even
+though the building is 21.7 × 23.1 m — that is the expected consequence of a ~45°
 real-world heading, not a scale error.
 
 ## Manifest draft
@@ -262,7 +262,7 @@ draft entry in `REPORT.md`. Do not edit the production manifest in this task.
   "file": "592-third.glb",
   "anchor": [
     -122.3946805,
-    37.7800981
+    37.780091
   ],
   "targetHeightM": 8.2,
   "cat": 3,
@@ -296,7 +296,7 @@ must re-verify anything it relies on.
 | Construction | **Wood frame (Type V)** | SF building permits 2011–2015, `existing_construction_type_description = "wood frame (5)"` |
 | Block / lot | 3776 / 114 | SF Assessor; DataSF footprint `mblr = SF3776114`; parcel `blklot 3776114` |
 | Parcel address of record | **590 3rd St** | DataSF parcels `acdm-wktn` — 588 / 590 / 592 3rd and 400 / 406 / 410 / 414 Brannan are all tenant addresses on this one lot (see 2.15) |
-| Footprint | 489 m²; 23.90 m (3rd St, NE) × 23.07 m (Brannan, SE) × 20.38 m (SW) × 23.67 m (NW) | DataSF LiDAR building footprint, reprojected — **measured** |
+| Footprint | 488.7 m²; 21.67 m (3rd St, NE) × 23.07 m (Brannan, SE) × 20.38 m (SW) × 23.44 m (NW), after de-spiking the published ring (2.3) | DataSF LiDAR building footprint, reprojected — **measured** |
 | Lot area | 5,318 sq ft (494 m²) | SF Assessor — the building covers the lot to within 1 % |
 | OSM footprint (cross-check) | 478 m², shifted several metres north on the 3rd St edge | OSM way/124903637, `source=Bing`; see 2.15 |
 | Roof deck height | **7.82 m** above ground | DataSF LiDAR `hgt_majoritycm` 782, `hgt_median_m` 7.77, `hgt_meancm` 769, std 0.64 m — **measured** |
@@ -305,7 +305,7 @@ must re-verify anything it relies on.
 | OSM `height` tag | `8` | OSM way/124903637 — agrees with the LiDAR roof deck, i.e. it describes the deck, not the crest |
 | Ground elevation | 6.94 m (NAVD88) `gnd_min_m`, mean 7.25 m, range 0.52 m — effectively flat | DataSF LiDAR — the app's terrain handles this, not the asset |
 | Zoning | **CMUO** (Central SoMa Mixed Use Office); assessor class Industrial, historic zoning SLI | DataSF parcels + Assessor |
-| Frontage headings | 3rd Street front faces **45.1° (NE)**; Brannan front faces **135.2° (SE)**; SW party wall 224.2°; NW party wall 315.8° | measured from the DataSF footprint polygon |
+| Frontage headings | 3rd Street front faces **45.1° (NE)**; Brannan front faces **135.2° (SE)**; SW party wall 224.2°; NW party wall 312.0° | measured from the DataSF footprint polygon |
 | Current occupants | Kinoko Real Estate (592, 3rd St), Cafe Buenos Aires (590, 3rd St), a disused dry cleaner (588), Buhler Commercial Construction (400 Brannan), Divine Yoga Studio (406 Brannan), J Body Works (410 Brannan) | OSM POI nodes, all `check_date=2026-04-26`; Google Maps listings; 2025 Street View signage |
 | Neighbour heights (LiDAR mode) | NW party wall neighbour `SF3776008` **11.03 m**; Brannan block face SW `SF3776011` **9.77 / 13.76 / 11.13 m**; 599 Third across 3rd `SF3775140` **15.70 m** (18.34 m crest); across Brannan `SF3787001/2` 8.49 / 4.96 m | DataSF LiDAR — 592 is the **lowest** thing on its own block |
 
@@ -334,38 +334,51 @@ north-east is 599 Third (already a manifest landmark); the Shell station at 551
 Third and 550 Third are the next two along 3rd to the north-west.
 
 Measured footprint polygon, in Blender coordinates (metres, `+X` east, `+Y`
-north), clockwise from the north corner, already centred on the anchor
-`-122.3946805, 37.7800981`:
+north), **counter-clockwise** from the north corner, already centred on the
+anchor `-122.3946805, 37.7800910`:
 
 ```
-n (-1.373,  16.603)   north corner — 3rd St / NW party wall
-e (15.487,   0.332)   east corner  — 3rd St / Brannan, the hero corner
-s (-0.871, -16.603)   south corner — Brannan / SW party wall
-w (-15.487,  2.399)   west corner  — the two party walls meet
+n (  0.195,  15.815)   north corner — 3rd St / NW party wall
+w (-15.485,  -1.605)   west corner  — the two party walls meet
+s ( -0.875, -15.815)   south corner — Brannan / SW party wall
+e ( 15.485,   0.455)   east corner  — 3rd St / Brannan, the hero corner
 ```
 
 | Edge | Length | Outward normal | Elevation |
 |---|---|---|---|
-| n→e | 23.90 m | 45.1° (NE) | **3rd Street front** — 588 / 590 / 592 |
-| e→s | 23.07 m | 135.2° (SE) | **Brannan Street front** — 400 / 406 / 410 / 414 |
-| s→w | 20.38 m | 224.2° (SW) | south-west party wall (414 Brannan block face) |
-| w→n | 23.67 m | 315.8° (NW) | north-west party wall (the 11 m neighbour on 3rd) |
+| n→w | 23.44 m | 312.0° (NW) | north-west party wall (the 11 m neighbour on 3rd) |
+| w→s | 20.38 m | 224.2° (SW) | south-west party wall (414 Brannan block face) |
+| s→e | 23.07 m | 135.2° (SE) | **Brannan Street front** — 400 / 406 / 410 / 414 |
+| e→n | 21.67 m | 45.1° (NE) | **3rd Street front** — 588 / 590 / 592 |
 
-Note that this is **not** a rectangle: the west corner is pulled in, so the NW
-party wall is not parallel to the Brannan front (315.8° vs 135.2°, a 0.6°
-divergence, and the SW edge is 2.7 m shorter than the NE edge). That skew is
-real — it is where the neighbouring lot bites in — and it is worth keeping,
-because a perfect square would read as invented on a block where nothing else is
-square either. Two sub-1.5 m re-entrant steps in the published DataSF ring along
-the NW edge were dropped: the tile bake simplifies rings at a 0.6 m tolerance
-anyway, and both are on a hidden party wall.
+Area 488.7 m², within 0.2 % of the published DataSF ring area of 489.4 m² and
+within 1 % of the assessor's 494 m² lot.
 
-Because of the ~45° heading the axis-aligned bounding box is ~31.0 × 33.2 m.
+**The published DataSF ring has a zero-width spike and it moves the north
+corner.** `SF3776114` is published with 13 vertices. Its last vertex before
+closing, `(-122.3946783, 37.7802340)`, lies **on** the 3rd Street frontage line
+to within 9 mm, 2.23 m short of the ring's first vertex — so the first vertex is
+a degenerate spike of zero width projecting north-west past the real corner, not
+a corner. Taking the ring at face value gives a 3rd Street frontage of 23.90 m;
+the real wall is **21.67 m**. Anything built on the naive reading is 2.2 m too
+long on its most visible elevation and has its anchor 0.7 m out of place.
+Everything in this plan uses the de-spiked quadrilateral above. The remaining
+seven intermediate vertices along the NW party wall deviate from the straight
+n→w chord by at most **0.55 m** — under the 0.6 m tolerance the tile bake
+simplifies at — and are dropped as raster-edge noise on a wall nobody can see.
+
+Note also that this is **not** a rectangle: the NW party wall runs 312.0° where
+the Brannan front runs 135.2°, a 3.2° divergence, and the SW edge is 1.3 m
+shorter than the NE edge. That skew is real — it is where the neighbouring lot
+bites in — and it is worth keeping, because a perfect square would read as
+invented on a block where nothing else is square either.
+
+Because of the ~45° heading the axis-aligned bounding box is ~30.97 × 31.63 m.
 That is correct.
 
 ### 2.4 What each side shows
 
-**North-east (3rd Street front, 23.9 m)** — Two storeys, read as two horizontal
+**North-east (3rd Street front, 21.7 m)** — Two storeys, read as two horizontal
 bands. The lower band is a continuous **near-black shopfront** running the full
 frontage: flat black awnings, one per bay, with white sans-serif tenant lettering
 on them; below each awning a large plate-glass window with a low dark bulkhead
@@ -423,7 +436,7 @@ the 3rd Street parapet.
 
 **Preserve**
 
-- The 23.90 × 23.07 m footprint with its pulled-in west corner, and the real 45°
+- The 21.67 × 23.07 m footprint with its pulled-in west corner, and the real 45°
   heading, exactly
 - The two-band composition, identical on both street faces, turning the corner
   unbroken
@@ -558,7 +571,7 @@ glazing and openings ~1.8k, upper windows ~1.5k, condensers and garage door
   "file": "592-third.glb",
   "anchor": [
     -122.3946805,
-    37.7800981
+    37.780091
   ],
   "targetHeightM": 8.2,
   "cat": 3,
@@ -626,7 +639,7 @@ published or directly measured figure (2.1, 2.15).
 - [ ] Fresh-scene re-import of the exported GLB (never validate the authoring scene)
 - [ ] `min Z` within 0.5 m of 0, XY center offset within ~1 m
 - [ ] Bounding-box top exactly 8.2 m (loader scale lands at 1.0)
-- [ ] Dimensions plausible in meters and consistent with 2.1 (XY bbox ~31.0 × 33.2 m is expected)
+- [ ] Dimensions plausible in meters and consistent with 2.1 (XY bbox ~31.0 × 31.6 m is expected)
 - [ ] Triangles at or under 9,000
 - [ ] Materials all `Toy_*`, flat, no textures, no alpha, no `Toy_body`
 - [ ] `_Glow` only on the shopfront bays and the two corner skylights; glow shells proud of opaque glazing
@@ -660,7 +673,9 @@ published or directly measured figure (2.1, 2.15).
 - **The OSM footprint is wrong enough to matter.** Way/124903637 is a
   `source=Bing` trace: 478 m² against the DataSF LiDAR footprint's 489 m² and
   the assessor's 494 m² lot, and its 3rd Street edge is displaced several metres
-  north of the surveyed line. On the block-face lesson the plans README already
+  north of the surveyed line. Separately, the DataSF ring itself carries a
+  zero-width spike at the north corner that inflates the 3rd Street frontage by
+  2.2 m if taken literally — see 2.3. On the block-face lesson the plans README already
   records (358 Brannan, 165 South Park), **the DataSF polygon is the survey and
   OSM is the cross-check.** Build on 2.3.
 - **The address is ambiguous and the parcel disagrees with the request.** The
