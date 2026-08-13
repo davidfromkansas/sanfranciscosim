@@ -27,6 +27,11 @@ plans reference the landmark plans here (de Young, Cal Academy, Conservatory,
 Painted Ladies, Mission Dolores Basilica, Palace of Fine Arts) rather than
 duplicating them.
 
+[**civic-center-plaza.md**](./civic-center-plaza.md) is the exception to that rule:
+a designed hardscape with a fixed surveyed layout and no natural component, planned
+as a single landmark GLB on the same argument that made the Palace of Fine Arts
+grounds a landmark. See its §2.15 risk 5.
+
 [**flora-kit.md**](./flora-kit.md) is the one plan here that is not a landmark:
 an authored Blender kit of tree species and landscape props to replace the single
 procedural lollipop that all 289,741 of the city's baked trees currently share.
@@ -73,8 +78,9 @@ route, and the park plans depend on it (§E8 of the parks README).
 | [Louise M. Davies Symphony Hall](./davies-symphony-hall.md) | `davies-symphony-hall` | 35 m | new landmark |
 | [101 Grove Street (Public Health Building)](./101-grove.md) | `101-grove` | 21.4 m | new landmark |
 | [Asian Art Museum (Old Main Library)](./asian-art-museum.md) | `asian-art-museum` | 28.1 m | new landmark |
+| [Civic Center Plaza](./civic-center-plaza.md) | `civic-center-plaza` | 30.48 m (flagpole crest) | new landmark |
 
-## Shared contract (all 36)
+## Shared contract (all 37)
 
 - Style: `docs/styles/miniature-toy.md` (authoritative for artistic decisions)
 - Technical contract: `.agents/skills/sf-asset-check/SKILL.md` (authoritative for the GLB)
