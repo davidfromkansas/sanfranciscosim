@@ -193,6 +193,21 @@ export const LANDMARKS = [
     exclude: 62,
     camera: { distance: 700, yaw: 90, pitch: 18 },
   },
+  // Fills its own Civic Center block with no attached neighbours, so a plain
+  // radius works. Half the 122.6 m envelope is 61 m, but the block's south edge
+  // is only ~40 m from this anchor and Hayes Street is ~20 m wide — 62 m would
+  // reach real buildings on the far side. 55 m clears the Davies footprint (its
+  // centroid sits ~5 m from the anchor) and leaves the Hayes and Grove
+  // frontages alone.
+  {
+    id: 'daviesSymphonyHall',
+    name: 'Davies Symphony Hall',
+    lon: -122.4206030,
+    lat: 37.7776227,
+    height: 35,
+    exclude: 55,
+    camera: { distance: 620, yaw: 45, pitch: 18 },
+  },
   {
     // The Veterans Building, the Opera House's twin across the memorial court.
     // Exclusion 58 m covers the 83 x 67 m footprint plus a margin (the Opera

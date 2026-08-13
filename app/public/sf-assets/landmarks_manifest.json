@@ -571,5 +571,24 @@
     ],
     "tris": 9821,
     "loadRadius": 2500
+  },
+  {
+    "id": "davies-symphony-hall",
+    "file": "davies-symphony-hall.glb",
+    "anchor": [
+      -122.420603,
+      37.7776227
+    ],
+    "targetHeightM": 35,
+    "cat": 17,
+    "name": "Davies Symphony Hall",
+    "estimated": false,
+    "dims": [
+      124.747,
+      95.0375,
+      35
+    ],
+    "tris": 9518,
+    "loadRadius": 2500
   }
 ]
