@@ -8,13 +8,13 @@ observations: `REFERENCE.md`.
 **This report beats the plan wherever they disagree.** Six build corrections were
 made and are recorded in §1 and §4.
 
-## 0. Headline (pre-optimize)
+## 0. Headline (shipped, post-optimize)
 
 | | |
 |---|---|
-| Asset | `artifacts/590-third/590-third.glb` |
-| File size | **310,156 bytes** as authored (stage 4 will replace this) |
-| Objects / triangles | **92** / **5,312** (cap 11,000; contract ceiling 27,000) |
+| Asset | `artifacts/590-third/590-third.glb` (post-optimize; pre-optimize original archived at `optimize/input/`) |
+| File size | **143,672 bytes** raw, meshopt-compressed (was 310,156 as authored) |
+| Objects / triangles | **12** / **5,312** (cap 11,000; contract ceiling 27,000) — 92 objects as authored, joined per material by stage 4 |
 | Dimensions (x, y, z) | 31.913 × 31.531 × **9.500** m |
 | min Z / max Z | 0.000 / 9.500 |
 | Loader scale factor | **1.000000** (`targetHeightM` 9.5 ÷ measured 9.5) |
@@ -22,7 +22,8 @@ made and are recorded in §1 and §4.
 | Materials | 11, all `Toy_*`; 3 `_Glow` |
 | Anchor | −122.3946749, 37.7800837 |
 | 3rd Street front normal / Brannan front normal | 45.2° / 135.1° true |
-| Validator | **PASS** — all 15 checks, ray residual 0.000000 |
+| Draw submeshes | **14** (94 as authored) |
+| Validator | **PASS** — all 15 checks on the SHIPPED file, ray residual 0.000000 |
 
 ## 1. Dossier verification and corrections (REPORT beats plan)
 
@@ -235,10 +236,12 @@ input at integration.
 
 | File | Bytes |
 |---|---|
-| `590-third.glb` | 310,156 |
+| `590-third.glb` | 143,672 (shipped, meshopt) |
+| `optimize/input/590-third.glb` | 310,156 (pre-optimize archive) |
 | `590-third.blend` | authoring scene |
 | `build_590_third.py` / `render_590_third.py` / `validate_590_third.py` / `make_contact_sheet.py` | deterministic rig |
 | `590-third-{aerial,top,north,east,south,west,night}.png` | review renders |
 | `590-third-contact-sheet.png` | review sheet |
 | `validation.json` | validation report |
 | `REFERENCE.md` | sources and observations |
+| `optimize/` | stage 4 — scripts, A/B renders, diffs, gate results (`optimize/REPORT.md`) |
