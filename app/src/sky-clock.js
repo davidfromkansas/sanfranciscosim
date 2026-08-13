@@ -228,14 +228,17 @@ export function createSkyClock({ read, readWeather = () => null }) {
     const gust = summary.windSpeed >= 1 ? ` · ${Math.round(summary.windSpeed)} mph ${compass(summary.windDir)}` : '';
     if (windText.textContent !== gust) windText.textContent = gust;
 
-    // The eased value so a debug override moves the chip; the feed's own
-    // reading when nothing has overridden it.
+    // Always shown whenever there is a reading, not only when the air is bad:
+    // a chip that appears once a year is a chip nobody knows exists, and clean
+    // air on a clear day is worth stating. Colour carries the severity.
     const aqi = weather.aqi ?? summary.aqi;
-    aqiChip.hidden = !(Number.isFinite(aqi) && aqi > 100);
+    aqiChip.hidden = !Number.isFinite(aqi);
     if (!aqiChip.hidden) {
       const text = `AQI ${Math.round(aqi)}`;
       if (aqiChip.textContent !== text) aqiChip.textContent = text;
-      aqiChip.dataset.tone = aqi > 150 ? 'coral' : 'mustard';
+      // EPA bands: good / moderate / unhealthy for sensitive groups / worse.
+      aqiChip.dataset.tone = aqi <= 50 ? 'forest' : aqi <= 100 ? 'mustard' : aqi <= 150 ? 'coral' : 'plum';
+      aqiChip.title = aqi <= 50 ? 'Air quality: good' : aqi <= 100 ? 'Air quality: moderate' : aqi <= 150 ? 'Air quality: unhealthy for sensitive groups' : 'Air quality: unhealthy';
     }
   }
 

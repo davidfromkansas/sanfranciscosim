@@ -97,6 +97,10 @@ export function createWeather({ project }) {
   let summary = null;
   let staleSince = 0;
   let override = null;
+  // The last good payload, kept so clearing an override can restore the live
+  // field immediately instead of leaving the scene on the override until the
+  // next poll lands (up to a minute later).
+  let lastPayload = null;
   let nextPollAt = 0;
   let warned = false;
   let grid = null;
@@ -147,6 +151,7 @@ export function createWeather({ project }) {
     scalars.target.windDir = payload.summary?.windDir ?? 270;
     scalars.target.aqi = payload.summary?.aqi ?? 0;
     summary = payload.summary || null;
+    lastPayload = payload;
     staleSince = 0;
     return true;
   }
@@ -291,6 +296,10 @@ export function createWeather({ project }) {
     setOverride(patch) {
       override = patch;
       if (patch === null || patch === undefined) {
+        // Put the real weather back at once. Without this the scene keeps the
+        // override's field until the next successful poll.
+        if (lastPayload) applyPayload(lastPayload);
+        override = null;
         nextPollAt = 0;
         return null;
       }

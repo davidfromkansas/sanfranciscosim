@@ -23,14 +23,21 @@ import { mergeGeometries } from 'three/addons/utils/BufferGeometryUtils.js';
 import { shared } from './env.js';
 
 // Instance caps by quality tier. The clouds are cosmetic: they go first.
-export const CLOUD_CAPS = { ultra: 64, high: 64, medium: 40, low: 24 };
+export const CLOUD_CAPS = { ultra: 160, high: 160, medium: 96, low: 48 };
 
-// Altitude bands, metres. Low cloud is the marine layer's ceiling and the one
-// that matters in San Francisco; the others are scenery.
+// Altitude bands, metres, with `scale` in geometry units — the blob is ~2.73
+// units wide, so a scale of 720 is a cloud about 2 km across.
+//
+// These are sized for COVERAGE, not for instance count. The first cut used
+// ~900 m clouds scattered over an 18 km box, which looked reasonable as a
+// number (39 instances at full overcast) and read as an almost empty sky: it
+// covered 8.7% of it. Real clouds are kilometres wide, and an overcast marine
+// layer has to close over the city, so the low deck is both bigger and packed
+// into a tighter box than the decorative layers above it.
 const LAYERS = [
-  { key: 'low', altitude: 620, scale: 340, spread: 1.0 },
-  { key: 'mid', altitude: 2000, scale: 620, spread: 1.35 },
-  { key: 'high', altitude: 6000, scale: 1500, spread: 1.9 },
+  { key: 'low', altitude: 620, scale: 720, spread: 0.7 },
+  { key: 'mid', altitude: 2000, scale: 1100, spread: 1.2 },
+  { key: 'high', altitude: 6000, scale: 2000, spread: 1.6 },
 ];
 
 // The city, plus margin so clouds exist beyond the visible edge.
@@ -138,6 +145,9 @@ export function createClouds(scene, { sampleAt }) {
     const layer = share < LAYER_MIX[0] ? LAYERS[0] : share < LAYER_MIX[0] + LAYER_MIX[1] ? LAYERS[1] : LAYERS[2];
     slots.push({
       layer,
+      key: layer.key,
+      shown: false,
+      lastSize: 0,
       // Base position, drifted every frame and wrapped at the extent.
       x: (hash(i, 1) - 0.5) * 2 * EXTENT * layer.spread,
       z: (hash(i, 2) - 0.5) * 2 * EXTENT * layer.spread,
@@ -148,9 +158,36 @@ export function createClouds(scene, { sampleAt }) {
   }
 
   let activeCap = cap;
+  // Live tuning knobs. Cloud size and density are pure art calls that can only
+  // be judged against the running scene, so they are adjustable at runtime
+  // rather than only by redeploying: SF.clouds.tune({ size: 1.4 }).
+  const tuning = { size: 1, density: 1 };
 
   function setQuality(key) {
     activeCap = CLOUD_CAPS[key] ?? cap;
+  }
+
+  function tune(patch = {}) {
+    if (Number.isFinite(patch.size)) tuning.size = Math.max(0.1, patch.size);
+    if (Number.isFinite(patch.density)) tuning.density = Math.max(0, Math.min(1.5, patch.density));
+    return { ...tuning };
+  }
+
+  // How much of the sky the current instances actually cover, as a fraction of
+  // the low layer's scatter box. This is the number that matters for "does it
+  // look overcast", and counting instances hides it entirely.
+  function coverage() {
+    geometry.computeBoundingBox();
+    const unit = geometry.boundingBox.max.x - geometry.boundingBox.min.x;
+    let area = 0;
+    for (let i = 0; i < cap; i++) {
+      const slot = slots[i];
+      if (slot.key !== 'low' || !slot.shown) continue;
+      const w = unit * slot.lastSize;
+      area += Math.PI * (w / 2) ** 2;
+    }
+    const box = (2 * EXTENT * LAYERS[0].spread) ** 2;
+    return +(area / box).toFixed(3);
   }
 
   function update(dt) {
@@ -176,9 +213,10 @@ export function createClouds(scene, { sampleAt }) {
       const cover = i < limit ? sampleAt(slot.x, slot.z, key) : 0;
       // Each instance owns a slice of the 0..1 cover range, so raising cover
       // brings clouds in a few at a time instead of all at once.
-      const threshold = hash(i, 6) * 0.9;
+      const threshold = hash(i, 6) * 0.9 * (2 - tuning.density);
       const presence = Math.max(0, Math.min(1, (cover - threshold) * 4));
 
+      slot.shown = presence > 0.01;
       if (presence <= 0.01) {
         // Park it far below the world rather than reallocating the table.
         _matrix.compose(_hidden, _quaternion, _scale.set(0.0001, 0.0001, 0.0001));
@@ -187,7 +225,8 @@ export function createClouds(scene, { sampleAt }) {
       }
 
       drawn++;
-      const size = slot.layer.scale * slot.size * (0.55 + 0.45 * presence);
+      const size = slot.layer.scale * slot.size * (0.55 + 0.45 * presence) * tuning.size;
+      slot.lastSize = size;
       _position.set(slot.x, slot.layer.altitude + slot.lift, slot.z);
       _quaternion.setFromAxisAngle(UP, slot.spin);
       _scale.set(size, size * 0.42, size);
@@ -204,6 +243,8 @@ export function createClouds(scene, { sampleAt }) {
     mesh,
     update,
     setQuality,
+    tune,
+    coverage,
     get material() {
       return material;
     },

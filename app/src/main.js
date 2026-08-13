@@ -602,6 +602,16 @@ async function boot() {
     },
     // Skip the 60 s ease and jump to the incoming field — for screenshots and
     // automated checks, which have no time (or no frame loop) to wait it out.
+    // Dial cloud size and density against the running scene:
+    //   SF.tuneClouds({ size: 1.4, density: 1.2 })  ->  then SF.cloudCoverage()
+    tuneClouds(patch) {
+      return clouds.tune(patch);
+    },
+    // The fraction of sky the low deck actually covers. Counting instances
+    // hides this: 39 clouds sounded fine while covering 8.7% of the sky.
+    cloudCoverage() {
+      return clouds.coverage();
+    },
     settleWeather() {
       weather.settle();
       skyClock.update();
