@@ -533,5 +533,24 @@
     ],
     "tris": 6396,
     "loadRadius": 2500
+  },
+  {
+    "id": "505-van-ness",
+    "file": "505-van-ness.glb",
+    "anchor": [
+      -122.4212915,
+      37.7804835
+    ],
+    "targetHeightM": 27.0,
+    "cat": 18,
+    "name": "505 Van Ness Avenue",
+    "estimated": true,
+    "dims": [
+      124.2265,
+      95.3195,
+      27.0
+    ],
+    "tris": 18774,
+    "loadRadius": 2500
   }
 ]
