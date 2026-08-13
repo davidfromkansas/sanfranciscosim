@@ -90,11 +90,12 @@ export function createClouds(scene, { sampleAt }) {
 
   // Two flat tones split by the world-up normal: cream lit top, cool underside.
   // The same trick the moon uses — no texture, no second light.
-  // Half the opacity the deck first shipped with (0.95). Note that instances
-  // overlap heavily at high cover and do not write depth, so alpha compounds
-  // where clouds stack — an overcast deck still reads solid at its centre while
-  // the edges stay airy.
-  const material = new MeshLambertMaterial({ color: 0xffffff, transparent: true, opacity: 0.475, depthWrite: false });
+  // Tuned down twice from the 0.95 the deck first shipped with: halved, then
+  // another quarter off. Instances overlap heavily at high cover and do not
+  // write depth, so alpha compounds where clouds stack — an overcast deck still
+  // reads solid through its middle while the edges stay airy.
+  const CLOUD_OPACITY = 0.356;
+  const material = new MeshLambertMaterial({ color: 0xffffff, transparent: true, opacity: CLOUD_OPACITY, depthWrite: false });
   const lit = new Color(0xfdf8ef);
   const shade = new Color(0xb9c4d8);
   material.onBeforeCompile = (shader) => {
@@ -165,7 +166,7 @@ export function createClouds(scene, { sampleAt }) {
   // Live tuning knobs. Cloud size and density are pure art calls that can only
   // be judged against the running scene, so they are adjustable at runtime
   // rather than only by redeploying: SF.clouds.tune({ size: 1.4 }).
-  const tuning = { size: 1, density: 1, opacity: 0.475 };
+  const tuning = { size: 1, density: 1, opacity: CLOUD_OPACITY };
 
   function setQuality(key) {
     activeCap = CLOUD_CAPS[key] ?? cap;
