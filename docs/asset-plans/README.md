@@ -80,19 +80,22 @@ route, and the park plans depend on it (§E8 of the parks README).
 | [171 South Park Street](./171-south-park.md) | `171-south-park` | 12.6 m | new landmark |
 | [101 South Park](./101-south-park.md) | `101-south-park` | 10.9 m (estimated) | new landmark |
 
-## Shared contract (all 45)
+## Shared contract (all 46)
 | [155 – 157 South Park Street](./155-south-park.md) | `155-south-park` | 10.1 m | new landmark |
 
-## Shared contract (all 45)
+## Shared contract (all 46)
 | [135 South Park](./135-south-park.md) | `135-south-park` | 8.5 m (LiDAR-derived) | new landmark |
 
-## Shared contract (all 45)
-## Shared contract (all 45)
+## Shared contract (all 46)
+## Shared contract (all 46)
 | [165–167 South Park](./165-south-park.md) | `165-south-park` | 9.0 m (estimated) | new landmark |
 
-## Shared contract (all 45)
-## Shared contract (all 45)
-## Shared contract (all 45)
+## Shared contract (all 46)
+## Shared contract (all 46)
+## Shared contract (all 46)
+| [181 South Park](./181-south-park.md) | `181-south-park` | 16.5 m (LiDAR-derived) | new landmark |
+
+## Shared contract (all 46)
 
 - Style: `docs/styles/miniature-toy.md` (authoritative for artistic decisions)
 - Technical contract: `.agents/skills/sf-asset-check/SKILL.md` (authoritative for the GLB)
@@ -184,6 +187,17 @@ Where a plan cites a DataSF `mblr`/`sf16_bldgid` footprint, that is the survey; 
 geometry on small SoMa lots is a Bing trace and should be treated as a cross-check
 only. Getting from an address to the right DataSF polygon goes through the parcels
 dataset (`acdm-wktn`, `blklot` -> address range), not through a spatial guess.
+that could plausibly be a sea-level datum. 181 South Park is a fifth: its `height=14`
+matches the LiDAR median to within 0.2 m, which makes it look corroborated rather than
+merely repeated, and the crest is still 2.3 m above it.
+
+One plan, [181 South Park](./181-south-park.md), was written with nadir aerial imagery but
+no street-level imagery available to its author. Its geometry is measured, its roof is
+observed, and its four elevations are explicitly marked as inference; street-level photo
+research is written into Part 1 as a gate that must clear before modelling starts. It is
+also the set's clearest case of an OSM `height` tag that is neither eave nor crest: on a
+ridged roof the LiDAR median it matches corresponds to no physical line on the building.
+Read that plan's Part 2 preamble before executing it.
 
 The executing agent is expected to re-verify height, anchor, footprint and
 orientation before modelling — the dossier is a head start, not a citation.

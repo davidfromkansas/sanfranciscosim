@@ -784,6 +784,34 @@ export const LANDMARKS = [
     exclude: 1.3,
     camera: { distance: 160, yaw: 350, pitch: 26 },
   },
+  {
+    // A 43.2 x 13.8 m slab running the full depth of the block, from the South
+    // Park oval back to the Varney Place alley, sharing a party wall with 171
+    // South Park. That party wall makes the exclusion radius unusually
+    // constrained on BOTH sides, so this number is measured, not guessed.
+    // excluded() drops a footprint when its centroid OR any ring vertex falls
+    // inside the radius. Measured against the Overture footprints the bake
+    // actually consumes (not OSM — the two differ here and it matters):
+    //    4.05 m  this building's own footprint, via its centroid — the trigger
+    //            that removes the procedural slab
+    //    7.00 m  171 South Park, via a ring vertex that is a node SHARED with
+    //            this building's own outline
+    //    9.17 m  the Shell canopy at 551 Third Street
+    //   12.32 m  167 South Park
+    // So the whole safe window is (4.06, 7.00) — 2.9 m wide, one of the
+    // tightest in this registry. 5 sits in it with 0.95 m of margin below and
+    // 2.00 m above. Below 4.06 the procedural slab survives and pokes through
+    // the model; at 7.00 the re-bake punches a hole where 171 should be.
+    // Verified on the re-bake: exactly one footprint dropped, 23 kept within
+    // 60 m. Do not widen this without re-running that check.
+    id: '181SouthPark',
+    name: '181 South Park',
+    lon: -122.3945113,
+    lat: 37.7807582,
+    height: 16.5,
+    exclude: 5,
+    camera: { distance: 190, yaw: 255, pitch: 24 },
+  },
 ];
 
 // Parks/green spaces the landcover bake must match at least one source polygon
