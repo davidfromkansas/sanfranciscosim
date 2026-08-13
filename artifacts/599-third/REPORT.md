@@ -110,9 +110,6 @@ isolated Blender 5.2.0 scene (never the authoring scene).
 | `crest_is_target_height` | PASS (max Z 18.300) |
 | `centered_xy` | PASS (−0.002, −0.009) |
 | `under_triangle_budget` | PASS (9,384 / 15,000) |
-
-Re-run against the **shipped** (post-optimize) GLB: still PASS on all 15, now at
-12 objects instead of 376. Stage 4 details: `optimize/REPORT.md`.
 | `no_image_textures` | PASS |
 | `no_transparency` | PASS |
 | `materials_follow_contract` | PASS (12 `Toy_*`, no `Toy_body`) |
@@ -124,6 +121,9 @@ Re-run against the **shipped** (post-optimize) GLB: still PASS on all 15, now at
 | `no_degenerate_geometry` | PASS (0) |
 | `no_unexpected_objects` | PASS |
 | **overall** | **PASS** |
+
+Re-run against the **shipped** (post-optimize) GLB: still PASS on all 15, now at
+12 objects instead of 376. Stage 4 details: `optimize/REPORT.md`.
 
 Normals were checked two ways, as the pipeline requires: per-object signed volume
 (authoritative for a union of closed solids) gave **zero inverted objects**, and
