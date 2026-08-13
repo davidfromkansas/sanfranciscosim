@@ -257,7 +257,87 @@ and prop vocabulary, so office is the truer runtime answer.
 `pipeline/lib/landmarks.mjs` id at integration or the procedural version will not be hidden
 and the site will show two buildings. Verified against `app/src/assets.js`.
 
-## 8. Integration warning: the exclusion radius is the tightest in the registry
+## 8. Stage 5 — local integration QA (batch mode)
+
+Case B, batch mode: the bake was run in full for QA and then discarded, and only source
+was committed.
+
+| Check | Result |
+|---|---|
+| Re-validation of the shipped GLB | PASS — 16/16, §2 |
+| Manifest entry | PASS — valid JSON, 36 entries |
+| id mapping `135-south-park` → `135SouthPark` | PASS — verified against `camelId()` in `app/src/assets.js` |
+| Registry entry | PASS — 42 landmarks, no duplicate ids |
+| **Exclusion drops exactly one footprint** | **PASS — A/B bake: 174,755 without the entry, 174,754 with it** |
+| `audit.mjs` check 1.6 | PASS — "42 landmarks clear" |
+| Context tier | PASS — `landmark:135SouthPark` in `context/landmarks.json` at x 3826, z −1227.3, h 8.5 with its camera preset; present in `search-index.json` |
+| Loader merge line | PASS — `merged 11 objects / 9 materials -> batched (2113 tris body); uniform x1.0000 at 3826, -1227` |
+| Scale factor | PASS — **x1.0000** |
+| Single building at the site | PASS — procedural stand-in excluded, GLB placed, no twin |
+| Night glow | PASS — monitor clerestory + four front bays light; nothing else |
+| Draw calls < 300 | PASS — 87/frame hero, 65/frame near streamed landmarks (`landmark-streaming-check.mjs`) |
+| Streaming lifecycle | PASS — all 6 checks: boot/approach/depart/re-approach, zero failures |
+| Fallback drill | PASS — see below |
+| `npm run lint` | PASS |
+| `npm run build` | PASS — 3,315 tiles 56.3 → 31.6 MB |
+| Bake discarded, source only | PASS — see §9 |
+
+**Fallback drill.** With `app/public/sf-assets/landmarks/135-south-park.glb` renamed away
+and the page reloaded, the app booted, South Park rendered, and the console carried exactly
+one warning:
+
+```
+sf-assets: 135-south-park failed to load (Unexpected token '<', "<!doctype "... is not valid JSON)
+stats: { entries: 36, live: 18, fading: 10, failed: 1 }
+```
+
+Ten other landmarks streamed in alongside it. Case B, so the site is empty ground inside
+the exclusion zone — expected, and noted here per the integration prompt. File restored and
+re-verified byte-identical to the artifact.
+
+**Audit failures that are not mine.** `audit.mjs` reports 29 pass / 3 fail / 1 info. The
+three failures are **1.2b** (p95 height 13.9 m vs an expected 25–120 m band the DataSF
+source cannot satisfy), **1.3c** (Telegraph Hill terrain 90.5 m from the Terrarium DEM vs a
+surveyed 84 m) and **1.7b** (1 of 793 sampled trees offshore). All three live in tiers this
+change does not touch, and `docs/asset-pipeline/BATCH-INTEGRATE.md` states outright that
+"Checks 1.2b, 1.3c and 1.7b fail on main today; they are pre-existing and not yours."
+
+**One honest limitation.** The in-editor preview pane hides its window, which pauses
+`requestAnimationFrame`, so the LOD cross-fade never settles there and the renderer's
+draw-call counter reports whatever the last partial frame did. Visual screenshots taken in
+that pane are therefore not trustworthy evidence, and no claim here rests on them. The
+draw-call and lifecycle results above come from `pipeline/landmark-streaming-check.mjs`,
+which drives the built app in headless Chrome precisely because, in its own words,
+"rendering runs continuously there, which the in-editor preview pane cannot guarantee."
+
+## 9. Batch mode: what was committed
+
+`docs/asset-pipeline/ADDRESS-TO-ASSET.md` "Batch mode" applies — seven other landmark
+sessions were running on this machine concurrently (101 and 165 South Park, 350/358/370
+Brannan, 551/599 Third). A Case B re-bake rewrites ~600 generated files whatever the
+landmark was, so two such branches cannot merge.
+
+The bake **was** run in full (terrain → bridges → buildings → streets → landcover →
+validate → lore → toy → notables → context → muni-shapes) because a Case B landmark cannot
+be judged without its exclusion applied, and then discarded:
+
+```
+git checkout -- app/public/tiles api/_data
+```
+
+It touched `app/public/tiles/buildings/23_13.bin`, `toy/23_13.bin`, ~590 `ctx/*.json`
+sidecars, the tile indexes and `api/_data/` — all thrown away. Committed source only:
+
+- `app/public/sf-assets/landmarks/135-south-park.glb`
+- the `landmarks_manifest.json` entry
+- the `pipeline/lib/landmarks.mjs` entry
+- this asset plan and `artifacts/135-south-park/`
+
+All three shared files are append-only lists that merge mechanically. The city gets rebuilt
+once for the whole batch by `docs/asset-pipeline/BATCH-INTEGRATE.md`, which is also where
+the single PR is opened. **Nothing was pushed.**
+
+## 10. Integration warning: the exclusion radius is the tightest in the registry
 
 Full derivation in the plan's 2.13. Measured from this anchor, against the metric
 `excluded()` in `pipeline/buildings.mjs` actually uses — *centroid **or** any ring vertex

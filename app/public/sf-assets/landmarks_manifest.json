@@ -647,5 +647,24 @@
     ],
     "tris": 13176,
     "loadRadius": 2500
+  },
+  {
+    "id": "135-south-park",
+    "file": "135-south-park.glb",
+    "anchor": [
+      -122.3940203,
+      37.781103
+    ],
+    "targetHeightM": 8.5,
+    "cat": 3,
+    "name": "135 South Park",
+    "estimated": false,
+    "dims": [
+      34.45,
+      25.95,
+      8.5
+    ],
+    "tris": 3836,
+    "loadRadius": 2500
   }
 ]

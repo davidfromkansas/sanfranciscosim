@@ -534,6 +534,39 @@ export const LANDMARKS = [
     exclude: 40,
     camera: { distance: 600, yaw: 268, pitch: 20 },
   },
+  {
+    // The tightest exclusion window in this registry, so the radius is derived
+    // rather than guessed. `excluded()` in pipeline/buildings.mjs drops a
+    // footprint when its centroid OR any ring vertex falls inside the circle,
+    // and the bake reads DataSF first then gap-fills from Overture (which
+    // carries OSM geometry), so both sources bind. Measured from this anchor:
+    //
+    //                                  nearest vertex   centroid
+    //   own footprint (OSM)                  1.03 m       3.04 m
+    //   own footprint (DataSF SF3775033)     4.68 m       3.29 m
+    //   nearest neighbour (OSM way/1311547493, the rear building)
+    //                                        6.18 m      12.96 m
+    //   nearest neighbour (DataSF SF3775036)
+    //                                       10.32 m      15.37 m
+    //
+    // So the safe window is 4.68 < r < 6.18 if the rear building arrives via
+    // Overture, and 3.29 < r < 10.32 if it arrives via DataSF. 5 satisfies
+    // both, with 0.3 m of headroom over our own DataSF ring and 1.2 m below the
+    // nearest neighbour. Do NOT raise it: at 7 the rear building vanishes and
+    // leaves a hole no GLB fills, and at 11 so does 123 South Park — which
+    // shares this building's north-east party wall at a 0.0 m gap.
+    id: '135SouthPark',
+    name: '135 South Park',
+    lon: -122.3940203,
+    lat: 37.781103,
+    height: 8.5,
+    exclude: 5,
+    // camera.js puts the eye at target + distance*(sin yaw, ., cos yaw) with +x
+    // east and +z south, so yaw 225 stands north-west of the building — square
+    // onto the South Park front, which is also the side the roof monitor reads
+    // from. 150 m suits an 8.5 m building (cf. 543 Presidio at 120 for 9.55 m).
+    camera: { distance: 150, yaw: 225, pitch: 26 },
+  },
 ];
 
 // Parks/green spaces the landcover bake must match at least one source polygon
