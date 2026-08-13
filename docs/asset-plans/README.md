@@ -94,8 +94,9 @@ route, and the park plans depend on it (§E8 of the parks README).
 | [500 Third Street](./500-third.md) | `500-third` | 26.5 m | new landmark |
 | [599 Third Street](./599-third.md) | `599-third` | 18.3 m | new landmark |
 | [Civic Center Plaza](./civic-center-plaza.md) | `civic-center-plaza` | 30.48 m (flagpole crest) | new landmark |
+| [250 Van Ness Avenue (171–195 Grove Street)](./250-van-ness.md) | `250-van-ness` | 10.0 m (estimated) | new landmark |
 
-## Shared contract (all 52)
+## Shared contract (all 53)
 
 - Style: `docs/styles/miniature-toy.md` (authoritative for artistic decisions)
 - Technical contract: `.agents/skills/sf-asset-check/SKILL.md` (authoritative for the GLB)
@@ -214,6 +215,11 @@ median (15.62 m) agree on the parapet and both are right — the tag is only unt
 by default, not always wrong. There the open question is the other end, the LiDAR
 `hgt_max` of 18.34 m, which is a single maximum and could be a mast rather than the
 penthouse.
+
+250 Van Ness is a different trap again: OSM and the LiDAR *mode* agree on ~10 m while
+Overture — the pipeline's own bake input — carries 12.4 m, because both the LiDAR max
+(13.0 m) and the LiDAR min (2.5 m) on that footprint are street-tree canopy, not
+building. A height read off a raster statistic is only as good as the raster's edges.
 
 The executing agent is expected to re-verify height, anchor, footprint and
 orientation before modelling — the dossier is a head start, not a citation.
