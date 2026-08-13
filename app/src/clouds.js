@@ -90,7 +90,11 @@ export function createClouds(scene, { sampleAt }) {
 
   // Two flat tones split by the world-up normal: cream lit top, cool underside.
   // The same trick the moon uses — no texture, no second light.
-  const material = new MeshLambertMaterial({ color: 0xffffff, transparent: true, opacity: 0.95, depthWrite: false });
+  // Half the opacity the deck first shipped with (0.95). Note that instances
+  // overlap heavily at high cover and do not write depth, so alpha compounds
+  // where clouds stack — an overcast deck still reads solid at its centre while
+  // the edges stay airy.
+  const material = new MeshLambertMaterial({ color: 0xffffff, transparent: true, opacity: 0.475, depthWrite: false });
   const lit = new Color(0xfdf8ef);
   const shade = new Color(0xb9c4d8);
   material.onBeforeCompile = (shader) => {
@@ -161,7 +165,7 @@ export function createClouds(scene, { sampleAt }) {
   // Live tuning knobs. Cloud size and density are pure art calls that can only
   // be judged against the running scene, so they are adjustable at runtime
   // rather than only by redeploying: SF.clouds.tune({ size: 1.4 }).
-  const tuning = { size: 1, density: 1 };
+  const tuning = { size: 1, density: 1, opacity: 0.475 };
 
   function setQuality(key) {
     activeCap = CLOUD_CAPS[key] ?? cap;
@@ -170,6 +174,10 @@ export function createClouds(scene, { sampleAt }) {
   function tune(patch = {}) {
     if (Number.isFinite(patch.size)) tuning.size = Math.max(0.1, patch.size);
     if (Number.isFinite(patch.density)) tuning.density = Math.max(0, Math.min(1.5, patch.density));
+    if (Number.isFinite(patch.opacity)) {
+      tuning.opacity = Math.max(0.02, Math.min(1, patch.opacity));
+      material.opacity = tuning.opacity;
+    }
     return { ...tuning };
   }
 
