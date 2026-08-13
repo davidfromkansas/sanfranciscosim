@@ -326,6 +326,25 @@
     "tris": 10412
   },
   {
+    "id": "362-brannan",
+    "file": "362-brannan.glb",
+    "anchor": [
+      -122.393745,
+      37.780843
+    ],
+    "targetHeightM": 8.6,
+    "cat": 19,
+    "name": "362 Brannan Street",
+    "estimated": false,
+    "dims": [
+      31.2274,
+      30.835,
+      8.6
+    ],
+    "tris": 5904,
+    "loadRadius": 2500
+  },
+  {
     "id": "380-brannan",
     "file": "380-brannan.glb",
     "anchor": [

@@ -261,6 +261,27 @@ export const LANDMARKS = [
   //
   // 9 m is the middle of the safe band. Do not raise it past 12 without re-running
   // that check — on a mid-block site a generous radius removes the neighbours.
+  // 362 Brannan St (Standard Sheet Metal & Marine Plumbing, 1925) — a through lot
+  // four doors northeast of 380, party walls on both flanks. `excluded()` in
+  // buildings.mjs tests every ring VERTEX as well as the centroid, which is what
+  // makes a generous radius dangerous here; measured against the real bake input
+  // (data/buildings_datasf.geojson):
+  //
+  //   exclude  6-10 m -> drops 1  (correct: this building, centroid 3.49 m)
+  //   exclude 11 m    -> drops 2  (eats 370 Brannan, nearest VERTEX 10.00 m)
+  //
+  // 8 m is the middle of the safe band. Do not raise it past 10. Note that
+  // 370 Brannan's centroid is 13.33 m away — reasoning from centroids alone would
+  // wrongly license 12 and delete it.
+  {
+    id: '362Brannan',
+    name: '362 Brannan Street',
+    lon: -122.393745,
+    lat: 37.780843,
+    height: 8.6,
+    exclude: 8,
+    camera: { distance: 200, yaw: 45, pitch: 24 },
+  },
   {
     id: '380Brannan',
     name: '380 Brannan Street',
