@@ -309,14 +309,16 @@ export const LANDMARKS = [
   {
     // Civic Center corner block on Grove at Polk, 63 x 37 m, facing City Hall.
     // `excluded()` drops a footprint when its centroid OR any of its vertices
-    // lands in the zone, and this footprint's centroid sits on the anchor, so
-    // the zone only has to be wide enough to catch any sub-part the baked
-    // sources split the block into. The ceiling is the neighbours: the nearest
-    // foreign vertex is 30.1 m out (OSM way/940206561 "The Civic" across Polk,
-    // and way/35176282 immediately south), with 31.5 and 31.9 m behind it. The
-    // building's own corners are 28.5-34.2 m out. 24 m therefore covers the
-    // whole interior with a 6 m margin to anything that is not this building.
-    // Verified against the re-bake and audit check 1.6.
+    // lands in the zone, and here it is the CENTROID test that does the work:
+    // this block's centroid sits on the anchor while its own corners are
+    // 28.5-34.2 m out. The vertex window is closed from the other side —
+    // DataSF's nearest foreign vertex is 29.45 m away (OSM agrees: 30.1 m,
+    // way/940206561 "The Civic" across Polk and way/35176282 immediately
+    // south, then 31.5 and 31.9 m) — so a radius wide enough to also catch
+    // this building's own corners would start taking neighbours.
+    // 24 m verified against the re-bake: cell 19_14 goes 80 -> 79 buildings,
+    // zero footprints left with a vertex inside the zone, nearest surviving
+    // vertex 29.45 m. Exactly one building dropped, and it is this one.
     id: '101Grove',
     name: '101 Grove Street (Public Health Building)',
     lon: -122.4186747,
