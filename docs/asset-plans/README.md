@@ -87,8 +87,9 @@ route, and the park plans depend on it (§E8 of the parks README).
 | [San Francisco Main Public Library](./sf-main-library.md) | `sf-main-library` | 28.98 m | new landmark |
 | [234 Van Ness Avenue (The Kelsey Civic Center)](./234-van-ness.md) | `234-van-ness` | 30.12 m | new landmark |
 | [500 Third Street](./500-third.md) | `500-third` | 26.5 m | new landmark |
+| [599 Third Street](./599-third.md) | `599-third` | 18.3 m | new landmark |
 
-## Shared contract (all 50)
+## Shared contract (all 51)
 
 - Style: `docs/styles/miniature-toy.md` (authoritative for artistic decisions)
 - Technical contract: `.agents/skills/sf-asset-check/SKILL.md` (authoritative for the GLB)
@@ -201,6 +202,12 @@ building — a service-station forecourt whose asset is a canopy, two pump islan
 a kiosk and the asphalt they stand on. Its `targetHeightM` is a thin crest above
 a measured canopy deck, and its exclusion zone cannot be solved with one circle;
 see that plan's 2.13 and 2.15 before treating it as routine.
+
+599 Third Street is the reassuring counter-example: its OSM `height=16` and the LiDAR
+median (15.62 m) agree on the parapet and both are right — the tag is only untrustworthy
+by default, not always wrong. There the open question is the other end, the LiDAR
+`hgt_max` of 18.34 m, which is a single maximum and could be a mast rather than the
+penthouse.
 
 The executing agent is expected to re-verify height, anchor, footprint and
 orientation before modelling — the dossier is a head start, not a citation.

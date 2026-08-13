@@ -912,6 +912,37 @@ export const LANDMARKS = [
     exclude: 20,
     camera: { distance: 240, yaw: 25, pitch: 26 },
   },
+  {
+    // 599 Third Street — 4-storey live/work lofts on the north corner of 3rd
+    // and Brannan, completing that corner alongside 550 Third and 380 Brannan.
+    //
+    // exclude: 10 is MEASURED against the bake's own input (DataSF footprints
+    // streamed through geojsonStream + ringCentroid), not derived from the OSM
+    // polygon. The asset plan's estimate of 22 came from this building's OSM
+    // corner vertices and is wrong: the DataSF ring is a 16-vertex outline
+    // whose centroid sits 2.08 m from the anchor and whose nearest vertex is
+    // 15.56 m, while the nearest NEIGHBOUR vertex is only 17.24 m away. Since
+    // excluded() drops a ring on centroid OR any-vertex, the window that drops
+    // exactly this building is 2.08 < r <= 17.24; 22 would have taken three
+    // neighbours with it. 10 sits in the middle of the real band.
+    id: '599Third',
+    name: '599 Third Street',
+    lon: -122.3942739,
+    lat: 37.7804504,
+    height: 18.3,
+    exclude: 10,
+    // `camera` is mandatory even though this building gets no number `key` —
+    // see the note on 542PresidioBlvd. main.js maps EVERY manifest landmark
+    // into `presets`, and camera.js reads `preset.yaw` unconditionally, so
+    // omitting it boots to "Cannot read properties of undefined (reading
+    // 'yaw')". Verified by doing exactly that here too.
+    // yaw 0 stands the camera due south (app yaw = 180 − true bearing), which
+    // is the bisector of the 3rd Street front (normal 224.8°) and the Brannan
+    // front (135.2°) — the one angle where both designed elevations and the
+    // corner between them read at once. 240 m suits an 18.3 m block (cf.
+    // 380Brannan 220 at 12.6 m, 550Third 190 at 11 m).
+    camera: { distance: 240, yaw: 0, pitch: 26 },
+  },
 ];
 
 // Parks/green spaces the landcover bake must match at least one source polygon
