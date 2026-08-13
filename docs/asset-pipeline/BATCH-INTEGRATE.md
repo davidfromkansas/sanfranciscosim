@@ -87,16 +87,14 @@ search and the concierge broken. `lore` must precede `context`.
 Then remove the symlink (`rm pipeline/data`) — it is not covered by the
 `pipeline/data/` gitignore rule and will otherwise be committed as a link.
 
-**Restore the route shapes.** `validate` deletes
-`app/public/tiles/muni-shapes.bin` along with everything else it does not find
-in `out/`, and `muni-shapes.mjs` only regenerates it when `MUNI_511_KEY` is set:
-
-```
-git checkout -- app/public/tiles/muni-shapes.bin
-```
-
-Symptom if you forget: a `sf-muni: no route shapes (shapes bad magic)` console
-warning and buses that dead-reckon.
+Then confirm `git status` shows nothing deleted under `app/public/tiles/`. The
+publish step used to wipe that directory wholesale and take
+`app/public/tiles/muni-shapes.bin` with it — the one file no later stage
+restores, since `muni-shapes.mjs` needs `MUNI_511_KEY` and no-ops without it.
+`validate.mjs` now clears only the tiers it owns, so this should come up clean;
+if the file is missing, `git checkout -- app/public/tiles/muni-shapes.bin` puts
+it back. Symptom if it slips through: a `sf-muni: no route shapes (shapes bad
+magic)` console warning and buses that dead-reckon.
 
 ## 3. Verify
 
