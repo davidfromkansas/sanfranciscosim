@@ -77,7 +77,10 @@ route, and the park plans depend on it (§E8 of the parks README).
 | [171 South Park Street](./171-south-park.md) | `171-south-park` | 12.6 m | new landmark |
 | [101 South Park](./101-south-park.md) | `101-south-park` | 10.9 m (estimated) | new landmark |
 
-## Shared contract (all 39)
+## Shared contract (all 40)
+| [155 – 157 South Park Street](./155-south-park.md) | `155-south-park` | 10.1 m | new landmark |
+
+## Shared contract (all 40)
 
 - Style: `docs/styles/miniature-toy.md` (authoritative for artistic decisions)
 - Technical contract: `.agents/skills/sf-asset-check/SKILL.md` (authoritative for the GLB)
