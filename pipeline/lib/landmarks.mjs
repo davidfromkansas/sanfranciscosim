@@ -1114,8 +1114,8 @@ export const LANDMARKS = [
     // bake the same way the building radius is measured; do not reason about it.
     id: 'civicCenterPlaza',
     name: 'Civic Center Plaza',
-    lon: -122.4176184,
-    lat: 37.7794818,
+    lon: -122.41761,
+    lat: 37.7794895,
     height: 30.48,
     exclude: 95,
     clearTrees: true,

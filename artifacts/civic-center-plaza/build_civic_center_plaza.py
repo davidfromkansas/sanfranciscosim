@@ -33,8 +33,8 @@ Design (see REFERENCE.md for the sources behind every number):
 
 Authoring frame: geometry is laid out in the plaza's local (u, v) frame —
 u along the long axis, POSITIVE TOWARD THE SOUTH (Grove Street), bearing
-189.06 deg true; v across, POSITIVE TOWARD THE WEST (City Hall), bearing
-279.06 deg — and mapped to world x/y by to_world(). The plaza sits 9.06 deg off
+170.94 deg true; v across, POSITIVE TOWARD THE WEST (City Hall), bearing
+260.94 deg — and mapped to world x/y by to_world(). The plaza sits 9.06 deg off
 the world axes, so the axis-aligned XY bounding box is ~146.6 x 192.4 m even
 though the plaza is 177.9 x 121.5 m. That is expected, not a scale error.
 """
@@ -53,8 +53,19 @@ from mathutils import Vector
 # Heading of the plaza's long axis, from the minimum-area oriented bounding box
 # over OSM way 284764947. The Civic Center street grid runs the same 9.06 deg,
 # which is why every lawn and walk in the measured data shares it.
-HEADING_LONG = 189.06   # +u, toward Grove Street (south)
-HEADING_CROSS = 279.06  # +v, toward City Hall (west)
+#
+# The grid leans 9.06 deg EAST of north, so the axis toward Grove Street (south)
+# bears 170.94 deg (= 180 - 9.06), not 189.06 (= 180 + 9.06). Those two are
+# mirror images about north and both "look like 9.06 deg off the axes" in any
+# bounding-box check, which is why the first build shipped the wrong one: the
+# plaza came out rotated 18.12 deg from the block it sits on, visibly crooked
+# against City Hall while every measurement in the report still read 9.06 deg.
+# The AABB cannot catch this; only a SIGNED angle can. Ground truth: 109 of the
+# 166 baked DataSF footprints over 200 m2 in cells 19_13 + 19_14 sit at +9 deg
+# in this convention and none at -9, and the neighbouring landmark GLBs (City
+# Hall 9.62, Main Library 9.06, Bill Graham 9.31, 234 Van Ness 10.27) agree.
+HEADING_LONG = 170.94   # +u, toward Grove Street (south)
+HEADING_CROSS = 260.94  # +v, toward City Hall (west)
 
 _UL = math.radians(HEADING_LONG)
 U_DIR = (math.sin(_UL), math.cos(_UL))
