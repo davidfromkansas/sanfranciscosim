@@ -73,8 +73,9 @@ route, and the park plans depend on it (§E8 of the parks README).
 | [Louise M. Davies Symphony Hall](./davies-symphony-hall.md) | `davies-symphony-hall` | 35 m | new landmark |
 | [101 Grove Street (Public Health Building)](./101-grove.md) | `101-grove` | 21.4 m | new landmark |
 | [Asian Art Museum (Old Main Library)](./asian-art-museum.md) | `asian-art-museum` | 28.1 m | new landmark |
+| [165–167 South Park](./165-south-park.md) | `165-south-park` | 9.0 m (estimated) | new landmark |
 
-## Shared contract (all 36)
+## Shared contract (all 37)
 
 - Style: `docs/styles/miniature-toy.md` (authoritative for artistic decisions)
 - Technical contract: `.agents/skills/sf-asset-check/SKILL.md` (authoritative for the GLB)
@@ -128,6 +129,14 @@ the two — the crest is 9.55 m. The Asian Art Museum is a fourth: its OSM
 `height=46` is not a height at all but the NAVD88 roof *elevation* (152.93 ft),
 1.6x the real 28.1 m crest — see that plan's 2.3 before trusting any `height` tag
 that could plausibly be a sea-level datum.
+
+165–167 South Park is the one plan here whose footprint is **not** measured from OSM, and
+it is the case that shows why the default has limits. No OSM way carries its address at
+all: the building sits inside a Bing trace tagged `167` that is larger than the whole lot
+and overlaps its neighbour. That plan's geometry comes from the surveyed DataSF parcel
+(`acdm-wktn`), with the DataSF LiDAR footprint (`ynuv-fyni`) supplying only the built depth
+— and even those two disagree by 3.7 m, which its 2.3 reconciles. On dense narrow-lot
+blocks, prefer the parcel layer and treat OSM as a cross-check.
 
 The executing agent is expected to re-verify height, anchor, footprint and
 orientation before modelling — the dossier is a head start, not a citation.
