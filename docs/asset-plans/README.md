@@ -80,23 +80,11 @@ route, and the park plans depend on it (§E8 of the parks README).
 | [Asian Art Museum (Old Main Library)](./asian-art-museum.md) | `asian-art-museum` | 28.1 m | new landmark |
 | [171 South Park Street](./171-south-park.md) | `171-south-park` | 12.6 m | new landmark |
 | [101 South Park](./101-south-park.md) | `101-south-park` | 10.9 m (estimated) | new landmark |
-
-## Shared contract (all 47)
 | [155 – 157 South Park Street](./155-south-park.md) | `155-south-park` | 10.1 m | new landmark |
-
-## Shared contract (all 47)
 | [135 South Park](./135-south-park.md) | `135-south-park` | 8.5 m (LiDAR-derived) | new landmark |
-
-## Shared contract (all 47)
-## Shared contract (all 47)
 | [165–167 South Park](./165-south-park.md) | `165-south-park` | 9.0 m (estimated) | new landmark |
-
-## Shared contract (all 47)
-## Shared contract (all 47)
-## Shared contract (all 47)
 | [181 South Park](./181-south-park.md) | `181-south-park` | 16.5 m (LiDAR-derived) | new landmark |
 
-## Shared contract (all 47)
 ## Shared contract (all 47)
 
 - Style: `docs/styles/miniature-toy.md` (authoritative for artistic decisions)
