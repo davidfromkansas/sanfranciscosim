@@ -182,3 +182,76 @@ published height exists for this building and 9.60 m is photogrammetric (see
 2.5 km a 9.6 m building is far below a pixel, so the empty exclusion zone beyond the
 radius is illegible.
 </content>
+
+## 10. Integration (stage 5) — local QA
+
+Run 13 August 2026 per `docs/asset-plans/INTEGRATION-PROMPT.md` Part 1, **Case B**
+(new landmark: registry entry + tile re-bake), in **batch mode** (the bake was run for
+this QA and then discarded; the branch carries source only).
+
+| Item | Result |
+|---|---|
+| Re-validation of the shipped GLB in a fresh scene | **PASS** — all 16 contract checks |
+| Manifest entry appended | **PASS** — `358-brannan`, before `380-brannan` |
+| id mapping `camelId('358-brannan')` → `358Brannan` | **PASS** — matches the registry entry |
+| Registry entry in `pipeline/lib/landmarks.mjs` | **PASS** — `exclude: 7` (band 3-12 m, derived below) |
+| Tile re-bake, full chain | **PASS** — terrain → bridges → buildings → streets → landcover → validate → lore → toy → notables → context → muni-shapes, exit 0 |
+| `pipeline/audit.mjs` check 1.6 | **PASS** — "42 landmarks clear" |
+| `pipeline/verify-rebake.mjs` | **PASS** — "584 of 585 cells unchanged; 23_13 233 → 232 ← 358Brannan; nearest surviving footprint 12.0 m vs 7 m radius" |
+| Exactly one building on the site | **PASS** — the procedural footprint is dropped; no twin, no z-fighting |
+| Merge line | **PASS** — `sf-assets: 358-brannan merged 13 objects / 11 materials -> batched (2118 tris body); uniform x1.0000 at 3860, -1208` |
+| Scale factor | **PASS** — exactly **1.0000** |
+| Orientation | **PASS** — the terracotta front and bay face Brannan Street; the roof deck sits at the Varney Place end |
+| Terrain seating | **PASS** — placed at the sampled elevation, flush with both neighbours, no float or sink |
+| Night glow | **PASS** — at `night 1.00` only the sign strip and the two bay windows light; no facade wash |
+| Draw calls | **PASS** — 89 for the whole scene at street level in SoMa with the asset loaded (budget < 300). The landmark itself adds **zero**: it merges into the shared landmark `BatchedMesh` pair |
+| Fallback drill | **PASS** — with the GLB renamed the app boots, every other landmark loads, and exactly one warning appears: `sf-assets: 358-brannan failed to load (...)`. The site is empty ground inside the exclusion zone, which is the expected Case B behaviour |
+| `npm run lint` / `npm run build` | **PASS** — clean; build 880 kB JS / 245 kB gzip, unchanged |
+
+### Sizing the exclusion radius
+
+`excluded()` drops a footprint whose centroid **or any ring vertex** falls inside the
+radius, so the binding constraint is the neighbours' nearest *vertex*. Measured against
+the committed tile `23_13` (233 footprints) before the bake:
+
+| | centroid | nearest vertex | height |
+|---|---|---|---|
+| target #98 — the through-lot itself | 4.06 m | **2.47 m** | 11.2 m |
+| #63 — 350 Brannan (SW party wall) | 12.60 m | **12.01 m** | 13.7 m |
+| #152 — 362-366 Brannan (NE party wall) | 15.41 m | 12.69 m | 7.9 m |
+
+Safe band **3-12 m**; 13 m eats both neighbours and leaves two holes in the block.
+`exclude: 7` is the middle of it, and `verify-rebake.mjs` confirms after the fact that
+exactly one footprint went and the nearest survivor is 12.0 m out.
+
+Worth recording: the baked footprint on this lot is **11.2 m tall against the asset's
+9.6 m**, so shipping the manifest entry without the exclusion would have hidden the GLB
+completely rather than merely clashing with it — the failure mode
+`sf3d-case-b-rebake` warns about.
+
+### A confirmation that fell out of the bake
+
+The baked footprint for this lot (`23_13` #98) measures **−3.46 to +3.47 m across the
+frontage and −12.61 to +12.50 m in depth** in the asset's own frame — the same
+6.93 × 25.20 m rectangle this asset was authored on, to within a few centimetres, and
+its neighbours' rings sit exactly on the party-wall lines at ±3.46 m. The pipeline's
+own building source and the DataSF LiDAR footprint agree completely. Only OSM's
+Bing-traced way is wrong (`REFERENCE.md` §7).
+
+### Environment limitation, stated rather than hidden
+
+Local QA ran in the in-app browser pane, which keeps the tab hidden, so `rAF` is paused
+and `assets.load()` — which the render loop calls on first frame (`app/src/main.js`) —
+never fires on its own. It was invoked directly from the console, and the draw-call
+number above was taken from a forced `renderer.render(scene, camera)` rather than from
+the stats overlay, whose `fps 0 / draw calls 1` readout reflects the stalled loop and
+not the scene. The heavy hashed-alpha dithering in the QA screenshots is the same
+cause: the tile cross-fade never settles when frames are stepped one at a time. Neither
+is a defect in this asset. A foregrounded Chrome would be needed for a clean frame-rate
+measurement; the deployed QA after merge is the place for that.
+
+### Not done, deliberately
+
+Per `ADDRESS-TO-ASSET.md` stage 5, this session stops at a locally verified,
+source-only branch. Nothing has been pushed, no PR opened, no deployment made. The
+batch is baked once and shipped by `docs/asset-pipeline/BATCH-INTEGRATE.md`.
