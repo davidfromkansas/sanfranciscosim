@@ -63,6 +63,7 @@ route, and the park plans depend on it (§E8 of the parks README).
 | [358 Brannan Street](./358-brannan.md) | `358-brannan` | 9.6 m (estimated) | new landmark |
 | [380 Brannan Street](./380-brannan.md) | `380-brannan` | 12.6 m | new landmark |
 | [550 Third Street](./550-third.md) | `550-third` | 11 m | new landmark |
+| [551 Third Street (Shell Service Station)](./551-third.md) | `551-third` | 6.6 m | new landmark |
 | [375 Alabama Street (Ames Harris Neville Co.)](./375-alabama.md) | `375-alabama` | 22.5 m | new landmark |
 | [1008 General Kennedy Avenue](./1008-general-kennedy.md) | `1008-general-kennedy` | 11.9 m | new landmark |
 | [Letterman Digital Arts Center](./letterman-digital-arts-center.md) | `letterman` | ~22 m (estimated) | new landmark |
@@ -80,22 +81,23 @@ route, and the park plans depend on it (§E8 of the parks README).
 | [171 South Park Street](./171-south-park.md) | `171-south-park` | 12.6 m | new landmark |
 | [101 South Park](./101-south-park.md) | `101-south-park` | 10.9 m (estimated) | new landmark |
 
-## Shared contract (all 46)
+## Shared contract (all 47)
 | [155 – 157 South Park Street](./155-south-park.md) | `155-south-park` | 10.1 m | new landmark |
 
-## Shared contract (all 46)
+## Shared contract (all 47)
 | [135 South Park](./135-south-park.md) | `135-south-park` | 8.5 m (LiDAR-derived) | new landmark |
 
-## Shared contract (all 46)
-## Shared contract (all 46)
+## Shared contract (all 47)
+## Shared contract (all 47)
 | [165–167 South Park](./165-south-park.md) | `165-south-park` | 9.0 m (estimated) | new landmark |
 
-## Shared contract (all 46)
-## Shared contract (all 46)
-## Shared contract (all 46)
+## Shared contract (all 47)
+## Shared contract (all 47)
+## Shared contract (all 47)
 | [181 South Park](./181-south-park.md) | `181-south-park` | 16.5 m (LiDAR-derived) | new landmark |
 
-## Shared contract (all 46)
+## Shared contract (all 47)
+## Shared contract (all 47)
 
 - Style: `docs/styles/miniature-toy.md` (authoritative for artistic decisions)
 - Technical contract: `.agents/skills/sf-asset-check/SKILL.md` (authoritative for the GLB)
@@ -198,6 +200,12 @@ research is written into Part 1 as a gate that must clear before modelling start
 also the set's clearest case of an OSM `height` tag that is neither eave nor crest: on a
 ridged roof the LiDAR median it matches corresponds to no physical line on the building.
 Read that plan's Part 2 preamble before executing it.
+
+551 Third Street is the odd one out in a different way: it is a *site*, not a
+building — a service-station forecourt whose asset is a canopy, two pump islands,
+a kiosk and the asphalt they stand on. Its `targetHeightM` is a thin crest above
+a measured canopy deck, and its exclusion zone cannot be solved with one circle;
+see that plan's 2.13 and 2.15 before treating it as routine.
 
 The executing agent is expected to re-verify height, anchor, footprint and
 orientation before modelling — the dossier is a head start, not a citation.

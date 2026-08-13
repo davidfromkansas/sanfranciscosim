@@ -2,6 +2,13 @@
 // procedural footprints from fighting the hand-built model, and the camera
 // preset the runtime flies to. Consumed by buildings.mjs (exclusion) and
 // emitted to the app as landmarks.json (presets + placement).
+//
+// A landmark is normally one circle around its anchor. A site whose lot carries
+// more than one baked footprint can declare `extraExclusions: [{lon, lat, r}]`
+// for the ones a single radius cannot reach without eating a neighbour — see
+// 551Third. Build the zone list with exclusionZones() below rather than reading
+// `exclude` directly, so the bake and audit 1.6 can never disagree about what
+// is cleared.
 
 export const LANDMARKS = [
   {
@@ -379,6 +386,27 @@ export const LANDMARKS = [
     height: 11,
     exclude: 8,
     camera: { distance: 190, yaw: 260, pitch: 34 },
+  },
+  {
+    // Shell service station, across 3rd Street from 550 Third. The asset is a
+    // forecourt, not a building, and the lot carries TWO baked footprints — the
+    // canopy at the anchor and the kiosk 19.7 m away at the Brannan end. No
+    // single radius takes both: reaching the kiosk needs r > 16.40 m, and 181
+    // South Park's footprint behind the lot comes within 16.37 m. Hence the
+    // second zone on the kiosk, which drops it by the centroid test with 2.9 m
+    // of clearance to that neighbour. See docs/asset-plans/551-third.md 2.13.
+    id: '551Third',
+    name: '551 Third Street (Shell Station)',
+    lon: -122.3946431,
+    lat: 37.7806625,
+    height: 6.6,
+    exclude: 8,
+    extraExclusions: [{ lon: -122.3944594, lat: 37.7805609, r: 4 }],
+    // Camera offset is (sin yaw east, cos yaw south), so yaw 315 puts the eye
+    // south-west of the site: the 3rd Street frontage, with the umbrellas
+    // reading in front of the kiosk. No `key` — at 6.6 m this is texture in the
+    // block, not a destination, and the number keys stay for skyline pieces.
+    camera: { distance: 170, yaw: 315, pitch: 32 },
   },
   {
     // Ames Harris Neville Co. Building, 1926 — a whole block corner, so the
@@ -816,6 +844,20 @@ export const LANDMARKS = [
 
 // Parks/green spaces the landcover bake must match at least one source polygon
 // for; validate.mjs fails if any of these come up empty.
+// Every circle the bake clears, one row per zone. A landmark contributes its
+// own `exclude` circle plus any `extraExclusions`; `id`/`name` stay attached so
+// audit 1.6 can name the landmark responsible for an intrusion.
+export function exclusionZones() {
+  const zones = [];
+  for (const l of LANDMARKS) {
+    if (l.exclude) zones.push({ id: l.id, name: l.name, lon: l.lon, lat: l.lat, r: l.exclude });
+    for (const e of l.extraExclusions ?? []) {
+      zones.push({ id: l.id, name: l.name, lon: e.lon, lat: e.lat, r: e.r });
+    }
+  }
+  return zones;
+}
+
 export const NAMED_PARKS = [
   { id: 'goldenGatePark', name: 'Golden Gate Park', lon: -122.4862, lat: 37.7694 },
   { id: 'presidio', name: 'Presidio', lon: -122.4662, lat: 37.7989 },
