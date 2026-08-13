@@ -261,6 +261,30 @@ export const LANDMARKS = [
   //
   // 9 m is the middle of the safe band. Do not raise it past 12 without re-running
   // that check — on a mid-block site a generous radius removes the neighbours.
+  // 358 Brannan, three lots northeast, is the tightest site in this registry: a
+  // single 25-foot lot, 6.93 m wide, with both neighbours' walls ON the property
+  // line. Measured against the committed tile 23_13 (233 footprints):
+  //
+  //   target #98 (the through-lot itself, h 11.2 m): centroid 4.06 m from the
+  //   anchor, nearest ring vertex 2.47 m
+  //   nearest neighbour #63 (350 Brannan, h 13.7 m): nearest vertex 12.01 m
+  //
+  //   exclude  3-12 m -> drops 1 building  (correct: #98 only)
+  //   exclude 13-16 m -> drops 3  (eats BOTH party-wall neighbours)
+  //   exclude 20 m    -> drops 5
+  //
+  // 7 m is the middle of the safe band. The baked footprint is TALLER than the
+  // asset (11.2 m vs 9.6 m), so shipping the manifest entry without this
+  // exclusion would hide the GLB completely rather than merely clash with it.
+  {
+    id: '358Brannan',
+    name: '358 Brannan Street',
+    lon: -122.3936350,
+    lat: 37.7809258,
+    height: 9.6,
+    exclude: 7,
+    camera: { distance: 190, yaw: 315, pitch: 26 },
+  },
   {
     id: '380Brannan',
     name: '380 Brannan Street',
