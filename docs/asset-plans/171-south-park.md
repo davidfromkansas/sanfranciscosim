@@ -688,6 +688,14 @@ back at this footprint.
   the 2009 historic district record says ca. 1910 and uses "ca." deliberately. Both are
   post-earthquake reconstruction and neither changes the design. The district record is the
   better-researched source; use ca. 1910 and note the Assessor value.
+- **The roof is known only from directly overhead.** No oblique aerial was obtainable, so
+  the skylight count (four plus a pair), the mechanical box and the rear deck are read off
+  a single top-down satellite frame. They are the weakest geometry in 2.7 — and they are
+  the surface the app's camera looks at most, so check them again before modelling.
+- **The window rhythm is *inferred*.** A street tree covers the middle of the front in the
+  only pano available, so "two pairs on the centre facet, one pair per outer facet" is a
+  reading, not a count. The same applies to the number of garland panels per frieze, which
+  the model abstracts into a plain band anyway.
 - **The light-well notch** on the southwest flank (`v9→v11`) is present in both the OSM and
   DataSF outlines, so it is real geometry, but its depth and whether it runs full height
   are *inferred*.
