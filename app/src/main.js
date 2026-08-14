@@ -39,6 +39,7 @@ import { createSkyClock } from './sky-clock.js';
 import { createWeather } from './weather.js';
 import { createClouds } from './clouds.js';
 import { createRain } from './rain.js';
+import { createFogBanks } from './fogbanks.js';
 import { localDayStart, moonPosition, skySnapshot, sunPosition } from '../../api/_lib/astro.mjs';
 
 const canvas = document.getElementById('view');
@@ -147,6 +148,9 @@ async function boot() {
   const clouds = createClouds(scene, { sampleAt: weather.sampleAt });
   // Rain falls where the field says it is raining, in a box around the camera.
   const rain = createRain(scene, { sampleAt: weather.sampleAt });
+  // Karl with a silhouette. The shader fog dissolves the city with distance;
+  // these are the vapour you can actually see, placed by the same field.
+  const fogBanks = createFogBanks(scene, { sampleAt: weather.sampleAt });
   // Real Muni buses from /api/muni; when the feed is away this layer is simply
   // empty — the procedural road traffic never depended on it.
   const muni = createLiveMuni(scene, data);
@@ -212,6 +216,7 @@ async function boot() {
     terrain.setQuality(key);
     clouds.setQuality(key);
     rain.setQuality(key);
+    fogBanks.setQuality(key);
     post.setSamples(quality.samples);
     renderer.setSize(window.innerWidth, window.innerHeight, false);
     post.setSize();
@@ -596,6 +601,7 @@ async function boot() {
     ferries,
     clouds,
     rain,
+    fogBanks,
     muni,
     governor,
     boot: bootScreen,
@@ -655,6 +661,10 @@ async function boot() {
     },
     // Dial cloud size and density against the running scene:
     //   SF.tuneClouds({ size: 1.4, density: 1.2 })  ->  then SF.cloudCoverage()
+    // Dial the fog banks: size, opacity and how readily they appear.
+    tuneBanks(patch) {
+      return fogBanks.tune(patch);
+    },
     tuneClouds(patch) {
       return clouds.tune(patch);
     },
@@ -760,6 +770,7 @@ async function boot() {
     weather.update(Math.min(1, elapsed));
     clouds.update(Math.min(1, elapsed));
     rain.update(dt, camera.position);
+    fogBanks.update(Math.min(1, elapsed));
     muni.update(dt, camera);
     trackVessel(dt);
     landmarks.update();
