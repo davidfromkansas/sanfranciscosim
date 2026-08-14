@@ -658,7 +658,11 @@ async function boot() {
     pickRay.setFromCamera(pickPointer, camera);
     const hasGround = rig.screenToGround(pickPointer.x, pickPointer.y, groundPoint);
     const entity = await pickAt(pickPointer.x, pickPointer.y, hasGround);
-    if (entity) selectEntity(entity);
+    // Clicking an aircraft TRAVELS to it — everything else in the city stays
+    // put when you click it, but a plane you have not flown to is a speck that
+    // leaves frame before you can read the card. The follow takes over when
+    // the fly-in lands.
+    if (entity) selectEntity(entity, { fly: entity.kind === 'aircraft' });
   });
 
   city.preload(rig.state.pivot.clone());
