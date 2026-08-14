@@ -27,7 +27,7 @@ const URL = `${import.meta.env.BASE_URL}sf-assets/fog-cube.glb`;
 // it does readily on a loaded machine — the fog vanished completely and the
 // city looked like the feature was broken. Fog is the headline here; it is the
 // last thing to cut, not the first.
-export const BANK_CAPS = { ultra: 280, high: 280, medium: 160, low: 70 };
+export const BANK_CAPS = { ultra: 420, high: 420, medium: 240, low: 110 };
 
 // The cube is a unit volume, so this is the width of one bank in metres.
 //
@@ -36,12 +36,12 @@ export const BANK_CAPS = { ultra: 280, high: 280, medium: 160, low: 70 };
 // filled with straight-edged translucent sheets instead of fog. The asset is a
 // cluster: a discrete clump. So: much smaller clumps, many more of them, which
 // is also how a real marine layer is built.
-const BANK_SIZE = 640;
+const BANK_SIZE = 780;
 // Sea level to here: the marine layer's own thickness.
 const BANK_BASE = 30;
 const BANK_TOP = 300;
 // Tighter than the cloud scatter: fog sits ON the city, not out at sea.
-const EXTENT = 5800;
+const EXTENT = 7000;
 
 const _matrix = new Matrix4();
 const _position = new Vector3();
@@ -76,8 +76,11 @@ export function createFogBanks(scene, { sampleAt }) {
       shown: false,
       lastSize: 0,
       // Each bank appears at its own point on the density ramp, so fog thickens
-      // by gaining banks rather than by everything fading up together.
-      threshold: hash(i, 6) * 0.85,
+      // by gaining banks rather than by everything fading up together. The
+      // range is deliberately well under 1: at 0.85 the higher-threshold banks
+      // never switched on anywhere except the very thickest cells, which left
+      // the fog bunched into one corner of the city instead of spread over it.
+      threshold: hash(i, 6) * 0.5,
     });
   }
 
