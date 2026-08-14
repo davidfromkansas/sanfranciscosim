@@ -86,6 +86,7 @@ const FRAG = /* glsl */ `
 
     float fogFactor = 1.0 - exp(-uFogDensity * uFogDensity * dist * dist);
     col = mix(col, uFogColor, clamp(fogFactor, 0.0, 1.0));
+
     gl_FragColor = vec4(col, 1.0);
   }
 `;

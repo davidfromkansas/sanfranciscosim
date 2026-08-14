@@ -37,6 +37,10 @@ import { createFocusOverlay } from './focus.js';
 import { createContextCard, createSearch } from './cards.js';
 import { createConcierge } from './concierge.js';
 import { createSkyClock } from './sky-clock.js';
+import { createWeather } from './weather.js';
+import { createClouds } from './clouds.js';
+import { createRain } from './rain.js';
+import { createFogBanks } from './fogbanks.js';
 import { localDayStart, moonPosition, skySnapshot, sunPosition } from '../../api/_lib/astro.mjs';
 
 const canvas = document.getElementById('view');
@@ -112,6 +116,42 @@ async function boot() {
   const agents = createAgents(scene, data, city);
   // Real WETA vessels from /api/ferries; falls back to the procedural ferries.
   const ferries = createLiveFerries(scene, data, agents);
+  // The live weather field. Created before the clock so the card can read it
+  // on its very first render.
+  const weather = createWeather({ project: data.project });
+  // ?weather=<preset> pins a showcase state at load, so a dramatic view can be
+  // linked to rather than typed into a console. Live weather is still the
+  // default and there is no control in the UI for this — the city's promise is
+  // that what you see is real, and only an explicit URL opts out of it.
+  // Unknown values are ignored rather than erroring: a bad link shows the real
+  // city, which is the right failure.
+  function applyWeatherFromUrl() {
+    let requested = null;
+    try {
+      requested = new URLSearchParams(window.location.search).get('weather');
+    } catch {
+      return null;
+    }
+    if (!requested) return null;
+    const name = String(requested).toLowerCase();
+    if (!weather.presetNames.includes(name)) {
+      console.warn(`?weather=${requested} is not a known preset (${weather.presetNames.join(', ')}) — showing live weather`);
+      return null;
+    }
+    weather.setOverride({ preset: name });
+    // A linked state should be there on arrival, not ease in over a minute.
+    weather.settle();
+    return name;
+  }
+
+  // Toy clouds read the same field the shadows do, so what floats overhead and
+  // what darkens the ground always agree.
+  const clouds = createClouds(scene, { sampleAt: weather.sampleAt });
+  // Rain falls where the field says it is raining, in a box around the camera.
+  const rain = createRain(scene, { sampleAt: weather.sampleAt });
+  // Karl with a silhouette. The shader fog dissolves the city with distance;
+  // these are the vapour you can actually see, placed by the same field.
+  const fogBanks = createFogBanks(scene, { sampleAt: weather.sampleAt });
   // Real Muni buses from /api/muni; when the feed is away this layer is simply
   // empty — the procedural road traffic never depended on it.
   const muni = createLiveMuni(scene, data);
@@ -178,6 +218,9 @@ async function boot() {
     water.setQuality(key);
     agents.setQuality(key);
     terrain.setQuality(key);
+    clouds.setQuality(key);
+    rain.setQuality(key);
+    fogBanks.setQuality(key);
     post.setSamples(quality.samples);
     renderer.setSize(window.innerWidth, window.innerHeight, false);
     post.setSize();
@@ -256,7 +299,11 @@ async function boot() {
     }
   }
   tickSky();
-  const skyClock = createSkyClock({ read: () => sky });
+  const skyClock = createSkyClock({ read: () => sky, readWeather: () => weather });
+  // After the first poll has had a moment: an override set before any payload
+  // arrives would be overwritten by it.
+  let urlWeather = applyWeatherFromUrl();
+  if (urlWeather) setTimeout(() => { urlWeather = applyWeatherFromUrl(); skyClock.update(); }, 2500);
 
   const ui = createUI({
     presets,
@@ -686,6 +733,9 @@ async function boot() {
     city,
     agents,
     ferries,
+    clouds,
+    rain,
+    fogBanks,
     muni,
     aircraft,
     // Which aircraft the camera is locked to, or null. Exposed because the
@@ -719,6 +769,52 @@ async function boot() {
     },
     get sky() {
       return sky;
+    },
+    // The eased weather state. Debug only, exactly like setClock: no UI, no
+    // URL parameter, and the model can never set it.
+    get weather() {
+      return weather.snapshot();
+    },
+    // Read the eased field at a world position, the same way the shaders do.
+    // The orientation of that lookup is the easiest thing in this feature to
+    // get silently wrong, so it is checkable: sampleWeather at the Sunset and
+    // at Bayview must disagree the way the feed's districts do.
+    sampleWeather(x, z, key = 'fog') {
+      return weather.sampleAt(x, z, key);
+    },
+    // Skip the 60 s ease and jump to the incoming field — for screenshots and
+    // automated checks, which have no time (or no frame loop) to wait it out.
+    // Dial cloud size and density against the running scene:
+    //   SF.tuneClouds({ size: 1.4, density: 1.2 })  ->  then SF.cloudCoverage()
+    // Dial the fog banks: size, opacity and how readily they appear.
+    tuneBanks(patch) {
+      return fogBanks.tune(patch);
+    },
+    // Fraction of the ground the fog banks actually cover. Counting them hides
+    // the only number that matters.
+    bankCoverage() {
+      return fogBanks.coverage();
+    },
+    tuneClouds(patch) {
+      return clouds.tune(patch);
+    },
+    // The fraction of sky the low deck actually covers. Counting instances
+    // hides this: 39 clouds sounded fine while covering 8.7% of the sky.
+    cloudCoverage() {
+      return clouds.coverage();
+    },
+    settleWeather() {
+      weather.settle();
+      skyClock.update();
+      return weather.snapshot();
+    },
+    // A partial patch merges onto the live field; null returns to live.
+    // SF.setWeather({ preset: 'karl' | 'storm' | 'clear' | 'smoke' }) gives the
+    // canonical demo states, which is how the rare ones get QA'd at all.
+    setWeather(patch) {
+      weather.setOverride(patch === undefined ? null : patch);
+      skyClock.update();
+      return weather.snapshot();
     },
     // null resumes live San Francisco time; a number is epoch ms, a string is
     // anything Date.parse understands ('2026-08-10T02:00:00-07:00').
@@ -800,6 +896,12 @@ async function boot() {
     city.update(dt, pivotWorld, camera.position, quality);
     agents.update(dt, pivotWorld, camera.position);
     ferries.update(dt);
+    // Weather eases on wall time for the same reason the clouds do: the
+    // simulation clamp would stall the transition below 20 fps.
+    weather.update(Math.min(1, elapsed));
+    clouds.update(Math.min(1, elapsed));
+    rain.update(dt, camera.position);
+    fogBanks.update(Math.min(1, elapsed));
     muni.update(dt, camera);
     aircraft.update(dt, camera);
     trackVessel(dt);

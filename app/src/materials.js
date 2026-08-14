@@ -37,11 +37,20 @@ const DITHER = /* glsl */ `
 `;
 
 // Cloud shadows: two scrolling value-noise octaves in world XZ, sampled per
-// fragment, so soft shadow blankets drift across the city with the wind.
+// fragment, so soft shadow blankets drift across the city with the real wind.
+// How dark a fully overcast cell may go. The toy city has to stay a painted
+// object, so this is deliberately well short of 1.0 — it is an art call, not a
+// physical one.
+export const CLOUD_MAX_SHADE = 0.45;
+
 const CLOUDS = /* glsl */ `
-  uniform float uCloudCover;
+  // uNight is declared by the host shader (every one that injects this block
+  // already had it) — declaring it here too is a GLSL redefinition error.
   uniform vec2 uCloudDrift;
   uniform float uToy;
+  uniform sampler2D uWeatherField;
+  uniform vec2 uWeatherOrigin;
+  uniform vec2 uWeatherScale;
 
   float cloudNoise(vec2 p) {
     vec2 i = floor(p);
@@ -55,21 +64,49 @@ const CLOUDS = /* glsl */ `
   }
 
   float cloudShadow(vec2 world) {
-    // The diorama multiplies the result to 1.0 anyway — skip the two noise
-    // evaluations instead of computing a no-op per fragment.
-    if (uToy > 0.5) return 1.0;
+    // Cover comes from the sky, shape comes from the noise. The field is
+    // sampled by world position, so an overcast Sunset darkens while a clear
+    // Mission does not — a single citywide number cannot do that.
+    // (Weather used to be switched off entirely in diorama mode: "no weather on
+    // the tabletop". David reversed that deliberately — see
+    // docs/plans/WEATHER-PLAN.md §0. Do not put the uToy kill back.)
+    vec2 uv = (world - uWeatherOrigin) * uWeatherScale;
+    float cover = texture2D(uWeatherField, clamp(uv, 0.0, 1.0)).g;
+    // No cloud, no work: skip the two noise evaluations entirely.
+    if (cover < 0.01) return 1.0;
+
     vec2 p = world * 0.00055 + uCloudDrift;
     float n = cloudNoise(p) * 0.65 + cloudNoise(p * 2.3 + 11.0) * 0.35;
     float shade = smoothstep(0.42, 0.72, n);
-    // The diorama is lit like a model on a table: no weather on the tabletop.
-    return 1.0 - shade * uCloudCover * (1.0 - uToy);
+    // MAX_SHADE caps how dark it can ever get: a fully shadowed toy city is a
+    // grey city, and the model has to keep its painted look. uNight fades the
+    // whole term out — cloud shade only means anything while there is sun.
+    return 1.0 - shade * cover * ${CLOUD_MAX_SHADE.toFixed(2)} * (1.0 - uNight * 0.85);
+  }
+`;
+
+// Lightning. Storms only; the flash IS the effect, there is no bolt geometry.
+// (There is deliberately no shader fog here. Fog in this city is the fog-cube
+// GLB, instanced by fogbanks.js, and nothing else — do not reintroduce a
+// screen-space or per-fragment fog term.)
+const FLASH = /* glsl */ `
+  uniform float uFlash;
+  uniform float uWetness;
+
+  vec3 applyFlash(vec3 color) {
+    return color + vec3(0.55, 0.6, 0.75) * uFlash;
   }
 `;
 
 const CLOUD_UNIFORMS = () => ({
-  uCloudCover: shared.uCloudCover,
   uCloudDrift: shared.uCloudDrift,
   uToy: shared.uToy,
+  uNight: shared.uNight,
+  uWeatherField: shared.uWeatherField,
+  uWeatherOrigin: shared.uWeatherOrigin,
+  uWeatherScale: shared.uWeatherScale,
+  uWetness: shared.uWetness,
+  uFlash: shared.uFlash,
 });
 
 const HASH = /* glsl */ `
@@ -129,7 +166,8 @@ export function createBuildingMaterial({ windows = 1 } = {}) {
         varying float vLocalY;
         ${DITHER}
         ${HASH}
-        ${CLOUDS}`
+        ${CLOUDS}
+        ${FLASH}`
       )
       .replace(
         '#include <clipping_planes_fragment>',
@@ -177,6 +215,13 @@ export function createBuildingMaterial({ windows = 1 } = {}) {
         }
         diffuseColor.rgb *= cloudShadow(vCityWorld.xz);
         totalEmissiveRadiance += emissive;`
+      )
+      .replace(
+        '#include <fog_fragment>',
+        `#include <fog_fragment>
+        // Karl goes on AFTER lighting: fog is atmosphere between the eye and
+        // the surface, not pigment on it.
+        gl_FragColor.rgb = applyFlash(gl_FragColor.rgb);`
       );
   };
 
@@ -202,7 +247,7 @@ const FLAG_DECODE = /* glsl */ `
 
 export function createToyBuildingMaterial() {
   const material = new MeshLambertMaterial({ vertexColors: true, dithering: true });
-  material.uniformsHolder = { uFade: { value: 1 }, uFloor: { value: 3.5 }, uNight: shared.uNight };
+  material.uniformsHolder = { uFade: { value: 1 }, uFloor: { value: 3.5 }, uNight: shared.uNight, ...CLOUD_UNIFORMS() };
 
   material.onBeforeCompile = function patchToy(shader) {
     Object.assign(shader.uniforms, this.uniformsHolder);
@@ -237,6 +282,8 @@ export function createToyBuildingMaterial() {
         varying vec3 vToyNormal;
         varying float vToyWall;
         varying float vFlag;
+        ${CLOUDS}
+        ${FLASH}
         ${DITHER}
         ${HASH}`
       )
@@ -275,7 +322,13 @@ export function createToyBuildingMaterial() {
             totalEmissiveRadiance += diffuseColor.rgb * glowProp * uNight * 1.35;
             diffuseColor.rgb *= mix(1.0, 0.72, uNight);
           }
-        }`
+        }
+        diffuseColor.rgb *= cloudShadow(vToyPos.xz);`
+      )
+      .replace(
+        '#include <fog_fragment>',
+        `#include <fog_fragment>
+        gl_FragColor.rgb = applyFlash(gl_FragColor.rgb);`
       );
   };
 
@@ -292,7 +345,7 @@ export function createToyBuildingMaterial() {
 // tiers' cross-fade instead of popping in.
 export function createKitMaterial() {
   const material = new MeshLambertMaterial({ vertexColors: true, dithering: true });
-  material.uniformsHolder = { uNight: shared.uNight };
+  material.uniformsHolder = { uNight: shared.uNight, ...CLOUD_UNIFORMS() };
 
   material.onBeforeCompile = function patchKit(shader) {
     Object.assign(shader.uniforms, this.uniformsHolder);
@@ -325,6 +378,8 @@ export function createKitMaterial() {
         uniform float uNight;
         varying float vKit;
         varying vec3 vKitPos;
+        ${CLOUDS}
+        ${FLASH}
         ${DITHER}
         ${HASH}`
       )
@@ -342,7 +397,13 @@ export function createKitMaterial() {
           float lit = step(hash13(floor(vKitPos * vec3(1.4, 0.45, 1.4))), 0.58);
           totalEmissiveRadiance += vec3(1.0, 0.78, 0.48) * glass * lit * uNight * 1.5;
           diffuseColor.rgb *= mix(1.0, 0.72, uNight);
-        }`
+        }
+        diffuseColor.rgb *= cloudShadow(vKitPos.xz);`
+      )
+      .replace(
+        '#include <fog_fragment>',
+        `#include <fog_fragment>
+        gl_FragColor.rgb = applyFlash(gl_FragColor.rgb);`
       );
   };
 
@@ -355,17 +416,34 @@ export function createKitMaterial() {
 // landmark colours are authored, only the alpha channel is used.
 export function createBatchFadeLambert() {
   const material = new MeshLambertMaterial({ vertexColors: true, dithering: true });
-  material.onBeforeCompile = (shader) => {
+  material.uniformsHolder = CLOUD_UNIFORMS();
+  material.onBeforeCompile = function patchBatchFade(shader) {
+    Object.assign(shader.uniforms, this.uniformsHolder);
+    shader.vertexShader = shader.vertexShader
+      .replace('#include <common>', `#include <common>\n        varying vec3 vBatchPos;`)
+      .replace(
+        '#include <worldpos_vertex>',
+        `#include <worldpos_vertex>
+        vBatchPos = (modelMatrix * vec4(transformed, 1.0)).xyz;`
+      );
     shader.fragmentShader = shader.fragmentShader
       .replace(
         '#include <common>',
         `#include <common>
-        ${DITHER}`
+        uniform float uNight;
+        varying vec3 vBatchPos;
+        ${DITHER}
+        ${CLOUDS}
+        ${FLASH}`
       )
       .replace(
         '#include <clipping_planes_fragment>',
         `#include <clipping_planes_fragment>
         if (vColor.a < 0.999 && ditherThreshold(gl_FragCoord.xy) > vColor.a) discard;`
+      )      .replace(
+        '#include <fog_fragment>',
+        `#include <fog_fragment>
+        gl_FragColor.rgb = applyFlash(gl_FragColor.rgb);`
       );
   };
   return material;
@@ -379,6 +457,7 @@ export function createFarBuildingMaterial() {
     uQuadFade: { value: new Vector4(1, 1, 1, 1) },
     uNight: shared.uNight,
     uToy: shared.uToy,
+    ...CLOUD_UNIFORMS(),
   };
 
   material.onBeforeCompile = function patchFar(shader) {
@@ -389,7 +468,13 @@ export function createFarBuildingMaterial() {
         `#include <common>
         attribute float aQuad;
         uniform vec4 uQuadFade;
-        varying float vFade;`
+        varying float vFade;
+        varying vec3 vFarPos;`
+      )
+      .replace(
+        '#include <worldpos_vertex>',
+        `#include <worldpos_vertex>
+        vFarPos = (modelMatrix * vec4(transformed, 1.0)).xyz;`
       )
       .replace(
         '#include <begin_vertex>',
@@ -402,10 +487,14 @@ export function createFarBuildingMaterial() {
       .replace(
         '#include <common>',
         `#include <common>
+        // uToy is declared by the CLOUDS chunk below — declaring it here too
+        // is a GLSL redefinition error.
         uniform float uNight;
-        uniform float uToy;
         varying float vFade;
-        ${DITHER}`
+        varying vec3 vFarPos;
+        ${DITHER}
+        ${CLOUDS}
+        ${FLASH}`
       )
       .replace(
         '#include <clipping_planes_fragment>',
@@ -419,7 +508,12 @@ export function createFarBuildingMaterial() {
         totalEmissiveRadiance += vec3(1.0, 0.72, 0.42) * uNight * 0.075 * (1.0 - uToy);
         // In toy mode the far tier is not re-baked: it just goes bright and flat
         // so it reads as more of the same model, out of focus.
-        diffuseColor.rgb = mix(diffuseColor.rgb, pow(diffuseColor.rgb, vec3(0.72)) * 1.1 + 0.06, uToy);`
+        diffuseColor.rgb = mix(diffuseColor.rgb, pow(diffuseColor.rgb, vec3(0.72)) * 1.1 + 0.06, uToy);
+        diffuseColor.rgb *= cloudShadow(vFarPos.xz);`
+      )      .replace(
+        '#include <fog_fragment>',
+        `#include <fog_fragment>
+        gl_FragColor.rgb = applyFlash(gl_FragColor.rgb);`
       );
   };
 
@@ -443,12 +537,12 @@ export function createGroundMaterial() {
         `#include <common>
         attribute float aKind;
         varying float vKind;
-        varying vec2 vGroundWorld;`
+        varying vec3 vGroundWorld;`
       )
       .replace(
         '#include <worldpos_vertex>',
         `#include <worldpos_vertex>
-        vGroundWorld = (modelMatrix * vec4(transformed, 1.0)).xz;`
+        vGroundWorld = (modelMatrix * vec4(transformed, 1.0)).xyz;`
       )
       .replace(
         '#include <begin_vertex>',
@@ -461,8 +555,9 @@ export function createGroundMaterial() {
         `#include <common>
         uniform float uNight;
         varying float vKind;
-        varying vec2 vGroundWorld;
-        ${CLOUDS}`
+        varying vec3 vGroundWorld;
+        ${CLOUDS}
+        ${FLASH}`
       )
       .replace(
         '#include <color_fragment>',
@@ -471,9 +566,19 @@ export function createGroundMaterial() {
         // warm sodium sheen at night, and the paint stays crisp on top of it.
         float asphalt = step(63.5, vKind) * step(vKind, 64.5);
         float marking = step(65.5, vKind);
-        diffuseColor.rgb *= cloudShadow(vGroundWorld);
+        diffuseColor.rgb *= cloudShadow(vGroundWorld.xz);
+        // Wet ground: darker and slightly cooler, the way tarmac actually goes.
+        diffuseColor.rgb *= mix(1.0, 0.62, uWetness * asphalt);
+        diffuseColor.rgb = mix(diffuseColor.rgb, diffuseColor.rgb * vec3(0.86, 0.92, 1.06), uWetness * asphalt);
         totalEmissiveRadiance += vec3(1.0, 0.72, 0.42) * asphalt * uNight * 0.06;
         totalEmissiveRadiance += vec3(0.85, 0.86, 0.82) * marking * uNight * 0.1;`
+      )
+      .replace(
+        '#include <fog_fragment>',
+        `#include <fog_fragment>
+        // Karl goes on AFTER lighting: fog is atmosphere between the eye and
+        // the surface, not pigment on it.
+        gl_FragColor.rgb = applyFlash(gl_FragColor.rgb);`
       );
   };
 
@@ -488,18 +593,26 @@ export function createCloudShadedMaterial() {
   material.onBeforeCompile = function patchCloudShaded(shader) {
     Object.assign(shader.uniforms, this.uniformsHolder);
     shader.vertexShader = shader.vertexShader
-      .replace('#include <common>', `#include <common>\n        varying vec2 vCloudWorld;`)
+      .replace('#include <common>', `#include <common>\n        varying vec3 vCloudWorld;`)
       .replace(
         '#include <worldpos_vertex>',
         `#include <worldpos_vertex>
-        vCloudWorld = (modelMatrix * vec4(transformed, 1.0)).xz;`
+        vCloudWorld = (modelMatrix * vec4(transformed, 1.0)).xyz;`
       );
     shader.fragmentShader = shader.fragmentShader
-      .replace('#include <common>', `#include <common>\n        varying vec2 vCloudWorld;\n        ${CLOUDS}`)
+      .replace('#include <common>', `#include <common>\n        uniform float uNight;\n        varying vec3 vCloudWorld;\n        ${CLOUDS}
+        ${FLASH}`)
       .replace(
         '#include <color_fragment>',
         `#include <color_fragment>
-        diffuseColor.rgb *= cloudShadow(vCloudWorld);`
+        diffuseColor.rgb *= cloudShadow(vCloudWorld.xz);`
+      .replace(
+        '#include <fog_fragment>',
+        `#include <fog_fragment>
+        // Karl goes on AFTER lighting: fog is atmosphere between the eye and
+        // the surface, not pigment on it.
+        gl_FragColor.rgb = applyFlash(gl_FragColor.rgb);`
+      )
       );
   };
   return material;
