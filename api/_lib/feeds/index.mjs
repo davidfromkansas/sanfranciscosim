@@ -4,3 +4,4 @@
 
 import './ferries.mjs';
 import './muni.mjs';
+import './flights.mjs';

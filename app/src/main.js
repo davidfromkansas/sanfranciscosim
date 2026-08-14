@@ -25,6 +25,7 @@ import { createPiers } from './piers.js';
 import { createAgents } from './agents.js';
 import { createLiveFerries } from './ferries.js';
 import { createLiveMuni } from './muni.js';
+import { createLiveAircraft } from './aircraft.js';
 import { createCameraRig } from './camera.js';
 import { createSigns } from './signs.js';
 import { createToyPost } from './toypost.js';
@@ -114,6 +115,9 @@ async function boot() {
   // Real Muni buses from /api/muni; when the feed is away this layer is simply
   // empty — the procedural road traffic never depended on it.
   const muni = createLiveMuni(scene, data);
+  // Real aircraft from /api/flights. Like the Muni layer this one simply stays
+  // empty when the feed is away — nothing else in the city depends on it.
+  const aircraft = createLiveAircraft(scene, data);
   const signs = createSigns(scene, data);
   const post = createToyPost(renderer);
 
@@ -441,6 +445,15 @@ async function boot() {
       if (intent.type === 'focus_entity' || intent.type === 'highlight') {
         // Live-fleet ids from the muni feed ("SF:8632"): the concierge saw them
         // in live_data and the bus layer has the current position.
+        // Aircraft ids from the flights feed ("AC:a98edc"): the concierge saw
+        // them in live_data and this layer has the current position.
+        if (typeof intent.id === 'string' && intent.id.startsWith('AC:')) {
+          const plane = aircraft.aircraftEntity(intent.id);
+          if (plane) {
+            selectEntity(plane, { fly: intent.type === 'focus_entity' });
+            return;
+          }
+        }
         if (typeof intent.id === 'string' && intent.id.startsWith('SF:')) {
           const bus = muni.busEntity(intent.id);
           if (bus) {
@@ -486,9 +499,14 @@ async function boot() {
   let vesselCardAge = 0;
   function trackVessel(dt) {
     const selected = focus.entity;
-    if (selected?.kind !== 'vessel' && selected?.kind !== 'transit') return;
+    if (selected?.kind !== 'vessel' && selected?.kind !== 'transit' && selected?.kind !== 'aircraft')
+      return;
     const fresh =
-      selected.kind === 'vessel' ? ferries.vesselEntity(selected.id) : muni.busEntity(selected.id);
+      selected.kind === 'vessel'
+        ? ferries.vesselEntity(selected.id)
+        : selected.kind === 'transit'
+          ? muni.busEntity(selected.id)
+          : aircraft.aircraftEntity(selected.id);
     if (!fresh) return;
     focus.entity = fresh;
     overlay.show(fresh, { toy: style === 'toy', groundY: 0 });
@@ -503,6 +521,11 @@ async function boot() {
   async function pickAt(nx, ny, hasGround) {
     pickPointer.set(nx, ny);
     pickRay.setFromCamera(pickPointer, camera);
+    // Aircraft are picked first: they are small, fast and in front of
+    // everything else on screen, so whatever is behind one is never the more
+    // interesting answer.
+    const plane = aircraft.pickAircraft(pickRay.ray.origin, pickRay.ray.direction);
+    if (plane) return plane;
     const vessel = ferries.pickVessel(pickRay.ray.origin, pickRay.ray.direction);
     if (vessel) return vessel;
     const bus = muni.pickBus(pickRay.ray.origin, pickRay.ray.direction);
@@ -553,6 +576,7 @@ async function boot() {
     agents,
     ferries,
     muni,
+    aircraft,
     governor,
     boot: bootScreen,
     landmarks,
@@ -658,6 +682,7 @@ async function boot() {
     agents.update(dt, pivotWorld, camera.position);
     ferries.update(dt);
     muni.update(dt, camera);
+    aircraft.update(dt, camera);
     trackVessel(dt);
     landmarks.update();
     assets.update(camera.position, dt);
@@ -704,6 +729,7 @@ async function boot() {
           `cars       ${agents.carCount}`,
           `ferries    ${ferries.count}${ferries.live ? ' live' : ' procedural'}`,
           `muni       ${muni.count}${muni.live ? ` live (${muni.onShapeCount} on-route${muni.degraded ? ', degraded' : ''})` : ' off'}`,
+          `aircraft   ${aircraft.count}${aircraft.live ? ` live (${aircraft.source})` : ' off'}`,
           `altitude   ${(camera.position.y - rig.state.pivot.y).toFixed(0)} m`,
           `zoom       ${rig.state.distance.toFixed(0)} m`,
           `time       ${sky ? sky.localTime : 'fallback'}${clockOverride === null ? '' : ' (held)'}`,

@@ -18,6 +18,7 @@ const GLYPHS = {
   view: '<circle cx="12" cy="12" r="3"/><path d="M2 12s4-6 10-6 10 6 10 6-4 6-10 6S2 12 2 12z"/>',
   vessel: '<path d="M4 14h16l-2 5H6zM12 14V5l6 4-6 2M7 14v-4h5"/>',
   transit: '<rect x="5" y="4" width="14" height="13" rx="2"/><path d="M5 12h14M8 20l1-3M16 20l-1-3"/><circle cx="9" cy="15" r=".5"/><circle cx="15" cy="15" r=".5"/>',
+  aircraft: '<path d="M12 3c.9 0 1.4.9 1.4 2v4.2l7.1 4v2l-7.1-2.2V17l2.2 1.6v1.7L12 19.5l-3.6.8v-1.7L10.6 17v-3.9L3.5 15.3v-2l7.1-4V5c0-1.1.5-2 1.4-2z"/>',
 };
 
 const KIND_GLYPH = {
@@ -30,6 +31,7 @@ const KIND_GLYPH = {
   view: 'view',
   vessel: 'vessel',
   transit: 'transit',
+  aircraft: 'aircraft',
 };
 
 const CAT_TONE = [
@@ -221,6 +223,36 @@ export function createContextCard({ onFly, onAsk, onSelectHistory }) {
       }
       fact('Speed', `${Math.round(entity.speedKmh)} km/h`);
       fact('Position reported', relative(entity.recordedAt));
+    } else if (entity.kind === 'aircraft') {
+      // Every number here is the TRUE reading from the transponder. Only the
+      // height the aircraft is DRAWN at is compressed (see aircraft.js dispY),
+      // so the card is never the place that lies.
+      subtitle.textContent = entity.aircraftType
+        ? `${entity.name} \u00b7 ${entity.aircraftType}`
+        : entity.name;
+      chips.append(chip(entity.demo ? 'Demo aircraft' : 'Live aircraft', 'teal', 'aircraft'));
+      if (entity.phase) chips.append(chip(entity.phase, 'navy'));
+      if (entity.emergency) chips.append(chip(entity.emergency, 'coral'));
+      if (entity.military) chips.append(chip('Military', 'mustard'));
+      if (entity.callsign) fact('Callsign', entity.callsign);
+      if (entity.registration && entity.registration !== entity.callsign) {
+        fact('Tail number', entity.registration);
+      }
+      if (entity.aircraftType) fact('Type', entity.aircraftType);
+      fact('Altitude', `${entity.altitudeFt.toLocaleString('en-US')} ft \u00b7 ${entity.altitudeM.toLocaleString('en-US')} m`);
+      fact('Ground speed', `${entity.speedKt} kn \u00b7 ${Math.round(entity.speedKmh)} km/h`);
+      // A vertical rate under ~500 fpm is noise on a barometric encoder, so it
+      // is reported as level rather than as a spurious 40 fpm climb.
+      const fpm = entity.verticalRateFpm;
+      fact(
+        'Vertical rate',
+        Math.abs(fpm) < 500
+          ? 'Level'
+          : `${fpm > 0 ? 'Climbing' : 'Descending'} ${Math.abs(fpm).toLocaleString('en-US')} ft/min`
+      );
+      fact('Heading', `${entity.heading}\u00b0`);
+      if (entity.squawk) fact('Squawk', entity.squawk);
+      fact('Position reported', relative(entity.recordedAt));
     } else if (entity.kind === 'neighborhood') {
       subtitle.textContent = 'Analysis neighbourhood';
       chips.append(chip('Neighbourhood', 'plum', 'neighborhood'));
@@ -231,7 +263,8 @@ export function createContextCard({ onFly, onAsk, onSelectHistory }) {
 
     // The concierge only knows the baked city, so it has nothing to say about a
     // boat that showed up in a live feed thirty seconds ago.
-    askButton.hidden = entity.kind === 'vessel' || entity.kind === 'transit';
+    askButton.hidden =
+      entity.kind === 'vessel' || entity.kind === 'transit' || entity.kind === 'aircraft';
 
     const bits = [`Source: ${sourceLabel(entity.source)}`];
     if (entity.kind === 'building') bits.push(confidenceLabel(entity.confidence));
