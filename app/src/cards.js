@@ -18,6 +18,7 @@ const GLYPHS = {
   view: '<circle cx="12" cy="12" r="3"/><path d="M2 12s4-6 10-6 10 6 10 6-4 6-10 6S2 12 2 12z"/>',
   vessel: '<path d="M4 14h16l-2 5H6zM12 14V5l6 4-6 2M7 14v-4h5"/>',
   transit: '<rect x="5" y="4" width="14" height="13" rx="2"/><path d="M5 12h14M8 20l1-3M16 20l-1-3"/><circle cx="9" cy="15" r=".5"/><circle cx="15" cy="15" r=".5"/>',
+  aircraft: '<path d="M12 3c.9 0 1.4.9 1.4 2v4.2l7.1 4v2l-7.1-2.2V17l2.2 1.6v1.7L12 19.5l-3.6.8v-1.7L10.6 17v-3.9L3.5 15.3v-2l7.1-4V5c0-1.1.5-2 1.4-2z"/>',
 };
 
 const KIND_GLYPH = {
@@ -30,6 +31,7 @@ const KIND_GLYPH = {
   view: 'view',
   vessel: 'vessel',
   transit: 'transit',
+  aircraft: 'aircraft',
 };
 
 const CAT_TONE = [
@@ -97,7 +99,7 @@ function chip(text, tone, glyphName) {
   return node;
 }
 
-export function createContextCard({ onFly, onAsk, onSelectHistory }) {
+export function createContextCard({ onFly, onAsk, onSelectHistory, onClose }) {
   const card = el('div', 'toy-card');
   card.id = 'context-card';
   card.hidden = true;
@@ -130,7 +132,13 @@ export function createContextCard({ onFly, onAsk, onSelectHistory }) {
   document.body.appendChild(card);
 
   let current = null;
-  close.addEventListener('click', () => hide());
+  close.addEventListener('click', () => {
+    // Dismissing the card is also how you let go of whatever it was about —
+    // for a followed aircraft that means handing the camera back.
+    const dismissed = current;
+    hide();
+    onClose?.(dismissed);
+  });
   flyButton.addEventListener('click', () => current && onFly(current));
   askButton.addEventListener('click', () => current && onAsk(current));
 
@@ -221,6 +229,63 @@ export function createContextCard({ onFly, onAsk, onSelectHistory }) {
       }
       fact('Speed', `${Math.round(entity.speedKmh)} km/h`);
       fact('Position reported', relative(entity.recordedAt));
+    } else if (entity.kind === 'aircraft') {
+      // Every number here is the TRUE reading from the transponder. Only the
+      // height the aircraft is DRAWN at is compressed (see aircraft.js dispY),
+      // so the card is never the place that lies.
+      // The route is the most glanceable fact there is, so it headlines when
+      // known: "Airliner \u00b7 B739 \u00b7 SFO \u2192 PVR".
+      const leg =
+        entity.route && (entity.route.from?.iata || entity.route.to?.iata)
+          ? `${entity.route.from?.iata || '?'} \u2192 ${entity.route.to?.iata || '?'}`
+          : null;
+      subtitle.textContent = [entity.name, entity.aircraftType, leg].filter(Boolean).join(' \u00b7 ');
+      chips.append(chip(entity.demo ? 'Demo aircraft' : 'Live aircraft', 'teal', 'aircraft'));
+      if (entity.phase) chips.append(chip(entity.phase, 'navy'));
+      if (entity.emergency) chips.append(chip(entity.emergency, 'coral'));
+      if (entity.military) chips.append(chip('Military', 'mustard'));
+      if (entity.callsign) fact('Callsign', entity.callsign);
+      if (entity.registration && entity.registration !== entity.callsign) {
+        fact('Tail number', entity.registration);
+      }
+      if (entity.aircraftType) fact('Type', entity.aircraftType);
+      // Origin and destination. ADS-B does not broadcast these — they are
+      // looked up from the callsign, so a private flight legitimately has none
+      // and says so rather than showing a blank row.
+      if (entity.route) {
+        const place = (node) =>
+          node
+            ? [node.city, node.iata ? `(${node.iata})` : null].filter(Boolean).join(' ') ||
+              node.name ||
+              'Not reported'
+            : 'Not reported';
+        fact('From', place(entity.route.from));
+        fact('To', place(entity.route.to));
+      } else if (entity.callsign && entity.callsign !== entity.registration) {
+        fact('Route', 'Not published');
+      }
+      fact('Altitude', `${entity.altitudeFt.toLocaleString('en-US')} ft \u00b7 ${entity.altitudeM.toLocaleString('en-US')} m`);
+      fact('Ground speed', `${entity.speedKt} kn \u00b7 ${Math.round(entity.speedKmh)} km/h`);
+      // A vertical rate under ~500 fpm is noise on a barometric encoder, so it
+      // is reported as level rather than as a spurious 40 fpm climb.
+      const fpm = entity.verticalRateFpm;
+      fact(
+        'Vertical rate',
+        Math.abs(fpm) < 500
+          ? 'Level'
+          : `${fpm > 0 ? 'Climbing' : 'Descending'} ${Math.abs(fpm).toLocaleString('en-US')} ft/min`
+      );
+      fact('Heading', `${entity.heading}\u00b0`);
+      // Say plainly that the aircraft is drawn nearer than it is. The distance
+      // is the real one; only the position on screen is compressed.
+      if (entity.scaledPlacement) {
+        fact(
+          'Actually',
+          `${entity.trueDistanceKm.toFixed(1)} km from the city \u00b7 drawn overhead to keep it in view`
+        );
+      }
+      if (entity.squawk) fact('Squawk', entity.squawk);
+      fact('Position reported', relative(entity.recordedAt));
     } else if (entity.kind === 'neighborhood') {
       subtitle.textContent = 'Analysis neighbourhood';
       chips.append(chip('Neighbourhood', 'plum', 'neighborhood'));
@@ -231,6 +296,9 @@ export function createContextCard({ onFly, onAsk, onSelectHistory }) {
 
     // The concierge only knows the baked city, so it has nothing to say about a
     // boat that showed up in a live feed thirty seconds ago.
+    // Aircraft DO get the ask button: unlike a ferry or a bus, the concierge
+    // has the whole flights feed through live_data, and the clicked aircraft's
+    // full state rides along in the focus context — so it can actually answer.
     askButton.hidden = entity.kind === 'vessel' || entity.kind === 'transit';
 
     const bits = [`Source: ${sourceLabel(entity.source)}`];

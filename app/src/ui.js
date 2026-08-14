@@ -67,7 +67,7 @@ export function createUI({ presets, onPreset, onQuality }) {
   help.innerHTML =
     '<label>Controls</label><div style="margin-top:4px;line-height:1.5;color:rgba(255,255,255,.78)">' +
     'WASD / arrows pan · Q E rotate · wheel zooms to cursor · right-drag orbits · left-drag grabs the ground · ' +
-    'screen edges scroll · Shift boosts · 0–9 fly to landmarks · H home · / search · ' +
+    'screen edges scroll · Shift boosts · 0–9 fly to landmarks · A aircraft · H home · / search · ' +
     'the sky follows San Francisco time' +
     '</div>';
 
