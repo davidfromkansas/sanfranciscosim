@@ -17,7 +17,7 @@
 // FALL direction, so a streak turns its face to the eye while staying aligned
 // with the way the rain is going — it reads as a line, never a rectangle.
 
-import { InstancedBufferAttribute, InstancedMesh, PlaneGeometry, ShaderMaterial, Vector2, Vector3 } from 'three';
+import { DoubleSide, InstancedBufferAttribute, InstancedMesh, PlaneGeometry, ShaderMaterial, Vector2, Vector3 } from 'three';
 import { shared } from './env.js';
 import { DECK_ALTITUDE } from './clouds.js';
 
@@ -26,19 +26,26 @@ import { DECK_ALTITUDE } from './clouds.js';
 // Instancing makes count nearly free -- these are two triangles each -- so the
 // shaft count is high. At 3000 spread through a column kilometres wide the rain
 // read as scattered showers rather than a downpour.
-export const RAIN_CAPS = { ultra: 26000, high: 26000, medium: 13000, low: 5000 };
+// Both ends of this have now been measured against real frames:
+//   26k over a 1.4 km radius -> readable shafts, but sparse
+//   64k over a 350 m radius  -> a dense dither speckle, reads as noise
+// This sits between them.
+export const RAIN_CAPS = { ultra: 44000, high: 44000, medium: 22000, low: 9000 };
 
 // The rain column runs the full height from the cloud deck to the ground, so
 // the shafts visibly hang off the clouds that are producing them.
 const RAIN_TOP = DECK_ALTITUDE;
 // How wide the column is, as a multiple of the camera's orbit distance: the
 // rain has to cover what is on screen, so it grows as you pull back.
-// Tighter than the view, deliberately. The column has to cover what is on
-// screen, but every extra metre of radius thins the rain out over the square of
-// it -- at a 9 km radius the shafts were spread through 250 square kilometres.
-const RADIUS_PER_DISTANCE = 0.85;
-const RADIUS_MIN = 600;
-const RADIUS_MAX = 5200;
+// SMALL, and centred on the camera rather than on the city. This is the lesson
+// that took longest here: spreading drops evenly across the whole view puts
+// almost all of them far away, where a streak is under a pixel and contributes
+// nothing -- 64,000 of them rendered as about eight visible lines. Rain reads
+// as rain when it is CLOSE to the eye and dense. nycsim uses a 120 m radius for
+// exactly this reason; this is wider only because the camera sits further out.
+const RADIUS_PER_DISTANCE = 0.5;
+const RADIUS_MIN = 300;
+const RADIUS_MAX = 2200;
 
 const clamp01 = (v) => (v < 0 ? 0 : v > 1 ? 1 : v);
 
@@ -50,12 +57,13 @@ export function createRain(scene, { sampleAt }) {
   // 150 m each streak was a vertical pole standing over the city; the length
   // has to stay well under the height it falls through or the eye sees columns
   // instead of weather.
-  // WIDTH is what decides whether a streak exists on screen at all: at diorama
-  // range anything under ~3 m is sub-pixel and renders as nothing, however many
-  // there are. Length decides whether it reads as rain or as a pole. Both have
-  // been wrong in both directions here; these are the values that survived
-  // looking at the frame.
-  const geometry = new PlaneGeometry(3.4, 95);
+  // Short and thin and MANY. Width has to clear about a pixel at the working
+  // camera distance or the streak renders as nothing; length is what decides
+  // whether the result reads as rain or as a picket fence. At 3.4 x 95 m these
+  // were unmistakably vertical poles standing over the city, spaced far enough
+  // apart to count. Rain is dense and small: the density has to come from the
+  // NUMBER of streaks, not the size of them.
+  const geometry = new PlaneGeometry(3.4, 72);
   const seeds = new Float32Array(cap * 3);
   for (let i = 0; i < cap * 3; i++) {
     const x = Math.sin(i * 127.1 + 311.7) * 43758.5453;
@@ -76,6 +84,12 @@ export function createRain(scene, { sampleAt }) {
   const material = new ShaderMaterial({
     transparent: true,
     depthWrite: false,
+    // DoubleSide is NOT optional here, and dropping it when porting from nycsim
+    // is what made 64,000 streaks render as nothing. The quad billboards around
+    // the fall direction using cross(fall, viewDir), so its winding flips
+    // depending on which side of the camera the drop is on -- with the default
+    // FrontSide, every streak on the wrong side is silently culled.
+    side: DoubleSide,
     uniforms,
     vertexShader: /* glsl */ `
       attribute vec3 aRnd;
@@ -106,7 +120,7 @@ export function createRain(scene, { sampleAt }) {
         vec3 rt = normalize(cross(fall, vd));
         vec3 p = wp + rt * position.x - fall * position.y;
 
-        vA = uOn * 0.5 * smoothstep(0.0, 0.07, vFall);
+        vA = uOn * 0.55 * smoothstep(0.0, 0.05, vFall);
         gl_Position = projectionMatrix * viewMatrix * vec4(p, 1.0);
       }
     `,
@@ -137,7 +151,7 @@ export function createRain(scene, { sampleAt }) {
     activeCap = RAIN_CAPS[key] ?? cap;
   };
 
-  function update(dt, focus, cameraDistance = 900) {
+  function update(dt, focus, cameraPosition, cameraDistance = 900) {
     // Local rain, not the citywide mean: stand in the shower, not near it.
     intensity = clamp01(sampleAt(focus.x, focus.z, 'precip'));
     const count = Math.floor(activeCap * intensity);
@@ -145,9 +159,10 @@ export function createRain(scene, { sampleAt }) {
     mesh.count = count;
     if (!count) return 0;
 
-    // Centred on the ground being framed, and running from there up to the
-    // cloud deck -- so the shafts hang off the clouds and land on the city.
-    uniforms.uCenter.value.set(focus.x, focus.y, focus.z);
+    // Centred on the CAMERA in xz so the drops are near the eye and read, but
+    // running from the GROUND up to the cloud deck in y, so they still visibly
+    // fall the whole way from the clouds rather than appearing at eye level.
+    uniforms.uCenter.value.set(cameraPosition.x, focus.y, cameraPosition.z);
     uniforms.uWind.value.copy(shared.uWind.value);
     uniforms.uRadius.value = Math.max(RADIUS_MIN, Math.min(RADIUS_MAX, cameraDistance * RADIUS_PER_DISTANCE));
     uniforms.uOn.value = 1;
