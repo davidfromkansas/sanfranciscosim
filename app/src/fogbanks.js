@@ -39,7 +39,7 @@ export const BANK_CAPS = { ultra: 625, high: 625, medium: 340, low: 150 };
 const BANK_SIZE = 820;
 // Sea level to here: the marine layer's own thickness.
 const BANK_BASE = 30;
-const BANK_TOP = 300;
+const BANK_TOP = 340;
 // Tighter than the cloud scatter: fog sits ON the city, not out at sea.
 const EXTENT = 6000;
 
@@ -62,7 +62,13 @@ export function createFogBanks(scene, { sampleAt }) {
   let ready = false;
   // Opacity well under 1: these overlap heavily, and alpha compounds where
   // they stack, so a per-instance 1.0 stacked into an opaque wall.
-  const tuning = { size: 1, opacity: 0.16, density: 1 };
+  // Per-instance alpha. The banks overlap heavily by design (they have to, to
+  // read as one mass rather than as separate puffs), and alpha compounds where
+  // they stack, so this number is far more sensitive than it looks:
+  //   0.16 -> a thin veil, too sparse
+  //   0.26 -> fog you can still see the city through   <- shipped
+  //   0.38 -> a full white-out, the city essentially gone
+  const tuning = { size: 1, opacity: 0.26, density: 1 };
   const cap = BANK_CAPS.ultra;
 
   // A JITTERED GRID, not a random scatter. Random positions clump and leave
@@ -89,7 +95,7 @@ export function createFogBanks(scene, { sampleAt }) {
       // range is deliberately well under 1: at 0.85 the higher-threshold banks
       // never switched on anywhere except the very thickest cells, which left
       // the fog bunched into one corner of the city instead of spread over it.
-      threshold: hash(i, 6) * 0.42,
+      threshold: hash(i, 6) * 0.22,
     });
   }
 
@@ -221,7 +227,7 @@ export function createFogBanks(scene, { sampleAt }) {
       // Flattened, but nowhere near as hard as before: squashing a voxel
       // cluster to a third of its height is what made each one read as a sheet
       // rather than as a clump of vapour.
-      _scale.set(size, size * 0.62, size);
+      _scale.set(size, size * 0.85, size);
       _matrix.compose(_position, _quaternion, _scale);
       mesh.setMatrixAt(i, _matrix);
       alphaAttribute.array[i] = presence * tuning.opacity;
