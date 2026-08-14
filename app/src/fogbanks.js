@@ -22,16 +22,26 @@ import { shared } from './env.js';
 
 const URL = `${import.meta.env.BASE_URL}sf-assets/fog-cube.glb`;
 
-// Banks are the most expensive thing weather draws — they are big, blended and
-// overlapping. They go first when the tier drops.
-export const BANK_CAPS = { ultra: 120, high: 120, medium: 64, low: 0 };
+// Banks thin out as the tier drops, but they NEVER go to zero. Setting the
+// low tier to 0 meant that the moment the governor demoted the scene — which
+// it does readily on a loaded machine — the fog vanished completely and the
+// city looked like the feature was broken. Fog is the headline here; it is the
+// last thing to cut, not the first.
+export const BANK_CAPS = { ultra: 120, high: 120, medium: 80, low: 36 };
 
 // The cube is a unit volume, so this is the width of one bank in metres.
-const BANK_SIZE = 900;
+//
+// Sized for COVERAGE, not for count -- the same lesson the clouds taught. At
+// 900 m over an 18 km spread, seventy banks covered about 14% of the ground
+// and were effectively invisible from the diorama camera, however many of them
+// there were. A real marine layer is continuous, so the banks are now
+// kilometres wide and packed into a tighter box.
+const BANK_SIZE = 2100;
 // Sea level to here: the marine layer's own thickness.
-const BANK_BASE = 20;
-const BANK_TOP = 260;
-const EXTENT = 9000;
+const BANK_BASE = 30;
+const BANK_TOP = 300;
+// Tighter than the cloud scatter: fog sits ON the city, not out at sea.
+const EXTENT = 5800;
 
 const _matrix = new Matrix4();
 const _position = new Vector3();
@@ -61,6 +71,8 @@ export function createFogBanks(scene, { sampleAt }) {
       y: BANK_BASE + hash(i, 5) * (BANK_TOP - BANK_BASE),
       size: 0.6 + hash(i, 3) * 0.9,
       spin: hash(i, 4) * Math.PI * 2,
+      shown: false,
+      lastSize: 0,
       // Each bank appears at its own point on the density ramp, so fog thickens
       // by gaining banks rather than by everything fading up together.
       threshold: hash(i, 6) * 0.85,
@@ -141,6 +153,15 @@ export function createFogBanks(scene, { sampleAt }) {
     return { ...tuning };
   }
 
+  // Fraction of the bank box the visible banks actually cover. Counting
+  // instances hides the only thing that matters -- 71 banks sounded fine while
+  // covering 14% of the ground and reading as nothing.
+  function coverage() {
+    let area = 0;
+    for (const slot of slots) if (slot.shown) area += Math.PI * (slot.lastSize / 2) ** 2;
+    return +(area / (2 * EXTENT) ** 2).toFixed(3);
+  }
+
   function update(dt) {
     if (!ready || !mesh) return 0;
     const limit = Math.min(activeCap, cap);
@@ -161,10 +182,16 @@ export function createFogBanks(scene, { sampleAt }) {
       // A clear day has a residual density of a few percent, and an instance
       // whose threshold happened to land near zero would sit there as a lone
       // bank in a blue sky. Nothing below this counts as fog at all.
-      const raw = i < limit ? sampleAt(slot.x, slot.z, 'fog') * tuning.density : 0;
+      // Thin the set by STRIDE, not by taking the first N: the low indices are
+      // an arbitrary corner of the scatter, so slicing them left the survivors
+      // clumped and off camera.
+      const stride = Math.max(1, Math.ceil(cap / Math.max(1, limit)));
+      const inTier = i % stride === 0;
+      const raw = inTier ? sampleAt(slot.x, slot.z, 'fog') * tuning.density : 0;
       const local = raw < 0.08 ? 0 : raw;
       const presence = Math.max(0, Math.min(1, (local - slot.threshold) * 3));
 
+      slot.shown = presence > 0.02;
       if (presence <= 0.02) {
         alphaAttribute.array[i] = 0;
         _matrix.compose(_hidden, _quaternion, _scale.set(0.0001, 0.0001, 0.0001));
@@ -174,6 +201,7 @@ export function createFogBanks(scene, { sampleAt }) {
 
       drawn++;
       const size = BANK_SIZE * slot.size * tuning.size * (0.7 + 0.3 * presence);
+      slot.lastSize = size;
       _position.set(slot.x, slot.y, slot.z);
       _quaternion.setFromAxisAngle(UP, slot.spin);
       // Wide and flat: a marine layer spreads, it does not tower.
@@ -193,6 +221,7 @@ export function createFogBanks(scene, { sampleAt }) {
     update,
     setQuality,
     tune,
+    coverage,
     get mesh() {
       return mesh;
     },

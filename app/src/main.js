@@ -648,6 +648,11 @@ async function boot() {
     tuneBanks(patch) {
       return fogBanks.tune(patch);
     },
+    // Fraction of the ground the fog banks actually cover. Counting them hides
+    // the only number that matters.
+    bankCoverage() {
+      return fogBanks.coverage();
+    },
     tuneClouds(patch) {
       return clouds.tune(patch);
     },
