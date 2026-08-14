@@ -25,6 +25,7 @@ import { createPiers } from './piers.js';
 import { createAgents } from './agents.js';
 import { createLiveFerries } from './ferries.js';
 import { createLiveMuni } from './muni.js';
+import { createMuniStopLayer } from './munistoplayer.js';
 import { createLiveAircraft } from './aircraft.js';
 import { createCameraRig } from './camera.js';
 import { createSigns } from './signs.js';
@@ -155,6 +156,9 @@ async function boot() {
   // Real Muni buses from /api/muni; when the feed is away this layer is simply
   // empty — the procedural road traffic never depended on it.
   const muni = createLiveMuni(scene, data);
+  // Clickable markers over the real bus stops; the shelters themselves are
+  // street furniture placed by the tile worker at the same coordinates.
+  const muniStops = createMuniStopLayer(scene, data, muni);
   // Real aircraft from /api/flights. Like the Muni layer this one simply stays
   // empty when the feed is away — nothing else in the city depends on it.
   const aircraft = createLiveAircraft(scene, data);
@@ -652,14 +656,18 @@ async function boot() {
   let vesselCardAge = 0;
   function trackVessel(dt) {
     const selected = focus.entity;
-    if (selected?.kind !== 'vessel' && selected?.kind !== 'transit' && selected?.kind !== 'aircraft')
-      return;
+    const LIVE_KINDS = ['vessel', 'transit', 'aircraft', 'transit-stop'];
+    if (!LIVE_KINDS.includes(selected?.kind)) return;
+    // A stop does not move, but what is coming to it does — refreshing it keeps
+    // the arrival times on an open card honest.
     const fresh =
       selected.kind === 'vessel'
         ? ferries.vesselEntity(selected.id)
         : selected.kind === 'transit'
           ? muni.busEntity(selected.id)
-          : aircraft.aircraftEntity(selected.id);
+          : selected.kind === 'transit-stop'
+            ? muniStops.stopEntity(selected.id)
+            : aircraft.aircraftEntity(selected.id);
     if (!fresh) return;
     focus.entity = fresh;
     overlay.show(fresh, { toy: style === 'toy', groundY: 0 });
@@ -683,6 +691,8 @@ async function boot() {
     if (vessel) return vessel;
     const bus = muni.pickBus(pickRay.ray.origin, pickRay.ray.direction);
     if (bus) return bus;
+    const stop = muniStops.pickStop(pickRay.ray.origin, pickRay.ray.direction);
+    if (stop) return stop;
     return context.pick(pickRay.ray.origin, pickRay.ray.direction, hasGround ? groundPoint : null, {
       toy: style === 'toy',
     });
@@ -737,6 +747,7 @@ async function boot() {
     rain,
     fogBanks,
     muni,
+    muniStops,
     aircraft,
     // Which aircraft the camera is locked to, or null. Exposed because the
     // follow is otherwise unobservable from outside and QA has to be able to
@@ -903,6 +914,7 @@ async function boot() {
     rain.update(dt, camera.position);
     fogBanks.update(Math.min(1, elapsed));
     muni.update(dt, camera);
+    muniStops.update(dt, camera, pivotWorld);
     aircraft.update(dt, camera);
     trackVessel(dt);
     landmarks.update();
@@ -950,6 +962,7 @@ async function boot() {
           `cars       ${agents.carCount}`,
           `ferries    ${ferries.count}${ferries.live ? ' live' : ' procedural'}`,
           `muni       ${muni.count}${muni.live ? ` live (${muni.onShapeCount} on-route${muni.degraded ? ', degraded' : ''})` : ' off'}`,
+          `stops      ${muniStops.count} shown / ${muniStops.total}`,
           `aircraft   ${aircraft.count}${aircraft.live ? ` live (${aircraft.source})` : ' off'}`,
           `altitude   ${(camera.position.y - rig.state.pivot.y).toFixed(0)} m`,
           `zoom       ${rig.state.distance.toFixed(0)} m`,

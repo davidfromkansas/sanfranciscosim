@@ -71,6 +71,14 @@ const TROLLEY_NUMBERS = new Set([
   '1', '2', '3', '5', '6', '7', '14', '21', '22', '24', '30', '31', '33', '41', '45', '49',
 ]);
 
+// A rider calls both of these "the bus": motor coaches and trolley coaches look
+// alike, stop at the same kind of stop, and between them are the whole surface
+// bus network. Rail and cable are excluded — they have platforms, not bus stops.
+function isBusRoute(routeId) {
+  const id = String(routeId).toUpperCase();
+  return !RAIL_OR_CABLE.has(id);
+}
+
 function isMotorCoach(routeId) {
   const id = String(routeId).toUpperCase();
   if (RAIL_OR_CABLE.has(id)) return false;
@@ -272,29 +280,75 @@ async function main() {
       `headsign ${Object.keys(tripHeadsign).length}/${trips.size}`,
   );
 
-  // stop_times.txt is the big one (~1M rows): stream it once, recording both the
-  // stops motor-coach trips serve (for the client's card) and every stop with any
-  // service at all (for the concierge, whose questions span every mode).
+  // Every BUS trip (motor coach + trolley coach), for the stop layer. The shape
+  // machinery above stays motor-coach-only: it drives vehicle movement, and only
+  // motor coaches are drawn today.
+  const busTrips = new Map(); // tripId -> routeId
+  const busRouteNames = new Map(); // routeId -> display name
+  await eachRow('routes.txt', (cols, h) => {
+    const id = cols[h.route_id];
+    if (!isBusRoute(id)) return;
+    busRouteNames.set(id, cols[h.route_long_name] || cols[h.route_short_name] || id);
+  });
+  await eachRow('trips.txt', (cols, h) => {
+    const routeId = cols[h.route_id];
+    if (busRouteNames.has(routeId)) busTrips.set(cols[h.trip_id], routeId);
+  });
+  console.log(`[muni-shapes] bus routes (motor + trolley): ${busRouteNames.size}`);
+
+  // stop_times.txt is the big one (~1M rows): stream it once, recording the stops
+  // motor-coach trips serve (the bus card's "next stops"), every stop with any
+  // service (the concierge), and — the new part — which BUS ROUTES serve each
+  // stop, which is what "which buses stop here" is answered from.
   const wantedStops = new Set();
   const servedStops = new Set();
+  const stopRoutes = new Map(); // stopId -> Set(routeId)
   await eachRow('stop_times.txt', (cols, h) => {
-    servedStops.add(cols[h.stop_id]);
-    if (trips.has(cols[h.trip_id])) wantedStops.add(cols[h.stop_id]);
+    const stopId = cols[h.stop_id];
+    servedStops.add(stopId);
+    const tripId = cols[h.trip_id];
+    if (trips.has(tripId)) wantedStops.add(stopId);
+    const busRoute = busTrips.get(tripId);
+    if (busRoute) {
+      let set = stopRoutes.get(stopId);
+      if (!set) stopRoutes.set(stopId, (set = new Set()));
+      set.add(busRoute);
+    }
   });
+  console.log(`[muni-shapes] stops served by a bus route: ${stopRoutes.size}`);
+  // Route ids are interned into a flat list so a stop's routes cost one small
+  // integer each instead of repeating "38R" a few thousand times.
+  const busRouteList = [...busRouteNames.keys()].sort();
+  const busRouteIdx = new Map(busRouteList.map((id, i) => [id, i]));
+
   const stops = {};
   const allStops = {};
+  const busStops = {};
   await eachRow('stops.txt', (cols, h) => {
     const id = cols[h.stop_id];
     if (!servedStops.has(id)) return;
     const [x, z] = project(Number(cols[h.stop_lon]), Number(cols[h.stop_lat]));
     const name = cols[h.stop_name] || id;
-    // [name, x, z] as a tuple, not an object: 3,500 stops of {"name":...} keys
-    // is a megabyte of repeated property names in the function bundle.
-    allStops[id] = [name, Math.round(x), Math.round(z)];
+    const routes = stopRoutes.get(id);
+    // [name, x, z, routeIdx...] as a tuple, not an object: 3,500 stops of
+    // {"name":...} keys is a megabyte of repeated property names.
+    allStops[id] = [name, Math.round(x), Math.round(z),
+                    ...[...(routes || [])].map((r) => busRouteIdx.get(r)).filter((i) => i !== undefined)];
     if (wantedStops.has(id)) {
       stops[id] = { nameIdx: intern(name), x: +x.toFixed(1), z: +z.toFixed(1) };
     }
+    // THE BUS-STOP LAYER: only stops a bus actually calls at. This is what puts
+    // a shelter on the ground, so it must never include a rail-only platform.
+    if (routes && routes.size) {
+      busStops[id] = [
+        intern(name),
+        Math.round(x * 10) / 10,
+        Math.round(z * 10) / 10,
+        [...routes].map((r) => busRouteIdx.get(r)).sort((a, b) => a - b),
+      ];
+    }
   });
+  console.log(`[muni-shapes] BUS STOPS (shelter sites): ${Object.keys(busStops).length}`);
   console.log(`[muni-shapes] stops kept: ${Object.keys(stops).length}, strings: ${strings.length}`);
 
   // ------------------------------------------------------------- serialise
@@ -307,6 +361,9 @@ async function main() {
       tripHeadsign,
       tripDefaults,
       stops,
+      busStops,
+      busRoutes: busRouteList,
+      busRouteNames: busRouteList.map((id) => intern(busRouteNames.get(id))),
       strings,
     }),
   );
@@ -332,7 +389,15 @@ async function main() {
   }
   writeFileSync(OUT, blob);
   mkdirSync(path.dirname(OUT_STOPS), { recursive: true });
-  writeFileSync(OUT_STOPS, JSON.stringify({ generated: new Date().toISOString(), stops: allStops }));
+  writeFileSync(
+    OUT_STOPS,
+    JSON.stringify({
+      generated: new Date().toISOString(),
+      // Entries are [name, x, z, ...routeIdx] — routeIdx indexes `busRoutes`.
+      busRoutes: busRouteList,
+      stops: allStops,
+    }),
+  );
   console.log(
     `[muni-shapes] wrote ${OUT_STOPS}: ${Object.keys(allStops).length} stops, ` +
       `${(readFileSync(OUT_STOPS).length / 1024).toFixed(0)} KB`,

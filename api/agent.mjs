@@ -46,7 +46,7 @@ function loadData() {
     read('./_data/stats.json'),
     // Stop index for transit_nearby. Optional: a deployment without it just
     // loses that one tool rather than failing to answer anything at all.
-    read('./_data/muni-stops.json').then((d) => d.stops).catch(() => null),
+    read('./_data/muni-stops.json').catch(() => null),
   ]).then(([places, search, parks, neighborhoods, streets, stats, muniStops]) => ({
     places,
     search,
@@ -54,7 +54,8 @@ function loadData() {
     neighborhoods,
     streets,
     stats,
-    muniStops,
+    muniStops: muniStops?.stops || null,
+    muniRoutes: muniStops?.busRoutes || [],
   }));
   return dataPromise;
 }

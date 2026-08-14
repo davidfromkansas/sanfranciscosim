@@ -401,6 +401,7 @@ export function createLiveMuni(scene, data) {
   let polling = false;
   let warnedFetch = false;
   let demoStart = 0;
+  let arrivalsByStop = new Map();
   // Adaptive badge radius, within whatever the zoom allows. A dense corridor
   // pulls it in, a quiet neighbourhood lets it back out. O(1) per frame, no
   // sorting, no allocation, and slow enough that bubbles fade rather than blink.
@@ -681,6 +682,19 @@ export function createLiveMuni(scene, data) {
     }
     live = true;
     degraded = !!payload.degraded;
+    // Index the predictions by stop so the stop layer's card can answer "what
+    // is coming here" from the same poll — a second fetch would double the
+    // spend against a 60-request-an-hour key for data already in hand.
+    const byStop = new Map();
+    for (const vehicle of payload.vehicles) {
+      for (const stop of vehicle.stops || []) {
+        let list = byStop.get(stop.stopId);
+        if (!list) byStop.set(stop.stopId, (list = []));
+        list.push({ route: vehicle.route, mode: vehicle.mode, at: stop.arrivalAt, fleetNumber: vehicle.fleetNumber });
+      }
+    }
+    for (const list of byStop.values()) list.sort((a, b) => a.at - b.at);
+    arrivalsByStop = byStop;
     apply(payload.vehicles, now);
   }
 
@@ -876,6 +890,10 @@ export function createLiveMuni(scene, data) {
     update,
     pickBus,
     busEntity,
+    /** Live arrivals at a stop, soonest first — [] when nothing is predicted. */
+    arrivalsAt(stopId) {
+      return arrivalsByStop.get(String(stopId)) || [];
+    },
     get live() {
       return live;
     },

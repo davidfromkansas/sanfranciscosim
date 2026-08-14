@@ -650,6 +650,7 @@ function planFurniture(streetBlobs, streetClasses, plan) {
     market: plan.market,
     commercial: plan.commercial,
     exclusions: plan.exclusions,
+    busStops: plan.busStops,
     limit: plan.limit,
   });
 }
