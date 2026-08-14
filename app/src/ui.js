@@ -60,25 +60,12 @@ export function createUI({ presets, onPreset, onQuality }) {
   });
   qualityPanel.append(qualityLabel, qualitySelect, debugToggle);
 
-  const help = document.createElement('div');
-  help.className = 'panel';
-  help.style.maxWidth = '260px';
-  help.style.display = 'block';
-  help.innerHTML =
-    '<label>Controls</label><div style="margin-top:4px;line-height:1.5;color:rgba(255,255,255,.78)">' +
-    'WASD / arrows pan · Q E rotate · wheel zooms to cursor · right-drag orbits · left-drag grabs the ground · ' +
-    'screen edges scroll · Shift boosts · 0–9 fly to landmarks · A aircraft · H home · / search · ' +
-    'the sky follows San Francisco time' +
-    '</div>';
-
-  const styleBadge = document.createElement('div');
-  styleBadge.className = 'panel';
-  styleBadge.hidden = true;
-  styleBadge.innerHTML =
-    '<label>Diorama mode</label><div style="margin-top:4px;color:rgba(255,255,255,.78)">' +
-    'Locked 42° view · Q E step 45° · click anything for its story</div>';
-
-  hud.append(viewPanel, qualityPanel, help, styleBadge);
+  // The keyboard-shortcut crib sheet and the "Diorama mode" badge that used to
+  // sit here are gone. Between them they took the top-right corner of every
+  // screenshot and, on a phone, a good fraction of the city — to restate the
+  // controls of a map, which are the controls of every map, and to name a mode
+  // that is simply how the scene looks. Every key they listed still works.
+  hud.append(viewPanel, qualityPanel);
 
   window.addEventListener('keydown', (event) => {
     if (event.code === 'F3' || event.key === '`') {
@@ -93,9 +80,6 @@ export function createUI({ presets, onPreset, onQuality }) {
     },
     setQuality(key) {
       qualitySelect.value = key;
-    },
-    setStyle(toy) {
-      styleBadge.hidden = !toy;
     },
     setDebug(text) {
       if (!debug.hidden) debug.textContent = text;

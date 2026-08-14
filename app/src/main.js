@@ -266,7 +266,6 @@ async function boot() {
     agents.setToy(toy);
     signs.setVisible(toy);
     post.setEnabled(toy);
-    ui.setStyle(toy);
     await city.setTier(toy ? 'toy' : 'base');
   }
 
