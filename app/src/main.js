@@ -147,7 +147,7 @@ async function boot() {
   // what darkens the ground always agree.
   const clouds = createClouds(scene, { sampleAt: weather.sampleAt });
   // Rain falls where the field says it is raining, in a box around the camera.
-  const rain = createRain(scene, { sampleAt: weather.sampleAt });
+  const rain = createRain(scene, { sampleAt: weather.sampleAt, renderer });
   // Karl with a silhouette. The shader fog dissolves the city with distance;
   // these are the vapour you can actually see, placed by the same field.
   const fogBanks = createFogBanks(scene, { sampleAt: weather.sampleAt });
@@ -758,7 +758,7 @@ async function boot() {
     weather.update(Math.min(1, elapsed));
     clouds.update(Math.min(1, elapsed));
     // The pivot, not the camera: rain has to fall where the camera is looking.
-    rain.update(dt, pivotWorld, rig.state.distance);
+    rain.update(dt, pivotWorld, camera.position);
     fogBanks.update(Math.min(1, elapsed));
     muni.update(dt, camera);
     trackVessel(dt);
@@ -774,6 +774,8 @@ async function boot() {
     signs.update(rig.state.distance, rig.state.yaw);
     // Tilt-shift + grade in diorama mode; a straight canvas render otherwise.
     post.render(scene, camera);
+    // The screen-space rain veil goes on last, over the finished frame.
+    rain.renderVeil();
 
     // Landmark assets are fetched only once the city is actually on screen.
     if (!assetsRequested) {
