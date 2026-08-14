@@ -1,11 +1,11 @@
 {
  "file_bytes": {
-  "raw": 949380,
-  "gzip9": 220836
+  "raw": 949388,
+  "gzip9": 220822
  },
  "objects": 94,
  "total_tris": 17820,
- "total_verts": 33336,
+ "total_verts": 33335,
  "primitives_est": 100,
  "top20": [
   {
@@ -13,8 +13,8 @@
    "tris": 9120,
    "verts": 15960,
    "dims": [
-    92.565,
-    56.959,
+    92.508,
+    57.028,
     11.36
    ],
    "materials": [
@@ -27,8 +27,8 @@
    "tris": 2240,
    "verts": 4200,
    "dims": [
-    112.909,
-    140.548,
+    98.286,
+    154.349,
     30.18
    ],
    "materials": [
@@ -44,8 +44,8 @@
    "tris": 584,
    "verts": 1132,
    "dims": [
-    145.612,
-    192.624,
+    146.529,
+    192.345,
     0.3
    ],
    "materials": [
@@ -57,8 +57,8 @@
    "tris": 480,
    "verts": 960,
    "dims": [
-    88.315,
-    90.624,
+    90.57,
+    89.328,
     2.08
    ],
    "materials": [
@@ -120,10 +120,10 @@
   {
    "name": "kiosk_garage",
    "tris": 164,
-   "verts": 314,
+   "verts": 315,
    "dims": [
-    13.64,
-    8.564,
+    13.638,
+    8.475,
     3.2
    ],
    "materials": [
@@ -135,8 +135,8 @@
    "tris": 164,
    "verts": 336,
    "dims": [
-    34.513,
-    47.655,
+    36.143,
+    46.203,
     0.15
    ],
    "materials": [
@@ -146,10 +146,10 @@
   {
    "name": "gravel_court",
    "tris": 116,
-   "verts": 222,
+   "verts": 220,
    "dims": [
-    73.499,
-    24.404,
+    73.555,
+    24.475,
     0.1
    ],
    "materials": [
@@ -161,8 +161,8 @@
    "tris": 116,
    "verts": 240,
    "dims": [
-    35.114,
-    49.708,
+    36.257,
+    48.656,
     0.15
    ],
    "materials": [
@@ -266,8 +266,8 @@
    "tris": 68,
    "verts": 144,
    "dims": [
-    28.181,
-    40.175,
+    28.033,
+    40.004,
     0.12
    ],
    "materials": [
@@ -378,13 +378,13 @@
  "textures": [],
  "bbox": {
   "dims": [
-   145.6123,
-   192.6242,
+   146.5287,
+   192.3451,
    30.48
   ],
   "min": [
-   -72.8061,
-   -96.3121,
+   -73.2643,
+   -96.1726,
    0.0
   ],
   "origin_offset_xy": [
@@ -468,10 +468,10 @@
   "Toy_white": 3
  },
  "degenerate_tris": 0,
- "coincident_vert_pairs": 22898,
+ "coincident_vert_pairs": 22897,
  "over_tess": {
-  "near_distance_m": 288.94,
-  "one_px_world_m": 0.1947,
+  "near_distance_m": 288.52,
+  "one_px_world_m": 0.1945,
   "note": "cylinders whose chord error < one_px_world_m can halve segments"
  }
 }

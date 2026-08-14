@@ -17,7 +17,7 @@ disagree**; the corrections are in §4 and in `REFERENCE.md` §7.
 | Height datum | US flagpole finial at exactly 30.480 m — validator confirms the extreme vertex belongs to the `flagpoles` object |
 | Anchor (bbox centre) | lon **−122.4176184**, lat **37.7794818** |
 | Plaza OBB centre | lon −122.4176170, lat 37.7794913 (`recentre()` shift: 0.13 m W, 1.05 m S) |
-| Long axis heading | 189.06° true (toward Grove Street) |
+| Long axis heading | 170.94° true (toward Grove Street) |
 | Materials | 19, all `Toy_*`, 4 `_Glow` |
 | Shipping GLB | **479,064 bytes** (meshopt, stage 4); pre-optimize 949,380 |
 
