@@ -304,7 +304,23 @@ debug hook.
 
 # STAGE 3 — Karl, rain, storms, smoke
 
-## 3.1 Karl the Fog — two layers, both procedural
+## 3.1 Karl the Fog — the fog-cube GLB, and nothing else
+
+> **SUPERSEDED 2026-08-13, by David's explicit instruction.** The two-layer
+> design below is no longer what ships. There is exactly ONE fog system in this
+> city: David's `fog-cube.glb`, instanced by `app/src/fogbanks.js`. The
+> per-fragment shader fog that section 3.1a describes has been **deleted** —
+> its chunk, its uniforms, its noise, its water term, and its `SF.tuneFog`
+> dial. Do not reintroduce a screen-space or per-fragment fog term, do not
+> "improve" the banks by adding a distance haze behind them, and do not treat
+> the text below as a specification. It is kept only as a record of what was
+> tried and why it was dropped.
+>
+> Consequence worth knowing: wildfire smoke (§3.4) rode the shader fog's
+> machinery, so AQI now drives the clock-card readout only and has no effect on
+> the scene.
+
+## (superseded) 3.1 Karl the Fog — two layers, both procedural
 
 The headline. Real marine layer, spatially placed, genuinely swallowing the
 west side while downtown stays clear.

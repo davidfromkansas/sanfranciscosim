@@ -85,91 +85,16 @@ const CLOUDS = /* glsl */ `
   }
 `;
 
-// Karl. Spatial height fog evaluated per fragment: density from the weather
-// field at the fragment's own world position, so the Sunset can be socked in
-// while the Mission stays clear. scene.fog cannot do this -- FogExp2 is uniform
-// over the whole scene, and "fogged over there" is the entire feature.
-//
-// Three separate falloffs multiply together:
-//   density  the field, sampled by world XZ
-//   height   a LAYER, not a soup -- Twin Peaks and Sutro poke out of the top
-//   bubble   a clear radius around the camera, so flying into a bank never
-//            blinds you (David's call; the diorama must stay readable)
-const FOG = /* glsl */ `
-  uniform vec3 uFogColor;
-  uniform float uFogTop;
-  uniform float uFogClear;
-  uniform float uFogMax;
-  uniform float uSmoke;
-  uniform vec3 uSmokeColor;
-  uniform float uWetness;
+// Lightning. Storms only; the flash IS the effect, there is no bolt geometry.
+// (There is deliberately no shader fog here. Fog in this city is the fog-cube
+// GLB, instanced by fogbanks.js, and nothing else — do not reintroduce a
+// screen-space or per-fragment fog term.)
+const FLASH = /* glsl */ `
   uniform float uFlash;
-  uniform float uFogDensity;
-  uniform float uFogWisp;
-  uniform float uTime;
-  uniform vec2 uWind;
+  uniform float uWetness;
 
-  // 3D value noise. Fog that is a flat mix() toward grey can only ever read as
-  // a blanket; what makes fog look like fog is that its density varies through
-  // the volume and drifts. Two octaves is the whole budget -- this runs per
-  // fragment on every surface in the city.
-  float fogHash(vec3 p) {
-    p = fract(p * 0.3183099 + vec3(0.1, 0.2, 0.3));
-    p *= 17.0;
-    return fract(p.x * p.y * p.z * (p.x + p.y + p.z));
-  }
-
-  float fogNoise(vec3 p) {
-    vec3 i = floor(p);
-    vec3 f = fract(p);
-    f = f * f * (3.0 - 2.0 * f);
-    return mix(
-      mix(mix(fogHash(i + vec3(0,0,0)), fogHash(i + vec3(1,0,0)), f.x),
-          mix(fogHash(i + vec3(0,1,0)), fogHash(i + vec3(1,1,0)), f.x), f.y),
-      mix(mix(fogHash(i + vec3(0,0,1)), fogHash(i + vec3(1,0,1)), f.x),
-          mix(fogHash(i + vec3(0,1,1)), fogHash(i + vec3(1,1,1)), f.x), f.y),
-      f.z);
-  }
-
-  float weatherFog(vec3 worldPos) {
-    vec2 uv = (worldPos.xz - uWeatherOrigin) * uWeatherScale;
-    float density = texture2D(uWeatherField, clamp(uv, 0.0, 1.0)).r;
-    density = max(density, uSmoke * 0.55);
-    if (density < 0.01) return 0.0;
-
-    // Wisps: two octaves of drifting 3D noise, stretched flat on Y so the
-    // structure reads as layered sheets rather than as a ball of cotton wool.
-    // The drift is the real wind, so the bank moves the way the clouds do.
-    vec3 q = worldPos * vec3(0.0016, 0.006, 0.0016);
-    q.xz += uWind * uTime * 0.0016;
-    float n = fogNoise(q) * 0.62 + fogNoise(q * 2.7 + 4.1) * 0.38;
-    // Around 1.0 on average, so wisp = 0 leaves the old flat behaviour intact.
-    float wisp = mix(1.0, 0.35 + 1.5 * n, uFogWisp);
-
-    // The top of the layer is ragged, not a ruled line: the same noise erodes
-    // the ceiling, which is what makes a bank look like it has a surface.
-    float top = uFogTop * (1.0 + uFogWisp * (n - 0.5) * 0.85);
-    float height = 1.0 - smoothstep(0.0, max(top, 1.0), max(worldPos.y, 0.0));
-    if (height <= 0.001) return 0.0;
-
-    float dist = distance(worldPos, cameraPosition);
-    float bubble = smoothstep(0.0, uFogClear, dist);
-    float k = density * wisp * uFogDensity;
-    float f = 1.0 - exp(-k * k * dist * dist);
-    return clamp(f * height * bubble * uFogMax, 0.0, 1.0);
-  }
-
-  // A lightning flash lifts the whole frame for a frame or two. Cheap, and the
-  // flash IS the effect -- there is no bolt geometry anywhere.
   vec3 applyFlash(vec3 color) {
     return color + vec3(0.55, 0.6, 0.75) * uFlash;
-  }
-
-  vec3 applyWeatherFog(vec3 color, vec3 worldPos) {
-    // Wildfire smoke rides the same machinery: it is a colour and a floor on
-    // density, never a second system.
-    vec3 tint = mix(uFogColor, uSmokeColor, clamp(uSmoke, 0.0, 1.0));
-    return applyFlash(mix(color, tint, weatherFog(worldPos)));
   }
 `;
 
@@ -180,18 +105,8 @@ const CLOUD_UNIFORMS = () => ({
   uWeatherField: shared.uWeatherField,
   uWeatherOrigin: shared.uWeatherOrigin,
   uWeatherScale: shared.uWeatherScale,
-  uFogColor: shared.uFogColor,
-  uFogTop: shared.uFogTop,
-  uFogClear: shared.uFogClear,
-  uFogMax: shared.uFogMax,
-  uSmoke: shared.uSmoke,
-  uSmokeColor: shared.uSmokeColor,
   uWetness: shared.uWetness,
   uFlash: shared.uFlash,
-  uFogDensity: shared.uFogDensity,
-  uFogWisp: shared.uFogWisp,
-  uTime: shared.uTime,
-  uWind: shared.uWind,
 });
 
 const HASH = /* glsl */ `
@@ -252,7 +167,7 @@ export function createBuildingMaterial({ windows = 1 } = {}) {
         ${DITHER}
         ${HASH}
         ${CLOUDS}
-        ${FOG}`
+        ${FLASH}`
       )
       .replace(
         '#include <clipping_planes_fragment>',
@@ -306,7 +221,7 @@ export function createBuildingMaterial({ windows = 1 } = {}) {
         `#include <fog_fragment>
         // Karl goes on AFTER lighting: fog is atmosphere between the eye and
         // the surface, not pigment on it.
-        gl_FragColor.rgb = applyWeatherFog(gl_FragColor.rgb, vCityWorld);`
+        gl_FragColor.rgb = applyFlash(gl_FragColor.rgb);`
       );
   };
 
@@ -368,7 +283,7 @@ export function createToyBuildingMaterial() {
         varying float vToyWall;
         varying float vFlag;
         ${CLOUDS}
-        ${FOG}
+        ${FLASH}
         ${DITHER}
         ${HASH}`
       )
@@ -413,7 +328,7 @@ export function createToyBuildingMaterial() {
       .replace(
         '#include <fog_fragment>',
         `#include <fog_fragment>
-        gl_FragColor.rgb = applyWeatherFog(gl_FragColor.rgb, vToyPos);`
+        gl_FragColor.rgb = applyFlash(gl_FragColor.rgb);`
       );
   };
 
@@ -464,7 +379,7 @@ export function createKitMaterial() {
         varying float vKit;
         varying vec3 vKitPos;
         ${CLOUDS}
-        ${FOG}
+        ${FLASH}
         ${DITHER}
         ${HASH}`
       )
@@ -488,7 +403,7 @@ export function createKitMaterial() {
       .replace(
         '#include <fog_fragment>',
         `#include <fog_fragment>
-        gl_FragColor.rgb = applyWeatherFog(gl_FragColor.rgb, vKitPos);`
+        gl_FragColor.rgb = applyFlash(gl_FragColor.rgb);`
       );
   };
 
@@ -519,7 +434,7 @@ export function createBatchFadeLambert() {
         varying vec3 vBatchPos;
         ${DITHER}
         ${CLOUDS}
-        ${FOG}`
+        ${FLASH}`
       )
       .replace(
         '#include <clipping_planes_fragment>',
@@ -528,7 +443,7 @@ export function createBatchFadeLambert() {
       )      .replace(
         '#include <fog_fragment>',
         `#include <fog_fragment>
-        gl_FragColor.rgb = applyWeatherFog(gl_FragColor.rgb, vBatchPos);`
+        gl_FragColor.rgb = applyFlash(gl_FragColor.rgb);`
       );
   };
   return material;
@@ -579,7 +494,7 @@ export function createFarBuildingMaterial() {
         varying vec3 vFarPos;
         ${DITHER}
         ${CLOUDS}
-        ${FOG}`
+        ${FLASH}`
       )
       .replace(
         '#include <clipping_planes_fragment>',
@@ -598,7 +513,7 @@ export function createFarBuildingMaterial() {
       )      .replace(
         '#include <fog_fragment>',
         `#include <fog_fragment>
-        gl_FragColor.rgb = applyWeatherFog(gl_FragColor.rgb, vFarPos);`
+        gl_FragColor.rgb = applyFlash(gl_FragColor.rgb);`
       );
   };
 
@@ -642,7 +557,7 @@ export function createGroundMaterial() {
         varying float vKind;
         varying vec3 vGroundWorld;
         ${CLOUDS}
-        ${FOG}`
+        ${FLASH}`
       )
       .replace(
         '#include <color_fragment>',
@@ -663,7 +578,7 @@ export function createGroundMaterial() {
         `#include <fog_fragment>
         // Karl goes on AFTER lighting: fog is atmosphere between the eye and
         // the surface, not pigment on it.
-        gl_FragColor.rgb = applyWeatherFog(gl_FragColor.rgb, vGroundWorld);`
+        gl_FragColor.rgb = applyFlash(gl_FragColor.rgb);`
       );
   };
 
@@ -686,7 +601,7 @@ export function createCloudShadedMaterial() {
       );
     shader.fragmentShader = shader.fragmentShader
       .replace('#include <common>', `#include <common>\n        uniform float uNight;\n        varying vec3 vCloudWorld;\n        ${CLOUDS}
-        ${FOG}`)
+        ${FLASH}`)
       .replace(
         '#include <color_fragment>',
         `#include <color_fragment>
@@ -696,7 +611,7 @@ export function createCloudShadedMaterial() {
         `#include <fog_fragment>
         // Karl goes on AFTER lighting: fog is atmosphere between the eye and
         // the surface, not pigment on it.
-        gl_FragColor.rgb = applyWeatherFog(gl_FragColor.rgb, vCloudWorld);`
+        gl_FragColor.rgb = applyFlash(gl_FragColor.rgb);`
       )
       );
   };

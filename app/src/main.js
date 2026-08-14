@@ -642,23 +642,6 @@ async function boot() {
     },
     // Skip the 60 s ease and jump to the incoming field — for screenshots and
     // automated checks, which have no time (or no frame loop) to wait it out.
-    // Dial Karl against the running scene. `density` is how fast fog builds
-    // with distance, `max` the ceiling on how opaque it may ever get (the
-    // readability cap), `top` the altitude the marine layer thins out at, and
-    // `clear` the radius kept clear around the camera.
-    tuneFog(patch = {}) {
-      const map = { density: 'uFogDensity', max: 'uFogMax', top: 'uFogTop', clear: 'uFogClear', wisp: 'uFogWisp' };
-      for (const [key, uniform] of Object.entries(map)) {
-        if (Number.isFinite(patch[key])) shared[uniform].value = patch[key];
-      }
-      return {
-        density: shared.uFogDensity.value,
-        max: shared.uFogMax.value,
-        top: shared.uFogTop.value,
-        clear: shared.uFogClear.value,
-        wisp: shared.uFogWisp.value,
-      };
-    },
     // Dial cloud size and density against the running scene:
     //   SF.tuneClouds({ size: 1.4, density: 1.2 })  ->  then SF.cloudCoverage()
     // Dial the fog banks: size, opacity and how readily they appear.
