@@ -63,9 +63,20 @@ const dummy = new Object3D();
 const cells = new Map();
 const chosen = [];
 
+// The Muni worm, the mark on the side of every coach in the fleet — including
+// the one this scene drives. Shipped as the artwork rather than redrawn, so the
+// pin carries the real thing.
+const WORM_URL = `${import.meta.env.BASE_URL}sf-assets/muni-worm.png`;
+const WORM_ASPECT = 260 / 126;
+
 // One marker icon for every stop, so no atlas is needed — a roundel in the toy
-// UI voice (cream card stock, warm-ink border, hard offset shadow) with the
-// bus-front glyph the cards already use for transit.
+// UI voice (cream card stock, warm-ink border, hard offset shadow) carrying the
+// worm.
+//
+// The worm arrives asynchronously, so the roundel is drawn now and the mark is
+// composited on top when the image lands, at which point the texture is marked
+// dirty. Until then the pin is a blank card — visible, clickable, just wearing
+// no badge — rather than nothing at all.
 function markerTexture() {
   const canvas = document.createElement('canvas');
   canvas.width = 128;
@@ -92,23 +103,21 @@ function markerTexture() {
   ctx.strokeStyle = '#3a3530';
   ctx.stroke();
 
-  // Bus glyph.
-  ctx.strokeStyle = '#c1272d';
-  ctx.lineWidth = 5;
-  ctx.lineCap = 'round';
-  ctx.strokeRect(cx - 17, cy - 20, 34, 30);
-  ctx.beginPath();
-  ctx.moveTo(cx - 17, cy - 3);
-  ctx.lineTo(cx + 17, cy - 3);
-  ctx.stroke();
-  ctx.fillStyle = '#3a3530';
-  ctx.beginPath();
-  ctx.arc(cx - 10, cy + 5, 3, 0, Math.PI * 2);
-  ctx.arc(cx + 10, cy + 5, 3, 0, Math.PI * 2);
-  ctx.fill();
-
   const texture = new CanvasTexture(canvas);
   texture.colorSpace = SRGBColorSpace;
+
+  const worm = new Image();
+  worm.onload = () => {
+    // Widest the mark can be and still sit inside the roundel with a margin.
+    // It is a wide, short glyph, so width is what the circle constrains.
+    const w = r * 1.7;
+    ctx.drawImage(worm, cx - w / 2, cy - w / WORM_ASPECT / 2, w, w / WORM_ASPECT);
+    texture.needsUpdate = true;
+  };
+  worm.onerror = () => {
+    console.warn('sf-munistops: muni-worm.png missing — stop pins draw blank');
+  };
+  worm.src = WORM_URL;
   return texture;
 }
 
