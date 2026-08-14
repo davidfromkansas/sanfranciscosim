@@ -161,16 +161,30 @@ function sample(values, lat, lon) {
   return top * (1 - fv) + bottom * fv;
 }
 
+// The word a person would actually use, from visibility AND low cloud together.
+// Visibility alone was calling a 95%-low-cloud cell "clear" at 12 km while the
+// citywide code said Fog -- the concierge would contradict itself inside one
+// answer. In San Francisco a socked-in marine layer routinely reports double
+// digit kilometres at the sensor while being unmistakably fog to anyone in it.
+function fogWord(visibilityM, lowCloud) {
+  if (visibilityM < 2000) return 'thick fog';
+  if (visibilityM < 6000) return 'fog';
+  if (lowCloud >= 90) return visibilityM < 13000 ? 'fog' : 'low cloud';
+  if (lowCloud >= 70) return 'misty';
+  if (visibilityM < 12000) return 'hazy';
+  return 'clear';
+}
+
 function digest(fields) {
   const out = {};
   for (const [name, lat, lon] of DISTRICTS) {
     const visibility = sample(fields.visibility, lat, lon);
+    const cloud = Math.round(sample(fields.cloudLow, lat, lon));
     out[name] = {
       temp: Number(sample(fields.temp, lat, lon).toFixed(1)),
-      cloud: Math.round(sample(fields.cloudLow, lat, lon)),
+      cloud,
       visibilityKm: Number((visibility / 1000).toFixed(1)),
-      // The word a person would actually use for that visibility.
-      fog: visibility < 2000 ? 'thick fog' : visibility < 6000 ? 'foggy' : visibility < 12000 ? 'hazy' : 'clear',
+      conditions: fogWord(visibility, cloud),
     };
   }
   return out;
