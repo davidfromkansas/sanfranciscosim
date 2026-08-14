@@ -1,10 +1,14 @@
 // Rain, and the wet streets that sell it better than the drops do.
 //
-// Streaks live in a box that follows the camera — you only ever see rain near
-// you, so there is no reason to simulate it over the whole city. One
-// InstancedMesh, one draw call. Count scales with the precipitation the weather
-// field reports at the camera's own position, so a shower over the Richmond is
-// a shower over the Richmond (WEATHER-PLAN §3.2).
+// Streaks live in a box around the point the camera is LOOKING AT, not around
+// the camera itself. This is a diorama: the camera sits high and looks down, so
+// a box centred on the camera put every drop above and behind the view, drawing
+// seventeen hundred streaks that rendered exactly zero pixels. The box follows
+// the rig's pivot instead, which is the patch of city on screen.
+//
+// One InstancedMesh, one draw call. Count scales with the precipitation the
+// weather field reports at that same point, so a shower over the Richmond is a
+// shower over the Richmond (WEATHER-PLAN §3.2).
 //
 // Off entirely at Quality=Low: rain is the first thing to go.
 
@@ -14,8 +18,8 @@ import { shared } from './env.js';
 export const RAIN_CAPS = { ultra: 2000, high: 2000, medium: 900, low: 0 };
 
 // The box that rides with the camera, metres.
-const BOX = 300;
-const TOP = 220;
+const BOX = 520;
+const TOP = 420;
 // Terminal velocity, toy-scale: real rain at ~9 m/s reads as a static smear at
 // this camera distance, so it falls slower and reads as motion instead.
 const FALL = 34;
@@ -34,9 +38,12 @@ function hash(i, salt) {
 }
 
 export function createRain(scene, { sampleAt }) {
-  // A thin vertical quad. Streaks, not spheres: a droplet at city scale is
-  // invisible, and the toy look wants a graphic mark anyway.
-  const geometry = new PlaneGeometry(0.45, 9);
+  // A vertical streak, sized for the DIORAMA camera rather than for life. The
+  // first cut used a realistic 0.45 m x 9 m drop, which at the 600-3000 m the
+  // camera actually sits at is well under a pixel wide -- seventeen hundred of
+  // them changed the frame by 0.09 of one brightness level. Rain has to be a
+  // graphic mark at this scale, not a raindrop.
+  const geometry = new PlaneGeometry(3.2, 34);
   const material = new MeshBasicMaterial({
     color: new Color(0xc8dbe8),
     transparent: true,
@@ -71,9 +78,11 @@ export function createRain(scene, { sampleAt }) {
     activeCap = RAIN_CAPS[key] ?? cap;
   };
 
-  function update(dt, cameraPosition) {
+  // `focus` is the ground point the camera is framing (the rig pivot), NOT the
+  // camera position.
+  function update(dt, focus) {
     // Local rain, not the citywide mean: stand in the shower, not near it.
-    const local = Math.max(0, Math.min(1, sampleAt(cameraPosition.x, cameraPosition.z, 'precip')));
+    const local = Math.max(0, Math.min(1, sampleAt(focus.x, focus.z, 'precip')));
     const count = Math.round(activeCap * local);
     mesh.visible = count > 0;
     if (!mesh.visible) return 0;
@@ -95,14 +104,15 @@ export function createRain(scene, { sampleAt }) {
       // Recycle from the top rather than allocating anything.
       if (drop.y < 0) drop.y += TOP;
 
-      _position.set(cameraPosition.x + drop.x, cameraPosition.y - TOP * 0.5 + drop.y, cameraPosition.z + drop.z);
+      // Falls from the top of the box down to the ground being looked at.
+      _position.set(focus.x + drop.x, focus.y + drop.y, focus.z + drop.z);
       _scale.set(1, drop.length, 1);
       _matrix.compose(_position, _quaternion, _scale);
       mesh.setMatrixAt(i, _matrix);
     }
     mesh.instanceMatrix.needsUpdate = true;
     mesh.count = cap;
-    material.opacity = 0.24 + 0.3 * local;
+    material.opacity = 0.3 + 0.45 * local;
     return count;
   }
 
