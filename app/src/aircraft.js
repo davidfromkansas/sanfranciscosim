@@ -60,11 +60,21 @@ const STALE_MS = 3 * 60 * 1000; // backstop when polling itself fails
 const MISSES_TO_DROP = 3; // consecutive snapshots without it → it has gone
 const DEAD_RECKON_MAX_S = 120; // never extrapolate a fix further than this
 
-// The water plane is 30 km across (app/src/water.js), so that is the edge of
-// the world for anything airborne. Aircraft shrink away over the last 2 km
-// instead of vanishing mid-air.
-const SCENE_RADIUS = 15000;
-const FADE_BAND = 2000;
+// How far out aircraft are still drawn.
+//
+// The obvious choice is the 15 km water plane (app/src/water.js), and it is
+// WRONG — measured against the live feed, a 15 km horizon put 3 of 25 aircraft
+// in the scene and left every interesting one out. SFO sits at z +16.7 km and
+// OAK at x +19 km, so the whole approach corridor, and with it every aircraft
+// low enough to read as an aeroplane rather than a dot, falls outside.
+//
+// A boat beyond the water plane would float over void; an aircraft does not,
+// because it is seen against SKY. So the air layer gets its own horizon at
+// 26 km — far enough to hold both airports' arrival streams — and fades over
+// the last 3 km. Looking south from the hero camera you now see the queue into
+// SFO, which is the thing worth looking at.
+const SCENE_RADIUS = 26000;
+const FADE_BAND = 3000;
 
 // Semantic scale, the same move the road fleet makes (agents.js draws cars at
 // 1.6x). A 38 m airliner is 4 px at the hero camera and reads as a speck; at
@@ -1158,6 +1168,9 @@ export function createLiveAircraft(scene, data) {
         state.kind === 'heli' ? 'Helicopter' : state.kind === 'light' ? 'Light aircraft' : 'Airliner',
       x: state.x,
       z: state.z,
+      // Where the airframe is actually DRAWN, so the camera can frame it. The
+      // true altitude is altitudeFt/altitudeM below.
+      displayY: state.displayY ?? dispY(state.y),
       // The card shows TRUE numbers; only the rendered height is compressed.
       altitudeFt: ft,
       altitudeM: Math.round(state.altM),
@@ -1205,12 +1218,25 @@ export function createLiveAircraft(scene, data) {
     return state && state.index >= 0 ? entityFor(state) : null;
   }
 
+  // The "fly to an aircraft" shortcut. Ordered LOWEST FIRST: a 737 on approach
+  // is worth looking at, a cruiser at FL350 is a dot. Passing the current id
+  // steps to the next one, so the key cycles through the sky.
+  function nextAircraft(afterId) {
+    const drawn = [...aircraft.values()]
+      .filter((state) => state.index >= 0)
+      .sort((a, b) => a.altM - b.altM);
+    if (!drawn.length) return null;
+    const at = afterId == null ? -1 : drawn.findIndex((state) => state.id === afterId);
+    return entityFor(drawn[(at + 1) % drawn.length]);
+  }
+
   build();
 
   return {
     update,
     pickAircraft,
     aircraftEntity,
+    nextAircraft,
     get live() {
       return live;
     },

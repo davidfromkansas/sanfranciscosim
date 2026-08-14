@@ -294,6 +294,17 @@ async function boot() {
       focus.entity = null;
       return;
     }
+    // A — fly to an aircraft, lowest first, pressing again for the next one.
+    // Live aircraft can be anywhere and are not in the baked search index, so
+    // without this the only way to find one is to spot it by eye.
+    if (event.key === 'a' || event.key === 'A') {
+      const plane = aircraft.nextAircraft(
+        focus.entity?.kind === 'aircraft' ? focus.entity.id : null
+      );
+      if (plane) selectEntity(plane, { fly: true });
+      else console.info('[aircraft] nothing in the sky right now');
+      return;
+    }
     if (event.key === 'h' || event.key === 'H') {
       rig.flyTo(presets[0]);
       ui.setPresetIndex(0);
@@ -336,6 +347,19 @@ async function boot() {
     }
     if (entity.kind === 'landmark' && entity.camera) {
       return { x: entity.x, z: entity.z, y: ground + (entity.height || 60) / 2, ...entity.camera };
+    }
+    if (entity.kind === 'aircraft') {
+      // Frame the airframe where it is DRAWN (compressed altitude), not the
+      // ground beneath it, and stand off far enough that a 40 m airliner drawn
+      // at semantic scale fills a sensible part of the view.
+      return {
+        x: entity.x,
+        z: entity.z,
+        y: entity.displayY,
+        yaw: 210,
+        pitch: style === 'toy' ? 22 : 18,
+        distance: 420,
+      };
     }
     if (entity.kind === 'vessel') {
       return { x: entity.x, z: entity.z, y: 20, yaw: 210, pitch: style === 'toy' ? 30 : 22, distance: 300 };
