@@ -357,7 +357,9 @@ async function boot() {
         z: entity.z,
         y: entity.displayY,
         yaw: 210,
-        pitch: style === 'toy' ? 22 : 18,
+        // Look DOWN on it, the way the diorama looks down on everything else —
+        // the follow camera eases to the same framing once the fly-in lands.
+        pitch: style === 'toy' ? 40 : 32,
         distance: 420,
       };
     }
@@ -375,8 +377,52 @@ async function boot() {
     rig.flyTo(target, duration);
   }
 
+  // Camera follow, for entities that move. Clicking an aircraft flies to it
+  // and then TRACKS it — a plane doing 250 kn leaves a static frame within
+  // seconds, so "take me to that plane" is meaningless without this. The rig
+  // keeps its downward diorama pitch throughout: the point is to watch it from
+  // above the city, not to sit in its wake.
+  const FOLLOW_DISTANCE = 400;
+  const FOLLOW_PITCH = 40 * (Math.PI / 180);
+  let following = null; // aircraft id
+
+  function stopFollowing() {
+    following = null;
+  }
+
+  // Any deliberate camera input hands control back to the user immediately.
+  canvas.addEventListener('wheel', stopFollowing, { passive: true });
+  window.addEventListener('keydown', (event) => {
+    if ('wasdqerfWASDQERF'.includes(event.key) || event.key.startsWith('Arrow') ||
+        event.key === 'PageUp' || event.key === 'PageDown') {
+      stopFollowing();
+    }
+  });
+
+  function updateFollow(dt) {
+    if (!following) return;
+    const fresh = aircraft.aircraftEntity(following);
+    if (!fresh) {
+      stopFollowing();
+      return;
+    }
+    // While the initial fly-in is running the rig owns the camera; tracking
+    // takes over when it lands, and eases so the hand-off is not a jump.
+    if (rig.flying) return;
+    const k = 1 - Math.exp(-Math.min(dt, 0.25) * 3.2);
+    rig.state.holdY = true;
+    rig.state.pivot.x += (fresh.x - rig.state.pivot.x) * k;
+    rig.state.pivot.y += (fresh.displayY - rig.state.pivot.y) * k;
+    rig.state.pivot.z += (fresh.z - rig.state.pivot.z) * k;
+    rig.state.distance += (FOLLOW_DISTANCE - rig.state.distance) * k;
+    rig.state.pitch += (FOLLOW_PITCH - rig.state.pitch) * k;
+  }
+
   function selectEntity(entity, { fly = false } = {}) {
     if (!entity) return;
+    // Selecting anything else releases a follow; selecting an aircraft starts
+    // one, whether it came from a click, the A key or the concierge.
+    following = entity.kind === 'aircraft' ? entity.id : null;
     focus.entity = entity;
     focus.history = [entity, ...focus.history.filter((e) => e.id !== entity.id)].slice(0, 3);
     overlay.show(entity, {
@@ -449,6 +495,33 @@ async function boot() {
               cat: focus.entity.cat ?? null,
               x: Math.round(focus.entity.x),
               z: Math.round(focus.entity.z),
+              // A clicked aircraft carries its whole state, so "what is this
+              // flight?" is answerable from context alone. Everything here is
+              // the TRUE reading — only the drawn position is compressed.
+              ...(focus.entity.kind === 'aircraft'
+                ? {
+                    aircraft: {
+                      callsign: focus.entity.callsign,
+                      registration: focus.entity.registration,
+                      type: focus.entity.aircraftType,
+                      airframe: focus.entity.name,
+                      altitudeFt: focus.entity.altitudeFt,
+                      speedKt: focus.entity.speedKt,
+                      verticalRateFpm: focus.entity.verticalRateFpm,
+                      headingDeg: focus.entity.heading,
+                      phase: focus.entity.phase,
+                      squawk: focus.entity.squawk,
+                      emergency: focus.entity.emergency,
+                      from: focus.entity.route?.from?.city || null,
+                      fromCode: focus.entity.route?.from?.iata || null,
+                      to: focus.entity.route?.to?.city || null,
+                      toCode: focus.entity.route?.to?.iata || null,
+                      trueDistanceKm: focus.entity.trueDistanceKm
+                        ? Math.round(focus.entity.trueDistanceKm)
+                        : null,
+                    },
+                  }
+                : {}),
             }
           : null,
       };
@@ -559,6 +632,7 @@ async function boot() {
     });
   }
 
+  canvas.addEventListener('pointerdown', () => stopFollowing());
   canvas.addEventListener('pointerdown', (event) => {
     // A second finger means a pinch/twist, not a tap — whatever this press was,
     // it must not pick on release.
@@ -697,6 +771,7 @@ async function boot() {
       if (clockOverride === null) tickSky();
     }
 
+    updateFollow(dt);
     rig.update(dt);
     governor.update(elapsed * 1000);
     pivotWorld.copy(rig.state.pivot);

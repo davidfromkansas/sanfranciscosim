@@ -290,8 +290,10 @@ export function createContextCard({ onFly, onAsk, onSelectHistory }) {
 
     // The concierge only knows the baked city, so it has nothing to say about a
     // boat that showed up in a live feed thirty seconds ago.
-    askButton.hidden =
-      entity.kind === 'vessel' || entity.kind === 'transit' || entity.kind === 'aircraft';
+    // Aircraft DO get the ask button: unlike a ferry or a bus, the concierge
+    // has the whole flights feed through live_data, and the clicked aircraft's
+    // full state rides along in the focus context — so it can actually answer.
+    askButton.hidden = entity.kind === 'vessel' || entity.kind === 'transit';
 
     const bits = [`Source: ${sourceLabel(entity.source)}`];
     if (entity.kind === 'building') bits.push(confidenceLabel(entity.confidence));
