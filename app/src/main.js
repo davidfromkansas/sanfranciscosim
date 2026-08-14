@@ -388,7 +388,14 @@ async function boot() {
   let following = null; // aircraft id
 
   function stopFollowing() {
+    // Only when actually following: releaseHold would otherwise also release a
+    // landmark or building focus, which is a different feature that is fine as
+    // it is.
+    if (!following) return;
     following = null;
+    // Re-anchor to the ground without moving the camera. Skipping this is what
+    // made letting go of a plane yank the view down by the aircraft's altitude.
+    rig.releaseHold();
   }
 
   // Any deliberate camera input hands control back to the user immediately.
