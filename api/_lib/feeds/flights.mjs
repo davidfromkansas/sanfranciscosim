@@ -115,6 +115,116 @@ function emergencyFor(squawk, emergency) {
   return declared && declared !== 'none' ? declared : null;
 }
 
+// ------------------------------------------------------------------ routes
+//
+// ADS-B carries no origin or destination — a transponder broadcasts identity
+// and state, not intent. The route comes from adsbdb.com, a free no-key
+// database keyed by CALLSIGN (UAL589 -> DEN-RIC), resolved here rather than in
+// the browser so one warm instance's cache serves every visitor and the client
+// never makes a second round trip.
+//
+// Two things keep this inside a free service's good graces:
+//   - A callsign's route is the same all day, so resolutions cache for 12 h and
+//     MISSES cache too (6 h). Without negative caching the GA fleet would be
+//     re-queried forever, since those never resolve.
+//   - Only NEW callsigns are looked up, at most ROUTE_BUDGET per refresh, so a
+//     busy sky resolves over a couple of minutes instead of in one burst.
+const ADSBDB = 'https://api.adsbdb.com/v0/callsign/';
+const ROUTE_TTL_MS = 12 * 60 * 60 * 1000;
+const ROUTE_MISS_TTL_MS = 6 * 60 * 60 * 1000;
+const ROUTE_BUDGET = 8; // new lookups per refresh
+const ROUTE_TIMEOUT_MS = 4 * 1000;
+const ROUTE_CACHE_MAX = 2000;
+
+// callsign -> { at, route: {...} | null }
+const routes = new Map();
+
+function cachedRoute(callsign) {
+  const hit = routes.get(callsign);
+  if (!hit) return undefined;
+  const ttl = hit.route ? ROUTE_TTL_MS : ROUTE_MISS_TTL_MS;
+  if (Date.now() - hit.at > ttl) {
+    routes.delete(callsign);
+    return undefined;
+  }
+  return hit.route;
+}
+
+function rememberRoute(callsign, route) {
+  // Bounded: drop the oldest insertion when full (Map preserves insert order).
+  if (routes.size >= ROUTE_CACHE_MAX) routes.delete(routes.keys().next().value);
+  routes.set(callsign, { at: Date.now(), route });
+}
+
+function airport(node) {
+  if (!node) return null;
+  const iata = node.iata_code || null;
+  const icao = node.icao_code || null;
+  const city = node.municipality || null;
+  const name = node.name || null;
+  if (!iata && !icao && !city) return null;
+  return { iata, icao, city, name, country: node.country_name || null };
+}
+
+async function lookupRoute(callsign) {
+  const controller = new AbortController();
+  const timer = setTimeout(() => controller.abort(), ROUTE_TIMEOUT_MS);
+  try {
+    const res = await fetch(ADSBDB + encodeURIComponent(callsign), {
+      signal: controller.signal,
+      headers: { accept: 'application/json' },
+    });
+    // 404 is the normal answer for a private tail number, not a failure.
+    if (res.status === 404) return null;
+    if (!res.ok) throw new Error(`route-${res.status}`);
+    const body = await res.json();
+    const leg = body?.response?.flightroute;
+    if (!leg) return null;
+    const from = airport(leg.origin);
+    const to = airport(leg.destination);
+    if (!from && !to) return null;
+    return { from, to };
+  } finally {
+    clearTimeout(timer);
+  }
+}
+
+// A callsign that IS the tail number is a private/GA flight with no scheduled
+// route — the single biggest source of wasted lookups, skipped for free.
+function worthLookup(a) {
+  if (!a.callsign) return false;
+  if (a.registration && a.callsign.toUpperCase() === a.registration.toUpperCase()) return false;
+  return true;
+}
+
+// Attach cached routes to everything, then spend the budget resolving the
+// unknown ones. Best-effort throughout: a route lookup must never fail or
+// delay the positions, which are the actual product here.
+async function attachRoutes(aircraft) {
+  const pending = [];
+  for (const a of aircraft) {
+    if (!worthLookup(a)) continue;
+    const hit = cachedRoute(a.callsign);
+    if (hit !== undefined) {
+      if (hit) a.route = hit;
+    } else if (pending.length < ROUTE_BUDGET && !pending.includes(a.callsign)) {
+      pending.push(a.callsign);
+    }
+  }
+  if (!pending.length) return;
+  const settled = await Promise.allSettled(pending.map((cs) => lookupRoute(cs)));
+  settled.forEach((result, i) => {
+    if (result.status !== 'fulfilled') return; // transient: leave uncached, retry next refresh
+    rememberRoute(pending[i], result.value);
+  });
+  // Fill in what just resolved so this very response carries it.
+  for (const a of aircraft) {
+    if (a.route || !a.callsign) continue;
+    const hit = cachedRoute(a.callsign);
+    if (hit) a.route = hit;
+  }
+}
+
 function normalise(payload, now) {
   const out = [];
   for (const a of payload?.ac || payload?.aircraft || []) {
@@ -196,6 +306,7 @@ function summarise(aircraft) {
     byKind,
     lowestAltM: lowest === null ? null : Math.round(lowest),
     radiusNm: RADIUS_NM,
+    withRoute: aircraft.filter((a) => a.route).length,
   };
 }
 
@@ -223,6 +334,13 @@ async function fetchFlights() {
       // a Class B airport — it means that network lost its receivers. Try the
       // next one; the registry serves last-good if they all come up empty.
       if (!aircraft.length) throw new Error('no aircraft');
+      // Origin/destination, best-effort — never lets a route lookup break the
+      // positions.
+      try {
+        await attachRoutes(aircraft);
+      } catch (error) {
+        console.warn(`[feed:flights] route lookup failed: ${error?.message || error}`);
+      }
       if (failures.length) console.warn(`[feed:flights] ${failures.join('; ')} → served ${name}`);
       return { live: true, source: name, summary: summarise(aircraft), aircraft };
     } catch (error) {
@@ -235,7 +353,7 @@ async function fetchFlights() {
 
 registerFeed('flights', {
   describe:
-    'real aircraft in the sky over San Francisco right now, from community ADS-B receivers — per aircraft: callsign, tail number, ICAO type (B739, C172, EC35), airframe kind (airliner/light/heli), lat/lon, altitude in metres, ground speed, heading, climb or descent rate, and flight phase',
+    'real aircraft in the sky over San Francisco right now, from community ADS-B receivers — per aircraft: callsign, tail number, ICAO type (B739, C172, EC35), airframe kind (airliner/light/heli), lat/lon, altitude in metres, ground speed, heading, climb or descent rate, flight phase, and for scheduled flights the route it is flying (origin and destination airport)',
   ttl: TTL_MS,
   staleMs: STALE_MS,
   backoffMs: BACKOFF_MS,

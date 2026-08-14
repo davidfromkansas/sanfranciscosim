@@ -227,9 +227,13 @@ export function createContextCard({ onFly, onAsk, onSelectHistory }) {
       // Every number here is the TRUE reading from the transponder. Only the
       // height the aircraft is DRAWN at is compressed (see aircraft.js dispY),
       // so the card is never the place that lies.
-      subtitle.textContent = entity.aircraftType
-        ? `${entity.name} \u00b7 ${entity.aircraftType}`
-        : entity.name;
+      // The route is the most glanceable fact there is, so it headlines when
+      // known: "Airliner \u00b7 B739 \u00b7 SFO \u2192 PVR".
+      const leg =
+        entity.route && (entity.route.from?.iata || entity.route.to?.iata)
+          ? `${entity.route.from?.iata || '?'} \u2192 ${entity.route.to?.iata || '?'}`
+          : null;
+      subtitle.textContent = [entity.name, entity.aircraftType, leg].filter(Boolean).join(' \u00b7 ');
       chips.append(chip(entity.demo ? 'Demo aircraft' : 'Live aircraft', 'teal', 'aircraft'));
       if (entity.phase) chips.append(chip(entity.phase, 'navy'));
       if (entity.emergency) chips.append(chip(entity.emergency, 'coral'));
@@ -239,6 +243,21 @@ export function createContextCard({ onFly, onAsk, onSelectHistory }) {
         fact('Tail number', entity.registration);
       }
       if (entity.aircraftType) fact('Type', entity.aircraftType);
+      // Origin and destination. ADS-B does not broadcast these — they are
+      // looked up from the callsign, so a private flight legitimately has none
+      // and says so rather than showing a blank row.
+      if (entity.route) {
+        const place = (node) =>
+          node
+            ? [node.city, node.iata ? `(${node.iata})` : null].filter(Boolean).join(' ') ||
+              node.name ||
+              'Not reported'
+            : 'Not reported';
+        fact('From', place(entity.route.from));
+        fact('To', place(entity.route.to));
+      } else if (entity.callsign && entity.callsign !== entity.registration) {
+        fact('Route', 'Not published');
+      }
       fact('Altitude', `${entity.altitudeFt.toLocaleString('en-US')} ft \u00b7 ${entity.altitudeM.toLocaleString('en-US')} m`);
       fact('Ground speed', `${entity.speedKt} kn \u00b7 ${Math.round(entity.speedKmh)} km/h`);
       // A vertical rate under ~500 fpm is noise on a barometric encoder, so it

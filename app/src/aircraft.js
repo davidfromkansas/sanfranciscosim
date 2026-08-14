@@ -929,6 +929,11 @@ export function createLiveAircraft(scene, data) {
       state.verticalRateMs = a.verticalRateMs || 0;
       state.phaseLabel = a.phase || null;
       state.squawk = a.squawk || null;
+      // Origin/destination resolved server-side from the callsign. Arrives a
+      // refresh or two after the aircraft does (the feed resolves new
+      // callsigns on a budget), so it is set whenever it turns up rather than
+      // only on first sight.
+      if (a.route) state.route = a.route;
       state.emergency = a.emergency || null;
       state.military = a.military || false;
       state.recordedAt = a.recordedAt || fetchedAt || now;
@@ -1282,6 +1287,7 @@ export function createLiveAircraft(scene, data) {
       verticalRateFpm: fpm,
       phase: state.phaseLabel,
       aircraftType: state.type,
+      route: state.route || null,
       callsign: state.callsign,
       registration: state.registration,
       squawk: state.squawk,
