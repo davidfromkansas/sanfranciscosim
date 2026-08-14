@@ -26,26 +26,42 @@ import {
 
 import { loadBusStops, compareRoute } from './munistops.js';
 
-const MARKER_W = 6.6;
-const MARKER_H = 6.6;
+const MARKER_W = 7.4;
+const MARKER_H = 7.4;
 // Metres above the pavement. This does NOT shrink with the marker: a pin has to
 // clear the shelter roof, the street trees and the parked cars whatever size it
 // is drawn at, and at street level a low one vanishes into the canyon.
 const MARKER_Y = 11;
 
-// Stops are static and dense, so these run tighter than the bus badges.
-const RADIUS_MIN = 220;
-const RADIUS_MAX = 2400;
-const RADIUS_PER_M = 0.85; // radius per metre of camera height
-const REF_DIST = 300; // distance at which a marker draws at its authored size
+const RADIUS_MIN = 260;
+// Wide enough to cover the ground actually in frame from the hero view: an
+// 18-degree lens 5.4 km up sees a few kilometres of city.
+const RADIUS_MAX = 4200;
+const RADIUS_PER_M = 0.8; // radius per metre of camera height
+// Distance at which a marker draws at its authored size. Apparent size is
+// MARKER_W / REF_DIST, so this pair is the on-screen size dial.
+const REF_DIST = 240;
 const SCALE_MIN = 1.0;
-const SCALE_MAX = 16;
-const MAX_MARKERS = 26;
+// Enough headroom to hold that apparent size all the way out: the hero view is
+// ~8 km from the marker, which needs ~34x. Capping lower is what made them
+// shrink into nothing when zoomed out.
+const SCALE_MAX = 40;
+const MAX_MARKERS = 40;
+// Declutter spacing, as a multiple of a marker's own width. Markers are drawn
+// at a constant SIZE ON SCREEN, so the world distance that keeps two of them
+// from overlapping grows with viewing distance — which makes this the honest
+// unit. Deriving the cell from the search radius instead looked equivalent and
+// merged the four corners of an intersection into a single pin at street level.
+const DECLUTTER_SPACING = 1.4;
+const DECLUTTER_MIN_M = 11;
 
 const PICK_RADIUS = 11;
 const MAX_PICK_DISTANCE = 4000;
 
 const dummy = new Object3D();
+// Reused every frame so the declutter pass allocates nothing.
+const cells = new Map();
+const chosen = [];
 
 // One marker icon for every stop, so no atlas is needed — a roundel in the toy
 // UI voice (cream card stock, warm-ink border, hard offset shadow) with the
@@ -143,17 +159,43 @@ export function createMuniStopLayer(scene, data, muni) {
     const camQ = camera.quaternion;
     const zoomRadius = Math.max(RADIUS_MIN, Math.min(RADIUS_MAX, camY * RADIUS_PER_M));
 
-    let count = 0;
-    let eligible = 0;
-    visible = [];
+    // ONE MARKER PER VIEW CELL, nearest the centre of the view winning. An
+    // earlier version instead shrank the radius until few enough stops were in
+    // range, which sounds equivalent and behaves very differently: downtown it
+    // collapsed to a ~380 m circle and stacked every marker in the middle of a
+    // whole-city view, so from altitude the layer read as empty. Spreading over
+    // a grid keeps the same budget but puts a marker where each part of the
+    // city is, at every zoom.
+    // How wide a marker is in world metres at this viewing distance.
+    const viewDist = Math.hypot(camera.position.x - camX, camera.position.y, camera.position.z - camZ);
+    const markerWorldW = MARKER_W * Math.max(SCALE_MIN, Math.min(SCALE_MAX, viewDist / REF_DIST));
+    const cellSize = Math.max(DECLUTTER_MIN_M, markerWorldW * DECLUTTER_SPACING);
+    cells.clear();
+    chosen.length = 0;
     for (const stop of table.stops) {
-      const dist = Math.hypot(stop.x - camX, stop.z - camZ);
-      if (dist > radius) continue;
-      eligible++;
-      if (count >= MAX_MARKERS) continue;
+      const dx = stop.x - camX;
+      const dz = stop.z - camZ;
+      const d2 = dx * dx + dz * dz;
+      if (d2 > radius * radius) continue;
+      const key = `${Math.floor(stop.x / cellSize)}_${Math.floor(stop.z / cellSize)}`;
+      const held = cells.get(key);
+      if (!held || d2 < held.d2) cells.set(key, { stop, d2 });
+    }
+    for (const { stop, d2 } of cells.values()) chosen.push({ stop, d2 });
+    // Nearest the view centre first, so the cap trims the far edges rather than
+    // whatever the map happened to iterate last.
+    chosen.sort((a, b) => a.d2 - b.d2);
+
+    let count = 0;
+    visible = [];
+    for (const { stop } of chosen) {
+      if (count >= MAX_MARKERS) break;
       const y = data.sampleElevation ? data.sampleElevation(stop.x, stop.z) : 0;
-      const scale = Math.max(SCALE_MIN, Math.min(SCALE_MAX, dist / REF_DIST));
-      dummy.position.set(stop.x, y + MARKER_Y, stop.z);
+      // Scale off the CAMERA distance (not the pivot distance) so apparent size
+      // stays put; the pivot only decides which stops are shown.
+      const camDist = Math.hypot(stop.x - camera.position.x, stop.z - camera.position.z, y - camera.position.y);
+      const scale = Math.max(SCALE_MIN, Math.min(SCALE_MAX, camDist / REF_DIST));
+      dummy.position.set(stop.x, y + MARKER_Y * Math.max(1, scale * 0.35), stop.z);
       dummy.quaternion.copy(camQ);
       dummy.scale.setScalar(scale);
       dummy.updateMatrix();
@@ -164,8 +206,8 @@ export function createMuniStopLayer(scene, data, muni) {
     mesh.count = count;
     mesh.instanceMatrix.needsUpdate = true;
 
-    const target = eligible > MAX_MARKERS ? radius * 0.94 : radius * 1.06;
-    radius = Math.max(120, Math.min(zoomRadius, radius + (target - radius) * Math.min(1, dt * 1.5)));
+    // The radius now just follows the zoom; density is the grid's job.
+    radius += (zoomRadius - radius) * Math.min(1, dt * 2);
   }
 
   // Upcoming buses at a stop, grouped by route — the shape the card wants:
