@@ -36,7 +36,14 @@ function loadFeeds(server) {
   feedsPromise = (async () => {
     const dir = new URL('../api/_lib/', import.meta.url).href;
     const core = await import(/* @vite-ignore */ `${dir}feedcore.mjs`);
-    const names = ['ferries.mjs', 'muni.mjs', 'weather.mjs'];
+    // Read the directory rather than keeping a list: a hardcoded one silently
+    // omitted a newly added feed, which then 404'd locally while working fine
+    // in production.
+    const { readdirSync } = await import('node:fs');
+    const dirPath = new URL('../api/_lib/feeds/', import.meta.url);
+    const names = readdirSync(dirPath)
+      .filter((f) => f.endsWith('.mjs') && f !== 'index.mjs')
+      .sort();
     for (const name of names) {
       try {
         await import(/* @vite-ignore */ `${dir}feeds/${name}`);

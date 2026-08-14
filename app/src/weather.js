@@ -14,6 +14,14 @@ import { ClampToEdgeWrapping, DataTexture, LinearFilter, RGBAFormat, Vector2 } f
 import { shared } from './env.js';
 
 const ENDPOINT = '/api/weather';
+const SAT_ENDPOINT = '/api/satfog';
+// How much the satellite reshapes the model's fog. The model (HRRR) is an
+// hourly FORECAST with real units -- it knows how foggy, in metres of
+// visibility. The satellite is a five-minute OBSERVATION with no units -- it
+// knows where, and nothing else. So the blend takes magnitude from the model
+// and shape from the observation, and stays a minority partner: a satellite
+// sees cloud TOPS, and high cirrus over a clear city reads cold too.
+const SAT_WEIGHT = 0.4;
 const POLL_MS = 5 * 60 * 1000;
 const POLL_JITTER_MS = 15 * 1000;
 const RETRY_MS = 60 * 1000;
@@ -108,6 +116,8 @@ export function createWeather({ project }) {
   // field immediately instead of leaving the scene on the override until the
   // next poll lands (up to a minute later).
   let lastPayload = null;
+  // Longitude -> observed cloud-top score, from the satellite transect.
+  let satCurve = null;
   let nextPollAt = 0;
   let wetness = 0;
   let flashUntil = 0;
@@ -164,7 +174,79 @@ export function createWeather({ project }) {
     summary = payload.summary || null;
     lastPayload = payload;
     staleSince = 0;
+    applySatellite(g);
     return true;
+  }
+
+  // The satellite is best-effort in the strictest sense: it refines the fog's
+  // shape and nothing depends on it. A failure leaves the model's own field
+  // exactly as it was.
+  async function pollSatellite() {
+    try {
+      const res = await fetch(SAT_ENDPOINT, { headers: { accept: 'application/json' } });
+      if (!res.ok) throw new Error(String(res.status));
+      const payload = await res.json();
+      if (!payload?.live || !payload.usable || !payload.cloudTopScore) {
+        satCurve = null;
+        return;
+      }
+      // The samples are a west-to-east transect, so collapse them to a curve in
+      // longitude: the marine layer boundary runs north-south, and it is the
+      // east-west profile that carries the signal.
+      const LON = {
+        Ocean: -122.52, Sunset: -122.4869, 'Golden Gate': -122.4783, Richmond: -122.4803,
+        'Twin Peaks': -122.4477, Downtown: -122.4, Mission: -122.4148, Bayview: -122.39,
+      };
+      const points = Object.entries(payload.cloudTopScore)
+        .filter(([name, v]) => v !== null && LON[name] !== undefined)
+        .map(([name, v]) => [LON[name], v])
+        .sort((a, b) => a[0] - b[0]);
+      satCurve = points.length >= 3 ? points : null;
+    } catch {
+      satCurve = null;
+    }
+  }
+
+  // Sample the transect at a longitude, linearly between its two nearest points.
+  function satAt(lon) {
+    if (!satCurve) return null;
+    if (lon <= satCurve[0][0]) return satCurve[0][1];
+    if (lon >= satCurve[satCurve.length - 1][0]) return satCurve[satCurve.length - 1][1];
+    for (let i = 1; i < satCurve.length; i++) {
+      const [x1, y1] = satCurve[i];
+      const [x0, y0] = satCurve[i - 1];
+      if (lon <= x1) return y0 + ((y1 - y0) * (lon - x0)) / (x1 - x0 || 1);
+    }
+    return null;
+  }
+
+  // Reshape the model's fog towards what the satellite actually sees, keeping
+  // the model's overall magnitude: normalise both to their own means, blend the
+  // shapes, then restore the model's level.
+  function applySatellite(g) {
+    if (!satCurve) return;
+    let modelSum = 0;
+    for (let i = 0; i < CELLS; i++) modelSum += target.fog[i];
+    const modelMean = modelSum / CELLS;
+    if (modelMean < 0.01) return;
+
+    const sat = new Float32Array(CELLS);
+    let satSum = 0;
+    for (let row = 0; row < H; row++) {
+      for (let col = 0; col < W; col++) {
+        const lon = g.lon0 + ((g.lon1 - g.lon0) * col) / (W - 1);
+        const v = satAt(lon);
+        sat[row * W + col] = v === null ? 1 : v;
+        satSum += sat[row * W + col];
+      }
+    }
+    const satMean = satSum / CELLS;
+    if (satMean < 0.01) return;
+
+    for (let i = 0; i < CELLS; i++) {
+      const shaped = modelMean * (sat[i] / satMean);
+      target.fog[i] = clamp01(target.fog[i] * (1 - SAT_WEIGHT) + shaped * SAT_WEIGHT);
+    }
   }
 
   async function poll() {
@@ -198,7 +280,8 @@ export function createWeather({ project }) {
   function tick() {
     if (Date.now() < nextPollAt) return;
     nextPollAt = Date.now() + RETRY_MS; // claim the slot so we never stack requests
-    poll();
+    // Satellite first, so the shape is available when the model's field lands.
+    pollSatellite().then(poll);
   }
 
   // Ease every field towards the target. Frame-rate independent, no allocation.
@@ -370,6 +453,10 @@ export function createWeather({ project }) {
     },
     // The names ?weather= will accept. Exposed so the URL parser validates
     // against the real list instead of keeping a second copy of it.
+    // Whether the satellite is currently reshaping the fog, for QA.
+    get satellite() {
+      return satCurve ? { points: satCurve.length, curve: satCurve } : null;
+    },
     get presetNames() {
       return Object.keys(PRESETS);
     },
@@ -378,6 +465,8 @@ export function createWeather({ project }) {
       return {
         live: this.live,
         stale: staleSince > 0,
+        // Whether the satellite observation is currently reshaping the fog.
+        satellite: satCurve ? { points: satCurve.length } : null,
         summary,
         override,
         wind: { speed: scalars.current.windSpeed, dir: Math.round(scalars.current.windDir) },
