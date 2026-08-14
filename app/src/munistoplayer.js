@@ -38,6 +38,22 @@ const RADIUS_MIN = 260;
 // 18-degree lens 5.4 km up sees a few kilometres of city.
 const RADIUS_MAX = 4200;
 const RADIUS_PER_M = 0.8; // radius per metre of camera height
+
+// CEILING. A stop pin answers "can I catch a bus here" — a question you ask
+// standing in a street, not surveying a city. The layer used to have no ceiling
+// at all: the search radius simply saturated at RADIUS_MAX, which happens at
+// RADIUS_MAX / RADIUS_PER_M = 5,250 m, so pins were still drawn from the hero
+// view where a whole neighbourhood is forty pixels wide and a pin says nothing
+// about which street it belongs to. Coming down to a fifth of that height is
+// where a pin starts pointing at somewhere you could walk to.
+//
+// This is the OPPOSITE call from the bus route badges, deliberately. A badge
+// tracks something moving and reads as life in the city from any height; a stop
+// is a fixed label on a kerb, and a label you cannot place is just clutter.
+const CEILING_Y = 1050;
+// Faded out over the last stretch rather than switched off, so climbing away
+// dims the layer instead of blinking it out.
+const CEILING_FADE = 260;
 // Distance at which a marker draws at its authored size. Apparent size is
 // MARKER_W / REF_DIST, so this pair is the on-screen size dial.
 const REF_DIST = 240;
@@ -205,6 +221,17 @@ export function createMuniStopLayer(scene, data, muni) {
     const camY = camera.position.y;
     const camQ = camera.quaternion;
     const zoomRadius = Math.max(RADIUS_MIN, Math.min(RADIUS_MAX, camY * RADIUS_PER_M));
+
+    // Above the ceiling there is nothing to draw and nothing to pick — clearing
+    // `visible` is what makes the second true, so a pin cannot be clicked from a
+    // height it is not shown at.
+    const fade = Math.min(1, Math.max(0, (CEILING_Y - camY) / CEILING_FADE));
+    mesh.material.opacity = fade;
+    if (fade <= 0) {
+      mesh.count = 0;
+      visible = [];
+      return;
+    }
 
     // ONE MARKER PER VIEW CELL, nearest the centre of the view winning. An
     // earlier version instead shrank the radius until few enough stops were in
