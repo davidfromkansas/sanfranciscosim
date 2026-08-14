@@ -47,10 +47,13 @@ const GROUP_LIMIT = 2400;
 // signal head or a lit shelter is not what the street is lit by. Radii follow
 // the fixture — the Path of Gold standards on Market are taller and throw
 // wider than a residential pole.
+// How far each lamp throws. Doubled from the original 7.5 / 9 / 6: a pool that
+// stopped at the kerb read as a smudge under the pole rather than a lamp
+// lighting the road it stands over.
 const POOL_RADIUS = {
-  sl_standard: 7.5,
-  sl_pathofgold: 9,
-  sl_residential: 6,
+  sl_standard: 15,
+  sl_pathofgold: 18,
+  sl_residential: 12,
 };
 const CAPACITY = {
   sl_standard: 3000,
@@ -281,7 +284,18 @@ export function createStreetKitFleet(scene, kit, sampleElevation) {
       pool.renderOrder = 3; // after the road ribbon, so the wash lands on it
       root.add(pool);
     }
-    return { id: piece.id, capacity, body, glow, pool, poolRadius, groups: new Map(), dirty: false, overflow: 0 };
+    // Where the light actually comes from. A standard lamp's head hangs on an
+    // arm ~1.3 m out over the carriageway, and the pool used to be centred on
+    // the POLE — so the lit patch sat on the pavement beside the road instead of
+    // on the road. Taken from the piece's own glow geometry rather than a table,
+    // so a new lamp model carries its own answer.
+    const head = new Vector3();
+    if (glow) {
+      glow.geometry.computeBoundingBox();
+      glow.geometry.boundingBox.getCenter(head);
+      head.y = 0; // the pool is a ground disc; only the lateral offset matters
+    }
+    return { id: piece.id, capacity, body, glow, pool, poolRadius, head, groups: new Map(), dirty: false, overflow: 0 };
   });
 
   let instances = 0;
@@ -342,7 +356,15 @@ export function createStreetKitFleet(scene, kit, sampleElevation) {
           // On the ground under the pole: the pole's translation, tilted to the
           // grade rather than the pole's own yaw (a disc has no yaw to inherit),
           // scaled to the pool radius.
-          position.setFromMatrixPosition(matrix);
+          // Start at the lamp HEAD, carried through the instance's own rotation
+          // so a pole facing any direction throws its light over the road it
+          // faces — then drop to the ground for the disc.
+          position.copy(type.head).applyMatrix4(matrix);
+          // Only x/z move to the head: the disc keeps the POLE's own ground
+          // height, because that is the pavement it stands on. Re-sampling
+          // terrain here put the pool ~0.4 m below the kerb and the sidewalk
+          // swallowed it.
+          position.y = matrix.elements[13];
           alignPoolToGround(poolTilt, position.x, position.z, sampleElevation);
           position.y += POOL_LIFT;
           const radius = type.poolRadius * poolRadiusScale;
