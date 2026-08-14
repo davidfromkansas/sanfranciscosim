@@ -104,6 +104,7 @@ const FOG = /* glsl */ `
   uniform vec3 uSmokeColor;
   uniform float uWetness;
   uniform float uFlash;
+  uniform float uFogDensity;
 
   float weatherFog(vec3 worldPos) {
     vec2 uv = (worldPos.xz - uWeatherOrigin) * uWeatherScale;
@@ -116,7 +117,7 @@ const FOG = /* glsl */ `
 
     float dist = distance(worldPos, cameraPosition);
     float bubble = smoothstep(0.0, uFogClear, dist);
-    float k = density * 0.00042;
+    float k = density * uFogDensity;
     float f = 1.0 - exp(-k * k * dist * dist);
     return clamp(f * height * bubble * uFogMax, 0.0, 1.0);
   }
@@ -150,6 +151,7 @@ const CLOUD_UNIFORMS = () => ({
   uSmokeColor: shared.uSmokeColor,
   uWetness: shared.uWetness,
   uFlash: shared.uFlash,
+  uFogDensity: shared.uFogDensity,
 });
 
 const HASH = /* glsl */ `

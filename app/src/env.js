@@ -70,6 +70,10 @@ export const shared = {
   // How opaque the thickest fog may ever get. Deliberately short of 1 so a
   // landmark always ghosts through -- the diorama has to stay readable.
   uFogMax: { value: 0.78 },
+  // How fast fog accumulates with distance. Raised from the first cut's
+  // 0.00042: at diorama distances that was thin enough that even a full
+  // pea-souper read as light haze.
+  uFogDensity: { value: 0.00072 },
   uSmokeColor: { value: new Color(0xd08a4a) },
 };
 

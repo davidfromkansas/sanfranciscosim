@@ -351,8 +351,13 @@ export function createWeather({ project }) {
         for (let r = 0; r < H; r++) {
           for (let c = 0; c < W; c++) {
             const west = 1 - c / (W - 1);
-            target.fog[r * W + c] = clamp01(merged.fog * (0.15 + 0.85 * west * west));
-            target.cloudLow[r * W + c] = clamp01((merged.cloud ?? merged.fog) * (0.2 + 0.8 * west));
+            // Linear, not squared: the Sunset and the Gate sit a column in from
+            // the western edge, and squaring the falloff was quietly halving the
+            // value they actually got. The floor stays LOW on purpose -- raising
+            // it fogs the east side too, and "socked in out west, clear
+            // downtown" is the entire point of a field.
+            target.fog[r * W + c] = clamp01(merged.fog * (0.12 + 0.88 * west));
+            target.cloudLow[r * W + c] = clamp01((merged.cloud ?? merged.fog) * (0.25 + 0.75 * west));
           }
         }
       }
@@ -398,7 +403,7 @@ const mean = (a) => {
 // producible on a clear August afternoon or they can never be QA'd.
 const PRESETS = {
   clear: { fog: 0.02, cloud: 0.05, cloudHigh: 0.1, precip: 0, aqi: 15 },
-  karl: { fog: 0.85, cloud: 0.95, cloudHigh: 0.2, precip: 0, windSpeed: 7, windDir: 260, gradient: true },
+  karl: { fog: 1, cloud: 1, cloudHigh: 0.25, precip: 0, windSpeed: 7, windDir: 260, gradient: true },
   storm: { fog: 0.35, cloud: 1, cloudHigh: 0.9, precip: 0.85, windSpeed: 18, windDir: 200 },
   smoke: { fog: 0.45, cloud: 0.15, cloudHigh: 0.3, precip: 0, aqi: 240, windSpeed: 3 },
 };
