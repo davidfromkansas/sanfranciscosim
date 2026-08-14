@@ -185,28 +185,24 @@ async function boot() {
 
   let quality = QUALITY.high;
   let qualityKey = 'high';
-  // Small screens and integrated GPUs start a tier down; the user can override.
+  // Small screens and integrated GPUs start a tier down; the governor takes it
+  // from there, measuring the frame rather than guessing at the hardware.
   if (window.devicePixelRatio > 1.9 || window.innerWidth < 900) {
     qualityKey = 'medium';
     quality = QUALITY.medium;
   }
 
+  // Read-only now that the quality select is gone. Nothing writes this key any
+  // more, but a viewer who pinned a tier while the control existed keeps it
+  // rather than being silently moved onto the governor.
   function readQualityPreference() {
     try {
       const saved = window.localStorage.getItem('sf.quality');
       if (saved === 'auto' || QUALITY[saved]) return saved;
     } catch {
-      // Safari private windows can reject both reads and writes.
+      // Safari private windows can reject a read.
     }
     return 'auto';
-  }
-
-  function writeQualityPreference(key) {
-    try {
-      window.localStorage.setItem('sf.quality', key);
-    } catch {
-      // A pinned quality still applies for this session when storage is unavailable.
-    }
   }
 
   function applyQuality(key) {
@@ -266,7 +262,6 @@ async function boot() {
     agents.setToy(toy);
     signs.setVisible(toy);
     post.setEnabled(toy);
-    ui.setStyle(toy);
     await city.setTier(toy ? 'toy' : 'base');
   }
 
@@ -309,19 +304,7 @@ async function boot() {
   let urlWeather = applyWeatherFromUrl();
   if (urlWeather) setTimeout(() => { urlWeather = applyWeatherFromUrl(); skyClock.update(); }, 2500);
 
-  const ui = createUI({
-    presets,
-    onPreset(index) {
-      rig.flyTo(presets[index]);
-    },
-    onQuality(key) {
-      writeQualityPreference(key);
-      governor.setMode(key);
-      if (key !== 'auto') applyQuality(key);
-      ui.setQuality(key);
-    },
-  });
-  ui.setQuality(qualityPreference);
+  const ui = createUI();
   applyQuality(qualityKey);
 
   // Diorama is the only style this app ships. It is applied here, before the
@@ -359,14 +342,10 @@ async function boot() {
     }
     if (event.key === 'h' || event.key === 'H') {
       rig.flyTo(presets[0]);
-      ui.setPresetIndex(0);
       return;
     }
     const index = presets.findIndex((preset) => preset.key && preset.key === event.key);
-    if (index >= 0) {
-      rig.flyTo(presets[index]);
-      ui.setPresetIndex(index);
-    }
+    if (index >= 0) rig.flyTo(presets[index]);
   });
 
   window.addEventListener('resize', () => {

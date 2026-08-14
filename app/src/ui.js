@@ -24,67 +24,22 @@ export const QUALITY = {
 };
 export const QUALITY_LADDER = ['low', 'medium', 'high', 'ultra'];
 
-export function createUI({ presets, onPreset, onQuality }) {
-  const hud = document.getElementById('hud');
+// There is no HUD any more. It held four panels — the view presets, the quality
+// tier, a keyboard crib sheet and a "Diorama mode" badge — and all four have
+// gone, in that order of reluctance.
+//
+// What they offered is still reachable, by better routes than a select in the
+// corner of the sky: every preset is in the search box by name, the numbered
+// ones are on the number keys, H is home, and quality is the governor's job —
+// it watches the real frame time and moves the tier itself, which is a better
+// answer than asking a viewer to guess what their GPU can do. A saved manual
+// preference is still honoured if one was ever set (main.js), so nobody who had
+// pinned a tier is moved off it.
+//
+// What is left of this module is the performance overlay, which is not UI: it
+// is hidden until F3, and no first-time viewer will ever see it.
+export function createUI() {
   const debug = document.getElementById('debug');
-
-  const viewPanel = document.createElement('div');
-  viewPanel.className = 'panel';
-  const viewLabel = document.createElement('label');
-  viewLabel.textContent = 'View';
-  const select = document.createElement('select');
-  presets.forEach((preset, i) => {
-    const option = document.createElement('option');
-    option.value = String(i);
-    option.textContent = preset.key ? `${preset.key} · ${preset.name}` : preset.name;
-    select.appendChild(option);
-  });
-  select.addEventListener('change', () => onPreset(Number(select.value)));
-  viewPanel.append(viewLabel, select);
-
-  const qualityPanel = document.createElement('div');
-  qualityPanel.className = 'panel';
-  const qualityLabel = document.createElement('label');
-  qualityLabel.textContent = 'Quality';
-  const qualitySelect = document.createElement('select');
-  const autoOption = document.createElement('option');
-  autoOption.value = 'auto';
-  autoOption.textContent = 'Auto';
-  qualitySelect.appendChild(autoOption);
-  for (const [key, value] of Object.entries(QUALITY)) {
-    const option = document.createElement('option');
-    option.value = key;
-    option.textContent = value.label;
-    qualitySelect.appendChild(option);
-  }
-  qualitySelect.addEventListener('change', () => onQuality(qualitySelect.value));
-  const debugToggle = document.createElement('button');
-  debugToggle.textContent = 'stats';
-  debugToggle.title = 'Toggle the performance overlay (F3)';
-  debugToggle.addEventListener('click', () => {
-    debug.hidden = !debug.hidden;
-  });
-  qualityPanel.append(qualityLabel, qualitySelect, debugToggle);
-
-  const help = document.createElement('div');
-  help.className = 'panel';
-  help.style.maxWidth = '260px';
-  help.style.display = 'block';
-  help.innerHTML =
-    '<label>Controls</label><div style="margin-top:4px;line-height:1.5;color:rgba(255,255,255,.78)">' +
-    'WASD / arrows pan · Q E rotate · wheel zooms to cursor · right-drag orbits · left-drag grabs the ground · ' +
-    'screen edges scroll · Shift boosts · 0–9 fly to landmarks · A aircraft · H home · / search · ' +
-    'the sky follows San Francisco time' +
-    '</div>';
-
-  const styleBadge = document.createElement('div');
-  styleBadge.className = 'panel';
-  styleBadge.hidden = true;
-  styleBadge.innerHTML =
-    '<label>Diorama mode</label><div style="margin-top:4px;color:rgba(255,255,255,.78)">' +
-    'Locked 42° view · Q E step 45° · click anything for its story</div>';
-
-  hud.append(viewPanel, qualityPanel, help, styleBadge);
 
   window.addEventListener('keydown', (event) => {
     if (event.code === 'F3' || event.key === '`') {
@@ -94,15 +49,6 @@ export function createUI({ presets, onPreset, onQuality }) {
   });
 
   return {
-    setPresetIndex(i) {
-      select.value = String(i);
-    },
-    setQuality(key) {
-      qualitySelect.value = key;
-    },
-    setStyle(toy) {
-      styleBadge.hidden = !toy;
-    },
     setDebug(text) {
       if (!debug.hidden) debug.textContent = text;
     },
