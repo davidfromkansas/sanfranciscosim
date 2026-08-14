@@ -27,16 +27,16 @@ const URL = `${import.meta.env.BASE_URL}sf-assets/fog-cube.glb`;
 // it does readily on a loaded machine — the fog vanished completely and the
 // city looked like the feature was broken. Fog is the headline here; it is the
 // last thing to cut, not the first.
-export const BANK_CAPS = { ultra: 120, high: 120, medium: 80, low: 36 };
+export const BANK_CAPS = { ultra: 280, high: 280, medium: 160, low: 70 };
 
 // The cube is a unit volume, so this is the width of one bank in metres.
 //
-// Sized for COVERAGE, not for count -- the same lesson the clouds taught. At
-// 900 m over an 18 km spread, seventy banks covered about 14% of the ground
-// and were effectively invisible from the diorama camera, however many of them
-// there were. A real marine layer is continuous, so the banks are now
-// kilometres wide and packed into a tighter box.
-const BANK_SIZE = 2100;
+// Coverage matters, but so does SHAPE, and 2.1 km banks bought coverage by
+// turning each instance into a flat slab the width of a district -- the frame
+// filled with straight-edged translucent sheets instead of fog. The asset is a
+// cluster: a discrete clump. So: much smaller clumps, many more of them, which
+// is also how a real marine layer is built.
+const BANK_SIZE = 640;
 // Sea level to here: the marine layer's own thickness.
 const BANK_BASE = 30;
 const BANK_TOP = 300;
@@ -60,7 +60,9 @@ export function createFogBanks(scene, { sampleAt }) {
   let alphaAttribute = null;
   let activeCap = BANK_CAPS.high;
   let ready = false;
-  const tuning = { size: 1, opacity: 1, density: 1 };
+  // Opacity well under 1: these overlap heavily, and alpha compounds where
+  // they stack, so a per-instance 1.0 stacked into an opaque wall.
+  const tuning = { size: 1, opacity: 0.5, density: 1 };
   const cap = BANK_CAPS.ultra;
 
   const slots = [];
@@ -204,8 +206,10 @@ export function createFogBanks(scene, { sampleAt }) {
       slot.lastSize = size;
       _position.set(slot.x, slot.y, slot.z);
       _quaternion.setFromAxisAngle(UP, slot.spin);
-      // Wide and flat: a marine layer spreads, it does not tower.
-      _scale.set(size, size * 0.32, size);
+      // Flattened, but nowhere near as hard as before: squashing a voxel
+      // cluster to a third of its height is what made each one read as a sheet
+      // rather than as a clump of vapour.
+      _scale.set(size, size * 0.62, size);
       _matrix.compose(_position, _quaternion, _scale);
       mesh.setMatrixAt(i, _matrix);
       alphaAttribute.array[i] = presence * tuning.opacity;
