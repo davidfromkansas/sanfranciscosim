@@ -292,6 +292,7 @@ async function boot() {
       card.hide();
       overlay.clear();
       focus.entity = null;
+      stopFollowing(); // Escape is the same dismissal as the card's close button
       return;
     }
     // A — fly to an aircraft, lowest first, pressing again for the next one.
@@ -440,6 +441,7 @@ async function boot() {
     onFly: (entity) => flyTo(focusTarget(entity)),
     onAsk: (entity) => concierge.ask(`Tell me about ${entity.title}.`),
     onSelectHistory: (entity) => selectEntity(entity),
+    onClose: () => stopFollowing(),
   });
 
   const search = createSearch({
@@ -679,6 +681,13 @@ async function boot() {
     ferries,
     muni,
     aircraft,
+    // Which aircraft the camera is locked to, or null. Exposed because the
+    // follow is otherwise unobservable from outside and QA has to be able to
+    // assert that dismissing the card lets go of the camera.
+    get following() {
+      return following;
+    },
+    stopFollowing,
     governor,
     boot: bootScreen,
     landmarks,

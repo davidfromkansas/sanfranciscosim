@@ -99,7 +99,7 @@ function chip(text, tone, glyphName) {
   return node;
 }
 
-export function createContextCard({ onFly, onAsk, onSelectHistory }) {
+export function createContextCard({ onFly, onAsk, onSelectHistory, onClose }) {
   const card = el('div', 'toy-card');
   card.id = 'context-card';
   card.hidden = true;
@@ -132,7 +132,13 @@ export function createContextCard({ onFly, onAsk, onSelectHistory }) {
   document.body.appendChild(card);
 
   let current = null;
-  close.addEventListener('click', () => hide());
+  close.addEventListener('click', () => {
+    // Dismissing the card is also how you let go of whatever it was about —
+    // for a followed aircraft that means handing the camera back.
+    const dismissed = current;
+    hide();
+    onClose?.(dismissed);
+  });
   flyButton.addEventListener('click', () => current && onFly(current));
   askButton.addEventListener('click', () => current && onAsk(current));
 
