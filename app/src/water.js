@@ -25,6 +25,16 @@ const FRAG = /* glsl */ `
   uniform float uCheap;
   uniform vec3 uFogColor;
   uniform float uFogDensity;
+  // Karl, same field the land reads. Water sets fog:false and rolls its own
+  // fog, so without this the Bay stayed clear while the city vanished.
+  uniform sampler2D uWeatherField;
+  uniform vec2 uWeatherOrigin;
+  uniform vec2 uWeatherScale;
+  uniform vec3 uWeatherFogColor;
+  uniform float uWeatherFogTop;
+  uniform float uWeatherFogClear;
+  uniform float uWeatherFogMax;
+  uniform float uWeatherFogDensity;
   varying vec3 vWorld;
 
   vec2 hash2(vec2 p) {
@@ -86,6 +96,17 @@ const FRAG = /* glsl */ `
 
     float fogFactor = 1.0 - exp(-uFogDensity * uFogDensity * dist * dist);
     col = mix(col, uFogColor, clamp(fogFactor, 0.0, 1.0));
+
+    // Sea level is the bottom of the marine layer, so water takes the full
+    // height term -- if anything is fogged, the Bay is.
+    vec2 wuv = (vWorld.xz - uWeatherOrigin) * uWeatherScale;
+    float wDensity = texture2D(uWeatherField, clamp(wuv, 0.0, 1.0)).r;
+    if (wDensity > 0.01) {
+      float wk = wDensity * uWeatherFogDensity;
+      float wf = 1.0 - exp(-wk * wk * dist * dist);
+      float wBubble = smoothstep(0.0, uWeatherFogClear, dist);
+      col = mix(col, uWeatherFogColor, clamp(wf * wBubble * uWeatherFogMax, 0.0, 1.0));
+    }
     gl_FragColor = vec4(col, 1.0);
   }
 `;
@@ -101,6 +122,14 @@ export function createWater(scene) {
     uGlitter: { value: 1 },
     uCheap: { value: 0 },
     uFogColor: { value: scene.fog.color },
+    uWeatherField: shared.uWeatherField,
+    uWeatherOrigin: shared.uWeatherOrigin,
+    uWeatherScale: shared.uWeatherScale,
+    uWeatherFogColor: shared.uFogColor,
+    uWeatherFogTop: shared.uFogTop,
+    uWeatherFogClear: shared.uFogClear,
+    uWeatherFogMax: shared.uFogMax,
+    uWeatherFogDensity: shared.uFogDensity,
     uFogDensity: { value: scene.fog.density },
   };
 
