@@ -15,11 +15,18 @@
 import { Color, DynamicDrawUsage, InstancedMesh, Matrix4, MeshBasicMaterial, PlaneGeometry, Quaternion, Vector3 } from 'three';
 import { shared } from './env.js';
 
-export const RAIN_CAPS = { ultra: 2000, high: 2000, medium: 900, low: 0 };
+// Never zero. Setting the low tier to 0 meant the governor -- which demotes
+// readily on a loaded machine -- silently deleted the rain, so a storm looked
+// like a dry overcast day. Same mistake the fog banks made.
+export const RAIN_CAPS = { ultra: 2600, high: 2600, medium: 1400, low: 600 };
 
-// The box that rides with the camera, metres.
+// The box the streaks live in, metres, at the CLOSEST zoom. It scales up with
+// the camera's distance: a fixed 520 m box is most of the frame at street level
+// and an unnoticeable patch in the corner from the hero view, which is why a
+// storm read as dry from far out.
 const BOX = 520;
 const TOP = 420;
+const BOX_MAX_SCALE = 7;
 // Terminal velocity, toy-scale: real rain at ~9 m/s reads as a static smear at
 // this camera distance, so it falls slower and reads as motion instead.
 const FALL = 34;
@@ -80,7 +87,10 @@ export function createRain(scene, { sampleAt }) {
 
   // `focus` is the ground point the camera is framing (the rig pivot), NOT the
   // camera position.
-  function update(dt, focus) {
+  function update(dt, focus, cameraDistance = 900) {
+    // Zoomed out, the box grows and the streaks grow with it, so rain reads at
+    // every zoom instead of only from the street.
+    const spread = Math.max(1, Math.min(BOX_MAX_SCALE, cameraDistance / 700));
     // Local rain, not the citywide mean: stand in the shower, not near it.
     const local = Math.max(0, Math.min(1, sampleAt(focus.x, focus.z, 'precip')));
     const count = Math.round(activeCap * local);
@@ -105,8 +115,8 @@ export function createRain(scene, { sampleAt }) {
       if (drop.y < 0) drop.y += TOP;
 
       // Falls from the top of the box down to the ground being looked at.
-      _position.set(focus.x + drop.x, focus.y + drop.y, focus.z + drop.z);
-      _scale.set(1, drop.length, 1);
+      _position.set(focus.x + drop.x * spread, focus.y + drop.y * spread, focus.z + drop.z * spread);
+      _scale.set(spread, drop.length * spread, spread);
       _matrix.compose(_position, _quaternion, _scale);
       mesh.setMatrixAt(i, _matrix);
     }

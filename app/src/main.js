@@ -758,7 +758,7 @@ async function boot() {
     weather.update(Math.min(1, elapsed));
     clouds.update(Math.min(1, elapsed));
     // The pivot, not the camera: rain has to fall where the camera is looking.
-    rain.update(dt, pivotWorld);
+    rain.update(dt, pivotWorld, rig.state.distance);
     fogBanks.update(Math.min(1, elapsed));
     muni.update(dt, camera);
     trackVessel(dt);

@@ -143,7 +143,7 @@ export function createFogBanks(scene, { sampleAt }) {
             gl_FragColor.rgb = mix(gl_FragColor.rgb, gl_FragColor.rgb * 0.35, uNight);
             // Wildfire smoke: the same banks go amber rather than a second
             // system existing. September 2020 was orange, not grey.
-            gl_FragColor.rgb = mix(gl_FragColor.rgb, uSmokeColor, clamp(uSmoke, 0.0, 1.0) * 0.7);`
+            gl_FragColor.rgb = mix(gl_FragColor.rgb, uSmokeColor, clamp(uSmoke, 0.0, 1.0) * 0.6);`
           );
       };
 
@@ -213,10 +213,11 @@ export function createFogBanks(scene, { sampleAt }) {
       const inTier = i % stride === 0;
       // Smoke fills the sky whether or not there is fog: a wildfire pall is
       // not damp, but it is very much in the air.
-      // 0.45, not higher: at full strength the pall swallowed the city whole.
-      // September 2020 really did look like that, but a diorama nobody can read
-      // is not a diorama.
-      const smokeFloor = shared.uSmoke.value * 0.45;
+      // Smoke is a THIN haze, not thick ground fog. The light carries this
+      // effect now (env.js turns the sun to an ember and the sky brown), so the
+      // banks only need to hint at particulate in the air. At 0.45 they were as
+      // dense as a pea-souper and the orange sky had nothing left to light.
+      const smokeFloor = shared.uSmoke.value * 0.14;
       const raw = inTier ? Math.max(sampleAt(slot.x, slot.z, 'fog'), smokeFloor) * tuning.density : 0;
       const local = raw < 0.08 ? 0 : raw;
       const presence = Math.max(0, Math.min(1, (local - slot.threshold) * 3));

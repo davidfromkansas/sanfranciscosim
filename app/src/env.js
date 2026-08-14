@@ -184,6 +184,20 @@ const TOY_NIGHT = {
   hemiIntensity: 1.15,
   fog: new Color(0x1e2740),
 };
+// Wildfire smoke. It is NOT fog with an orange tint: what made September 2020
+// unmistakable was that the LIGHT changed. A high smoke pall filters the sun to
+// a dim ember, kills the blue out of the sky, and drops the whole city into a
+// brown-orange dusk at midday. Tinting the fog alone just makes orange fog.
+// Bright, not dark. The 2020 sky GLOWED -- an orange so luminous it read as
+// daylight through a filter. A first pass dimmed the sun hard and browned the
+// sky, which produced a dark murk: the right hue and completely the wrong
+// exposure.
+const SMOKE_SUN = new Color(0xff9448);
+const SMOKE_SKY = new Color(0xe08a4e);
+const SMOKE_HORIZON = new Color(0xf0a058);
+const SMOKE_ZENITH = new Color(0xd4703a);
+const SMOKE_GROUND = new Color(0xa06038);
+
 const STAR_COUNT = 2000;
 
 // The usability floor. The plan asks for at least 0.25 key and 0.42 hemisphere;
@@ -493,6 +507,28 @@ export function createEnvironment(scene) {
     stars.material.opacity = lift * 0.9;
     skyUniforms.uHorizonNight.value.copy(state.toy ? TOY_NIGHT.horizon : NIGHT.horizon);
     skyUniforms.uZenithNight.value.copy(state.toy ? TOY_NIGHT.zenith : NIGHT.zenith);
+
+    // ---------------------------------------------------------------- smoke
+    // Applied last, over whatever the hour decided: a wildfire pall overrides
+    // the time of day rather than blending with it.
+    const smoke = clamp01(shared.uSmoke.value);
+    if (smoke > 0.001) {
+      sun.color.lerp(SMOKE_SUN, smoke * 0.9);
+      // The sun is still up there, just not getting through.
+      // Only a modest dim: the pall filters the sun, it does not switch it off,
+      // and the hemisphere fill below keeps the streets readable.
+      sun.intensity *= 1 - 0.2 * smoke;
+      hemi.color.lerp(SMOKE_SKY, smoke * 0.9);
+      hemi.intensity *= 1 + 0.25 * smoke;
+      hemi.groundColor.lerp(SMOKE_GROUND, smoke * 0.9);
+      skyUniforms.uHorizonDay.value.copy(DAY.horizon).lerp(SMOKE_HORIZON, smoke);
+      skyUniforms.uZenithDay.value.copy(DAY.zenith).lerp(SMOKE_ZENITH, smoke);
+      skyUniforms.uHorizonNight.value.lerp(SMOKE_HORIZON, smoke * 0.6);
+      skyUniforms.uZenithNight.value.lerp(SMOKE_ZENITH, smoke * 0.6);
+    } else {
+      skyUniforms.uHorizonDay.value.copy(DAY.horizon);
+      skyUniforms.uZenithDay.value.copy(DAY.zenith);
+    }
 
     shared.uSunColor.value.copy(sun.color);
     shared.uSkyColor.value.copy(hemi.color);

@@ -494,5 +494,8 @@ const PRESETS = {
   clear: { fog: 0.02, cloud: 0.05, cloudHigh: 0.1, precip: 0, aqi: 15 },
   karl: { fog: 1, cloud: 1, cloudHigh: 0.25, precip: 0, windSpeed: 7, windDir: 260, gradient: true },
   storm: { fog: 0.35, cloud: 1, cloudHigh: 0.9, precip: 0.85, windSpeed: 18, windDir: 200 },
-  smoke: { fog: 0.45, cloud: 0.15, cloudHigh: 0.3, precip: 0, aqi: 240, windSpeed: 3 },
+  // Smoke's fog value is deliberately LOW. The effect is carried by the light
+  // -- env.js turns the sun to an ember and the sky brown -- not by thick air.
+  // At 0.45 the banks were a pea-souper and the orange sky lit nothing.
+  smoke: { fog: 0.1, cloud: 0.1, cloudHigh: 0.25, precip: 0, aqi: 240, windSpeed: 3 },
 };
