@@ -1,71 +1,57 @@
-// Rain: shafts falling from the cloud deck down to the city.
+// Rain: a faithful port of nycsim's precipitation (public/index.html —
+// makePrecip('rain') and precipOverlay), constants included.
 //
-// The vertex-shader motion and the fall-aligned billboard come from the owner's
-// nycsim (public/index.html, makePrecip) and are the good parts of it. Its
-// screen-space veil is deliberately NOT used here: a fullscreen overlay slides
-// across the frame no matter where the clouds are, and in a diorama you are
-// looking down at the weather from outside it, so rain has to visibly come OUT
-// of the cloud deck and land on the city. Screen rain reads as a filter on the
-// picture; world rain reads as weather happening to the model.
+// This repo re-derived those numbers several times and got them wrong in both
+// directions every time, so they are copied rather than reasoned about. They
+// only make sense TOGETHER, which is the part that kept being missed:
 //
-// So the column spans the real distance from DECK_ALTITUDE (the cloud ceiling,
-// shared with clouds.js so they can never drift apart) down to the ground, and
-// it is centred on the patch of city being framed rather than on the camera.
+//   1. In-world streaks. Tiny — 3.5 cm x 95 cm — in a 120 m cylinder around the
+//      camera, gated to `camY < 1600` so they fade out as you climb. They are a
+//      CLOSE-UP effect and were never meant to be visible from altitude.
 //
-// All motion is in the VERTEX SHADER: the CPU writes a centre, a radius and a
-// wind vector once a frame and nothing else. Each quad billboards around the
-// FALL direction, so a streak turns its face to the eye while staying aligned
-// with the way the rain is going — it reads as a line, never a rectangle.
+//   2. A screen-space veil that ramps the other way, `0.3 + camY / 1600`, and
+//      carries the effect from high up. Without it there is no rain at all
+//      above the streak ceiling — which is exactly the hole this repo kept
+//      falling into while trying to make the streaks alone do everything.
+//
+// All streak motion is in the VERTEX shader: the CPU writes a centre and a wind
+// vector per frame and nothing else. Each quad billboards around the FALL
+// direction, so it turns its face to the eye while staying aligned with the way
+// the rain is going — a line, never a rectangle. DoubleSide is required: that
+// billboard flips its winding depending on which side of the camera a drop is
+// on, and without it half of them are silently culled.
 
-import { DoubleSide, InstancedBufferAttribute, InstancedMesh, PlaneGeometry, ShaderMaterial, Vector2, Vector3 } from 'three';
+import {
+  DoubleSide,
+  InstancedBufferAttribute,
+  InstancedMesh,
+  Mesh,
+  OrthographicCamera,
+  PlaneGeometry,
+  Scene,
+  ShaderMaterial,
+  Vector2,
+  Vector3,
+} from 'three';
 import { shared } from './env.js';
-import { DECK_ALTITUDE } from './clouds.js';
 
-// Rain thins with the quality tier but never switches off: a storm that renders
-// dry because the governor demoted is worse than a slow one.
-// Instancing makes count nearly free -- these are two triangles each -- so the
-// shaft count is high. At 3000 spread through a column kilometres wide the rain
-// read as scattered showers rather than a downpour.
-// Both ends of this have now been measured against real frames:
-//   26k over a 1.4 km radius -> readable shafts, but sparse
-//   64k over a 350 m radius  -> a dense dither speckle, reads as noise
-// This sits between them.
-export const RAIN_CAPS = { ultra: 44000, high: 44000, medium: 22000, low: 9000 };
+// nycsim's N. Instancing makes this nearly free either way.
+const N = 3000;
+// The one deliberate departure. nycsim's camera lives near street level; this
+// one orbits between 150 and 8000 m, so the whole in-world system is scaled up
+// BODILY — cylinder, fall height, streak size and the altitude gate together —
+// rather than any single number being re-tuned on its own. Piecemeal re-tuning
+// of these values is precisely what went wrong repeatedly before.
+const SCALE = 26;
 
-// The rain column runs the full height from the cloud deck to the ground, so
-// the shafts visibly hang off the clouds that are producing them.
-const RAIN_TOP = DECK_ALTITUDE;
-// How wide the column is, as a multiple of the camera's orbit distance: the
-// rain has to cover what is on screen, so it grows as you pull back.
-// SMALL, and centred on the camera rather than on the city. This is the lesson
-// that took longest here: spreading drops evenly across the whole view puts
-// almost all of them far away, where a streak is under a pixel and contributes
-// nothing -- 64,000 of them rendered as about eight visible lines. Rain reads
-// as rain when it is CLOSE to the eye and dense. nycsim uses a 120 m radius for
-// exactly this reason; this is wider only because the camera sits further out.
-const RADIUS_PER_DISTANCE = 0.5;
-const RADIUS_MIN = 300;
-const RADIUS_MAX = 2200;
-
+const _size = new Vector2();
 const clamp01 = (v) => (v < 0 ? 0 : v > 1 ? 1 : v);
 
-export function createRain(scene, { sampleAt }) {
-  const cap = RAIN_CAPS.ultra;
-
-  // --------------------------------------------------------- in-world streaks
-  // Long enough to read at diorama distance, short enough to read as RAIN. At
-  // 150 m each streak was a vertical pole standing over the city; the length
-  // has to stay well under the height it falls through or the eye sees columns
-  // instead of weather.
-  // Short and thin and MANY. Width has to clear about a pixel at the working
-  // camera distance or the streak renders as nothing; length is what decides
-  // whether the result reads as rain or as a picket fence. At 3.4 x 95 m these
-  // were unmistakably vertical poles standing over the city, spaced far enough
-  // apart to count. Rain is dense and small: the density has to come from the
-  // NUMBER of streaks, not the size of them.
-  const geometry = new PlaneGeometry(3.4, 72);
-  const seeds = new Float32Array(cap * 3);
-  for (let i = 0; i < cap * 3; i++) {
+export function createRain(scene, { sampleAt, renderer }) {
+  // ------------------------------------------------- in-world streaks (nycsim)
+  const geometry = new PlaneGeometry(0.035 * SCALE, 0.95 * SCALE);
+  const seeds = new Float32Array(N * 3);
+  for (let i = 0; i < N * 3; i++) {
     const x = Math.sin(i * 127.1 + 311.7) * 43758.5453;
     seeds[i] = x - Math.floor(x);
   }
@@ -76,110 +62,145 @@ export function createRain(scene, { sampleAt }) {
     uWind: { value: new Vector2() },
     uTime: shared.uTime,
     uOn: { value: 0 },
-    uSpeed: { value: 620 },
-    uRadius: { value: RADIUS_MIN },
-    uTop: { value: RAIN_TOP },
+    uSpeed: { value: 15 * SCALE },
   };
 
   const material = new ShaderMaterial({
     transparent: true,
     depthWrite: false,
-    // DoubleSide is NOT optional here, and dropping it when porting from nycsim
-    // is what made 64,000 streaks render as nothing. The quad billboards around
-    // the fall direction using cross(fall, viewDir), so its winding flips
-    // depending on which side of the camera the drop is on -- with the default
-    // FrontSide, every streak on the wrong side is silently culled.
     side: DoubleSide,
     uniforms,
     vertexShader: /* glsl */ `
       attribute vec3 aRnd;
-      uniform vec3 uCenter;
-      uniform vec2 uWind;
-      uniform float uTime, uSpeed, uOn, uRadius, uTop;
+      uniform vec3 uCenter; uniform vec2 uWind; uniform float uTime, uSpeed, uOn;
       varying float vA;
-      varying float vFall;
-      void main() {
-        // Scatter over a disc. sqrt keeps the density even instead of crowding
-        // everything into the middle.
-        float r = sqrt(aRnd.x) * uRadius;
+      void main(){
+        float r = sqrt(aRnd.x) * ${(120 * SCALE).toFixed(1)};
         float ang = aRnd.y * 6.28318;
         float speed = uSpeed * (0.8 + aRnd.z * 0.5);
-        // Falls the WHOLE way from the cloud deck to the ground, then recycles.
-        float fy = mod(aRnd.z * 977.0 + uTime * speed, uTop);
+        float H = ${(150 * SCALE).toFixed(1)};
+        float fy = mod(aRnd.z * 977.0 + uTime * speed, H);
         vec2 base = uCenter.xz + vec2(cos(ang), sin(ang)) * r;
         vec2 carry = uWind * (fy / max(speed, 0.1));
-        vec3 wp = vec3(base.x + carry.x, uCenter.y + uTop - fy, base.y + carry.y);
-        // How far down the shaft has come, 0 at the cloud base and 1 at street
-        // level: used to fade it in just under the deck so shafts appear to be
-        // emerging from the cloud rather than starting in clear air.
-        vFall = fy / uTop;
-
-        // Billboard around the fall direction rather than around the camera.
+        vec3 wp = vec3(base.x + carry.x, uCenter.y + ${(90 * SCALE).toFixed(1)} - fy, base.y + carry.y);
         vec3 fall = normalize(vec3(uWind.x, -uSpeed, uWind.y));
         vec3 vd = normalize(wp - cameraPosition);
         vec3 rt = normalize(cross(fall, vd));
         vec3 p = wp + rt * position.x - fall * position.y;
-
-        vA = uOn * 0.55 * smoothstep(0.0, 0.05, vFall);
+        vA = uOn * 0.25;
         gl_Position = projectionMatrix * viewMatrix * vec4(p, 1.0);
-      }
-    `,
-    fragmentShader: /* glsl */ `
-      varying float vA;
-      varying float vFall;
-      // Darker and cooler than the sky, not paler. Storms come with heavy fog
-      // that washes the whole frame pale blue, and pale rain over a pale
-      // background is invisible however much of it there is -- which is exactly
-      // how 22,000 shafts managed to render nothing. Rain needs to be DARKER
-      // than what is behind it.
-      void main() { gl_FragColor = vec4(0.42, 0.50, 0.62, vA); }
-    `,
+      }`,
+    fragmentShader: 'varying float vA; void main(){ gl_FragColor = vec4(0.75, 0.82, 0.92, vA); }',
   });
 
-  const mesh = new InstancedMesh(geometry, material, cap);
+  const mesh = new InstancedMesh(geometry, material, N);
   mesh.count = 0;
   mesh.visible = false;
   mesh.frustumCulled = false;
-  mesh.renderOrder = 900;
+  mesh.renderOrder = 5;
   mesh.name = 'rain';
   scene.add(mesh);
 
-  let activeCap = cap;
+  // ----------------------------------------------------- screen veil (nycsim)
+  const veilScene = new Scene();
+  const veilCamera = new OrthographicCamera(-1, 1, 1, -1, 0, 1);
+  const veilUniforms = {
+    uTime: shared.uTime,
+    uOpacity: { value: 0 },
+    uAspect: { value: 1 },
+    uSlant: { value: 0.18 },
+  };
+  const veilMaterial = new ShaderMaterial({
+    transparent: true,
+    depthTest: false,
+    depthWrite: false,
+    uniforms: veilUniforms,
+    vertexShader: 'varying vec2 vUv; void main(){ vUv = uv; gl_Position = vec4(position.xy, 0.0, 1.0); }',
+    fragmentShader: /* glsl */ `
+      precision highp float; varying vec2 vUv;
+      uniform float uTime, uOpacity, uAspect, uSlant;
+      float hash(vec2 p){ return fract(sin(dot(p, vec2(127.1, 311.7))) * 43758.5453); }
+      void main(){
+        if (uOpacity <= 0.001) discard;
+        vec2 uv = vUv; uv.x *= uAspect;
+        float acc = 0.0;
+        for (int i = 0; i < 3; i++){
+          float fi = float(i);
+          float dens = 85.0 + fi * 55.0, sp = 1.1 + fi * 0.7;
+          vec2 p = uv; p.x += p.y * uSlant;
+          float colf = p.x * dens, ci = floor(colf), cf = fract(colf);
+          float seed = hash(vec2(ci, fi * 7.0));
+          float y = fract(p.y * (1.6 + seed) + uTime * sp + seed * 9.0);
+          float streak = smoothstep(0.0, 0.04, y) * smoothstep(0.32, 0.0, y);
+          float thin = smoothstep(0.5, 0.46, abs(cf - 0.5));
+          acc += streak * thin * step(0.58, seed) * (0.5 + 0.5 * seed);
+        }
+        gl_FragColor = vec4(vec3(0.82, 0.87, 0.96), acc * 0.5 * uOpacity);
+      }`,
+  });
+  veilScene.add(new Mesh(new PlaneGeometry(2, 2), veilMaterial));
+
+  // nycsim's altitude gates, in this scene's units.
+  const CEILING = 1600 * (SCALE / 6);
+  const FADE = 500 * (SCALE / 6);
+
   let intensity = 0;
+  let cap = 1;
 
   const setQuality = (key) => {
-    activeCap = RAIN_CAPS[key] ?? cap;
+    // nycsim scales the fleet by a quality factor; same idea, never to zero.
+    cap = key === 'low' ? 0.4 : key === 'medium' ? 0.7 : 1;
   };
 
-  function update(dt, focus, cameraPosition, cameraDistance = 900) {
+  function update(dt, focus, cameraPosition) {
     // Local rain, not the citywide mean: stand in the shower, not near it.
-    intensity = clamp01(sampleAt(focus.x, focus.z, 'precip'));
-    const count = Math.floor(activeCap * intensity);
+    intensity = clamp01(sampleAt(focus.x, focus.z, 'precip')) * cap;
+    const count = Math.floor(N * intensity);
     mesh.visible = count > 0;
     mesh.count = count;
-    if (!count) return 0;
+    if (!count) {
+      veilUniforms.uOpacity.value = 0;
+      return 0;
+    }
 
-    // Centred on the CAMERA in xz so the drops are near the eye and read, but
-    // running from the GROUND up to the cloud deck in y, so they still visibly
-    // fall the whole way from the clouds rather than appearing at eye level.
-    uniforms.uCenter.value.set(cameraPosition.x, focus.y, cameraPosition.z);
+    // Streaks ride the camera and fade out with altitude; the veil takes over.
+    uniforms.uCenter.value.copy(cameraPosition);
     uniforms.uWind.value.copy(shared.uWind.value);
-    uniforms.uRadius.value = Math.max(RADIUS_MIN, Math.min(RADIUS_MAX, cameraDistance * RADIUS_PER_DISTANCE));
-    uniforms.uOn.value = 1;
+    const camY = Math.max(0, cameraPosition.y - focus.y);
+    uniforms.uOn.value = clamp01((CEILING - camY) / FADE);
+
+    const size = renderer.getSize(_size);
+    veilUniforms.uAspect.value = size.x / Math.max(1, size.y);
+    veilUniforms.uOpacity.value = intensity * Math.min(0.85, Math.max(0.3, 0.3 + camY / CEILING));
     return count;
+  }
+
+  // After the scene and after the post pass, straight onto the canvas.
+  function renderVeil() {
+    if (veilUniforms.uOpacity.value <= 0.001) return;
+    const auto = renderer.autoClear;
+    renderer.autoClear = false;
+    renderer.setRenderTarget(null);
+    renderer.render(veilScene, veilCamera);
+    renderer.autoClear = auto;
   }
 
   return {
     mesh,
     update,
+    renderVeil,
     setQuality,
     get intensity() {
       return intensity;
+    },
+    get veilOpacity() {
+      return veilUniforms.uOpacity.value;
     },
     dispose() {
       scene.remove(mesh);
       geometry.dispose();
       material.dispose();
+      veilMaterial.dispose();
     },
   };
 }
