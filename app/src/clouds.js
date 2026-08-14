@@ -45,7 +45,7 @@ export const CLOUD_CAPS = { ultra: 160, high: 160, medium: 96, low: 48 };
 // camera.js), which puts the camera at most 8000 * sin(42) = ~5350 m over its
 // pivot. 4600 leaves roughly 750 m of headroom. If that clamp ever changes,
 // change this with it.
-const DECK_ALTITUDE = 4600;
+export const DECK_ALTITUDE = 4600;
 const LAYERS = [
   { key: 'low', altitude: DECK_ALTITUDE, scale: 720, spread: 0.7 },
   { key: 'mid', altitude: DECK_ALTITUDE, scale: 1100, spread: 1.2 },
