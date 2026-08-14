@@ -317,6 +317,8 @@ export function createStreetKitFleet(scene, kit, sampleElevation) {
   // The pools are ground-level overdraw, so the tier scales them down and
   // `low` switches them off. `poolsLit` is the night gate, updated per frame.
   let poolStrength = 1;
+  // Multiplier on each lamp's pool radius; fill cost goes as its square.
+  let poolRadiusScale = 1;
   let poolsLit = false;
 
   function applyVisibility(type) {
@@ -343,7 +345,8 @@ export function createStreetKitFleet(scene, kit, sampleElevation) {
           position.setFromMatrixPosition(matrix);
           alignPoolToGround(poolTilt, position.x, position.z, sampleElevation);
           position.y += POOL_LIFT;
-          poolScale.set(type.poolRadius, 1, type.poolRadius);
+          const radius = type.poolRadius * poolRadiusScale;
+          poolScale.set(radius, 1, radius);
           poolMatrix.compose(position, poolTilt, poolScale);
           type.pool.setMatrixAt(n, poolMatrix);
         }
@@ -370,14 +373,24 @@ export function createStreetKitFleet(scene, kit, sampleElevation) {
 
   return {
     root,
-    setQuality(tier) {
+    setQuality(tier, quality = null) {
       allowedId =
         tier === 'low'
           ? (id) => LOW_KEEPS.has(id)
           : tier === 'medium'
             ? (id) => !MEDIUM_DROPS.has(id)
             : () => true;
-      poolStrength = tier === 'low' ? 0 : tier === 'medium' ? 0.9 : 1;
+      // From the QUALITY table when it is given. This used to re-derive the
+      // numbers from the tier NAME, which quietly made the table's poolScale
+      // and poolStrength dead settings — editing them changed nothing.
+      poolStrength = quality?.poolStrength ?? (tier === 'low' ? 0 : tier === 'medium' ? 0.9 : 1);
+      const nextScale = quality?.poolScale ?? (tier === 'medium' ? 0.7 : 1);
+      if (nextScale !== poolRadiusScale) {
+        poolRadiusScale = nextScale;
+        // The radius is baked into each pool's matrix, so a change to it has to
+        // be repacked rather than just re-uniformed.
+        for (const type of types) if (type.pool) repack(type);
+      }
       if (poolStrength === 0) poolsLit = false;
       for (const type of types) applyVisibility(type);
     },
