@@ -27,7 +27,7 @@ const URL = `${import.meta.env.BASE_URL}sf-assets/fog-cube.glb`;
 // it does readily on a loaded machine — the fog vanished completely and the
 // city looked like the feature was broken. Fog is the headline here; it is the
 // last thing to cut, not the first.
-export const BANK_CAPS = { ultra: 420, high: 420, medium: 240, low: 110 };
+export const BANK_CAPS = { ultra: 625, high: 625, medium: 340, low: 150 };
 
 // The cube is a unit volume, so this is the width of one bank in metres.
 //
@@ -36,12 +36,12 @@ export const BANK_CAPS = { ultra: 420, high: 420, medium: 240, low: 110 };
 // filled with straight-edged translucent sheets instead of fog. The asset is a
 // cluster: a discrete clump. So: much smaller clumps, many more of them, which
 // is also how a real marine layer is built.
-const BANK_SIZE = 780;
+const BANK_SIZE = 820;
 // Sea level to here: the marine layer's own thickness.
 const BANK_BASE = 30;
 const BANK_TOP = 300;
 // Tighter than the cloud scatter: fog sits ON the city, not out at sea.
-const EXTENT = 7000;
+const EXTENT = 6000;
 
 const _matrix = new Matrix4();
 const _position = new Vector3();
@@ -62,14 +62,23 @@ export function createFogBanks(scene, { sampleAt }) {
   let ready = false;
   // Opacity well under 1: these overlap heavily, and alpha compounds where
   // they stack, so a per-instance 1.0 stacked into an opaque wall.
-  const tuning = { size: 1, opacity: 0.5, density: 1 };
+  const tuning = { size: 1, opacity: 0.16, density: 1 };
   const cap = BANK_CAPS.ultra;
 
+  // A JITTERED GRID, not a random scatter. Random positions clump and leave
+  // holes at any density -- which is why the fog read as a field of separate
+  // puffs rather than one mass. On a grid every bank has neighbours a fixed
+  // distance away, and because a bank is wider than a grid cell they overlap
+  // into a continuous sheet. The jitter is what stops it looking like a grid.
+  const GRID = Math.ceil(Math.sqrt(cap));
+  const CELL = (2 * EXTENT) / GRID;
   const slots = [];
   for (let i = 0; i < cap; i++) {
+    const gx = i % GRID;
+    const gz = Math.floor(i / GRID);
     slots.push({
-      x: (hash(i, 1) - 0.5) * 2 * EXTENT,
-      z: (hash(i, 2) - 0.5) * 2 * EXTENT,
+      x: -EXTENT + (gx + 0.5) * CELL + (hash(i, 1) - 0.5) * CELL * 0.85,
+      z: -EXTENT + (gz + 0.5) * CELL + (hash(i, 2) - 0.5) * CELL * 0.85,
       y: BANK_BASE + hash(i, 5) * (BANK_TOP - BANK_BASE),
       size: 0.6 + hash(i, 3) * 0.9,
       spin: hash(i, 4) * Math.PI * 2,
@@ -80,7 +89,7 @@ export function createFogBanks(scene, { sampleAt }) {
       // range is deliberately well under 1: at 0.85 the higher-threshold banks
       // never switched on anywhere except the very thickest cells, which left
       // the fog bunched into one corner of the city instead of spread over it.
-      threshold: hash(i, 6) * 0.5,
+      threshold: hash(i, 6) * 0.42,
     });
   }
 
