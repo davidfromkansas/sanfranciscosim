@@ -127,19 +127,23 @@ export function createFogBanks(scene, { sampleAt }) {
       alphaAttribute.setUsage(DynamicDrawUsage);
 
       material.onBeforeCompile = (shader) => {
-        shader.uniforms.uBankTint = { value: new Color(0xffffff) };
         shader.uniforms.uNight = shared.uNight;
+        shader.uniforms.uSmoke = shared.uSmoke;
+        shader.uniforms.uSmokeColor = { value: new Color(0xd8823c) };
         shader.vertexShader = shader.vertexShader
           .replace('#include <common>', '#include <common>\n        attribute float aFogAlpha;\n        varying float vFogAlpha;')
           .replace('#include <begin_vertex>', '#include <begin_vertex>\n        vFogAlpha = aFogAlpha;');
         shader.fragmentShader = shader.fragmentShader
-          .replace('#include <common>', '#include <common>\n        uniform float uNight;\n        varying float vFogAlpha;')
+          .replace('#include <common>', '#include <common>\n        uniform float uNight;\n        uniform float uSmoke;\n        uniform vec3 uSmokeColor;\n        varying float vFogAlpha;')
           .replace(
             '#include <dithering_fragment>',
             `#include <dithering_fragment>
             gl_FragColor.a *= vFogAlpha;
             // A bank at night is dark vapour lit by the city, not a white sheet.
-            gl_FragColor.rgb = mix(gl_FragColor.rgb, gl_FragColor.rgb * 0.35, uNight);`
+            gl_FragColor.rgb = mix(gl_FragColor.rgb, gl_FragColor.rgb * 0.35, uNight);
+            // Wildfire smoke: the same banks go amber rather than a second
+            // system existing. September 2020 was orange, not grey.
+            gl_FragColor.rgb = mix(gl_FragColor.rgb, uSmokeColor, clamp(uSmoke, 0.0, 1.0) * 0.7);`
           );
       };
 
@@ -207,7 +211,13 @@ export function createFogBanks(scene, { sampleAt }) {
       // clumped and off camera.
       const stride = Math.max(1, Math.ceil(cap / Math.max(1, limit)));
       const inTier = i % stride === 0;
-      const raw = inTier ? sampleAt(slot.x, slot.z, 'fog') * tuning.density : 0;
+      // Smoke fills the sky whether or not there is fog: a wildfire pall is
+      // not damp, but it is very much in the air.
+      // 0.45, not higher: at full strength the pall swallowed the city whole.
+      // September 2020 really did look like that, but a diorama nobody can read
+      // is not a diorama.
+      const smokeFloor = shared.uSmoke.value * 0.45;
+      const raw = inTier ? Math.max(sampleAt(slot.x, slot.z, 'fog'), smokeFloor) * tuning.density : 0;
       const local = raw < 0.08 ? 0 : raw;
       const presence = Math.max(0, Math.min(1, (local - slot.threshold) * 3));
 
