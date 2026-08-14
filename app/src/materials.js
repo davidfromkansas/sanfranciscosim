@@ -105,6 +105,31 @@ const FOG = /* glsl */ `
   uniform float uWetness;
   uniform float uFlash;
   uniform float uFogDensity;
+  uniform float uFogWisp;
+  uniform float uTime;
+  uniform vec2 uWind;
+
+  // 3D value noise. Fog that is a flat mix() toward grey can only ever read as
+  // a blanket; what makes fog look like fog is that its density varies through
+  // the volume and drifts. Two octaves is the whole budget -- this runs per
+  // fragment on every surface in the city.
+  float fogHash(vec3 p) {
+    p = fract(p * 0.3183099 + vec3(0.1, 0.2, 0.3));
+    p *= 17.0;
+    return fract(p.x * p.y * p.z * (p.x + p.y + p.z));
+  }
+
+  float fogNoise(vec3 p) {
+    vec3 i = floor(p);
+    vec3 f = fract(p);
+    f = f * f * (3.0 - 2.0 * f);
+    return mix(
+      mix(mix(fogHash(i + vec3(0,0,0)), fogHash(i + vec3(1,0,0)), f.x),
+          mix(fogHash(i + vec3(0,1,0)), fogHash(i + vec3(1,1,0)), f.x), f.y),
+      mix(mix(fogHash(i + vec3(0,0,1)), fogHash(i + vec3(1,0,1)), f.x),
+          mix(fogHash(i + vec3(0,1,1)), fogHash(i + vec3(1,1,1)), f.x), f.y),
+      f.z);
+  }
 
   float weatherFog(vec3 worldPos) {
     vec2 uv = (worldPos.xz - uWeatherOrigin) * uWeatherScale;
@@ -112,12 +137,24 @@ const FOG = /* glsl */ `
     density = max(density, uSmoke * 0.55);
     if (density < 0.01) return 0.0;
 
-    float height = 1.0 - smoothstep(0.0, uFogTop, max(worldPos.y, 0.0));
+    // Wisps: two octaves of drifting 3D noise, stretched flat on Y so the
+    // structure reads as layered sheets rather than as a ball of cotton wool.
+    // The drift is the real wind, so the bank moves the way the clouds do.
+    vec3 q = worldPos * vec3(0.0016, 0.006, 0.0016);
+    q.xz += uWind * uTime * 0.0016;
+    float n = fogNoise(q) * 0.62 + fogNoise(q * 2.7 + 4.1) * 0.38;
+    // Around 1.0 on average, so wisp = 0 leaves the old flat behaviour intact.
+    float wisp = mix(1.0, 0.35 + 1.5 * n, uFogWisp);
+
+    // The top of the layer is ragged, not a ruled line: the same noise erodes
+    // the ceiling, which is what makes a bank look like it has a surface.
+    float top = uFogTop * (1.0 + uFogWisp * (n - 0.5) * 0.85);
+    float height = 1.0 - smoothstep(0.0, max(top, 1.0), max(worldPos.y, 0.0));
     if (height <= 0.001) return 0.0;
 
     float dist = distance(worldPos, cameraPosition);
     float bubble = smoothstep(0.0, uFogClear, dist);
-    float k = density * uFogDensity;
+    float k = density * wisp * uFogDensity;
     float f = 1.0 - exp(-k * k * dist * dist);
     return clamp(f * height * bubble * uFogMax, 0.0, 1.0);
   }
@@ -152,6 +189,9 @@ const CLOUD_UNIFORMS = () => ({
   uWetness: shared.uWetness,
   uFlash: shared.uFlash,
   uFogDensity: shared.uFogDensity,
+  uFogWisp: shared.uFogWisp,
+  uTime: shared.uTime,
+  uWind: shared.uWind,
 });
 
 const HASH = /* glsl */ `

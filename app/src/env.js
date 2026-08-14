@@ -74,6 +74,10 @@ export const shared = {
   // 0.00042: at diorama distances that was thin enough that even a full
   // pea-souper read as light haze.
   uFogDensity: { value: 0.00072 },
+  // How much drifting 3D noise breaks the fog up. 0 is the flat blanket the
+  // first cut shipped; 1 is fully wispy. Fog reads as fog because its density
+  // varies through the volume, not because it is grey.
+  uFogWisp: { value: 0.85 },
   uSmokeColor: { value: new Color(0xd08a4a) },
 };
 

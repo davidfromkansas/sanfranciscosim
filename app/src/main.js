@@ -641,11 +641,17 @@ async function boot() {
     // readability cap), `top` the altitude the marine layer thins out at, and
     // `clear` the radius kept clear around the camera.
     tuneFog(patch = {}) {
-      const map = { density: 'uFogDensity', max: 'uFogMax', top: 'uFogTop', clear: 'uFogClear' };
+      const map = { density: 'uFogDensity', max: 'uFogMax', top: 'uFogTop', clear: 'uFogClear', wisp: 'uFogWisp' };
       for (const [key, uniform] of Object.entries(map)) {
         if (Number.isFinite(patch[key])) shared[uniform].value = patch[key];
       }
-      return { density: shared.uFogDensity.value, max: shared.uFogMax.value, top: shared.uFogTop.value, clear: shared.uFogClear.value };
+      return {
+        density: shared.uFogDensity.value,
+        max: shared.uFogMax.value,
+        top: shared.uFogTop.value,
+        clear: shared.uFogClear.value,
+        wisp: shared.uFogWisp.value,
+      };
     },
     // Dial cloud size and density against the running scene:
     //   SF.tuneClouds({ size: 1.4, density: 1.2 })  ->  then SF.cloudCoverage()
