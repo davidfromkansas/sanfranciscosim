@@ -452,8 +452,15 @@ sky may go orange, the city must stay readable.
 ## 3.5 Debug hook
 
 `SF.setWeather(patch | null)` — merge a partial override onto the live field,
-`null` returns to live. Debug only: **no UI, no URL parameter**, exactly
-matching how `SF.setClock` works today. Also expose `SF.weather` returning the
+`null` returns to live. Debug only: **no UI**, exactly matching how
+`SF.setClock` works today.
+
+**Amended 2026-08-13:** David added `?weather=<preset>` after all, so a
+dramatic view can be linked rather than typed into a console. Live weather is
+still the default, there is still no control in the interface, and an unknown
+value logs a warning and shows the real city rather than erroring. The rule
+that survives is the one that mattered: nothing in the UI lets a visitor
+believe they are looking at real weather when they are not. Also expose `SF.weather` returning the
 current eased state, and make `SF.setWeather({ preset: 'karl' | 'storm' |
 'clear' | 'smoke' })` produce the canonical demo states — QA and screenshots
 both depend on it.

@@ -117,6 +117,31 @@ async function boot() {
   // The live weather field. Created before the clock so the card can read it
   // on its very first render.
   const weather = createWeather({ project: data.project });
+  // ?weather=<preset> pins a showcase state at load, so a dramatic view can be
+  // linked to rather than typed into a console. Live weather is still the
+  // default and there is no control in the UI for this — the city's promise is
+  // that what you see is real, and only an explicit URL opts out of it.
+  // Unknown values are ignored rather than erroring: a bad link shows the real
+  // city, which is the right failure.
+  function applyWeatherFromUrl() {
+    let requested = null;
+    try {
+      requested = new URLSearchParams(window.location.search).get('weather');
+    } catch {
+      return null;
+    }
+    if (!requested) return null;
+    const name = String(requested).toLowerCase();
+    if (!weather.presetNames.includes(name)) {
+      console.warn(`?weather=${requested} is not a known preset (${weather.presetNames.join(', ')}) — showing live weather`);
+      return null;
+    }
+    weather.setOverride({ preset: name });
+    // A linked state should be there on arrival, not ease in over a minute.
+    weather.settle();
+    return name;
+  }
+
   // Toy clouds read the same field the shadows do, so what floats overhead and
   // what darkens the ground always agree.
   const clouds = createClouds(scene, { sampleAt: weather.sampleAt });
@@ -266,6 +291,10 @@ async function boot() {
   }
   tickSky();
   const skyClock = createSkyClock({ read: () => sky, readWeather: () => weather });
+  // After the first poll has had a moment: an override set before any payload
+  // arrives would be overwritten by it.
+  let urlWeather = applyWeatherFromUrl();
+  if (urlWeather) setTimeout(() => { urlWeather = applyWeatherFromUrl(); skyClock.update(); }, 2500);
 
   const ui = createUI({
     presets,

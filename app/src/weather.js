@@ -363,6 +363,11 @@ export function createWeather({ project }) {
     get override() {
       return override;
     },
+    // The names ?weather= will accept. Exposed so the URL parser validates
+    // against the real list instead of keeping a second copy of it.
+    get presetNames() {
+      return Object.keys(PRESETS);
+    },
     // Live state, for SF.weather.
     snapshot() {
       return {
