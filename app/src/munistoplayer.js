@@ -46,13 +46,24 @@ const SCALE_MIN = 1.0;
 // ~8 km from the marker, which needs ~34x. Capping lower is what made them
 // shrink into nothing when zoomed out.
 const SCALE_MAX = 40;
-const MAX_MARKERS = 40;
+// A quarter of what this used to draw. Every stop having a pin is what the data
+// says, but it is not what a city looks like: at 40 the layer read as a field of
+// markers with a diorama behind it. Ten is enough to say "there is transit here,
+// and here, and here" and leave the buildings visible, which is the whole point
+// of only showing the ones nearby.
+const MAX_MARKERS = 10;
 // Declutter spacing, as a multiple of a marker's own width. Markers are drawn
 // at a constant SIZE ON SCREEN, so the world distance that keeps two of them
 // from overlapping grows with viewing distance — which makes this the honest
 // unit. Deriving the cell from the search radius instead looked equivalent and
 // merged the four corners of an intersection into a single pin at street level.
-const DECLUTTER_SPACING = 1.4;
+//
+// Doubled along with the cut above, and that pairing is the point: density falls
+// with the SQUARE of this, so doubling it is itself the quarter. Cutting the cap
+// alone would have kept the old close spacing and simply stopped after ten,
+// bunching every survivor around the centre of the view and leaving the edges
+// bare. Widening the grid instead thins the whole frame evenly.
+const DECLUTTER_SPACING = 2.8;
 const DECLUTTER_MIN_M = 11;
 
 const MAX_PICK_DISTANCE = 4000;
