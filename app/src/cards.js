@@ -31,6 +31,7 @@ const KIND_GLYPH = {
   view: 'view',
   vessel: 'vessel',
   transit: 'transit',
+  'transit-stop': 'transit',
   aircraft: 'aircraft',
 };
 
@@ -229,6 +230,21 @@ export function createContextCard({ onFly, onAsk, onSelectHistory, onClose }) {
       }
       fact('Speed', `${Math.round(entity.speedKmh)} km/h`);
       fact('Position reported', relative(entity.recordedAt));
+    } else if (entity.kind === 'transit-stop') {
+      subtitle.textContent = 'Muni bus stop';
+      chips.append(chip('Bus stop', 'navy', 'transit'));
+      for (const route of entity.routes.slice(0, 6)) chips.append(chip(route, 'coral'));
+      if (entity.routes.length > 6) chips.append(chip(`+${entity.routes.length - 6}`, 'navy'));
+      fact('Routes stopping here', entity.routes.join(' \u00b7 '));
+      // Grouped by route, because "when is the next 38R" is the question a
+      // rider is asking — a flat list of vehicles makes them do the grouping.
+      if (entity.arrivals.length) {
+        for (const group of entity.arrivals) {
+          fact(group.route, group.minutes.map((m) => (m <= 0 ? 'now' : `${m} min`)).join(', '));
+        }
+      } else {
+        fact('Coming soon', 'Nothing predicted in the next few minutes');
+      }
     } else if (entity.kind === 'aircraft') {
       // Every number here is the TRUE reading from the transponder. Only the
       // height the aircraft is DRAWN at is compressed (see aircraft.js dispY),
@@ -299,7 +315,8 @@ export function createContextCard({ onFly, onAsk, onSelectHistory, onClose }) {
     // Aircraft DO get the ask button: unlike a ferry or a bus, the concierge
     // has the whole flights feed through live_data, and the clicked aircraft's
     // full state rides along in the focus context — so it can actually answer.
-    askButton.hidden = entity.kind === 'vessel' || entity.kind === 'transit';
+    askButton.hidden =
+      entity.kind === 'vessel' || entity.kind === 'transit' || entity.kind === 'transit-stop';
 
     const bits = [`Source: ${sourceLabel(entity.source)}`];
     if (entity.kind === 'building') bits.push(confidenceLabel(entity.confidence));

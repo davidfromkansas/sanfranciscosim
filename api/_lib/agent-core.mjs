@@ -111,7 +111,7 @@ const TOOLS = [
   {
     name: 'transit_nearby',
     description:
-      'When the next Muni vehicles reach the stops around a point: the nearest stops by walking distance, each with the next arrivals (route, mode, minutes away, fleet number). THE tool for "when is the next bus/train", "what stops near here", "how do I get somewhere" — do not use live_data for those, it returns the whole citywide fleet and gets truncated. Resolve an address or place to x/z first with search_city or search_places.',
+      'Muni stops around a point: the nearest bus stops by walking distance, each with the ROUTES THAT STOP THERE and the next arrivals (route, minutes away, fleet number). A stop is listed even when nothing is due soon, so this answers "which buses stop near me" as well as "when is the next one". THE tool for any stop or arrival question — do not use live_data, which returns the whole citywide fleet and gets truncated. Resolve an address or place to x/z first with search_city or search_places.',
     input_schema: {
       type: 'object',
       properties: {
@@ -267,7 +267,7 @@ function fitBudget(payload, budget) {
 // The read-only tools. `data` is the loaded bake; only live_data fetches, and
 // only from the city's own feed endpoints.
 export function createTools(data) {
-  const { search, places, parks, neighborhoods, streets, stats, muniStops } = data;
+  const { search, places, parks, neighborhoods, streets, stats, muniStops, muniRoutes = [] } = data;
 
   function pointInRings(x, z, rings) {
     for (const ring of rings) {
@@ -357,17 +357,26 @@ export function createTools(data) {
 
       const wanted = route ? String(route).toUpperCase() : null;
       const now = Date.now();
-      // stopId -> arrivals, built only for stops inside the radius.
+
+      // Every bus stop in range FIRST, from the static bake — so a stop with
+      // nothing due in the next few minutes still appears, with the routes that
+      // serve it. Arrivals are then laid over the top. Building the list from
+      // live arrivals alone (the old behaviour) made a quiet stop invisible,
+      // which is the wrong answer to "what stops are near me".
       const inRange = new Map();
+      for (const [stopId, entry] of Object.entries(muniStops)) {
+        const [name, sx, sz, ...routeIdx] = entry;
+        const d = distance(x, z, sx, sz);
+        if (d > r) continue;
+        const serves = routeIdx.map((i) => muniRoutes[i]).filter(Boolean);
+        if (wanted && !serves.some((v) => v.toUpperCase() === wanted)) continue;
+        inRange.set(stopId, { name, x: sx, z: sz, walk_m: Math.round(d), routes: serves, arrivals: [] });
+      }
       for (const vehicle of payload.vehicles || []) {
         if (wanted && String(vehicle.route).toUpperCase() !== wanted) continue;
         for (const stop of vehicle.stops || []) {
-          const entry = muniStops[stop.stopId];
-          if (!entry) continue;
-          const d = distance(x, z, entry[1], entry[2]);
-          if (d > r) continue;
-          let bucket = inRange.get(stop.stopId);
-          if (!bucket) inRange.set(stop.stopId, (bucket = { name: entry[0], x: entry[1], z: entry[2], walk_m: Math.round(d), arrivals: [] }));
+          const bucket = inRange.get(stop.stopId);
+          if (!bucket) continue; // outside the radius, or filtered out by `route`
           bucket.arrivals.push({
             route: vehicle.route,
             mode: vehicle.mode,
@@ -379,13 +388,19 @@ export function createTools(data) {
         }
       }
 
+      // The stop table spans every mode, so a rail-only platform lands in range
+      // with no bus routes. Keep it only if something is actually predicted
+      // there; otherwise it reads as a stop that no service calls at.
       const ranked = [...inRange.values()]
+        .filter((stop) => stop.routes.length || stop.arrivals.length)
         .map((stop) => {
           stop.arrivals.sort((a, b) => a.at - b.at);
           stop.arrivals = stop.arrivals.slice(0, 3);
           return stop;
         })
-        .sort((a, b) => (a.arrivals[0]?.at ?? Infinity) - (b.arrivals[0]?.at ?? Infinity) || a.walk_m - b.walk_m);
+        // Nearest first. Sorting by soonest arrival buried the stop across the
+        // street under one four blocks away that happened to have a bus due.
+        .sort((a, b) => a.walk_m - b.walk_m);
 
       // Pick for ROUTE VARIETY, not just for the soonest times. A busy corridor
       // puts six consecutive stops of one line at the top of a time sort, which
