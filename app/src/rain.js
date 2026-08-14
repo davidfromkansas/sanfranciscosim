@@ -23,16 +23,22 @@ import { DECK_ALTITUDE } from './clouds.js';
 
 // Rain thins with the quality tier but never switches off: a storm that renders
 // dry because the governor demoted is worse than a slow one.
-export const RAIN_CAPS = { ultra: 3000, high: 3000, medium: 1600, low: 700 };
+// Instancing makes count nearly free -- these are two triangles each -- so the
+// shaft count is high. At 3000 spread through a column kilometres wide the rain
+// read as scattered showers rather than a downpour.
+export const RAIN_CAPS = { ultra: 26000, high: 26000, medium: 13000, low: 5000 };
 
 // The rain column runs the full height from the cloud deck to the ground, so
 // the shafts visibly hang off the clouds that are producing them.
 const RAIN_TOP = DECK_ALTITUDE;
 // How wide the column is, as a multiple of the camera's orbit distance: the
 // rain has to cover what is on screen, so it grows as you pull back.
-const RADIUS_PER_DISTANCE = 1.15;
-const RADIUS_MIN = 700;
-const RADIUS_MAX = 9000;
+// Tighter than the view, deliberately. The column has to cover what is on
+// screen, but every extra metre of radius thins the rain out over the square of
+// it -- at a 9 km radius the shafts were spread through 250 square kilometres.
+const RADIUS_PER_DISTANCE = 0.85;
+const RADIUS_MIN = 600;
+const RADIUS_MAX = 5200;
 
 const clamp01 = (v) => (v < 0 ? 0 : v > 1 ? 1 : v);
 
@@ -40,9 +46,16 @@ export function createRain(scene, { sampleAt }) {
   const cap = RAIN_CAPS.ultra;
 
   // --------------------------------------------------------- in-world streaks
-  // A long, thin shaft. These are hundreds of metres tall in world units --
-  // at diorama distances a life-sized raindrop is far under a pixel.
-  const geometry = new PlaneGeometry(2.2, 150);
+  // Long enough to read at diorama distance, short enough to read as RAIN. At
+  // 150 m each streak was a vertical pole standing over the city; the length
+  // has to stay well under the height it falls through or the eye sees columns
+  // instead of weather.
+  // WIDTH is what decides whether a streak exists on screen at all: at diorama
+  // range anything under ~3 m is sub-pixel and renders as nothing, however many
+  // there are. Length decides whether it reads as rain or as a pole. Both have
+  // been wrong in both directions here; these are the values that survived
+  // looking at the frame.
+  const geometry = new PlaneGeometry(3.4, 95);
   const seeds = new Float32Array(cap * 3);
   for (let i = 0; i < cap * 3; i++) {
     const x = Math.sin(i * 127.1 + 311.7) * 43758.5453;
@@ -93,14 +106,19 @@ export function createRain(scene, { sampleAt }) {
         vec3 rt = normalize(cross(fall, vd));
         vec3 p = wp + rt * position.x - fall * position.y;
 
-        vA = uOn * 0.30 * smoothstep(0.0, 0.09, vFall);
+        vA = uOn * 0.5 * smoothstep(0.0, 0.07, vFall);
         gl_Position = projectionMatrix * viewMatrix * vec4(p, 1.0);
       }
     `,
     fragmentShader: /* glsl */ `
       varying float vA;
       varying float vFall;
-      void main() { gl_FragColor = vec4(0.78, 0.85, 0.95, vA); }
+      // Darker and cooler than the sky, not paler. Storms come with heavy fog
+      // that washes the whole frame pale blue, and pale rain over a pale
+      // background is invisible however much of it there is -- which is exactly
+      // how 22,000 shafts managed to render nothing. Rain needs to be DARKER
+      // than what is behind it.
+      void main() { gl_FragColor = vec4(0.42, 0.50, 0.62, vA); }
     `,
   });
 
