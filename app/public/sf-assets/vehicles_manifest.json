@@ -212,6 +212,21 @@
       "tris": 22916,
       "weight": 0,
       "notes": "Live-aircraft airframe; spawned by aircraft.js from /api/flights, not by road traffic. weight 0 keeps it out of the road spawner. Origin is the CENTRE of the airframe, not base-centre, because the air layer positions aircraft by their centreline at altitude. Conformed from the authored source by tools/conform-aircraft-glb.mjs (nose +X -> -Z, materials -> Toy_*, lights -> *_Glow)."
+    },
+    {
+      "id": "helicopter",
+      "file": "vehicles/helicopter.glb",
+      "kind": "aircraft",
+      "dims": [
+        8.94,
+        4.02,
+        11.56
+      ],
+      "targetLengthM": 11.56,
+      "front": "-Z",
+      "tris": 7376,
+      "weight": 0,
+      "notes": "Live-aircraft airframe for rotorcraft; spawned by aircraft.js from /api/flights. weight 0 keeps it out of the road spawner. Origin is the CENTRE of the airframe. The source file animates MainRotor_Pivot (local +Y) and TailRotor_Pivot (local +Z); the loader extracts those two subtrees as separately spun instanced meshes rather than running an AnimationMixer per aircraft. Conformed by tools/conform-aircraft-glb.mjs."
     }
   ]
 }

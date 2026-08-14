@@ -39,6 +39,7 @@ import {
   InstancedMesh,
   LineSegments,
   LineBasicMaterial,
+  Matrix4,
   MeshBasicMaterial,
   MeshLambertMaterial,
   Object3D,
@@ -53,20 +54,47 @@ import { createGLTFLoader } from './gltf.js';
 import { shared } from './env.js';
 
 const AIRLINER_ASSET = `${import.meta.env.BASE_URL}sf-assets/vehicles/passenger-airplane.glb`;
+const HELI_ASSET = `${import.meta.env.BASE_URL}sf-assets/vehicles/helicopter.glb`;
+
+// The helicopter's rotors are ANIMATED in the source file (node rotations, one
+// clip each). An instanced fleet cannot run an AnimationMixer per aircraft, and
+// merging everything static would freeze the blades — a helicopter with a still
+// rotor reads as broken, not as a helicopter. So the two rotor subtrees are
+// extracted as their own instanced meshes and spun on the GPU-side matrix
+// instead: same result, no mixer, two extra draw calls for the whole fleet.
+// Axes are the ones the clips actually animate, read out of the file.
+const HELI_ROTORS = [
+  { node: 'MainRotor_Pivot', axis: 'y', rate: 1 },
+  { node: 'TailRotor_Pivot', axis: 'z', rate: 4.2 }, // tail rotors turn far faster
+];
 
 // Merge a loaded GLB into at most two geometries — paint and lights — baking
 // each material's colour into COLOR_0 so the whole airframe draws with one
 // Lambert material plus one glow set. The same idiom the ferry and landmark
 // loaders use; `*_Glow` is the contract's marker for surfaces that light up.
-function mergeAirframe(root) {
+function mergeAirframe(root, rotorSpecs = []) {
   root.updateMatrixWorld(true);
   const body = [];
   const glow = [];
+  // Meshes under a rotor pivot belong to that rotor, not to the airframe.
+  const rotors = rotorSpecs
+    .map((spec) => {
+      const pivot = root.getObjectByName(spec.node);
+      if (!pivot) return null;
+      return { spec, pivot, parts: [], inverse: pivot.matrixWorld.clone().invert() };
+    })
+    .filter(Boolean);
+  const rotorOf = new Map();
+  for (const rotor of rotors) rotor.pivot.traverse((o) => { if (o.isMesh) rotorOf.set(o, rotor); });
+
   root.traverse((object) => {
     if (!object.isMesh) return;
     const material = object.material;
     const geometry = object.geometry.clone();
-    geometry.applyMatrix4(object.matrixWorld);
+    const rotor = rotorOf.get(object);
+    // A rotor's geometry is baked in its PIVOT's space, so spinning it is one
+    // rotation about the origin rather than an offset dance every frame.
+    geometry.applyMatrix4(rotor ? _mx.multiplyMatrices(rotor.inverse, object.matrixWorld) : object.matrixWorld);
     geometry.deleteAttribute('uv');
     geometry.deleteAttribute('uv1');
     geometry.deleteAttribute('tangent');
@@ -84,7 +112,8 @@ function mergeAirframe(root) {
       colors[i * 3 + 2] = source ? source.getZ(i) * b : b;
     }
     geometry.setAttribute('color', new BufferAttribute(colors, 3));
-    (material?.name?.endsWith('_Glow') ? glow : body).push(geometry);
+    if (rotor) rotor.parts.push(geometry);
+    else (material?.name?.endsWith('_Glow') ? glow : body).push(geometry);
   });
   const join = (parts) => {
     if (!parts.length) return null;
@@ -92,8 +121,24 @@ function mergeAirframe(root) {
     for (const part of parts) part.dispose();
     return merged;
   };
-  return { body: join(body), glow: join(glow) };
+  return {
+    body: join(body),
+    glow: join(glow),
+    rotors: rotors
+      .map((rotor) => ({
+        axis: rotor.spec.axis,
+        rate: rotor.spec.rate,
+        // Where the pivot sits inside the model, applied before the spin.
+        pivot: rotor.pivot.matrixWorld.clone(),
+        geometry: join(rotor.parts),
+      }))
+      .filter((rotor) => rotor.geometry),
+  };
 }
+
+const _mx = new Matrix4();
+const _spin = new Matrix4();
+const _rotorMatrix = new Matrix4();
 
 const ENDPOINT = `${import.meta.env.BASE_URL.replace(/\/$/, '')}/api/flights`;
 
@@ -813,7 +858,10 @@ export function createLiveAircraft(scene, data) {
   const meshes = {};
   let finMesh = null;
   let airlinerGlow = null; // lit surfaces of the GLB airframe, ignited at night
+  let heliGlow = null;
+  let heliRotors = []; // [{ mesh, pivot, axis, rate }]
   let usingAsset = false;
+  let usingHeliAsset = false;
   let spinnerMesh = null;
   let trails = null;
   let lights = null;
@@ -898,24 +946,7 @@ export function createLiveAircraft(scene, data) {
             finMesh.material.dispose();
             finMesh = null;
           }
-          if (glow) {
-            airlinerGlow = new InstancedMesh(
-              glow,
-              new MeshBasicMaterial({
-                vertexColors: true,
-                transparent: true,
-                depthWrite: false,
-                toneMapped: false, // lights read as LIGHTS, not as dim paint
-              }),
-              CAPACITY
-            );
-            airlinerGlow.name = 'live-aircraft-airliner-glow';
-            airlinerGlow.instanceMatrix.setUsage(DynamicDrawUsage);
-            airlinerGlow.frustumCulled = false;
-            airlinerGlow.renderOrder = 3;
-            airlinerGlow.count = 0;
-            scene.add(airlinerGlow);
-          }
+          if (glow) airlinerGlow = buildGlowMesh(glow, 'live-aircraft-airliner-glow');
           usingAsset = true;
         } catch (error) {
           console.warn('[aircraft] airliner asset unusable, keeping procedural:', error?.message || error);
@@ -1245,6 +1276,7 @@ export function createLiveAircraft(scene, data) {
       const mesh = meshes[state.kind];
       const index = counts[state.kind]++;
       mesh.setMatrixAt(index, dummy.matrix);
+      if (state.kind === 'heli' && heliGlow) heliGlow.setMatrixAt(index, dummy.matrix);
       if (state.kind === 'airliner') {
         if (finMesh) {
           // Same transform as the airframe; only the colour differs per instance.
@@ -1258,7 +1290,20 @@ export function createLiveAircraft(scene, data) {
       state.displayY = y;
 
       // Rotors and propellers: same disc geometry, placed and sized by kind.
-      if (state.kind === 'heli' || state.kind === 'light') {
+      if (state.kind === 'heli' && heliRotors.length) {
+        // Real rotors: instance transform, then into the pivot's frame, then
+        // spin about the axis the source clip actually animates.
+        for (const rotor of heliRotors) {
+          _spin.identity();
+          const angle = spinAngle * rotor.rate;
+          if (rotor.axis === 'y') _spin.makeRotationY(angle);
+          else if (rotor.axis === 'z') _spin.makeRotationZ(angle);
+          else _spin.makeRotationX(angle);
+          _rotorMatrix.copy(dummy.matrix).multiply(rotor.pivot).multiply(_spin);
+          rotor.mesh.setMatrixAt(index, _rotorMatrix);
+        }
+      } else if (state.kind === 'heli' || state.kind === 'light') {
+        // Procedural fallback disc, and the light aircraft's propeller.
         const heli = state.kind === 'heli';
         dummy.rotation.set(0, 0, 0);
         dummy.rotateY(state.yaw);
@@ -1326,6 +1371,15 @@ export function createLiveAircraft(scene, data) {
       finMesh.count = counts.airliner;
       finMesh.instanceMatrix.needsUpdate = true;
       if (finMesh.instanceColor) finMesh.instanceColor.needsUpdate = true;
+    }
+    for (const rotor of heliRotors) {
+      rotor.mesh.count = counts.heli;
+      rotor.mesh.instanceMatrix.needsUpdate = true;
+    }
+    if (heliGlow) {
+      heliGlow.count = counts.heli;
+      heliGlow.instanceMatrix.needsUpdate = true;
+      heliGlow.material.opacity = nightLift;
     }
     if (airlinerGlow) {
       airlinerGlow.count = counts.airliner;
@@ -1458,8 +1512,58 @@ export function createLiveAircraft(scene, data) {
     return entityFor(drawn[(at + 1) % drawn.length]);
   }
 
+  // Lit surfaces of a GLB airframe: unlit material so they read as LIGHTS, with
+  // opacity driven by uNight exactly like the landmark glow.
+  function buildGlowMesh(geometry, name) {
+    const mesh = new InstancedMesh(
+      geometry,
+      new MeshBasicMaterial({ vertexColors: true, transparent: true, depthWrite: false, toneMapped: false }),
+      CAPACITY
+    );
+    mesh.name = name;
+    mesh.instanceMatrix.setUsage(DynamicDrawUsage);
+    mesh.frustumCulled = false;
+    mesh.renderOrder = 3;
+    mesh.count = 0;
+    scene.add(mesh);
+    return mesh;
+  }
+
+  // The hand-made helicopter, with its rotors as separately spun instanced
+  // meshes. Same rule-3 shape as the airliner: the procedural one is already
+  // flying, so a failure here costs one warning.
+  function loadHeliAsset() {
+    createGLTFLoader().load(
+      HELI_ASSET,
+      (gltf) => {
+        try {
+          const { body, glow, rotors } = mergeAirframe(gltf.scene, HELI_ROTORS);
+          if (!body) throw new Error('no paint geometry');
+          const old = meshes.heli;
+          meshes.heli = buildAirframeMesh(body, 'live-aircraft-heli');
+          scene.add(meshes.heli);
+          scene.remove(old);
+          old.geometry.dispose();
+          old.material.dispose();
+          if (glow) heliGlow = buildGlowMesh(glow, 'live-aircraft-heli-glow');
+          heliRotors = rotors.map((rotor, i) => {
+            const mesh = buildAirframeMesh(rotor.geometry, `live-aircraft-heli-rotor-${i}`);
+            scene.add(mesh);
+            return { mesh, pivot: rotor.pivot, axis: rotor.axis, rate: rotor.rate };
+          });
+          usingHeliAsset = true;
+        } catch (error) {
+          console.warn('[aircraft] helicopter asset unusable, keeping procedural:', error?.message || error);
+        }
+      },
+      undefined,
+      () => console.warn('[aircraft] helicopter asset missing, keeping procedural airframe')
+    );
+  }
+
   build();
   loadAirlinerAsset();
+  loadHeliAsset();
 
   return {
     update,
@@ -1476,6 +1580,9 @@ export function createLiveAircraft(scene, data) {
     // fallback is flying — the thing a QA pass needs to be able to tell.
     get usingAsset() {
       return usingAsset;
+    },
+    get usingHeliAsset() {
+      return usingHeliAsset;
     },
     get source() {
       return source;
