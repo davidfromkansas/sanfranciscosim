@@ -30,7 +30,11 @@ from mathutils import Vector
 TRI_BUDGET = 18000
 TARGET_HEIGHT = 30.48
 TREE_COUNT = 190
-HEADING_LONG = 189.06
+# 170.94 = 180 - 9.06. The grid leans EAST of north, so the southward bearing
+# is the supplement, not 180 + 9.06. This constant maps the surveyed (u, v)
+# tree positions into world, so getting it wrong here validates the model
+# against a mirrored frame and passes a plaza that is 18.12 deg out of true.
+HEADING_LONG = 170.94
 # Cluster trees on their BOTTOM trunk ring only. The crown is 6.6 m across and
 # its underside sits at 4.90 m (4.61 m at the low end of the +/-6% scale
 # jitter), so a threshold anywhere above that pulls crown vertices in and splits
@@ -316,7 +320,7 @@ def main():
         "unexpected_geometry_or_objects": unexpected,
         "material_contract_violations": sorted(off_contract),
         "glow_materials": sorted(m["name"] for m in mat_rows if m["glow"]),
-        "anchor_lonlat": [-122.4176184, 37.7794818],
+        "anchor_lonlat": [-122.41761, 37.7794895],
         "front_heading_deg_true": HEADING_LONG,
         "target_height_m": TARGET_HEIGHT,
         "height_datum": "US flagpole finial (OSM node 7797674733, height=30.48)",

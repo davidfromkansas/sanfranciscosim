@@ -937,19 +937,19 @@
     "id": "civic-center-plaza",
     "file": "civic-center-plaza.glb",
     "anchor": [
-      -122.4176184,
-      37.7794818
+      -122.41761,
+      37.7794895
     ],
     "targetHeightM": 30.48,
     "cat": 0,
     "name": "Civic Center Plaza",
     "estimated": true,
     "dims": [
-      145.612,
-      192.624,
+      146.5287,
+      192.3451,
       30.48
     ],
-    "tris": 17703,
+    "tris": 17728,
     "loadRadius": 2500
   },
   {

@@ -33,18 +33,18 @@
   },
   {
    "step": "limited-dissolve",
-   "tris": 17732,
-   "verts": 10394
+   "tris": 17736,
+   "verts": 10396
   },
   {
    "step": "join-per-material",
-   "tris": 17732,
-   "verts": 10394
+   "tris": 17736,
+   "verts": 10396
   }
  ],
  "input": {
   "tris": 17820,
-  "verts": 33336,
+  "verts": 33335,
   "objects": 94
  },
  "interior_faces_removed": 0,
@@ -83,13 +83,13 @@
    "Toy_white"
   ],
   "bbox_dims": [
-   145.6123,
-   192.6242,
+   146.5287,
+   192.3451,
    30.48
   ],
   "bbox_min": [
-   -72.8061,
-   -96.3121,
+   -73.2643,
+   -96.1726,
    0.0
   ]
  },
