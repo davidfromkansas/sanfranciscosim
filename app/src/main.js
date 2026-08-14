@@ -25,6 +25,7 @@ import { createPiers } from './piers.js';
 import { createAgents } from './agents.js';
 import { createLiveFerries } from './ferries.js';
 import { createLiveMuni } from './muni.js';
+import { createLiveAircraft } from './aircraft.js';
 import { createCameraRig } from './camera.js';
 import { createSigns } from './signs.js';
 import { createToyPost } from './toypost.js';
@@ -154,6 +155,9 @@ async function boot() {
   // Real Muni buses from /api/muni; when the feed is away this layer is simply
   // empty — the procedural road traffic never depended on it.
   const muni = createLiveMuni(scene, data);
+  // Real aircraft from /api/flights. Like the Muni layer this one simply stays
+  // empty when the feed is away — nothing else in the city depends on it.
+  const aircraft = createLiveAircraft(scene, data);
   const signs = createSigns(scene, data);
   const post = createToyPost(renderer);
 
@@ -335,6 +339,18 @@ async function boot() {
       card.hide();
       overlay.clear();
       focus.entity = null;
+      stopFollowing(); // Escape is the same dismissal as the card's close button
+      return;
+    }
+    // A — fly to an aircraft, lowest first, pressing again for the next one.
+    // Live aircraft can be anywhere and are not in the baked search index, so
+    // without this the only way to find one is to spot it by eye.
+    if (event.key === 'a' || event.key === 'A') {
+      const plane = aircraft.nextAircraft(
+        focus.entity?.kind === 'aircraft' ? focus.entity.id : null
+      );
+      if (plane) selectEntity(plane, { fly: true });
+      else console.info('[aircraft] nothing in the sky right now');
       return;
     }
     if (event.key === 'h' || event.key === 'H') {
@@ -380,6 +396,21 @@ async function boot() {
     if (entity.kind === 'landmark' && entity.camera) {
       return { x: entity.x, z: entity.z, y: ground + (entity.height || 60) / 2, ...entity.camera };
     }
+    if (entity.kind === 'aircraft') {
+      // Frame the airframe where it is DRAWN (compressed altitude), not the
+      // ground beneath it, and stand off far enough that a 40 m airliner drawn
+      // at semantic scale fills a sensible part of the view.
+      return {
+        x: entity.x,
+        z: entity.z,
+        y: entity.displayY,
+        yaw: 210,
+        // Look DOWN on it, the way the diorama looks down on everything else —
+        // the follow camera eases to the same framing once the fly-in lands.
+        pitch: style === 'toy' ? 40 : 32,
+        distance: 420,
+      };
+    }
     if (entity.kind === 'vessel') {
       return { x: entity.x, z: entity.z, y: 20, yaw: 210, pitch: style === 'toy' ? 30 : 22, distance: 300 };
     }
@@ -394,8 +425,59 @@ async function boot() {
     rig.flyTo(target, duration);
   }
 
+  // Camera follow, for entities that move. Clicking an aircraft flies to it
+  // and then TRACKS it — a plane doing 250 kn leaves a static frame within
+  // seconds, so "take me to that plane" is meaningless without this. The rig
+  // keeps its downward diorama pitch throughout: the point is to watch it from
+  // above the city, not to sit in its wake.
+  const FOLLOW_DISTANCE = 400;
+  const FOLLOW_PITCH = 40 * (Math.PI / 180);
+  let following = null; // aircraft id
+
+  function stopFollowing() {
+    // Only when actually following: releaseHold would otherwise also release a
+    // landmark or building focus, which is a different feature that is fine as
+    // it is.
+    if (!following) return;
+    following = null;
+    // Re-anchor to the ground without moving the camera. Skipping this is what
+    // made letting go of a plane yank the view down by the aircraft's altitude.
+    rig.releaseHold();
+  }
+
+  // Any deliberate camera input hands control back to the user immediately.
+  canvas.addEventListener('wheel', stopFollowing, { passive: true });
+  window.addEventListener('keydown', (event) => {
+    if ('wasdqerfWASDQERF'.includes(event.key) || event.key.startsWith('Arrow') ||
+        event.key === 'PageUp' || event.key === 'PageDown') {
+      stopFollowing();
+    }
+  });
+
+  function updateFollow(dt) {
+    if (!following) return;
+    const fresh = aircraft.aircraftEntity(following);
+    if (!fresh) {
+      stopFollowing();
+      return;
+    }
+    // While the initial fly-in is running the rig owns the camera; tracking
+    // takes over when it lands, and eases so the hand-off is not a jump.
+    if (rig.flying) return;
+    const k = 1 - Math.exp(-Math.min(dt, 0.25) * 3.2);
+    rig.state.holdY = true;
+    rig.state.pivot.x += (fresh.x - rig.state.pivot.x) * k;
+    rig.state.pivot.y += (fresh.displayY - rig.state.pivot.y) * k;
+    rig.state.pivot.z += (fresh.z - rig.state.pivot.z) * k;
+    rig.state.distance += (FOLLOW_DISTANCE - rig.state.distance) * k;
+    rig.state.pitch += (FOLLOW_PITCH - rig.state.pitch) * k;
+  }
+
   function selectEntity(entity, { fly = false } = {}) {
     if (!entity) return;
+    // Selecting anything else releases a follow; selecting an aircraft starts
+    // one, whether it came from a click, the A key or the concierge.
+    following = entity.kind === 'aircraft' ? entity.id : null;
     focus.entity = entity;
     focus.history = [entity, ...focus.history.filter((e) => e.id !== entity.id)].slice(0, 3);
     overlay.show(entity, {
@@ -413,6 +495,7 @@ async function boot() {
     onFly: (entity) => flyTo(focusTarget(entity)),
     onAsk: (entity) => concierge.ask(`Tell me about ${entity.title}.`),
     onSelectHistory: (entity) => selectEntity(entity),
+    onClose: () => stopFollowing(),
   });
 
   const search = createSearch({
@@ -468,6 +551,33 @@ async function boot() {
               cat: focus.entity.cat ?? null,
               x: Math.round(focus.entity.x),
               z: Math.round(focus.entity.z),
+              // A clicked aircraft carries its whole state, so "what is this
+              // flight?" is answerable from context alone. Everything here is
+              // the TRUE reading — only the drawn position is compressed.
+              ...(focus.entity.kind === 'aircraft'
+                ? {
+                    aircraft: {
+                      callsign: focus.entity.callsign,
+                      registration: focus.entity.registration,
+                      type: focus.entity.aircraftType,
+                      airframe: focus.entity.name,
+                      altitudeFt: focus.entity.altitudeFt,
+                      speedKt: focus.entity.speedKt,
+                      verticalRateFpm: focus.entity.verticalRateFpm,
+                      headingDeg: focus.entity.heading,
+                      phase: focus.entity.phase,
+                      squawk: focus.entity.squawk,
+                      emergency: focus.entity.emergency,
+                      from: focus.entity.route?.from?.city || null,
+                      fromCode: focus.entity.route?.from?.iata || null,
+                      to: focus.entity.route?.to?.city || null,
+                      toCode: focus.entity.route?.to?.iata || null,
+                      trueDistanceKm: focus.entity.trueDistanceKm
+                        ? Math.round(focus.entity.trueDistanceKm)
+                        : null,
+                    },
+                  }
+                : {}),
             }
           : null,
       };
@@ -488,6 +598,15 @@ async function boot() {
       if (intent.type === 'focus_entity' || intent.type === 'highlight') {
         // Live-fleet ids from the muni feed ("SF:8632"): the concierge saw them
         // in live_data and the bus layer has the current position.
+        // Aircraft ids from the flights feed ("AC:a98edc"): the concierge saw
+        // them in live_data and this layer has the current position.
+        if (typeof intent.id === 'string' && intent.id.startsWith('AC:')) {
+          const plane = aircraft.aircraftEntity(intent.id);
+          if (plane) {
+            selectEntity(plane, { fly: intent.type === 'focus_entity' });
+            return;
+          }
+        }
         if (typeof intent.id === 'string' && intent.id.startsWith('SF:')) {
           const bus = muni.busEntity(intent.id);
           if (bus) {
@@ -533,9 +652,14 @@ async function boot() {
   let vesselCardAge = 0;
   function trackVessel(dt) {
     const selected = focus.entity;
-    if (selected?.kind !== 'vessel' && selected?.kind !== 'transit') return;
+    if (selected?.kind !== 'vessel' && selected?.kind !== 'transit' && selected?.kind !== 'aircraft')
+      return;
     const fresh =
-      selected.kind === 'vessel' ? ferries.vesselEntity(selected.id) : muni.busEntity(selected.id);
+      selected.kind === 'vessel'
+        ? ferries.vesselEntity(selected.id)
+        : selected.kind === 'transit'
+          ? muni.busEntity(selected.id)
+          : aircraft.aircraftEntity(selected.id);
     if (!fresh) return;
     focus.entity = fresh;
     overlay.show(fresh, { toy: style === 'toy', groundY: 0 });
@@ -550,6 +674,11 @@ async function boot() {
   async function pickAt(nx, ny, hasGround) {
     pickPointer.set(nx, ny);
     pickRay.setFromCamera(pickPointer, camera);
+    // Aircraft are picked first: they are small, fast and in front of
+    // everything else on screen, so whatever is behind one is never the more
+    // interesting answer.
+    const plane = aircraft.pickAircraft(pickRay.ray.origin, pickRay.ray.direction);
+    if (plane) return plane;
     const vessel = ferries.pickVessel(pickRay.ray.origin, pickRay.ray.direction);
     if (vessel) return vessel;
     const bus = muni.pickBus(pickRay.ray.origin, pickRay.ray.direction);
@@ -559,6 +688,7 @@ async function boot() {
     });
   }
 
+  canvas.addEventListener('pointerdown', () => stopFollowing());
   canvas.addEventListener('pointerdown', (event) => {
     // A second finger means a pinch/twist, not a tap — whatever this press was,
     // it must not pick on release.
@@ -584,7 +714,11 @@ async function boot() {
     pickRay.setFromCamera(pickPointer, camera);
     const hasGround = rig.screenToGround(pickPointer.x, pickPointer.y, groundPoint);
     const entity = await pickAt(pickPointer.x, pickPointer.y, hasGround);
-    if (entity) selectEntity(entity);
+    // Clicking an aircraft TRAVELS to it — everything else in the city stays
+    // put when you click it, but a plane you have not flown to is a speck that
+    // leaves frame before you can read the card. The follow takes over when
+    // the fly-in lands.
+    if (entity) selectEntity(entity, { fly: entity.kind === 'aircraft' });
   });
 
   city.preload(rig.state.pivot.clone());
@@ -603,6 +737,14 @@ async function boot() {
     rain,
     fogBanks,
     muni,
+    aircraft,
+    // Which aircraft the camera is locked to, or null. Exposed because the
+    // follow is otherwise unobservable from outside and QA has to be able to
+    // assert that dismissing the card lets go of the camera.
+    get following() {
+      return following;
+    },
+    stopFollowing,
     governor,
     boot: bootScreen,
     landmarks,
@@ -745,6 +887,7 @@ async function boot() {
       if (clockOverride === null) tickSky();
     }
 
+    updateFollow(dt);
     rig.update(dt);
     governor.update(elapsed * 1000);
     pivotWorld.copy(rig.state.pivot);
@@ -760,6 +903,7 @@ async function boot() {
     rain.update(dt, camera.position);
     fogBanks.update(Math.min(1, elapsed));
     muni.update(dt, camera);
+    aircraft.update(dt, camera);
     trackVessel(dt);
     landmarks.update();
     assets.update(camera.position, dt);
@@ -806,6 +950,7 @@ async function boot() {
           `cars       ${agents.carCount}`,
           `ferries    ${ferries.count}${ferries.live ? ' live' : ' procedural'}`,
           `muni       ${muni.count}${muni.live ? ` live (${muni.onShapeCount} on-route${muni.degraded ? ', degraded' : ''})` : ' off'}`,
+          `aircraft   ${aircraft.count}${aircraft.live ? ` live (${aircraft.source})` : ' off'}`,
           `altitude   ${(camera.position.y - rig.state.pivot.y).toFixed(0)} m`,
           `zoom       ${rig.state.distance.toFixed(0)} m`,
           `time       ${sky ? sky.localTime : 'fallback'}${clockOverride === null ? '' : ' (held)'}`,

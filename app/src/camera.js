@@ -548,6 +548,55 @@ export function createCameraRig(camera, domElement, sampleElevation, extent) {
     pitchLocked = true;
   }
 
+  // Hand a view that is aimed at ALTITUDE back to the ground without moving the
+  // camera a pixel.
+  //
+  // A follow camera orbits a point in the sky — a plane at 1600 m. Simply
+  // clearing holdY drops the pivot to the terrain (the !holdY branch in
+  // update), and since the camera is a fixed offset from the pivot it falls the
+  // aircraft's whole altitude with it: a violent lurch downward the instant any
+  // movement input arrives, which edge-scroll supplies just from where the
+  // cursor happens to rest.
+  //
+  // So instead of moving the camera to suit the pivot, move the PIVOT to suit
+  // the camera: drop it to the ground directly below, then solve the distance
+  // and pitch that describe the very same camera position orbiting that new
+  // point. Yaw is untouched because the horizontal direction does not change.
+  // The result is that releasing a follow is invisible — the view is identical
+  // before and after, it is simply anchored to the ground again.
+  function releaseHold() {
+    if (!state.holdY) return;
+    // Solve for DISTANCE and the pivot's ground position, holding yaw and pitch
+    // fixed. Pitch is not ours to choose: diorama mode pins it at 42 degrees
+    // and rewrites it every frame, so a solution that changes pitch is undone
+    // immediately and the camera slides away over the following second.
+    // Distance and where the pivot sits on the ground are the free variables.
+    const sinPitch = Math.sin(state.pitch);
+    const cosPitch = Math.cos(state.pitch);
+    const dirX = Math.sin(state.yaw) * cosPitch;
+    const dirZ = Math.cos(state.yaw) * cosPitch;
+    const cx = camera.position.x;
+    const cy = camera.position.y;
+    const cz = camera.position.z;
+    // The pivot's ground height depends on where the pivot lands, which depends
+    // on the distance, which depends on the ground height — so settle it with a
+    // few iterations rather than pretending it is closed-form.
+    let ground = groundHeight(state.pivot.x, state.pivot.z);
+    let distance = state.distance;
+    for (let i = 0; i < 4; i++) {
+      distance = Math.min(
+        state.maxDistance,
+        Math.max(state.minDistance, (cy - ground) / Math.max(sinPitch, 0.05))
+      );
+      ground = groundHeight(cx - dirX * distance, cz - dirZ * distance);
+    }
+    state.distance = distance;
+    state.pivot.set(cx - dirX * distance, ground, cz - dirZ * distance);
+    state.holdY = false;
+    clampPivot();
+    apply();
+  }
+
   function set(preset) {
     state.holdY = Number.isFinite(preset.y);
     state.pivot.set(preset.x, state.holdY ? preset.y : groundHeight(preset.x, preset.z), preset.z);
@@ -575,6 +624,7 @@ export function createCameraRig(camera, domElement, sampleElevation, extent) {
     update,
     flyTo,
     set,
+    releaseHold,
     setDiorama,
     get diorama() {
       return diorama;
