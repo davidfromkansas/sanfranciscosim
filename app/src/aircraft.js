@@ -1,8 +1,8 @@
 // Live air traffic over San Francisco.
 //
 // /api/flights serves every airborne aircraft within 30 NM from community
-// ADS-B receivers; this layer flies each one at its real position, on one of
-// three procedural toy airframes chosen from the ICAO type the feed reports —
+// ADS-B receivers; this layer flies each one on one of three procedural toy
+// airframes chosen from the ICAO type the feed reports —
 // airliner, light aircraft, helicopter — with a callsign bubble, a fading
 // track behind it, and nav/strobe lights that ignite at dusk.
 //
@@ -13,10 +13,10 @@
 //   - The sky has to be readable from the hero camera. Real cruise altitude is
 //     11 km, twice the camera's own ceiling, so display altitude is COMPRESSED
 //     (see dispY) while every number on the card stays true.
-//   - The city's airports are off-scene. SFO sits at z +16.7 km and OAK at
-//     x +19 km, both outside the 15 km water plane, so this is an OVERFLIGHT
-//     layer: the arrival stream crosses the Bay and fades out at the scene
-//     edge rather than popping.
+//   - The city's airports are off-scene, and so is most of the traffic: SFO
+//     sits at z +16.7 km and OAK at x +19 km. Drawn literally the sky over the
+//     city is EMPTY, so positions are compressed horizontally onto SF itself —
+//     see the rule 5 note above dispY before changing anything about this.
 //   - No feed, no key, no aircraft → the layer is simply empty. Nothing else
 //     in the city depended on it, so there is no fallback to hand off (rule 3
 //     is satisfied by construction, not by a spare code path).
@@ -102,6 +102,65 @@ function dispY(altM) {
   const a = Math.max(ALT_FLOOR, altM);
   if (a <= ALT_TRUE_TO) return a;
   return ALT_TRUE_TO + ALT_COMPRESS_SPAN * (1 - Math.exp(-(a - ALT_TRUE_TO) / ALT_COMPRESS_RATE));
+}
+
+// ------------------------------------------------- horizontal compression
+//
+// DELIBERATE EXCEPTION TO IRON RULE 5 (AGENTS.md: never move real-world
+// features), owner-approved 2026-08-13. Do not "fix" this back to literal
+// placement — read this first, then ask David.
+//
+// Why: San Francisco's airspace mostly isn't over San Francisco. Measured
+// against the live feed, of 23 aircraft within 30 NM, EIGHT were within 26 km
+// and ZERO were over the city itself — SFO works the peninsula to the south
+// and OAK the bay to the east. Placed literally, the layer is technically
+// perfect and shows the user an empty sky, which communicates the opposite of
+// the truth that the sky is busy.
+//
+// So the horizontal axis gets the same treatment the vertical axis already
+// has: compressed for legibility, with the true reading preserved on the card.
+// Rule 5 still binds everything that IS the city — buildings, streets,
+// landmarks, terrain. It is relaxed only for transient live aircraft, and only
+// for where they are DRAWN.
+//
+// The map: bearing from the city is preserved EXACTLY (an aircraft south of
+// you stays south, on the same heading), and only the radius is compressed, so
+// the spatial story survives and only the distance shrinks. Aircraft genuinely
+// over the city keep their true position; everything beyond is drawn closer on
+// a curve that is monotonic and order-preserving, so nearer aircraft always
+// stay nearer.
+//
+// Centre and radius are SF's real land geometry, not the projection origin:
+// a 5 km disc about (-471, 1183) sits inside every coastline edge (the
+// tightest is the county line at 5676 m), so compressed traffic is over LAND,
+// never out at sea. Disable with ?airscale=off to see literal positions.
+const SCALE_CENTER_X = -471;
+const SCALE_CENTER_Z = 1183;
+const SCALE_TRUE_TO = 2500; // within this of the centre, position is untouched
+const SCALE_MAX_R = 5000; // everything is drawn inside this
+const SCALE_FEED_R = 30000; // real radius that maps to the rim
+// Below 1 the curve spreads distant traffic through the disc instead of piling
+// it all against the rim; 0.55 was picked by checking the live feed's actual
+// radius distribution lands evenly rather than as a halo.
+const SCALE_EXP = 0.55;
+
+// Compressed radius for a true radius.
+function scaleRadius(r) {
+  if (r <= SCALE_TRUE_TO) return r;
+  const u = Math.min(1, (r - SCALE_TRUE_TO) / (SCALE_FEED_R - SCALE_TRUE_TO));
+  return SCALE_TRUE_TO + (SCALE_MAX_R - SCALE_TRUE_TO) * u ** SCALE_EXP;
+}
+
+// d(scaleRadius)/dr — needed because VELOCITY has to be transformed by the
+// map's Jacobian too. Compress position without compressing motion and every
+// fix would yank the aircraft back against its own dead reckoning; this is
+// what keeps the two consistent so nothing rubber-bands.
+function scaleRadiusDerivative(r) {
+  if (r <= SCALE_TRUE_TO) return 1;
+  const span = SCALE_FEED_R - SCALE_TRUE_TO;
+  const u = (r - SCALE_TRUE_TO) / span;
+  if (u >= 1 || u <= 0) return 0;
+  return ((SCALE_MAX_R - SCALE_TRUE_TO) * SCALE_EXP * u ** (SCALE_EXP - 1)) / span;
 }
 
 // Tracks: a preallocated ring per slot, one point every TRAIL_STEP_S, drawn as
@@ -674,6 +733,36 @@ function demoFixes(startedAt, now) {
 export function createLiveAircraft(scene, data) {
   const params = new URLSearchParams(window.location.search);
   const demo = params.get('flights') === 'demo';
+  const scaled = params.get('airscale') !== 'off';
+
+  // A true-space fix and velocity to where the aircraft is DRAWN. The radial
+  // map shrinks the radius from SF's land centre; the velocity is transformed
+  // by the map's Jacobian, which for a radial map means the radial component
+  // scales by f'(r) and the tangential component by f(r)/r. Getting that right
+  // is what lets an aircraft dead-reckon between fixes and still land on the
+  // next compressed fix instead of snapping back to it.
+  function toDrawnSpace(x, z, vx, vz) {
+    if (!scaled) return { x, z, vx, vz };
+    const dx = x - SCALE_CENTER_X;
+    const dz = z - SCALE_CENTER_Z;
+    const r = Math.hypot(dx, dz);
+    if (r < 1 || r <= SCALE_TRUE_TO) return { x, z, vx, vz };
+    const nr = scaleRadius(r);
+    const ux = dx / r;
+    const uz = dz / r;
+    // Split velocity into radial (along û) and tangential (the remainder).
+    const radial = vx * ux + vz * uz;
+    const tangentX = vx - radial * ux;
+    const tangentZ = vz - radial * uz;
+    const dfdr = scaleRadiusDerivative(r);
+    const tangentScale = nr / r;
+    return {
+      x: SCALE_CENTER_X + ux * nr,
+      z: SCALE_CENTER_Z + uz * nr,
+      vx: radial * dfdr * ux + tangentX * tangentScale,
+      vz: radial * dfdr * uz + tangentZ * tangentScale,
+    };
+  }
 
   const aircraft = new Map(); // id -> state
   const meshes = {};
@@ -759,8 +848,11 @@ export function createLiveAircraft(scene, data) {
     for (const a of list) {
       if (!Number.isFinite(a.lat) || !Number.isFinite(a.lon) || !Number.isFinite(a.altM)) continue;
       const [x, z] = data.project(a.lon, a.lat);
-      const radius = Math.hypot(x, z);
-      if (radius > SCENE_RADIUS + 6000) continue; // far outside the world; not worth a slot
+      // Cull on the TRUE radius from SF's land centre. With scaling on, the
+      // feed radius is the horizon (everything inside it compresses into the
+      // disc); with it off, the literal 26 km horizon applies.
+      const trueRadius = Math.hypot(x - SCALE_CENTER_X, z - SCALE_CENTER_Z);
+      if (trueRadius > (scaled ? SCALE_FEED_R : SCENE_RADIUS + 6000)) continue;
 
       seen.add(a.id);
       const ageS = Math.min(DEAD_RECKON_MAX_S, Math.max(0, (now - (a.recordedAt || fetchedAt || now)) / 1000));
@@ -781,9 +873,15 @@ export function createLiveAircraft(scene, data) {
       }
       // Velocity along the heading. Front is -Z, so world forward for a yaw is
       // (-sin, -cos) — the same derivation the ferry layer documents.
-      const vx = yaw === null ? 0 : -Math.sin(yaw) * speed;
-      const vz = yaw === null ? 0 : -Math.cos(yaw) * speed;
+      const trueVx = yaw === null ? 0 : -Math.sin(yaw) * speed;
+      const trueVz = yaw === null ? 0 : -Math.cos(yaw) * speed;
       const vy = a.verticalRateMs || 0;
+
+      // Map the fix (and its velocity) into drawn space. With scaling off this
+      // is the identity, so the literal layer is the same code path.
+      const drawn = toDrawnSpace(x, z, trueVx, trueVz);
+      const vx = drawn.vx;
+      const vz = drawn.vz;
 
       if (!state) {
         if (!freeSlots.length) continue;
@@ -791,9 +889,9 @@ export function createLiveAircraft(scene, data) {
         state = {
           id: a.id,
           slot,
-          x: x + vx * ageS,
+          x: drawn.x + vx * ageS,
           y: Math.max(0, a.altM + vy * ageS),
-          z: z + vz * ageS,
+          z: drawn.z + vz * ageS,
           yaw: yaw ?? 0,
           bank: 0,
           trailHead: -1,
@@ -808,9 +906,14 @@ export function createLiveAircraft(scene, data) {
       // distance actually travelled.
       state.fixX = x;
       state.fixZ = z;
-      state.targetX = x + vx * ageS;
+      state.targetX = drawn.x + vx * ageS;
       state.targetY = Math.max(0, a.altM + vy * ageS);
-      state.targetZ = z + vz * ageS;
+      state.targetZ = drawn.z + vz * ageS;
+      // The real position, kept so the card can report where the aircraft
+      // actually is rather than where it is drawn.
+      state.trueX = x;
+      state.trueZ = z;
+      state.trueRadius = trueRadius;
       state.vx = vx;
       state.vy = vy;
       state.vz = vz;
@@ -1185,6 +1288,11 @@ export function createLiveAircraft(scene, data) {
       emergency: state.emergency,
       military: state.military || undefined,
       heading: Math.round(((-state.yaw * 180) / Math.PI + 360) % 360),
+      // Where it REALLY is. The airframe is drawn compressed onto the city, so
+      // the card carries the true distance and says so — the scaling is a
+      // legibility device, not something to hide from the person reading it.
+      scaledPlacement: scaled && state.trueRadius > SCALE_TRUE_TO,
+      trueDistanceKm: state.trueRadius == null ? null : state.trueRadius / 1000,
       recordedAt: state.recordedAt,
       demo,
       source: demo ? 'demo' : `ADS-B (${source || 'community'})`,

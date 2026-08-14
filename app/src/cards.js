@@ -251,6 +251,14 @@ export function createContextCard({ onFly, onAsk, onSelectHistory }) {
           : `${fpm > 0 ? 'Climbing' : 'Descending'} ${Math.abs(fpm).toLocaleString('en-US')} ft/min`
       );
       fact('Heading', `${entity.heading}\u00b0`);
+      // Say plainly that the aircraft is drawn nearer than it is. The distance
+      // is the real one; only the position on screen is compressed.
+      if (entity.scaledPlacement) {
+        fact(
+          'Actually',
+          `${entity.trueDistanceKm.toFixed(1)} km from the city \u00b7 drawn overhead to keep it in view`
+        );
+      }
       if (entity.squawk) fact('Squawk', entity.squawk);
       fact('Position reported', relative(entity.recordedAt));
     } else if (entity.kind === 'neighborhood') {
