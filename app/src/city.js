@@ -1078,7 +1078,7 @@ export function createCity(scene, data) {
       quality.windows = q.windows;
       quality.tier = tier;
       // Lamp pools are fill rate, so the tier scales both how far they reach
-      // and how hard they hit; `low` turns them off outright.
+      // and how hard they hit.
       quality.poolScale = q.poolScale;
       quality.poolStrength = q.poolStrength;
       for (const c of chunks.values()) {
@@ -1089,7 +1089,10 @@ export function createCity(scene, data) {
       // Street furniture answers to the same knob: the placement stays
       // planned, only the per-class meshes hide (PERF-PLAN #6).
       if (tier && streetkit.fleet) {
-        streetkit.fleet.setQuality(tier);
+        // Hand over the tier's own pool numbers rather than only its name: the
+        // kit used to re-derive them from the name, so editing the QUALITY
+        // table had no effect on the lamps.
+        streetkit.fleet.setQuality(tier, q);
         stats.furnitureDraws = streetkit.fleet.drawCalls;
       }
     },
