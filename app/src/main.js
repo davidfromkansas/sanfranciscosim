@@ -698,6 +698,41 @@ async function boot() {
     });
   }
 
+  // HOVER: the floating markers — pins, badges, the aircraft and ferry tags —
+  // are the only things in the scene drawn as UI rather than as city, so they
+  // are the only things that claim the click cursor. A building is pickable too,
+  // but everything is a building; a cursor that turned into a hand over the
+  // whole map would say nothing.
+  //
+  // Only the four marker layers are asked, and they are all synchronous point
+  // tests against at most a few dozen instances. The city's own pick is not
+  // asked: it is async, it streams cell sidecars, and running it every time the
+  // mouse moves would fetch the map for a cursor shape.
+  const hoverRay = new Raycaster();
+  const hoverPointer = new Vector2();
+  let hoverAt = 0;
+  canvas.addEventListener('pointermove', (event) => {
+    // Mid-drag the camera owns the cursor (it sets `grabbing`), and a touch
+    // pointer has no hover state to speak of.
+    if (event.buttons !== 0 || event.pointerType === 'touch') return;
+    const now = performance.now();
+    if (now - hoverAt < 60) return;
+    hoverAt = now;
+    const rect = canvas.getBoundingClientRect();
+    hoverPointer.set(
+      ((event.clientX - rect.left) / rect.width) * 2 - 1,
+      -((event.clientY - rect.top) / rect.height) * 2 + 1
+    );
+    hoverRay.setFromCamera(hoverPointer, camera);
+    const { origin, direction } = hoverRay.ray;
+    const over =
+      aircraft.pickAircraft(origin, direction) ||
+      ferries.pickVessel(origin, direction) ||
+      muni.pickBus(origin, direction) ||
+      muniStops.pickStop(origin, direction);
+    canvas.style.cursor = over ? 'pointer' : 'default';
+  });
+
   canvas.addEventListener('pointerdown', () => stopFollowing());
   canvas.addEventListener('pointerdown', (event) => {
     // A second finger means a pinch/twist, not a tap — whatever this press was,

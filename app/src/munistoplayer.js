@@ -55,7 +55,6 @@ const MAX_MARKERS = 40;
 const DECLUTTER_SPACING = 1.4;
 const DECLUTTER_MIN_M = 11;
 
-const PICK_RADIUS = 11;
 const MAX_PICK_DISTANCE = 4000;
 
 const dummy = new Object3D();
@@ -232,12 +231,16 @@ export function createMuniStopLayer(scene, data, muni) {
       // stays put; the pivot only decides which stops are shown.
       const camDist = Math.hypot(stop.x - camera.position.x, stop.z - camera.position.z, y - camera.position.y);
       const scale = Math.max(SCALE_MIN, Math.min(SCALE_MAX, camDist / REF_DIST));
-      dummy.position.set(stop.x, y + MARKER_Y * Math.max(1, scale * 0.35), stop.z);
+      const markerY = y + MARKER_Y * Math.max(1, scale * 0.35);
+      dummy.position.set(stop.x, markerY, stop.z);
       dummy.quaternion.copy(camQ);
       dummy.scale.setScalar(scale);
       dummy.updateMatrix();
       mesh.setMatrixAt(count, dummy.matrix);
-      visible.push(stop);
+      // Where the pin was actually DRAWN, and how big. The pick reads these
+      // rather than recomputing from the stop, so the hit target is the art on
+      // screen and cannot drift from it.
+      visible.push({ stop, y, markerY, scale });
       count++;
     }
     mesh.count = count;
@@ -278,22 +281,35 @@ export function createMuniStopLayer(scene, data, muni) {
     };
   }
 
+  // Distance from a ray to a point, and how far along the ray the closest
+  // approach is. Returns null behind the camera or past the reach.
+  function rayHit(origin, direction, x, y, z, reach) {
+    const px = x - origin.x;
+    const py = y - origin.y;
+    const pz = z - origin.z;
+    const t = px * direction.x + py * direction.y + pz * direction.z;
+    if (t <= 0 || t > MAX_PICK_DISTANCE) return null;
+    const away = Math.hypot(px - direction.x * t, py - direction.y * t, pz - direction.z * t);
+    return away > reach ? null : t;
+  }
+
   function pickStop(origin, direction) {
-    // Unlike the draw gate above, this one is genuinely camera-relative: it is
-    // testing a ray that starts at the camera.
+    // THE PIN IS THE TARGET, and nothing else is. It floats MARKER_Y above the
+    // pavement and is the only part of a stop a viewer can see or aim at, but
+    // this used to test a point 3 m off the ground with a radius that grew with
+    // viewing distance. Two things were wrong with that: the click landed where
+    // the art is not, so the pin — which looks exactly like a button — did
+    // nothing when pressed; and the radius reached 88 m at altitude, which
+    // measured 180 px wide on screen against art 70 px wide, so the cursor lit
+    // up over half a block of empty road.
+    //
+    // The test is now the drawn quad itself: its centre, and its own half-width
+    // at the size it was drawn. The tail needs no special case — it is inside
+    // that quad, which is the whole of the art.
     let best = null;
-    for (const stop of visible) {
-      const y = data.sampleElevation ? data.sampleElevation(stop.x, stop.z) : 0;
-      const px = stop.x - origin.x;
-      const py = y + 3 - origin.y;
-      const pz = stop.z - origin.z;
-      const t = px * direction.x + py * direction.y + pz * direction.z;
-      if (t <= 0 || t > MAX_PICK_DISTANCE) continue;
-      // Pick radius grows with distance so a marker stays as easy to hit as it
-      // looks — it is drawn at constant screen size, so its target should match.
-      const reach = PICK_RADIUS * Math.max(1, t / REF_DIST);
-      const away = Math.hypot(px - direction.x * t, py - direction.y * t, pz - direction.z * t);
-      if (away > reach || (best && t >= best.distance)) continue;
+    for (const { stop, markerY, scale } of visible) {
+      const t = rayHit(origin, direction, stop.x, markerY, stop.z, (MARKER_W / 2) * scale);
+      if (t === null || (best && t >= best.distance)) continue;
       best = { ...entityFor(stop), distance: t };
     }
     return best;
