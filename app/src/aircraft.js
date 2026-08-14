@@ -21,8 +21,9 @@
 //     in the city depended on it, so there is no fallback to hand off (rule 3
 //     is satisfied by construction, not by a spare code path).
 //
-// Draw calls: 3 airframes + 1 spinner (rotors/propellers) + trails + lights +
-// badges = 7 worst case, and only for the classes actually in the sky.
+// Draw calls: 3 airframes + the airliner's lit surfaces + 1 spinner
+// (rotors/propellers) + trails + nav lights + badges = 8 worst case, and only
+// for the classes actually in the sky.
 
 import {
   AdditiveBlending,
@@ -48,7 +49,51 @@ import {
 } from 'three';
 import { mergeGeometries } from 'three/addons/utils/BufferGeometryUtils.js';
 
+import { createGLTFLoader } from './gltf.js';
 import { shared } from './env.js';
+
+const AIRLINER_ASSET = `${import.meta.env.BASE_URL}sf-assets/vehicles/passenger-airplane.glb`;
+
+// Merge a loaded GLB into at most two geometries — paint and lights — baking
+// each material's colour into COLOR_0 so the whole airframe draws with one
+// Lambert material plus one glow set. The same idiom the ferry and landmark
+// loaders use; `*_Glow` is the contract's marker for surfaces that light up.
+function mergeAirframe(root) {
+  root.updateMatrixWorld(true);
+  const body = [];
+  const glow = [];
+  root.traverse((object) => {
+    if (!object.isMesh) return;
+    const material = object.material;
+    const geometry = object.geometry.clone();
+    geometry.applyMatrix4(object.matrixWorld);
+    geometry.deleteAttribute('uv');
+    geometry.deleteAttribute('uv1');
+    geometry.deleteAttribute('tangent');
+    if (!geometry.attributes.normal) geometry.computeVertexNormals();
+    const count = geometry.attributes.position.count;
+    const source = geometry.attributes.color;
+    const colors = new Float32Array(count * 3);
+    const base = material?.color;
+    for (let i = 0; i < count; i++) {
+      const r = base ? base.r : 1;
+      const g = base ? base.g : 1;
+      const b = base ? base.b : 1;
+      colors[i * 3] = source ? source.getX(i) * r : r;
+      colors[i * 3 + 1] = source ? source.getY(i) * g : g;
+      colors[i * 3 + 2] = source ? source.getZ(i) * b : b;
+    }
+    geometry.setAttribute('color', new BufferAttribute(colors, 3));
+    (material?.name?.endsWith('_Glow') ? glow : body).push(geometry);
+  });
+  const join = (parts) => {
+    if (!parts.length) return null;
+    const merged = mergeGeometries(parts, false);
+    for (const part of parts) part.dispose();
+    return merged;
+  };
+  return { body: join(body), glow: join(glow) };
+}
 
 const ENDPOINT = `${import.meta.env.BASE_URL.replace(/\/$/, '')}/api/flights`;
 
@@ -767,6 +812,8 @@ export function createLiveAircraft(scene, data) {
   const aircraft = new Map(); // id -> state
   const meshes = {};
   let finMesh = null;
+  let airlinerGlow = null; // lit surfaces of the GLB airframe, ignited at night
+  let usingAsset = false;
   let spinnerMesh = null;
   let trails = null;
   let lights = null;
@@ -824,6 +871,59 @@ export function createLiveAircraft(scene, data) {
     badge = buildBadgeMesh(atlas);
     scene.add(badge.mesh);
     ready = true;
+  }
+
+  // The hand-made airliner, swapped in over the procedural one once it loads.
+  // Rule 3 in practice: the procedural airframe is already flying before this
+  // is even requested, so a missing or broken GLB costs one warning and
+  // nothing else — never a hole in the sky.
+  function loadAirlinerAsset() {
+    createGLTFLoader().load(
+      AIRLINER_ASSET,
+      (gltf) => {
+        try {
+          const { body, glow } = mergeAirframe(gltf.scene);
+          if (!body) throw new Error('no paint geometry');
+          const old = meshes.airliner;
+          meshes.airliner = buildAirframeMesh(body, 'live-aircraft-airliner');
+          scene.add(meshes.airliner);
+          scene.remove(old);
+          old.geometry.dispose();
+          old.material.dispose();
+          // The GLB carries its own livery, so the per-instance tinted fin —
+          // which only existed to tell procedural airframes apart — retires.
+          if (finMesh) {
+            scene.remove(finMesh);
+            finMesh.geometry.dispose();
+            finMesh.material.dispose();
+            finMesh = null;
+          }
+          if (glow) {
+            airlinerGlow = new InstancedMesh(
+              glow,
+              new MeshBasicMaterial({
+                vertexColors: true,
+                transparent: true,
+                depthWrite: false,
+                toneMapped: false, // lights read as LIGHTS, not as dim paint
+              }),
+              CAPACITY
+            );
+            airlinerGlow.name = 'live-aircraft-airliner-glow';
+            airlinerGlow.instanceMatrix.setUsage(DynamicDrawUsage);
+            airlinerGlow.frustumCulled = false;
+            airlinerGlow.renderOrder = 3;
+            airlinerGlow.count = 0;
+            scene.add(airlinerGlow);
+          }
+          usingAsset = true;
+        } catch (error) {
+          console.warn('[aircraft] airliner asset unusable, keeping procedural:', error?.message || error);
+        }
+      },
+      undefined,
+      () => console.warn('[aircraft] airliner asset missing, keeping procedural airframe')
+    );
   }
 
   // ------------------------------------------------------------- ingest
@@ -1146,9 +1246,12 @@ export function createLiveAircraft(scene, data) {
       const index = counts[state.kind]++;
       mesh.setMatrixAt(index, dummy.matrix);
       if (state.kind === 'airliner') {
-        // Same transform as the airframe; only the colour differs per instance.
-        finMesh.setMatrixAt(index, dummy.matrix);
-        finMesh.setColorAt(index, scratchColor.setHex(state.livery));
+        if (finMesh) {
+          // Same transform as the airframe; only the colour differs per instance.
+          finMesh.setMatrixAt(index, dummy.matrix);
+          finMesh.setColorAt(index, scratchColor.setHex(state.livery));
+        }
+        if (airlinerGlow) airlinerGlow.setMatrixAt(index, dummy.matrix);
       }
       state.index = index;
       state.drawScale = scale;
@@ -1219,9 +1322,20 @@ export function createLiveAircraft(scene, data) {
       meshes[key].count = counts[key];
       meshes[key].instanceMatrix.needsUpdate = true;
     }
-    finMesh.count = counts.airliner;
-    finMesh.instanceMatrix.needsUpdate = true;
-    if (finMesh.instanceColor) finMesh.instanceColor.needsUpdate = true;
+    if (finMesh) {
+      finMesh.count = counts.airliner;
+      finMesh.instanceMatrix.needsUpdate = true;
+      if (finMesh.instanceColor) finMesh.instanceColor.needsUpdate = true;
+    }
+    if (airlinerGlow) {
+      airlinerGlow.count = counts.airliner;
+      airlinerGlow.instanceMatrix.needsUpdate = true;
+      // Same curve the landmark glow and the live buses use: a hint of colour
+      // by day, fully lit after dusk. uNight is exactly 0 by day and 1 at
+      // night, so this is what makes the cabin windows and nav lights come on
+      // as the city does.
+      airlinerGlow.material.opacity = nightLift;
+    }
     spinnerMesh.count = spinnerCount;
     spinnerMesh.instanceMatrix.needsUpdate = true;
     lights.geometry.attributes.position.needsUpdate = true;
@@ -1345,6 +1459,7 @@ export function createLiveAircraft(scene, data) {
   }
 
   build();
+  loadAirlinerAsset();
 
   return {
     update,
@@ -1356,6 +1471,11 @@ export function createLiveAircraft(scene, data) {
     },
     get demo() {
       return demo;
+    },
+    // False means the hand-made airframe never loaded and the procedural
+    // fallback is flying — the thing a QA pass needs to be able to tell.
+    get usingAsset() {
+      return usingAsset;
     },
     get source() {
       return source;

@@ -197,6 +197,21 @@
       "tris": 2378,
       "weight": 0,
       "notes": "Live-data vehicle; spawned by muni.js from /api/muni (GTFS-Realtime), not by road traffic. weight 0 keeps it out of the road spawner, the ferry precedent."
+    },
+    {
+      "id": "passenger-airplane",
+      "file": "vehicles/passenger-airplane.glb",
+      "kind": "aircraft",
+      "dims": [
+        34.64,
+        11.11,
+        38.7
+      ],
+      "targetLengthM": 38.7,
+      "front": "-Z",
+      "tris": 22916,
+      "weight": 0,
+      "notes": "Live-aircraft airframe; spawned by aircraft.js from /api/flights, not by road traffic. weight 0 keeps it out of the road spawner. Origin is the CENTRE of the airframe, not base-centre, because the air layer positions aircraft by their centreline at altitude. Conformed from the authored source by tools/conform-aircraft-glb.mjs (nose +X -> -Z, materials -> Toy_*, lights -> *_Glow)."
     }
   ]
 }
