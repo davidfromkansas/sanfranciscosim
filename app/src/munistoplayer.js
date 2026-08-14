@@ -64,41 +64,70 @@ const cells = new Map();
 const chosen = [];
 
 // The Muni worm, the mark on the side of every coach in the fleet — including
-// the one this scene drives. Shipped as the artwork rather than redrawn, so the
-// pin carries the real thing.
-const WORM_URL = `${import.meta.env.BASE_URL}sf-assets/muni-worm.png`;
+// the one this scene drives. Vector, not a bitmap: the pin is drawn anywhere
+// from a handful of pixels at hero altitude to a third of the screen at street
+// level, and only an outline survives that range without either softening or
+// showing its own pixels. The browser rasterises the SVG at whatever size we
+// hand drawImage.
+const WORM_URL = `${import.meta.env.BASE_URL}sf-assets/muni-worm.svg`;
 const WORM_ASPECT = 260 / 126;
 
-// One marker icon for every stop, so no atlas is needed — a roundel in the toy
+// Texture side. The pin is not square — it is a card with a tail — but a
+// power-of-two square is what samples cleanly on every GPU, so the art is laid
+// out inside it and the empty margins cost nothing.
+const PIN_TEX = 256;
+
+// A squircle, not a circle: the mark inside is a wide, short block, and a round
+// card wastes its corners and squeezes the worm to fit the chord. The straight
+// runs of a superellipse give the glyph its full width at the same visual size.
+function pinPath(ctx, x, y, w, h, radius, tailHalf, tailTip) {
+  const r = Math.min(radius, w / 2, h / 2);
+  const cx = x + w / 2;
+  const right = x + w;
+  const bottom = y + h;
+  ctx.beginPath();
+  ctx.moveTo(x + r, y);
+  ctx.arcTo(right, y, right, y + r, r);
+  ctx.arcTo(right, bottom, right - r, bottom, r);
+  // The tail is cut into the bottom edge rather than pasted on underneath, so
+  // the whole pin is one closed outline and the border strokes round it once.
+  ctx.lineTo(cx + tailHalf, bottom);
+  ctx.lineTo(cx, tailTip);
+  ctx.lineTo(cx - tailHalf, bottom);
+  ctx.arcTo(x, bottom, x, bottom - r, r);
+  ctx.arcTo(x, y, x + r, y, r);
+  ctx.closePath();
+}
+
+// One marker icon for every stop, so no atlas is needed — a squircle in the toy
 // UI voice (cream card stock, warm-ink border, hard offset shadow) carrying the
 // worm.
 //
-// The worm arrives asynchronously, so the roundel is drawn now and the mark is
+// The worm arrives asynchronously, so the card is drawn now and the mark is
 // composited on top when the image lands, at which point the texture is marked
 // dirty. Until then the pin is a blank card — visible, clickable, just wearing
 // no badge — rather than nothing at all.
 function markerTexture() {
   const canvas = document.createElement('canvas');
-  canvas.width = 128;
-  canvas.height = 128;
+  canvas.width = PIN_TEX;
+  canvas.height = PIN_TEX;
   const ctx = canvas.getContext('2d');
-  const cx = 64;
-  const cy = 56;
-  const r = 40;
+  const cardX = 50;
+  const cardY = 28;
+  const cardW = 156;
+  const cardH = 150;
+  const cardR = 52; // a third of the side: reads as a squircle, not a rounded box
+  const cx = cardX + cardW / 2;
+  const cy = cardY + cardH / 2;
 
-  ctx.beginPath();
-  ctx.arc(cx + 3, cy + 5, r, 0, Math.PI * 2);
+  pinPath(ctx, cardX + 6, cardY + 10, cardW, cardH, cardR, 26, 244);
   ctx.fillStyle = 'rgba(28, 24, 20, 0.34)';
   ctx.fill();
 
-  // Pin body: circle plus a tail dropping onto the stop itself.
-  ctx.beginPath();
-  ctx.arc(cx, cy, r, Math.PI * 0.18, Math.PI * 0.82, true);
-  ctx.lineTo(cx, 122);
-  ctx.closePath();
+  pinPath(ctx, cardX, cardY, cardW, cardH, cardR, 26, 234);
   ctx.fillStyle = '#fbf7ee';
   ctx.fill();
-  ctx.lineWidth = 5;
+  ctx.lineWidth = 10;
   ctx.lineJoin = 'round';
   ctx.strokeStyle = '#3a3530';
   ctx.stroke();
@@ -108,14 +137,13 @@ function markerTexture() {
 
   const worm = new Image();
   worm.onload = () => {
-    // Widest the mark can be and still sit inside the roundel with a margin.
-    // It is a wide, short glyph, so width is what the circle constrains.
-    const w = r * 1.7;
+    // Across the card's straight run, inside the border and the corner arcs.
+    const w = cardW * 0.72;
     ctx.drawImage(worm, cx - w / 2, cy - w / WORM_ASPECT / 2, w, w / WORM_ASPECT);
     texture.needsUpdate = true;
   };
   worm.onerror = () => {
-    console.warn('sf-munistops: muni-worm.png missing — stop pins draw blank');
+    console.warn('sf-munistops: muni-worm.svg missing — stop pins draw blank');
   };
   worm.src = WORM_URL;
   return texture;
