@@ -347,8 +347,18 @@ export function planStreetFurniture(job) {
 
   // Road samples in a coarse grid, so orienting a stop is a local lookup rather
   // than a scan of every centreline in the cell.
+  //
+  // The halo is in here for the same reason it completes junctions. A street is
+  // baked into whichever tile it began in, so a road can run well inside this
+  // group while every one of its samples belongs to the neighbour — and a bus
+  // stop on it is then owned by a group that cannot see the road it stands on.
+  // Measured on Fillmore at Sutter: zero road samples within 48 m of three
+  // adjacent stops, in a group whose edge is 92 m away, with a lamp standing a
+  // metre from each (lamps are walked along the roads, so they came from the
+  // neighbour). Reading the halo answers where the kerb is; it still places
+  // nothing along it.
   const roadGrid = grid(32);
-  for (const road of roads) {
+  for (const road of haloRoads.length ? roads.concat(haloRoads) : roads) {
     const halfW = road.width / 2;
     for (let k = 0; k < road.n; k++) {
       roadGrid.add(road.px[k], road.pz[k], { x: road.px[k], y: road.py[k], z: road.pz[k], halfW });
@@ -408,34 +418,34 @@ export function planStreetFurniture(job) {
   }
 
   // --------------------------------------------------- BUS SHELTERS ---
-// Shelters used to be walked along every major road at a fixed spacing with a
-// hash for a coin flip, which put them in places no bus has ever stopped. They
-// now stand only where Muni actually calls: `busStops` is the cell's slice of
-// the GTFS stop table (app/src/munistops.js), so every shelter marks a real
-// stop and every real stop in frame gets one.
-for (let i = 0; i + 1 < busStops.length; i += 2) {
-  const sx = busStops[i];
-  const sz = busStops[i + 1];
-  if (!owns(sx, sz)) continue;
-  const near = nearestRoad(sx, sz);
-  if (!near) continue;
-  // Face the shelter across the carriageway: its back goes to the buildings,
-  // its opening to the road the bus pulls up on.
-  const toRoad = Math.atan2(near.x - sx, near.z - sz);
-  // A GTFS stop is surveyed at the kerb, which the baked sidewalk may sit a
-  // metre or two off; nudge onto the footway rather than rejecting the stop.
-  const push = Math.min(2.5, Math.max(0, near.dist - near.halfW - 1.2));
-  const px = sx + Math.sin(toRoad + Math.PI) * push;
-  const pz = sz + Math.cos(toRoad + Math.PI) * push;
-  // needSidewalk/crossing are relaxed deliberately: a real stop sits at a real
-  // corner, and dropping it because the baked footway is a metre narrow would
-  // reintroduce exactly the fiction this replaces.
-  place(P.muni_shelter, px, near.y + 0.15, pz, toRoad, {
-    needSidewalk: false,
-    crossing: false,
-    clear: 6,
-  });
-}
+  // Shelters used to be walked along every major road at a fixed spacing with a
+  // hash for a coin flip, which put them in places no bus has ever stopped. They
+  // now stand only where Muni actually calls: `busStops` is the cell's slice of
+  // the GTFS stop table (app/src/munistops.js), so every shelter marks a real
+  // stop and every real stop in frame gets one.
+  for (let i = 0; i + 1 < busStops.length; i += 2) {
+    const sx = busStops[i];
+    const sz = busStops[i + 1];
+    if (!owns(sx, sz)) continue;
+    const near = nearestRoad(sx, sz);
+    if (!near) continue;
+    // Face the shelter across the carriageway: its back goes to the buildings,
+    // its opening to the road the bus pulls up on.
+    const toRoad = Math.atan2(near.x - sx, near.z - sz);
+    // A GTFS stop is surveyed at the kerb, which the baked sidewalk may sit a
+    // metre or two off; nudge onto the footway rather than rejecting the stop.
+    const push = Math.min(2.5, Math.max(0, near.dist - near.halfW - 1.2));
+    const px = sx + Math.sin(toRoad + Math.PI) * push;
+    const pz = sz + Math.cos(toRoad + Math.PI) * push;
+    // needSidewalk/crossing are relaxed deliberately: a real stop sits at a real
+    // corner, and dropping it because the baked footway is a metre narrow would
+    // reintroduce exactly the fiction this replaces.
+    place(P.muni_shelter, px, near.y + 0.15, pz, toRoad, {
+      needSidewalk: false,
+      crossing: false,
+      clear: 6,
+    });
+  }
 
   // ------------------------------------------------------------- lamps ---
   for (const road of roads) {

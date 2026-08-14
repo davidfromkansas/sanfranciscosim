@@ -62,7 +62,13 @@ const CAPACITY = {
   traffic_signal: 900,
   hydrant: 1400,
   mailbox: 500,
-  muni_shelter: 250,
+  // A shelter now stands at every real Muni stop rather than at a scattering of
+  // hashed guesses, and the streamed box is 4 km on a side. The densest such box
+  // in the city holds 670 stops (measured over the baked table), so 250 was not
+  // a budget — it was a silent truncation that kept whichever shelters happened
+  // to stream first and dropped the rest, including every one near the camera.
+  // At 196 tris the shelter is the same weight as a hydrant, which runs 1,400.
+  muni_shelter: 800,
   bench: 700,
   trashcan: 900,
   newsboxes: 500,
