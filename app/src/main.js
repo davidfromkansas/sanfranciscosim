@@ -148,7 +148,7 @@ async function boot() {
   // what darkens the ground always agree.
   const clouds = createClouds(scene, { sampleAt: weather.sampleAt });
   // Rain falls where the field says it is raining, in a box around the camera.
-  const rain = createRain(scene, { sampleAt: weather.sampleAt });
+  const rain = createRain(scene, { sampleAt: weather.sampleAt, renderer });
   // Karl with a silhouette. The shader fog dissolves the city with distance;
   // these are the vapour you can actually see, placed by the same field.
   const fogBanks = createFogBanks(scene, { sampleAt: weather.sampleAt });
@@ -900,7 +900,8 @@ async function boot() {
     // simulation clamp would stall the transition below 20 fps.
     weather.update(Math.min(1, elapsed));
     clouds.update(Math.min(1, elapsed));
-    rain.update(dt, camera.position);
+    // The pivot, not the camera: rain has to fall where the camera is looking.
+    rain.update(dt, pivotWorld, camera.position);
     fogBanks.update(Math.min(1, elapsed));
     muni.update(dt, camera);
     aircraft.update(dt, camera);
@@ -917,6 +918,8 @@ async function boot() {
     signs.update(rig.state.distance, rig.state.yaw);
     // Tilt-shift + grade in diorama mode; a straight canvas render otherwise.
     post.render(scene, camera);
+    // nycsim's screen veil, over the finished frame.
+    rain.renderVeil();
 
     // Landmark assets are fetched only once the city is actually on screen.
     if (!assetsRequested) {

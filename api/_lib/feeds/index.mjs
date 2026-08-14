@@ -5,4 +5,5 @@
 import './ferries.mjs';
 import './muni.mjs';
 import './weather.mjs';
+import './satfog.mjs';
 import './flights.mjs';
