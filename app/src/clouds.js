@@ -39,13 +39,21 @@ export const CLOUD_CAPS = { ultra: 160, high: 160, medium: 96, low: 48 };
 // scatter around one. The bands still differ in size, spread and which part of
 // the weather field they read.
 //
-// The height is pinned just UNDER the camera's own ceiling, so you can always
-// climb above the deck but normally fly beneath it. Diorama mode clamps the
-// orbit distance to 8000 m at a locked 42 degree pitch (see DIORAMA in
-// camera.js), which puts the camera at most 8000 * sin(42) = ~5350 m over its
-// pivot. 4600 leaves roughly 750 m of headroom. If that clamp ever changes,
-// change this with it.
-export const DECK_ALTITUDE = 4600;
+// The deck sits BETWEEN the opening view and the zoom-out ceiling, which is the
+// whole arrangement:
+//
+//     hero spawn ~6090 m  <  DECK_ALTITUDE 7200 m  <  max zoom ~10700 m
+//
+// So the clouds are overhead and out of frame when the city first opens — they
+// were at 4600 m, below the spawn, which put you above them looking down
+// through the deck at your own city — and they come into view only if you
+// deliberately pull back, with room left to rise clear above them.
+//
+// Both bounds are real constraints. The lower one is the hero preset's 9000 m
+// orbit (viewPresets in the tile manifest) at diorama mode's locked 42 degree
+// pitch: 9000 * sin(42) = ~6020 m. The upper one is DIORAMA.max in camera.js,
+// 16000 * sin(42) = ~10700 m. Change either and re-check this number.
+export const DECK_ALTITUDE = 7200;
 const LAYERS = [
   { key: 'low', altitude: DECK_ALTITUDE, scale: 720, spread: 0.7 },
   { key: 'mid', altitude: DECK_ALTITUDE, scale: 1100, spread: 1.2 },
