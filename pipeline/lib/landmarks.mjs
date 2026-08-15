@@ -919,6 +919,39 @@ export const LANDMARKS = [
     camera: { distance: 190, yaw: 255, pitch: 24 },
   },
   {
+    // South Park Lofts, 188 South Park / 549 3rd St. A 2002 four-storey
+    // live/work loft building by Santos-Prescott (Adele Santos) on the north
+    // rim of the South Park oval, with a penthouse/roof terrace reaching
+    // 15.93 m. Through-lot: the building faces SE onto South Park and has a
+    // patio/courtyard toward 3rd St at the NW end.
+    //
+    // The anchor is the DataSF LiDAR footprint's area centroid (not the OSM
+    // OBB centre), for the same reason as 165SouthPark next door: on a
+    // party-wall site, centring the exclusion circle on the DataSF area
+    // centroid opens the widest viable window. excluded() drops a footprint
+    // when its centroid OR any ring vertex falls inside the radius. Measured
+    // from this anchor against the DataSF footprints excluded() consumes:
+    //
+    //   0.00 m  this building's own footprint (SF3775125), via centroid
+    //   8.76 m  OSM way 124884355 (untagged), nearest vertex — may not be
+    //           a separate Overture footprint; if not, the ceiling is 12.95 m
+    //   12.95 m SF3775070 (166-168 South Park), nearest ring vertex
+    //   17.50 m 521-527 3rd St (way 124884350), nearest vertex
+    //   21.53 m 164 South Park (way 124884357), nearest vertex
+    //
+    // The conservative safe window is (0.1, 8.76) m; the wide window (if the
+    // untagged OSM way is not a separate Overture footprint) is (0.1, 12.95).
+    // 5 sits in the middle of the conservative window with ~3.8 m of margin
+    // at both ends. Do not raise past 8 without re-running audit.mjs check 1.6.
+    id: '188SouthPark',
+    name: '188 South Park',
+    lon: -122.3950794,
+    lat: 37.7810118,
+    height: 15.93,
+    exclude: 5,
+    camera: { distance: 190, yaw: 315, pitch: 26 },
+  },
+  {
     // The new Main Library, one block south of the Old Main across Fulton, on a
     // near-identical 106 x 57 m block. Same radius rule as its neighbour and for
     // the same reason: excluded() drops a footprint when its centroid OR ANY ring
