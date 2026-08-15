@@ -101,8 +101,9 @@ route, and the park plans depend on it (§E8 of the parks README).
 | [590 Third Street](./590-third.md) | `590-third` | 9.5 m (estimated) | new landmark |
 | [592 Third Street](./592-third.md) | `592-third` | 8.2 m (estimated) | new landmark |
 | [400 Brannan Street](./400-brannan.md) | `400-brannan` | 8.8 m | new landmark |
+| [188 South Park (South Park Lofts)](./188-south-park.md) | `188-south-park` | 15.93 m (LiDAR-derived) | new landmark |
 
-## Shared contract (all 59)
+## Shared contract (all 60)
 
 - Style: `docs/styles/miniature-toy.md` (authoritative for artistic decisions)
 - Technical contract: `.agents/skills/sf-asset-check/SKILL.md` (authoritative for the GLB)
@@ -141,7 +142,11 @@ Anchors and footprints were measured from OSM geometry pulled directly from the
 OSM API (`/api/0.6/way|relation`), reprojected locally, and reduced to a
 minimum-area oriented bounding box — those numbers are marked as measured. Heights,
 dates, architects and dimensions come from Wikidata claims and Wikipedia infoboxes
-with the source named in each row. Anything visual, derived or unconfirmed is
+with the source named in each row. **Building photos and street-level visual
+research** use the `exa` MCP server (`web_search_advanced_exa`) to find
+elevation photos, rooftop/aerial views, real estate listing photos, and
+architecture articles — see `docs/asset-pipeline/ADDRESS-TO-ASSET.md` Stage 1
+for the exact search recipe. Anything visual, derived or unconfirmed is
 labelled *inferred* or *estimated* and is called out again in each plan's section
 2.15. Several OSM `height` tags describe only a low shell (City Hall 30 m, St
 Mary's 18.9 m, Cal Academy 11 m, de Young 13 m) and must never be used as the

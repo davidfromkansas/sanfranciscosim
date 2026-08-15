@@ -1065,5 +1065,24 @@
     ],
     "tris": 9512,
     "loadRadius": 2500
+  },
+  {
+    "id": "188-south-park",
+    "file": "188-south-park.glb",
+    "anchor": [
+      -122.3950794,
+      37.7810118
+    ],
+    "targetHeightM": 15.93,
+    "cat": 2,
+    "name": "188 South Park",
+    "estimated": false,
+    "dims": [
+      28.5663,
+      28.6103,
+      15.93
+    ],
+    "tris": 3864,
+    "loadRadius": 2500
   }
 ]
