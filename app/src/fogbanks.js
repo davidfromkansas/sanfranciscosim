@@ -37,9 +37,14 @@ export const BANK_CAPS = { ultra: 625, high: 625, medium: 340, low: 150 };
 // cluster: a discrete clump. So: much smaller clumps, many more of them, which
 // is also how a real marine layer is built.
 const BANK_SIZE = 820;
-// Sea level to here: the marine layer's own thickness.
-const BANK_BASE = 30;
-const BANK_TOP = 340;
+// Sea level to here: the marine layer's own thickness. Raised 30% (was 30-340,
+// with banks 0.85 of their width tall) so the fog stands deeper over the city —
+// the band and the banks' own height move together, or the layer just gets a
+// wider scatter of the same short clumps.
+const BANK_BASE = 39;
+const BANK_TOP = 442;
+// How tall a bank is as a fraction of its width.
+const BANK_FLATTEN = 1.105;
 // Tighter than the cloud scatter: fog sits ON the city, not out at sea.
 const EXTENT = 6000;
 
@@ -245,10 +250,10 @@ export function createFogBanks(scene, { sampleAt }) {
       slot.lastSize = size;
       _position.set(slot.x, slot.y, slot.z);
       _quaternion.setFromAxisAngle(UP, slot.spin);
-      // Flattened, but nowhere near as hard as before: squashing a voxel
-      // cluster to a third of its height is what made each one read as a sheet
-      // rather than as a clump of vapour.
-      _scale.set(size, size * 0.85, size);
+      // Flattened, but nowhere near as hard as it once was: squashing a cluster
+      // to a third of its height is what made each one read as a sheet rather
+      // than as a clump of vapour.
+      _scale.set(size, size * BANK_FLATTEN, size);
       _matrix.compose(_position, _quaternion, _scale);
       mesh.setMatrixAt(i, _matrix);
       alphaAttribute.array[i] = presence * tuning.opacity;
