@@ -142,7 +142,11 @@ Anchors and footprints were measured from OSM geometry pulled directly from the
 OSM API (`/api/0.6/way|relation`), reprojected locally, and reduced to a
 minimum-area oriented bounding box — those numbers are marked as measured. Heights,
 dates, architects and dimensions come from Wikidata claims and Wikipedia infoboxes
-with the source named in each row. Anything visual, derived or unconfirmed is
+with the source named in each row. **Building photos and street-level visual
+research** use the `exa` MCP server (`web_search_advanced_exa`) to find
+elevation photos, rooftop/aerial views, real estate listing photos, and
+architecture articles — see `docs/asset-pipeline/ADDRESS-TO-ASSET.md` Stage 1
+for the exact search recipe. Anything visual, derived or unconfirmed is
 labelled *inferred* or *estimated* and is called out again in each plan's section
 2.15. Several OSM `height` tags describe only a low shell (City Hall 30 m, St
 Mary's 18.9 m, Cal Academy 11 m, de Young 13 m) and must never be used as the

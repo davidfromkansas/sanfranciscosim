@@ -38,8 +38,19 @@ landmark branches unmergeable.
    Overpass for the building way/relation). If the name is ambiguous
    ("St Mary's" — cathedral or church?), present the candidates with
    addresses and ask the user; never guess.
-2. Derive the kebab-case `<slug>` and `<Name>`.
-3. Route by existing state — check ALL of:
+2. **Exa disambiguation search** (when the name is colloquial or ambiguous):
+   use the `exa` MCP server's `web_search_advanced_exa` tool to search for
+   the building name + "San Francisco" to find its canonical name, address,
+   and any Wikipedia/Wikidata entry. This resolves "the Pyramid" →
+   Transamerica Pyramid, "the Armory" → 1800 Folsom, etc. before geocoding.
+   Example:
+   ```
+   web_search_advanced_exa(query="<name> San Francisco building address",
+                           numResults=5, enableSummary=true,
+                           includeDomains=["en.wikipedia.org", "wikidata.org"])
+   ```
+3. Derive the kebab-case `<slug>` and `<Name>`.
+4. Route by existing state — check ALL of:
    - `app/public/sf-assets/landmarks_manifest.json` → already integrated?
      Report and stop (or run stage 4 retroactively if it predates the
      optimize pass and the user wants it).
@@ -62,6 +73,47 @@ follow `docs/asset-plans/README.md` ("Research method and confidence") and
 mirror the structure of an existing plan (e.g. `fairmont-san-francisco.md`)
 section for section, including Part 1's ready-to-run task prompt.
 
+**Exa photo & info research** (run before authoring the dossier, using the
+`exa` MCP server's `web_search_advanced_exa` tool):
+
+1. **Building photos** — search for street-level and aerial photos of all
+   four elevations plus the roof. The camera looks down; roofs are facades
+   (style bible). Try the address, the building name, and nearby
+   cross-streets:
+   ```
+   web_search_advanced_exa(query="<address> San Francisco building",
+                           numResults=10, enableHighlights=true,
+                           highlightsQuery="facade elevation photo")
+   ```
+   Then a second pass targeting real estate and architecture sources:
+   ```
+   web_search_advanced_exa(query="<name> OR <address> San Francisco",
+                           numResults=10, enableSummary=true,
+                           includeDomains=["redfin.com","zillow.com",
+                                           "archdaily.com","curbed.com",
+                                           "sf.curbed.com","sfgate.com"])
+   ```
+2. **Architect & history** — search for the architect, year built, and any
+   design awards or landmark status:
+   ```
+   web_search_advanced_exa(query="<name> architect San Francisco built",
+                           numResults=5, enableSummary=true)
+   ```
+3. **Roof & penthouse detail** — search for rooftop, penthouse, and
+   mechanical equipment photos (these are invisible from the street but
+   define the silhouette from the aerial camera):
+   ```
+   web_search_advanced_exa(query="<address> rooftop penthouse San Francisco",
+                           numResults=5, enableHighlights=true)
+   ```
+4. **Save the Exa results** in the plan's §2.15 (sources) — record the
+   query, the domains that yielded photos, and any facts confirmed (height,
+   storeys, facade material, architect, year). Photos themselves are not
+   downloaded; the URLs and descriptions go in the plan so the modeller
+   can open them. Label anything from real estate listings as *observed
+   (listing photo)* — listings show the building as marketed, which is
+   usually but not always the current state.
+
 Non-negotiables from past corrections:
 
 - Footprint measured from OSM geometry via the API, reduced to an oriented
@@ -72,7 +124,9 @@ Non-negotiables from past corrections:
   18.9 m) and must never be the target height. Record eave vs crest
   explicitly.
 - Photo research: elevations for all four sides plus roof/aerial — the
-  camera looks down; roofs are facades (style bible).
+  camera looks down; roofs are facades (style bible). **Exa is the primary
+  photo research tool**; supplement with Google Street View when available
+  and Wikidata/Wikipedia for canonical facts.
 - Everything unverified is labelled *inferred* / *estimated*.
 - Add the landmark's row to the README table with its runtime status.
 
