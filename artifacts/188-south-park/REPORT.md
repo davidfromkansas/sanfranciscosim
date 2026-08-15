@@ -20,7 +20,7 @@ all `Toy_*` materials, no textures/cameras/lights/animation.
 | XY center offset | (0.0, 0.0) |
 | Materials | 9 (Toy_sand, Toy_stone, Toy_trim, Toy_glass, Toy_roofd, Toy_steel, Toy_ink, Toy_glass_Glow, Toy_trim_Glow) |
 | Glow groups | 2 (Toy_glass_Glow, Toy_trim_Glow) |
-| GLB file size | 276 KB (pre-optimization) |
+| GLB file size | 119 KB (optimized, was 276 KB pre-optimization) |
 | Validation | ALL PASS |
 
 ## Dossier corrections
@@ -119,7 +119,8 @@ All 14 checks PASS:
   "estimated": false,
   "dims": [28.57, 28.61, 15.93],
   "tris": 3864,
-  "loadRadius": 2500
+  "loadRadius": 2500,
+  "optimizedBytes": 119312
 }
 ```
 
