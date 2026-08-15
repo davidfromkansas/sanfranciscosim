@@ -7,10 +7,18 @@ import {
   AdditiveBlending,
   BufferGeometry,
   Color,
+  DataTexture,
   DoubleSide,
   Float32BufferAttribute,
+  LinearFilter,
+  LinearMipmapLinearFilter,
   MeshBasicMaterial,
   MeshLambertMaterial,
+  RepeatWrapping,
+  RGBAFormat,
+  SRGBColorSpace,
+  TextureLoader,
+  UnsignedByteType,
   Vector3,
   Vector4,
 } from 'three';
@@ -108,6 +116,80 @@ const CLOUD_UNIFORMS = () => ({
   uWetness: shared.uWetness,
   uFlash: shared.uFlash,
 });
+
+// Golden Gate Park gets a real repeating turf texture at the two detailed
+// quality tiers. The sampler is complete from frame one and the old baked
+// vertex colours remain the guaranteed fallback if the PNG cannot be loaded.
+const PARK_GRASS_URL = `${import.meta.env.BASE_URL}textures/grass-platformer-inspired-v2.png`;
+const parkGrassPlaceholder = new DataTexture(
+  new Uint8Array([55, 92, 30, 255]),
+  1,
+  1,
+  RGBAFormat,
+  UnsignedByteType
+);
+parkGrassPlaceholder.needsUpdate = true;
+
+const PARK_GRASS_UNIFORMS = {
+  uParkGrass: { value: parkGrassPlaceholder },
+  uParkGrassReady: { value: 0 },
+  uParkGrassStrength: { value: 1 },
+};
+
+new TextureLoader().load(
+  PARK_GRASS_URL,
+  (texture) => {
+    texture.wrapS = RepeatWrapping;
+    texture.wrapT = RepeatWrapping;
+    texture.minFilter = LinearMipmapLinearFilter;
+    texture.magFilter = LinearFilter;
+    texture.generateMipmaps = true;
+    texture.colorSpace = SRGBColorSpace;
+    texture.needsUpdate = true;
+    PARK_GRASS_UNIFORMS.uParkGrass.value = texture;
+    PARK_GRASS_UNIFORMS.uParkGrassReady.value = 1;
+    parkGrassPlaceholder.dispose();
+  },
+  undefined,
+  () => {
+    console.warn('Golden Gate Park grass texture unavailable — keeping baked ground colours');
+  }
+);
+
+const PARK_GRASS_SHADER = /* glsl */ `
+  uniform sampler2D uParkGrass;
+  uniform float uParkGrassReady;
+  uniform float uParkGrassStrength;
+
+  float kindIs(float kind, float expected) {
+    return 1.0 - step(0.49, abs(kind - expected));
+  }
+
+  float goldenGateParkTurf(vec2 world, float kind) {
+    // The seven baked Golden Gate Park sections form a long, slightly tilted
+    // corridor. The land-kind gate keeps neighbouring blocks and roads out.
+    float along = clamp((-world.x - 300.0) / 6150.0, 0.0, 1.0);
+    float centerZ = -80.0 + along * 330.0;
+    float xMask = smoothstep(-6600.0, -6460.0, world.x)
+      * (1.0 - smoothstep(-260.0, -120.0, world.x));
+    float stripMask = 1.0 - smoothstep(390.0, 440.0, abs(world.y - centerZ));
+    float turfKind = max(max(kindIs(kind, 0.0), kindIs(kind, 1.0)), kindIs(kind, 4.0));
+    return xMask * stripMask * turfKind;
+  }
+
+  vec3 applyGoldenGateParkGrass(vec3 base, vec2 world, float kind) {
+    float mask = goldenGateParkTurf(world, kind) * uParkGrassReady * uParkGrassStrength;
+    if (mask <= 0.001) return base;
+    // One repeat spans roughly 55 m. The source is intentionally enlarged so
+    // its painterly variation survives the park's normal aerial camera.
+    vec3 turf = texture2D(uParkGrass, world * 0.018).rgb;
+    return mix(base, turf, mask * 0.8);
+  }
+`;
+
+export function setParkGrassQuality(tier) {
+  PARK_GRASS_UNIFORMS.uParkGrassStrength.value = tier === 'low' ? 0.55 : tier === 'medium' ? 0.78 : 1;
+}
 
 const HASH = /* glsl */ `
   float hash13(vec3 p) {
@@ -524,7 +606,7 @@ export function createFarBuildingMaterial() {
 // ground. Asphalt (kind 64) picks up a faint warm sheen at night.
 export function createGroundMaterial() {
   const material = new MeshLambertMaterial({ vertexColors: true, dithering: true });
-  material.uniformsHolder = { uNight: shared.uNight, ...CLOUD_UNIFORMS() };
+  material.uniformsHolder = { uNight: shared.uNight, ...CLOUD_UNIFORMS(), ...PARK_GRASS_UNIFORMS };
   material.polygonOffset = true;
   material.polygonOffsetFactor = -2;
   material.polygonOffsetUnits = -2;
@@ -556,12 +638,14 @@ export function createGroundMaterial() {
         uniform float uNight;
         varying float vKind;
         varying vec3 vGroundWorld;
+        ${PARK_GRASS_SHADER}
         ${CLOUDS}
         ${FLASH}`
       )
       .replace(
         '#include <color_fragment>',
         `#include <color_fragment>
+        diffuseColor.rgb = applyGoldenGateParkGrass(diffuseColor.rgb, vGroundWorld.xz, vKind);
         // 64 asphalt, 65 sidewalk, 66 paint: only the roadway picks up the
         // warm sodium sheen at night, and the paint stays crisp on top of it.
         float asphalt = step(63.5, vKind) * step(vKind, 64.5);
@@ -587,24 +671,40 @@ export function createGroundMaterial() {
 
 // Terrain and trees: the same drifting cloud shade, so a shadow blanket crosses
 // hillside, park and rooftop as one.
-export function createCloudShadedMaterial() {
+export function createCloudShadedMaterial({ parkGrass = false } = {}) {
   const material = new MeshLambertMaterial({ vertexColors: true, dithering: true });
-  material.uniformsHolder = CLOUD_UNIFORMS();
+  material.uniformsHolder = {
+    ...CLOUD_UNIFORMS(),
+    ...(parkGrass ? PARK_GRASS_UNIFORMS : {}),
+  };
+  material.customProgramCacheKey = () => (parkGrass ? 'cloud-shaded-park-grass-v1' : 'cloud-shaded-v1');
   material.onBeforeCompile = function patchCloudShaded(shader) {
     Object.assign(shader.uniforms, this.uniformsHolder);
     shader.vertexShader = shader.vertexShader
-      .replace('#include <common>', `#include <common>\n        varying vec3 vCloudWorld;`)
+      .replace(
+        '#include <common>',
+        `#include <common>
+        varying vec3 vCloudWorld;
+        ${parkGrass ? 'attribute float aKind; varying float vTerrainKind;' : ''}`
+      )
       .replace(
         '#include <worldpos_vertex>',
         `#include <worldpos_vertex>
-        vCloudWorld = (modelMatrix * vec4(transformed, 1.0)).xyz;`
+        vCloudWorld = (modelMatrix * vec4(transformed, 1.0)).xyz;
+        ${parkGrass ? 'vTerrainKind = aKind;' : ''}`
       );
     shader.fragmentShader = shader.fragmentShader
-      .replace('#include <common>', `#include <common>\n        uniform float uNight;\n        varying vec3 vCloudWorld;\n        ${CLOUDS}
+      .replace('#include <common>', `#include <common>
+        uniform float uNight;
+        varying vec3 vCloudWorld;
+        ${parkGrass ? `varying float vTerrainKind;
+        ${PARK_GRASS_SHADER}` : ''}
+        ${CLOUDS}
         ${FLASH}`)
       .replace(
         '#include <color_fragment>',
         `#include <color_fragment>
+        ${parkGrass ? 'diffuseColor.rgb = applyGoldenGateParkGrass(diffuseColor.rgb, vCloudWorld.xz, vTerrainKind);' : ''}
         diffuseColor.rgb *= cloudShadow(vCloudWorld.xz);`
       .replace(
         '#include <fog_fragment>',
@@ -616,6 +716,10 @@ export function createCloudShadedMaterial() {
       );
   };
   return material;
+}
+
+export function createTerrainMaterial() {
+  return createCloudShadedMaterial({ parkGrass: true });
 }
 
 export function createTreeMaterial() {

@@ -4,7 +4,7 @@
 // green rectangle from the hero view without loading any park geometry).
 
 import { BufferAttribute, BufferGeometry, Mesh } from 'three';
-import { createCloudShadedMaterial } from './materials.js';
+import { createTerrainMaterial, setParkGrassQuality } from './materials.js';
 
 const SEGMENTS = 512; // per quadrant -> 1024 across the city, ~15 m spacing
 const MASK = 512; // bathymetry mask resolution over the whole extent
@@ -91,6 +91,7 @@ export function createTerrain(data) {
   const halfD = (maxZ - minZ) / 2;
   const meshes = [];
   const tmp = [0, 0, 0];
+  const material = createTerrainMaterial();
 
   for (let qz = 0; qz < 2; qz++) {
     for (let qx = 0; qx < 2; qx++) {
@@ -103,6 +104,7 @@ export function createTerrain(data) {
       const positions = new Float32Array(count * 3);
       const normals = new Float32Array(count * 3);
       const colors = new Float32Array(count * 3);
+      const kinds = new Float32Array(count);
 
       for (let j = 0; j < side; j++) {
         const z = oz + j * stepZ;
@@ -129,6 +131,7 @@ export function createTerrain(data) {
           normals[p + 2] = nz / len;
 
           const kind = submerged ? 3 : sampleLanduse(x, z);
+          kinds[j * side + i] = kind;
           const preset = KIND_COLORS[kind];
           if (preset) {
             tmp[0] = preset[0];
@@ -174,10 +177,11 @@ export function createTerrain(data) {
       geometry.setAttribute('position', new BufferAttribute(positions, 3));
       geometry.setAttribute('normal', new BufferAttribute(normals, 3));
       geometry.setAttribute('color', new BufferAttribute(colors, 3));
+      geometry.setAttribute('aKind', new BufferAttribute(kinds, 1));
       geometry.setIndex(fullIndex);
       geometry.computeBoundingSphere();
 
-      const mesh = new Mesh(geometry, createCloudShadedMaterial());
+      const mesh = new Mesh(geometry, material);
       mesh.receiveShadow = true;
       mesh.name = `terrain-${qx}-${qz}`;
       mesh.userData.terrainIndex = { full: fullIndex, coarse: coarseIndex };
@@ -188,6 +192,7 @@ export function createTerrain(data) {
   return {
     meshes,
     setQuality(tier) {
+      setParkGrassQuality(tier);
       const coarse = tier === 'low' || tier === 'medium';
       for (const mesh of meshes) {
         const { full, coarse: half } = mesh.userData.terrainIndex;
