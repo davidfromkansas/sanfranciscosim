@@ -47,10 +47,13 @@ const GROUP_LIMIT = 2400;
 // signal head or a lit shelter is not what the street is lit by. Radii follow
 // the fixture — the Path of Gold standards on Market are taller and throw
 // wider than a residential pole.
+// How far each lamp throws. Doubled from the original 7.5 / 9 / 6: a pool that
+// stopped at the kerb read as a smudge under the pole rather than a lamp
+// lighting the road it stands over.
 const POOL_RADIUS = {
-  sl_standard: 7.5,
-  sl_pathofgold: 9,
-  sl_residential: 6,
+  sl_standard: 15,
+  sl_pathofgold: 18,
+  sl_residential: 12,
 };
 const CAPACITY = {
   sl_standard: 3000,
@@ -59,7 +62,13 @@ const CAPACITY = {
   traffic_signal: 900,
   hydrant: 1400,
   mailbox: 500,
-  muni_shelter: 250,
+  // A shelter now stands at every real Muni stop rather than at a scattering of
+  // hashed guesses, and the streamed box is 4 km on a side. The densest such box
+  // in the city holds 670 stops (measured over the baked table), so 250 was not
+  // a budget — it was a silent truncation that kept whichever shelters happened
+  // to stream first and dropped the rest, including every one near the camera.
+  // At 196 tris the shelter is the same weight as a hydrant, which runs 1,400.
+  muni_shelter: 800,
   bench: 700,
   trashcan: 900,
   newsboxes: 500,
@@ -281,7 +290,18 @@ export function createStreetKitFleet(scene, kit, sampleElevation) {
       pool.renderOrder = 3; // after the road ribbon, so the wash lands on it
       root.add(pool);
     }
-    return { id: piece.id, capacity, body, glow, pool, poolRadius, groups: new Map(), dirty: false, overflow: 0 };
+    // Where the light actually comes from. A standard lamp's head hangs on an
+    // arm ~1.3 m out over the carriageway, and the pool used to be centred on
+    // the POLE — so the lit patch sat on the pavement beside the road instead of
+    // on the road. Taken from the piece's own glow geometry rather than a table,
+    // so a new lamp model carries its own answer.
+    const head = new Vector3();
+    if (glow) {
+      glow.geometry.computeBoundingBox();
+      glow.geometry.boundingBox.getCenter(head);
+      head.y = 0; // the pool is a ground disc; only the lateral offset matters
+    }
+    return { id: piece.id, capacity, body, glow, pool, poolRadius, head, groups: new Map(), dirty: false, overflow: 0 };
   });
 
   let instances = 0;
@@ -317,6 +337,8 @@ export function createStreetKitFleet(scene, kit, sampleElevation) {
   // The pools are ground-level overdraw, so the tier scales them down and
   // `low` switches them off. `poolsLit` is the night gate, updated per frame.
   let poolStrength = 1;
+  // Multiplier on each lamp's pool radius; fill cost goes as its square.
+  let poolRadiusScale = 1;
   let poolsLit = false;
 
   function applyVisibility(type) {
@@ -340,10 +362,19 @@ export function createStreetKitFleet(scene, kit, sampleElevation) {
           // On the ground under the pole: the pole's translation, tilted to the
           // grade rather than the pole's own yaw (a disc has no yaw to inherit),
           // scaled to the pool radius.
-          position.setFromMatrixPosition(matrix);
+          // Start at the lamp HEAD, carried through the instance's own rotation
+          // so a pole facing any direction throws its light over the road it
+          // faces — then drop to the ground for the disc.
+          position.copy(type.head).applyMatrix4(matrix);
+          // Only x/z move to the head: the disc keeps the POLE's own ground
+          // height, because that is the pavement it stands on. Re-sampling
+          // terrain here put the pool ~0.4 m below the kerb and the sidewalk
+          // swallowed it.
+          position.y = matrix.elements[13];
           alignPoolToGround(poolTilt, position.x, position.z, sampleElevation);
           position.y += POOL_LIFT;
-          poolScale.set(type.poolRadius, 1, type.poolRadius);
+          const radius = type.poolRadius * poolRadiusScale;
+          poolScale.set(radius, 1, radius);
           poolMatrix.compose(position, poolTilt, poolScale);
           type.pool.setMatrixAt(n, poolMatrix);
         }
@@ -370,14 +401,24 @@ export function createStreetKitFleet(scene, kit, sampleElevation) {
 
   return {
     root,
-    setQuality(tier) {
+    setQuality(tier, quality = null) {
       allowedId =
         tier === 'low'
           ? (id) => LOW_KEEPS.has(id)
           : tier === 'medium'
             ? (id) => !MEDIUM_DROPS.has(id)
             : () => true;
-      poolStrength = tier === 'low' ? 0 : tier === 'medium' ? 0.9 : 1;
+      // From the QUALITY table when it is given. This used to re-derive the
+      // numbers from the tier NAME, which quietly made the table's poolScale
+      // and poolStrength dead settings — editing them changed nothing.
+      poolStrength = quality?.poolStrength ?? (tier === 'low' ? 0 : tier === 'medium' ? 0.9 : 1);
+      const nextScale = quality?.poolScale ?? (tier === 'medium' ? 0.7 : 1);
+      if (nextScale !== poolRadiusScale) {
+        poolRadiusScale = nextScale;
+        // The radius is baked into each pool's matrix, so a change to it has to
+        // be repacked rather than just re-uniformed.
+        for (const type of types) if (type.pool) repack(type);
+      }
       if (poolStrength === 0) poolsLit = false;
       for (const type of types) applyVisibility(type);
     },

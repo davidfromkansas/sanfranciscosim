@@ -42,6 +42,7 @@ import { createKitLoader, loadKitIndex } from './kitassets.js';
 import { createKitFleet } from './kitfleet.js';
 import { landmarkExclusions, loadKitZones } from './kitzones.js';
 import { GROUP_LIMIT, createStreetHints, createStreetKitFleet, loadStreetKit } from './streetkit.js';
+import { loadBusStops, stopsInBounds } from './munistops.js';
 
 const GROUP = 2000;
 const CHUNK = 1000;
@@ -300,6 +301,8 @@ export function createCity(scene, data) {
   // the kit fails to load, `streetkit.fleet` stays null and the streets are the
   // layer 1 streets, with one warning.
   const streetkit = { fleet: null, hints: null, exclusions: null, warned: false };
+  // One fetch+parse of the baked stop table, shared with the marker layer.
+  const busStopsReady = loadBusStops();
   const streetkitReady = (async () => {
     try {
       const loaded = await loadStreetKit();
@@ -730,11 +733,21 @@ export function createCity(scene, data) {
           streetkit.hints(g.originX, g.originZ, g.originX + GROUP, g.originZ + GROUP),
           streetBlobs(haloCellsFor(g)),
         ]);
+        // Real bus stops for this cell. The worker cannot fetch, so the slice
+        // rides along with the job the same way the streetkit hints do.
+        const stopTable = await busStopsReady;
         plan = {
           ...hints,
           halo,
           bounds: [g.originX, g.originZ, g.originX + GROUP, g.originZ + GROUP],
           exclusions: streetkit.exclusions,
+          busStops: stopsInBounds(
+            stopTable,
+            g.originX,
+            g.originZ,
+            g.originX + GROUP,
+            g.originZ + GROUP,
+          ),
           limit: GROUP_LIMIT,
         };
       }
@@ -1065,7 +1078,7 @@ export function createCity(scene, data) {
       quality.windows = q.windows;
       quality.tier = tier;
       // Lamp pools are fill rate, so the tier scales both how far they reach
-      // and how hard they hit; `low` turns them off outright.
+      // and how hard they hit.
       quality.poolScale = q.poolScale;
       quality.poolStrength = q.poolStrength;
       for (const c of chunks.values()) {
@@ -1076,7 +1089,10 @@ export function createCity(scene, data) {
       // Street furniture answers to the same knob: the placement stays
       // planned, only the per-class meshes hide (PERF-PLAN #6).
       if (tier && streetkit.fleet) {
-        streetkit.fleet.setQuality(tier);
+        // Hand over the tier's own pool numbers rather than only its name: the
+        // kit used to re-derive them from the name, so editing the QUALITY
+        // table had no effect on the lamps.
+        streetkit.fleet.setQuality(tier, q);
         stats.furnitureDraws = streetkit.fleet.drawCalls;
       }
     },

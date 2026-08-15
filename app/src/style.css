@@ -35,22 +35,9 @@ body {
   pointer-events: none;
 }
 
-#hud {
-  position: fixed;
-  right: 10px;
-  top: 10px;
-  display: flex;
-  flex-direction: column;
-  gap: 6px;
-  align-items: flex-end;
-  opacity: 0.55;
-  transition: opacity 0.2s ease;
-}
-
-#hud:hover {
-  opacity: 1;
-}
-
+/* `.panel` outlived the HUD it was written for: the only thing still wearing it
+   is the fatal-load message in main.js, which is centred on the screen rather
+   than stacked in a corner. */
 .panel {
   background: rgba(14, 18, 24, 0.72);
   border: 1px solid rgba(255, 255, 255, 0.12);
@@ -60,18 +47,6 @@ body {
   gap: 8px;
   align-items: center;
   backdrop-filter: blur(6px);
-}
-
-/* `display: flex` above would otherwise beat the UA rule for [hidden]. */
-.panel[hidden] {
-  display: none;
-}
-
-.panel label {
-  color: rgba(255, 255, 255, 0.6);
-  font-size: 10px;
-  text-transform: uppercase;
-  letter-spacing: 0.6px;
 }
 
 select,

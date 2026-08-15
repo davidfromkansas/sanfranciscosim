@@ -25,6 +25,7 @@ import { createPiers } from './piers.js';
 import { createAgents } from './agents.js';
 import { createLiveFerries } from './ferries.js';
 import { createLiveMuni } from './muni.js';
+import { createMuniStopLayer } from './munistoplayer.js';
 import { createLiveAircraft } from './aircraft.js';
 import { createCameraRig } from './camera.js';
 import { createSigns } from './signs.js';
@@ -155,6 +156,9 @@ async function boot() {
   // Real Muni buses from /api/muni; when the feed is away this layer is simply
   // empty — the procedural road traffic never depended on it.
   const muni = createLiveMuni(scene, data);
+  // Clickable markers over the real bus stops; the shelters themselves are
+  // street furniture placed by the tile worker at the same coordinates.
+  const muniStops = createMuniStopLayer(scene, data, muni);
   // Real aircraft from /api/flights. Like the Muni layer this one simply stays
   // empty when the feed is away — nothing else in the city depends on it.
   const aircraft = createLiveAircraft(scene, data);
@@ -181,28 +185,24 @@ async function boot() {
 
   let quality = QUALITY.high;
   let qualityKey = 'high';
-  // Small screens and integrated GPUs start a tier down; the user can override.
+  // Small screens and integrated GPUs start a tier down; the governor takes it
+  // from there, measuring the frame rather than guessing at the hardware.
   if (window.devicePixelRatio > 1.9 || window.innerWidth < 900) {
     qualityKey = 'medium';
     quality = QUALITY.medium;
   }
 
+  // Read-only now that the quality select is gone. Nothing writes this key any
+  // more, but a viewer who pinned a tier while the control existed keeps it
+  // rather than being silently moved onto the governor.
   function readQualityPreference() {
     try {
       const saved = window.localStorage.getItem('sf.quality');
       if (saved === 'auto' || QUALITY[saved]) return saved;
     } catch {
-      // Safari private windows can reject both reads and writes.
+      // Safari private windows can reject a read.
     }
     return 'auto';
-  }
-
-  function writeQualityPreference(key) {
-    try {
-      window.localStorage.setItem('sf.quality', key);
-    } catch {
-      // A pinned quality still applies for this session when storage is unavailable.
-    }
   }
 
   function applyQuality(key) {
@@ -262,7 +262,6 @@ async function boot() {
     agents.setToy(toy);
     signs.setVisible(toy);
     post.setEnabled(toy);
-    ui.setStyle(toy);
     await city.setTier(toy ? 'toy' : 'base');
   }
 
@@ -305,19 +304,7 @@ async function boot() {
   let urlWeather = applyWeatherFromUrl();
   if (urlWeather) setTimeout(() => { urlWeather = applyWeatherFromUrl(); skyClock.update(); }, 2500);
 
-  const ui = createUI({
-    presets,
-    onPreset(index) {
-      rig.flyTo(presets[index]);
-    },
-    onQuality(key) {
-      writeQualityPreference(key);
-      governor.setMode(key);
-      if (key !== 'auto') applyQuality(key);
-      ui.setQuality(key);
-    },
-  });
-  ui.setQuality(qualityPreference);
+  const ui = createUI();
   applyQuality(qualityKey);
 
   // Diorama is the only style this app ships. It is applied here, before the
@@ -355,14 +342,10 @@ async function boot() {
     }
     if (event.key === 'h' || event.key === 'H') {
       rig.flyTo(presets[0]);
-      ui.setPresetIndex(0);
       return;
     }
     const index = presets.findIndex((preset) => preset.key && preset.key === event.key);
-    if (index >= 0) {
-      rig.flyTo(presets[index]);
-      ui.setPresetIndex(index);
-    }
+    if (index >= 0) rig.flyTo(presets[index]);
   });
 
   window.addEventListener('resize', () => {
@@ -652,14 +635,18 @@ async function boot() {
   let vesselCardAge = 0;
   function trackVessel(dt) {
     const selected = focus.entity;
-    if (selected?.kind !== 'vessel' && selected?.kind !== 'transit' && selected?.kind !== 'aircraft')
-      return;
+    const LIVE_KINDS = ['vessel', 'transit', 'aircraft', 'transit-stop'];
+    if (!LIVE_KINDS.includes(selected?.kind)) return;
+    // A stop does not move, but what is coming to it does — refreshing it keeps
+    // the arrival times on an open card honest.
     const fresh =
       selected.kind === 'vessel'
         ? ferries.vesselEntity(selected.id)
         : selected.kind === 'transit'
           ? muni.busEntity(selected.id)
-          : aircraft.aircraftEntity(selected.id);
+          : selected.kind === 'transit-stop'
+            ? muniStops.stopEntity(selected.id)
+            : aircraft.aircraftEntity(selected.id);
     if (!fresh) return;
     focus.entity = fresh;
     overlay.show(fresh, { toy: style === 'toy', groundY: 0 });
@@ -683,10 +670,47 @@ async function boot() {
     if (vessel) return vessel;
     const bus = muni.pickBus(pickRay.ray.origin, pickRay.ray.direction);
     if (bus) return bus;
+    const stop = muniStops.pickStop(pickRay.ray.origin, pickRay.ray.direction);
+    if (stop) return stop;
     return context.pick(pickRay.ray.origin, pickRay.ray.direction, hasGround ? groundPoint : null, {
       toy: style === 'toy',
     });
   }
+
+  // HOVER: the floating markers — pins, badges, the aircraft and ferry tags —
+  // are the only things in the scene drawn as UI rather than as city, so they
+  // are the only things that claim the click cursor. A building is pickable too,
+  // but everything is a building; a cursor that turned into a hand over the
+  // whole map would say nothing.
+  //
+  // Only the four marker layers are asked, and they are all synchronous point
+  // tests against at most a few dozen instances. The city's own pick is not
+  // asked: it is async, it streams cell sidecars, and running it every time the
+  // mouse moves would fetch the map for a cursor shape.
+  const hoverRay = new Raycaster();
+  const hoverPointer = new Vector2();
+  let hoverAt = 0;
+  canvas.addEventListener('pointermove', (event) => {
+    // Mid-drag the camera owns the cursor (it sets `grabbing`), and a touch
+    // pointer has no hover state to speak of.
+    if (event.buttons !== 0 || event.pointerType === 'touch') return;
+    const now = performance.now();
+    if (now - hoverAt < 60) return;
+    hoverAt = now;
+    const rect = canvas.getBoundingClientRect();
+    hoverPointer.set(
+      ((event.clientX - rect.left) / rect.width) * 2 - 1,
+      -((event.clientY - rect.top) / rect.height) * 2 + 1
+    );
+    hoverRay.setFromCamera(hoverPointer, camera);
+    const { origin, direction } = hoverRay.ray;
+    const over =
+      aircraft.pickAircraft(origin, direction) ||
+      ferries.pickVessel(origin, direction) ||
+      muni.pickBus(origin, direction) ||
+      muniStops.pickStop(origin, direction);
+    canvas.style.cursor = over ? 'pointer' : 'default';
+  });
 
   canvas.addEventListener('pointerdown', () => stopFollowing());
   canvas.addEventListener('pointerdown', (event) => {
@@ -737,6 +761,7 @@ async function boot() {
     rain,
     fogBanks,
     muni,
+    muniStops,
     aircraft,
     // Which aircraft the camera is locked to, or null. Exposed because the
     // follow is otherwise unobservable from outside and QA has to be able to
@@ -904,6 +929,7 @@ async function boot() {
     rain.update(dt, pivotWorld, camera.position);
     fogBanks.update(Math.min(1, elapsed));
     muni.update(dt, camera);
+    muniStops.update(dt, camera, pivotWorld);
     aircraft.update(dt, camera);
     trackVessel(dt);
     landmarks.update();
@@ -953,6 +979,7 @@ async function boot() {
           `cars       ${agents.carCount}`,
           `ferries    ${ferries.count}${ferries.live ? ' live' : ' procedural'}`,
           `muni       ${muni.count}${muni.live ? ` live (${muni.onShapeCount} on-route${muni.degraded ? ', degraded' : ''})` : ' off'}`,
+          `stops      ${muniStops.count} shown / ${muniStops.total}`,
           `aircraft   ${aircraft.count}${aircraft.live ? ` live (${aircraft.source})` : ' off'}`,
           `altitude   ${(camera.position.y - rig.state.pivot.y).toFixed(0)} m`,
           `zoom       ${rig.state.distance.toFixed(0)} m`,
