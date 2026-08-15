@@ -71,22 +71,32 @@ export function createFogBanks(scene, { sampleAt }) {
   const tuning = { size: 1, opacity: 0.26, density: 1 };
   const cap = BANK_CAPS.ultra;
 
-  // A JITTERED GRID, not a random scatter. Random positions clump and leave
-  // holes at any density -- which is why the fog read as a field of separate
-  // puffs rather than one mass. On a grid every bank has neighbours a fixed
-  // distance away, and because a bank is wider than a grid cell they overlap
-  // into a continuous sheet. The jitter is what stops it looking like a grid.
+  // A jittered grid, because pure random scatter clumps and leaves holes at any
+  // density. But a grid has to be broken properly or it shows, and the first
+  // version showed badly: jitter was +/-0.42 of a cell, so a bank could never
+  // leave its own cell, and 25 banks sharing a row sat within +/-204 m of the
+  // same z. That is a straight 12 km band of fog, and it read as ruled lines
+  // across the city.
+  //
+  // Three things break the lattice, and all three are needed:
+  //   - odd rows offset half a cell, so no two rows line up (hex packing, which
+  //     also covers more evenly than a square grid for the same count)
+  //   - jitter WIDER than the cell, so banks cross into their neighbours and
+  //     there is no cell boundary left to see
+  //   - a wide size spread, so even a surviving alignment is not a row of
+  //     matching shapes
   const GRID = Math.ceil(Math.sqrt(cap));
   const CELL = (2 * EXTENT) / GRID;
   const slots = [];
   for (let i = 0; i < cap; i++) {
     const gx = i % GRID;
     const gz = Math.floor(i / GRID);
+    const stagger = gz % 2 === 0 ? 0 : CELL * 0.5;
     slots.push({
-      x: -EXTENT + (gx + 0.5) * CELL + (hash(i, 1) - 0.5) * CELL * 0.85,
-      z: -EXTENT + (gz + 0.5) * CELL + (hash(i, 2) - 0.5) * CELL * 0.85,
+      x: -EXTENT + (gx + 0.5) * CELL + stagger + (hash(i, 1) - 0.5) * CELL * 1.6,
+      z: -EXTENT + (gz + 0.5) * CELL + (hash(i, 2) - 0.5) * CELL * 1.6,
       y: BANK_BASE + hash(i, 5) * (BANK_TOP - BANK_BASE),
-      size: 0.6 + hash(i, 3) * 0.9,
+      size: 0.45 + hash(i, 3) * 1.35,
       spin: hash(i, 4) * Math.PI * 2,
       shown: false,
       lastSize: 0,
