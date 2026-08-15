@@ -101,8 +101,9 @@ route, and the park plans depend on it (§E8 of the parks README).
 | [590 Third Street](./590-third.md) | `590-third` | 9.5 m (estimated) | new landmark |
 | [592 Third Street](./592-third.md) | `592-third` | 8.2 m (estimated) | new landmark |
 | [400 Brannan Street](./400-brannan.md) | `400-brannan` | 8.8 m | new landmark |
+| [188 South Park (South Park Lofts)](./188-south-park.md) | `188-south-park` | 15.93 m (LiDAR-derived) | new landmark |
 
-## Shared contract (all 59)
+## Shared contract (all 60)
 
 - Style: `docs/styles/miniature-toy.md` (authoritative for artistic decisions)
 - Technical contract: `.agents/skills/sf-asset-check/SKILL.md` (authoritative for the GLB)
