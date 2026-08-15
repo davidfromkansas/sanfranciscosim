@@ -57,11 +57,25 @@ const NEUTRAL = {
 
 const field = (value) => new Float32Array(CELLS).fill(value);
 
-// Visibility (metres) -> a fog density the shader can use directly. Calibrated
-// so 20 km reads as clean air and 1 km is a genuine white-out.
-function fogFromVisibility(metres) {
+// Visibility AND low cloud -> the fog density the banks are placed from.
+//
+// Visibility alone was wrong, and wrong in the direction that made the whole
+// feature look broken: San Francisco's marine layer barely moves that number.
+// On a day the feed itself calls Fog, with 100% low cloud citywide and the view
+// out the window completely socked in, Open-Meteo still reports 12-14 km — which
+// mapped to a density of about 0.3 and rendered as light haze.
+//
+// Low cloud IS the marine layer here. The two are combined by taking whichever
+// says it is foggier, so a genuine low-visibility event still reads (fog at
+// street level with broken cloud above), and a socked-in overcast reads too.
+// The concierge's wording was fixed this way already; the VISUALS were not, and
+// that mismatch is why production disagreed with the window.
+function fogDensity(metres, lowCloudPct) {
   const v = Math.max(50, metres);
-  return clamp01((1 / v - 1 / 20000) * 12000);
+  const fromVisibility = clamp01((1 / v - 1 / 20000) * 12000);
+  // 70% low cloud is where a marine layer starts to read; 100% is socked in.
+  const fromCloud = clamp01((lowCloudPct - 70) / 30) * 0.9;
+  return clamp01(Math.max(fromVisibility, fromCloud));
 }
 
 // Rain intensity from mm in the reporting interval. 0.1 mm is a drizzle you can
@@ -164,7 +178,7 @@ export function createWeather({ project }) {
     for (let i = 0; i < CELLS; i++) {
       target.cloudLow[i] = clamp01(payload.cloudLow[i] / 100);
       target.cloudHigh[i] = clamp01((payload.cloudMid[i] + payload.cloudHigh[i]) / 200);
-      target.fog[i] = fogFromVisibility(payload.visibility[i]);
+      target.fog[i] = fogDensity(payload.visibility[i], payload.cloudLow[i]);
       target.precip[i] = rainFromPrecip(payload.precip[i]);
     }
     // mph to m/s: the scene works in metres.
