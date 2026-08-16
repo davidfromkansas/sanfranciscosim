@@ -86,6 +86,8 @@ Z_BED = 0.66         # bio-retention beds, the tallest ground layer
 Z_WALL = Z_PLATE + 0.45   # cast-in-place seat walls, 450 mm seat height
 Z_MOUND = Z_PLATE + 1.00  # the play mound that hides the Shout's six posts
 
+PLATE_BAND = 6.0     # transverse slice width for the draped ground plate
+PLATE_DEPTH = 1.20   # how far the earth body reaches below its own draped top
 KERB_WIDTH = 0.70    # plan 2.15 risk 7 — profile is undocumented, and
                      # 0.45 m did not draw the oval from above
 WALL_THICK = 0.35
@@ -200,6 +202,48 @@ def to_world(u, v):
     return (u * U_DIR[0] + v * V_DIR[0], u * U_DIR[1] + v * V_DIR[1])
 
 
+# --------------------------------------------------------------- the terrain
+#
+# THE ASSET IS DRAPED. app/src/assets.js seats a landmark by ONE terrain
+# sample, at the anchor, which is right for a building and wrong for a park:
+# South Park falls 6.1 m over its 160 m length, and the first build — a flat
+# slab seated at the anchor's 10.73 m — was buried 2.9 m under the hillside at
+# the Second Street end and floating 3.2 m at Third. Caught in the running app,
+# not in any render: from above, the north-east half of the park had vanished
+# under the baked landcover with only the tree crowns showing.
+#
+# So every z in this file is `authored height + TERRAIN.dy(u)`, and z = 0 means
+# THE ANCHOR'S GROUND rather than the bottom of the model. Two consequences the
+# rest of the pipeline has to know about, both documented in REFERENCE.md:
+#   * min_z is about -3.2 m, not 0. The contract's "sits on z=0" rule assumes a
+#     flat base; for a terrain-following asset the meaningful statement is the
+#     one the loader actually uses, and the loader puts z=0 at the anchor.
+#   * targetHeightM must therefore be the model's VERTICAL EXTENT (terrain fall
+#     + the tallest elm), not an architectural height, because the loader's
+#     scale is targetHeightM / bbox height and it has to land on 1.0.
+# The cross-axis is flat to 0.30 m, measured, so dy is a function of u alone.
+
+class Terrain:
+    def __init__(self, data):
+        self.u0 = data["u_min"]
+        self.step = data["u_step"]
+        self.dy = data["dy"]
+        self.fall = data["fall_m"]
+
+    def __call__(self, u):
+        t = (u - self.u0) / self.step
+        i = int(math.floor(t))
+        if i < 0:
+            return self.dy[0]
+        if i >= len(self.dy) - 1:
+            return self.dy[-1]
+        f = t - i
+        return self.dy[i] * (1 - f) + self.dy[i + 1] * f
+
+
+TERRAIN = None  # set in main()
+
+
 def orient_for_world(poly):
     """Order a park-frame ring so that it comes out COUNTER-clockwise in world
     space, which is what makes prism_verts_faces' caps face outward.
@@ -274,6 +318,36 @@ def inset_ring(poly, d):
         scale = d / max(0.35, (1 + na[0] * nb[0] + na[1] * nb[1]) / 2) ** 0.5
         out.append((cu + mu / lm * scale, cv + mv / lm * scale))
     return out
+
+
+def band_spans(ring, width):
+    us = [p[0] for p in ring]
+    lo, hi = min(us), max(us)
+    n = max(1, int(math.ceil((hi - lo) / width)))
+    step = (hi - lo) / n
+    return [(lo + i * step, lo + (i + 1) * step) for i in range(n)]
+
+
+def clip_ring_u(ring, u0, u1):
+    """Sutherland-Hodgman the ring against the slab u0 <= u <= u1."""
+    poly = list(ring)
+    for keep_low, bound in ((True, u0), (False, u1)):
+        out = []
+        n = len(poly)
+        for i in range(n):
+            a = poly[i]
+            b = poly[(i + 1) % n]
+            ain = a[0] >= bound if keep_low else a[0] <= bound
+            bin_ = b[0] >= bound if keep_low else b[0] <= bound
+            if ain:
+                out.append(a)
+            if ain != bin_:
+                t = (bound - a[0]) / (b[0] - a[0])
+                out.append((bound, a[1] + (b[1] - a[1]) * t))
+        poly = out
+        if not poly:
+            return []
+    return dedupe_ring(poly)
 
 
 def point_in_ring(poly, p):
@@ -351,10 +425,14 @@ def bevel(obj, width=0.12, segments=2):
 
 def prism_verts_faces(poly_uv, z0, z1, base_index=0):
     """Closed extrusion of a park-frame polygon: walls + both caps. Orients the
-    ring itself, so every caller gets outward normals."""
-    poly = [to_world(u, v) for u, v in orient_for_world(poly_uv)]
+    ring itself, so every caller gets outward normals, and drapes both caps on
+    the terrain per vertex so a prism laid across the slope follows it."""
+    ring_uv = orient_for_world(poly_uv)
+    poly = [to_world(u, v) for u, v in ring_uv]
+    dys = [TERRAIN(u) for u, _ in ring_uv]
     n = len(poly)
-    verts = [(x, y, z0) for x, y in poly] + [(x, y, z1) for x, y in poly]
+    verts = ([(x, y, z0 + d) for (x, y), d in zip(poly, dys)]
+             + [(x, y, z1 + d) for (x, y), d in zip(poly, dys)])
     b = base_index
     faces = []
     for i in range(n):
@@ -390,10 +468,11 @@ def ngon_uv(nsides, uc, vc, r, rot=0.0):
 
 def frustum(vb, fb, nsides, uc, vc, r0, r1, z0, z1, rot=0.0):
     b = len(vb)
+    d = TERRAIN(uc)
     lo = ngon_uv(nsides, uc, vc, r0, rot)
     hi = ngon_uv(nsides, uc, vc, r1, rot)
-    vb.extend([to_world(u, v) + (z0,) for u, v in lo])
-    vb.extend([to_world(u, v) + (z1,) for u, v in hi])
+    vb.extend([to_world(u, v) + (z0 + d,) for u, v in lo])
+    vb.extend([to_world(u, v) + (z1 + d,) for u, v in hi])
     for i in range(nsides):
         j = (i + 1) % nsides
         fb.append((b + i, b + j, b + nsides + j, b + nsides + i))
@@ -404,8 +483,9 @@ def frustum(vb, fb, nsides, uc, vc, r0, r1, z0, z1, rot=0.0):
 def cone_ring(vb, fb, nsides, uc, vc, radii, zs, rot=0.0):
     """A stack of ngon rings closed top and bottom — the tree crowns."""
     b = len(vb)
+    d = TERRAIN(uc)
     for r, z in zip(radii, zs):
-        vb.extend([to_world(u, v) + (z,) for u, v in ngon_uv(nsides, uc, vc, r, rot)])
+        vb.extend([to_world(u, v) + (z + d,) for u, v in ngon_uv(nsides, uc, vc, r, rot)])
     for k in range(len(radii) - 1):
         o0 = b + k * nsides
         o1 = b + (k + 1) * nsides
@@ -594,8 +674,22 @@ def build(data, mats):
 
     # 1. ground plate — the park's earth body. Its side wall IS the historic
     #    rounded kerb face, the one piece of 1854 fabric that survives.
-    objs.append(bevel(prism_uv("ground_plate", ring, 0.0, Z_PLATE,
-                               mats["Toy_stone"]), 0.14, segments=1))
+    # Sliced into transverse bands rather than extruded as one prism: a single
+    # 47-vertex cap spanning 160 m of a 6.1 m slope is a badly non-planar ngon,
+    # and Blender fans it from the first vertex into a warped surface. Bands of
+    # PLATE_BAND metres each stay near-planar and join continuously, because
+    # every vertex carries its own dy.
+    #
+    # The plate is also the only element whose UNDERSIDE matters: it has to
+    # reach below the terrain everywhere so the park reads as an earth body cut
+    # into the hill, not a sheet floating over it. PLATE_DEPTH is measured down
+    # from the draped top.
+    vb, fb = [], []
+    for u0, u1 in band_spans(ring, PLATE_BAND):
+        band = clip_ring_u(ring, u0, u1)
+        if len(band) >= 3:
+            add_prism(vb, fb, band, -PLATE_DEPTH, Z_PLATE)
+    objs.append(new_mesh("ground_plate", vb, fb, [mats["Toy_stone"]]))
 
     # 2. kerb band — a 0.45 m ring standing 0.12 m proud, a half-tone lighter
     #    than the plate. This is what draws the oval from directly above and it
@@ -627,7 +721,7 @@ def build(data, mats):
                  (shrink(poly, 0.22), Z_PLATE + crown)]
         b = len(vb)
         for rp, z in rings:
-            vb.extend([to_world(u, v) + (z,) for u, v in rp])
+            vb.extend([to_world(u, v) + (z + TERRAIN(u),) for u, v in rp])
         m = len(poly)
         for k in range(len(rings) - 1):
             o0, o1 = b + k * m, b + (k + 1) * m
@@ -742,7 +836,7 @@ def build(data, mats):
              ([(su + (u - su) * 0.30, sv + (v - sv) * 0.30) for u, v in pg], Z_MOUND)]
     b = 0
     for rp, z in rings:
-        vb.extend([to_world(u, v) + (z,) for u, v in rp])
+        vb.extend([to_world(u, v) + (z + TERRAIN(u),) for u, v in rp])
     m = len(pg)
     for k in range(len(rings) - 1):
         o0, o1 = k * m, (k + 1) * m
@@ -767,8 +861,10 @@ def build(data, mats):
     #    undulating SHOUT_LO -> SHOUT_HI over SHOUT_WAVES full waves.
     r0 = data["shout"]["radius_m"]
 
+    shout_dy = TERRAIN(su)
+
     def shout_z(theta):
-        return (Z_MOUND + SHOUT_LO
+        return (shout_dy + Z_MOUND + SHOUT_LO
                 + (SHOUT_HI - SHOUT_LO) * 0.5 * (1 - math.cos(SHOUT_WAVES * theta)))
 
     vb, fb = [], []
@@ -904,6 +1000,8 @@ def main():
     os.makedirs(out_dir, exist_ok=True)
 
     data = json.load(open(os.path.join(here, "data", "park_uv.json")))
+    global TERRAIN
+    TERRAIN = Terrain(json.load(open(os.path.join(here, "data", "terrain_uv.json"))))
     clear_scene()
     bpy.context.scene.unit_settings.system = "METRIC"
     bpy.context.scene.unit_settings.scale_length = 1.0
@@ -911,30 +1009,21 @@ def main():
     mats = make_materials()
     objs, tablets = build(data, mats)
 
-    # Normalize Z only. The authored origin is ALREADY the park's oriented
-    # bounding-box centre — that is what the manifest anchor means — so the
-    # model must not be re-centred on its own axis-aligned bounding box. The
-    # first build did, and because the canopy overhangs the kerb asymmetrically
-    # the whole park slid 0.92 m across the city: the Shout came out at
-    # v = -0.39 where the survey puts it at -1.29. Rule 5 is not negotiable for
-    # 0.92 m of convenience. min z goes to exactly 0; x/y are left alone, and
-    # the ground plate's own centre is what the validator checks against the
-    # 0.5 m tolerance.
-    dg = bpy.context.evaluated_depsgraph_get()
-    mn = [1e9] * 3
-    mx = [-1e9] * 3
-    for o in objs:
-        ev = o.evaluated_get(dg)
-        me = ev.to_mesh()
-        for vert in me.vertices:
-            w = o.matrix_world @ vert.co
-            for i in range(3):
-                mn[i] = min(mn[i], w[i])
-                mx[i] = max(mx[i], w[i])
-        ev.to_mesh_clear()
-    shift = Vector((0.0, 0.0, -mn[2]))
-    for o in objs:
-        o.location += shift
+    # NO normalization. Both of the usual moves are wrong for a draped asset:
+    #
+    #   * re-centring x/y on the model's own bounding box slid the park 0.92 m
+    #     across the city, because the canopy overhangs the kerb asymmetrically
+    #     (build iteration 10). The authored origin is already the park's OBB
+    #     centre, which is what the manifest anchor means.
+    #   * shifting z so min_z = 0 would break the drape. app/src/assets.js puts
+    #     the GLB's z = 0 plane at the anchor's terrain elevation, and this
+    #     model's z = 0 IS the anchor's ground: TERRAIN(0) = 0 by construction.
+    #     Lifting the model until its lowest point reached zero would float the
+    #     Third Street end 3.2 m into the air — the failure this drape exists to
+    #     fix, reintroduced from the other side.
+    #
+    # So the export ships exactly the authored coordinates, min_z is negative,
+    # and targetHeightM is the vertical EXTENT printed below.
     bpy.context.view_layer.update()
     for o in objs:
         o.select_set(True)
@@ -958,17 +1047,30 @@ def main():
         ev.to_mesh_clear()
 
     datum = data["tallest_elm_m"]
+    extent = mx[2] - mn[2]
     print("objects        %d" % len(objs))
     print("tablets        %d" % tablets)
     print("triangles      %d / %d" % (tris, TRI_CAP))
     print("dims           %.4f x %.4f x %.4f" % tuple(mx[i] - mn[i] for i in range(3)))
-    print("min z          %.6f" % mn[2])
+    print("min z          %.6f  (the Third Street end, below the anchor's ground)" % mn[2])
+    print("max z          %.6f  (the tallest elm at the Second Street end)" % mx[2])
+    print("terrain fall   %.4f" % TERRAIN.fall)
     print("centre xy      %.6f %.6f" % ((mn[0] + mx[0]) / 2, (mn[1] + mx[1]) / 2))
-    print("datum          %.4f (target %.2f, delta %.4f)" % (mx[2], datum, mx[2] - datum))
+    # The topmost tree in world z is not the tallest tree: on a 6.1 m slope a
+    # 14 m plane standing uphill out-tops a 15 m elm standing downhill. The
+    # datum is the tallest crest ABOVE ITS OWN GROUND, which is what the asset
+    # is authored to; max_z is where the canopy happens to peak.
+    tall = max(data["trees"], key=lambda t: t["crest_m"])
+    top = max(data["trees"], key=lambda t: t["crest_m"] + TERRAIN(t["uv"][0]))
+    print("tallest crest  %.2f above its own ground at u=%.1f (datum %.2f)"
+          % (tall["crest_m"], tall["uv"][0], datum))
+    print("canopy peak    %.4f at u=%.1f (crest %.2f + terrain %.2f)"
+          % (top["crest_m"] + TERRAIN(top["uv"][0]), top["uv"][0],
+             top["crest_m"], TERRAIN(top["uv"][0])))
+    print("VERTICAL EXTENT %.4f  <- this is targetHeightM, so the loader scale is 1.0"
+          % extent)
     if tris > TRI_CAP:
         print("!! OVER TRIANGLE CAP")
-    if abs(mx[2] - datum) > 0.01:
-        print("!! MAX Z IS NOT THE DATUM")
 
     blend = os.path.join(out_dir, "64-south-park.blend")
     glb = os.path.join(out_dir, "64-south-park.glb")

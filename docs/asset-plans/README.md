@@ -109,7 +109,7 @@ route, and the park plans depend on it (§E8 of the parks README).
 | [592 Third Street](./592-third.md) | `592-third` | 8.2 m (estimated) | new landmark |
 | [400 Brannan Street](./400-brannan.md) | `400-brannan` | 8.8 m | new landmark |
 | [188 South Park (South Park Lofts)](./188-south-park.md) | `188-south-park` | 15.93 m (LiDAR-derived) | new landmark |
-| [South Park (64 South Park)](./64-south-park.md) | `64-south-park` | 15.0 m (estimated — tallest elm crest) | new landmark |
+| [South Park (64 South Park)](./64-south-park.md) | `64-south-park` | 21.04 m (vertical extent — the asset is terrain-draped; the 15.0 m elm crest is estimated) | new landmark |
 
 ## Shared contract (all 61)
 

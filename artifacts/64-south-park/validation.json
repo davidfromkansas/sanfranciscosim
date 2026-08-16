@@ -5,42 +5,50 @@
   "reimported_final_glb": true,
   "object_count": 15,
   "mesh_object_count": 15,
-  "triangle_count": 11500,
+  "triangle_count": 11436,
   "triangle_budget": 12000,
-  "file_bytes": 283916,
+  "file_bytes": 397368,
   "dimensions_m": [
     122.4585,
     121.0471,
-    15.0
+    21.0415
   ],
   "bbox_min_m": [
     -61.7692,
     -59.7834,
-    0.0
+    -4.1833
   ],
   "bbox_max_m": [
     60.6893,
     61.2637,
-    15.0
+    16.8582
   ],
   "oriented_footprint_m": [
-    159.4629,
-    23.5066
+    159.5082,
+    23.5074
   ],
   "ground_plate_centre_uv": [
-    0.0124,
-    -0.0004
+    -0.0,
+    0.0
   ],
   "heading_long_deg": 45.4669,
+  "vertical_extent_m": 21.0415,
+  "manifest_targetHeightM": 21.0415,
   "height_datum_m": 15.0,
-  "height_datum_source": "tallest American elm crest \u2014 ESTIMATED, plan 2.15 risk 1",
+  "height_datum_source": "tallest American elm crest ABOVE ITS OWN GROUND \u2014 ESTIMATED, plan 2.15 risk 1",
+  "draped": true,
+  "terrain_fall_m": 6.106,
+  "terrain_cross_axis_range_m": 0.296,
+  "anchor_ground_elevation_m": 10.728,
+  "plate_top_above_terrain_m": 0.34,
+  "plate_top_above_terrain_spread_m": 0.0,
   "shout": {
     "diameter_m": 12.8356,
     "centre_uv": [
       -36.0336,
       -1.2918
     ],
-    "crest_m": 4.5349
+    "crest_m": 3.1506
   },
   "path_centreline_m": 188.0,
   "seat_wall_total_m": 369.9,
@@ -74,28 +82,28 @@
   "animated_objects": [],
   "non_mesh_objects": [],
   "signed_volumes_m3": {
-    "beds": 315.8785,
-    "furniture_wood": 5.3141,
-    "ground_plate": 1179.0587,
-    "grp_Toy_cream": 78.6759,
-    "grp_Toy_mint": 831.9373,
+    "beds": 315.4239,
+    "furniture_wood": 5.3144,
+    "ground_plate": 5356.435,
+    "grp_Toy_cream": 78.639,
+    "grp_Toy_mint": 832.0794,
     "grp_Toy_steel": 32.4519,
-    "grp_Toy_stone": 406.6653,
+    "grp_Toy_stone": 404.733,
     "lamp_glow": 0.5836,
     "lamp_heads": 0.5919,
     "nest_swing": 0.486,
-    "path_glow": 22.1363,
+    "path_glow": 21.6914,
     "play_surfacing": 14.0148,
     "shout_nets": 4.6182,
     "shout_tubes": 9.7532,
-    "tree_crowns": 8957.8804
+    "tree_crowns": 8957.8803
   },
   "objects_with_non_positive_volume": [],
   "checks": [
     {
       "name": "binary GLB present",
       "pass": true,
-      "value": 283916
+      "value": 397368
     },
     {
       "name": "no non-mesh objects (cameras/lights/armatures)",
@@ -113,28 +121,52 @@
       "value": []
     },
     {
-      "name": "min_z ~ 0",
+      "name": "ground plate top is 0.34 m above the terrain, everywhere",
       "pass": true,
-      "value": 0.0
+      "value": [
+        0.34,
+        0.0
+      ]
+    },
+    {
+      "name": "terrain drape present (min_z below the anchor's ground by the fall)",
+      "pass": true,
+      "value": [
+        -4.183,
+        6.106
+      ]
     },
     {
       "name": "ground plate centred within 0.5 m of the origin",
       "pass": true,
       "value": [
-        0.0124,
-        -0.0004
+        -0.0,
+        0.0
       ]
     },
     {
-      "name": "max_z == datum exactly",
+      "name": "targetHeightM == the model's vertical extent (loader scale 1.0)",
+      "pass": true,
+      "value": [
+        21.0415,
+        21.0415
+      ]
+    },
+    {
+      "name": "tallest crest is the 15.00 m datum above its own ground",
       "pass": true,
       "value": 15.0
+    },
+    {
+      "name": "canopy peak == max_z (crest + terrain at that tree)",
+      "pass": true,
+      "value": 16.8582
     },
     {
       "name": "oriented footprint 159.51 x 23.51 m +/- 0.5",
       "pass": true,
       "value": [
-        159.463,
+        159.508,
         23.507
       ]
     },
@@ -152,7 +184,7 @@
       ]
     },
     {
-      "name": "Shout crest 4.34 m (centreline)",
+      "name": "Shout crest 4.34 m above its own ground (centreline)",
       "pass": true,
       "value": 4.31
     },
@@ -169,7 +201,7 @@
     {
       "name": "triangles <= cap",
       "pass": true,
-      "value": "11500/12000"
+      "value": "11436/12000"
     },
     {
       "name": "no image textures",

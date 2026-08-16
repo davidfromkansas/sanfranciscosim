@@ -1,9 +1,10 @@
 # South Park (64 South Park) — build report
 
 **What was built:** a validated miniature GLB of South Park, San Francisco's oldest
-public park, at `artifacts/64-south-park/64-south-park.glb`. 11,500 triangles, 283,916
-bytes meshopt-compressed, 13 palette materials, `max_z` exactly 15.00 m, all contract
-checks PASS on the shipped file.
+public park, at `artifacts/64-south-park/64-south-park.glb`. 11,436 triangles, 397,368
+bytes meshopt-compressed, 13 palette materials, **draped on the baked terrain**, all 23
+contract checks PASS on the shipped file, and integrated and verified in the running app
+at `uniform x1.0000`.
 
 Plan: `docs/asset-plans/64-south-park.md`. As-built dossier: `REFERENCE.md`
 (authoritative where it disagrees with the plan). Machine-readable checks:
@@ -13,14 +14,16 @@ Plan: `docs/asset-plans/64-south-park.md`. As-built dossier: `REFERENCE.md`
 
 | | |
 |---|---|
-| Triangles | **11,500** / 12,000 cap |
-| GLB on disk | **283,916 bytes** shipped, meshopt-compressed (609,080 B pre-optimize, −53.4%) |
-| Oriented footprint | **159.463 × 23.507 m**, heading 45.4669° true |
-| Axis-aligned bbox | **122.46 × 121.05 × 15.00 m** |
-| Height datum | **15.00 m exactly** — tallest American elm crest, ESTIMATED |
-| Anchor | −122.3939704, 37.7815903 (ground plate centre measured at u +0.012, v −0.000) |
+| Triangles | **11,436** / 12,000 cap |
+| GLB on disk | **397,368 bytes** shipped, meshopt-compressed (603,856 B pre-optimize, −34.2%) |
+| Oriented footprint | **159.508 × 23.507 m**, heading 45.4669° true |
+| Axis-aligned bbox | **122.46 × 121.05 × 21.04 m** |
+| Terrain | draped; falls 6.106 m along the axis, flat to 0.296 m across |
+| `targetHeightM` | **21.0415 m** — the vertical extent, so the loader's scale is 1.0 |
+| Height datum | **15.00 m** — tallest elm crest above its own ground, ESTIMATED |
+| Anchor | −122.3939704, 37.7815903 (ground plate centre measured at u −0.000, v +0.000) |
 | Objects / materials | 15 mesh objects shipped (20 as authored), 13 materials, 2 `_Glow` |
-| Signed volumes | all positive |
+| Signed volumes | all positive; ray flip fraction 0.0 over 22,500 rays |
 
 Triangle split (as authored; the shipped file joins these per material except
 `ground_plate` and `tree_crowns`, see `optimize/REPORT.md`):
@@ -35,8 +38,8 @@ Triangle split (as authored; the shipped file joins these per material except
 | `furniture_wood` | 728 |
 | `furniture_steel` | 644 |
 | `kerb` | 564 |
-| `ground_plate` | 560 |
 | `beds` | 500 |
+| `ground_plate` | 496 |
 | `path_field` | 492 |
 | `lawns` | 404 |
 | `path_glow` | 360 |
@@ -47,23 +50,25 @@ Triangle split (as authored; the shipped file joins these per material except
 | `play_surfacing` | 52 |
 | `shout_nets` | 48 |
 | `nest_swing` | 36 |
-| **total** | **11,500** |
+| **total** | **11436** |
 
 ## Optimize pass (stage 4)
 
 Run with `docs/asset-pipeline/GLB-OPTIMIZE-PROMPT.md` defaults for a landmark
-(`ALLOW_MESHOPT: yes`, `ALLOW_BAKE: no`). **609,080 → 283,916 bytes (−53.4%)**, 20 → 15
-primitives, triangles unchanged at 11,500, materials identical, ray flip fraction 0.0,
-A/B pixel deltas ≤ 0.053% against gates of 2% / 4%. All of G1–G6 and G8 pass; the
-shipped file re-passes the full stage-2 contract validator above. Two per-asset
-adaptations — the limited dissolve is skipped (coplanar ring bands) and `ground_plate` /
-`tree_crowns` are held out of the per-material join so the shipped file stays checkable
-against the survey. Full metrics, census and gate evidence: `optimize/REPORT.md`.
+(`ALLOW_MESHOPT: yes`, `ALLOW_BAKE: no`). **603,856 → 397,368 bytes (−34.2%)**, 20 → 15
+primitives, triangles unchanged at 11,436, materials identical, ray flip fraction 0.0,
+A/B pixel deltas ≤ 0.12% against gates of 2% / 4%. G1–G6 and G8 pass; the shipped file
+re-passes the full stage-2 contract validator above. Three per-asset adaptations, all in
+`optimize/REPORT.md`: the limited dissolve is skipped (coplanar ring bands), the 1 mm
+weld is disabled (it smoothed the flat shading and bought 256 bytes), and `ground_plate`
+/ `tree_crowns` are held out of the per-material join so the shipped file stays checkable
+against the survey.
 
 ## How to reproduce
 
 ```
-python3 extract_park_uv.py                       # OSM survey -> data/park_uv.json
+python3 extract_park_uv.py                       # OSM survey  -> data/park_uv.json
+node sample_terrain.mjs                          # baked terrain -> data/terrain_uv.json
 blender -b --python build_64_south_park.py       # -> .blend + .glb
 blender -b --python render_64_south_park.py      # 7 day images
 blender -b --python render_64_south_park.py -- --night
@@ -137,7 +142,19 @@ dimension checks while it was wrong. That is the point of reviewing the top view
     three-quarter aerial stands at azimuth 262° — 36° off the park's own axis — because
     standing at 225°, where the app's fly-to preset sits, foreshortens 160 m of park into a
     narrow vertical strip. That view is `-axis.png`.
-12. **The top view was unreadable under the standard key.** A 52° key throws 10-sided
+12. **Half the park was buried under the hillside — found only in the running app.**
+    The single biggest correction, and the one nothing in stages 2–4 could have caught.
+    `placeGeneric()` seats a landmark from ONE terrain sample at the anchor; South Park
+    falls 6.106 m over its 160 m, so the flat model was 2.9 m under the ground at the
+    Second Street end and 3.2 m above it at Third. In the app the whole north-east half
+    of the park had vanished under the baked landcover with only the tree crowns showing,
+    while every Blender render of the asset in isolation looked perfect. The asset is now
+    draped: `sample_terrain.mjs` reads the same heightmap the bake uses, and every z is
+    `authored height + dy(u)`. Two contract deviations follow, both deliberate and both
+    asserted rather than waved through — `min_z` is −4.18 m because z = 0 is the anchor's
+    ground, and `targetHeightM` is the model's 21.04 m vertical extent because the
+    loader's scale must land on 1.0. See REFERENCE.md, "The terrain drape".
+13. **The top view was unreadable under the standard key.** A 52° key throws 10-sided
     crown shadows with straight edges across the paving, and in a nadir view those read as
     black polygons cut into the path. The top view now gets a near-overhead key and a
     lifted ambient; the rest of the rig is unchanged.
@@ -163,6 +180,54 @@ dimension checks while it was wrong. That is the point of reviewing the top view
 - **`Toy_teal` is declared in the palette but unused** in the shipped build. Left in the
   build script's palette map with the note explaining both roles it was rejected from, so
   the next person does not re-run the experiment.
+
+## Integration (stage 5) — local QA
+
+**Case B**, batch mode. The GLB is at `app/public/sf-assets/landmarks/64-south-park.glb`,
+the manifest entry is appended, and `pipeline/lib/landmarks.mjs` carries `64SouthPark`.
+The city was re-baked for the QA below and then discarded per
+`docs/asset-pipeline/ADDRESS-TO-ASSET.md`; this branch commits **source only**.
+
+| Check | Result | Evidence |
+|---|---|---|
+| Re-validation of the shipped GLB | **PASS** | all 23 checks, `validation.json` |
+| Manifest entry | **PASS** | append-only diff, JSON valid, 59 entries |
+| id mapping `64-south-park` → `64SouthPark` | **PASS** | `camelId()` round trip verified against the registry |
+| Registry entry + exclusion radii | **PASS** | `exclude: 12` and `clearTreesRadius: 80`, both measured against the committed bake — see below |
+| Re-bake | **PASS** | full chain through `muni-shapes`; 1,980 generated files changed, all discarded |
+| audit 1.6 (no procedural footprint in a bespoke exclusion zone) | **PASS** | 66 zones over 65 landmarks clear |
+| `verify-rebake` | **PASS** | 584 of 585 cells unchanged; the one that moved is **not ours** — see below |
+| Single building at the site | **PASS** | no procedural twin; the park had no procedural footprint to replace |
+| Scale factor | **PASS** | `sf-assets: 64-south-park … uniform x1.0000 at 3830, -1281` |
+| Orientation | **PASS** | oval lies on the block at 45.47°; the Shout at the Third Street end, the big lawn at Second |
+| Terrain seating | **PASS after the drape** | flat, half the park was buried; draped, it sits on the ground end to end. This is build iteration 12 |
+| Night glow | **PASS** | one continuous lit promenade through a dark canopy; lawns, beds and crowns dark; four lamp heads lit; nothing else |
+| Draw calls | **PASS** | 91 day / 92 night at the landmark, against a 300 budget |
+| `landmark-streaming-check` | **PASS** | 6/6: boot-unloaded, load on approach (52 live), release on depart, re-approach with 0 failures, 165 and 96 avg draw calls |
+| Fallback drill | **PASS** | GLB removed → exactly one warning, `sf-assets: 64-south-park failed to load`, the app boots, the block renders, the site is empty ground inside the exclusion zone (expected for Case B) |
+| `npm run lint` / `npm run build` | **PASS** | clean; build leaves no tracked changes |
+| Batch-mode sanity | **PASS** | `git diff --name-only origin/main` lists nothing under `app/public/tiles/` or `api/_data/` |
+
+**Sizing the two radii.** Both were measured against the committed bake rather than
+reasoned about, per the method `civicCenterPlaza` established:
+
+- `exclude: 12` deletes nothing, and that is the measured answer. Over the 320 baked
+  footprints within 400 m, **zero** have any vertex inside the park ring; the nearest
+  baked ring vertex is 22.81 m from the anchor (a 24.2 m building on the Bryant side) and
+  must survive. r ≤ 20 drops 0, r = 30 drops 4, r = 80 drops 44. The usual half-diagonal
+  rule would put r at 79.8 m and delete most of the block. The radius is kept non-zero so
+  the site is registered in `exclusionZones()` and audit 1.6 guards it.
+- `clearTreesRadius: 80` clears all 25 procedural trees standing inside the park and cuts
+  **zero** outside it (at 110 m it starts costing 2). 80 m covers the park's 79.76 m
+  half-diagonal exactly. A circle is a poor fit for a 6.8:1 lozenge and only gets away
+  with it here because party-wall SoMa has no mapped street trees within 80 m.
+
+**A trap in `verify-rebake` worth recording.** It reports cell 23_13 moving 217 → 216 and
+attributes it to `64SouthPark`, because that is the new landmark in the cell. It is not
+ours: the footprint that disappears is 102.8 m away and is taken by `188SouthPark`'s
+`exclude: 5`. That entry landed source-only on 15 Aug 2026 and the committed tiles were
+last baked on the 13th, so its exclusion had never been applied. A fresh bake settles
+every pending neighbour's debt at once, and attribution by cell cannot tell them apart.
 
 ## Approval
 

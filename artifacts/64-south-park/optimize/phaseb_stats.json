@@ -16,31 +16,32 @@
  ],
  "steps": [
   {
-   "step": "weld+degenerate",
-   "tris": 11500,
-   "verts": 6550
+   "step": "degenerate-only (weld disabled)",
+   "tris": 11436,
+   "verts": 21618
   },
   {
    "step": "interior-faces",
-   "tris": 11500,
-   "verts": 6550
+   "tris": 11436,
+   "verts": 21618
   },
   {
    "step": "limited-dissolve-SKIPPED",
-   "tris": 11500,
-   "verts": 6550
+   "tris": 11436,
+   "verts": 21618
   },
   {
    "step": "join-per-material",
-   "tris": 11500,
-   "verts": 6550
+   "tris": 11436,
+   "verts": 21618
   }
  ],
  "input": {
-  "tris": 11500,
-  "verts": 21824,
+  "tris": 11436,
+  "verts": 21618,
   "objects": 20
  },
+ "weld": "disabled: 256 bytes (0.06%) for a step that smooths flat shading",
  "interior_faces_removed": 0,
  "limited_dissolve": "skipped: coplanar ring bands (kerb, plate, tablets, beds)",
  "joins": {
@@ -70,12 +71,12 @@
   "bbox_dims": [
    122.4585,
    121.0471,
-   15.0
+   21.0415
   ],
   "bbox_min": [
    -61.7692,
    -59.7834,
-   0.0
+   -4.1833
   ]
  },
  "bbox_ok": true,

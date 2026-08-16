@@ -6,13 +6,22 @@ Re-imports the SHIPPING GLB into a fresh, isolated scene and checks every item
 in docs/asset-plans/64-south-park.md 2.14. Writes validation.json and prints a
 PASS/FAIL table. Exit status is non-zero if anything fails.
 
-Two checks are worth explaining because they are the ones that would otherwise
-be judged by eye and got judged wrong during the build:
+Three checks are worth explaining because they are the ones that would otherwise
+be judged by eye, and each of them got judged wrong at some point:
 
-* `max_z` must be EXACTLY the datum (15.00 m, the tallest American elm). The
-  loader scales by targetHeightM / measuredHeight, so a drifting datum silently
-  rescales the whole 160 m park. The height itself is estimated (plan 2.15
-  risk 1); its EXACTNESS is not negotiable.
+* **THIS ASSET IS DRAPED ON THE TERRAIN, so `min_z` is NEGATIVE and that is
+  correct.** South Park falls 6.1 m over its length; app/src/assets.js seats a
+  landmark by one terrain sample at the anchor and puts the GLB's z = 0 plane
+  there. So z = 0 means the anchor's ground, the Third Street end sits ~3.2 m
+  below it and the Second Street end ~2.9 m above, and the contract's flat-base
+  "min_z ~ 0" rule does not apply. What IS asserted instead: the ground plate's
+  top at u = 0 is exactly Z_PLATE above zero, which is the same guarantee stated
+  in the frame the loader actually uses.
+* **`targetHeightM` is therefore the model's VERTICAL EXTENT, not an
+  architectural height.** The loader's scale is targetHeightM / bbox height and
+  it has to land on 1.0; with a draped asset the bbox spans the terrain fall as
+  well as the trees. The architectural number — the 15.00 m tallest elm crest
+  above its own ground — is asserted separately, against the tree data.
 * the normals test is per-object SIGNED VOLUME, which is the authoritative test
   for a union of closed solids. The whole-model ray residual is reported as a
   secondary figure. Non-manifold edge counts are deliberately NOT a gate here:
@@ -29,7 +38,9 @@ import bmesh
 import bpy
 from mathutils import Vector
 
-DATUM_M = 15.00
+DATUM_M = 15.00           # tallest elm crest ABOVE ITS OWN GROUND
+Z_PLATE = 0.34            # ground plate top above the local terrain
+PLATE_TOP_TOL = 0.02
 TRI_CAP = 12000
 OBB_LONG = 159.508
 OBB_CROSS = 23.507
@@ -68,6 +79,18 @@ def main():
     glb = argv[argv.index("--glb") + 1] if "--glb" in argv else os.path.join(here, "64-south-park.glb")
     out = argv[argv.index("--out") + 1] if "--out" in argv else os.path.join(here, "validation.json")
     data = json.load(open(os.path.join(here, "data", "park_uv.json")))
+    terr = json.load(open(os.path.join(here, "data", "terrain_uv.json")))
+
+    def dy(u):
+        t = (u - terr["u_min"]) / terr["u_step"]
+        i = int(math.floor(t))
+        prof = terr["dy"]
+        if i < 0:
+            return prof[0]
+        if i >= len(prof) - 1:
+            return prof[-1]
+        f = t - i
+        return prof[i] * (1 - f) + prof[i + 1] * f
 
     bpy.ops.wm.read_factory_settings(use_empty=True)
     before = set(bpy.data.objects)
@@ -134,6 +157,32 @@ def main():
     plate_ctr = ((max(p[0] for p in plate_uv) + min(p[0] for p in plate_uv)) / 2,
                  (max(p[1] for p in plate_uv) + min(p[1] for p in plate_uv)) / 2) if plate_uv else (9e9, 9e9)
 
+    # The plate's top ABOVE ITS OWN LOCAL TERRAIN, everywhere. Measuring the raw
+    # z near u=0 does not work: the plate is built in 6 m transverse bands, so a
+    # window wide enough to catch a band also catches its far edge, 0.1 m up the
+    # slope. Subtracting dy(u) per vertex is the check that actually means
+    # something — the plate must stand Z_PLATE above the ground along its whole
+    # length, not just at the anchor.
+    plate_above_terrain = []
+    plate_bottom_residual = []
+    if plate:
+        for v in plate.data.vertices:
+            w = plate.matrix_world @ v.co
+            u, _vv = to_uv(w.x, w.y)
+            r = w.z - dy(u)
+            (plate_above_terrain if r > -0.1 else plate_bottom_residual).append(r)
+    plate_top_at_anchor = max(plate_above_terrain) if plate_above_terrain else -1e9
+    plate_top_spread = (max(plate_above_terrain) - min(plate_above_terrain)) if plate_above_terrain else 9e9
+
+    extent = 0.0
+    manifest_height = None
+    try:
+        man = json.load(open(os.path.join(here, "..", "..", "app", "public",
+                                          "sf-assets", "landmarks_manifest.json")))
+        manifest_height = next(e["targetHeightM"] for e in man if e["id"] == "64-south-park")
+    except Exception:
+        manifest_height = None
+
     shout = next((o for o in meshes if o.name.startswith("shout_tubes")), None)
     shout_uv = []
     shout_top = 0.0
@@ -158,6 +207,7 @@ def main():
             if any(abs(p[0] - tu) < 6.0 and abs(p[1] - tv) < 6.0 for p in pts):
                 tree_hits += 1
 
+    extent = mx[2] - mn[2]
     glow = sorted(m for m in mats if m.endswith("_Glow"))
     off_palette = sorted(m for m in mats if m not in PALETTE)
     bad_volumes = sorted(n for n, v in volumes.items() if v <= 0)
@@ -168,7 +218,17 @@ def main():
         ("no non-mesh objects (cameras/lights/armatures)", not non_mesh, non_mesh),
         ("no animation data", not animated, animated),
         ("no negative scales", not bad_scales, bad_scales),
-        ("min_z ~ 0", abs(mn[2]) < 1e-4, round(mn[2], 6)),
+        # NOT "min_z ~ 0": see the module docstring. The asset is draped, so the
+        # equivalent guarantee is that z = 0 is the anchor's ground plane.
+        # NOT "min_z ~ 0": see the module docstring. The asset is draped, so the
+        # equivalent guarantee is that the ground plate stands a constant
+        # Z_PLATE above the terrain along its whole 160 m.
+        ("ground plate top is 0.34 m above the terrain, everywhere",
+         abs(plate_top_at_anchor - Z_PLATE) < PLATE_TOP_TOL and plate_top_spread < PLATE_TOP_TOL,
+         [round(plate_top_at_anchor, 4), round(plate_top_spread, 4)]),
+        ("terrain drape present (min_z below the anchor's ground by the fall)",
+         mn[2] < -1.0 and abs(mn[2] - (min(terr["dy"][i] for i in range(len(terr["dy"]))) - 1.20)) < 1.5,
+         [round(mn[2], 3), round(terr["fall_m"], 3)]),
         # measured on the GROUND PLATE, not the whole model: the canopy
         # overhangs the kerb asymmetrically, and re-centring the model on its
         # own AABB to satisfy this check is what slid the park 0.92 m off its
@@ -176,7 +236,15 @@ def main():
         ("ground plate centred within 0.5 m of the origin",
          abs(plate_ctr[0]) < 0.5 and abs(plate_ctr[1]) < 0.5,
          [round(plate_ctr[0], 4), round(plate_ctr[1], 4)]),
-        ("max_z == datum exactly", abs(mx[2] - DATUM_M) < 0.01, round(mx[2], 4)),
+        ("targetHeightM == the model's vertical extent (loader scale 1.0)",
+         abs(extent - manifest_height) < 0.01 if manifest_height else False,
+         [round(extent, 4), manifest_height]),
+        ("tallest crest is the 15.00 m datum above its own ground",
+         abs(max(t["crest_m"] for t in data["trees"]) - DATUM_M) < 0.01,
+         round(max(t["crest_m"] for t in data["trees"]), 3)),
+        ("canopy peak == max_z (crest + terrain at that tree)",
+         abs(max(t["crest_m"] + dy(t["uv"][0]) for t in data["trees"]) - mx[2]) < 0.05,
+         round(mx[2], 4)),
         ("oriented footprint 159.51 x 23.51 m +/- 0.5",
          abs(plate_long - OBB_LONG) < 0.5 and abs(plate_cross - OBB_CROSS) < 0.5,
          [round(plate_long, 3), round(plate_cross, 3)]),
@@ -185,8 +253,11 @@ def main():
         ("Shout centred at (-36.03, -1.29)",
          math.dist(shout_ctr, SHOUT_CENTRE_UV) < 0.5,
          [round(shout_ctr[0], 3), round(shout_ctr[1], 3)]),
-        ("Shout crest 4.34 m (centreline)", abs(shout_top - SHOUT_CREST) < 0.1,
-         round(shout_top - SHOUT_TUBE_R, 3)),
+        # measured against the Shout's OWN ground, which is 1.4 m below the
+        # anchor's — the structure is draped like everything else
+        ("Shout crest 4.34 m above its own ground (centreline)",
+         abs((shout_top - dy(SHOUT_CENTRE_UV[0])) - SHOUT_CREST) < 0.1,
+         round(shout_top - dy(SHOUT_CENTRE_UV[0]) - SHOUT_TUBE_R, 3)),
         ("Shout at the SOUTH-WEST end (mirror check)", shout_ctr[0] < -20.0,
          round(shout_ctr[0], 2)),
         ("all 20 measured tree positions present",
@@ -222,8 +293,16 @@ def main():
         "oriented_footprint_m": [round(plate_long, 4), round(plate_cross, 4)],
         "ground_plate_centre_uv": [round(plate_ctr[0], 4), round(plate_ctr[1], 4)],
         "heading_long_deg": HEADING_LONG,
+        "vertical_extent_m": round(extent, 4),
+        "manifest_targetHeightM": manifest_height,
         "height_datum_m": DATUM_M,
-        "height_datum_source": "tallest American elm crest — ESTIMATED, plan 2.15 risk 1",
+        "height_datum_source": "tallest American elm crest ABOVE ITS OWN GROUND — ESTIMATED, plan 2.15 risk 1",
+        "draped": True,
+        "terrain_fall_m": terr["fall_m"],
+        "terrain_cross_axis_range_m": terr["cross_axis_range_m"],
+        "anchor_ground_elevation_m": terr["anchor_elevation_m"],
+        "plate_top_above_terrain_m": round(plate_top_at_anchor, 4),
+        "plate_top_above_terrain_spread_m": round(plate_top_spread, 4),
         "shout": {"diameter_m": round(shout_dia, 4),
                   "centre_uv": [round(shout_ctr[0], 4), round(shout_ctr[1], 4)],
                   "crest_m": round(shout_top, 4)},

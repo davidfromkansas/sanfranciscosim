@@ -62,14 +62,38 @@ def snap(label):
     print(f"STEP {label}: tris={t} verts={v}")
 
 # --- 1+2a. weld + degenerate, per object ---
+#
+# Per-asset adaptation: RE-ASSERT FLAT SHADING after the weld. Every surface in
+# this asset is authored flat, and the glTF round-trip brings the flat look back
+# as custom split normals. bmesh's remove_doubles fuses the vertices those
+# normals hang off and the mesh falls back to smooth, which on a draped ground
+# plate built from 24 transverse bands rounds every band seam into a ripple.
+# Measured on this asset before the fix: the A/B day-near delta was 1.03%, all
+# of it from Phase B (the meshopt pack contributed 0.0006%), and the diff showed
+# soft streaks along the promenade and the lawn edges. Nothing in G1/G2/G3/G5
+# catches it — materials, bbox, volumes and submesh counts are all unchanged.
+#
+# ...and then the weld was turned OFF anyway, because it earns nothing here.
+# Measured: with the weld the packed file is 397,624 bytes, without it 397,368 —
+# 256 bytes, 0.06%. It reduces the Blender-side vertex count from 21,618 to
+# 6,466 and the exporter then splits every one of them straight back apart,
+# because on an all-flat asset each face needs its own normal. So the step buys
+# nothing and has already shipped one wrong-looking build. Degenerate-face
+# removal stays (it is free and cannot smooth anything), and the shade_flat()
+# call stays as a guard, so that re-enabling the weld cannot quietly reintroduce
+# the ripple.
+WELD = False
 for o in mesh_objs():
     bm = bmesh.new()
     bm.from_mesh(o.data)
-    bmesh.ops.remove_doubles(bm, verts=bm.verts, dist=0.001)
+    if WELD:
+        bmesh.ops.remove_doubles(bm, verts=bm.verts, dist=0.001)
     bmesh.ops.dissolve_degenerate(bm, edges=bm.edges, dist=0.001)
     bm.to_mesh(o.data)
     bm.free()
-snap("weld+degenerate")
+    o.data.shade_flat()
+stats["weld"] = "disabled: 256 bytes (0.06%) for a step that smooths flat shading"
+snap("degenerate-only (weld disabled)")
 
 # --- 2b. interior faces provably buried inside box-like solids ---
 EPS = 0.001

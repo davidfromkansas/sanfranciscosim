@@ -27,9 +27,10 @@ prompt, Part 2 is the research and design dossier behind it.
 | Registry id | `64SouthPark` (`camelId()` in `app/src/assets.js` maps one to the other) |
 | Existing procedural builder | none — new landmark (**Case B**: needs a `pipeline/lib/landmarks.mjs` entry and a re-bake, see 2.13) |
 | WGS84 anchor | `-122.3939704, 37.7815903` (oriented-bounding-box centre, measured from OSM way `24052083`) |
-| Target height | **15.0 m** — the crest of the tallest American elm. *Estimated*; see 2.15 risk 1. Shout crest 4.34 m; seat walls 0.79 m; ground plate +0.34 m |
+| Target height | **21.04 m** — the asset's VERTICAL EXTENT, because the asset is draped on the terrain: 6.11 m of terrain fall + the 15.0 m tallest elm + the plate's skirt. The architectural number is the 15.0 m elm crest above its own ground, *estimated*; see 2.15 risks 1 and 9 |
 | Footprint | 159.51 m × 23.51 m oriented (long axis bearing 45.47° true), 3,478 m² = 0.859 acre, measured from OSM way `24052083` |
-| Axis-aligned XY bbox | ~117.1 m × 115.7 m — expected, not a scale error: a 6.8:1 lozenge at 45° to the world axes has a near-square AABB |
+| Axis-aligned XY bbox | 122.5 m × 121.0 m — expected, not a scale error: a 6.8:1 lozenge at 45° to the world axes has a near-square AABB, plus canopy overhang |
+| Terrain | falls **6.11 m** along the long axis (13.58 m at Second Street, 7.73 m at Third); cross-axis flat to 0.30 m. **The asset is draped** — see 2.15 risk 9 |
 | Triangle cap | 12,000 |
 | Category | `0` (Miscellaneous — the slot Civic Center Plaza, Palace of Fine Arts, Coit Tower and Chase Center use) |
 
@@ -125,7 +126,7 @@ art director. What is NOT negotiable:
 - the measured plan — the oval, the path centreline, the wall alignments, the bed and
   lawn polygons and the Shout's circle are survey data, not design;
 - the style bible (`docs/styles/miniature-toy.md`) and the asset contract;
-- `max_z` = exactly the target height (see below);
+- the terrain drape, and the two contract deviations it forces (see below);
 - a designed night state.
 
 ## Scope of the exported asset
@@ -143,9 +144,16 @@ neighbouring houses are already their own landmarks.
 
 - Binary GLB, real metres, applied transforms, no negative scales.
 - Origin at the OBB centre, geometry sitting on z = 0, XY centre within 0.5 m of origin.
-- **`max_z` normalized to exactly 15.00 m** (the tallest elm crest) so the loader's
-  `targetHeightM / measuredHeight` scale lands at 1.0. Drive it from a named constant and
-  assert it in the validator.
+- **The asset is DRAPED on the baked terrain** (2.15 risk 9). `placeGeneric()` in
+  `app/src/assets.js` seats a landmark from ONE terrain sample at the anchor, and this
+  park falls 6.11 m over its length, so a flat slab is buried at one end and floating at
+  the other. Every z is `authored height + dy(u)`, sampled from
+  `pipeline/lib/heightmap.mjs` by `sample_terrain.mjs`. Consequences: **`min_z` is
+  negative** (z = 0 is the anchor's ground, which is where the loader puts it, not the
+  bottom of the model), and **`targetHeightM` is the model's vertical extent**, not an
+  architectural height, because the loader's scale is `targetHeightM / bbox height` and
+  it must land on 1.0. The 15.00 m elm crest is asserted separately, against its own
+  ground.
 - Authored in world space at the real heading (long axis bearing 45.47°), like
   `civic-center-plaza`: the loader applies no rotation. The AABB comes out ~117 × 116 m;
   that is correct.
@@ -460,29 +468,32 @@ Cap: **12,000**. Hard repo limit is 30,000 for a standard landmark (`PERF-PLAN` 
 sits well inside it, which matters because the asset also has to fit the shared 400k
 batch alongside the seven neighbouring South Park landmarks that stream in with it.
 
-### 2.12 Draft manifest entry
+### 2.12 Manifest entry (as shipped)
 
 ```json
 {
   "id": "64-south-park",
   "file": "64-south-park.glb",
   "anchor": [-122.3939704, 37.7815903],
-  "targetHeightM": 15.0,
+  "targetHeightM": 21.0415,
   "cat": 0,
   "name": "South Park",
   "estimated": true,
-  "dims": [117.11, 115.74, 15.0],
-  "tris": 0,
+  "dims": [122.4585, 121.0471, 21.0415],
+  "tris": 11436,
   "loadRadius": 2500
 }
 ```
 
-`estimated: true` because the height datum is a tree crest that no source establishes
-(2.15 risk 1). `dims` is the **axis-aligned** box the validator measures — fill in the
-built numbers; the oriented figure is 159.51 × 23.51 m. `loadRadius` is the default rule,
-`max(2500, targetHeightM × 30) = max(2500, 450) = 2500`; `alwaysLoaded` would be wrong,
-this is a 15 m ground asset, not a skyline piece. Beyond the radius the stand-in is bare
-baked landcover with no trees (they are cleared, 2.13), which is illegible at 2.5 km.
+`targetHeightM` is the model's **vertical extent**, not an architectural height, because
+the asset is draped (2.15 risk 9) and the loader's scale is `targetHeightM / bbox height`
+— it has to land on 1.0, and it does: the app logs `uniform x1.0000 at 3830, -1281`.
+`estimated: true` on both counts: the extent contains a tree crest no source establishes
+(2.15 risk 1). `dims` is the axis-aligned box; the oriented footprint is 159.51 × 23.51 m.
+`loadRadius` is the default rule, `max(2500, targetHeightM × 30) = 2500`; `alwaysLoaded`
+would be wrong, this is a ground asset, not a skyline piece. Beyond the radius the
+stand-in is bare baked landcover with no trees (they are cleared, 2.13), which is
+illegible at 2.5 km.
 
 ### 2.13 Integration notes (for later, not this task)
 
@@ -546,8 +557,13 @@ would hide a loader failure from the eye.
 ### 2.14 Validation checklist
 
 - [ ] Binary GLB, real metres, applied transforms, no negative scales
-- [ ] `min_z ≈ 0`, XY centre within 0.5 m of the origin
-- [ ] `max_z == 15.00 ± 0.01`, achieved by the tallest American elm crown
+- [ ] ground plate top is exactly 0.34 m above the terrain **along its whole length**
+      (the draped equivalent of `min_z ≈ 0`), ground-plate XY centre within 0.5 m of the
+      origin
+- [ ] `targetHeightM` equals the model's vertical extent to 0.01 m, so the loader's
+      scale is 1.0
+- [ ] tallest crest is 15.00 ± 0.01 m **above its own ground**; `max_z` equals crest +
+      terrain at whichever tree actually peaks (not the tallest tree)
 - [ ] Oriented footprint 159.51 × 23.51 m ± 0.5 m; AABB ≈ 117.1 × 115.7 m (the 45.47°
       heading, not a scale error)
 - [ ] The Shout's ring is a circle 11.8 m across, centred at (u −36.03, v −1.29), and its
@@ -627,7 +643,20 @@ would hide a loader failure from the eye.
    both a plausible kerb and the device that draws the oval from above. If that reads as
    too heavy in the top render, thin the band before lowering it — the outline is the
    first recognition cue and losing it costs more than an over-scaled kerb does.
-8. **The park is a live site.** OSM's furniture survey is from 2017–2018 with a few 2023
+9. **The park is on a 6.11 m slope, and the loader does not know.** This is the largest
+   correction the build made to this plan, and it was found only in the running app.
+   `placeGeneric()` seats a landmark by a single `sampleElevation()` at the anchor, which
+   is right for a compact building — a hillside building buries its base uphill, exactly
+   as the real one does — and wrong for an asset that IS the ground. Flat, South Park was
+   buried 2.9 m at the Second Street end and floating 3.2 m at Third; from above, the
+   whole north-east half had vanished under the baked landcover with only the tree crowns
+   showing. The asset is therefore draped, which costs two contract deviations, both
+   deliberate and both asserted in the validator rather than waved through:
+   `min_z` is negative, and `targetHeightM` carries the vertical extent rather than an
+   architectural height. Anything else that ships a large ground-plane asset in this city
+   will hit the same wall; the alternative is a loader change to drape at placement time,
+   which is a bigger decision than one landmark should make.
+10. **The park is a live site.** OSM's furniture survey is from 2017–2018 with a few 2023
    additions (the covered outdoor seating way `1169236104`, the `South Park Commons`
    building across Brannan). Confirm against recent imagery which elements are still
    present before modelling them, especially the picnic sites and the bike racks.

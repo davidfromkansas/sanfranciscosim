@@ -1,11 +1,11 @@
 {
  "file_bytes": {
-  "raw": 609080,
-  "gzip9": 159782
+  "raw": 603856,
+  "gzip9": 174495
  },
  "objects": 20,
- "total_tris": 11500,
- "total_verts": 21824,
+ "total_tris": 11436,
+ "total_verts": 21618,
  "primitives_est": 20,
  "top20": [
   {
@@ -15,7 +15,7 @@
    "dims": [
     120.455,
     121.047,
-    13.2
+    17.295
    ],
    "materials": [
     "Toy_verdigris"
@@ -28,7 +28,7 @@
    "dims": [
     103.921,
     97.397,
-    0.538
+    5.748
    ],
    "materials": [
     "Toy_stone"
@@ -54,7 +54,7 @@
    "dims": [
     111.85,
     112.443,
-    4.94
+    9.722
    ],
    "materials": [
     "Toy_steel"
@@ -67,7 +67,7 @@
    "dims": [
     116.294,
     109.135,
-    0.03
+    5.77
    ],
    "materials": [
     "Toy_cream"
@@ -80,7 +80,7 @@
    "dims": [
     104.195,
     108.742,
-    0.56
+    5.742
    ],
    "materials": [
     "Toy_rust"
@@ -93,7 +93,7 @@
    "dims": [
     113.977,
     111.907,
-    1.03
+    6.551
    ],
    "materials": [
     "Toy_steel"
@@ -106,23 +106,10 @@
    "dims": [
     118.52,
     117.139,
-    0.24
+    6.061
    ],
    "materials": [
     "Toy_cream"
-   ]
-  },
-  {
-   "name": "ground_plate",
-   "tris": 560,
-   "verts": 1112,
-   "dims": [
-    117.107,
-    115.731,
-    0.34
-   ],
-   "materials": [
-    "Toy_stone"
    ]
   },
   {
@@ -132,10 +119,23 @@
    "dims": [
     116.7,
     115.415,
-    0.4
+    5.987
    ],
    "materials": [
     "Toy_verdigris"
+   ]
+  },
+  {
+   "name": "ground_plate",
+   "tris": 496,
+   "verts": 906,
+   "dims": [
+    117.114,
+    115.735,
+    7.319
+   ],
+   "materials": [
+    "Toy_stone"
    ]
   },
   {
@@ -145,7 +145,7 @@
    "dims": [
     122.459,
     114.358,
-    0.218
+    6.106
    ],
    "materials": [
     "Toy_stone"
@@ -158,7 +158,7 @@
    "dims": [
     104.249,
     97.386,
-    1.38
+    5.863
    ],
    "materials": [
     "Toy_mint"
@@ -171,7 +171,7 @@
    "dims": [
     118.604,
     109.677,
-    0.028
+    5.822
    ],
    "materials": [
     "Toy_cream_Glow"
@@ -184,7 +184,7 @@
    "dims": [
     115.622,
     93.066,
-    0.32
+    5.712
    ],
    "materials": [
     "Toy_gold_Glow"
@@ -197,7 +197,7 @@
    "dims": [
     115.542,
     92.986,
-    0.4
+    5.792
    ],
    "materials": [
     "Toy_gold"
@@ -210,7 +210,7 @@
    "dims": [
     23.319,
     23.169,
-    1.08
+    1.751
    ],
    "materials": [
     "Toy_mint"
@@ -223,7 +223,7 @@
    "dims": [
     114.992,
     92.437,
-    5.24
+    10.632
    ],
    "materials": [
     "Toy_steel"
@@ -249,7 +249,7 @@
    "dims": [
     12.301,
     12.301,
-    2.517
+    2.942
    ],
    "materials": [
     "Toy_ink"
@@ -344,18 +344,18 @@
   "dims": [
    122.4585,
    121.0471,
-   15.0
+   21.0415
   ],
   "min": [
    -61.7692,
    -59.7834,
-   0.0
+   -4.1833
   ],
   "origin_offset_xy": [
    -0.5399,
    0.7402
   ],
-  "base_z": 0.0
+  "base_z": -4.1833
  },
  "duplicate_mesh_groups": [],
  "dup_redundant_tris": 0,
@@ -367,7 +367,7 @@
   "Toy_verdigris": 2
  },
  "degenerate_tris": 0,
- "coincident_vert_pairs": 15274,
+ "coincident_vert_pairs": 15152,
  "over_tess": {
   "near_distance_m": 183.69,
   "one_px_world_m": 0.1238,

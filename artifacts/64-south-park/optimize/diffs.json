@@ -1,42 +1,42 @@
 {
  "day_near": {
-  "mean_abs_rgb_pct": 0.0167,
-  "max_px_delta": 12,
-  "fg_pixels": 121910
+  "mean_abs_rgb_pct": 0.0228,
+  "max_px_delta": 7,
+  "fg_pixels": 122284
  },
  "day_far": {
-  "mean_abs_rgb_pct": 0.0137,
-  "max_px_delta": 7,
-  "fg_pixels": 9358
+  "mean_abs_rgb_pct": 0.0227,
+  "max_px_delta": 30,
+  "fg_pixels": 9056
  },
  "night_near": {
-  "mean_abs_rgb_pct": 0.0529,
-  "max_px_delta": 51,
-  "fg_pixels": 121910
+  "mean_abs_rgb_pct": 0.1209,
+  "max_px_delta": 47,
+  "fg_pixels": 122284
  },
  "night_far": {
-  "mean_abs_rgb_pct": 0.0526,
-  "max_px_delta": 28,
-  "fg_pixels": 9358
+  "mean_abs_rgb_pct": 0.1155,
+  "max_px_delta": 34,
+  "fg_pixels": 9056
  },
  "elev_n": {
-  "mean_abs_rgb_pct": 0.0223,
-  "max_px_delta": 34,
-  "fg_pixels": 61956
+  "mean_abs_rgb_pct": 0.0118,
+  "max_px_delta": 12,
+  "fg_pixels": 65497
  },
  "elev_e": {
-  "mean_abs_rgb_pct": 0.0177,
-  "max_px_delta": 29,
-  "fg_pixels": 61479
+  "mean_abs_rgb_pct": 0.0106,
+  "max_px_delta": 25,
+  "fg_pixels": 65221
  },
  "elev_s": {
-  "mean_abs_rgb_pct": 0.0126,
-  "max_px_delta": 70,
-  "fg_pixels": 61499
+  "mean_abs_rgb_pct": 0.0124,
+  "max_px_delta": 9,
+  "fg_pixels": 71190
  },
  "elev_w": {
-  "mean_abs_rgb_pct": 0.0152,
-  "max_px_delta": 42,
-  "fg_pixels": 62196
+  "mean_abs_rgb_pct": 0.0128,
+  "max_px_delta": 11,
+  "fg_pixels": 72258
  }
 }

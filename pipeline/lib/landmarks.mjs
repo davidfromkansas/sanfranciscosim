@@ -1206,6 +1206,64 @@ export const LANDMARKS = [
     exclude: 28,
     camera: { distance: 320, yaw: 232, pitch: 24 },
   },
+  {
+    // A 0.86-acre PARK, not a building — the second such entry after
+    // civicCenterPlaza, and the first where the buildings job has nothing to do
+    // at all.
+    //
+    // `exclude: 12` deletes NOTHING, and that is the measured answer, not a
+    // guess. Counted over the 320 baked footprints within 400 m of the anchor
+    // in cells 22-24_12-14, with the metric `excluded()` uses (centroid OR any
+    // ring vertex inside the radius):
+    //   0 footprints have any vertex inside the park ring
+    //   22.81 m   nearest baked ring VERTEX (24.2 m tall, the row on the
+    //             Bryant side)  <- must survive
+    //   r <= 20 m drops 0;  r = 30 drops 4;  r = 40 drops 12;  r = 80 drops 44
+    // So the window is 0 < r < 22.8 and 12 m sits in the middle of it. The
+    // usual half-diagonal rule would put r at 79.8 m and delete 44 real
+    // buildings — most of the block, including houses that have no GLB to
+    // replace them. The radius is kept non-zero so the site is registered in
+    // exclusionZones() and audit check 1.6 guards it against a future bake
+    // dropping a footprint onto the park.
+    //
+    // A trap for whoever runs verify-rebake.mjs next: it reports cell 23_13
+    // moving 217 -> 216 and blames this entry, because this is the new landmark
+    // in that cell. It is not this entry. The footprint that disappears sits
+    // 102.8 m away and is taken by 188SouthPark's exclude: 5 — that entry
+    // landed source-only on 15 Aug 2026 and the committed tiles were last baked
+    // on the 13th, so its exclusion had never actually been applied. A fresh
+    // bake settles every pending neighbour's debt at once; attribution by cell
+    // cannot tell them apart.
+    //
+    // `clearTreesRadius: 80` is the job that actually matters here. The park is
+    // leisure=park, so the landcover scatter drops procedural lollipops the
+    // length of it, standing among 34 hand-modelled trees and looking like a
+    // different world. Counted against the committed toyland tiles:
+    //   radius   left INSIDE the park   cut OUTSIDE it
+    //     40 m           11                    0
+    //     60 m            5                    0
+    //     80 m            0                    0     <- 79.76 m half-diagonal
+    //    110 m            0                    2
+    // 80 m clears all 25 and costs nothing: this is party-wall SoMa and there
+    // are no mapped street trees within 80 m of the park's centre. A circle is
+    // a poor fit for a 6.8:1 lozenge, and it only gets away with it because of
+    // that. Measure it the same way if the block ever changes.
+    id: '64SouthPark',
+    name: 'South Park',
+    lon: -122.3939704,
+    lat: 37.7815903,
+    height: 15.0,
+    exclude: 12,
+    clearTrees: true,
+    clearTreesRadius: 80,
+    // App yaw = 180 - true bearing, so yaw 315 stands the camera at 225 deg —
+    // south-west, at the Third Street entry — looking north-east ALONG the
+    // park's 45.47 deg axis, with the Shout nearest the eye and 160 m of
+    // promenade running away from it. On a lozenge this thin there is no
+    // three-quarter that shows the whole thing; the axis is the composition.
+    // Verified by render, not derived on paper (the 592Third lesson).
+    camera: { distance: 400, yaw: 315, pitch: 24 },
+  },
 ];
 
 // Parks/green spaces the landcover bake must match at least one source polygon

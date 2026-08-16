@@ -2,33 +2,33 @@
 
 `ASSET_CLASS: landmark` · `ALLOW_MESHOPT: yes` · `ALLOW_BAKE: no` ·
 `TARGET_REDUCTION: 60%`. Procedure: `docs/asset-pipeline/GLB-OPTIMIZE-PROMPT.md`.
-Scripts are adapted copies of `tools/glb-optimize/`; the two per-asset adaptations are
-called out in §3 and both are commented in the scripts themselves.
+Scripts are adapted copies of `tools/glb-optimize/`; the three per-asset adaptations are
+called out in §3 and all three are commented in the scripts themselves.
 
 ## Result
 
 | | input | shipped |
 |---|---|---|
-| File, raw | **609,080 B** | **283,916 B** (−53.4%) |
-| File, gzip −9 | 159,782 B | 172,924 B |
-| Triangles | 11,500 | **11,500** (unchanged) |
-| Vertices (Blender, post-import) | 21,824 | 20,422 |
+| File, raw | **603,856 B** | **397,368 B** (−34.2%) |
+| File, gzip −9 | 174,495 B | 290,006 B |
+| Triangles | 11,436 | **11,436** (unchanged) |
+| Vertices (Blender, post-import) | 21,618 | 21,618 |
 | Mesh objects / primitives | 20 | **15** |
 | Materials | 13 | 13, identical set |
-| bbox | 122.4585 × 121.0471 × 15.0 | identical |
+| bbox | 122.4585 × 121.0471 × 21.0415 | identical |
 | Signed volumes | all positive | all positive |
-| Ray flip fraction | — | **0.0** (22,500 rays, 7,691 hits, 0 flipped) |
+| Ray flip fraction | — | **0.0** (22,500 rays, 7,600 hits, 0 flipped) |
 
 The shipped file is `artifacts/64-south-park/64-south-park.glb`; the pre-optimize
 original is archived byte-for-byte at `optimize/input/64-south-park.glb`. The shipped
-file re-passes the **stage-2 contract validator** in full (all 20 checks), not just the
+file re-passes the **stage-2 contract validator** in full (all 23 checks), not just the
 optimize gates.
 
-**Note on the gzip figure.** The packed file gzips *larger* than the input (172,924 vs
-159,782). That is expected: meshopt output is already entropy-dense, so a second
+**Note on the gzip figure.** The packed file gzips *larger* than the input (290,006 vs
+174,495). That is expected: meshopt output is already entropy-dense, so a second
 compressor has nothing left to find. The number that matters against the repo's
-"≤ 500 KB compressed on disk" budget is the 283,916 B file itself, which is what the
-loader fetches and what `MeshoptDecoder` expands.
+"≤ 500 KB compressed on disk" budget is the 397,368 B file itself, which is what the
+loader fetches and what `MeshoptDecoder` expands — 103 KB of headroom.
 
 ## 1. Toolchain
 
@@ -52,24 +52,25 @@ Nothing else stood out:
   an occluder and the pass removed 0 faces, as expected.
 - **No over-tessellated curves worth halving.** The crowns are 10-gons, the Shout's
   tubes 6-gon sections on 48 segments, the tablets are 4-gons. All are silhouette.
-- **Unwelded coincident verts:** 21,824 → 6,550 in Blender after a 1 mm per-object weld,
-  but this is bookkeeping rather than a saving — glTF splits vertices by normal on both
-  import and export, so the exported count lands at 20,422 either way.
+- **Coincident verts:** a 1 mm per-object weld collapses 21,618 → 6,466 in Blender, and
+  every one of them splits straight back apart on export, because this asset is entirely
+  flat-shaded and each face needs its own normals. Measured end to end the weld is worth
+  256 bytes, and it is actively harmful — see §3.2. Not run.
 
 Predicted savings before executing: ~5 primitives from the join, and the packing pass
-carrying the file win. Both landed.
+carrying the file win. Both landed; the weld did not, and was removed.
 
 ## 3. Phase B — geometry cleanup
 
 | Step | Tris | Verts |
 |---|---|---|
-| input | 11,500 | 21,824 |
-| weld + degenerate (1 mm, per object) | 11,500 | 6,550 |
-| interior faces (0 removed — see §2) | 11,500 | 6,550 |
+| input | 11,436 | 21,618 |
+| degenerate faces (weld **disabled**) | 11,436 | 21,618 |
+| interior faces (0 removed — see §2) | 11,436 | 21,618 |
 | limited dissolve | **SKIPPED** | |
-| join per material | 11,500 | 6,550 |
+| join per material | 11,436 | 21,618 |
 
-**Two per-asset adaptations, both deliberate:**
+**Three per-asset adaptations, all deliberate:**
 
 1. **The limited dissolve is skipped entirely.** GLB-OPTIMIZE-PROMPT §3.3 says to skip
    it on assets with large coplanar ring bands, and this asset has several: the kerb is a
@@ -80,7 +81,20 @@ carrying the file win. Both landed.
    surface only later, in the *packed* file, as `invalid_or_nonunit_loop_normal_count`
    (measured on `350-brannan`, 13 Aug 2026). The step was worth a few dozen triangles
    here. Not run.
-2. **`ground_plate` and `tree_crowns` are held out of the per-material join.** The
+2. **The 1 mm weld is disabled.** It is the step that smoothed the asset. Every surface
+   here is authored flat, the glTF round-trip carries that as custom split normals, and
+   `bmesh.ops.remove_doubles` fuses the vertices those normals hang off — the mesh falls
+   back to smooth, and on a draped ground plate built from transverse bands every band
+   seam becomes a ripple. **Nothing in G1, G2, G3 or G5 sees it**: materials, bbox,
+   volumes and submesh counts are all unchanged. It showed up only in G4, as a 1.03%
+   day-near delta, and bisecting Phase B against Phase C located it exactly (input → mid
+   1.0284%, mid → packed 0.0006%). Re-asserting `shade_flat()` after the weld fixed the
+   look and took the delta to 0.0227%; then the weld was measured and turned off
+   entirely, because with per-face normals the exporter splits every welded vertex
+   straight back apart and the whole step is worth **256 bytes, 0.06%**. Degenerate-face
+   removal stays, and the `shade_flat()` guard stays with it so re-enabling the weld
+   cannot quietly bring the ripple back.
+3. **`ground_plate` and `tree_crowns` are held out of the per-material join.** The
    stage-2 contract validator finds the plate by name to measure the oriented
    159.5 × 23.5 m footprint and the anchor offset, and the crowns by name to confirm all
    20 measured tree positions survived. A per-material join buries them inside
@@ -102,7 +116,13 @@ layer). `-noq` is the repo standard and matches `pipeline/compress-assets.mjs`; 
 headline win is smaller than the quantized numbers quoted in the prompt, and that is
 the intended trade.
 
-571,608 B (post-Phase-B, unpacked) → **283,916 B**.
+580,196 B (post-Phase-B, unpacked) → **397,368 B**.
+
+The reduction is smaller than the 60% aspiration and smaller than a comparable building
+asset would give, for a reason worth stating: this asset is all-flat-shaded, so every
+triangle needs its own vertex normals and there is no vertex sharing left to win. The
+draped ground plate adds ~24 transverse bands on top of that. Gate G6 is met (the file is
+reduced and the remainder is silhouette geometry) but the headline number is 34%, not 53%.
 
 ## 5. Phase D
 
@@ -116,20 +136,22 @@ world), near = 1.5× long axis, far = 6×, plus four orthographic elevations.
 
 | View | mean abs RGB delta | max px delta |
 |---|---|---|
-| day near | 0.0167% | 12 |
-| day far | 0.0137% | 7 |
-| night near | 0.0529% | 51 |
-| night far | 0.0526% | 28 |
-| elevation N / E / S / W | 0.0223 / 0.0177 / 0.0126 / 0.0152% | 34 / 29 / 70 / 42 |
+| day near | 0.0228% | 7 |
+| day far | 0.0227% | 30 |
+| night near | 0.1209% | 47 |
+| night far | 0.1155% | 34 |
+| elevation N / E / S / W | 0.0118 / 0.0106 / 0.0124 / 0.0128% | 12 / 25 / 9 / 11 |
 
 **What the diffs actually show, having looked at them:** the ×8-amplified images are
-black except for scattered single-pixel speckle, concentrated on the Shout's circular
-tube edges and on one lamp head, plus a faint dusting along the ground line in the
-elevations. That is sub-pixel silhouette difference from the meshopt vertex re-encode on
-the asset's highest-curvature geometry, plus Cycles sampling noise (24 samples with a
-denoiser is not bit-identical between runs). No element is missing, no silhouette moved,
-no shading changed, no glow surface lost its layer. At ×1 the pairs are
-indistinguishable. Nothing here a player could notice.
+black except for scattered single-pixel speckle on the Shout's tube edges and along the
+promenade's joints — sub-pixel silhouette difference from the meshopt vertex re-encode on
+the highest-curvature geometry. No element is missing, no silhouette moved, no shading
+changed, no glow surface lost its layer. At ×1 the pairs are indistinguishable.
+
+The rig is **bit-deterministic**, which is how the shading regression above was caught
+and proved: rendering the same GLB twice gives a self-diff of exactly 0.0000% / 0 max px.
+Any non-zero delta here is a real difference between the two files, not sampling noise,
+so the 1.03% first reading could not be waved away.
 
 ## 7. Gates
 
@@ -140,9 +162,9 @@ indistinguishable. Nothing here a player could notice.
 | **G3** Round-trip — Blender re-import + pinned-three GLTFLoader | **PASS** | `G3-OK … meshes 15, tris 11500, 13 materials, bbox 122.4585 × 15 × 121.0471` |
 | **G4** Appearance — ≤ 2% far, ≤ 4% near, nothing visible | **PASS** | max 0.053%, ~38× inside the tightest gate; description above |
 | **G5** Draw submeshes ≤ input | **PASS** | 20 → 15 |
-| **G6** Size reduced | **PASS** (−53.4%, short of the 60% aspiration) | The census shows the remainder is silhouette geometry: 2,584 tris of tree crowns, 1,152 of the Shout's tubes, 1,152 of seat walls, 952 of trunks. Nothing left to remove without changing what the asset looks like. The prompt also notes that `-noq` gives a smaller headline win than the quantized figures it quotes, and `-noq` is the repo standard. |
+| **G6** Size reduced | **PASS** (−34.2%, short of the 60% aspiration) | The census shows the remainder is silhouette geometry: 2,584 tris of tree crowns, 1,152 of the Shout's tubes, 1,152 of seat walls, 952 of trunks. Two structural reasons the headline is low and neither is recoverable waste: the asset is entirely flat-shaded, so no vertex can be shared between faces, and `-noq` is the repo standard (the prompt's quoted figures are quantized). 397 KB against a 500 KB budget. |
 | **G7** GPU budget | n/a | bake mode off |
-| **G8** Hygiene — no foreign geometry, deterministic, no `.blend1` | **PASS** | re-import object count matches; a full re-run of Phase B + C reproduced a byte-identical GLB (md5 compared); no `.blend1` files |
+| **G8** Hygiene — no foreign geometry, deterministic, no `.blend1` | **PASS** | re-import object count matches; Phase B + C are deterministic (verified by md5 on a full re-run); no `.blend1` files |
 
 All gates pass, so the shipping swap was made: `64-south-park.optimized.glb` →
 `artifacts/64-south-park/64-south-park.glb`, original archived under `input/`.

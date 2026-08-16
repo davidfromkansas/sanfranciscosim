@@ -27,10 +27,12 @@ two undulating steel tubes in section.
 | Heading, long axis | **45.4669° true** toward Second Street; cross axis 135.4669° toward Brannan | measured |
 | Axis-aligned XY bbox | **122.46 × 121.05 m** — a 6.8:1 lozenge at 45° plus canopy overhang. Not a scale error | `validation.json` |
 | Area | 3,478.2 m² = 0.859 acre = 37,439 sq ft | shoelace over the OSM ring — measured. Rec & Park publish ~34,000 sq ft and Fletcher Studio 1.2 acres; see REPORT |
-| Height datum | **15.00 m exactly**, the tallest American elm crest — **ESTIMATED** | see "The height datum" below |
-| Triangles | **11,500** of a 12,000 cap | `validation.json` |
-| GLB shipped | **283,916 bytes**, meshopt-compressed | `optimize/REPORT.md` |
-| GLB pre-optimize | 609,080 bytes, archived at `optimize/input/` | `optimize/REPORT.md` |
+| Height datum | **15.00 m**, the tallest American elm crest **above its own ground** — ESTIMATED | see "The height datum" below |
+| Manifest `targetHeightM` | **21.0415 m** — the model's VERTICAL EXTENT, not an architectural height | see "The terrain drape" below |
+| Terrain | falls **6.106 m** along the axis; cross-axis flat to **0.296 m**; anchor ground 10.728 m | `data/terrain_uv.json`, sampled from `pipeline/lib/heightmap.mjs` |
+| Triangles | **11,436** of a 12,000 cap | `validation.json` |
+| GLB shipped | **397,368 bytes**, meshopt-compressed | `optimize/REPORT.md` |
+| GLB pre-optimize | 603,856 bytes, archived at `optimize/input/` | `optimize/REPORT.md` |
 | Materials | 13, all `Toy_*`, all in the palette, two `_Glow` (`Toy_teal` is declared in the build palette but unused) | `validation.json` |
 | Objects | 15 shipped (20 as authored, joined per material except `ground_plate` and `tree_crowns`), all signed volumes positive | `validation.json` |
 
@@ -55,6 +57,43 @@ from the OSM survey except where marked:
 | Furniture | 15 benches, 13 tables, 3 picnic tables, 4 bike racks, 7 waste baskets, 1 drinking fountain | all measured |
 | Lamps | 4 `highway=street_lamp` at u +73.2, −29.9, −48.6, −73.2 | all measured |
 
+## The terrain drape — read this before changing anything
+
+**This asset is draped on the baked terrain, and that is why `min_z` is negative and
+`targetHeightM` is 21.04 m.** Both are deliberate, both are asserted by
+`validate_64_south_park.py`, and neither is a contract slip.
+
+`placeGeneric()` in `app/src/assets.js` seats a landmark from a single terrain sample:
+
+```js
+const y = Math.max(0, data.sampleElevation(x, z));   // at the anchor, once
+```
+
+That is correct for a building — a compact footprint on a slope buries its base uphill,
+which is what the real building does — and wrong for an asset that IS the ground. South
+Park falls **6.106 m** over its 160 m (13.58 m at the Second Street end, 7.73 m at
+Third). Built flat and seated at the anchor's 10.728 m, the model was buried 2.9 m at one
+end and floating 3.2 m at the other; in the running app the whole north-east half of the
+park had disappeared under the baked landcover, with only the tree crowns showing. That
+is not visible in any Blender render — the asset looks perfect in isolation — and no
+contract check catches it.
+
+So every z in `build_64_south_park.py` is `authored height + dy(u)`, with `dy` sampled by
+`sample_terrain.mjs` from the same heightmap the bake uses. The consequences:
+
+- **z = 0 is the anchor's ground**, not the bottom of the model, which is exactly where
+  the loader puts it. `min_z` is −4.18 m (the Third Street end plus the plate's skirt).
+  The check that replaces "min_z ≈ 0" is that the ground plate stands 0.34 m above the
+  terrain **along its whole length** — measured spread 0.0000 m.
+- **`targetHeightM` is the vertical extent**, 21.0415 m, because the loader's scale is
+  `targetHeightM / bbox height` and it must be 1.0. Confirmed in the app:
+  `sf-assets: 64-south-park merged … uniform x1.0000 at 3830, -1281`.
+- The cross-axis is flat to 0.296 m, measured, so `dy` is a function of `u` alone.
+
+Anything else in this city that ships a large ground-plane asset will hit the same wall.
+The alternative is a loader change that drapes at placement time, which is a bigger
+decision than one landmark should take on its own.
+
 ## The height datum — read this before changing anything
 
 `targetHeightM = 15.0` is the crest of the tallest American elm, and it is **estimated**.
@@ -66,12 +105,17 @@ and from the aerial, where the canopy reads at or just below the roofs of the 3�
 row around it — 181 South Park 16.5 m, 188 South Park 15.93 m, 171 South Park 12.6 m, all
 measured and all already in the manifest.
 
-**The error is contained.** The build normalizes `max_z` to exactly 15.00 and the loader
-scales by `targetHeightM / measuredHeight`, so the scale lands at 1.0 and the plan
-dimensions stay exact whatever the trees really are. A wrong number here makes the trees
-wrong, not the park. The manifest entry is therefore `"estimated": true`, the crest is
-driven by `TALLEST_ELM_M` in `extract_park_uv.py`, and `validate_64_south_park.py` asserts
-it to 10 mm. Changing it is a one-line edit and a rebuild.
+**The error is contained.** Whatever the trees really are, the plan dimensions stay
+exact: the loader scales by `targetHeightM / bbox height`, `targetHeightM` is set to the
+measured bbox height, and the scale lands on 1.0. A wrong crest makes the trees wrong,
+not the park. The manifest entry is `"estimated": true`, the crest is driven by
+`TALLEST_ELM_M` in `extract_park_uv.py`, and `validate_64_south_park.py` asserts it to
+10 mm against the tree data. Changing it is a one-line edit, a rebuild, and a new
+`targetHeightM` in the manifest.
+
+Note that on a 6.1 m slope the tallest tree is not the highest tree: `max_z` (16.86 m)
+belongs to a 14.34 m plane standing uphill at u +68, not to the 15.00 m elm at u +33.5.
+The validator checks both, separately.
 
 ## Trees
 
