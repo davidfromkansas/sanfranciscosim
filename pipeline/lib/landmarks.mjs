@@ -952,6 +952,51 @@ export const LANDMARKS = [
     camera: { distance: 190, yaw: 315, pitch: 26 },
   },
   {
+    // The 1923 Kohler Co. plumbing-supply warehouse at 544 Second Street /
+    // 2 South Park, closing the east end of the South Park oval. Three storeys
+    // of unreinforced brick to a 12.83 m roof deck, with a stair/lift penthouse
+    // at 17.72 m. A corner lot: Second Street on the NE, South Park on the SE,
+    // Taber Place (an alley) on the NW, and a party wall on the SW.
+    //
+    // This is the one South Park entry anchored on the DataSF surveyed PARCEL
+    // centroid rather than the LiDAR footprint centroid, and the reason is that
+    // it can afford to be. 165SouthPark and 188SouthPark are party-wall sites on
+    // the narrow rim of the oval where the safe window is a few metres wide and
+    // centring on the bake input's own ring centroid is the only way to open one.
+    // Here the window is nearly 14 m, so AGENTS rule 5 wins: put the model where
+    // the survey says the building is. The three surveys agree on the shape to
+    // within a metre (parcel 29.81 x 20.91 m, OSM 29.77 x 21.27, DataSF LiDAR
+    // 29.69 x 22.11) and their centroids sit within 2.9 m of each other.
+    //
+    // excluded() drops a footprint when its centroid OR any ring vertex falls
+    // inside the radius. Measured from this anchor against the actual bake input
+    // (DataSF footprints primary, Overture/OSM gap-fill):
+    //
+    //    2.10 m  this building's own DataSF footprint (SF3775005), via centroid
+    //    2.90 m  this building's own OSM/Overture way 112926339, via centroid
+    //            -> the FLOOR: below this the procedural twin survives
+    //   16.76 m  SF3775106 (the South Park party-wall neighbour), nearest vertex
+    //            -> the CEILING, and the binding constraint
+    //   17.29 m  OSM way 112926341 (the same neighbour), nearest vertex
+    //   19.35 m  SF3775004, nearest ring vertex
+    //   19.44 m  OSM way 112926337 (524 Second Street), nearest vertex
+    //   28.78 m  SF3775048 (across Taber Place), nearest ring vertex
+    //
+    // Safe window (2.90, 16.76) m. 9 sits near the middle with 6.10 m of margin
+    // below and 7.76 m above — the most comfortable exclusion in this row, which
+    // is what a corner lot with two streets and an alley around it buys you.
+    // Note both of this building's own footprints clear the floor by their
+    // CENTROIDS, not their vertices (nearest own vertex is 13.5-14.4 m out);
+    // that is normal for a 9 m circle around the middle of a 30 x 21 m building.
+    id: '2SouthPark',
+    name: '2 South Park',
+    lon: -122.3932364,
+    lat: 37.7824236,
+    height: 17.72,
+    exclude: 9,
+    camera: { distance: 200, yaw: 90, pitch: 26 },
+  },
+  {
     // The new Main Library, one block south of the Old Main across Fulton, on a
     // near-identical 106 x 57 m block. Same radius rule as its neighbour and for
     // the same reason: excluded() drops a footprint when its centroid OR ANY ring

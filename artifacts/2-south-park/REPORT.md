@@ -189,11 +189,50 @@ extremely well. The asset is packed anyway — `pipeline/compress-assets.mjs`
 would do it at intake regardless — and both figures sit far inside the 500 KB
 budget. `optimize/REPORT.md` §4 records the trade in full.
 
-## 9. Integration (not done in this task)
+## 9. Stage 5 — integration (Case B, BATCH mode)
 
-New landmark, Case B. `pipeline/lib/landmarks.mjs` needs
-`id: '2-south-park', lon: -122.3932364, lat: 37.7824236, height: 17.72, exclude: 9`
-and a tile re-bake. The safe exclusion window measured from this anchor is
-**(2.90, 16.76) m** — the lower bound is this building's own OSM/Overture
-centroid, the upper is the nearest ring vertex of the South Park party-wall
-neighbour SF3775106. See plan 2.13 for the full table.
+Done, on branch `pipeline/2-south-park`, per `INTEGRATION-PROMPT.md` Part 1 with
+the batch amendment: the bake was run and used for QA, then discarded, and the
+branch commits **source only**. `git diff --name-only origin/main` lists nothing
+under `app/public/tiles/` or `api/_data/`.
+
+Registry entry added to `pipeline/lib/landmarks.mjs`:
+`id: '2SouthPark', lon: -122.3932364, lat: 37.7824236, height: 17.72, exclude: 9`,
+`camera: { distance: 200, yaw: 90, pitch: 26 }` (yaw 90 puts the camera due east,
+square onto the corner where both public elevations read).
+
+### Local QA
+
+| Item | Result |
+|---|---|
+| Re-validation of the shipped GLB | **PASS** — all 16 contract checks, 4,716 tris, 36.298 × 36.298 × 17.720 m, min z 0.0, XY centre (0, 0) |
+| `compress-assets.mjs` on intake | **PASS** — `skip (already compressed): landmarks/2-south-park.glb` (the stage-4 pack is the shipping encoding) |
+| Manifest entry | **PASS** — 59th entry, valid JSON, formatting matches its neighbours |
+| id mapping | **PASS** — `camelId('2-south-park')` → `2SouthPark`, which is the registry id |
+| Registry + re-bake | **PASS** — full 11-stage chain in 72 s on a warm `pipeline/data/` |
+| `audit.mjs` check 1.6 | **PASS** — "no procedural footprint inside a bespoke landmark exclusion zone — 66 zones over 65 landmarks clear" |
+| `verify-rebake.mjs` | **PASS** — "only the new landmarks' cells moved"; **584 of 585 cells unchanged**; cell 23_13 went 217 → 215 buildings (the two footprints are this building's DataSF and Overture representations); nearest surviving footprint **16.8 m vs the 9 m radius**, matching the predicted 16.76 m ceiling to 4 cm |
+| Merge line | **PASS** — `sf-assets: 2-south-park merged 8 objects / 8 materials -> batched (3226 tris body); uniform x1.0000 at 3895, -1373` |
+| Scale factor | **PASS** — exactly **1.0000** |
+| Single building | **PASS** — one building on the lot, no procedural twin, no baked block poking through, no z-fighting |
+| Footprint / orientation | **PASS** — six bays on the south-east (South Park) face and four on the north-east (Second Street) face, read from a camera due east; the blind party wall is on the south-west |
+| Terrain seating | **PASS** — sits flat on the sidewalk grade, no float, no sink |
+| Night glow | **PASS** — at `night 1.00` the warm café glow wraps the east corner on both street faces and five scattered office windows light on the upper floors; the roof, the alley face and the party wall stay dark |
+| Draw calls | **PASS** — **95** for the whole scene at this SoMa street-level view against a 300 budget (measured with a direct `renderer.render(scene, camera)` and `renderer.info.render.calls`; the F3 overlay reads 1 because it samples `renderer.info` after the post stack has already reset it, which is pre-existing) |
+| Fallback drill | **PASS** — with the GLB renamed the app boots, the district renders, the site is empty ground inside the exclusion zone (expected for Case B), and exactly one warning appears: `sf-assets: 2-south-park failed to load`. Restored afterwards and re-verified. |
+| `npm run lint` / `npm run build` | **PASS** — eslint clean; Vite build 1.11 s |
+| 3 audit checks that FAIL | pre-existing on `main` (1.2b height band, 1.3c Telegraph Hill DEM, 1.7b one offshore tree) — not attributable to this change |
+| `GL_INVALID_OPERATION: glDrawArraysInstanced` console warnings | pre-existing — they appear during asset streaming both with this landmark present and with it renamed away, and before it loads at all |
+
+Two honest caveats on the local run. The in-app screenshots were taken through
+the hidden Browser pane, where rAF only advances while a screenshot is being
+captured, so surrounding tiles are frozen mid-crossfade (the hashed-alpha
+dither) in several frames; that is a harness artifact, not a scene bug. And for
+the same reason the fps figure in the overlay is meaningless here — the frame
+rate was not measured, only the draw-call count.
+
+### Still to do
+
+Nothing on this branch. The city gets rebuilt once for the whole batch by
+`docs/asset-pipeline/BATCH-INTEGRATE.md`, which is also where the PR is opened
+and where the deployed QA on https://sf-3d.vercel.app runs.
