@@ -13,14 +13,16 @@
 // when data goes away the layer simply empties — procedural road traffic is
 // untouched either way, so there is no fallback hand-off to manage.
 //
-// Draw calls: one instanced body + one glow set + one badge layer = 3.
+// Draw calls: 5 instanced body + 5 glow + 1 badge + 1 route glow wall = 12.
 
 import {
   BufferAttribute,
+  BufferGeometry,
   CanvasTexture,
   DynamicDrawUsage,
   InstancedBufferAttribute,
   InstancedMesh,
+  Mesh,
   MeshBasicMaterial,
   MeshLambertMaterial,
   Object3D,
@@ -111,6 +113,21 @@ const MAX_BADGES = 60;
 
 const PICK_RADIUS = 16;
 const MAX_PICK_DISTANCE = 9000;
+
+// Route glow: a vertical wall of light tracing each active route's shape,
+// rising from the ground to this height. Visible at the hero view without
+// dominating the skyline.
+const ROUTE_GLOW_HEIGHT = 500;
+// Per-mode colors for the route glow walls (RGB 0-1).
+const ROUTE_GLOW_COLORS = {
+  bus: [1.0, 0.72, 0.25], // warm amber
+  trolley: [0.25, 0.85, 0.78], // teal
+  lrv: [0.65, 0.4, 0.95], // violet
+  streetcar: [0.95, 0.45, 0.4], // coral
+  cable: [0.95, 0.82, 0.3], // gold
+};
+// Daytime minimum opacity; at night the full glow formula applies.
+const ROUTE_GLOW_DAY_OPACITY = 0.15;
 
 // Module-scope scratch: the update loop and the picker must not allocate.
 const dummy = new Object3D();
@@ -420,6 +437,13 @@ export function createLiveMuni(scene, data) {
   // sorting, no allocation, and slow enough that bubbles fade rather than blink.
   let badgeRadius = BADGE_RADIUS_MAX;
 
+  // Route glow: active route shape indices -> mode, rebuilt each poll.
+  // The glow mesh is a single BufferGeometry rebuilt when the active set
+  // changes, rendered as one transparent additive draw call.
+  const activeRouteShapes = new Map(); // shapeIdx -> mode
+  let routeGlowMesh = null;
+  let routeGlowDirty = false;
+
   async function load() {
     // The shapes bake is an enhancement, not a requirement: without it every
     // bus falls back to straight-line dead reckoning (spec fallback ladder).
@@ -518,6 +542,24 @@ export function createLiveMuni(scene, data) {
     atlas = new BadgeAtlas();
     badge = buildBadgeMesh(atlas);
     scene.add(badge.mesh);
+
+    // Route glow mesh: a single dynamic BufferGeometry rendered as a
+    // transparent additive wall. Rebuilt when the active route set changes.
+    routeGlowMesh = new Mesh(
+      new BufferGeometry(),
+      new MeshBasicMaterial({
+        vertexColors: true,
+        transparent: true,
+        blending: 2, // AdditiveBlending
+        depthWrite: false,
+        side: 2, // DoubleSide — visible from both sides of the wall
+      }),
+    );
+    routeGlowMesh.name = 'live-muni-route-glow';
+    routeGlowMesh.frustumCulled = false;
+    routeGlowMesh.renderOrder = 2;
+    scene.add(routeGlowMesh);
+
     ready = true;
   }
 
@@ -661,6 +703,23 @@ export function createLiveMuni(scene, data) {
       }
       state.misses += 1;
       if (state.misses >= MISSES_TO_DROP || now - state.lastFixAt > STALE_MS) buses.delete(id);
+    }
+
+    // Rebuild the active route set for the glow walls. Only routes with at
+    // least one live vehicle on them get a wall — this is called once per
+    // poll (not per frame), so the cost is negligible.
+    if (!stale) {
+      const next = new Map();
+      for (const state of buses.values()) {
+        if (state.shapeIdx >= 0 && state.seen) {
+          if (!next.has(state.shapeIdx)) next.set(state.shapeIdx, state.mode || 'bus');
+        }
+      }
+      if (next.size !== activeRouteShapes.size || [...next.keys()].some((k) => !activeRouteShapes.has(k))) {
+        activeRouteShapes.clear();
+        for (const [k, v] of next) activeRouteShapes.set(k, v);
+        routeGlowDirty = true;
+      }
     }
   }
 
@@ -820,6 +879,60 @@ export function createLiveMuni(scene, data) {
 
   load();
 
+  // ------------------------------------------------------- route glow walls
+
+  function rebuildRouteGlow() {
+    if (!shapes || !routeGlowMesh) return;
+    const F = shapes.floats;
+    const meta = shapes.meta;
+
+    // Collect vertices for all active route walls. Each shape polyline segment
+    // becomes a quad (4 vertices, 2 triangles): bottom-left, top-left,
+    // bottom-right, top-right. Vertex colors carry the mode color.
+    const positions = [];
+    const colors = [];
+    const indices = [];
+
+    for (const [shapeIdx, mode] of activeRouteShapes) {
+      const shape = meta.shapes[shapeIdx];
+      if (!shape) continue;
+      const color = ROUTE_GLOW_COLORS[mode] || ROUTE_GLOW_COLORS.bus;
+      const base = shape.vertexOffset * 3;
+      const count = shape.vertexCount;
+
+      for (let i = 0; i < count - 1; i++) {
+        const o = base + i * 3;
+        const q = o + 3;
+        const x0 = F[o], z0 = F[o + 1];
+        const x1 = F[q], z1 = F[q + 1];
+
+        // Four corners of the wall segment: bottom and top at each end.
+        const v = positions.length / 3;
+        // bottom-left (x0, 0, z0)
+        positions.push(x0, 0, z0);
+        // top-left (x0, height, z0)
+        positions.push(x0, ROUTE_GLOW_HEIGHT, z0);
+        // bottom-right (x1, 0, z1)
+        positions.push(x1, 0, z1);
+        // top-right (x1, height, z1)
+        positions.push(x1, ROUTE_GLOW_HEIGHT, z1);
+
+        // Color all four vertices with the mode color
+        for (let j = 0; j < 4; j++) colors.push(color[0], color[1], color[2]);
+
+        // Two triangles: (v, v+1, v+2) and (v+1, v+3, v+2)
+        indices.push(v, v + 1, v + 2, v + 1, v + 3, v + 2);
+      }
+    }
+
+    const geo = routeGlowMesh.geometry;
+    geo.setAttribute('position', new BufferAttribute(new Float32Array(positions), 3));
+    geo.setAttribute('color', new BufferAttribute(new Float32Array(colors), 3));
+    geo.setIndex(indices);
+    geo.computeVertexNormals();
+    routeGlowMesh.visible = positions.length > 0;
+  }
+
   // ---------------------------------------------------------------- frame
 
   function update(dt, camera) {
@@ -833,6 +946,17 @@ export function createLiveMuni(scene, data) {
     for (const f of fleets) {
       if (f.glowMesh) f.glowMesh.material.opacity = nightOpacity;
       f.count = 0;
+    }
+
+    // Route glow walls: rebuild when the active route set changes, and
+    // modulate opacity by day/night. Always visible — a subtle curtain by
+    // day, a vivid beam at night.
+    if (routeGlowDirty) {
+      rebuildRouteGlow();
+      routeGlowDirty = false;
+    }
+    if (routeGlowMesh) {
+      routeGlowMesh.material.opacity = Math.max(ROUTE_GLOW_DAY_OPACITY, nightOpacity);
     }
 
     const camQ = camera.quaternion;
