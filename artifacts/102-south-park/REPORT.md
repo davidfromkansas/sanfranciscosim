@@ -151,7 +151,65 @@ this asset carries three large coplanar ring bands (the 350-brannan sliver
 lesson). The optimized file is what ships; the pre-optimize original is archived
 at `optimize/input/102-south-park.glb`.
 
-## 8. Approval
+## 8. Stage 5 — integration (batch mode)
+
+Case B. Registry entry `102SouthPark` added to `pipeline/lib/landmarks.mjs`
+(`exclude: 4`, `camera: { distance: 170, yaw: 75, pitch: 26 }`), manifest entry
+appended, GLB copied to `app/public/sf-assets/landmarks/`, full twelve-stage bake
+run, QA'd, and then **discarded** — this branch commits source only, per the batch
+rule in `docs/asset-pipeline/ADDRESS-TO-ASSET.md`. `git diff --name-only
+origin/main` lists nothing under `app/public/tiles/` or `api/_data/`.
+
+### Exclusion radius
+
+Measured, not guessed — and re-measured once. `addBuilding()` runs
+`simplifyRing(ring, 0.6)` **before** `excluded()`, so the raw geojson ring is the
+wrong thing to measure: on the unsimplified rings 106 South Park's shared
+light-well vertex sits 3.03 m from the anchor and forces `exclude: 2.6`, while on
+the rings the gate actually sees its nearest approach is 6.50 m. Final band
+(2.02, 6.5]; shipped **4**, the middle. Full working in the registry comment.
+
+### QA table
+
+| Item | Result | Evidence |
+|---|---|---|
+| Re-validation of the shipped GLB | **PASS** | fresh-scene `validate_102_south_park.py`, 16/16 checks, on the packed file |
+| Manifest entry | **PASS** | 59 entries served; formatting of the other 58 untouched |
+| id mapping | **PASS** | `camelId('102-south-park')` = `102SouthPark`, matches the registry |
+| Registry + re-bake | **PASS** | full chain `terrain -> muni-shapes`, exit 0 |
+| Audit check 1.6 | **PASS** | "66 zones over 65 landmarks clear" |
+| `verify-rebake.mjs` | **PASS** | 584/585 cells unchanged; 23_13 only; nearest surviving footprint 7.9 m vs a 4 m radius |
+| Single building on the site | **PASS** | tile 23_13 decoded: the 15.0 m block at 1.95 m from the anchor is gone, all seven neighbours within 22 m survive (nearest 5.88 m) |
+| Scale factor | **PASS** | `uniform x1.0000 at 3795, -1301` |
+| Orientation | **PASS** | arched front faces the oval, flank runs toward Jack London Alley — screenshot |
+| Terrain seating | **PASS** | sits flush, no float or sink |
+| Night glow | **PASS** | café storefront warm, six SRO rooms cool, nothing else lit |
+| Draw calls | **PASS** | 80 parked at the landmark, 117 with the whole neighbourhood pumped in — budget is 300 |
+| Streaming | **PASS** | `entries 59, failed 0, live 51, loading 0` |
+| Fallback drill | **PASS** | GLB moved aside -> one warning, `failed: 1`, app boots, everything else renders, site is empty ground (Case B expected) |
+| lint / build | **PASS** | `eslint src` clean; `vite build` ok, 3315 tiles compressed |
+| Deployed QA | **not run** | the pipeline ends at a local verification and an ask |
+
+Two things worth recording that are **not** attributable to this landmark:
+
+1. **Tile 23_13 loses two footprints, not one.** The second (107.5 m from the
+   anchor, 15.4 m tall) disappears just as reliably with the registry entry
+   temporarily removed and `buildings.mjs` re-run — it is `pipeline/data/`
+   vintage drift between the committed tiles and the snapshot on disk, not this
+   exclusion zone. That is the decisive test from the data-vintage note, run here
+   before the claim was made.
+2. **`THREE.BatchedMesh: Reserved space request exceeds the maximum buffer size`
+   is reachable, but not by this asset.** Hand-pumping `assets.update()` and
+   `city.update()` at 250 ms while resetting the camera each tick exhausted the
+   shared 1.2 M-vertex batch and failed 30 landmarks at once, most of them
+   pre-existing ones. On a clean load with normal streaming the same camera
+   position gives `failed: 0, live: 51`. The failure is batch churn from the QA
+   harness, not manifest growth.
+
+Three audit checks (1.2b, 1.3c, 1.7b) fail; all three are pre-existing on `main`
+and unrelated to this landmark.
+
+## 9. Approval
 
 Stage 3 of `docs/asset-pipeline/ADDRESS-TO-ASSET.md`.
 

@@ -1084,5 +1084,24 @@
     ],
     "tris": 3864,
     "loadRadius": 2500
+  },
+  {
+    "id": "102-south-park",
+    "file": "102-south-park.glb",
+    "anchor": [
+      -122.3943678,
+      37.7817707
+    ],
+    "targetHeightM": 14.0,
+    "cat": 7,
+    "name": "The Park View (102 South Park)",
+    "estimated": true,
+    "dims": [
+      27.2532,
+      27.1464,
+      14.0
+    ],
+    "tris": 8100,
+    "loadRadius": 2500
   }
 ]

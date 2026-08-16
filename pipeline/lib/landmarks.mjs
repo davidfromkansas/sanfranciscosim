@@ -952,6 +952,56 @@ export const LANDMARKS = [
     camera: { distance: 190, yaw: 315, pitch: 26 },
   },
   {
+    // The Park View (1913, ex-Hotel Bo-Chow), the SRO over Caffe Centro on the
+    // NORTH rim of the oval — the first of this set that is not on the south
+    // side. A 25-foot lot with the Gran Oriente Filipino at 106 ATTACHED on the
+    // southwest, sharing light wells with it.
+    //
+    // MEASURE ON THE SIMPLIFIED RING, NOT THE RAW ONE. `addBuilding()` in
+    // buildings.mjs runs `simplifyRing(ring, 0.6)` BEFORE it calls `excluded()`,
+    // so the ring the gate sees is not the ring in the geojson. On this site that
+    // distinction moves the ceiling by 3.5 m: the shared light-well vertices that
+    // put 106's raw ring 3.03 m from this anchor are all simplified away, and its
+    // real nearest approach is 6.50 m. A raw-ring reading would have forced a
+    // radius of 2.6 — workable, but sitting 0.4 m off the floor for no reason.
+    //
+    // Measured on simplified rings from BOTH bake inputs (the Overture gap-fill
+    // runs through the same gate), distances from this anchor:
+    //
+    //   Overture 102 (h 14.2)   centroid  0.19 m
+    //   DataSF SF3775057 (102)  centroid  2.02 m, vertex 2.16 m  <- the floor
+    //   DataSF SF3775058 (106)  centroid  6.50 m, vertex 7.85 m  <- the ceiling
+    //   Overture 106 (h 11)     centroid  7.53 m
+    //   DataSF SF3775059 (108)  centroid 13.78 m
+    //
+    //   r <= 2.0 m  -> drops 1  (only the Overture copy; the DataSF block stays
+    //                            and the asset sits inside a procedural building)
+    //   r 2.1-6.4 m -> drops 2  (correct: both source copies of THIS building)
+    //   r >= 6.5 m  -> drops 3  (eats 106, which has no GLB to replace it)
+    //
+    // 4 is the middle of that band: 1.84 m clear of the floor, 2.5 m clear of the
+    // ceiling. Confirmed against the re-bake — tile 23_13 went 217 -> 215
+    // footprints and the only one removed within 22 m of the anchor is the 15.0 m
+    // block that stood at 1.95 m. Do not raise it past 6.
+    //
+    // Note also that Overture carries height 14.2 m for this footprint and places
+    // its centroid 0.19 m from this anchor, which independently corroborates both
+    // the asset's estimated 14.0 m cornice crest and the OSM-derived anchor.
+    id: '102SouthPark',
+    name: 'The Park View (102 South Park)',
+    lon: -122.3943678,
+    lat: 37.7817707,
+    height: 14.0,
+    exclude: 4,
+    // camera.yaw is 180 - the compass bearing the camera stands at (offset is
+    // (sin yaw, ., cos yaw) and +z is south, so bearing = atan2(sin yaw, -cos yaw)
+    // = 180 - yaw). The front faces 135.4 deg and the exposed NE flank 45.0, so
+    // bearing 105 is the three-quarter that shows both — yaw 75. Setting yaw to
+    // the frontage bearing itself would park the camera at bearing 45, square
+    // onto the flank with the arched facade edge-on.
+    camera: { distance: 170, yaw: 75, pitch: 26 },
+  },
+  {
     // The new Main Library, one block south of the Old Main across Fulton, on a
     // near-identical 106 x 57 m block. Same radius rule as its neighbour and for
     // the same reason: excluded() drops a footprint when its centroid OR ANY ring
