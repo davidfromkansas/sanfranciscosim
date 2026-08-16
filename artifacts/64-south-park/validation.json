@@ -1,0 +1,214 @@
+{
+  "asset": "64-south-park.glb",
+  "validator": "5.2.0 LTS",
+  "fresh_isolated_scene": true,
+  "reimported_final_glb": true,
+  "object_count": 20,
+  "mesh_object_count": 20,
+  "triangle_count": 11500,
+  "triangle_budget": 12000,
+  "file_bytes": 609080,
+  "dimensions_m": [
+    122.4585,
+    121.0471,
+    15.0
+  ],
+  "bbox_min_m": [
+    -61.7692,
+    -59.7834,
+    0.0
+  ],
+  "bbox_max_m": [
+    60.6893,
+    61.2637,
+    15.0
+  ],
+  "oriented_footprint_m": [
+    159.4629,
+    23.5066
+  ],
+  "ground_plate_centre_uv": [
+    0.0124,
+    -0.0004
+  ],
+  "heading_long_deg": 45.4669,
+  "height_datum_m": 15.0,
+  "height_datum_source": "tallest American elm crest \u2014 ESTIMATED, plan 2.15 risk 1",
+  "shout": {
+    "diameter_m": 12.8356,
+    "centre_uv": [
+      -36.0336,
+      -1.2918
+    ],
+    "crest_m": 4.5349
+  },
+  "path_centreline_m": 188.0,
+  "seat_wall_total_m": 369.9,
+  "trees": {
+    "osm": 20,
+    "derived": 14,
+    "measured_positions_present": 20
+  },
+  "materials": [
+    "Toy_coral",
+    "Toy_cream",
+    "Toy_cream_Glow",
+    "Toy_gold",
+    "Toy_gold_Glow",
+    "Toy_ink",
+    "Toy_mint",
+    "Toy_roofd",
+    "Toy_rust",
+    "Toy_sand",
+    "Toy_steel",
+    "Toy_stone",
+    "Toy_verdigris"
+  ],
+  "glow_materials": [
+    "Toy_cream_Glow",
+    "Toy_gold_Glow"
+  ],
+  "off_palette_materials": [],
+  "textured_materials": [],
+  "transparent_materials": [],
+  "animated_objects": [],
+  "non_mesh_objects": [],
+  "signed_volumes_m3": {
+    "beds": 315.8785,
+    "furniture_steel": 4.508,
+    "furniture_wood": 5.3141,
+    "ground_plate": 1179.0589,
+    "kerb": 57.3653,
+    "lamp_glow": 0.5836,
+    "lamp_heads": 0.5919,
+    "lamp_poles": 0.8622,
+    "lawns": 637.113,
+    "nest_swing": 0.486,
+    "path_field": 337.8382,
+    "path_glow": 22.1363,
+    "path_tablets": 21.3107,
+    "play_mound": 194.8246,
+    "play_surfacing": 14.0148,
+    "seat_walls": 68.8271,
+    "shout_nets": 4.6182,
+    "shout_tubes": 9.7532,
+    "tree_crowns": 8957.8804,
+    "tree_trunks": 27.0816
+  },
+  "objects_with_non_positive_volume": [],
+  "checks": [
+    {
+      "name": "binary GLB present",
+      "pass": true,
+      "value": 609080
+    },
+    {
+      "name": "no non-mesh objects (cameras/lights/armatures)",
+      "pass": true,
+      "value": []
+    },
+    {
+      "name": "no animation data",
+      "pass": true,
+      "value": []
+    },
+    {
+      "name": "no negative scales",
+      "pass": true,
+      "value": []
+    },
+    {
+      "name": "min_z ~ 0",
+      "pass": true,
+      "value": 0.0
+    },
+    {
+      "name": "ground plate centred within 0.5 m of the origin",
+      "pass": true,
+      "value": [
+        0.0124,
+        -0.0004
+      ]
+    },
+    {
+      "name": "max_z == datum exactly",
+      "pass": true,
+      "value": 15.0
+    },
+    {
+      "name": "oriented footprint 159.51 x 23.51 m +/- 0.5",
+      "pass": true,
+      "value": [
+        159.463,
+        23.507
+      ]
+    },
+    {
+      "name": "Shout is a circle 11.84 m across (centreline)",
+      "pass": true,
+      "value": 11.836
+    },
+    {
+      "name": "Shout centred at (-36.03, -1.29)",
+      "pass": true,
+      "value": [
+        -36.034,
+        -1.292
+      ]
+    },
+    {
+      "name": "Shout crest 4.34 m (centreline)",
+      "pass": true,
+      "value": 4.31
+    },
+    {
+      "name": "Shout at the SOUTH-WEST end (mirror check)",
+      "pass": true,
+      "value": -36.03
+    },
+    {
+      "name": "all 20 measured tree positions present",
+      "pass": true,
+      "value": "20/20"
+    },
+    {
+      "name": "triangles <= cap",
+      "pass": true,
+      "value": "11500/12000"
+    },
+    {
+      "name": "no image textures",
+      "pass": true,
+      "value": []
+    },
+    {
+      "name": "no transparency",
+      "pass": true,
+      "value": []
+    },
+    {
+      "name": "all materials Toy_* and in the palette",
+      "pass": true,
+      "value": []
+    },
+    {
+      "name": "no Toy_body (landmarks are never tintable)",
+      "pass": true,
+      "value": null
+    },
+    {
+      "name": "_Glow materials present",
+      "pass": true,
+      "value": [
+        "Toy_cream_Glow",
+        "Toy_gold_Glow"
+      ]
+    },
+    {
+      "name": "per-object signed volume positive (normals outward)",
+      "pass": true,
+      "value": []
+    }
+  ],
+  "all_pass": true
+}
