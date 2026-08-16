@@ -174,7 +174,7 @@ const FRAG = /* glsl */ `
   }
 `;
 
-export function createWater(scene) {
+export function createWater(scene, extent) {
   // A complete sampler is bound from frame one. The shader does not use it
   // until the real texture is decoded, and it remains harmless if loading
   // fails and the procedural fallback stays active.
@@ -207,11 +207,13 @@ export function createWater(scene) {
     uDistance: { value: TEXTURE_SETTINGS.distanceSheen },
   };
 
-  // Keep the mesh only a little larger than the baked city extent. A giant
-  // 120 km quad exceeds the camera's 60 km far plane at its corners; WebGL then
-  // clips it into a conspicuous black triangular wedge on the horizon.
+  // Clip the water to the city extent so it stays inside the plinth — the
+  // bay is a depression in the slab, not an endless ocean. The plane is
+  // centered at the origin, which is also the center of the extent.
+  const w = extent ? extent.maxX - extent.minX : 30000;
+  const d = extent ? extent.maxZ - extent.minZ : 30000;
   const mesh = new Mesh(
-    new PlaneGeometry(30000, 30000, 8, 8),
+    new PlaneGeometry(w, d, 8, 8),
     new ShaderMaterial({ uniforms, vertexShader: VERT, fragmentShader: FRAG })
   );
   mesh.rotation.x = -Math.PI / 2;

@@ -16,7 +16,7 @@ export function createCameraRig(camera, domElement, sampleElevation, extent) {
     pitch: 62 * DEG,
     distance: 9000,
     minDistance: 28,
-    maxDistance: 16000,
+    maxDistance: 57600,
     boost: 1,
     edgeScroll: true,
     // Set while the rig is aimed at a focused entity's mid-height instead of the
@@ -45,9 +45,9 @@ export function createCameraRig(camera, domElement, sampleElevation, extent) {
   // angle. Pan, wheel zoom, edge scroll and WASD all keep working.
   // `max` is the zoom-out ceiling. It has to clear the cloud deck: the whole
   // point of the deck's altitude is that you START below it and can climb
-  // ABOVE it, so 16000 m of orbit (x sin 42 = ~10.7 km of height) sits well
+  // ABOVE it, so 28800 m of orbit (x sin 42 = ~19.2 km of height) sits well
   // over DECK_ALTITUDE in clouds.js. Raise one and check the other.
-  const DIORAMA = { pitch: 42 * DEG, step: 45 * DEG, min: 150, max: 16000, dragPx: 60 };
+  const DIORAMA = { pitch: 42 * DEG, step: 45 * DEG, min: 150, max: 28800, dragPx: 60 };
   let diorama = false;
   let dioramaSaved = null;
   let yawStep = null;
