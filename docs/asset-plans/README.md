@@ -102,6 +102,7 @@ route, and the park plans depend on it (§E8 of the parks README).
 | [592 Third Street](./592-third.md) | `592-third` | 8.2 m (estimated) | new landmark |
 | [400 Brannan Street](./400-brannan.md) | `400-brannan` | 8.8 m | new landmark |
 | [188 South Park (South Park Lofts)](./188-south-park.md) | `188-south-park` | 15.93 m (LiDAR-derived) | new landmark |
+| [2 South Park (544 Second Street, Kohler warehouse)](./2-south-park.md) | `2-south-park` | 17.72 m (LiDAR-derived) | new landmark |
 
 ## Shared contract (all 60)
 
@@ -245,6 +246,19 @@ footprint shares a party wall with the 54 m Hiram W. Johnson slab and a 0.5 m ce
 that boundary samples the tower. Treat a single-cell `hgt_max` on a party wall as
 unusable. That plan's 2.14 is also the set's clearest exclusion-radius trap: the usual
 half-diagonal would have deleted the neighbour.
+
+2 South Park is the set's reassuring counter-example to all of the above, and worth
+reading for the shape of a *clean* case: OSM, the DataSF LiDAR footprint and the
+surveyed DataSF parcel independently agree on a 29.8 x 20.9 m rectangle to within a
+metre and 0.4°, the OSM `height=13` matches the LiDAR median, the Assessor supplies a
+1923 build date, and three of the four elevations plus the roof were photographed. Its
+one open number is the 17.72 m LiDAR maximum, 4.4σ above the median — and there it is
+the *permit* record that breaks the tie, because a 2018 elevator permit relocates a
+machine room into an existing roof penthouse. When a height outlier is ambiguous,
+check whether anyone has ever pulled a permit on the thing that would explain it. It
+is also the one plan here that deliberately anchors on the surveyed parcel centroid
+rather than the DataSF footprint centroid; its 2.13 explains when that trade is
+available and when it is not.
 
 The executing agent is expected to re-verify height, anchor, footprint and
 orientation before modelling — the dossier is a head start, not a citation.
