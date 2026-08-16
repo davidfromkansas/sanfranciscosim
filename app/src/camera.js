@@ -16,7 +16,7 @@ export function createCameraRig(camera, domElement, sampleElevation, extent) {
     pitch: 62 * DEG,
     distance: 9000,
     minDistance: 28,
-    maxDistance: 16000,
+    maxDistance: 57600,
     boost: 1,
     edgeScroll: true,
     // Set while the rig is aimed at a focused entity's mid-height instead of the
@@ -40,7 +40,7 @@ export function createCameraRig(camera, domElement, sampleElevation, extent) {
   // Diorama mode: the money shot is locked. Pitch never moves, the yaw only
   // visits eight 45-degree headings, and zoom rides in and out along that fixed
   // angle. Pan, wheel zoom, edge scroll and WASD all keep working.
-  const DIORAMA = { pitch: 42 * DEG, step: 45 * DEG, min: 150, max: 8000, dragPx: 60 };
+  const DIORAMA = { pitch: 42 * DEG, step: 45 * DEG, min: 150, max: 28800, dragPx: 60 };
   let diorama = false;
   let dioramaSaved = null;
   let yawStep = null;

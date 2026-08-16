@@ -16,6 +16,7 @@ import { loadCore } from './data.js';
 import { createEnvironment, shared } from './env.js';
 import { createTerrain } from './terrain.js';
 import { createWater } from './water.js';
+import { createPlinth } from './plinth.js';
 import { createCity } from './city.js';
 import { createLandmarks } from './landmarks.js';
 import { createAssets } from './assets.js';
@@ -45,7 +46,7 @@ renderer.shadowMap.type = PCFShadowMap;
 renderer.setSize(window.innerWidth, window.innerHeight, false);
 
 const scene = new Scene();
-const camera = new PerspectiveCamera(52, window.innerWidth / window.innerHeight, 4, 60000);
+const camera = new PerspectiveCamera(52, window.innerWidth / window.innerHeight, 4, 80000);
 
 async function boot() {
   const data = await loadCore((p) => loader.set(p * 0.55));
@@ -53,7 +54,10 @@ async function boot() {
   const env = createEnvironment(scene);
   for (const mesh of createTerrain(data)) scene.add(mesh);
   loader.set(0.75);
-  const water = createWater(scene);
+  const water = createWater(scene, data.manifest.extent);
+  // The diorama plinth: a lifted slab of earth under the city with stratified
+  // soil cross-sections on the side faces. Sits inside the clipped water.
+  scene.add(createPlinth(data.manifest.extent, data.sampleElevation));
   const landmarks = createLandmarks(scene, data);
   const piers = createPiers(scene, data);
   loader.set(0.9);
