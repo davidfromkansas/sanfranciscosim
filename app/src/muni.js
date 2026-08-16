@@ -58,6 +58,12 @@ const MAX_SPEED = 20; // m/s hard cap (45 mph); transit never exceeds it
 const SNAP_LIMIT_M = 150; // a fix further than this off-shape -> dead-reckon
 const SNAP_WINDOW_M = 1200; // how far along the shape a projection may jump
 const HEADING_EASE = 2.4; // rad/s toward the tangent
+// Cap on how far past the last fresh fix a bus may extrapolate along its
+// shape (seconds). The poll interval is 60 s and the server TTL is 90 s, so
+// fresh fixes arrive at most ~120 s apart in normal mode; 120 s of dead-reckon
+// bridges that gap. Beyond it the bus eases to a stop and waits for real data
+// (or drops at STALE_MS). Same pattern as ferries' DEAD_RECKON_MAX_S.
+const DEAD_RECKON_MAX_S = 120;
 
 // Badges: cream route pills over each roof, one instanced quad layer fed by a
 // lazily-grown canvas atlas (a draw call per route would be ~40 calls).
@@ -402,6 +408,7 @@ export function createLiveMuni(scene, data) {
   let warnedFetch = false;
   let demoStart = 0;
   let arrivalsByStop = new Map();
+  let lastFetchedAt = 0; // server-side fetchedAt of the last non-stale /api/muni payload
   // Adaptive badge radius, within whatever the zoom allows. A dense corridor
   // pulls it in, a quiet neighbourhood lets it back out. O(1) per frame, no
   // sorting, no allocation, and slow enough that bubbles fade rather than blink.
@@ -470,11 +477,21 @@ export function createLiveMuni(scene, data) {
 
   // ---------------------------------------------------------------- fixes
 
-  function apply(list, now) {
+  function apply(list, now, stale) {
     for (const state of buses.values()) state.seen = false;
 
     for (const bus of list) {
       if (bus.mode !== 'bus') continue; // other modes wait for their models
+
+      // Stale payload (CDN cache hit): mark everyone seen so they aren't
+      // dropped, but don't touch positions or speeds — the frame loop's
+      // dead-reckon extrapolation keeps them moving along their shapes.
+      if (stale) {
+        const state = buses.get(bus.id);
+        if (state) state.seen = true;
+        continue;
+      }
+
       const [x, z] = data.project(bus.lon, bus.lat);
       let state = buses.get(bus.id);
       if (!state) {
@@ -508,6 +525,15 @@ export function createLiveMuni(scene, data) {
         };
         placeOnShape(state, true);
         buses.set(bus.id, state);
+        continue;
+      }
+
+      // Same fix as the previous poll (server re-fetched from 511 but this
+      // vehicle hasn't reported a new position)? Keep dead-reckoning — don't
+      // reset target/speed, which would freeze the bus at the stale target.
+      if (bus.recordedAt != null && state.recordedAt === bus.recordedAt) {
+        state.seen = true;
+        state.misses = 0;
         continue;
       }
 
@@ -682,20 +708,31 @@ export function createLiveMuni(scene, data) {
     }
     live = true;
     degraded = !!payload.degraded;
+    // CDN cache hit? The server's fetchedAt is identical to the previous poll's
+    // — every vehicle in this payload is the same fix. Skip position updates so
+    // buses keep dead-reckoning along their shapes instead of freezing at the
+    // stale target. The per-vehicle recordedAt check in apply() catches the
+    // rarer case where the server re-fetched but individual vehicles haven't
+    // reported a new position.
+    const stalePayload = payload.fetchedAt && payload.fetchedAt === lastFetchedAt;
+    if (payload.fetchedAt) lastFetchedAt = payload.fetchedAt;
     // Index the predictions by stop so the stop layer's card can answer "what
     // is coming here" from the same poll — a second fetch would double the
     // spend against a 60-request-an-hour key for data already in hand.
-    const byStop = new Map();
-    for (const vehicle of payload.vehicles) {
-      for (const stop of vehicle.stops || []) {
-        let list = byStop.get(stop.stopId);
-        if (!list) byStop.set(stop.stopId, (list = []));
-        list.push({ route: vehicle.route, mode: vehicle.mode, at: stop.arrivalAt, fleetNumber: vehicle.fleetNumber });
+    // Skipped on a stale payload: the arrivals map is unchanged.
+    if (!stalePayload) {
+      const byStop = new Map();
+      for (const vehicle of payload.vehicles) {
+        for (const stop of vehicle.stops || []) {
+          let list = byStop.get(stop.stopId);
+          if (!list) byStop.set(stop.stopId, (list = []));
+          list.push({ route: vehicle.route, mode: vehicle.mode, at: stop.arrivalAt, fleetNumber: vehicle.fleetNumber });
+        }
       }
+      for (const list of byStop.values()) list.sort((a, b) => a.at - b.at);
+      arrivalsByStop = byStop;
     }
-    for (const list of byStop.values()) list.sort((a, b) => a.at - b.at);
-    arrivalsByStop = byStop;
-    apply(payload.vehicles, now);
+    apply(payload.vehicles, now, stalePayload);
   }
 
   function schedule() {
@@ -756,7 +793,21 @@ export function createLiveMuni(scene, data) {
         // Spend the banked distance to the latest fix's projection, never
         // overrunning it by more than a bus length, and only overspeeding a
         // little while well behind — "catches up gently, never lurches".
-        const lead = state.targetS - state.s;
+        let lead = state.targetS - state.s;
+        // Dead-reckon: if the bus has reached its projected target but was
+        // still moving at the last fresh fix, extrapolate the target forward
+        // along the shape so the bus keeps driving instead of freezing. This
+        // is what keeps buses moving between ~90 s fixes and on CDN cache
+        // hits — without it, the bus reaches targetS, lead hits zero, and
+        // the advance clamp freezes it in place. Capped at DEAD_RECKON_MAX_S
+        // seconds since the last fresh fix (ferries use the same pattern).
+        if (lead < DWELL_STEP_M && state.targetSpeed > 0) {
+          const sinceFresh = (now - state.lastFixAt) / 1000;
+          if (sinceFresh < DEAD_RECKON_MAX_S) {
+            state.targetS += state.targetSpeed * dt;
+            lead = state.targetS - state.s;
+          }
+        }
         const boost = lead > 200 ? CATCHUP_FACTOR : 1;
         const advance = Math.min(Math.max(0, lead + 12), state.speed * boost * dt);
         state.s += advance;
