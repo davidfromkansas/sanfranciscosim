@@ -11,11 +11,13 @@ where this file and the plan disagree, this file is what shipped.
 | Anchor | `-122.3932364, 37.7824236` (DataSF surveyed parcel 3775-005 area centroid) |
 | Target height | 17.72 m (roof penthouse crest = bounding-box top, loader scale 1.0) |
 | Triangles | **4,716** of a 9,000 cap |
+| Shipping file | 138,056 bytes raw (60,131 gzip-9) after the stage-4 optimize pass |
 | Dimensions | 36.298 x 36.298 x 17.720 m (axis-aligned; the building is 29.8 x 20.9 m at 45.2°) |
-| Objects | 141 |
+| Objects | **8** as shipped (141 authored, joined one-per-material in stage 4) |
 | Materials | 8 — `Toy_brick`, `Toy_stone`, `Toy_glass`, `Toy_steel`, `Toy_roofd`, `Toy_ink`, `Toy_glass_Glow`, `Toy_trim_Glow` |
 | Glow groups | 2 (`Toy_glass_Glow` lit offices, `Toy_trim_Glow` corner café) |
-| Validation | `validation.json` — **all 16 checks PASS** |
+| Draw submeshes | 8 |
+| Validation | `validation.json` — **all 16 checks PASS**, re-run against the shipped (optimized) file |
 
 ## 1. What is in the export
 
@@ -165,7 +167,29 @@ triangles, 36.3 x 36.3 x 17.72 m, 8 materials, 2 glow groups.
 parcel `IND`, but that is a stale roll code for a 1923 building whose permits
 have recorded it as retail over office since 2016.
 
-## 8. Integration (not done in this task)
+## 8. Stage 4 — optimize
+
+Run per `docs/asset-pipeline/GLB-OPTIMIZE-PROMPT.md`; full metrics, census, A/B
+deltas and gate table in `optimize/REPORT.md`. Headline: 141 objects → 8
+(one per material), 9,904 → 2,628 source vertices, 333,764 → 138,056 raw bytes
+(−58.6%), triangles unchanged at 4,716, all eight gates PASS with a worst-case
+A/B pixel delta of 0.0489%. The limited-dissolve step was skipped: this asset
+carries six coplanar ring bands and the step is the only one that can
+manufacture sliver geometry.
+
+The optimized file is now `2-south-park.glb`; the pre-optimize original is
+archived byte-for-byte at `optimize/input/2-south-park.glb`. The review renders,
+contact sheet, night render and `validation.json` in this directory were all
+regenerated from the shipped file, so every image depicts exactly the geometry
+that ships.
+
+One number is worth flagging: gzip-9 bytes *rose* 44,513 → 60,131, because
+meshopt output is already entropy-coded while the unpacked float32 input gzips
+extremely well. The asset is packed anyway — `pipeline/compress-assets.mjs`
+would do it at intake regardless — and both figures sit far inside the 500 KB
+budget. `optimize/REPORT.md` §4 records the trade in full.
+
+## 9. Integration (not done in this task)
 
 New landmark, Case B. `pipeline/lib/landmarks.mjs` needs
 `id: '2-south-park', lon: -122.3932364, lat: 37.7824236, height: 17.72, exclude: 9`
