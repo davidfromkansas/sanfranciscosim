@@ -3,6 +3,11 @@
 Run 16 August 2026 per `docs/asset-pipeline/GLB-OPTIMIZE-PROMPT.md` v2.
 `ASSET_CLASS: landmark`, `ALLOW_MESHOPT: yes`, `ALLOW_BAKE: no`.
 
+**Re-run 16 August 2026** after stage-5 local QA sent the roof membrane back to the
+authoring side (`Toy_steel` -> `Toy_sand`, see the asset `REPORT.md` §4 item 7). Every
+number below is from that second, shipping run; the gate results were identical both
+times.
+
 **Toolchain:** Blender 5.2.0 LTS (headless), `npx gltfpack@0.24`, node + the pinned three
 in `g3check/package.json`, python3 + Pillow, gzip −9. Scripts are adapted copies of
 `tools/glb-optimize/`; the only per-asset change is the deliberate skip in Phase B step 3
@@ -12,14 +17,14 @@ documented in §3.
 
 | | input | output | delta |
 |---|---|---|---|
-| File, raw | 344,840 B | **160,572 B** | **−53.4%** |
-| File, gzip −9 | 54,989 B | 104,048 B | +89% (see §4) |
+| File, raw | 345,036 B | **160,740 B** | **−53.4%** |
+| File, gzip −9 | 55,045 B | 104,018 B | +89% (see §4) |
 | Triangles | 5,620 | 5,620 | 0 |
 | Vertices (Blender, post-weld) | 11,432 | 3,016 | −73.6% |
 | Vertices (glTF, re-imported) | 11,432 | 10,248 | −10.4% |
 | Objects / nodes | 105 | **10** | −90.5% |
 | Draw submeshes (primitives) | 106 | **11** | −89.6% |
-| Materials | 9 | 9 | identical set |
+| Materials | 10 | 10 | identical set |
 | bbox dims | 35.9981 × 35.7656 × 9.9 | 35.9981 × 35.7656 × 9.9 | 0 |
 | bbox min | −17.99906, −17.88282, 0.0 | −17.99906, −17.88282, 0.0 | 0 |
 
@@ -34,7 +39,7 @@ waste is concentrated exactly where that construction puts it:
 |---|---|---|---|
 | Coincident vertices | **8,416 pairs** — every box and panel is flat-shaded and authored corner-by-corner | large vertex win | 11,432 → 3,016 verts |
 | Duplicate mesh groups | 15 groups, 3,172 redundant triangles (the 12 merlons, 5 roof vents, 15 window fills/frames repeated at identical size) | join, not instance — the counts are small and each is < 100 tris | folded into the per-material join |
-| Object-count overhead | 105 nodes for 9 materials; join candidates `Toy_glass` 30, `Toy_roofd` 30, `Toy_stone` 26, `Toy_brick` 5 | the single biggest byte win | 105 → 10 objects, 106 → 11 primitives |
+| Object-count overhead | 105 nodes for 10 materials; join candidates `Toy_glass` 30, `Toy_roofd` 30, `Toy_stone` 26, `Toy_brick` 5 | the single biggest byte win | 105 → 10 objects, 106 → 11 primitives |
 | Degenerate faces | 0 | none | 0 |
 | Buried interior faces | the entry bay overlaps two window frames; the 12 merlons straddle the parapet ring | the occluder rule needs a CLOSED, box-like solid (AABB fill ≥ 95%); a parapet is a ring, so nothing qualifies | 0 removed — correctly declined |
 | Over-tessellated curves | none. Every surface is a planar panel, box or prism | n/a | n/a |
@@ -76,14 +81,14 @@ npx gltfpack@0.24 -i mid.glb -o 524-second.optimized.glb -c -km -kn -noq
 
 `-km -kn` are mandatory (glow-ness is name-only; without `-km` gltfpack would merge
 `Toy_glass` and `Toy_glass_Glow` and silently kill the night layer — verified: the output
-material set is identical to the input's, all 9 names present). `-noq` is the repo
+material set is identical to the input's, all 10 names present). `-noq` is the repo
 standard and matches `pipeline/compress-assets.mjs`, which is the mandatory ship step;
 quantization breaks the kit merge path and fails the stage-2 validator on
 `transforms_applied` / `no_unexpected_objects`.
 
 **The gzip number goes up, and that is expected.** Meshopt buffers are already
 entropy-coded, so gzipping them again adds overhead rather than removing it:
-54,989 B → 104,048 B. The number that matters on disk and over the wire is the raw file,
+55,045 B → 104,018 B. The number that matters on disk and over the wire is the raw file,
 because the server does not re-compress an already-compressed payload. Same behaviour
 recorded for `358-brannan` (40,862 → 77,591 B) and every other meshopt landmark.
 
@@ -123,9 +128,9 @@ Nothing here is anything a player could notice.
 
 | Gate | Result | Evidence |
 |---|---|---|
-| G1 Contract | **PASS** | material name set identical (9); `_Glow` materials separate; no `Toy_body`; no manifest-referenced node names on this asset |
+| G1 Contract | **PASS** | material name set identical (10); `_Glow` materials separate; no `Toy_body`; no manifest-referenced node names on this asset |
 | G2 Geometry | **PASS** | bbox delta 0.00000 m; origin delta 0.00000 m; all 10 output solids positive signed volume; `inverted_solids: []`; ray flipped fraction **0.0** over 16,209 hits |
-| G3 Round-trip | **PASS** | re-imports in Blender; `g3check` → `G3-OK`, 11 meshes, 5,620 tris, 9 materials, bbox matches, no decode errors |
+| G3 Round-trip | **PASS** | re-imports in Blender; `g3check` → `G3-OK`, 11 meshes, 5,620 tris, 10 materials, bbox matches, no decode errors |
 | G4 Appearance | **PASS** | worst mean delta 0.034% vs 2–4% gates; visual description above |
 | G5 Draw submeshes ≤ input | **PASS** | 106 → 11 |
 | G6 Size reduced | **PASS on size, short of the 60% target** | −53.4% raw. See §7 |
@@ -148,5 +153,5 @@ the 60% figure in the prompt was measured with quantization on.
 
 `524-second.optimized.glb` copied over `artifacts/524-second/524-second.glb`. The
 pre-optimize original is archived byte-for-byte at `optimize/input/524-second.glb`
-(344,840 B). The asset's `validation.json` and `REPORT.md` were regenerated against the
+(345,036 B). The asset's `validation.json` and `REPORT.md` were regenerated against the
 shipped file, so the integration stage writes its manifest entry from reality.

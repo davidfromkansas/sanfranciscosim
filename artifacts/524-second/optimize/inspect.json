@@ -1,7 +1,7 @@
 {
  "file_bytes": {
-  "raw": 344840,
-  "gzip9": 54989
+  "raw": 345036,
+  "gzip9": 55030
  },
  "objects": 105,
  "total_tris": 5620,
@@ -45,7 +45,7 @@
    ],
    "materials": [
     "Toy_brick",
-    "Toy_steel"
+    "Toy_sand"
    ]
   },
   {
@@ -310,9 +310,14 @@
    "user_objects": 30
   },
   {
+   "name": "Toy_sand",
+   "glow": false,
+   "user_objects": 1
+  },
+  {
    "name": "Toy_steel",
    "glow": false,
-   "user_objects": 4
+   "user_objects": 3
   },
   {
    "name": "Toy_stone",
@@ -629,7 +634,7 @@
   "Toy_glassl": 3,
   "Toy_ink": 2,
   "Toy_roofd": 30,
-  "Toy_steel": 4,
+  "Toy_steel": 3,
   "Toy_stone": 26
  },
  "degenerate_tris": 0,

@@ -44,9 +44,10 @@ Design (see REFERENCE.md for the sources behind every number):
   surfaces are thin shells proud of the opaque surface behind them (the app
   renders _Glow in a separate layer that is ~12% alpha by day — never author a
   primary surface as glow);
-* the roof membrane is Toy_steel, not Toy_roofd. The Vexcel aerial shows a pale
-  sheet, and 358-brannan's build log records that a dark deck made that
-  building read as a black slot from the app's downward camera.
+* the roof membrane is Toy_sand, the palest thing on the asset. The Vexcel
+  aerial shows a near-white sheet; Toy_roofd and then Toy_steel were both tried
+  and both read too dark from the app's downward camera against the baked
+  neighbours (measured in the live scene, see REPORT.md s.4).
 """
 
 import math
@@ -120,6 +121,14 @@ PALETTE_HEX = {
     # front-to-back; here the split is horizontal, which is what keeps the two
     # SoMa warehouses from reading as one building twice.
     "Toy_stone": "d9d2c2",
+    # The roof membrane. Toy_steel (#9aa0a6) was tried first, following
+    # 358-brannan's log; in the LIVE SCENE at the app's downward camera the lit
+    # deck measured (90,98,107) against (146,133,104) on the baked neighbours —
+    # 27% darker and cooler, the darkest roof on the block. The Vexcel aerial
+    # shows this roof as a near-WHITE membrane, so Toy_sand is both truer and
+    # the better top-down read, and it lets the brick parapet ring carry the
+    # roof edge instead of fighting a mid-grey deck.
+    "Toy_sand": "ece4d4",
     "Toy_glass": "2a4d73",
     "Toy_glassl": "6f95b8",
     "Toy_roofd": "45454a",
@@ -396,6 +405,7 @@ def build():
     glassl = material("Toy_glassl")
     roofd = material("Toy_roofd")
     steel = material("Toy_steel")
+    sand = material("Toy_sand")
     ink = material("Toy_ink")
     gold_glow = material("Toy_gold_Glow")
     glass_glow = material("Toy_glass_Glow")
@@ -406,7 +416,7 @@ def build():
     taber = edge_wall(EDGE_TABER)
 
     # --- shell: red brick body, its cap IS the pale roof membrane -----------
-    prism("body", FOOTPRINT, 0.0, Z_DECK, brick, mat_caps=steel)
+    prism("body", FOOTPRINT, 0.0, Z_DECK, brick, mat_caps=sand)
 
     # --- parapet ring and coping, continuous on all four sides --------------
     # The coping is BRICK, not stone. Authored pale first, it swallowed the

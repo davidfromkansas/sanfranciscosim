@@ -1084,5 +1084,24 @@
     ],
     "tris": 3864,
     "loadRadius": 2500
+  },
+  {
+    "id": "524-second",
+    "file": "524-second.glb",
+    "anchor": [
+      -122.393433,
+      37.7825731
+    ],
+    "targetHeightM": 9.9,
+    "cat": 19,
+    "name": "524 Second Street",
+    "estimated": true,
+    "dims": [
+      35.9981,
+      35.7656,
+      9.9
+    ],
+    "tris": 5620,
+    "loadRadius": 2500
   }
 ]

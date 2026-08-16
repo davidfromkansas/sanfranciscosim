@@ -35,6 +35,7 @@
     "Toy_gold_Glow",
     "Toy_ink",
     "Toy_roofd",
+    "Toy_sand",
     "Toy_steel",
     "Toy_stone"
   ],
@@ -83,6 +84,13 @@
     },
     {
       "name": "Toy_roofd",
+      "image_texture_nodes": [],
+      "alpha": 1.0,
+      "roughness": 0.85,
+      "glow": false
+    },
+    {
+      "name": "Toy_sand",
       "image_texture_nodes": [],
       "alpha": 1.0,
       "roughness": 0.85,

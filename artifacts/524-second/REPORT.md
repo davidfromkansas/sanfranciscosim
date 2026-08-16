@@ -13,7 +13,7 @@ this file is what shipped, and every deviation is listed in §4.
 |---|---|
 | Manifest id | `524-second` |
 | File | `524-second.glb` |
-| File size | **160,572 B** raw, meshopt-compressed (was 344,840 B pre-optimize, −53.4%) |
+| File size | **160,740 B** raw, meshopt-compressed (was 345,036 B pre-optimize, −53.4%) |
 | Triangles | **5,620** (budget 11,000) |
 | Objects / draw submeshes | 10 objects, 11 primitives after stage 4 (was 105 / 106); the loader merges these to 2 draw calls |
 | Dimensions (axis-aligned) | 35.998 x 35.766 x 9.900 m |
@@ -23,7 +23,7 @@ this file is what shipped, and every deviation is listed in §4.
 | Anchor (WGS84) | `-122.3934330, 37.7825731` |
 | Second Street front heading | **45.6° true (NE)** |
 | Taber Place flank heading | 315.4° true (NW) |
-| Materials | 9, all `Toy_*`: brick, stone, glass, glassl, roofd, steel, ink, gold_Glow, glass_Glow |
+| Materials | 10, all `Toy_*`: brick, sand, stone, glass, glassl, roofd, steel, ink, gold_Glow, glass_Glow |
 | Glow surfaces | `Toy_gold_Glow` (entrance sign), `Toy_glass_Glow` (5 windows) |
 | Category | `19` (industrial) |
 
@@ -111,9 +111,17 @@ Everything below changed after the plan was written. Four came out of review ren
 6. **Five roof vents, not three.** The Vexcel aerial shows a straight diagonal run of
    small fixtures crossing the deck; two more on that line keep the rear half of a 620 m2
    roof from reading dead without inventing anything the imagery does not show.
-7. **The roof membrane is `Toy_steel`, not `Toy_roofd`.** The aerial shows a pale sheet,
-   and `358-brannan`'s build log records that a dark deck made that building read as a
-   black slot from the app's downward camera.
+7. **The roof membrane is `Toy_sand` (`#ece4d4`), after two earlier attempts.** The plan
+   said `Toy_roofd`; that was rejected at authoring time on `358-brannan`'s recorded
+   lesson that a dark deck reads as a black slot from the app's downward camera, and
+   `Toy_steel` (`#9aa0a6`) shipped instead. **The stage-5 local QA overturned that too**:
+   in the live scene the lit deck measured (90, 98, 107) against (146, 133, 104) on the
+   baked neighbours — 27% darker and cooler, the darkest roof on the block, on the single
+   biggest surface the app's camera sees. The Vexcel aerial shows this roof as a
+   near-white membrane, so `Toy_sand` is both truer and the better top-down read, and it
+   lets the brick parapet ring carry the roof edge instead of fighting a mid-grey deck.
+   This is the only change made after integration began; the asset was rebuilt,
+   re-optimized, re-validated and re-shot end to end.
 8. **The entrance bay is 2.40 m wide, not 3.10 m,** and projects 0.45 m. It straddles the
    centre pier and overlaps the neighbouring window frames by ~0.45 m each side — these
    are independent closed solids, not a boolean union, so the overlap is geometrically
@@ -187,7 +195,7 @@ stand-in beyond the radius is illegible.
 ## 8. Stage 4 — optimize
 
 Run 16 August 2026 per `docs/asset-pipeline/GLB-OPTIMIZE-PROMPT.md` v2; full detail in
-`optimize/REPORT.md`. Headline: 344,840 B → **160,572 B** raw (−53.4%), 106 → 11 draw
+`optimize/REPORT.md`. Headline: 345,036 B → **160,740 B** raw (−53.4%), 106 → 11 draw
 submeshes, triangles and bounding box unchanged, worst A/B pixel delta 0.034% against
 2–4% gates, all gates G1–G8 PASS. Phase B's limited-dissolve step was **deliberately
 skipped** — this asset has two stacked coplanar ring bands (parapet and coping) following
@@ -198,7 +206,49 @@ loop normals, confirming the skip was correct.
 The pre-optimize original is archived at `optimize/input/524-second.glb`. The numbers in
 §1 and §2 of this report are the **shipped** ones.
 
-## 9. Integration notes
+## 9. Stage 5 — local integration QA (batch mode)
+
+Case **B** (new landmark). Registry entry `524Second` in `pipeline/lib/landmarks.mjs`,
+manifest entry in `app/public/sf-assets/landmarks_manifest.json`, GLB at
+`app/public/sf-assets/landmarks/524-second.glb`.
+
+| Check | Result | Evidence |
+|---|---|---|
+| Stage-1 re-validation of the shipping GLB | **PASS** | `validation.json`, `overall: PASS`, fresh-scene re-import of the packed file |
+| Manifest entry valid + consistently formatted | **PASS** | 59 entries, JSON parses |
+| id mapping `524-second` -> `524Second` | **PASS** | `camelId()` round trip; the placed key in `SF.assets.placed` is `524Second`, matching `pipeline/lib/landmarks.mjs` |
+| Case B registry entry | **PASS** | `exclude: 11` m, sized from bake-input ring **vertices** |
+| Tile re-bake | **PASS** | full chain `terrain -> ... -> context -> muni-shapes`, exit 0 |
+| audit 1.6 (no procedural footprint in an exclusion zone) | **PASS** | 66 zones over 65 landmarks clear |
+| verify-rebake (only this landmark's cell moved) | **PASS** | 584/585 cells unchanged; `23_13` 217 -> 215; nearest surviving footprint **15.2 m vs the 11 m radius** |
+| Single building, no procedural twin, no z-fighting | **PASS** | `integration/524-second-day.png` |
+| Loader merge line | **PASS** | `sf-assets: 524-second merged 11 objects / 10 materials -> batched (3368 tris body); uniform x1.0000 at 3878, -1390` |
+| Scale factor | **PASS** | **x1.0000** — authored crest and `targetHeightM` agree exactly |
+| Orientation | **PASS** | the placement matrix is pure uniform scale + translation with no rotation terms, so the authored true-world heading (front 45.6 deg NE) is the scene heading |
+| Terrain seating | **PASS** | placed at y = 14.857 m; DataSF LiDAR ground for this footprint is 14.73 m NAVD88 |
+| Night glow | **PASS** | `integration/524-second-night.png` — only the five lit windows and the entrance sign light; the rest of the building stays dark against blazing neighbours |
+| Draw calls < 300 | **PASS** | `landmark-streaming-check`: 158/frame at hero, **92/frame** near this landmark |
+| Streaming lifecycle | **PASS** | all six `landmark-streaming-check` assertions PASS: unloaded at boot, loads on approach, releases on depart, re-approach with zero failures |
+| Fallback drill (mandatory) | **PASS** | GLB renamed away: app boots, city renders, exactly one `sf-assets: 524-second failed to load` warning, `failed: 1`, and the site is **empty ground inside the exclusion zone** — expected for Case B. `integration/524-second-fallback-day.png`. Restored afterwards |
+| `npm run lint` / `npm run build` | **PASS** | eslint clean; build ok |
+
+**Local-QA environment note.** The in-app Browser pane runs its tab with
+`document.hidden === true`, which stops rAF — the app rendered 22 frames in two minutes
+and every screenshot came back black. This is the documented behaviour in
+`.agents/skills/testing-sf-3d/SKILL.md` ("a hidden tab never reveals on its own... drive
+it with a real foregrounded Chrome"). The screenshots above were therefore taken with
+`integration/shoot.mjs`, a small CDP harness modelled on `pipeline/perf-harness.mjs`
+that launches headless Chrome with `--disable-backgrounding-occluded-windows
+--disable-renderer-backgrounding` and changes no app runtime code. Second gotcha, also
+already known: Vite answers a missing GLB with `index.html` at **200**, so the
+fallback-drill warning reads `Unexpected token '<'` rather than a 404.
+
+**Batch mode.** Per `ADDRESS-TO-ASSET.md`, the bake was run and QA'd, then discarded with
+`git checkout -- app/public/tiles api/_data`; only source is committed. Sanity check
+passes: `git diff --name-only origin/main` lists **0** files under `app/public/tiles/` or
+`api/_data/`.
+
+## 10. Integration notes
 
 - **New landmark (Case B).** Needs a `pipeline/lib/landmarks.mjs` entry and a tile
   re-bake, or the baked procedural building on this footprint will intersect the GLB.
