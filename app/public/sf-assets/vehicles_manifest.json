@@ -196,7 +196,33 @@
       ],
       "tris": 2378,
       "weight": 0,
-      "notes": "Live-data vehicle; spawned by muni.js from /api/muni (GTFS-Realtime), not by road traffic. weight 0 keeps it out of the road spawner, the ferry precedent."
+      "notes": "Live-data vehicle; spawned by muni.js from /api/muni (GTFS-Realtime), not by road traffic. weight 0 keeps it out of the road spawner, the ferry precedent. Also used as placeholder for trolley and LRV modes until dedicated GLBs are built."
+    },
+    {
+      "id": "muni-streetcar-pcc",
+      "file": "vehicles/muni-streetcar-pcc.glb",
+      "kind": "streetcar",
+      "dims": [
+        2.566,
+        4.904,
+        14.76
+      ],
+      "tris": 1923,
+      "weight": 0,
+      "notes": "Live-data vehicle; spawned by muni.js from /api/muni for F/E line streetcars. PCC historic streetcar, Toy_body material supports per-instance tinting for liveries."
+    },
+    {
+      "id": "cable-car-powell",
+      "file": "vehicles/cable-car-powell.glb",
+      "kind": "cable",
+      "dims": [
+        2.42,
+        3.18,
+        8.4
+      ],
+      "tris": 3776,
+      "weight": 0,
+      "notes": "Live-data vehicle; spawned by muni.js from /api/muni for PM/PH/CA cable car routes. Powell single-ended cable car."
     },
     {
       "id": "passenger-airplane",

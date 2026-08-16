@@ -400,11 +400,14 @@ export function createLiveMuni(scene, data) {
 
   const buses = new Map(); // id -> state
   let shapes = null; // ShapeSet | null (null => dead-reckon everything)
-  let bodyMesh = null;
-  let glowMesh = null;
+  // Fleet: one entry per mode that has a model. Each entry carries its own
+  // InstancedMesh pair and scale, so a bus/trolley/LRV/streetcar/cable car
+  // each render with their own geometry. Modes without a dedicated model fall
+  // back to the bus entry (the "placeholder" fleet).
+  const fleets = []; // { key, bodyMesh, glowMesh, scale, count }
+  let fleetByKey = {}; // mode -> fleet entry (resolved at load time)
   let badge = null;
   let atlas = null;
-  let scale = 1;
   let ready = false;
   let live = false;
   let degraded = false;
@@ -429,54 +432,94 @@ export function createLiveMuni(scene, data) {
       console.warn(`sf-muni: no route shapes (${error.message}) — buses will dead-reckon`);
     }
 
-    let entry = null;
+    // Manifest entries for every mode we want to render. The bus model is the
+    // minimum — without it, nothing renders. The others are best-effort: a
+    // missing streetcar or cable car GLB degrades that mode to the bus model
+    // (placeholder), not to nothing.
+    let manifest = null;
     try {
       const res = await fetch(MANIFEST);
-      if (res.ok) entry = ((await res.json()).vehicles || []).find((v) => v.id === 'muni-bus-40') || null;
+      if (res.ok) manifest = (await res.json()).vehicles || [];
     } catch {
-      entry = null;
+      manifest = null;
     }
-    if (!entry) {
-      console.warn('sf-muni: no muni-bus-40 manifest entry — live buses disabled');
+    if (!manifest) {
+      console.warn('sf-muni: no vehicle manifest — live buses disabled');
       return;
     }
 
-    let merged;
-    try {
-      const gltf = await createGLTFLoader().loadAsync(`${import.meta.env.BASE_URL}sf-assets/${entry.file}`);
-      merged = mergeBus(gltf.scene);
-    } catch (error) {
-      console.warn(`sf-muni: bus model failed to load (${error.message}) — live buses disabled`);
-      return;
+    // Mode -> manifest id. Trolley and LRV use the bus model as a placeholder
+    // until dedicated GLBs are built (owner decision).
+    const MODE_ENTRIES = [
+      { mode: 'bus', id: 'muni-bus-40' },
+      { mode: 'trolley', id: 'muni-bus-40' }, // placeholder: shares bus body
+      { mode: 'lrv', id: 'muni-bus-40' }, // placeholder: shares bus body
+      { mode: 'streetcar', id: 'muni-streetcar-pcc' },
+      { mode: 'cable', id: 'cable-car-powell' },
+    ];
+
+    const loader = createGLTFLoader();
+    const loadedByMode = {}; // mode -> { body, glow, scale } | null
+
+    for (const { mode, id } of MODE_ENTRIES) {
+      if (loadedByMode[mode]) continue; // already loaded (bus reused for trolley/lrv)
+      const entry = manifest.find((v) => v.id === id);
+      if (!entry) {
+        console.warn(`sf-muni: no ${id} manifest entry — ${mode} will use bus model`);
+        continue;
+      }
+      try {
+        const gltf = await loader.loadAsync(`${import.meta.env.BASE_URL}sf-assets/${entry.file}`);
+        const merged = mergeBus(gltf.scene);
+        if (!merged.body) {
+          console.warn(`sf-muni: ${id} had no geometry — ${mode} will use bus model`);
+          continue;
+        }
+        merged.body.computeBoundingBox();
+        const measured = merged.body.boundingBox.max.z - merged.body.boundingBox.min.z;
+        const target = entry.dims?.[2] ?? measured;
+        const scale = (measured > 0 ? target / measured : 1) * CAR_SCALE;
+        loadedByMode[mode] = { body: merged.body, glow: merged.glow, scale };
+      } catch (error) {
+        console.warn(`sf-muni: ${id} failed to load (${error.message}) — ${mode} will use bus model`);
+      }
     }
-    if (!merged.body) {
-      console.warn('sf-muni: bus model had no geometry — live buses disabled');
+
+    // The bus model is the floor — without it, nothing renders at all.
+    if (!loadedByMode.bus) {
+      console.warn('sf-muni: bus model unavailable — live buses disabled');
       return;
     }
 
-    merged.body.computeBoundingBox();
-    const measured = merged.body.boundingBox.max.z - merged.body.boundingBox.min.z;
-    const target = entry.dims?.[2] ?? measured;
-    scale = (measured > 0 ? target / measured : 1) * CAR_SCALE;
-
-    bodyMesh = new InstancedMesh(merged.body, new MeshLambertMaterial({ vertexColors: true }), CAPACITY);
-    bodyMesh.name = 'live-muni-fleet';
-    if (merged.glow) {
-      glowMesh = new InstancedMesh(merged.glow, new MeshBasicMaterial({ vertexColors: true, transparent: true }), CAPACITY);
-      glowMesh.name = 'live-muni-glow';
+    // Build one fleet entry per mode that successfully loaded. Modes that
+    // didn't get their own model fall back to the bus fleet entry.
+    for (const { mode } of MODE_ENTRIES) {
+      const loaded = loadedByMode[mode] || loadedByMode.bus;
+      const bodyMesh = new InstancedMesh(loaded.body, new MeshLambertMaterial({ vertexColors: true }), CAPACITY);
+      bodyMesh.name = `live-muni-${mode}`;
+      bodyMesh.instanceMatrix.setUsage(DynamicDrawUsage);
+      bodyMesh.frustumCulled = false;
+      bodyMesh.castShadow = false;
+      bodyMesh.count = 0;
+      let glowMesh = null;
+      if (loaded.glow) {
+        glowMesh = new InstancedMesh(loaded.glow, new MeshBasicMaterial({ vertexColors: true, transparent: true }), CAPACITY);
+        glowMesh.name = `live-muni-${mode}-glow`;
+        glowMesh.instanceMatrix.setUsage(DynamicDrawUsage);
+        glowMesh.frustumCulled = false;
+        glowMesh.castShadow = false;
+        glowMesh.count = 0;
+      }
+      const fleet = { key: mode, bodyMesh, glowMesh, scale: loaded.scale, count: 0 };
+      fleets.push(fleet);
+      fleetByKey[mode] = fleet;
+      scene.add(bodyMesh);
+      if (glowMesh) scene.add(glowMesh);
     }
+
     atlas = new BadgeAtlas();
     badge = buildBadgeMesh(atlas);
-    for (const mesh of [bodyMesh, glowMesh, badge.mesh]) {
-      if (!mesh) continue;
-      if (mesh !== badge.mesh) {
-        mesh.instanceMatrix.setUsage(DynamicDrawUsage);
-        mesh.frustumCulled = false;
-        mesh.castShadow = false;
-        mesh.count = 0;
-      }
-      scene.add(mesh);
-    }
+    scene.add(badge.mesh);
     ready = true;
   }
 
@@ -486,7 +529,9 @@ export function createLiveMuni(scene, data) {
     for (const state of buses.values()) state.seen = false;
 
     for (const bus of list) {
-      if (bus.mode !== 'bus') continue; // other modes wait for their models
+      // Resolve the fleet for this vehicle's mode. Unknown modes fall back to
+      // the bus fleet (the first entry), which is always present.
+      const fleet = fleetByKey[bus.mode] || fleets[0];
 
       // Stale payload (CDN cache hit): mark everyone seen so they aren't
       // dropped, and keep lastFixAt current so the stale-drop check in the
@@ -507,6 +552,8 @@ export function createLiveMuni(scene, data) {
           id: bus.id,
           fleetNumber: bus.fleetNumber,
           route: bus.route,
+          mode: bus.mode,
+          fleet,
           directionId: bus.directionId,
           tripId: bus.tripId,
           x,
@@ -553,6 +600,8 @@ export function createLiveMuni(scene, data) {
       state.fixX = x;
       state.fixZ = z;
       state.route = bus.route;
+      state.mode = bus.mode;
+      state.fleet = fleet;
       state.directionId = bus.directionId;
       state.occupancy = bus.occupancy;
       state.stops = bus.stops || [];
@@ -783,12 +832,14 @@ export function createLiveMuni(scene, data) {
     // The landmark glow formula (kit.js updateLandmarkGlow): near-invisible
     // by day, ignited at night — the first vehicle in the app to use it.
     const nightOpacity = Math.min(1, 0.12 + (shared.uNight.value ?? 0) * 0.95);
-    if (glowMesh) glowMesh.material.opacity = nightOpacity;
+    for (const f of fleets) {
+      if (f.glowMesh) f.glowMesh.material.opacity = nightOpacity;
+      f.count = 0;
+    }
 
     const camQ = camera.quaternion;
     const camX = camera.position.x;
     const camZ = camera.position.z;
-    let count = 0;
     let badgeCount = 0;
     let eligible = 0;
     // Camera height stands in for zoom: the rig is pitch-locked, so height and
@@ -849,15 +900,17 @@ export function createLiveMuni(scene, data) {
         }
       }
 
-      state.index = count;
+      const f = state.fleet || fleets[0];
+      if (f.count >= CAPACITY) { state.index = -1; continue; }
+      state.index = f.count;
       const y = data.sampleElevation ? data.sampleElevation(state.x, state.z) : 0;
 
       dummy.position.set(state.x, y + 0.35, state.z);
       dummy.rotation.set(0, state.yaw + Math.PI, 0); // model front is -Z; +Z is travel after the flip
-      dummy.scale.setScalar(scale);
+      dummy.scale.setScalar(f.scale);
       dummy.updateMatrix();
-      bodyMesh.setMatrixAt(count, dummy.matrix);
-      if (glowMesh) glowMesh.setMatrixAt(count, dummy.matrix);
+      f.bodyMesh.setMatrixAt(f.count, dummy.matrix);
+      if (f.glowMesh) f.glowMesh.setMatrixAt(f.count, dummy.matrix);
 
       // Badge: a speech bubble billboarded to the camera, only for buses close
       // enough to be worth calling out. Counted separately from the body so a
@@ -882,15 +935,16 @@ export function createLiveMuni(scene, data) {
         }
       }
 
-      count++;
-      if (count >= CAPACITY) break;
+      f.count++;
     }
 
-    bodyMesh.count = count;
-    bodyMesh.instanceMatrix.needsUpdate = true;
-    if (glowMesh) {
-      glowMesh.count = count;
-      glowMesh.instanceMatrix.needsUpdate = true;
+    for (const f of fleets) {
+      f.bodyMesh.count = f.count;
+      f.bodyMesh.instanceMatrix.needsUpdate = true;
+      if (f.glowMesh) {
+        f.glowMesh.count = f.count;
+        f.glowMesh.instanceMatrix.needsUpdate = true;
+      }
     }
     badge.mesh.count = badgeCount;
     badge.mesh.instanceMatrix.needsUpdate = true;
@@ -907,11 +961,13 @@ export function createLiveMuni(scene, data) {
   function entityFor(state) {
     const routeName = shapes?.routeName(state.route);
     const headsign = shapes?.headsign(state.tripId, state.route, state.directionId);
+    const modeLabel = state.mode === 'cable' ? 'Cable Car' : state.mode === 'streetcar' ? 'Streetcar' : state.mode === 'lrv' ? 'Muni Metro' : state.mode === 'trolley' ? 'Trolley' : 'Bus';
     return {
       kind: 'transit',
       id: state.id,
       title: routeName ? `${state.route} ${routeName}` : `Route ${state.route}`,
-      name: `Bus ${state.fleetNumber}`,
+      name: `${modeLabel} ${state.fleetNumber}`,
+      mode: state.mode || 'bus',
       x: state.x,
       z: state.z,
       route: state.route,
@@ -974,7 +1030,7 @@ export function createLiveMuni(scene, data) {
       return demo;
     },
     get count() {
-      return bodyMesh ? bodyMesh.count : 0;
+      return fleets.reduce((sum, f) => sum + f.count, 0);
     },
     get onShapeCount() {
       let n = 0;
@@ -985,6 +1041,7 @@ export function createLiveMuni(scene, data) {
     get buses() {
       return [...buses.values()].map((state) => ({
         id: state.id,
+        mode: state.mode || 'bus',
         route: state.route,
         x: Math.round(state.x),
         z: Math.round(state.z),
