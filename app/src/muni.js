@@ -568,6 +568,12 @@ export function createLiveMuni(scene, data) {
           placeOnShape(state, true);
         } else {
           state.targetS = hit.s;
+          // Dead-reckon may have driven the bus past where the fresh fix
+          // says it is. Snap s back to the real position so the bus doesn't
+          // sit frozen waiting for targetS to catch up past s. The overshoot
+          // is at most a few seconds of extrapolation — a sub-bus-length
+          // correction that's invisible at diorama scale.
+          if (state.s > state.targetS) state.s = state.targetS;
         }
       }
 
@@ -584,10 +590,12 @@ export function createLiveMuni(scene, data) {
       const reported = Number.isFinite(bus.speedMs) ? bus.speedMs : null;
       const fixStep = Math.hypot(x - prevFixX, z - prevFixZ);
       if (state.shapeIdx >= 0) {
+        // DWELL IS A DISPLACEMENT TEST: did the bus actually move between
+        // fixes? gapS (targetS - s) can't answer this — dead-reckon may have
+        // already driven the bus past the new target, making gapS negative
+        // even though the bus moved 900 m. fixStep is the honest metric.
         const gapS = Math.max(0, state.targetS - state.s);
-        // One bus length of slack: less than that across a whole fix gap is
-        // genuinely standing still, and the dwell easing takes it to a stop.
-        state.targetSpeed = gapS < DWELL_STEP_M ? 0 : Math.min(MAX_SPEED, Math.max(gapS / gap, (reported ?? 0) * 0.6));
+        state.targetSpeed = fixStep < DWELL_STEP_M ? 0 : Math.min(MAX_SPEED, Math.max(gapS / gap, fixStep / gap, (reported ?? 0) * 0.6));
       } else {
         state.targetSpeed = fixStep < DWELL_STEP_M ? 0 : Math.min(MAX_SPEED, fixStep / gap);
         state.deadYaw = fixStep > 4 ? Math.atan2(x - prevFixX, z - prevFixZ) : state.deadYaw;
