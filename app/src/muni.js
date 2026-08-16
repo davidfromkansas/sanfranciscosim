@@ -210,9 +210,11 @@ const ROUTE_GLOW_COLORS = {
   streetcar: [1.0, 0.1, 0.6], // neon pink
   cable: [1.0, 0.95, 0.1], // neon yellow
 };
-// Daytime minimum opacity; at night the full glow formula applies.
-// Both halved from original values (0.15 -> 0.075 day, night formula * 0.5).
-const ROUTE_GLOW_DAY_OPACITY = 0.01875;
+// Opacity floor an active route's wall never drops below. Additive light has
+// to fight a bright sky and sunlit ground, so daylight needs about as much
+// alpha as night to read at all — anything under ~0.05 disappears completely,
+// which is why the wall looked like a night-only feature.
+const ROUTE_GLOW_DAY_OPACITY = 0.1;
 
 // Module-scope scratch: the update loop and the picker must not allocate.
 const dummy = new Object3D();
@@ -1186,8 +1188,8 @@ export function createLiveMuni(scene, data) {
     }
 
     // Route glow walls: rebuild when the active route set changes, and
-    // modulate opacity by day/night. Always visible — a subtle curtain by
-    // day, a vivid beam at night.
+    // modulate opacity by day/night. An active route is always drawn — a
+    // curtain against the daylight, a vivid beam once the city goes dark.
     if (routeGlowDirty) {
       rebuildRouteGlow();
       routeGlowDirty = false;
