@@ -112,6 +112,46 @@ const BADGE_SCALE_MAX = 26;
 // center. Matches the InstancedMesh cap (CAPACITY).
 const MAX_BADGES = 512;
 
+// ------------------------------------------------------------------ subway
+
+// Muni Metro spends most of each route in tunnel, and a GTFS shape is one
+// polyline from terminal to terminal with nothing marking what is underground.
+// Drawn on the surface like a bus, an LRV therefore climbs over Buena Vista
+// Heights and through the houses on it instead of running under them — 38% of
+// the N is tunnel, 64% of the L.
+//
+// These are the portals where Metro reaches daylight; the stretch between a
+// pair is underground. Resolved against each shape's own polyline on first use
+// (rather than baked as arc lengths) so a re-bake or a reroute can't leave a
+// stale range behind: a portal that no longer sits on the shape is dropped and
+// that stretch simply draws, which is the old behaviour.
+const PORTAL = {
+  embarcadero: [-122.39664, 37.79293], // east end of the Market St subway
+  duboceChurch: [-122.42906, 37.7695], // N/J surface portal
+  duboceFillmore: [-122.4318, 37.7695], // Sunset Tunnel, east portal
+  carlCole: [-122.4497, 37.7661], // Sunset Tunnel, west portal
+  westPortal: [-122.4665, 37.7405], // Twin Peaks Tunnel, west portal
+  fourthBrannan: [-122.3965, 37.7773], // Central Subway, south portal
+  chinatown: [-122.4066, 37.7947], // Central Subway, north end
+};
+
+// Per route, the portal pairs that bound its tunnels. K/L/M run Market and
+// Twin Peaks back to back with no daylight at Castro, so that is one span.
+const TUNNELS = {
+  N: [['embarcadero', 'duboceChurch'], ['duboceFillmore', 'carlCole']],
+  J: [['embarcadero', 'duboceChurch']],
+  K: [['embarcadero', 'westPortal']],
+  L: [['embarcadero', 'westPortal']],
+  M: [['embarcadero', 'westPortal']],
+  T: [['fourthBrannan', 'chinatown']],
+};
+
+// A portal further than this from the shape isn't on this route's alignment.
+const PORTAL_MAX_OFF_M = 220;
+// Distance either side of a portal over which the train eases under the
+// street, so it descends into the tunnel instead of blinking out.
+const PORTAL_RAMP_M = 45;
+
 const PICK_RADIUS = 16;
 const MAX_PICK_DISTANCE = 9000;
 
@@ -421,8 +461,9 @@ export function createLiveMuni(scene, data) {
   // InstancedMesh pair and scale, so a bus/trolley/LRV/streetcar/cable car
   // each render with their own geometry. Modes without a dedicated model fall
   // back to the bus entry (the "placeholder" fleet).
-  const fleets = []; // { key, bodyMesh, glowMesh, scale, count }
+  const fleets = []; // { key, bodyMesh, glowMesh, scale, sinkM, count }
   let fleetByKey = {}; // mode -> fleet entry (resolved at load time)
+  const tunnelRanges = new Map(); // `${shapeIdx}|${route}` -> [[s0, s1], ...]
   let badge = null;
   let atlas = null;
   let ready = false;
@@ -445,6 +486,44 @@ export function createLiveMuni(scene, data) {
   const activeRouteShapes = new Map(); // shapeIdx -> mode
   let routeGlowMesh = null;
   let routeGlowDirty = false;
+
+  // ------------------------------------------------------------- subway
+
+  // Arc length of a portal along `shapeIdx`, or null when that portal is not on
+  // this shape (a route that never enters that tunnel, or a shape that no
+  // longer runs past it).
+  function portalS(shapeIdx, key) {
+    const [lon, lat] = PORTAL[key];
+    const [x, z] = data.project(lon, lat);
+    const hit = shapes.project(shapeIdx, x, z, null, Infinity);
+    return hit.dist <= PORTAL_MAX_OFF_M ? hit.s : null;
+  }
+
+  // The underground arc-length ranges of one shape, resolved once and memoised.
+  // A route with no tunnels resolves to an empty list and costs one lookup.
+  function undergroundFor(shapeIdx, route) {
+    const key = `${shapeIdx}|${route}`;
+    const cached = tunnelRanges.get(key);
+    if (cached) return cached;
+    const ranges = [];
+    for (const [a, b] of TUNNELS[String(route).toUpperCase()] || []) {
+      const sa = portalS(shapeIdx, a);
+      const sb = portalS(shapeIdx, b);
+      if (sa == null || sb == null) continue;
+      ranges.push([Math.min(sa, sb), Math.max(sa, sb)]);
+    }
+    tunnelRanges.set(key, ranges);
+    return ranges;
+  }
+
+  // 0 at street level, 1 once fully under, ramped either side of the portal.
+  function tunnelDepth(ranges, s) {
+    for (const [s0, s1] of ranges) {
+      if (s <= s0 || s >= s1) continue;
+      return Math.min(1, Math.min(s - s0, s1 - s) / PORTAL_RAMP_M);
+    }
+    return 0;
+  }
 
   async function load() {
     // The shapes bake is an enhancement, not a requirement: without it every
@@ -472,12 +551,12 @@ export function createLiveMuni(scene, data) {
       return;
     }
 
-    // Mode -> manifest id. Trolley and LRV use the bus model as a placeholder
-    // until dedicated GLBs are built (owner decision).
+    // Mode -> manifest id. Trolley still uses the bus model as a placeholder
+    // until a dedicated GLB is built (owner decision).
     const MODE_ENTRIES = [
       { mode: 'bus', id: 'muni-bus-40' },
       { mode: 'trolley', id: 'muni-bus-40' }, // placeholder: shares bus body
-      { mode: 'lrv', id: 'muni-bus-40' }, // placeholder: shares bus body
+      { mode: 'lrv', id: 'muni-lrv' },
       { mode: 'streetcar', id: 'muni-streetcar-pcc' },
       { mode: 'cable', id: 'cable-car-powell' },
     ];
@@ -503,7 +582,8 @@ export function createLiveMuni(scene, data) {
         const measured = merged.body.boundingBox.max.z - merged.body.boundingBox.min.z;
         const target = entry.dims?.[2] ?? measured;
         const scale = (measured > 0 ? target / measured : 1) * CAR_SCALE;
-        loadedByMode[mode] = { body: merged.body, glow: merged.glow, scale };
+        const height = merged.body.boundingBox.max.y - merged.body.boundingBox.min.y;
+        loadedByMode[mode] = { body: merged.body, glow: merged.glow, scale, height };
       } catch (error) {
         console.warn(`sf-muni: ${id} failed to load (${error.message}) — ${mode} will use bus model`);
       }
@@ -534,7 +614,10 @@ export function createLiveMuni(scene, data) {
         glowMesh.castShadow = false;
         glowMesh.count = 0;
       }
-      const fleet = { key: mode, bodyMesh, glowMesh, scale: loaded.scale, count: 0 };
+      // How far to drop a vehicle for it to be wholly under the street, plus a
+      // metre so a crowned road can't leave a roof showing.
+      const sinkM = (loaded.height || 4) * loaded.scale + 1;
+      const fleet = { key: mode, bodyMesh, glowMesh, scale: loaded.scale, sinkM, count: 0 };
       fleets.push(fleet);
       fleetByKey[mode] = fleet;
       scene.add(bodyMesh);
@@ -714,7 +797,10 @@ export function createLiveMuni(scene, data) {
       const next = new Map();
       for (const state of buses.values()) {
         if (state.shapeIdx >= 0 && state.seen) {
-          if (!next.has(state.shapeIdx)) next.set(state.shapeIdx, state.mode || 'bus');
+          // The route rides along so the wall builder can ask which stretches
+          // of this shape are tunnel; mode alone only picks the colour.
+          if (!next.has(state.shapeIdx))
+            next.set(state.shapeIdx, { mode: state.mode || 'bus', route: state.route });
         }
       }
       if (next.size !== activeRouteShapes.size || [...next.keys()].some((k) => !activeRouteShapes.has(k))) {
@@ -795,12 +881,20 @@ export function createLiveMuni(scene, data) {
     if (!shapes) return [];
     const elapsed = (now - demoStart) / 1000;
     const list = [];
+    // Each mode that owns a distinct GLB needs a run here, or the only way to
+    // see it is to wait for the live feed to put one in shot.
     const runs = [
-      { id: 'DEMO:8801', route: '38R', dir: 0, speed: 9, offset: 0 },
-      { id: 'DEMO:8802', route: '38R', dir: 0, speed: 9, offset: 900 },
-      { id: 'DEMO:8632', route: '29', dir: 1, speed: 7, offset: 300 },
-      { id: 'DEMO:8641', route: '29', dir: 1, speed: 0, offset: 2200 }, // dwells forever
-      { id: 'DEMO:8899', route: '44', dir: 0, speed: 8, offset: 1500 },
+      { id: 'DEMO:8801', route: '38R', dir: 0, speed: 9, offset: 0, mode: 'bus' },
+      { id: 'DEMO:8802', route: '38R', dir: 0, speed: 9, offset: 900, mode: 'bus' },
+      { id: 'DEMO:8632', route: '29', dir: 1, speed: 7, offset: 300, mode: 'bus' },
+      { id: 'DEMO:8641', route: '29', dir: 1, speed: 0, offset: 2200, mode: 'bus' }, // dwells forever
+      { id: 'DEMO:8899', route: '44', dir: 0, speed: 8, offset: 1500, mode: 'bus' },
+      // One N out on the surface in the Sunset, one starting inside the Sunset
+      // Tunnel (s 7375-8972 on the outbound shape) so every demo run exercises
+      // the underground path and the portal ramp.
+      { id: 'DEMO:2002', route: 'N', dir: 0, speed: 10, offset: 8600, mode: 'lrv' },
+      { id: 'DEMO:2014', route: 'N', dir: 0, speed: 10, offset: 10500, mode: 'lrv' },
+      { id: 'DEMO:1051', route: 'F', dir: 0, speed: 6, offset: 400, mode: 'streetcar' },
     ];
     for (const run of runs) {
       const idx = shapes.resolve(null, run.route, run.dir);
@@ -813,7 +907,7 @@ export function createLiveMuni(scene, data) {
       list.push({
         id: run.id,
         fleetNumber: run.id.slice(5),
-        mode: 'bus',
+        mode: run.mode,
         route: run.route,
         directionId: run.dir,
         tripId: `demo-${run.route}-${run.dir}`,
@@ -934,16 +1028,24 @@ export function createLiveMuni(scene, data) {
     const colors = [];
     const indices = [];
 
-    for (const [shapeIdx, mode] of activeRouteShapes) {
+    for (const [shapeIdx, { mode, route }] of activeRouteShapes) {
       const shape = meta.shapes[shapeIdx];
       if (!shape) continue;
       const color = ROUTE_GLOW_COLORS[mode] || ROUTE_GLOW_COLORS.bus;
       const base = shape.vertexOffset * 3;
       const count = shape.vertexCount;
+      // A wall marks where you can catch this route, so it ends at the portal
+      // for the same reason the train does: the tunnelled stretch isn't on the
+      // surface, and a beam over Buena Vista Heights says it is.
+      const tunnel = TUNNELS[String(route).toUpperCase()] ? undergroundFor(shapeIdx, route) : null;
 
       for (let i = 0; i < count - 1; i++) {
         const o = base + i * 3;
         const q = o + 3;
+        if (tunnel?.length) {
+          const mid = (F[o + 2] + F[q + 2]) / 2;
+          if (tunnel.some(([s0, s1]) => mid > s0 && mid < s1)) continue;
+        }
         const x0 = F[o], z0 = F[o + 1];
         const x1 = F[q], z1 = F[q + 1];
 
@@ -1072,10 +1174,22 @@ export function createLiveMuni(scene, data) {
 
       const f = state.fleet || fleets[0];
       if (f.count >= CAPACITY) { state.index = -1; continue; }
+
+      // In tunnel? Ease it under the street across the portal and stop drawing
+      // once it is wholly below. The road is opaque, so the descent reads as
+      // entering the tunnel rather than as a vehicle winking out — and while it
+      // is under, it costs nothing to draw.
+      let sink = 0;
+      if (shapes && state.shapeIdx >= 0 && TUNNELS[String(state.route).toUpperCase()]) {
+        const depth = tunnelDepth(undergroundFor(state.shapeIdx, state.route), state.s);
+        if (depth >= 1) { state.index = -1; continue; }
+        sink = depth * f.sinkM;
+      }
+
       state.index = f.count;
       const y = data.sampleElevation ? data.sampleElevation(state.x, state.z) : 0;
 
-      dummy.position.set(state.x, y + 0.35, state.z);
+      dummy.position.set(state.x, y + 0.35 - sink, state.z);
       dummy.rotation.set(0, state.yaw + Math.PI, 0); // model front is -Z; +Z is travel after the flip
       dummy.scale.setScalar(f.scale);
       dummy.updateMatrix();
@@ -1087,7 +1201,9 @@ export function createLiveMuni(scene, data) {
       // skipped bubble costs an instance rather than leaving a hole.
       const dist = Math.hypot(state.x - camX, state.z - camZ);
       const near = badgeRadius * 0.72; // fade over the outer quarter of the ring
-      if (dist < badgeRadius) {
+      // A bubble left hovering over the street while its train is on the way
+      // down reads as a label pinned to nothing, so it goes at the portal.
+      if (dist < badgeRadius && sink === 0) {
         eligible++;
         if (badgeCount < MAX_BADGES) {
           const fade = dist < near ? 1 : Math.max(0, 1 - (dist - near) / Math.max(1, badgeRadius - near));
@@ -1243,6 +1359,7 @@ export function createLiveMuni(scene, data) {
       const rows = all.slice(0, 20).map((s) => ({
         id: s.id,
         route: s.route,
+        mode: s.mode,
         speed: +s.speed.toFixed(1),
         targetSpeed: +s.targetSpeed.toFixed(1),
         s: Math.round(s.s),
@@ -1252,6 +1369,12 @@ export function createLiveMuni(scene, data) {
         fixAgeS: Math.round((now - s.lastFixAt) / 1000),
         onShape: s.shapeIdx >= 0,
         drawn: s.index >= 0,
+        // Distinguishes "in tunnel" from the other reasons a vehicle isn't
+        // drawn (stale fix, fleet at capacity).
+        inTunnel:
+          shapes && s.shapeIdx >= 0 && !!TUNNELS[String(s.route).toUpperCase()]
+            ? tunnelDepth(undergroundFor(s.shapeIdx, s.route), s.s) >= 1
+            : false,
         deadReckon: s.shapeIdx >= 0 && s.targetS - s.s < DWELL_STEP_M && s.targetSpeed > 0,
       }));
       console.log('=== SF.muni.debug ===');
