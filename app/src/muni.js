@@ -107,9 +107,10 @@ const BADGE_SCALE_MIN = 0.85;
 // there, drawn at half the size they needed, i.e. a few pixels.
 const BADGE_SCALE_MAX = 26;
 // Hard ceiling on how many shout at once, whatever the radius. Raised from 18
-// to 60 so the hero view on load shows tags across the whole city, not just a
-// cluster near the camera center. The InstancedMesh cap is 512, so 60 is safe.
-const MAX_BADGES = 60;
+// to 512 so the hero view on load shows tags across the whole city — every
+// vehicle within the zoom radius gets a badge, not just a cluster near the
+// center. Matches the InstancedMesh cap (CAPACITY).
+const MAX_BADGES = 512;
 
 const PICK_RADIUS = 16;
 const MAX_PICK_DISTANCE = 9000;
@@ -726,14 +727,53 @@ export function createLiveMuni(scene, data) {
 
   function placeOnShape(state, fresh) {
     state.shapeIdx = shapes ? shapes.resolve(state.tripId, state.route, state.directionId) : -1;
-    if (state.shapeIdx < 0) return;
-    const hit = shapes.project(state.shapeIdx, state.fixX, state.fixZ, fresh ? null : state.s);
-    if (hit.dist > SNAP_LIMIT_M) {
-      state.shapeIdx = -1; // genuinely off-route -> dead-reckon this bus
-      return;
+    if (state.shapeIdx >= 0) {
+      const hit = shapes.project(state.shapeIdx, state.fixX, state.fixZ, fresh ? null : state.s);
+      if (hit.dist <= SNAP_LIMIT_M) {
+        state.targetS = hit.s;
+        if (fresh || Math.abs(hit.s - state.s) > SNAP_WINDOW_M) state.s = hit.s;
+        return;
+      }
     }
-    state.targetS = hit.s;
-    if (fresh || Math.abs(hit.s - state.s) > SNAP_WINDOW_M) state.s = hit.s;
+    // The default shape was too far — try all shapes for this route. Routes
+    // often have variant shapes (e.g. route 14 has 4 shapes), and the direction
+    // default is just the most-used one, not necessarily the right one.
+    const routeShapeList = shapes?.meta.routeShapes?.[state.route];
+    if (routeShapeList) {
+      let bestIdx = -1, bestDist = SNAP_LIMIT_M, bestS = 0;
+      for (const idx of routeShapeList) {
+        if (idx === state.shapeIdx) continue;
+        const hit = shapes.project(idx, state.fixX, state.fixZ, null);
+        if (hit.dist < bestDist) { bestDist = hit.dist; bestIdx = idx; bestS = hit.s; }
+      }
+      if (bestIdx >= 0) {
+        state.shapeIdx = bestIdx;
+        state.targetS = bestS;
+        if (fresh || Math.abs(bestS - state.s) > SNAP_WINDOW_M) state.s = bestS;
+        return;
+      }
+    }
+    // Last resort: the GTFS shape for this trip may be wrong or highly
+    // simplified (some shapes have 3km straight-line jumps that miss where
+    // vehicles actually are). Try ALL shapes in the bake to find one the
+    // vehicle is physically on. This only runs on first appearance or trip
+    // change, not every frame, so the cost (298 shapes × ~113 vertices) is
+    // negligible.
+    if (shapes) {
+      let bestIdx = -1, bestDist = SNAP_LIMIT_M, bestS = 0;
+      for (let idx = 0; idx < shapes.meta.shapes.length; idx++) {
+        if (routeShapeList?.includes(idx) || idx === state.shapeIdx) continue;
+        const hit = shapes.project(idx, state.fixX, state.fixZ, null);
+        if (hit.dist < bestDist) { bestDist = hit.dist; bestIdx = idx; bestS = hit.s; }
+      }
+      if (bestIdx >= 0) {
+        state.shapeIdx = bestIdx;
+        state.targetS = bestS;
+        if (fresh || Math.abs(bestS - state.s) > SNAP_WINDOW_M) state.s = bestS;
+        return;
+      }
+    }
+    state.shapeIdx = -1; // genuinely off-route -> dead-reckon this bus
   }
 
   // ----------------------------------------------------------------- demo

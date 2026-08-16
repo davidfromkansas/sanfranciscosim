@@ -291,6 +291,23 @@ async function main() {
     }
     routesOut[routeId] = { name: r.name, directions };
   }
+  // Build route -> all shape indices map. The direction default is just the
+  // most-used shape, but a route can have many variant shapes. The client uses
+  // this to try all shapes for a route when the default is too far from the
+  // vehicle's GPS position — without it, vehicles on variant shapes can't snap.
+  const routeShapes = {};
+  for (const [routeId, r] of routes) {
+    const shapes = new Set();
+    for (const dir of [0, 1]) {
+      const e = byRouteDir.get(`${routeId}|${dir}`);
+      if (!e) continue;
+      for (const shapeId of e.shapes.keys()) {
+        const idx = shapeIndex.get(shapeId);
+        if (idx !== undefined) shapes.add(idx);
+      }
+    }
+    if (shapes.size > 0) routeShapes[routeId] = [...shapes];
+  }
   const tripShape = {};
   const tripHeadsign = {};
   for (const [tripId, t] of trips) {
@@ -383,6 +400,7 @@ async function main() {
     JSON.stringify({
       generated: new Date().toISOString(),
       routes: routesOut,
+      routeShapes,
       shapes: shapeMeta,
       tripShape,
       tripHeadsign,
