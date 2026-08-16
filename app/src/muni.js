@@ -93,7 +93,11 @@ const BADGE_RADIUS_MIN = 300;
 // bounds clutter, not the radius, so the radius may as well cover what is on
 // screen.
 const BADGE_RADIUS_MAX = 11000;
-const BADGE_RADIUS_PER_M = 2.2; // radius per metre of camera height
+// Mobile screens are narrower, so a user zooming in from the hero view passes
+// through more zoom levels before badges are close enough to read. Doubling the
+// radius-per-metre on small screens makes badges appear at twice the elevation
+// — the same ground distance, but visible sooner on a phone.
+const BADGE_RADIUS_PER_M = window.innerWidth < 900 ? 4.4 : 2.2;
 // Camera distance at which a bubble is drawn at its authored size; scale is
 // proportional to distance either side of it, so screen size stays put.
 const BADGE_REF_DIST = 420;
