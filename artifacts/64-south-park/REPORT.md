@@ -1,8 +1,9 @@
 # South Park (64 South Park) — build report
 
 **What was built:** a validated miniature GLB of South Park, San Francisco's oldest
-public park, at `artifacts/64-south-park/64-south-park.glb`. 11,500 triangles, 20 closed
-solids, 14 palette materials, `max_z` exactly 15.00 m, all contract checks PASS.
+public park, at `artifacts/64-south-park/64-south-park.glb`. 11,500 triangles, 283,916
+bytes meshopt-compressed, 13 palette materials, `max_z` exactly 15.00 m, all contract
+checks PASS on the shipped file.
 
 Plan: `docs/asset-plans/64-south-park.md`. As-built dossier: `REFERENCE.md`
 (authoritative where it disagrees with the plan). Machine-readable checks:
@@ -13,15 +14,16 @@ Plan: `docs/asset-plans/64-south-park.md`. As-built dossier: `REFERENCE.md`
 | | |
 |---|---|
 | Triangles | **11,500** / 12,000 cap |
-| GLB on disk | **609,080 bytes** (pre-optimize; the 500 KB budget is a stage-4 gate) |
+| GLB on disk | **283,916 bytes** shipped, meshopt-compressed (609,080 B pre-optimize, −53.4%) |
 | Oriented footprint | **159.463 × 23.507 m**, heading 45.4669° true |
 | Axis-aligned bbox | **122.46 × 121.05 × 15.00 m** |
 | Height datum | **15.00 m exactly** — tallest American elm crest, ESTIMATED |
 | Anchor | −122.3939704, 37.7815903 (ground plate centre measured at u +0.012, v −0.000) |
-| Objects / materials | 20 mesh objects, 14 materials, 2 `_Glow` |
-| Signed volumes | all 20 positive |
+| Objects / materials | 15 mesh objects shipped (20 as authored), 13 materials, 2 `_Glow` |
+| Signed volumes | all positive |
 
-Triangle split:
+Triangle split (as authored; the shipped file joins these per material except
+`ground_plate` and `tree_crowns`, see `optimize/REPORT.md`):
 
 | Object | Triangles |
 |---|---|
@@ -47,6 +49,17 @@ Triangle split:
 | `nest_swing` | 36 |
 | **total** | **11,500** |
 
+## Optimize pass (stage 4)
+
+Run with `docs/asset-pipeline/GLB-OPTIMIZE-PROMPT.md` defaults for a landmark
+(`ALLOW_MESHOPT: yes`, `ALLOW_BAKE: no`). **609,080 → 283,916 bytes (−53.4%)**, 20 → 15
+primitives, triangles unchanged at 11,500, materials identical, ray flip fraction 0.0,
+A/B pixel deltas ≤ 0.053% against gates of 2% / 4%. All of G1–G6 and G8 pass; the
+shipped file re-passes the full stage-2 contract validator above. Two per-asset
+adaptations — the limited dissolve is skipped (coplanar ring bands) and `ground_plate` /
+`tree_crowns` are held out of the per-material join so the shipped file stays checkable
+against the survey. Full metrics, census and gate evidence: `optimize/REPORT.md`.
+
 ## How to reproduce
 
 ```
@@ -56,6 +69,13 @@ blender -b --python render_64_south_park.py      # 7 day images
 blender -b --python render_64_south_park.py -- --night
 python3 make_contact_sheet.py
 blender -b --python validate_64_south_park.py    # -> validation.json, exit 1 on failure
+
+# stage 4, from optimize/:
+blender -b --python optimize.py -- input/64-south-park.glb mid.glb phaseb_stats.json
+npx gltfpack@0.24 -i mid.glb -o 64-south-park.optimized.glb -c -km -kn -noq
+blender -b --python validate.py -- input/64-south-park.glb 64-south-park.optimized.glb validation.json
+(cd g3check && npm install && node check.mjs ../64-south-park.optimized.glb)
+blender -b --python render_ab.py -- <glb> renders/<in|out>   ;  python3 diff_ab.py
 ```
 
 Deterministic: no random numbers anywhere, variation is the pipeline's `hash01` mixer
@@ -146,5 +166,14 @@ dimension checks while it was wrong. That is the point of reviewing the top view
 
 ## Approval
 
-Gate 3 pending. Presented: the contact sheet, the day and night aerials, the top view.
-The approval, when it comes, gets quoted verbatim here with its date.
+**Gate 3 PASS — 2026-08-16.** Standing approval given by David at the start of the
+session, verbatim:
+
+> "APPROVE EVERYTHING DONT ASK ME FOR PERMISSION"
+
+Presented under it: the contact sheet, the day and night aerials and the top view, with
+the numbers above. Recorded here rather than treated as silence, because the pipeline
+requires an explicit approval and this is one — given in advance, for the whole run,
+rather than per gate. It covers the asset gates only; it is **not** authority to push,
+open a PR or deploy, which `ADDRESS-TO-ASSET.md` reserves for a separate instruction
+(and which this session has not done).

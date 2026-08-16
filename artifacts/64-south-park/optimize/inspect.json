@@ -1,0 +1,376 @@
+{
+ "file_bytes": {
+  "raw": 609080,
+  "gzip9": 159782
+ },
+ "objects": 20,
+ "total_tris": 11500,
+ "total_verts": 21824,
+ "primitives_est": 20,
+ "top20": [
+  {
+   "name": "tree_crowns",
+   "tris": 2584,
+   "verts": 4760,
+   "dims": [
+    120.455,
+    121.047,
+    13.2
+   ],
+   "materials": [
+    "Toy_verdigris"
+   ]
+  },
+  {
+   "name": "seat_walls",
+   "tris": 1152,
+   "verts": 2304,
+   "dims": [
+    103.921,
+    97.397,
+    0.538
+   ],
+   "materials": [
+    "Toy_stone"
+   ]
+  },
+  {
+   "name": "shout_tubes",
+   "tris": 1152,
+   "verts": 2304,
+   "dims": [
+    12.835,
+    12.835,
+    2.79
+   ],
+   "materials": [
+    "Toy_roofd"
+   ]
+  },
+  {
+   "name": "tree_trunks",
+   "tris": 952,
+   "verts": 1632,
+   "dims": [
+    111.85,
+    112.443,
+    4.94
+   ],
+   "materials": [
+    "Toy_steel"
+   ]
+  },
+  {
+   "name": "path_tablets",
+   "tris": 864,
+   "verts": 1728,
+   "dims": [
+    116.294,
+    109.135,
+    0.03
+   ],
+   "materials": [
+    "Toy_cream"
+   ]
+  },
+  {
+   "name": "furniture_wood",
+   "tris": 728,
+   "verts": 1404,
+   "dims": [
+    104.195,
+    108.742,
+    0.56
+   ],
+   "materials": [
+    "Toy_rust"
+   ]
+  },
+  {
+   "name": "furniture_steel",
+   "tris": 644,
+   "verts": 1272,
+   "dims": [
+    113.977,
+    111.907,
+    1.03
+   ],
+   "materials": [
+    "Toy_steel"
+   ]
+  },
+  {
+   "name": "kerb",
+   "tris": 564,
+   "verts": 1128,
+   "dims": [
+    118.52,
+    117.139,
+    0.24
+   ],
+   "materials": [
+    "Toy_cream"
+   ]
+  },
+  {
+   "name": "ground_plate",
+   "tris": 560,
+   "verts": 1112,
+   "dims": [
+    117.107,
+    115.731,
+    0.34
+   ],
+   "materials": [
+    "Toy_stone"
+   ]
+  },
+  {
+   "name": "beds",
+   "tris": 500,
+   "verts": 828,
+   "dims": [
+    116.7,
+    115.415,
+    0.4
+   ],
+   "materials": [
+    "Toy_verdigris"
+   ]
+  },
+  {
+   "name": "path_field",
+   "tris": 492,
+   "verts": 984,
+   "dims": [
+    122.459,
+    114.358,
+    0.218
+   ],
+   "materials": [
+    "Toy_stone"
+   ]
+  },
+  {
+   "name": "lawns",
+   "tris": 404,
+   "verts": 700,
+   "dims": [
+    104.249,
+    97.386,
+    1.38
+   ],
+   "materials": [
+    "Toy_mint"
+   ]
+  },
+  {
+   "name": "path_glow",
+   "tris": 360,
+   "verts": 720,
+   "dims": [
+    118.604,
+    109.677,
+    0.028
+   ],
+   "materials": [
+    "Toy_cream_Glow"
+   ]
+  },
+  {
+   "name": "lamp_glow",
+   "tris": 112,
+   "verts": 192,
+   "dims": [
+    115.622,
+    93.066,
+    0.32
+   ],
+   "materials": [
+    "Toy_gold_Glow"
+   ]
+  },
+  {
+   "name": "lamp_heads",
+   "tris": 112,
+   "verts": 192,
+   "dims": [
+    115.542,
+    92.986,
+    0.4
+   ],
+   "materials": [
+    "Toy_gold"
+   ]
+  },
+  {
+   "name": "play_mound",
+   "tris": 104,
+   "verts": 180,
+   "dims": [
+    23.319,
+    23.169,
+    1.08
+   ],
+   "materials": [
+    "Toy_mint"
+   ]
+  },
+  {
+   "name": "lamp_poles",
+   "tris": 80,
+   "verts": 144,
+   "dims": [
+    114.992,
+    92.437,
+    5.24
+   ],
+   "materials": [
+    "Toy_steel"
+   ]
+  },
+  {
+   "name": "play_surfacing",
+   "tris": 52,
+   "verts": 84,
+   "dims": [
+    13.636,
+    13.661,
+    0.1
+   ],
+   "materials": [
+    "Toy_sand"
+   ]
+  },
+  {
+   "name": "shout_nets",
+   "tris": 48,
+   "verts": 96,
+   "dims": [
+    12.301,
+    12.301,
+    2.517
+   ],
+   "materials": [
+    "Toy_ink"
+   ]
+  },
+  {
+   "name": "nest_swing",
+   "tris": 36,
+   "verts": 60,
+   "dims": [
+    2.077,
+    2.071,
+    0.15
+   ],
+   "materials": [
+    "Toy_coral"
+   ]
+  }
+ ],
+ "vertex_attrs": [
+  "NORMAL"
+ ],
+ "materials": [
+  {
+   "name": "Toy_coral",
+   "glow": false,
+   "user_objects": 1
+  },
+  {
+   "name": "Toy_cream",
+   "glow": false,
+   "user_objects": 2
+  },
+  {
+   "name": "Toy_cream_Glow",
+   "glow": true,
+   "user_objects": 1
+  },
+  {
+   "name": "Toy_gold",
+   "glow": false,
+   "user_objects": 1
+  },
+  {
+   "name": "Toy_gold_Glow",
+   "glow": true,
+   "user_objects": 1
+  },
+  {
+   "name": "Toy_ink",
+   "glow": false,
+   "user_objects": 1
+  },
+  {
+   "name": "Toy_mint",
+   "glow": false,
+   "user_objects": 2
+  },
+  {
+   "name": "Toy_roofd",
+   "glow": false,
+   "user_objects": 1
+  },
+  {
+   "name": "Toy_rust",
+   "glow": false,
+   "user_objects": 1
+  },
+  {
+   "name": "Toy_sand",
+   "glow": false,
+   "user_objects": 1
+  },
+  {
+   "name": "Toy_steel",
+   "glow": false,
+   "user_objects": 3
+  },
+  {
+   "name": "Toy_stone",
+   "glow": false,
+   "user_objects": 3
+  },
+  {
+   "name": "Toy_verdigris",
+   "glow": false,
+   "user_objects": 2
+  }
+ ],
+ "textures": [],
+ "bbox": {
+  "dims": [
+   122.4585,
+   121.0471,
+   15.0
+  ],
+  "min": [
+   -61.7692,
+   -59.7834,
+   0.0
+  ],
+  "origin_offset_xy": [
+   -0.5399,
+   0.7402
+  ],
+  "base_z": 0.0
+ },
+ "duplicate_mesh_groups": [],
+ "dup_redundant_tris": 0,
+ "join_candidates": {
+  "Toy_cream": 2,
+  "Toy_mint": 2,
+  "Toy_steel": 3,
+  "Toy_stone": 3,
+  "Toy_verdigris": 2
+ },
+ "degenerate_tris": 0,
+ "coincident_vert_pairs": 15274,
+ "over_tess": {
+  "near_distance_m": 183.69,
+  "one_px_world_m": 0.1238,
+  "note": "cylinders whose chord error < one_px_world_m can halve segments"
+ }
+}

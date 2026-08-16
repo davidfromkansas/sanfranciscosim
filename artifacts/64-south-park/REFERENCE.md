@@ -29,9 +29,10 @@ two undulating steel tubes in section.
 | Area | 3,478.2 m² = 0.859 acre = 37,439 sq ft | shoelace over the OSM ring — measured. Rec & Park publish ~34,000 sq ft and Fletcher Studio 1.2 acres; see REPORT |
 | Height datum | **15.00 m exactly**, the tallest American elm crest — **ESTIMATED** | see "The height datum" below |
 | Triangles | **11,500** of a 12,000 cap | `validation.json` |
-| GLB (pre-optimize) | 609,080 bytes | `validation.json` |
-| Materials | 14, all `Toy_*`, all in the palette, two `_Glow` | `validation.json` |
-| Objects | 20 mesh objects, all closed solids, all signed volumes positive | `validation.json` |
+| GLB shipped | **283,916 bytes**, meshopt-compressed | `optimize/REPORT.md` |
+| GLB pre-optimize | 609,080 bytes, archived at `optimize/input/` | `optimize/REPORT.md` |
+| Materials | 13, all `Toy_*`, all in the palette, two `_Glow` (`Toy_teal` is declared in the build palette but unused) | `validation.json` |
+| Objects | 15 shipped (20 as authored, joined per material except `ground_plate` and `tree_crowns`), all signed volumes positive | `validation.json` |
 
 ## Measured input
 

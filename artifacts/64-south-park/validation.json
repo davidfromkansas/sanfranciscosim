@@ -3,11 +3,11 @@
   "validator": "5.2.0 LTS",
   "fresh_isolated_scene": true,
   "reimported_final_glb": true,
-  "object_count": 20,
-  "mesh_object_count": 20,
+  "object_count": 15,
+  "mesh_object_count": 15,
   "triangle_count": 11500,
   "triangle_budget": 12000,
-  "file_bytes": 609080,
+  "file_bytes": 283916,
   "dimensions_m": [
     122.4585,
     121.0471,
@@ -75,32 +75,27 @@
   "non_mesh_objects": [],
   "signed_volumes_m3": {
     "beds": 315.8785,
-    "furniture_steel": 4.508,
     "furniture_wood": 5.3141,
-    "ground_plate": 1179.0589,
-    "kerb": 57.3653,
+    "ground_plate": 1179.0587,
+    "grp_Toy_cream": 78.6759,
+    "grp_Toy_mint": 831.9373,
+    "grp_Toy_steel": 32.4519,
+    "grp_Toy_stone": 406.6653,
     "lamp_glow": 0.5836,
     "lamp_heads": 0.5919,
-    "lamp_poles": 0.8622,
-    "lawns": 637.113,
     "nest_swing": 0.486,
-    "path_field": 337.8382,
     "path_glow": 22.1363,
-    "path_tablets": 21.3107,
-    "play_mound": 194.8246,
     "play_surfacing": 14.0148,
-    "seat_walls": 68.8271,
     "shout_nets": 4.6182,
     "shout_tubes": 9.7532,
-    "tree_crowns": 8957.8804,
-    "tree_trunks": 27.0816
+    "tree_crowns": 8957.8804
   },
   "objects_with_non_positive_volume": [],
   "checks": [
     {
       "name": "binary GLB present",
       "pass": true,
-      "value": 609080
+      "value": 283916
     },
     {
       "name": "no non-mesh objects (cameras/lights/armatures)",

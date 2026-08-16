@@ -1,0 +1,83 @@
+{
+ "input_materials": [
+  "Toy_coral",
+  "Toy_cream",
+  "Toy_cream_Glow",
+  "Toy_gold",
+  "Toy_gold_Glow",
+  "Toy_ink",
+  "Toy_mint",
+  "Toy_roofd",
+  "Toy_rust",
+  "Toy_sand",
+  "Toy_steel",
+  "Toy_stone",
+  "Toy_verdigris"
+ ],
+ "steps": [
+  {
+   "step": "weld+degenerate",
+   "tris": 11500,
+   "verts": 6550
+  },
+  {
+   "step": "interior-faces",
+   "tris": 11500,
+   "verts": 6550
+  },
+  {
+   "step": "limited-dissolve-SKIPPED",
+   "tris": 11500,
+   "verts": 6550
+  },
+  {
+   "step": "join-per-material",
+   "tris": 11500,
+   "verts": 6550
+  }
+ ],
+ "input": {
+  "tris": 11500,
+  "verts": 21824,
+  "objects": 20
+ },
+ "interior_faces_removed": 0,
+ "limited_dissolve": "skipped: coplanar ring bands (kerb, plate, tablets, beds)",
+ "joins": {
+  "grp_Toy_steel": 3,
+  "grp_Toy_cream": 2,
+  "grp_Toy_mint": 2,
+  "grp_Toy_stone": 2
+ },
+ "inverted_solids": [],
+ "reimport": {
+  "objects": 15,
+  "materials": [
+   "Toy_coral",
+   "Toy_cream",
+   "Toy_cream_Glow",
+   "Toy_gold",
+   "Toy_gold_Glow",
+   "Toy_ink",
+   "Toy_mint",
+   "Toy_roofd",
+   "Toy_rust",
+   "Toy_sand",
+   "Toy_steel",
+   "Toy_stone",
+   "Toy_verdigris"
+  ],
+  "bbox_dims": [
+   122.4585,
+   121.0471,
+   15.0
+  ],
+  "bbox_min": [
+   -61.7692,
+   -59.7834,
+   0.0
+  ]
+ },
+ "bbox_ok": true,
+ "material_set_ok": true
+}
