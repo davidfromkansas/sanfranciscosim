@@ -103,6 +103,8 @@ route, and the park plans depend on it (§E8 of the parks README).
 | [400 Brannan Street](./400-brannan.md) | `400-brannan` | 8.8 m | new landmark |
 | [188 South Park (South Park Lofts)](./188-south-park.md) | `188-south-park` | 15.93 m (LiDAR-derived) | new landmark |
 
+| [501 Second Street](./501-second.md) | `501-second` | 37.7 m | new landmark |
+
 ## Shared contract (all 60)
 
 - Style: `docs/styles/miniature-toy.md` (authoritative for artistic decisions)
