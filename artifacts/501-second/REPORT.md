@@ -164,7 +164,55 @@ documented sliver trap — and the stage-2 contract validator was re-run against
 first asset in the set where that budget is a live constraint; any future detail increase
 must re-check it, and the lever is bay count.
 
-## 9. Integration notes
+## 9. Stage 5 — local integration QA (batch mode)
+
+Case **B** (new landmark). Registry entry `501Second` in `pipeline/lib/landmarks.mjs`,
+manifest entry in `app/public/sf-assets/landmarks_manifest.json`, GLB at
+`app/public/sf-assets/landmarks/501-second.glb`.
+
+| Check | Result | Evidence |
+|---|---|---|
+| Stage-1 re-validation of the shipping GLB | **PASS** | `validation.json`, `overall: PASS`, fresh-scene re-import of the packed file, 16,008 tris, 11 shells all positive volume, 0 invalid loop normals |
+| Manifest entry valid + consistently formatted | **PASS** | 59 entries, JSON parses |
+| id mapping `501-second` -> `501Second` | **PASS** | `camelId()` round trip; the placed key in `SF.assets.placed` is `501Second`, matching `pipeline/lib/landmarks.mjs` |
+| Case B registry entry | **PASS** | `exclude: 30` m, sized from bake-input ring **vertices** |
+| Tile re-bake | **PASS** | full chain `terrain -> ... -> context -> muni-shapes`, exit 0, zero errors in the log |
+| audit 1.6 (no procedural footprint in an exclusion zone) | **PASS** | 66 zones over 65 landmarks clear |
+| verify-rebake (only this landmark's cell moved) | **PASS** | 584/585 cells unchanged; `23_13` 217 -> 215; nearest surviving footprint **39.6 m vs the 30 m radius**, i.e. 9.6 m of margin |
+| Single building, no procedural twin, no z-fighting | **PASS** | `integration/501-second-day.png` |
+| Loader merge line | **PASS** | `sf-assets: 501-second merged 12 objects / 10 materials -> batched (11316 tris body); uniform x1.0000 at 3919, -1457` |
+| Scale factor | **PASS** | **x1.0000** — authored crest and `targetHeightM` agree exactly |
+| Orientation | **PASS** | the placement matrix is pure uniform scale + translation with no rotation terms, so the authored true-world heading (Second Street 225.4 deg SW, Bryant 315.4 deg NW) is the scene heading |
+| Footprint size against reality | **PASS** | fills its corner of the block between Second, Bryant and the Federal Street side, against the neighbours the bake kept |
+| Night glow | **PASS** | `integration/501-second-night.png` — a scatter of lit windows across floors on both street elevations plus the warm canopy sign; the rest of the building stays dark, noticeably calmer than the blazing baked neighbours |
+| Draw calls < 300 | **PASS** | `landmark-streaming-check`: 167/frame at hero, **92/frame** near this landmark |
+| Streaming lifecycle | **PASS** | all six `landmark-streaming-check` assertions PASS |
+| Fallback drill (mandatory) | **PASS** | GLB renamed away: app boots, city renders, exactly one `sf-assets: 501-second failed to load` warning, `failed: 1`, and the site is **empty ground inside the exclusion zone** — expected for Case B. `integration/501-second-fallback-day.png`. Restored afterwards |
+| `npm run lint` / `npm run build` | **PASS** | eslint clean; build ok |
+
+**The Case B hole is large here, and that is worth stating.** At `exclude: 30` the fallback
+drill leaves a 60 m-wide patch of bare ground — much more conspicuous than 524 Second's.
+That is the correct trade (the alternative is a procedural block intersecting a 37.7 m
+asset), and it is why the `loadRadius` decision matters: at the 2,500 m default the site is
+far below a pixel long before the GLB is released, so the absence is never legible in
+normal play. It is only visible if the asset itself fails to load, which is exactly what
+the drill simulates.
+
+**Local-QA environment note.** The in-app Browser pane runs its tab with
+`document.hidden === true`, which stops rAF, so screenshots of the city come back black.
+This is documented in `.agents/skills/testing-sf-3d/SKILL.md`. The screenshots above were
+taken with `integration/shoot.mjs`, a small CDP harness modelled on
+`pipeline/perf-harness.mjs` that launches headless Chrome with
+`--disable-backgrounding-occluded-windows --disable-renderer-backgrounding` and changes no
+app runtime code. Second known gotcha: Vite answers a missing GLB with `index.html` at
+**200**, so the fallback-drill warning reads `Unexpected token '<'` rather than a 404.
+
+**Batch mode.** Per `ADDRESS-TO-ASSET.md`, the bake was run and QA'd, then discarded with
+`git checkout -- app/public/tiles api/_data`; only source is committed. Sanity check
+passes: `git diff --name-only origin/main` lists **0** files under `app/public/tiles/` or
+`api/_data/`.
+
+## 10. Integration notes
 
 - **New landmark (Case B).** Needs a `pipeline/lib/landmarks.mjs` entry (`id: '501Second'`)
   and a tile re-bake.

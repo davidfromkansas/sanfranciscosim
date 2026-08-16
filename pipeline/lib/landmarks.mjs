@@ -1206,6 +1206,38 @@ export const LANDMARKS = [
     exclude: 28,
     camera: { distance: 320, yaw: 232, pitch: 24 },
   },
+  {
+    // 501 Second Street, the 1925 seven-storey cream office block on the Bryant
+    // corner. The largest bespoke footprint in the SoMa set: 72.79 x 42.24 m,
+    // 3,074 m2, a MEASURED 33.0 m parapet and a 37.7 m penthouse crest.
+    //
+    // Exclusion sized against the REAL bake input (pipeline/data/
+    // overture_buildings.geojsonseq), by nearest ring VERTEX, not centroid —
+    // excluded() in buildings.mjs fires on either:
+    //
+    //    7.09 m  this building's own footprint (h=33, 6 verts), via CENTROID.
+    //            Its own nearest vertex is 21.27 m out, so as at 524 Second the
+    //            centroid test is what does the work.
+    //   38.54 m  nearest neighbour vertex (h=15) — the first thing at risk
+    //   42.50 m and 48.91 m  the next two
+    //
+    // Safe window (7.1, 38.54) m, and no other footprint has a centroid inside
+    // 48 m. 30 sits in that window with 23 m of margin below and 8.5 m above —
+    // far more generous than 524 Second's (2.9, 14.78), because this building
+    // stands free on three streets instead of sharing two party walls. Note 30
+    // does NOT reach this footprint's own corners at 42.1 m; it does not need
+    // to, and reaching them would delete the neighbour at 38.54 m.
+    id: '501Second',
+    name: '501 Second Street',
+    lon: -122.3929683,
+    lat: 37.7831785,
+    height: 37.7,
+    exclude: 30,
+    // Camera offset is (sin yaw, ., cos yaw) with +z south, so yaw 270 stands
+    // the camera due WEST — the bisector of the Second Street elevation
+    // (225.4 deg) and the Bryant Street elevation (315.4 deg).
+    camera: { distance: 420, yaw: 270, pitch: 26 },
+  },
 ];
 
 // Parks/green spaces the landcover bake must match at least one source polygon
