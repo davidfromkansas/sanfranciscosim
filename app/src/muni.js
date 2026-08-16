@@ -67,6 +67,38 @@ const HEADING_EASE = 2.4; // rad/s toward the tangent
 // (or drops at STALE_MS). Same pattern as ferries' DEAD_RECKON_MAX_S.
 const DEAD_RECKON_MAX_S = 120;
 
+// ------------------------------------------------- in service, or parked?
+//
+// The feed reports every vehicle the agency has switched on, which at 7 a.m.
+// includes coaches idling in yards, trains on a terminal layover and runs that
+// have not started yet. Drawn like any other vehicle they read as a parked
+// fleet, which is the complaint these knobs answer: a vehicle only stays in the
+// scene while the data says it is working.
+//
+// A FIRST fix has no previous position to compare against, so its only movement
+// evidence is GTFS-RT's instantaneous `speed` — worthless on its own (see the
+// note in apply()): measured on the live feed, 65 of the 144 vehicles reporting
+// exactly 0 had moved more than 20 m 100 s later. So a vehicle whose own
+// predictions say it is working gets a modest provisional speed on its first
+// fix instead of standing still until the second one lands.
+const PROVISIONAL_SPEED = 5; // m/s, ~18 km/h: Muni's average scheduled speed
+const PROVISIONAL_LEAD_M = 150; // how far that guess may run before it waits
+// Displacement-free fix span after which a vehicle is standing, not rolling.
+// One poll gap plus slack, so a single missed fix can't trip it.
+const STILL_MS = 100 * 1000;
+// Standing this long with no movement at all -> yard, layover, or off shift.
+const PARK_HIDE_MS = 5 * 60 * 1000;
+// Standing, and the next predicted stop is this far out (or there is none while
+// the feed is predicting for others) -> the run hasn't started yet.
+const LAYOVER_LEAD_MS = 5 * 60 * 1000;
+// Seconds a vehicle takes to sink out of / rise back into the scene, so a
+// service change reads as arriving or leaving rather than as popping.
+const HIDE_FADE_S = 1.2;
+// Overshoot past a fresh fix that is held rather than reversed: dead reckoning
+// and the provisional guess both run ahead of the data, and yanking a bus
+// backwards is a visible teleport. Beyond this the guess was wrong -> snap.
+const OVERSHOOT_HOLD_M = 150;
+
 // Badges: cream route pills over each roof, one instanced quad layer fed by a
 // lazily-grown canvas atlas (a draw call per route would be ~40 calls).
 // Speech-bubble callouts, the idiom of the isometric city-builder the look is
@@ -485,6 +517,11 @@ export function createLiveMuni(scene, data) {
   let warnedFetch = false;
   let demoStart = 0;
   let arrivalsByStop = new Map();
+  // Is the feed predicting stop times at all this poll? On the shared ferry key
+  // it isn't (degraded mode), and then "no predictions" says nothing about a
+  // single vehicle — only when other vehicles do have them is an empty list
+  // evidence that this one isn't working yet.
+  let predictionsSeen = false;
   let lastFetchedAt = 0; // server-side fetchedAt of the last non-stale /api/muni payload
   // Adaptive badge radius, within whatever the zoom allows. A dense corridor
   // pulls it in, a quiet neighbourhood lets it back out. O(1) per frame, no
@@ -661,6 +698,38 @@ export function createLiveMuni(scene, data) {
 
   // ---------------------------------------------------------------- fixes
 
+  // Do the vehicle's own predictions say it is working right now? No
+  // predictions while the feed is publishing them for others means "not yet";
+  // no predictions anywhere (degraded mode) means unknown, so assume working.
+  function inService(stops, at) {
+    const eta = stops?.[0]?.arrivalAt ?? null;
+    if (eta == null) return !predictionsSeen;
+    return eta - at < LAYOVER_LEAD_MS;
+  }
+
+  // Speed to start a newly sighted vehicle at. See PROVISIONAL_SPEED.
+  function seedSpeed(bus, now) {
+    if (Number.isFinite(bus.speedMs) && bus.speedMs > 0) return Math.min(MAX_SPEED, bus.speedMs);
+    return inService(bus.stops, now) ? PROVISIONAL_SPEED : 0;
+  }
+
+  // Why this vehicle does not belong in the scene right now, or null. Measured
+  // in FIX time, not wall clock: a stale payload delivers no new fixes, and
+  // that must freeze this clock rather than quietly empty the city.
+  function dormantReason(state) {
+    const still = state.lastFreshFixAt - state.movedAt;
+    if (still > PARK_HIDE_MS) return 'parked';
+    if (still > STILL_MS && !inService(state.stops, state.lastFreshFixAt)) return 'layover';
+    return null;
+  }
+
+  // Everything that keeps a vehicle out of the scene. Demo runs are exempt:
+  // they exist to exercise the dwell and dead-reckon paths.
+  function hiddenReason(state) {
+    if (demo) return null;
+    return dormantReason(state) ?? (state.shapeIdx < 0 ? 'offRoute' : null);
+  }
+
   function apply(list, now, stale) {
     for (const state of buses.values()) state.seen = false;
 
@@ -697,8 +766,9 @@ export function createLiveMuni(scene, data) {
           yaw: 0,
           // Seeded from the fix, not zero: otherwise every bus stands still for
           // a full poll after it appears, and a page load shows a frozen fleet.
-          speed: Number.isFinite(bus.speedMs) ? Math.min(MAX_SPEED, bus.speedMs) : 0,
-          targetSpeed: Number.isFinite(bus.speedMs) ? Math.min(MAX_SPEED, bus.speedMs) : 0,
+          // A reported 0 is not evidence of standing still — seedSpeed().
+          speed: seedSpeed(bus, now),
+          targetSpeed: seedSpeed(bus, now),
           shapeIdx: -1,
           s: 0,
           targetS: 0,
@@ -712,9 +782,22 @@ export function createLiveMuni(scene, data) {
           misses: 0,
           seen: true,
           index: -1,
+          // Last fix at which this vehicle had actually moved: the clock every
+          // parked/layover decision is made against.
+          movedAt: now,
+          // Running on a guess until a second fix confirms it, so the guess is
+          // capped (provisionalCap) and cannot reverse the bus when it lands.
+          provisional: !(Number.isFinite(bus.speedMs) && bus.speedMs > 0),
+          provisionalCap: Infinity,
+          hide: 0,
+          hidden: null,
           sample: { x, z, yaw: 0, end: 0 },
         };
         placeOnShape(state, true);
+        state.provisionalCap = state.s + PROVISIONAL_LEAD_M;
+        // Off every one of its route's alignments: start it already sunk, so it
+        // never flashes on the street before being hidden.
+        state.hide = hiddenReason(state) === 'offRoute' ? 1 : 0;
         buses.set(bus.id, state);
         continue;
       }
@@ -758,12 +841,15 @@ export function createLiveMuni(scene, data) {
           placeOnShape(state, true);
         } else {
           state.targetS = hit.s;
-          // Dead-reckon may have driven the bus past where the fresh fix
-          // says it is. Snap s back to the real position so the bus doesn't
-          // sit frozen waiting for targetS to catch up past s. The overshoot
-          // is at most a few seconds of extrapolation — a sub-bus-length
-          // correction that's invisible at diorama scale.
-          if (state.s > state.targetS) state.s = state.targetS;
+          // Dead-reckon (or a provisional first-fix guess) may have driven the
+          // bus past where the fresh fix says it is. Hold it there and let the
+          // next fix pull it forward rather than reversing it — a bus sliding
+          // backwards up the street is the one artefact the eye always catches.
+          // Only a wrong guess, not a few seconds of drift, snaps back.
+          if (state.s > state.targetS) {
+            if (state.s - state.targetS <= OVERSHOOT_HOLD_M) state.targetS = state.s;
+            else state.s = state.targetS;
+          }
         }
       }
 
@@ -779,6 +865,10 @@ export function createLiveMuni(scene, data) {
       // how fast it runs once we know it has.
       const reported = Number.isFinite(bus.speedMs) ? bus.speedMs : null;
       const fixStep = Math.hypot(x - prevFixX, z - prevFixZ);
+      // Two fixes in hand: the guess is over, and this is the only place that
+      // can honestly say the vehicle moved.
+      state.provisional = false;
+      if (fixStep >= DWELL_STEP_M) state.movedAt = now;
       if (state.shapeIdx >= 0) {
         // DWELL IS A DISPLACEMENT TEST: did the bus actually move between
         // fixes? gapS (targetS - s) can't answer this — dead-reckon may have
@@ -807,7 +897,10 @@ export function createLiveMuni(scene, data) {
     if (!stale) {
       const next = new Map();
       for (const state of buses.values()) {
-        if (state.shapeIdx >= 0 && state.seen) {
+        // Only routes that are actually RUNNING light up. A single coach parked
+        // in a yard used to switch on its whole route's wall, which reads as
+        // "the 5 is running" at an hour when it isn't.
+        if (state.shapeIdx >= 0 && state.seen && !hiddenReason(state)) {
           // The route rides along so the wall builder can ask which stretches
           // of this shape are tunnel; mode alone only picks the colour.
           if (!next.has(state.shapeIdx))
@@ -850,27 +943,12 @@ export function createLiveMuni(scene, data) {
         return;
       }
     }
-    // Last resort: the GTFS shape for this trip may be wrong or highly
-    // simplified (some shapes have 3km straight-line jumps that miss where
-    // vehicles actually are). Try ALL shapes in the bake to find one the
-    // vehicle is physically on. This only runs on first appearance or trip
-    // change, not every frame, so the cost (298 shapes × ~113 vertices) is
-    // negligible.
-    if (shapes) {
-      let bestIdx = -1, bestDist = SNAP_LIMIT_M, bestS = 0;
-      for (let idx = 0; idx < shapes.meta.shapes.length; idx++) {
-        if (routeShapeList?.includes(idx) || idx === state.shapeIdx) continue;
-        const hit = shapes.project(idx, state.fixX, state.fixZ, null);
-        if (hit.dist < bestDist) { bestDist = hit.dist; bestIdx = idx; bestS = hit.s; }
-      }
-      if (bestIdx >= 0) {
-        state.shapeIdx = bestIdx;
-        state.targetS = bestS;
-        if (fresh || Math.abs(bestS - state.s) > SNAP_WINDOW_M) state.s = bestS;
-        return;
-      }
-    }
-    state.shapeIdx = -1; // genuinely off-route -> dead-reckon this bus
+    // Nowhere on its own route. This used to fall back to searching ALL 298
+    // baked shapes for one the vehicle happened to sit on, which is how a coach
+    // deadheading to a yard ended up driving down someone else's route: being
+    // near a line is not being on it. A vehicle we cannot place on its OWN
+    // alignment is left off the map instead of invented onto another one.
+    state.shapeIdx = -1;
   }
 
   // ----------------------------------------------------------------- demo
@@ -979,6 +1057,7 @@ export function createLiveMuni(scene, data) {
     }
     live = true;
     degraded = !!payload.degraded;
+    predictionsSeen = payload.vehicles.some((v) => v.stops?.length);
     // CDN cache hit? The server's fetchedAt is identical to the previous poll's
     // — every vehicle in this payload is the same fix. Skip position updates so
     // buses keep dead-reckoning along their shapes instead of freezing at the
@@ -1136,6 +1215,17 @@ export function createLiveMuni(scene, data) {
         continue;
       }
 
+      // In the scene only while the data says this vehicle is working: parked
+      // in a yard, waiting out a layover before its first trip, or off its own
+      // alignment -> it sinks under the street (the tunnel idiom) and rises
+      // again the moment it reports movement.
+      state.hidden = hiddenReason(state);
+      state.hide = Math.max(0, Math.min(1, state.hide + (state.hidden ? dt : -dt) / HIDE_FADE_S));
+      if (state.hide >= 1) {
+        state.index = -1;
+        continue;
+      }
+
       // Speed easing: decelerate hard into dwells, pull away gently, and only
       // ever overspeed a little to close a gap (the acceptance bar's "catches
       // up gently rather than lurching").
@@ -1156,7 +1246,10 @@ export function createLiveMuni(scene, data) {
         // seconds since the last fresh fix (ferries use the same pattern).
         if (lead < DWELL_STEP_M && state.targetSpeed > 0) {
           const sinceFresh = (now - state.lastFreshFixAt) / 1000;
-          if (sinceFresh < DEAD_RECKON_MAX_S) {
+          // A vehicle still running on its first-fix guess only rolls
+          // PROVISIONAL_LEAD_M before waiting for real data, so a genuinely
+          // parked one drifts half a block, not half a route.
+          if (sinceFresh < DEAD_RECKON_MAX_S && (!state.provisional || state.targetS < state.provisionalCap)) {
             state.targetS += state.targetSpeed * dt;
             lead = state.targetS - state.s;
           }
@@ -1190,11 +1283,11 @@ export function createLiveMuni(scene, data) {
       // once it is wholly below. The road is opaque, so the descent reads as
       // entering the tunnel rather than as a vehicle winking out — and while it
       // is under, it costs nothing to draw.
-      let sink = 0;
+      let sink = state.hide * f.sinkM;
       if (shapes && state.shapeIdx >= 0 && TUNNELS[String(state.route).toUpperCase()]) {
         const depth = tunnelDepth(undergroundFor(state.shapeIdx, state.route), state.s);
         if (depth >= 1) { state.index = -1; continue; }
-        sink = depth * f.sinkM;
+        sink = Math.max(sink, depth * f.sinkM);
       }
 
       state.index = f.count;
@@ -1364,6 +1457,13 @@ export function createLiveMuni(scene, data) {
         moving: all.filter((s) => s.speed > 0.5).length,
         targetMoving: all.filter((s) => s.targetSpeed > 0.5).length,
         frozen: all.filter((s) => s.index >= 0 && s.speed < 0.5 && s.targetSpeed < 0.5).length,
+        // Why the rest aren't drawn — the counts to read when the scene looks
+        // emptier or busier than the street does.
+        parked: all.filter((s) => s.hidden === 'parked').length,
+        layover: all.filter((s) => s.hidden === 'layover').length,
+        offRoute: all.filter((s) => s.hidden === 'offRoute').length,
+        provisional: all.filter((s) => s.provisional).length,
+        predictionsSeen,
         live,
         degraded,
         demo,
@@ -1382,6 +1482,9 @@ export function createLiveMuni(scene, data) {
         fixAgeS: Math.round((now - s.lastFixAt) / 1000),
         onShape: s.shapeIdx >= 0,
         drawn: s.index >= 0,
+        hidden: s.hidden ?? null,
+        stillS: Math.round((s.lastFreshFixAt - s.movedAt) / 1000),
+        provisional: !!s.provisional,
         // Distinguishes "in tunnel" from the other reasons a vehicle isn't
         // drawn (stale fix, fleet at capacity).
         inTunnel:
