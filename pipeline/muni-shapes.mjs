@@ -79,13 +79,15 @@ function isBusRoute(routeId) {
   return !RAIL_OR_CABLE.has(id);
 }
 
-function isMotorCoach(routeId) {
-  const id = String(routeId).toUpperCase();
-  if (RAIL_OR_CABLE.has(id)) return false;
-  if (TROLLEY_NUMBERS.has(id)) return false;
-  const rapid = id.match(/^([0-9]+)R$/);
-  if (rapid && TROLLEY_NUMBERS.has(rapid[1])) return false;
-  return true;
+// All Muni routes get shapes baked — motor coaches, trolley coaches, LRV,
+// streetcar, and cable car. The mode split is resolved at runtime from the
+// route_id (same table as api/_lib/feeds/muni.mjs); the bake just needs to
+// include every route's shape so the client can snap any vehicle to its
+// alignment. Previously only motor coaches were baked, leaving trolleys,
+// LRVs, streetcars, and cable cars to dead-reckon in straight lines through
+// buildings.
+function isMuniRoute(routeId) {
+  return Boolean(routeId);
 }
 
 // ------------------------------------------------------------------ download
@@ -172,14 +174,15 @@ async function main() {
   }
   extract();
 
-  // routes.txt: motor-coach route ids + display names.
+  // routes.txt: all Muni route ids + display names (motor coach, trolley,
+  // LRV, streetcar, cable car — every route in the SF agency feed).
   const routes = new Map(); // routeId -> { name }
   await eachRow('routes.txt', (cols, h) => {
     const id = cols[h.route_id];
-    if (!isMotorCoach(id)) return;
+    if (!isMuniRoute(id)) return;
     routes.set(id, { name: cols[h.route_long_name] || cols[h.route_short_name] || id });
   });
-  console.log(`[muni-shapes] motor-coach routes: ${routes.size}`);
+  console.log(`[muni-shapes] Muni routes: ${routes.size}`);
 
   // trips.txt: shape usage, headsigns.
   const shapeUse = new Map(); // shapeId -> count
@@ -198,7 +201,7 @@ async function main() {
     });
     shapeUse.set(shapeId, (shapeUse.get(shapeId) || 0) + 1);
   });
-  console.log(`[muni-shapes] motor-coach trips: ${trips.size}, shapes used: ${shapeUse.size}`);
+  console.log(`[muni-shapes] Muni trips: ${trips.size}, shapes used: ${shapeUse.size}`);
 
   // shapes.txt: project + simplify + arc length, only for used shapes.
   const rawShapes = new Map(); // shapeId -> [[x, z], ...] in sequence order
@@ -281,8 +284,9 @@ async function main() {
   );
 
   // Every BUS trip (motor coach + trolley coach), for the stop layer. The shape
-  // machinery above stays motor-coach-only: it drives vehicle movement, and only
-  // motor coaches are drawn today.
+  // machinery above now covers all Muni routes (motor coach, trolley, LRV,
+  // streetcar, cable car) for vehicle movement; the stop layer stays bus-only
+  // since rail and cable have platforms, not bus stops.
   const busTrips = new Map(); // tripId -> routeId
   const busRouteNames = new Map(); // routeId -> display name
   await eachRow('routes.txt', (cols, h) => {
