@@ -12,7 +12,8 @@ by `render_102_south_park.py` from the **exported GLB**, validated by
 | | |
 |---|---|
 | Triangles | **8,100** (budget 9,000; hard gate 30,000) |
-| Objects | 140 |
+| Objects (shipped, after the stage-4 join) | 11 — 140 before optimize |
+| File size (shipped) | **219,692 bytes** raw, meshopt-compressed — 489,472 before optimize, −55.1 % (gate ≤ 500 KB) |
 | Dimensions | 27.253 × 27.146 × **14.000** m |
 | min Z | 0.000 m |
 | XY centre offset | (0.214, −0.214) m |
@@ -110,7 +111,8 @@ Color, not from the imported `emissiveFactor`, per the note at the end of
 | `render_102_south_park.py` | review rig; always re-imports the exported GLB |
 | `validate_102_south_park.py` | fresh-scene contract validation → `validation.json` |
 | `make_contact_sheet.py` | composes the seven renders into the contact sheet |
-| `102-south-park.glb` | **the shipping asset** |
+| `102-south-park.glb` | **the shipping asset** — the stage-4 optimized, meshopt-packed file |
+| `optimize/` | stage-4 shrink pass: scripts, stats, A/B renders, `REPORT.md`, and the pre-optimize original archived at `optimize/input/` |
 | `102-south-park.blend` | authoring scene |
 | `102-south-park-{north,east,south,west,top}.png` | one rig, identical but for azimuth |
 | `102-south-park-aerial.png` | high three-quarter, 38° down, 105 mm lens, azimuth 105° |
@@ -139,7 +141,17 @@ Color, not from the imported `emissiveFactor`, per the note at the end of
 `estimated: true` because the cornice crest is a photogrammetric estimate, not a published
 figure. `loadRadius` takes the default `max(2500, 14.0 × 30) = 2500` m.
 
-## 7. Approval
+## 7. Stage 4 — optimize
+
+Run per `docs/asset-pipeline/GLB-OPTIMIZE-PROMPT.md`; full write-up in
+`optimize/REPORT.md`. **489,472 → 219,692 bytes (−55.1 %), 140 → 11 draw
+submeshes, 8,100 triangles unchanged, all eight gates PASS**, worst A/B pixel
+delta 0.0596 % against a 2 % gate. The limited-dissolve step was skipped because
+this asset carries three large coplanar ring bands (the 350-brannan sliver
+lesson). The optimized file is what ships; the pre-optimize original is archived
+at `optimize/input/102-south-park.glb`.
+
+## 8. Approval
 
 Stage 3 of `docs/asset-pipeline/ADDRESS-TO-ASSET.md`.
 
