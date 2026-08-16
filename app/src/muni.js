@@ -797,7 +797,10 @@ export function createLiveMuni(scene, data) {
       const next = new Map();
       for (const state of buses.values()) {
         if (state.shapeIdx >= 0 && state.seen) {
-          if (!next.has(state.shapeIdx)) next.set(state.shapeIdx, state.mode || 'bus');
+          // The route rides along so the wall builder can ask which stretches
+          // of this shape are tunnel; mode alone only picks the colour.
+          if (!next.has(state.shapeIdx))
+            next.set(state.shapeIdx, { mode: state.mode || 'bus', route: state.route });
         }
       }
       if (next.size !== activeRouteShapes.size || [...next.keys()].some((k) => !activeRouteShapes.has(k))) {
@@ -1025,16 +1028,24 @@ export function createLiveMuni(scene, data) {
     const colors = [];
     const indices = [];
 
-    for (const [shapeIdx, mode] of activeRouteShapes) {
+    for (const [shapeIdx, { mode, route }] of activeRouteShapes) {
       const shape = meta.shapes[shapeIdx];
       if (!shape) continue;
       const color = ROUTE_GLOW_COLORS[mode] || ROUTE_GLOW_COLORS.bus;
       const base = shape.vertexOffset * 3;
       const count = shape.vertexCount;
+      // A wall marks where you can catch this route, so it ends at the portal
+      // for the same reason the train does: the tunnelled stretch isn't on the
+      // surface, and a beam over Buena Vista Heights says it is.
+      const tunnel = TUNNELS[String(route).toUpperCase()] ? undergroundFor(shapeIdx, route) : null;
 
       for (let i = 0; i < count - 1; i++) {
         const o = base + i * 3;
         const q = o + 3;
+        if (tunnel?.length) {
+          const mid = (F[o + 2] + F[q + 2]) / 2;
+          if (tunnel.some(([s0, s1]) => mid > s0 && mid < s1)) continue;
+        }
         const x0 = F[o], z0 = F[o + 1];
         const x1 = F[q], z1 = F[q + 1];
 
