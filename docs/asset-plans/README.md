@@ -32,6 +32,13 @@ a designed hardscape with a fixed surveyed layout and no natural component, plan
 as a single landmark GLB on the same argument that made the Palace of Fine Arts
 grounds a landmark. See its §2.15 risk 5.
 
+[**64-south-park.md**](./64-south-park.md) is the second exception, and it does have a
+natural component. What carries it is that the 2017 Fletcher Studio park is a designed
+object at a surveyed layout, small enough (3,478 m²) and singular enough that scatter
+cannot produce it, and that seven of the buildings ringing the oval are already
+landmarks — leaving the middle procedural would put a lollipop-scattered green blob
+inside a hand-built block. See its §2.15 risk 6.
+
 [**flora-kit.md**](./flora-kit.md) is the one plan here that is not a landmark:
 an authored Blender kit of tree species and landscape props to replace the single
 procedural lollipop that all 289,741 of the city's baked trees currently share.
@@ -102,8 +109,9 @@ route, and the park plans depend on it (§E8 of the parks README).
 | [592 Third Street](./592-third.md) | `592-third` | 8.2 m (estimated) | new landmark |
 | [400 Brannan Street](./400-brannan.md) | `400-brannan` | 8.8 m | new landmark |
 | [188 South Park (South Park Lofts)](./188-south-park.md) | `188-south-park` | 15.93 m (LiDAR-derived) | new landmark |
+| [South Park (64 South Park)](./64-south-park.md) | `64-south-park` | 15.0 m (estimated — tallest elm crest) | new landmark |
 
-## Shared contract (all 60)
+## Shared contract (all 61)
 
 - Style: `docs/styles/miniature-toy.md` (authoritative for artistic decisions)
 - Technical contract: `.agents/skills/sf-asset-check/SKILL.md` (authoritative for the GLB)
