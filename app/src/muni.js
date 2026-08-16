@@ -92,12 +92,13 @@ const BADGE_RADIUS_MIN = 300;
 // 15 km, so a 2600 m cap left the whole skyline unlabelled — MAX_BADGES is what
 // bounds clutter, not the radius, so the radius may as well cover what is on
 // screen.
-const BADGE_RADIUS_MAX = 11000;
+const BADGE_RADIUS_MAX = window.innerWidth < 900 ? 33000 : 11000;
 // Mobile screens are narrower, so a user zooming in from the hero view passes
-// through more zoom levels before badges are close enough to read. Doubling the
-// radius-per-metre on small screens makes badges appear at twice the elevation
-// — the same ground distance, but visible sooner on a phone.
-const BADGE_RADIUS_PER_M = window.innerWidth < 900 ? 4.4 : 2.2;
+// through more zoom levels before badges are close enough to read. The radius-
+// per-metre is 3x wider on small screens (200% wider) and the max radius is
+// raised to match, so badges appear at 3x the elevation and cover 3x the ground
+// area — visible sooner on a phone while MAX_BADGES still bounds clutter.
+const BADGE_RADIUS_PER_M = window.innerWidth < 900 ? 6.6 : 2.2;
 // Camera distance at which a bubble is drawn at its authored size; scale is
 // proportional to distance either side of it, so screen size stays put.
 const BADGE_REF_DIST = 420;
