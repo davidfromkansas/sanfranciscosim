@@ -86,11 +86,23 @@ Append one entry to `app/public/sf-assets/landmarks_manifest.json`:
   "name": "<Name>",
   "estimated": false,
   "dims": [<measured x>, <measured y>, <measured z>],
-  "tris": <measured triangles>
+  "tris": <measured triangles>,
+  "loadRadius": <metres, see below — or omit>
 }
 ```
 
 Rules for the values:
+
+- `loadRadius` (PERF-PLAN #3) makes the asset **streamed**: the GLB is fetched
+  only when the camera comes within this many metres of the anchor and is
+  released again past 1.25×. Choose it so the swap happens while the asset is
+  still small on screen (a good default is `max(2500, targetHeightM * 30)`).
+  Omit it — or set `"alwaysLoaded": true` — only for skyline-scale pieces
+  (bridges, towers over ~150 m) that must never leave the frame. Every new
+  integration MUST make this decision explicitly and record it in the REPORT;
+  remember the far stand-in is the baked/code-built version, and for a bespoke
+  landmark whose baked buildings were carved out, beyond the radius the site
+  is empty — pick a radius at which that absence is illegible.
 
 - `anchor` and `targetHeightM` are the **real** WGS84 position and architectural
   height (AGENTS rule 5). Never nudge them to make the model sit better; if the model
@@ -127,12 +139,40 @@ building on that footprint, so the GLB will intersect it. You must also:
    gitignored, so a clean machine needs the download step first:
    ```
    cd pipeline && npm install
-   npm run download   # hundreds of MB; only if pipeline/data/ is absent
-   npm run buildings && npm run streets && npm run landcover && npm run validate && npm run toy
+   npm run download && npm run loredata   # ~700 MB; only if pipeline/data/ is absent
+   npm run terrain && npm run bridges && npm run buildings && npm run streets \
+     && npm run landcover && npm run validate && npm run lore && npm run toy \
+     && npm run notables && npm run context && npm run muni-shapes
+   # or just: npm run all (same order, includes the downloads)
    ```
-   Commit the regenerated files under `app/public/tiles/` that actually changed.
+   **`muni-shapes` belongs on that line too**, though without `MUNI_511_KEY` it
+   only prints "leaving the committed file as is" and exits. That used to be a
+   trap: the publish step wiped `app/public/tiles/` wholesale, so the committed
+   `muni-shapes.bin` was already gone by then and nothing restored it. `validate`
+   now clears only the tiers it owns. If the file does go missing, the symptom is
+   a `sf-muni: no route shapes (shapes bad magic)` console warning and buses that
+   dead-reckon; put it back with
+   `git checkout origin/main -- app/public/tiles/muni-shapes.bin`.
+   **Run the whole chain — stopping at `toy` is a trap.** `context.mjs` imports
+   `LANDMARKS`, so the context tier owns your landmark's pick box, its
+   `search-index` entry and its `context/landmarks.json` row; and the publish step
+   in `validate.mjs` drops `app/public/tiles/ctx/` and `context/`, so stopping
+   early silently deletes ~550 committed files and breaks search and the
+   concierge. `lore` must run before `context`, or `context` fails its own
+   "every building has a pick box and an identity" check against a stale join.
+   `context` also rewrites `api/_data/`.
+   Commit the regenerated files under `app/public/tiles/` and `api/_data/` that
+   actually changed — **unless this landmark is part of a batch**, in which case
+   run the bake for the Step 5/6 QA and then discard it
+   (`git checkout -- app/public/tiles api/_data`), committing source only. A
+   bake rewrites ~600 generated files regardless of which landmark triggered it,
+   so two landmark branches that each commit one cannot be merged. The batch is
+   baked once by `docs/asset-pipeline/BATCH-INTEGRATE.md`. If you do not know
+   whether other landmarks are in flight, assume they are.
 3. Confirm with `node pipeline/audit.mjs` that check 1.6 (no procedural footprint
-   inside a bespoke landmark exclusion zone) passes.
+   inside a bespoke landmark exclusion zone) passes, and with
+   `node pipeline/verify-rebake.mjs` that only your landmark's cell changed and
+   that nothing is left standing inside its exclusion radius.
 
 Never hand-edit anything under `app/public/tiles/` — it is generated.
 
@@ -154,8 +194,9 @@ Then, in the browser (real key presses, not synthetic events — see the testing
 - Check the footprint size against reality (compare with the neighbouring blocks and
   the plan's §2.1). The loader scales uniformly by height, so a height error shows up
   as a plan-size error — this matters most for wide, low assets.
-- Check orientation: the real front must face the real street. The loader never
-  rotates, so what you see is what was authored.
+- Check orientation: the real front must face the real street. Assets should still be
+  authored in true-world orientation; an explicit manifest `yawDeg` is a
+  data-visible placement override only when the authored heading is wrong.
 - Check it sits on the terrain: no floating, no sinking (hill sites especially).
 - Night: sweep the time slider past dusk and confirm only the intended `_Glow`
   surfaces light up.
@@ -232,7 +273,9 @@ acceptable; a hidden one is not.
   group.position.set(x, Math.max(0, data.sampleElevation(x, z)), z);
   ```
   Uniform scale from height, position from the real anchor and sampled terrain, and
-  **no rotation** — assets must be authored in true-world orientation.
+  optional `yawDeg` rotation about the model's vertical axis through its placement
+  origin. Assets must still be authored in true-world orientation; `yawDeg` is an
+  explicit, data-visible override for an asset whose authored heading is wrong.
 - `camelId('<slug>')` (`id.replace(/-([a-z])/g, ...)`) produces the pipeline's
   landmark id; `onPlaced` then lets `app/src/landmarks.js` hide the procedural twin.
   Bridges take the separate `placeBridge()` path with `ends`/`southEnd`.
@@ -266,7 +309,7 @@ inside the new asset.
 | Two buildings on the same spot | `camelId(id)` does not match the procedural/pipeline id, or Case B without a re-bake | fix the id, or add the registry entry and re-bake |
 | Baked blocks poking through the model | exclusion radius too small | raise `exclude`, re-bake, re-run `pipeline/audit.mjs` check 1.6 |
 | Model far too large or small | `targetHeightM` disagrees with the authored height | log line shows the scale factor; fix the manifest height, not the model |
-| Model faces the wrong way | authored to the `-Y` convention instead of true-world orientation | fix in authoring; the loader never rotates |
+| Model faces the wrong way | authored to the `-Y` convention instead of true-world orientation | fix in authoring, or use an explicit manifest `yawDeg` override for a known authored-heading error |
 | Model floats or sinks | terrain sampled at the anchor differs from the model's base | check `min Z` ~ 0 and the anchor; hill sites need a real base plinth |
 | Whole facade glows at night | `_Glow` on the wrong materials | fix material names in authoring |
 | More than 2 draw calls for the asset | more than one glow material set, or unmerged parts | check the merge line; usually an authoring issue |

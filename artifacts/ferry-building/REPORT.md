@@ -2,7 +2,9 @@
 
 ## Result
 
-**PASS** — `ferry-building.glb` meets the repository's landmark contract and was validated after a factory-reset, fresh-scene re-import in Blender 4.5.3 LTS. The asset is **not** integrated: `app/public/sf-assets/landmarks_manifest.json`, `pipeline/lib/landmarks.mjs` and all app code are untouched, and nothing was deployed.
+**PASS** — `ferry-building.glb` meets the repository's landmark contract and was validated after a factory-reset, fresh-scene re-import in Blender 4.5.3 LTS.
+
+The asset now carries a full **night state** (see "Night state" below): the lit arcade, clerestory, skylights, belvedere chambers, lantern beacon and cornice spill are authored as `_Glow` surfaces, which the loader merges into the landmark's second draw call and ignites from the shared day/night clock. The four clock dials were previously the only glowing surfaces.
 
 Every review render was produced from the exact exported GLB re-imported into an isolated scene. `validation.json` is the machine-readable authority for the numbers below.
 
@@ -14,9 +16,9 @@ Every review render was produced from the exact exported GLB re-imported into an
 - `render_ferry_building.py` — controlled render script (re-imports the final GLB)
 - `make_contact_sheet.py` — contact-sheet composer
 - `ferry-building.blend` — reproducible authoring scene (asset only)
-- `ferry-building.glb` — final binary deliverable (730 KB)
+- `ferry-building.glb` — final binary deliverable (880 KB)
 - `validation.json` — full object-level machine report
-- `ferry-building-{north,east,south,west,top,aerial}.png`, `ferry-building-contact-sheet.png`
+- `ferry-building-{north,east,south,west,top,aerial}.png`, `ferry-building-{night-west,night-aerial}.png`, `ferry-building-contact-sheet.png`
 
 Rebuild from this directory with:
 
@@ -42,19 +44,19 @@ Consequence: the axis-aligned bounds (167.5 × 197.8 m) are the rotated envelope
 
 | Rule | Result | Evidence |
 |---|---|---|
-| Binary GLB, no external dependencies | PASS | 730 KB self-contained `ferry-building.glb` |
+| Binary GLB, no external dependencies | PASS | 880 KB self-contained `ferry-building.glb` |
 | Real-world meters | PASS | 74.7 m tower height, 201 × 56 m authored footprint |
 | Origin / base at z≈0 | PASS | bbox min Z 0.0 m; XY center offset [0.0, 0.0] m |
 | Orientation | PASS | +Y true north; measured 143.6°/323.6° heading baked in (see above) |
-| Triangle budget | PASS | 12,392 / 24,000 triangles |
-| Applied transforms | PASS | all 323 imported mesh objects at loc 0, rot 0, scale 1 |
+| Triangle budget | PASS | 14,104 / 24,000 triangles |
+| Applied transforms | PASS | all 497 imported mesh objects at loc 0, rot 0, scale 1 |
 | Negative scales | PASS | none |
-| Normals outward | PASS | 0 invalid/non-unit loop normals; 16 flipped first-hits of 5,324 rays (0.3%, all coplanar decorative planes) within the validator's 0.5% tolerance |
-| Unexpected / leaked geometry | PASS | 323 mesh objects only; no plinth, context, studio floor, camera or light |
+| Normals outward | PASS | 0 invalid/non-unit loop normals; 16 flipped first-hits of 5,561 rays (0.3%, all coplanar decorative planes) within the validator's 0.5% tolerance |
+| Unexpected / leaked geometry | PASS | 497 mesh objects only; no plinth, context, studio floor, camera or light |
 | Image textures | PASS | 0 images, 0 texture nodes |
 | Transparency | PASS | all material alpha 1.0 |
-| Flat `Toy_*` materials, no `Toy_body` | PASS | `Toy_glass`, `Toy_gold`, `Toy_ink`, `Toy_roofd`, `Toy_sand`, `Toy_steel`, `Toy_trim`, `Toy_white_Glow` |
-| `_Glow` only where it glows at night | PASS | `Toy_white_Glow` used only for the four illuminated clock dials |
+| Flat `Toy_*` materials, no `Toy_body` | PASS | `Toy_cream_Glow`, `Toy_glass`, `Toy_gold`, `Toy_gold_Glow`, `Toy_ink`, `Toy_mustard_Glow`, `Toy_roofd`, `Toy_sand`, `Toy_steel`, `Toy_trim`, `Toy_white_Glow` |
+| `_Glow` only where it glows at night | PASS | the four glow materials are used only on light sources: dials, beacon, lit window planes, lit belvedere chambers and cornice spill bands (see "Night state") |
 | Cameras / lights | PASS | 0 / 0 |
 | Animations / armatures / constraints | PASS | 0 / 0 / 0 |
 | Degenerate geometry | PASS | 0 degenerate triangles |
@@ -62,12 +64,32 @@ Consequence: the axis-aligned bounds (167.5 × 197.8 m) are the rotated envelope
 
 ## Geometry and materials
 
-- Object count: **323 mesh objects**
-- Triangle count: **12,392**
+- Object count: **497 mesh objects**
+- Triangle count: **14,104** — 178 glow objects / 1,800 triangles of it
 - Dimensions: **[167.4984, 197.8239, 74.7] m** (rotated envelope; authored body 201.0 × 56.0 m)
 - Bounding box min / max: **[-83.7492, -98.912, 0.0]** / **[83.7492, 98.912, 74.7] m**
 - Minimum Z: **0.0 m** — XY center offset: **[0.0, 0.0] m**
-- Materials: `Toy_glass`, `Toy_gold`, `Toy_ink`, `Toy_roofd`, `Toy_sand`, `Toy_steel`, `Toy_trim`, `Toy_white_Glow`
+- Materials: `Toy_cream_Glow`, `Toy_glass`, `Toy_gold`, `Toy_gold_Glow`, `Toy_ink`, `Toy_mustard_Glow`, `Toy_roofd`, `Toy_sand`, `Toy_steel`, `Toy_trim`, `Toy_white_Glow`
+
+## Night state
+
+The app has no per-landmark night flag: `app/src/assets.js` buckets every material whose name ends in `_Glow` into a second merged mesh flagged `nightOnly`, and `updateLandmarkGlow` in `app/src/kit.js` ramps that mesh's opacity with the shared day/night clock (`0.12` by day → `~1.0` at night). Authoring the night state therefore means authoring geometry, not runtime code.
+
+Each lit window is a *separate, smaller* glow plane floating 0.06 m outside its dark opening (`lit_arch`), so the opening keeps a dark reveal by day and reads as a lit interior by night, and nothing z-fights.
+
+| Surface | Material | Reads as |
+|---|---|---|
+| Four clock dials | `Toy_white_Glow` | the illuminated dials (unchanged) |
+| Lantern drum inside the crown colonnade | `Toy_white_Glow` | the beacon — the brightest point on the building |
+| Ground arcade (48) and upper arcade (56) openings, three monumental central arches per side, end-elevation arches | `Toy_mustard_Glow` | warm marketplace light behind the arcade |
+| Clerestory windows (28) | `Toy_cream_Glow` | the cooler nave lighting |
+| Skylight bands (24) | `Toy_cream_Glow` | the nave glowing through the roof for the aerial camera |
+| Belvedere chambers, lower and upper | `Toy_mustard_Glow` | lit rooms seen between the crown piers |
+| Thin bands under the main cornice, central entablature and clock cornice | `Toy_gold_Glow` | floodlight spill that keeps the cornice lines after dark |
+
+Deliberately *not* lit: the facade walls, the roof slopes, the tower shaft, the gables and the plant clusters — the building should read as a dark cream mass wearing lit openings, not as a uniformly emissive block.
+
+`ferry-building-night-west.png` and `ferry-building-night-aerial.png` are the same cameras as the day renders with the glow set alight and the studio dimmed.
 
 ## Verified dimensions and discrepancies
 
@@ -99,7 +121,7 @@ The four elevations share orthographic projection, ortho scale, camera height, e
   "name": "Ferry Building",
   "estimated": false,
   "dims": [167.4984, 197.8239, 74.7],
-  "tris": 12392
+  "tris": 14104
 }
 ```
 

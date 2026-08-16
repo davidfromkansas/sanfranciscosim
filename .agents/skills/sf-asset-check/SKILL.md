@@ -61,7 +61,13 @@ result={"objects":len(objs),"tris":tris,"dims":[round(mx[i]-mn[i],2) for i in ra
 
 Anchor = real WGS84 lon/lat (verify against a map; mark `"estimated": true` if unsure). `cat` uses the project's category enum (16 = attraction/misc is the safe default).
 
-7. **Deliver:** PASS/FAIL/WARN table per rule, the thumbnail, the conformed GLB path, the manifest entry, and the drop instructions: copy into `~/sanfranciscosim/app/public/sf-assets/landmarks/`, append the manifest entry to `app/public/sf-assets/landmarks_manifest.json`, commit (author email must be the GitHub noreply address) and push — Vercel auto-deploys. Also copy the GLB to `~/sf-3d-assets/landmarks/` (the durable asset library).
+7. **Budget gates (PERF-PLAN #9 — hard limits, reject or decimate past them):** ≤ 30,000 triangles for a standard landmark, ≤ 60,000 for an `alwaysLoaded` skyline piece; ≤ 500 KB compressed on disk. The whole loaded set shares a ~400k-triangle batch, so one bloated asset spends everyone's budget.
+
+8. **Compress on ship (mandatory):** run `node pipeline/compress-assets.mjs` from the repo before committing — it meshopt-compresses in place with `-km -kn -noq` and refuses output whose material names changed. Never run gltfpack by hand with defaults: default quantization silently breaks the app's merge paths (every piece falls back to procedural and the city *looks* fine).
+
+9. **Streaming decision (mandatory):** add `loadRadius` (metres, default `max(2500, targetHeightM * 30)`) to the manifest entry, or `alwaysLoaded: true` only for skyline-scale pieces. Full field semantics: `docs/asset-plans/INTEGRATION-PROMPT.md`. Remember the far stand-in is the baked/code-built version — for a bespoke landmark whose baked buildings were carved out, beyond the radius the site is empty, so pick a radius at which that absence is illegible.
+
+10. **Deliver:** PASS/FAIL/WARN table per rule, the thumbnail, the conformed+compressed GLB path, the manifest entry (with the streaming field), and the drop instructions: copy into `~/sanfranciscosim/app/public/sf-assets/landmarks/`, append the manifest entry to `app/public/sf-assets/landmarks_manifest.json`, commit (author email must be the GitHub noreply address) and push — Vercel auto-deploys. Also copy the GLB to `~/sf-3d-assets/landmarks/` (the durable asset library). After a batch of integrations, run `node pipeline/landmark-streaming-check.mjs` against a build — it walks the load/fade/release lifecycle that the procedural fallback hides from visual QA.
 
 ## Context
 

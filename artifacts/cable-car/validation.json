@@ -1,0 +1,5057 @@
+{
+  "asset": "authored.glb",
+  "validator": "Blender 5.2.0 LTS",
+  "fresh_isolated_scene": true,
+  "reimported_final_glb": true,
+  "reporting_space": "glTF / three.js (Y up, front -Z); converted from Blender by (x, z, -y)",
+  "object_count": 227,
+  "mesh_object_count": 227,
+  "triangle_count": 3888,
+  "triangle_budget": 6000,
+  "dimensions_m": [
+    2.42,
+    3.18,
+    8.4
+  ],
+  "published_dimensions_m": [
+    2.4,
+    3.18,
+    8.4
+  ],
+  "bbox_min_m": [
+    -1.21,
+    0.0,
+    -4.2
+  ],
+  "bbox_max_m": [
+    1.21,
+    3.18,
+    4.2
+  ],
+  "min_y_m": 0.0,
+  "min_y_represents": "the wheel contact patch on the STREET surface. There are no rails in this scene (docs/asset-plans/transit/README.md), so there is no top-of-rail question: the car grounds exactly like a bus.",
+  "xz_center_offset_m": [
+    0.0,
+    0.0
+  ],
+  "front_face_direction": "-Z",
+  "front_face_evidence": {
+    "headlamp_glow_z_range_m": [
+      -4.2,
+      -4.135
+    ],
+    "cabin_glazing_z_range_m": [
+      -0.78,
+      3.57
+    ],
+    "test": "headlamp at the -Z extreme; cabin glazing entirely behind it"
+  },
+  "wheel_gauge_m": 1.067,
+  "wheel_gauge_expected_m": 1.067,
+  "materials": [
+    "Toy_cream",
+    "Toy_glass",
+    "Toy_gold",
+    "Toy_ink",
+    "Toy_maroon",
+    "Toy_mustard",
+    "Toy_mustard_Glow",
+    "Toy_oak",
+    "Toy_p_coral",
+    "Toy_p_cream",
+    "Toy_p_mustard",
+    "Toy_p_navy",
+    "Toy_p_tan",
+    "Toy_p_teal",
+    "Toy_roofd",
+    "Toy_sand",
+    "Toy_sky",
+    "Toy_steel",
+    "Toy_white",
+    "Toy_white_Glow"
+  ],
+  "material_details": [
+    {
+      "name": "Toy_cream",
+      "image_texture_nodes": [],
+      "alpha": 1.0,
+      "roughness": 0.85,
+      "emission_strength": 0.0,
+      "glow": false
+    },
+    {
+      "name": "Toy_glass",
+      "image_texture_nodes": [],
+      "alpha": 1.0,
+      "roughness": 0.85,
+      "emission_strength": 0.0,
+      "glow": false
+    },
+    {
+      "name": "Toy_gold",
+      "image_texture_nodes": [],
+      "alpha": 1.0,
+      "roughness": 0.85,
+      "emission_strength": 0.0,
+      "glow": false
+    },
+    {
+      "name": "Toy_ink",
+      "image_texture_nodes": [],
+      "alpha": 1.0,
+      "roughness": 0.85,
+      "emission_strength": 0.0,
+      "glow": false
+    },
+    {
+      "name": "Toy_maroon",
+      "image_texture_nodes": [],
+      "alpha": 1.0,
+      "roughness": 0.85,
+      "emission_strength": 0.0,
+      "glow": false
+    },
+    {
+      "name": "Toy_mustard",
+      "image_texture_nodes": [],
+      "alpha": 1.0,
+      "roughness": 0.85,
+      "emission_strength": 0.0,
+      "glow": false
+    },
+    {
+      "name": "Toy_mustard_Glow",
+      "image_texture_nodes": [],
+      "alpha": 1.0,
+      "roughness": 0.85,
+      "emission_strength": 0.0,
+      "glow": true
+    },
+    {
+      "name": "Toy_oak",
+      "image_texture_nodes": [],
+      "alpha": 1.0,
+      "roughness": 0.85,
+      "emission_strength": 0.0,
+      "glow": false
+    },
+    {
+      "name": "Toy_p_coral",
+      "image_texture_nodes": [],
+      "alpha": 1.0,
+      "roughness": 0.85,
+      "emission_strength": 0.0,
+      "glow": false
+    },
+    {
+      "name": "Toy_p_cream",
+      "image_texture_nodes": [],
+      "alpha": 1.0,
+      "roughness": 0.85,
+      "emission_strength": 0.0,
+      "glow": false
+    },
+    {
+      "name": "Toy_p_mustard",
+      "image_texture_nodes": [],
+      "alpha": 1.0,
+      "roughness": 0.85,
+      "emission_strength": 0.0,
+      "glow": false
+    },
+    {
+      "name": "Toy_p_navy",
+      "image_texture_nodes": [],
+      "alpha": 1.0,
+      "roughness": 0.85,
+      "emission_strength": 0.0,
+      "glow": false
+    },
+    {
+      "name": "Toy_p_tan",
+      "image_texture_nodes": [],
+      "alpha": 1.0,
+      "roughness": 0.85,
+      "emission_strength": 0.0,
+      "glow": false
+    },
+    {
+      "name": "Toy_p_teal",
+      "image_texture_nodes": [],
+      "alpha": 1.0,
+      "roughness": 0.85,
+      "emission_strength": 0.0,
+      "glow": false
+    },
+    {
+      "name": "Toy_roofd",
+      "image_texture_nodes": [],
+      "alpha": 1.0,
+      "roughness": 0.85,
+      "emission_strength": 0.0,
+      "glow": false
+    },
+    {
+      "name": "Toy_sand",
+      "image_texture_nodes": [],
+      "alpha": 1.0,
+      "roughness": 0.85,
+      "emission_strength": 0.0,
+      "glow": false
+    },
+    {
+      "name": "Toy_sky",
+      "image_texture_nodes": [],
+      "alpha": 1.0,
+      "roughness": 0.85,
+      "emission_strength": 0.0,
+      "glow": false
+    },
+    {
+      "name": "Toy_steel",
+      "image_texture_nodes": [],
+      "alpha": 1.0,
+      "roughness": 0.85,
+      "emission_strength": 0.0,
+      "glow": false
+    },
+    {
+      "name": "Toy_white",
+      "image_texture_nodes": [],
+      "alpha": 1.0,
+      "roughness": 0.85,
+      "emission_strength": 0.0,
+      "glow": false
+    },
+    {
+      "name": "Toy_white_Glow",
+      "image_texture_nodes": [],
+      "alpha": 1.0,
+      "roughness": 0.85,
+      "emission_strength": 0.0,
+      "glow": true
+    }
+  ],
+  "image_texture_count": 0,
+  "textured_materials": [],
+  "transparent_materials": [],
+  "camera_count": 0,
+  "light_count": 0,
+  "animation_fcurve_count": 0,
+  "armature_count": 0,
+  "constraint_count": 0,
+  "transforms_applied": true,
+  "negative_scales": false,
+  "degenerate_triangle_count": 0,
+  "invalid_or_nonunit_loop_normal_count": 0,
+  "open_shell_objects": [],
+  "inverted_or_zero_volume_objects": [],
+  "glow_materials": [
+    "Toy_mustard_Glow",
+    "Toy_white_Glow"
+  ],
+  "off_palette_warnings": {
+    "Toy_maroon": "the Powell livery; Toy_brick #c96f4a reads as terracotta",
+    "Toy_oak": "varnished wood - posts, benches, window frames, monitor wall"
+  },
+  "material_contract_violations": [],
+  "unexpected_geometry_or_objects": [],
+  "figure_object_count": 37,
+  "figure_triangle_count": 444,
+  "object_details": [
+    {
+      "name": "axle_f",
+      "triangles": 12,
+      "closed_solid": true,
+      "signed_volume_m3": 0.007682,
+      "location": [
+        0.0,
+        0.0,
+        0.0
+      ],
+      "rotation_euler": [
+        0.0,
+        0.0,
+        0.0
+      ],
+      "scale": [
+        1.0,
+        1.0,
+        1.0
+      ]
+    },
+    {
+      "name": "axle_r",
+      "triangles": 12,
+      "closed_solid": true,
+      "signed_volume_m3": 0.007682,
+      "location": [
+        0.0,
+        0.0,
+        0.0
+      ],
+      "rotation_euler": [
+        0.0,
+        0.0,
+        0.0
+      ],
+      "scale": [
+        1.0,
+        1.0,
+        1.0
+      ]
+    },
+    {
+      "name": "bench_back",
+      "triangles": 44,
+      "closed_solid": true,
+      "signed_volume_m3": 0.253788,
+      "location": [
+        0.0,
+        0.0,
+        0.0
+      ],
+      "rotation_euler": [
+        0.0,
+        0.0,
+        0.0
+      ],
+      "scale": [
+        1.0,
+        1.0,
+        1.0
+      ]
+    },
+    {
+      "name": "bench_pan_l",
+      "triangles": 44,
+      "closed_solid": true,
+      "signed_volume_m3": 0.160532,
+      "location": [
+        0.0,
+        0.0,
+        0.0
+      ],
+      "rotation_euler": [
+        0.0,
+        0.0,
+        0.0
+      ],
+      "scale": [
+        1.0,
+        1.0,
+        1.0
+      ]
+    },
+    {
+      "name": "bench_pan_r",
+      "triangles": 44,
+      "closed_solid": true,
+      "signed_volume_m3": 0.160532,
+      "location": [
+        0.0,
+        0.0,
+        0.0
+      ],
+      "rotation_euler": [
+        0.0,
+        0.0,
+        0.0
+      ],
+      "scale": [
+        1.0,
+        1.0,
+        1.0
+      ]
+    },
+    {
+      "name": "bracket_l_0_a",
+      "triangles": 12,
+      "closed_solid": true,
+      "signed_volume_m3": 0.00324,
+      "location": [
+        0.0,
+        0.0,
+        0.0
+      ],
+      "rotation_euler": [
+        0.0,
+        0.0,
+        0.0
+      ],
+      "scale": [
+        1.0,
+        1.0,
+        1.0
+      ]
+    },
+    {
+      "name": "bracket_l_0_b",
+      "triangles": 12,
+      "closed_solid": true,
+      "signed_volume_m3": 0.001404,
+      "location": [
+        0.0,
+        0.0,
+        0.0
+      ],
+      "rotation_euler": [
+        0.0,
+        0.0,
+        0.0
+      ],
+      "scale": [
+        1.0,
+        1.0,
+        1.0
+      ]
+    },
+    {
+      "name": "bracket_l_1_a",
+      "triangles": 12,
+      "closed_solid": true,
+      "signed_volume_m3": 0.00324,
+      "location": [
+        0.0,
+        0.0,
+        0.0
+      ],
+      "rotation_euler": [
+        0.0,
+        0.0,
+        0.0
+      ],
+      "scale": [
+        1.0,
+        1.0,
+        1.0
+      ]
+    },
+    {
+      "name": "bracket_l_1_b",
+      "triangles": 12,
+      "closed_solid": true,
+      "signed_volume_m3": 0.001404,
+      "location": [
+        0.0,
+        0.0,
+        0.0
+      ],
+      "rotation_euler": [
+        0.0,
+        0.0,
+        0.0
+      ],
+      "scale": [
+        1.0,
+        1.0,
+        1.0
+      ]
+    },
+    {
+      "name": "bracket_l_2_a",
+      "triangles": 12,
+      "closed_solid": true,
+      "signed_volume_m3": 0.00324,
+      "location": [
+        0.0,
+        0.0,
+        0.0
+      ],
+      "rotation_euler": [
+        0.0,
+        0.0,
+        0.0
+      ],
+      "scale": [
+        1.0,
+        1.0,
+        1.0
+      ]
+    },
+    {
+      "name": "bracket_l_2_b",
+      "triangles": 12,
+      "closed_solid": true,
+      "signed_volume_m3": 0.001404,
+      "location": [
+        0.0,
+        0.0,
+        0.0
+      ],
+      "rotation_euler": [
+        0.0,
+        0.0,
+        0.0
+      ],
+      "scale": [
+        1.0,
+        1.0,
+        1.0
+      ]
+    },
+    {
+      "name": "bracket_l_3_a",
+      "triangles": 12,
+      "closed_solid": true,
+      "signed_volume_m3": 0.00324,
+      "location": [
+        0.0,
+        0.0,
+        0.0
+      ],
+      "rotation_euler": [
+        0.0,
+        0.0,
+        0.0
+      ],
+      "scale": [
+        1.0,
+        1.0,
+        1.0
+      ]
+    },
+    {
+      "name": "bracket_l_3_b",
+      "triangles": 12,
+      "closed_solid": true,
+      "signed_volume_m3": 0.001405,
+      "location": [
+        0.0,
+        0.0,
+        0.0
+      ],
+      "rotation_euler": [
+        0.0,
+        0.0,
+        0.0
+      ],
+      "scale": [
+        1.0,
+        1.0,
+        1.0
+      ]
+    },
+    {
+      "name": "bracket_r_0_a",
+      "triangles": 12,
+      "closed_solid": true,
+      "signed_volume_m3": 0.00324,
+      "location": [
+        0.0,
+        0.0,
+        0.0
+      ],
+      "rotation_euler": [
+        0.0,
+        0.0,
+        0.0
+      ],
+      "scale": [
+        1.0,
+        1.0,
+        1.0
+      ]
+    },
+    {
+      "name": "bracket_r_0_b",
+      "triangles": 12,
+      "closed_solid": true,
+      "signed_volume_m3": 0.001404,
+      "location": [
+        0.0,
+        0.0,
+        0.0
+      ],
+      "rotation_euler": [
+        0.0,
+        0.0,
+        0.0
+      ],
+      "scale": [
+        1.0,
+        1.0,
+        1.0
+      ]
+    },
+    {
+      "name": "bracket_r_1_a",
+      "triangles": 12,
+      "closed_solid": true,
+      "signed_volume_m3": 0.00324,
+      "location": [
+        0.0,
+        0.0,
+        0.0
+      ],
+      "rotation_euler": [
+        0.0,
+        0.0,
+        0.0
+      ],
+      "scale": [
+        1.0,
+        1.0,
+        1.0
+      ]
+    },
+    {
+      "name": "bracket_r_1_b",
+      "triangles": 12,
+      "closed_solid": true,
+      "signed_volume_m3": 0.001404,
+      "location": [
+        0.0,
+        0.0,
+        0.0
+      ],
+      "rotation_euler": [
+        0.0,
+        0.0,
+        0.0
+      ],
+      "scale": [
+        1.0,
+        1.0,
+        1.0
+      ]
+    },
+    {
+      "name": "bracket_r_2_a",
+      "triangles": 12,
+      "closed_solid": true,
+      "signed_volume_m3": 0.00324,
+      "location": [
+        0.0,
+        0.0,
+        0.0
+      ],
+      "rotation_euler": [
+        0.0,
+        0.0,
+        0.0
+      ],
+      "scale": [
+        1.0,
+        1.0,
+        1.0
+      ]
+    },
+    {
+      "name": "bracket_r_2_b",
+      "triangles": 12,
+      "closed_solid": true,
+      "signed_volume_m3": 0.001404,
+      "location": [
+        0.0,
+        0.0,
+        0.0
+      ],
+      "rotation_euler": [
+        0.0,
+        0.0,
+        0.0
+      ],
+      "scale": [
+        1.0,
+        1.0,
+        1.0
+      ]
+    },
+    {
+      "name": "bracket_r_3_a",
+      "triangles": 12,
+      "closed_solid": true,
+      "signed_volume_m3": 0.00324,
+      "location": [
+        0.0,
+        0.0,
+        0.0
+      ],
+      "rotation_euler": [
+        0.0,
+        0.0,
+        0.0
+      ],
+      "scale": [
+        1.0,
+        1.0,
+        1.0
+      ]
+    },
+    {
+      "name": "bracket_r_3_b",
+      "triangles": 12,
+      "closed_solid": true,
+      "signed_volume_m3": 0.001404,
+      "location": [
+        0.0,
+        0.0,
+        0.0
+      ],
+      "rotation_euler": [
+        0.0,
+        0.0,
+        0.0
+      ],
+      "scale": [
+        1.0,
+        1.0,
+        1.0
+      ]
+    },
+    {
+      "name": "brake_lever",
+      "triangles": 12,
+      "closed_solid": true,
+      "signed_volume_m3": 0.003466,
+      "location": [
+        0.0,
+        0.0,
+        0.0
+      ],
+      "rotation_euler": [
+        0.0,
+        0.0,
+        0.0
+      ],
+      "scale": [
+        1.0,
+        1.0,
+        1.0
+      ]
+    },
+    {
+      "name": "bumper_f",
+      "triangles": 12,
+      "closed_solid": true,
+      "signed_volume_m3": 0.052976,
+      "location": [
+        0.0,
+        0.0,
+        0.0
+      ],
+      "rotation_euler": [
+        0.0,
+        0.0,
+        0.0
+      ],
+      "scale": [
+        1.0,
+        1.0,
+        1.0
+      ]
+    },
+    {
+      "name": "bumper_r",
+      "triangles": 12,
+      "closed_solid": true,
+      "signed_volume_m3": 0.052976,
+      "location": [
+        0.0,
+        0.0,
+        0.0
+      ],
+      "rotation_euler": [
+        0.0,
+        0.0,
+        0.0
+      ],
+      "scale": [
+        1.0,
+        1.0,
+        1.0
+      ]
+    },
+    {
+      "name": "cabbench_l",
+      "triangles": 12,
+      "closed_solid": true,
+      "signed_volume_m3": 0.16896,
+      "location": [
+        0.0,
+        0.0,
+        0.0
+      ],
+      "rotation_euler": [
+        0.0,
+        0.0,
+        0.0
+      ],
+      "scale": [
+        1.0,
+        1.0,
+        1.0
+      ]
+    },
+    {
+      "name": "cabbench_r",
+      "triangles": 12,
+      "closed_solid": true,
+      "signed_volume_m3": 0.16896,
+      "location": [
+        0.0,
+        0.0,
+        0.0
+      ],
+      "rotation_euler": [
+        0.0,
+        0.0,
+        0.0
+      ],
+      "scale": [
+        1.0,
+        1.0,
+        1.0
+      ]
+    },
+    {
+      "name": "ceiling",
+      "triangles": 12,
+      "closed_solid": true,
+      "signed_volume_m3": 1.372801,
+      "location": [
+        0.0,
+        0.0,
+        0.0
+      ],
+      "rotation_euler": [
+        0.0,
+        0.0,
+        0.0
+      ],
+      "scale": [
+        1.0,
+        1.0,
+        1.0
+      ]
+    },
+    {
+      "name": "ceiling_glow",
+      "triangles": 12,
+      "closed_solid": true,
+      "signed_volume_m3": 0.790401,
+      "location": [
+        0.0,
+        0.0,
+        0.0
+      ],
+      "rotation_euler": [
+        0.0,
+        0.0,
+        0.0
+      ],
+      "scale": [
+        1.0,
+        1.0,
+        1.0
+      ]
+    },
+    {
+      "name": "clerestory_l_0",
+      "triangles": 12,
+      "closed_solid": true,
+      "signed_volume_m3": 0.001069,
+      "location": [
+        0.0,
+        0.0,
+        0.0
+      ],
+      "rotation_euler": [
+        0.0,
+        0.0,
+        0.0
+      ],
+      "scale": [
+        1.0,
+        1.0,
+        1.0
+      ]
+    },
+    {
+      "name": "clerestory_l_1",
+      "triangles": 12,
+      "closed_solid": true,
+      "signed_volume_m3": 0.001069,
+      "location": [
+        0.0,
+        0.0,
+        0.0
+      ],
+      "rotation_euler": [
+        0.0,
+        0.0,
+        0.0
+      ],
+      "scale": [
+        1.0,
+        1.0,
+        1.0
+      ]
+    },
+    {
+      "name": "clerestory_l_2",
+      "triangles": 12,
+      "closed_solid": true,
+      "signed_volume_m3": 0.001069,
+      "location": [
+        0.0,
+        0.0,
+        0.0
+      ],
+      "rotation_euler": [
+        0.0,
+        0.0,
+        0.0
+      ],
+      "scale": [
+        1.0,
+        1.0,
+        1.0
+      ]
+    },
+    {
+      "name": "clerestory_l_3",
+      "triangles": 12,
+      "closed_solid": true,
+      "signed_volume_m3": 0.001069,
+      "location": [
+        0.0,
+        0.0,
+        0.0
+      ],
+      "rotation_euler": [
+        0.0,
+        0.0,
+        0.0
+      ],
+      "scale": [
+        1.0,
+        1.0,
+        1.0
+      ]
+    },
+    {
+      "name": "clerestory_l_4",
+      "triangles": 12,
+      "closed_solid": true,
+      "signed_volume_m3": 0.001069,
+      "location": [
+        0.0,
+        0.0,
+        0.0
+      ],
+      "rotation_euler": [
+        0.0,
+        0.0,
+        0.0
+      ],
+      "scale": [
+        1.0,
+        1.0,
+        1.0
+      ]
+    },
+    {
+      "name": "clerestory_r_0",
+      "triangles": 12,
+      "closed_solid": true,
+      "signed_volume_m3": 0.001069,
+      "location": [
+        0.0,
+        0.0,
+        0.0
+      ],
+      "rotation_euler": [
+        0.0,
+        0.0,
+        0.0
+      ],
+      "scale": [
+        1.0,
+        1.0,
+        1.0
+      ]
+    },
+    {
+      "name": "clerestory_r_1",
+      "triangles": 12,
+      "closed_solid": true,
+      "signed_volume_m3": 0.001069,
+      "location": [
+        0.0,
+        0.0,
+        0.0
+      ],
+      "rotation_euler": [
+        0.0,
+        0.0,
+        0.0
+      ],
+      "scale": [
+        1.0,
+        1.0,
+        1.0
+      ]
+    },
+    {
+      "name": "clerestory_r_2",
+      "triangles": 12,
+      "closed_solid": true,
+      "signed_volume_m3": 0.001069,
+      "location": [
+        0.0,
+        0.0,
+        0.0
+      ],
+      "rotation_euler": [
+        0.0,
+        0.0,
+        0.0
+      ],
+      "scale": [
+        1.0,
+        1.0,
+        1.0
+      ]
+    },
+    {
+      "name": "clerestory_r_3",
+      "triangles": 12,
+      "closed_solid": true,
+      "signed_volume_m3": 0.001069,
+      "location": [
+        0.0,
+        0.0,
+        0.0
+      ],
+      "rotation_euler": [
+        0.0,
+        0.0,
+        0.0
+      ],
+      "scale": [
+        1.0,
+        1.0,
+        1.0
+      ]
+    },
+    {
+      "name": "clerestory_r_4",
+      "triangles": 12,
+      "closed_solid": true,
+      "signed_volume_m3": 0.001069,
+      "location": [
+        0.0,
+        0.0,
+        0.0
+      ],
+      "rotation_euler": [
+        0.0,
+        0.0,
+        0.0
+      ],
+      "scale": [
+        1.0,
+        1.0,
+        1.0
+      ]
+    },
+    {
+      "name": "cond_lever",
+      "triangles": 12,
+      "closed_solid": true,
+      "signed_volume_m3": 0.002888,
+      "location": [
+        0.0,
+        0.0,
+        0.0
+      ],
+      "rotation_euler": [
+        0.0,
+        0.0,
+        0.0
+      ],
+      "scale": [
+        1.0,
+        1.0,
+        1.0
+      ]
+    },
+    {
+      "name": "conductor_arm_l",
+      "triangles": 12,
+      "closed_solid": true,
+      "signed_volume_m3": 0.005089,
+      "location": [
+        0.0,
+        0.0,
+        0.0
+      ],
+      "rotation_euler": [
+        0.0,
+        0.0,
+        0.0
+      ],
+      "scale": [
+        1.0,
+        1.0,
+        1.0
+      ]
+    },
+    {
+      "name": "conductor_arm_r",
+      "triangles": 12,
+      "closed_solid": true,
+      "signed_volume_m3": 0.014014,
+      "location": [
+        0.0,
+        0.0,
+        0.0
+      ],
+      "rotation_euler": [
+        0.0,
+        0.0,
+        0.0
+      ],
+      "scale": [
+        1.0,
+        1.0,
+        1.0
+      ]
+    },
+    {
+      "name": "conductor_head",
+      "triangles": 12,
+      "closed_solid": true,
+      "signed_volume_m3": 0.007946,
+      "location": [
+        0.0,
+        0.0,
+        0.0
+      ],
+      "rotation_euler": [
+        0.0,
+        0.0,
+        0.0
+      ],
+      "scale": [
+        1.0,
+        1.0,
+        1.0
+      ]
+    },
+    {
+      "name": "conductor_legs",
+      "triangles": 12,
+      "closed_solid": true,
+      "signed_volume_m3": 0.041,
+      "location": [
+        0.0,
+        0.0,
+        0.0
+      ],
+      "rotation_euler": [
+        0.0,
+        0.0,
+        0.0
+      ],
+      "scale": [
+        1.0,
+        1.0,
+        1.0
+      ]
+    },
+    {
+      "name": "conductor_torso",
+      "triangles": 12,
+      "closed_solid": true,
+      "signed_volume_m3": 0.042706,
+      "location": [
+        0.0,
+        0.0,
+        0.0
+      ],
+      "rotation_euler": [
+        0.0,
+        0.0,
+        0.0
+      ],
+      "scale": [
+        1.0,
+        1.0,
+        1.0
+      ]
+    },
+    {
+      "name": "corner_l_0",
+      "triangles": 12,
+      "closed_solid": true,
+      "signed_volume_m3": 0.00385,
+      "location": [
+        0.0,
+        0.0,
+        0.0
+      ],
+      "rotation_euler": [
+        0.0,
+        0.0,
+        0.0
+      ],
+      "scale": [
+        1.0,
+        1.0,
+        1.0
+      ]
+    },
+    {
+      "name": "corner_l_1",
+      "triangles": 12,
+      "closed_solid": true,
+      "signed_volume_m3": 0.00385,
+      "location": [
+        0.0,
+        0.0,
+        0.0
+      ],
+      "rotation_euler": [
+        0.0,
+        0.0,
+        0.0
+      ],
+      "scale": [
+        1.0,
+        1.0,
+        1.0
+      ]
+    },
+    {
+      "name": "corner_r_0",
+      "triangles": 12,
+      "closed_solid": true,
+      "signed_volume_m3": 0.00385,
+      "location": [
+        0.0,
+        0.0,
+        0.0
+      ],
+      "rotation_euler": [
+        0.0,
+        0.0,
+        0.0
+      ],
+      "scale": [
+        1.0,
+        1.0,
+        1.0
+      ]
+    },
+    {
+      "name": "corner_r_1",
+      "triangles": 12,
+      "closed_solid": true,
+      "signed_volume_m3": 0.00385,
+      "location": [
+        0.0,
+        0.0,
+        0.0
+      ],
+      "rotation_euler": [
+        0.0,
+        0.0,
+        0.0
+      ],
+      "scale": [
+        1.0,
+        1.0,
+        1.0
+      ]
+    },
+    {
+      "name": "dash_f_hi",
+      "triangles": 12,
+      "closed_solid": true,
+      "signed_volume_m3": 0.027072,
+      "location": [
+        0.0,
+        0.0,
+        0.0
+      ],
+      "rotation_euler": [
+        0.0,
+        0.0,
+        0.0
+      ],
+      "scale": [
+        1.0,
+        1.0,
+        1.0
+      ]
+    },
+    {
+      "name": "dash_f_lo",
+      "triangles": 44,
+      "closed_solid": true,
+      "signed_volume_m3": 0.03051,
+      "location": [
+        0.0,
+        0.0,
+        0.0
+      ],
+      "rotation_euler": [
+        0.0,
+        0.0,
+        0.0
+      ],
+      "scale": [
+        1.0,
+        1.0,
+        1.0
+      ]
+    },
+    {
+      "name": "dash_f_mid",
+      "triangles": 44,
+      "closed_solid": true,
+      "signed_volume_m3": 0.103632,
+      "location": [
+        0.0,
+        0.0,
+        0.0
+      ],
+      "rotation_euler": [
+        0.0,
+        0.0,
+        0.0
+      ],
+      "scale": [
+        1.0,
+        1.0,
+        1.0
+      ]
+    },
+    {
+      "name": "dash_r_hi",
+      "triangles": 12,
+      "closed_solid": true,
+      "signed_volume_m3": 0.027072,
+      "location": [
+        0.0,
+        0.0,
+        0.0
+      ],
+      "rotation_euler": [
+        0.0,
+        0.0,
+        0.0
+      ],
+      "scale": [
+        1.0,
+        1.0,
+        1.0
+      ]
+    },
+    {
+      "name": "dash_r_lo",
+      "triangles": 44,
+      "closed_solid": true,
+      "signed_volume_m3": 0.03051,
+      "location": [
+        0.0,
+        0.0,
+        0.0
+      ],
+      "rotation_euler": [
+        0.0,
+        0.0,
+        0.0
+      ],
+      "scale": [
+        1.0,
+        1.0,
+        1.0
+      ]
+    },
+    {
+      "name": "dash_r_mid",
+      "triangles": 44,
+      "closed_solid": true,
+      "signed_volume_m3": 0.130931,
+      "location": [
+        0.0,
+        0.0,
+        0.0
+      ],
+      "rotation_euler": [
+        0.0,
+        0.0,
+        0.0
+      ],
+      "scale": [
+        1.0,
+        1.0,
+        1.0
+      ]
+    },
+    {
+      "name": "endhead_f",
+      "triangles": 12,
+      "closed_solid": true,
+      "signed_volume_m3": 0.04464,
+      "location": [
+        0.0,
+        0.0,
+        0.0
+      ],
+      "rotation_euler": [
+        0.0,
+        0.0,
+        0.0
+      ],
+      "scale": [
+        1.0,
+        1.0,
+        1.0
+      ]
+    },
+    {
+      "name": "endhead_r",
+      "triangles": 12,
+      "closed_solid": true,
+      "signed_volume_m3": 0.04464,
+      "location": [
+        0.0,
+        0.0,
+        0.0
+      ],
+      "rotation_euler": [
+        0.0,
+        0.0,
+        0.0
+      ],
+      "scale": [
+        1.0,
+        1.0,
+        1.0
+      ]
+    },
+    {
+      "name": "endpost_f_l",
+      "triangles": 12,
+      "closed_solid": true,
+      "signed_volume_m3": 0.04992,
+      "location": [
+        0.0,
+        0.0,
+        0.0
+      ],
+      "rotation_euler": [
+        0.0,
+        0.0,
+        0.0
+      ],
+      "scale": [
+        1.0,
+        1.0,
+        1.0
+      ]
+    },
+    {
+      "name": "endpost_f_r",
+      "triangles": 12,
+      "closed_solid": true,
+      "signed_volume_m3": 0.04992,
+      "location": [
+        0.0,
+        0.0,
+        0.0
+      ],
+      "rotation_euler": [
+        0.0,
+        0.0,
+        0.0
+      ],
+      "scale": [
+        1.0,
+        1.0,
+        1.0
+      ]
+    },
+    {
+      "name": "endpost_r_l",
+      "triangles": 12,
+      "closed_solid": true,
+      "signed_volume_m3": 0.04992,
+      "location": [
+        0.0,
+        0.0,
+        0.0
+      ],
+      "rotation_euler": [
+        0.0,
+        0.0,
+        0.0
+      ],
+      "scale": [
+        1.0,
+        1.0,
+        1.0
+      ]
+    },
+    {
+      "name": "endpost_r_r",
+      "triangles": 12,
+      "closed_solid": true,
+      "signed_volume_m3": 0.04992,
+      "location": [
+        0.0,
+        0.0,
+        0.0
+      ],
+      "rotation_euler": [
+        0.0,
+        0.0,
+        0.0
+      ],
+      "scale": [
+        1.0,
+        1.0,
+        1.0
+      ]
+    },
+    {
+      "name": "fascia_cab",
+      "triangles": 44,
+      "closed_solid": true,
+      "signed_volume_m3": 1.164372,
+      "location": [
+        0.0,
+        0.0,
+        0.0
+      ],
+      "rotation_euler": [
+        0.0,
+        0.0,
+        0.0
+      ],
+      "scale": [
+        1.0,
+        1.0,
+        1.0
+      ]
+    },
+    {
+      "name": "floor",
+      "triangles": 12,
+      "closed_solid": true,
+      "signed_volume_m3": 1.209217,
+      "location": [
+        0.0,
+        0.0,
+        0.0
+      ],
+      "rotation_euler": [
+        0.0,
+        0.0,
+        0.0
+      ],
+      "scale": [
+        1.0,
+        1.0,
+        1.0
+      ]
+    },
+    {
+      "name": "gate_l",
+      "triangles": 12,
+      "closed_solid": true,
+      "signed_volume_m3": 0.004464,
+      "location": [
+        0.0,
+        0.0,
+        0.0
+      ],
+      "rotation_euler": [
+        0.0,
+        0.0,
+        0.0
+      ],
+      "scale": [
+        1.0,
+        1.0,
+        1.0
+      ]
+    },
+    {
+      "name": "gate_r",
+      "triangles": 12,
+      "closed_solid": true,
+      "signed_volume_m3": 0.004464,
+      "location": [
+        0.0,
+        0.0,
+        0.0
+      ],
+      "rotation_euler": [
+        0.0,
+        0.0,
+        0.0
+      ],
+      "scale": [
+        1.0,
+        1.0,
+        1.0
+      ]
+    },
+    {
+      "name": "grip_lever",
+      "triangles": 12,
+      "closed_solid": true,
+      "signed_volume_m3": 0.006642,
+      "location": [
+        0.0,
+        0.0,
+        0.0
+      ],
+      "rotation_euler": [
+        0.0,
+        0.0,
+        0.0
+      ],
+      "scale": [
+        1.0,
+        1.0,
+        1.0
+      ]
+    },
+    {
+      "name": "grip_shank",
+      "triangles": 12,
+      "closed_solid": true,
+      "signed_volume_m3": 0.016016,
+      "location": [
+        0.0,
+        0.0,
+        0.0
+      ],
+      "rotation_euler": [
+        0.0,
+        0.0,
+        0.0
+      ],
+      "scale": [
+        1.0,
+        1.0,
+        1.0
+      ]
+    },
+    {
+      "name": "grip_shoe",
+      "triangles": 12,
+      "closed_solid": true,
+      "signed_volume_m3": 0.00528,
+      "location": [
+        0.0,
+        0.0,
+        0.0
+      ],
+      "rotation_euler": [
+        0.0,
+        0.0,
+        0.0
+      ],
+      "scale": [
+        1.0,
+        1.0,
+        1.0
+      ]
+    },
+    {
+      "name": "gripman_arm_l",
+      "triangles": 12,
+      "closed_solid": true,
+      "signed_volume_m3": 0.005158,
+      "location": [
+        0.0,
+        0.0,
+        0.0
+      ],
+      "rotation_euler": [
+        0.0,
+        0.0,
+        0.0
+      ],
+      "scale": [
+        1.0,
+        1.0,
+        1.0
+      ]
+    },
+    {
+      "name": "gripman_arm_r",
+      "triangles": 12,
+      "closed_solid": true,
+      "signed_volume_m3": 0.005434,
+      "location": [
+        0.0,
+        0.0,
+        0.0
+      ],
+      "rotation_euler": [
+        0.0,
+        0.0,
+        0.0
+      ],
+      "scale": [
+        1.0,
+        1.0,
+        1.0
+      ]
+    },
+    {
+      "name": "gripman_head",
+      "triangles": 12,
+      "closed_solid": true,
+      "signed_volume_m3": 0.008043,
+      "location": [
+        0.0,
+        0.0,
+        0.0
+      ],
+      "rotation_euler": [
+        0.0,
+        0.0,
+        0.0
+      ],
+      "scale": [
+        1.0,
+        1.0,
+        1.0
+      ]
+    },
+    {
+      "name": "gripman_legs",
+      "triangles": 12,
+      "closed_solid": true,
+      "signed_volume_m3": 0.0415,
+      "location": [
+        0.0,
+        0.0,
+        0.0
+      ],
+      "rotation_euler": [
+        0.0,
+        0.0,
+        0.0
+      ],
+      "scale": [
+        1.0,
+        1.0,
+        1.0
+      ]
+    },
+    {
+      "name": "gripman_torso",
+      "triangles": 12,
+      "closed_solid": true,
+      "signed_volume_m3": 0.043226,
+      "location": [
+        0.0,
+        0.0,
+        0.0
+      ],
+      "rotation_euler": [
+        0.0,
+        0.0,
+        0.0
+      ],
+      "scale": [
+        1.0,
+        1.0,
+        1.0
+      ]
+    },
+    {
+      "name": "handrail_l",
+      "triangles": 12,
+      "closed_solid": true,
+      "signed_volume_m3": 0.007296,
+      "location": [
+        0.0,
+        0.0,
+        0.0
+      ],
+      "rotation_euler": [
+        0.0,
+        0.0,
+        0.0
+      ],
+      "scale": [
+        1.0,
+        1.0,
+        1.0
+      ]
+    },
+    {
+      "name": "handrail_r",
+      "triangles": 12,
+      "closed_solid": true,
+      "signed_volume_m3": 0.007296,
+      "location": [
+        0.0,
+        0.0,
+        0.0
+      ],
+      "rotation_euler": [
+        0.0,
+        0.0,
+        0.0
+      ],
+      "scale": [
+        1.0,
+        1.0,
+        1.0
+      ]
+    },
+    {
+      "name": "head_beam",
+      "triangles": 44,
+      "closed_solid": true,
+      "signed_volume_m3": 0.997201,
+      "location": [
+        0.0,
+        0.0,
+        0.0
+      ],
+      "rotation_euler": [
+        0.0,
+        0.0,
+        0.0
+      ],
+      "scale": [
+        1.0,
+        1.0,
+        1.0
+      ]
+    },
+    {
+      "name": "lamp_bezel",
+      "triangles": 36,
+      "closed_solid": true,
+      "signed_volume_m3": 0.003887,
+      "location": [
+        0.0,
+        0.0,
+        0.0
+      ],
+      "rotation_euler": [
+        0.0,
+        0.0,
+        0.0
+      ],
+      "scale": [
+        1.0,
+        1.0,
+        1.0
+      ]
+    },
+    {
+      "name": "lamp_glass",
+      "triangles": 36,
+      "closed_solid": true,
+      "signed_volume_m3": 0.000956,
+      "location": [
+        0.0,
+        0.0,
+        0.0
+      ],
+      "rotation_euler": [
+        0.0,
+        0.0,
+        0.0
+      ],
+      "scale": [
+        1.0,
+        1.0,
+        1.0
+      ]
+    },
+    {
+      "name": "lamp_lens",
+      "triangles": 36,
+      "closed_solid": true,
+      "signed_volume_m3": 0.001075,
+      "location": [
+        0.0,
+        0.0,
+        0.0
+      ],
+      "rotation_euler": [
+        0.0,
+        0.0,
+        0.0
+      ],
+      "scale": [
+        1.0,
+        1.0,
+        1.0
+      ]
+    },
+    {
+      "name": "letterboard_glow_l",
+      "triangles": 12,
+      "closed_solid": true,
+      "signed_volume_m3": 0.01309,
+      "location": [
+        0.0,
+        0.0,
+        0.0
+      ],
+      "rotation_euler": [
+        0.0,
+        0.0,
+        0.0
+      ],
+      "scale": [
+        1.0,
+        1.0,
+        1.0
+      ]
+    },
+    {
+      "name": "letterboard_glow_r",
+      "triangles": 12,
+      "closed_solid": true,
+      "signed_volume_m3": 0.01309,
+      "location": [
+        0.0,
+        0.0,
+        0.0
+      ],
+      "rotation_euler": [
+        0.0,
+        0.0,
+        0.0
+      ],
+      "scale": [
+        1.0,
+        1.0,
+        1.0
+      ]
+    },
+    {
+      "name": "letterboard_l",
+      "triangles": 12,
+      "closed_solid": true,
+      "signed_volume_m3": 0.02275,
+      "location": [
+        0.0,
+        0.0,
+        0.0
+      ],
+      "rotation_euler": [
+        0.0,
+        0.0,
+        0.0
+      ],
+      "scale": [
+        1.0,
+        1.0,
+        1.0
+      ]
+    },
+    {
+      "name": "letterboard_r",
+      "triangles": 12,
+      "closed_solid": true,
+      "signed_volume_m3": 0.02275,
+      "location": [
+        0.0,
+        0.0,
+        0.0
+      ],
+      "rotation_euler": [
+        0.0,
+        0.0,
+        0.0
+      ],
+      "scale": [
+        1.0,
+        1.0,
+        1.0
+      ]
+    },
+    {
+      "name": "letterboard_text_l",
+      "triangles": 12,
+      "closed_solid": true,
+      "signed_volume_m3": 0.00036,
+      "location": [
+        0.0,
+        0.0,
+        0.0
+      ],
+      "rotation_euler": [
+        0.0,
+        0.0,
+        0.0
+      ],
+      "scale": [
+        1.0,
+        1.0,
+        1.0
+      ]
+    },
+    {
+      "name": "letterboard_text_r",
+      "triangles": 12,
+      "closed_solid": true,
+      "signed_volume_m3": 0.00036,
+      "location": [
+        0.0,
+        0.0,
+        0.0
+      ],
+      "rotation_euler": [
+        0.0,
+        0.0,
+        0.0
+      ],
+      "scale": [
+        1.0,
+        1.0,
+        1.0
+      ]
+    },
+    {
+      "name": "lever_housing",
+      "triangles": 12,
+      "closed_solid": true,
+      "signed_volume_m3": 0.03648,
+      "location": [
+        0.0,
+        0.0,
+        0.0
+      ],
+      "rotation_euler": [
+        0.0,
+        0.0,
+        0.0
+      ],
+      "scale": [
+        1.0,
+        1.0,
+        1.0
+      ]
+    },
+    {
+      "name": "monitor_deck",
+      "triangles": 68,
+      "closed_solid": true,
+      "signed_volume_m3": 1.413895,
+      "location": [
+        0.0,
+        0.0,
+        0.0
+      ],
+      "rotation_euler": [
+        0.0,
+        0.0,
+        0.0
+      ],
+      "scale": [
+        1.0,
+        1.0,
+        1.0
+      ]
+    },
+    {
+      "name": "monitor_end_f",
+      "triangles": 20,
+      "closed_solid": true,
+      "signed_volume_m3": 0.053328,
+      "location": [
+        0.0,
+        0.0,
+        0.0
+      ],
+      "rotation_euler": [
+        0.0,
+        0.0,
+        0.0
+      ],
+      "scale": [
+        1.0,
+        1.0,
+        1.0
+      ]
+    },
+    {
+      "name": "monitor_end_r",
+      "triangles": 20,
+      "closed_solid": true,
+      "signed_volume_m3": 0.053328,
+      "location": [
+        0.0,
+        0.0,
+        0.0
+      ],
+      "rotation_euler": [
+        0.0,
+        0.0,
+        0.0
+      ],
+      "scale": [
+        1.0,
+        1.0,
+        1.0
+      ]
+    },
+    {
+      "name": "monitor_vent_0",
+      "triangles": 12,
+      "closed_solid": true,
+      "signed_volume_m3": 0.009979,
+      "location": [
+        0.0,
+        0.0,
+        0.0
+      ],
+      "rotation_euler": [
+        0.0,
+        0.0,
+        0.0
+      ],
+      "scale": [
+        1.0,
+        1.0,
+        1.0
+      ]
+    },
+    {
+      "name": "monitor_vent_1",
+      "triangles": 12,
+      "closed_solid": true,
+      "signed_volume_m3": 0.009979,
+      "location": [
+        0.0,
+        0.0,
+        0.0
+      ],
+      "rotation_euler": [
+        0.0,
+        0.0,
+        0.0
+      ],
+      "scale": [
+        1.0,
+        1.0,
+        1.0
+      ]
+    },
+    {
+      "name": "monitor_vent_2",
+      "triangles": 12,
+      "closed_solid": true,
+      "signed_volume_m3": 0.009979,
+      "location": [
+        0.0,
+        0.0,
+        0.0
+      ],
+      "rotation_euler": [
+        0.0,
+        0.0,
+        0.0
+      ],
+      "scale": [
+        1.0,
+        1.0,
+        1.0
+      ]
+    },
+    {
+      "name": "monitor_vent_3",
+      "triangles": 12,
+      "closed_solid": true,
+      "signed_volume_m3": 0.009979,
+      "location": [
+        0.0,
+        0.0,
+        0.0
+      ],
+      "rotation_euler": [
+        0.0,
+        0.0,
+        0.0
+      ],
+      "scale": [
+        1.0,
+        1.0,
+        1.0
+      ]
+    },
+    {
+      "name": "monitor_wall",
+      "triangles": 44,
+      "closed_solid": true,
+      "signed_volume_m3": 1.870372,
+      "location": [
+        0.0,
+        0.0,
+        0.0
+      ],
+      "rotation_euler": [
+        0.0,
+        0.0,
+        0.0
+      ],
+      "scale": [
+        1.0,
+        1.0,
+        1.0
+      ]
+    },
+    {
+      "name": "numberplate_r",
+      "triangles": 12,
+      "closed_solid": true,
+      "signed_volume_m3": 0.001638,
+      "location": [
+        0.0,
+        0.0,
+        0.0
+      ],
+      "rotation_euler": [
+        0.0,
+        0.0,
+        0.0
+      ],
+      "scale": [
+        1.0,
+        1.0,
+        1.0
+      ]
+    },
+    {
+      "name": "panel_cab",
+      "triangles": 44,
+      "closed_solid": true,
+      "signed_volume_m3": 3.425988,
+      "location": [
+        0.0,
+        0.0,
+        0.0
+      ],
+      "rotation_euler": [
+        0.0,
+        0.0,
+        0.0
+      ],
+      "scale": [
+        1.0,
+        1.0,
+        1.0
+      ]
+    },
+    {
+      "name": "panel_openl",
+      "triangles": 12,
+      "closed_solid": true,
+      "signed_volume_m3": 0.025788,
+      "location": [
+        0.0,
+        0.0,
+        0.0
+      ],
+      "rotation_euler": [
+        0.0,
+        0.0,
+        0.0
+      ],
+      "scale": [
+        1.0,
+        1.0,
+        1.0
+      ]
+    },
+    {
+      "name": "panel_openr",
+      "triangles": 12,
+      "closed_solid": true,
+      "signed_volume_m3": 0.025788,
+      "location": [
+        0.0,
+        0.0,
+        0.0
+      ],
+      "rotation_euler": [
+        0.0,
+        0.0,
+        0.0
+      ],
+      "scale": [
+        1.0,
+        1.0,
+        1.0
+      ]
+    },
+    {
+      "name": "panel_platl",
+      "triangles": 12,
+      "closed_solid": true,
+      "signed_volume_m3": 0.009828,
+      "location": [
+        0.0,
+        0.0,
+        0.0
+      ],
+      "rotation_euler": [
+        0.0,
+        0.0,
+        0.0
+      ],
+      "scale": [
+        1.0,
+        1.0,
+        1.0
+      ]
+    },
+    {
+      "name": "panel_platr",
+      "triangles": 12,
+      "closed_solid": true,
+      "signed_volume_m3": 0.009828,
+      "location": [
+        0.0,
+        0.0,
+        0.0
+      ],
+      "rotation_euler": [
+        0.0,
+        0.0,
+        0.0
+      ],
+      "scale": [
+        1.0,
+        1.0,
+        1.0
+      ]
+    },
+    {
+      "name": "pillar_l_0",
+      "triangles": 12,
+      "closed_solid": true,
+      "signed_volume_m3": 0.00455,
+      "location": [
+        0.0,
+        0.0,
+        0.0
+      ],
+      "rotation_euler": [
+        0.0,
+        0.0,
+        0.0
+      ],
+      "scale": [
+        1.0,
+        1.0,
+        1.0
+      ]
+    },
+    {
+      "name": "pillar_l_1",
+      "triangles": 12,
+      "closed_solid": true,
+      "signed_volume_m3": 0.0035,
+      "location": [
+        0.0,
+        0.0,
+        0.0
+      ],
+      "rotation_euler": [
+        0.0,
+        0.0,
+        0.0
+      ],
+      "scale": [
+        1.0,
+        1.0,
+        1.0
+      ]
+    },
+    {
+      "name": "pillar_l_2",
+      "triangles": 12,
+      "closed_solid": true,
+      "signed_volume_m3": 0.0035,
+      "location": [
+        0.0,
+        0.0,
+        0.0
+      ],
+      "rotation_euler": [
+        0.0,
+        0.0,
+        0.0
+      ],
+      "scale": [
+        1.0,
+        1.0,
+        1.0
+      ]
+    },
+    {
+      "name": "pillar_l_3",
+      "triangles": 12,
+      "closed_solid": true,
+      "signed_volume_m3": 0.0035,
+      "location": [
+        0.0,
+        0.0,
+        0.0
+      ],
+      "rotation_euler": [
+        0.0,
+        0.0,
+        0.0
+      ],
+      "scale": [
+        1.0,
+        1.0,
+        1.0
+      ]
+    },
+    {
+      "name": "pillar_l_4",
+      "triangles": 12,
+      "closed_solid": true,
+      "signed_volume_m3": 0.00455,
+      "location": [
+        0.0,
+        0.0,
+        0.0
+      ],
+      "rotation_euler": [
+        0.0,
+        0.0,
+        0.0
+      ],
+      "scale": [
+        1.0,
+        1.0,
+        1.0
+      ]
+    },
+    {
+      "name": "pillar_r_0",
+      "triangles": 12,
+      "closed_solid": true,
+      "signed_volume_m3": 0.00455,
+      "location": [
+        0.0,
+        0.0,
+        0.0
+      ],
+      "rotation_euler": [
+        0.0,
+        0.0,
+        0.0
+      ],
+      "scale": [
+        1.0,
+        1.0,
+        1.0
+      ]
+    },
+    {
+      "name": "pillar_r_1",
+      "triangles": 12,
+      "closed_solid": true,
+      "signed_volume_m3": 0.0035,
+      "location": [
+        0.0,
+        0.0,
+        0.0
+      ],
+      "rotation_euler": [
+        0.0,
+        0.0,
+        0.0
+      ],
+      "scale": [
+        1.0,
+        1.0,
+        1.0
+      ]
+    },
+    {
+      "name": "pillar_r_2",
+      "triangles": 12,
+      "closed_solid": true,
+      "signed_volume_m3": 0.0035,
+      "location": [
+        0.0,
+        0.0,
+        0.0
+      ],
+      "rotation_euler": [
+        0.0,
+        0.0,
+        0.0
+      ],
+      "scale": [
+        1.0,
+        1.0,
+        1.0
+      ]
+    },
+    {
+      "name": "pillar_r_3",
+      "triangles": 12,
+      "closed_solid": true,
+      "signed_volume_m3": 0.0035,
+      "location": [
+        0.0,
+        0.0,
+        0.0
+      ],
+      "rotation_euler": [
+        0.0,
+        0.0,
+        0.0
+      ],
+      "scale": [
+        1.0,
+        1.0,
+        1.0
+      ]
+    },
+    {
+      "name": "pillar_r_4",
+      "triangles": 12,
+      "closed_solid": true,
+      "signed_volume_m3": 0.00455,
+      "location": [
+        0.0,
+        0.0,
+        0.0
+      ],
+      "rotation_euler": [
+        0.0,
+        0.0,
+        0.0
+      ],
+      "scale": [
+        1.0,
+        1.0,
+        1.0
+      ]
+    },
+    {
+      "name": "pin_cab_l_0",
+      "triangles": 12,
+      "closed_solid": true,
+      "signed_volume_m3": 0.000105,
+      "location": [
+        0.0,
+        0.0,
+        0.0
+      ],
+      "rotation_euler": [
+        0.0,
+        0.0,
+        0.0
+      ],
+      "scale": [
+        1.0,
+        1.0,
+        1.0
+      ]
+    },
+    {
+      "name": "pin_cab_l_1",
+      "triangles": 12,
+      "closed_solid": true,
+      "signed_volume_m3": 0.000105,
+      "location": [
+        0.0,
+        0.0,
+        0.0
+      ],
+      "rotation_euler": [
+        0.0,
+        0.0,
+        0.0
+      ],
+      "scale": [
+        1.0,
+        1.0,
+        1.0
+      ]
+    },
+    {
+      "name": "pin_cab_l_b",
+      "triangles": 12,
+      "closed_solid": true,
+      "signed_volume_m3": 0.001035,
+      "location": [
+        0.0,
+        0.0,
+        0.0
+      ],
+      "rotation_euler": [
+        0.0,
+        0.0,
+        0.0
+      ],
+      "scale": [
+        1.0,
+        1.0,
+        1.0
+      ]
+    },
+    {
+      "name": "pin_cab_l_t",
+      "triangles": 12,
+      "closed_solid": true,
+      "signed_volume_m3": 0.001035,
+      "location": [
+        0.0,
+        0.0,
+        0.0
+      ],
+      "rotation_euler": [
+        0.0,
+        0.0,
+        0.0
+      ],
+      "scale": [
+        1.0,
+        1.0,
+        1.0
+      ]
+    },
+    {
+      "name": "pin_cab_r_0",
+      "triangles": 12,
+      "closed_solid": true,
+      "signed_volume_m3": 0.000105,
+      "location": [
+        0.0,
+        0.0,
+        0.0
+      ],
+      "rotation_euler": [
+        0.0,
+        0.0,
+        0.0
+      ],
+      "scale": [
+        1.0,
+        1.0,
+        1.0
+      ]
+    },
+    {
+      "name": "pin_cab_r_1",
+      "triangles": 12,
+      "closed_solid": true,
+      "signed_volume_m3": 0.000105,
+      "location": [
+        0.0,
+        0.0,
+        0.0
+      ],
+      "rotation_euler": [
+        0.0,
+        0.0,
+        0.0
+      ],
+      "scale": [
+        1.0,
+        1.0,
+        1.0
+      ]
+    },
+    {
+      "name": "pin_cab_r_b",
+      "triangles": 12,
+      "closed_solid": true,
+      "signed_volume_m3": 0.001035,
+      "location": [
+        0.0,
+        0.0,
+        0.0
+      ],
+      "rotation_euler": [
+        0.0,
+        0.0,
+        0.0
+      ],
+      "scale": [
+        1.0,
+        1.0,
+        1.0
+      ]
+    },
+    {
+      "name": "pin_cab_r_t",
+      "triangles": 12,
+      "closed_solid": true,
+      "signed_volume_m3": 0.001035,
+      "location": [
+        0.0,
+        0.0,
+        0.0
+      ],
+      "rotation_euler": [
+        0.0,
+        0.0,
+        0.0
+      ],
+      "scale": [
+        1.0,
+        1.0,
+        1.0
+      ]
+    },
+    {
+      "name": "platbracket_l_0",
+      "triangles": 12,
+      "closed_solid": true,
+      "signed_volume_m3": 0.002592,
+      "location": [
+        0.0,
+        0.0,
+        0.0
+      ],
+      "rotation_euler": [
+        0.0,
+        0.0,
+        0.0
+      ],
+      "scale": [
+        1.0,
+        1.0,
+        1.0
+      ]
+    },
+    {
+      "name": "platbracket_l_1",
+      "triangles": 12,
+      "closed_solid": true,
+      "signed_volume_m3": 0.002592,
+      "location": [
+        0.0,
+        0.0,
+        0.0
+      ],
+      "rotation_euler": [
+        0.0,
+        0.0,
+        0.0
+      ],
+      "scale": [
+        1.0,
+        1.0,
+        1.0
+      ]
+    },
+    {
+      "name": "platbracket_r_0",
+      "triangles": 12,
+      "closed_solid": true,
+      "signed_volume_m3": 0.002592,
+      "location": [
+        0.0,
+        0.0,
+        0.0
+      ],
+      "rotation_euler": [
+        0.0,
+        0.0,
+        0.0
+      ],
+      "scale": [
+        1.0,
+        1.0,
+        1.0
+      ]
+    },
+    {
+      "name": "platbracket_r_1",
+      "triangles": 12,
+      "closed_solid": true,
+      "signed_volume_m3": 0.002592,
+      "location": [
+        0.0,
+        0.0,
+        0.0
+      ],
+      "rotation_euler": [
+        0.0,
+        0.0,
+        0.0
+      ],
+      "scale": [
+        1.0,
+        1.0,
+        1.0
+      ]
+    },
+    {
+      "name": "platpost_l_0",
+      "triangles": 12,
+      "closed_solid": true,
+      "signed_volume_m3": 0.011502,
+      "location": [
+        0.0,
+        0.0,
+        0.0
+      ],
+      "rotation_euler": [
+        0.0,
+        0.0,
+        0.0
+      ],
+      "scale": [
+        1.0,
+        1.0,
+        1.0
+      ]
+    },
+    {
+      "name": "platpost_l_1",
+      "triangles": 12,
+      "closed_solid": true,
+      "signed_volume_m3": 0.011502,
+      "location": [
+        0.0,
+        0.0,
+        0.0
+      ],
+      "rotation_euler": [
+        0.0,
+        0.0,
+        0.0
+      ],
+      "scale": [
+        1.0,
+        1.0,
+        1.0
+      ]
+    },
+    {
+      "name": "platpost_r_0",
+      "triangles": 12,
+      "closed_solid": true,
+      "signed_volume_m3": 0.011502,
+      "location": [
+        0.0,
+        0.0,
+        0.0
+      ],
+      "rotation_euler": [
+        0.0,
+        0.0,
+        0.0
+      ],
+      "scale": [
+        1.0,
+        1.0,
+        1.0
+      ]
+    },
+    {
+      "name": "platpost_r_1",
+      "triangles": 12,
+      "closed_solid": true,
+      "signed_volume_m3": 0.011502,
+      "location": [
+        0.0,
+        0.0,
+        0.0
+      ],
+      "rotation_euler": [
+        0.0,
+        0.0,
+        0.0
+      ],
+      "scale": [
+        1.0,
+        1.0,
+        1.0
+      ]
+    },
+    {
+      "name": "pole_l_0",
+      "triangles": 28,
+      "closed_solid": true,
+      "signed_volume_m3": 0.01283,
+      "location": [
+        0.0,
+        0.0,
+        0.0
+      ],
+      "rotation_euler": [
+        0.0,
+        0.0,
+        0.0
+      ],
+      "scale": [
+        1.0,
+        1.0,
+        1.0
+      ]
+    },
+    {
+      "name": "pole_l_1",
+      "triangles": 28,
+      "closed_solid": true,
+      "signed_volume_m3": 0.012829,
+      "location": [
+        0.0,
+        0.0,
+        0.0
+      ],
+      "rotation_euler": [
+        0.0,
+        0.0,
+        0.0
+      ],
+      "scale": [
+        1.0,
+        1.0,
+        1.0
+      ]
+    },
+    {
+      "name": "pole_l_2",
+      "triangles": 28,
+      "closed_solid": true,
+      "signed_volume_m3": 0.01283,
+      "location": [
+        0.0,
+        0.0,
+        0.0
+      ],
+      "rotation_euler": [
+        0.0,
+        0.0,
+        0.0
+      ],
+      "scale": [
+        1.0,
+        1.0,
+        1.0
+      ]
+    },
+    {
+      "name": "pole_l_3",
+      "triangles": 28,
+      "closed_solid": true,
+      "signed_volume_m3": 0.012829,
+      "location": [
+        0.0,
+        0.0,
+        0.0
+      ],
+      "rotation_euler": [
+        0.0,
+        0.0,
+        0.0
+      ],
+      "scale": [
+        1.0,
+        1.0,
+        1.0
+      ]
+    },
+    {
+      "name": "pole_l_4",
+      "triangles": 28,
+      "closed_solid": true,
+      "signed_volume_m3": 0.01283,
+      "location": [
+        0.0,
+        0.0,
+        0.0
+      ],
+      "rotation_euler": [
+        0.0,
+        0.0,
+        0.0
+      ],
+      "scale": [
+        1.0,
+        1.0,
+        1.0
+      ]
+    },
+    {
+      "name": "pole_l_5",
+      "triangles": 28,
+      "closed_solid": true,
+      "signed_volume_m3": 0.01283,
+      "location": [
+        0.0,
+        0.0,
+        0.0
+      ],
+      "rotation_euler": [
+        0.0,
+        0.0,
+        0.0
+      ],
+      "scale": [
+        1.0,
+        1.0,
+        1.0
+      ]
+    },
+    {
+      "name": "pole_r_0",
+      "triangles": 28,
+      "closed_solid": true,
+      "signed_volume_m3": 0.01283,
+      "location": [
+        0.0,
+        0.0,
+        0.0
+      ],
+      "rotation_euler": [
+        0.0,
+        0.0,
+        0.0
+      ],
+      "scale": [
+        1.0,
+        1.0,
+        1.0
+      ]
+    },
+    {
+      "name": "pole_r_1",
+      "triangles": 28,
+      "closed_solid": true,
+      "signed_volume_m3": 0.01283,
+      "location": [
+        0.0,
+        0.0,
+        0.0
+      ],
+      "rotation_euler": [
+        0.0,
+        0.0,
+        0.0
+      ],
+      "scale": [
+        1.0,
+        1.0,
+        1.0
+      ]
+    },
+    {
+      "name": "pole_r_2",
+      "triangles": 28,
+      "closed_solid": true,
+      "signed_volume_m3": 0.01283,
+      "location": [
+        0.0,
+        0.0,
+        0.0
+      ],
+      "rotation_euler": [
+        0.0,
+        0.0,
+        0.0
+      ],
+      "scale": [
+        1.0,
+        1.0,
+        1.0
+      ]
+    },
+    {
+      "name": "pole_r_3",
+      "triangles": 28,
+      "closed_solid": true,
+      "signed_volume_m3": 0.01283,
+      "location": [
+        0.0,
+        0.0,
+        0.0
+      ],
+      "rotation_euler": [
+        0.0,
+        0.0,
+        0.0
+      ],
+      "scale": [
+        1.0,
+        1.0,
+        1.0
+      ]
+    },
+    {
+      "name": "pole_r_4",
+      "triangles": 28,
+      "closed_solid": true,
+      "signed_volume_m3": 0.01283,
+      "location": [
+        0.0,
+        0.0,
+        0.0
+      ],
+      "rotation_euler": [
+        0.0,
+        0.0,
+        0.0
+      ],
+      "scale": [
+        1.0,
+        1.0,
+        1.0
+      ]
+    },
+    {
+      "name": "pole_r_5",
+      "triangles": 28,
+      "closed_solid": true,
+      "signed_volume_m3": 0.012829,
+      "location": [
+        0.0,
+        0.0,
+        0.0
+      ],
+      "rotation_euler": [
+        0.0,
+        0.0,
+        0.0
+      ],
+      "scale": [
+        1.0,
+        1.0,
+        1.0
+      ]
+    },
+    {
+      "name": "post_l_0",
+      "triangles": 12,
+      "closed_solid": true,
+      "signed_volume_m3": 0.011502,
+      "location": [
+        0.0,
+        0.0,
+        0.0
+      ],
+      "rotation_euler": [
+        0.0,
+        0.0,
+        0.0
+      ],
+      "scale": [
+        1.0,
+        1.0,
+        1.0
+      ]
+    },
+    {
+      "name": "post_l_1",
+      "triangles": 12,
+      "closed_solid": true,
+      "signed_volume_m3": 0.011502,
+      "location": [
+        0.0,
+        0.0,
+        0.0
+      ],
+      "rotation_euler": [
+        0.0,
+        0.0,
+        0.0
+      ],
+      "scale": [
+        1.0,
+        1.0,
+        1.0
+      ]
+    },
+    {
+      "name": "post_l_2",
+      "triangles": 12,
+      "closed_solid": true,
+      "signed_volume_m3": 0.011502,
+      "location": [
+        0.0,
+        0.0,
+        0.0
+      ],
+      "rotation_euler": [
+        0.0,
+        0.0,
+        0.0
+      ],
+      "scale": [
+        1.0,
+        1.0,
+        1.0
+      ]
+    },
+    {
+      "name": "post_l_3",
+      "triangles": 12,
+      "closed_solid": true,
+      "signed_volume_m3": 0.011502,
+      "location": [
+        0.0,
+        0.0,
+        0.0
+      ],
+      "rotation_euler": [
+        0.0,
+        0.0,
+        0.0
+      ],
+      "scale": [
+        1.0,
+        1.0,
+        1.0
+      ]
+    },
+    {
+      "name": "post_r_0",
+      "triangles": 12,
+      "closed_solid": true,
+      "signed_volume_m3": 0.011502,
+      "location": [
+        0.0,
+        0.0,
+        0.0
+      ],
+      "rotation_euler": [
+        0.0,
+        0.0,
+        0.0
+      ],
+      "scale": [
+        1.0,
+        1.0,
+        1.0
+      ]
+    },
+    {
+      "name": "post_r_1",
+      "triangles": 12,
+      "closed_solid": true,
+      "signed_volume_m3": 0.011502,
+      "location": [
+        0.0,
+        0.0,
+        0.0
+      ],
+      "rotation_euler": [
+        0.0,
+        0.0,
+        0.0
+      ],
+      "scale": [
+        1.0,
+        1.0,
+        1.0
+      ]
+    },
+    {
+      "name": "post_r_2",
+      "triangles": 12,
+      "closed_solid": true,
+      "signed_volume_m3": 0.011502,
+      "location": [
+        0.0,
+        0.0,
+        0.0
+      ],
+      "rotation_euler": [
+        0.0,
+        0.0,
+        0.0
+      ],
+      "scale": [
+        1.0,
+        1.0,
+        1.0
+      ]
+    },
+    {
+      "name": "post_r_3",
+      "triangles": 12,
+      "closed_solid": true,
+      "signed_volume_m3": 0.011502,
+      "location": [
+        0.0,
+        0.0,
+        0.0
+      ],
+      "rotation_euler": [
+        0.0,
+        0.0,
+        0.0
+      ],
+      "scale": [
+        1.0,
+        1.0,
+        1.0
+      ]
+    },
+    {
+      "name": "reveal_cab",
+      "triangles": 12,
+      "closed_solid": true,
+      "signed_volume_m3": 0.56544,
+      "location": [
+        0.0,
+        0.0,
+        0.0
+      ],
+      "rotation_euler": [
+        0.0,
+        0.0,
+        0.0
+      ],
+      "scale": [
+        1.0,
+        1.0,
+        1.0
+      ]
+    },
+    {
+      "name": "reveal_openl",
+      "triangles": 12,
+      "closed_solid": true,
+      "signed_volume_m3": 0.017192,
+      "location": [
+        0.0,
+        0.0,
+        0.0
+      ],
+      "rotation_euler": [
+        0.0,
+        0.0,
+        0.0
+      ],
+      "scale": [
+        1.0,
+        1.0,
+        1.0
+      ]
+    },
+    {
+      "name": "reveal_openr",
+      "triangles": 12,
+      "closed_solid": true,
+      "signed_volume_m3": 0.017192,
+      "location": [
+        0.0,
+        0.0,
+        0.0
+      ],
+      "rotation_euler": [
+        0.0,
+        0.0,
+        0.0
+      ],
+      "scale": [
+        1.0,
+        1.0,
+        1.0
+      ]
+    },
+    {
+      "name": "reveal_platl",
+      "triangles": 12,
+      "closed_solid": true,
+      "signed_volume_m3": 0.006552,
+      "location": [
+        0.0,
+        0.0,
+        0.0
+      ],
+      "rotation_euler": [
+        0.0,
+        0.0,
+        0.0
+      ],
+      "scale": [
+        1.0,
+        1.0,
+        1.0
+      ]
+    },
+    {
+      "name": "reveal_platr",
+      "triangles": 12,
+      "closed_solid": true,
+      "signed_volume_m3": 0.006552,
+      "location": [
+        0.0,
+        0.0,
+        0.0
+      ],
+      "rotation_euler": [
+        0.0,
+        0.0,
+        0.0
+      ],
+      "scale": [
+        1.0,
+        1.0,
+        1.0
+      ]
+    },
+    {
+      "name": "rider_bl0_head",
+      "triangles": 12,
+      "closed_solid": true,
+      "signed_volume_m3": 0.00648,
+      "location": [
+        0.0,
+        0.0,
+        0.0
+      ],
+      "rotation_euler": [
+        0.0,
+        0.0,
+        0.0
+      ],
+      "scale": [
+        1.0,
+        1.0,
+        1.0
+      ]
+    },
+    {
+      "name": "rider_bl0_shin",
+      "triangles": 12,
+      "closed_solid": true,
+      "signed_volume_m3": 0.0104,
+      "location": [
+        0.0,
+        0.0,
+        0.0
+      ],
+      "rotation_euler": [
+        0.0,
+        0.0,
+        0.0
+      ],
+      "scale": [
+        1.0,
+        1.0,
+        1.0
+      ]
+    },
+    {
+      "name": "rider_bl0_thigh",
+      "triangles": 12,
+      "closed_solid": true,
+      "signed_volume_m3": 0.012012,
+      "location": [
+        0.0,
+        0.0,
+        0.0
+      ],
+      "rotation_euler": [
+        0.0,
+        0.0,
+        0.0
+      ],
+      "scale": [
+        1.0,
+        1.0,
+        1.0
+      ]
+    },
+    {
+      "name": "rider_bl0_torso",
+      "triangles": 12,
+      "closed_solid": true,
+      "signed_volume_m3": 0.028028,
+      "location": [
+        0.0,
+        0.0,
+        0.0
+      ],
+      "rotation_euler": [
+        0.0,
+        0.0,
+        0.0
+      ],
+      "scale": [
+        1.0,
+        1.0,
+        1.0
+      ]
+    },
+    {
+      "name": "rider_br0_head",
+      "triangles": 12,
+      "closed_solid": true,
+      "signed_volume_m3": 0.00648,
+      "location": [
+        0.0,
+        0.0,
+        0.0
+      ],
+      "rotation_euler": [
+        0.0,
+        0.0,
+        0.0
+      ],
+      "scale": [
+        1.0,
+        1.0,
+        1.0
+      ]
+    },
+    {
+      "name": "rider_br0_shin",
+      "triangles": 12,
+      "closed_solid": true,
+      "signed_volume_m3": 0.0104,
+      "location": [
+        0.0,
+        0.0,
+        0.0
+      ],
+      "rotation_euler": [
+        0.0,
+        0.0,
+        0.0
+      ],
+      "scale": [
+        1.0,
+        1.0,
+        1.0
+      ]
+    },
+    {
+      "name": "rider_br0_thigh",
+      "triangles": 12,
+      "closed_solid": true,
+      "signed_volume_m3": 0.012012,
+      "location": [
+        0.0,
+        0.0,
+        0.0
+      ],
+      "rotation_euler": [
+        0.0,
+        0.0,
+        0.0
+      ],
+      "scale": [
+        1.0,
+        1.0,
+        1.0
+      ]
+    },
+    {
+      "name": "rider_br0_torso",
+      "triangles": 12,
+      "closed_solid": true,
+      "signed_volume_m3": 0.028028,
+      "location": [
+        0.0,
+        0.0,
+        0.0
+      ],
+      "rotation_euler": [
+        0.0,
+        0.0,
+        0.0
+      ],
+      "scale": [
+        1.0,
+        1.0,
+        1.0
+      ]
+    },
+    {
+      "name": "rider_br1_head",
+      "triangles": 12,
+      "closed_solid": true,
+      "signed_volume_m3": 0.00648,
+      "location": [
+        0.0,
+        0.0,
+        0.0
+      ],
+      "rotation_euler": [
+        0.0,
+        0.0,
+        0.0
+      ],
+      "scale": [
+        1.0,
+        1.0,
+        1.0
+      ]
+    },
+    {
+      "name": "rider_br1_shin",
+      "triangles": 12,
+      "closed_solid": true,
+      "signed_volume_m3": 0.0104,
+      "location": [
+        0.0,
+        0.0,
+        0.0
+      ],
+      "rotation_euler": [
+        0.0,
+        0.0,
+        0.0
+      ],
+      "scale": [
+        1.0,
+        1.0,
+        1.0
+      ]
+    },
+    {
+      "name": "rider_br1_thigh",
+      "triangles": 12,
+      "closed_solid": true,
+      "signed_volume_m3": 0.012012,
+      "location": [
+        0.0,
+        0.0,
+        0.0
+      ],
+      "rotation_euler": [
+        0.0,
+        0.0,
+        0.0
+      ],
+      "scale": [
+        1.0,
+        1.0,
+        1.0
+      ]
+    },
+    {
+      "name": "rider_br1_torso",
+      "triangles": 12,
+      "closed_solid": true,
+      "signed_volume_m3": 0.028028,
+      "location": [
+        0.0,
+        0.0,
+        0.0
+      ],
+      "rotation_euler": [
+        0.0,
+        0.0,
+        0.0
+      ],
+      "scale": [
+        1.0,
+        1.0,
+        1.0
+      ]
+    },
+    {
+      "name": "rider_sl0_arm_l",
+      "triangles": 12,
+      "closed_solid": true,
+      "signed_volume_m3": 0.002431,
+      "location": [
+        0.0,
+        0.0,
+        0.0
+      ],
+      "rotation_euler": [
+        0.0,
+        0.0,
+        0.0
+      ],
+      "scale": [
+        1.0,
+        1.0,
+        1.0
+      ]
+    },
+    {
+      "name": "rider_sl0_arm_r",
+      "triangles": 12,
+      "closed_solid": true,
+      "signed_volume_m3": 0.00495,
+      "location": [
+        0.0,
+        0.0,
+        0.0
+      ],
+      "rotation_euler": [
+        0.0,
+        0.0,
+        0.0
+      ],
+      "scale": [
+        1.0,
+        1.0,
+        1.0
+      ]
+    },
+    {
+      "name": "rider_sl0_head",
+      "triangles": 12,
+      "closed_solid": true,
+      "signed_volume_m3": 0.007752,
+      "location": [
+        0.0,
+        0.0,
+        0.0
+      ],
+      "rotation_euler": [
+        0.0,
+        0.0,
+        0.0
+      ],
+      "scale": [
+        1.0,
+        1.0,
+        1.0
+      ]
+    },
+    {
+      "name": "rider_sl0_legs",
+      "triangles": 12,
+      "closed_solid": true,
+      "signed_volume_m3": 0.04,
+      "location": [
+        0.0,
+        0.0,
+        0.0
+      ],
+      "rotation_euler": [
+        0.0,
+        0.0,
+        0.0
+      ],
+      "scale": [
+        1.0,
+        1.0,
+        1.0
+      ]
+    },
+    {
+      "name": "rider_sl0_torso",
+      "triangles": 12,
+      "closed_solid": true,
+      "signed_volume_m3": 0.041664,
+      "location": [
+        0.0,
+        0.0,
+        0.0
+      ],
+      "rotation_euler": [
+        0.0,
+        0.0,
+        0.0
+      ],
+      "scale": [
+        1.0,
+        1.0,
+        1.0
+      ]
+    },
+    {
+      "name": "rider_sr0_arm_l",
+      "triangles": 12,
+      "closed_solid": true,
+      "signed_volume_m3": 0.00495,
+      "location": [
+        0.0,
+        0.0,
+        0.0
+      ],
+      "rotation_euler": [
+        0.0,
+        0.0,
+        0.0
+      ],
+      "scale": [
+        1.0,
+        1.0,
+        1.0
+      ]
+    },
+    {
+      "name": "rider_sr0_arm_r",
+      "triangles": 12,
+      "closed_solid": true,
+      "signed_volume_m3": 0.002431,
+      "location": [
+        0.0,
+        0.0,
+        0.0
+      ],
+      "rotation_euler": [
+        0.0,
+        0.0,
+        0.0
+      ],
+      "scale": [
+        1.0,
+        1.0,
+        1.0
+      ]
+    },
+    {
+      "name": "rider_sr0_head",
+      "triangles": 12,
+      "closed_solid": true,
+      "signed_volume_m3": 0.007752,
+      "location": [
+        0.0,
+        0.0,
+        0.0
+      ],
+      "rotation_euler": [
+        0.0,
+        0.0,
+        0.0
+      ],
+      "scale": [
+        1.0,
+        1.0,
+        1.0
+      ]
+    },
+    {
+      "name": "rider_sr0_legs",
+      "triangles": 12,
+      "closed_solid": true,
+      "signed_volume_m3": 0.04,
+      "location": [
+        0.0,
+        0.0,
+        0.0
+      ],
+      "rotation_euler": [
+        0.0,
+        0.0,
+        0.0
+      ],
+      "scale": [
+        1.0,
+        1.0,
+        1.0
+      ]
+    },
+    {
+      "name": "rider_sr0_torso",
+      "triangles": 12,
+      "closed_solid": true,
+      "signed_volume_m3": 0.041664,
+      "location": [
+        0.0,
+        0.0,
+        0.0
+      ],
+      "rotation_euler": [
+        0.0,
+        0.0,
+        0.0
+      ],
+      "scale": [
+        1.0,
+        1.0,
+        1.0
+      ]
+    },
+    {
+      "name": "rider_sr1_arm_l",
+      "triangles": 12,
+      "closed_solid": true,
+      "signed_volume_m3": 0.004742,
+      "location": [
+        0.0,
+        0.0,
+        0.0
+      ],
+      "rotation_euler": [
+        0.0,
+        0.0,
+        0.0
+      ],
+      "scale": [
+        1.0,
+        1.0,
+        1.0
+      ]
+    },
+    {
+      "name": "rider_sr1_arm_r",
+      "triangles": 12,
+      "closed_solid": true,
+      "signed_volume_m3": 0.002431,
+      "location": [
+        0.0,
+        0.0,
+        0.0
+      ],
+      "rotation_euler": [
+        0.0,
+        0.0,
+        0.0
+      ],
+      "scale": [
+        1.0,
+        1.0,
+        1.0
+      ]
+    },
+    {
+      "name": "rider_sr1_head",
+      "triangles": 12,
+      "closed_solid": true,
+      "signed_volume_m3": 0.007461,
+      "location": [
+        0.0,
+        0.0,
+        0.0
+      ],
+      "rotation_euler": [
+        0.0,
+        0.0,
+        0.0
+      ],
+      "scale": [
+        1.0,
+        1.0,
+        1.0
+      ]
+    },
+    {
+      "name": "rider_sr1_legs",
+      "triangles": 12,
+      "closed_solid": true,
+      "signed_volume_m3": 0.0385,
+      "location": [
+        0.0,
+        0.0,
+        0.0
+      ],
+      "rotation_euler": [
+        0.0,
+        0.0,
+        0.0
+      ],
+      "scale": [
+        1.0,
+        1.0,
+        1.0
+      ]
+    },
+    {
+      "name": "rider_sr1_torso",
+      "triangles": 12,
+      "closed_solid": true,
+      "signed_volume_m3": 0.040101,
+      "location": [
+        0.0,
+        0.0,
+        0.0
+      ],
+      "rotation_euler": [
+        0.0,
+        0.0,
+        0.0
+      ],
+      "scale": [
+        1.0,
+        1.0,
+        1.0
+      ]
+    },
+    {
+      "name": "rocker_cab",
+      "triangles": 44,
+      "closed_solid": true,
+      "signed_volume_m3": 1.711551,
+      "location": [
+        0.0,
+        0.0,
+        0.0
+      ],
+      "rotation_euler": [
+        0.0,
+        0.0,
+        0.0
+      ],
+      "scale": [
+        1.0,
+        1.0,
+        1.0
+      ]
+    },
+    {
+      "name": "rocker_openl",
+      "triangles": 12,
+      "closed_solid": true,
+      "signed_volume_m3": 0.051576,
+      "location": [
+        0.0,
+        0.0,
+        0.0
+      ],
+      "rotation_euler": [
+        0.0,
+        0.0,
+        0.0
+      ],
+      "scale": [
+        1.0,
+        1.0,
+        1.0
+      ]
+    },
+    {
+      "name": "rocker_openr",
+      "triangles": 12,
+      "closed_solid": true,
+      "signed_volume_m3": 0.051576,
+      "location": [
+        0.0,
+        0.0,
+        0.0
+      ],
+      "rotation_euler": [
+        0.0,
+        0.0,
+        0.0
+      ],
+      "scale": [
+        1.0,
+        1.0,
+        1.0
+      ]
+    },
+    {
+      "name": "rocker_platl",
+      "triangles": 12,
+      "closed_solid": true,
+      "signed_volume_m3": 0.019656,
+      "location": [
+        0.0,
+        0.0,
+        0.0
+      ],
+      "rotation_euler": [
+        0.0,
+        0.0,
+        0.0
+      ],
+      "scale": [
+        1.0,
+        1.0,
+        1.0
+      ]
+    },
+    {
+      "name": "rocker_platr",
+      "triangles": 12,
+      "closed_solid": true,
+      "signed_volume_m3": 0.019656,
+      "location": [
+        0.0,
+        0.0,
+        0.0
+      ],
+      "rotation_euler": [
+        0.0,
+        0.0,
+        0.0
+      ],
+      "scale": [
+        1.0,
+        1.0,
+        1.0
+      ]
+    },
+    {
+      "name": "rockertext_cab_l",
+      "triangles": 12,
+      "closed_solid": true,
+      "signed_volume_m3": 0.00476,
+      "location": [
+        0.0,
+        0.0,
+        0.0
+      ],
+      "rotation_euler": [
+        0.0,
+        0.0,
+        0.0
+      ],
+      "scale": [
+        1.0,
+        1.0,
+        1.0
+      ]
+    },
+    {
+      "name": "rockertext_cab_r",
+      "triangles": 12,
+      "closed_solid": true,
+      "signed_volume_m3": 0.00476,
+      "location": [
+        0.0,
+        0.0,
+        0.0
+      ],
+      "rotation_euler": [
+        0.0,
+        0.0,
+        0.0
+      ],
+      "scale": [
+        1.0,
+        1.0,
+        1.0
+      ]
+    },
+    {
+      "name": "rockertext_open_l",
+      "triangles": 12,
+      "closed_solid": true,
+      "signed_volume_m3": 0.003738,
+      "location": [
+        0.0,
+        0.0,
+        0.0
+      ],
+      "rotation_euler": [
+        0.0,
+        0.0,
+        0.0
+      ],
+      "scale": [
+        1.0,
+        1.0,
+        1.0
+      ]
+    },
+    {
+      "name": "rockertext_open_r",
+      "triangles": 12,
+      "closed_solid": true,
+      "signed_volume_m3": 0.003738,
+      "location": [
+        0.0,
+        0.0,
+        0.0
+      ],
+      "rotation_euler": [
+        0.0,
+        0.0,
+        0.0
+      ],
+      "scale": [
+        1.0,
+        1.0,
+        1.0
+      ]
+    },
+    {
+      "name": "rockertext_plat_l",
+      "triangles": 12,
+      "closed_solid": true,
+      "signed_volume_m3": 0.001078,
+      "location": [
+        0.0,
+        0.0,
+        0.0
+      ],
+      "rotation_euler": [
+        0.0,
+        0.0,
+        0.0
+      ],
+      "scale": [
+        1.0,
+        1.0,
+        1.0
+      ]
+    },
+    {
+      "name": "rockertext_plat_r",
+      "triangles": 12,
+      "closed_solid": true,
+      "signed_volume_m3": 0.001078,
+      "location": [
+        0.0,
+        0.0,
+        0.0
+      ],
+      "rotation_euler": [
+        0.0,
+        0.0,
+        0.0
+      ],
+      "scale": [
+        1.0,
+        1.0,
+        1.0
+      ]
+    },
+    {
+      "name": "roof_bell",
+      "triangles": 36,
+      "closed_solid": true,
+      "signed_volume_m3": 0.006466,
+      "location": [
+        0.0,
+        0.0,
+        0.0
+      ],
+      "rotation_euler": [
+        0.0,
+        0.0,
+        0.0
+      ],
+      "scale": [
+        1.0,
+        1.0,
+        1.0
+      ]
+    },
+    {
+      "name": "roof_fascia",
+      "triangles": 44,
+      "closed_solid": true,
+      "signed_volume_m3": 1.580391,
+      "location": [
+        0.0,
+        0.0,
+        0.0
+      ],
+      "rotation_euler": [
+        0.0,
+        0.0,
+        0.0
+      ],
+      "scale": [
+        1.0,
+        1.0,
+        1.0
+      ]
+    },
+    {
+      "name": "roof_moulding",
+      "triangles": 32,
+      "closed_solid": true,
+      "signed_volume_m3": 0.109869,
+      "location": [
+        0.0,
+        0.0,
+        0.0
+      ],
+      "rotation_euler": [
+        0.0,
+        0.0,
+        0.0
+      ],
+      "scale": [
+        1.0,
+        1.0,
+        1.0
+      ]
+    },
+    {
+      "name": "roof_slab",
+      "triangles": 60,
+      "closed_solid": true,
+      "signed_volume_m3": 1.121647,
+      "location": [
+        0.0,
+        0.0,
+        0.0
+      ],
+      "rotation_euler": [
+        0.0,
+        0.0,
+        0.0
+      ],
+      "scale": [
+        1.0,
+        1.0,
+        1.0
+      ]
+    },
+    {
+      "name": "routeboard_f",
+      "triangles": 12,
+      "closed_solid": true,
+      "signed_volume_m3": 0.003373,
+      "location": [
+        0.0,
+        0.0,
+        0.0
+      ],
+      "rotation_euler": [
+        0.0,
+        0.0,
+        0.0
+      ],
+      "scale": [
+        1.0,
+        1.0,
+        1.0
+      ]
+    },
+    {
+      "name": "routeboard_f_glow",
+      "triangles": 12,
+      "closed_solid": true,
+      "signed_volume_m3": 0.007722,
+      "location": [
+        0.0,
+        0.0,
+        0.0
+      ],
+      "rotation_euler": [
+        0.0,
+        0.0,
+        0.0
+      ],
+      "scale": [
+        1.0,
+        1.0,
+        1.0
+      ]
+    },
+    {
+      "name": "routeboard_r",
+      "triangles": 12,
+      "closed_solid": true,
+      "signed_volume_m3": 0.005632,
+      "location": [
+        0.0,
+        0.0,
+        0.0
+      ],
+      "rotation_euler": [
+        0.0,
+        0.0,
+        0.0
+      ],
+      "scale": [
+        1.0,
+        1.0,
+        1.0
+      ]
+    },
+    {
+      "name": "routeboard_r_glow",
+      "triangles": 12,
+      "closed_solid": true,
+      "signed_volume_m3": 0.01386,
+      "location": [
+        0.0,
+        0.0,
+        0.0
+      ],
+      "rotation_euler": [
+        0.0,
+        0.0,
+        0.0
+      ],
+      "scale": [
+        1.0,
+        1.0,
+        1.0
+      ]
+    },
+    {
+      "name": "runboard_l",
+      "triangles": 12,
+      "closed_solid": true,
+      "signed_volume_m3": 0.1664,
+      "location": [
+        0.0,
+        0.0,
+        0.0
+      ],
+      "rotation_euler": [
+        0.0,
+        0.0,
+        0.0
+      ],
+      "scale": [
+        1.0,
+        1.0,
+        1.0
+      ]
+    },
+    {
+      "name": "runboard_r",
+      "triangles": 12,
+      "closed_solid": true,
+      "signed_volume_m3": 0.1664,
+      "location": [
+        0.0,
+        0.0,
+        0.0
+      ],
+      "rotation_euler": [
+        0.0,
+        0.0,
+        0.0
+      ],
+      "scale": [
+        1.0,
+        1.0,
+        1.0
+      ]
+    },
+    {
+      "name": "runboard_strip_l",
+      "triangles": 12,
+      "closed_solid": true,
+      "signed_volume_m3": 0.003744,
+      "location": [
+        0.0,
+        0.0,
+        0.0
+      ],
+      "rotation_euler": [
+        0.0,
+        0.0,
+        0.0
+      ],
+      "scale": [
+        1.0,
+        1.0,
+        1.0
+      ]
+    },
+    {
+      "name": "runboard_strip_r",
+      "triangles": 12,
+      "closed_solid": true,
+      "signed_volume_m3": 0.003744,
+      "location": [
+        0.0,
+        0.0,
+        0.0
+      ],
+      "rotation_euler": [
+        0.0,
+        0.0,
+        0.0
+      ],
+      "scale": [
+        1.0,
+        1.0,
+        1.0
+      ]
+    },
+    {
+      "name": "sill",
+      "triangles": 44,
+      "closed_solid": true,
+      "signed_volume_m3": 0.432548,
+      "location": [
+        0.0,
+        0.0,
+        0.0
+      ],
+      "rotation_euler": [
+        0.0,
+        0.0,
+        0.0
+      ],
+      "scale": [
+        1.0,
+        1.0,
+        1.0
+      ]
+    },
+    {
+      "name": "slot_lever",
+      "triangles": 12,
+      "closed_solid": true,
+      "signed_volume_m3": 0.003004,
+      "location": [
+        0.0,
+        0.0,
+        0.0
+      ],
+      "rotation_euler": [
+        0.0,
+        0.0,
+        0.0
+      ],
+      "scale": [
+        1.0,
+        1.0,
+        1.0
+      ]
+    },
+    {
+      "name": "taillamp_l",
+      "triangles": 12,
+      "closed_solid": true,
+      "signed_volume_m3": 0.00096,
+      "location": [
+        0.0,
+        0.0,
+        0.0
+      ],
+      "rotation_euler": [
+        0.0,
+        0.0,
+        0.0
+      ],
+      "scale": [
+        1.0,
+        1.0,
+        1.0
+      ]
+    },
+    {
+      "name": "taillamp_r",
+      "triangles": 12,
+      "closed_solid": true,
+      "signed_volume_m3": 0.00096,
+      "location": [
+        0.0,
+        0.0,
+        0.0
+      ],
+      "rotation_euler": [
+        0.0,
+        0.0,
+        0.0
+      ],
+      "scale": [
+        1.0,
+        1.0,
+        1.0
+      ]
+    },
+    {
+      "name": "truckframe_l",
+      "triangles": 12,
+      "closed_solid": true,
+      "signed_volume_m3": 0.05016,
+      "location": [
+        0.0,
+        0.0,
+        0.0
+      ],
+      "rotation_euler": [
+        0.0,
+        0.0,
+        0.0
+      ],
+      "scale": [
+        1.0,
+        1.0,
+        1.0
+      ]
+    },
+    {
+      "name": "truckframe_r",
+      "triangles": 12,
+      "closed_solid": true,
+      "signed_volume_m3": 0.05016,
+      "location": [
+        0.0,
+        0.0,
+        0.0
+      ],
+      "rotation_euler": [
+        0.0,
+        0.0,
+        0.0
+      ],
+      "scale": [
+        1.0,
+        1.0,
+        1.0
+      ]
+    },
+    {
+      "name": "underframe",
+      "triangles": 44,
+      "closed_solid": true,
+      "signed_volume_m3": 2.586911,
+      "location": [
+        0.0,
+        0.0,
+        0.0
+      ],
+      "rotation_euler": [
+        0.0,
+        0.0,
+        0.0
+      ],
+      "scale": [
+        1.0,
+        1.0,
+        1.0
+      ]
+    },
+    {
+      "name": "wheel_fl",
+      "triangles": 44,
+      "closed_solid": true,
+      "signed_volume_m3": 0.028224,
+      "location": [
+        0.0,
+        0.0,
+        0.0
+      ],
+      "rotation_euler": [
+        0.0,
+        0.0,
+        0.0
+      ],
+      "scale": [
+        1.0,
+        1.0,
+        1.0
+      ]
+    },
+    {
+      "name": "wheel_fr",
+      "triangles": 44,
+      "closed_solid": true,
+      "signed_volume_m3": 0.028224,
+      "location": [
+        0.0,
+        0.0,
+        0.0
+      ],
+      "rotation_euler": [
+        0.0,
+        0.0,
+        0.0
+      ],
+      "scale": [
+        1.0,
+        1.0,
+        1.0
+      ]
+    },
+    {
+      "name": "wheel_rl",
+      "triangles": 44,
+      "closed_solid": true,
+      "signed_volume_m3": 0.028224,
+      "location": [
+        0.0,
+        0.0,
+        0.0
+      ],
+      "rotation_euler": [
+        0.0,
+        0.0,
+        0.0
+      ],
+      "scale": [
+        1.0,
+        1.0,
+        1.0
+      ]
+    },
+    {
+      "name": "wheel_rr",
+      "triangles": 44,
+      "closed_solid": true,
+      "signed_volume_m3": 0.028224,
+      "location": [
+        0.0,
+        0.0,
+        0.0
+      ],
+      "rotation_euler": [
+        0.0,
+        0.0,
+        0.0
+      ],
+      "scale": [
+        1.0,
+        1.0,
+        1.0
+      ]
+    },
+    {
+      "name": "win_l_0",
+      "triangles": 20,
+      "closed_solid": true,
+      "signed_volume_m3": 0.021438,
+      "location": [
+        0.0,
+        0.0,
+        0.0
+      ],
+      "rotation_euler": [
+        0.0,
+        0.0,
+        0.0
+      ],
+      "scale": [
+        1.0,
+        1.0,
+        1.0
+      ]
+    },
+    {
+      "name": "win_l_1",
+      "triangles": 20,
+      "closed_solid": true,
+      "signed_volume_m3": 0.021438,
+      "location": [
+        0.0,
+        0.0,
+        0.0
+      ],
+      "rotation_euler": [
+        0.0,
+        0.0,
+        0.0
+      ],
+      "scale": [
+        1.0,
+        1.0,
+        1.0
+      ]
+    },
+    {
+      "name": "win_l_2",
+      "triangles": 20,
+      "closed_solid": true,
+      "signed_volume_m3": 0.021438,
+      "location": [
+        0.0,
+        0.0,
+        0.0
+      ],
+      "rotation_euler": [
+        0.0,
+        0.0,
+        0.0
+      ],
+      "scale": [
+        1.0,
+        1.0,
+        1.0
+      ]
+    },
+    {
+      "name": "win_l_3",
+      "triangles": 20,
+      "closed_solid": true,
+      "signed_volume_m3": 0.021438,
+      "location": [
+        0.0,
+        0.0,
+        0.0
+      ],
+      "rotation_euler": [
+        0.0,
+        0.0,
+        0.0
+      ],
+      "scale": [
+        1.0,
+        1.0,
+        1.0
+      ]
+    },
+    {
+      "name": "win_r_0",
+      "triangles": 20,
+      "closed_solid": true,
+      "signed_volume_m3": 0.021438,
+      "location": [
+        0.0,
+        0.0,
+        0.0
+      ],
+      "rotation_euler": [
+        0.0,
+        0.0,
+        0.0
+      ],
+      "scale": [
+        1.0,
+        1.0,
+        1.0
+      ]
+    },
+    {
+      "name": "win_r_1",
+      "triangles": 20,
+      "closed_solid": true,
+      "signed_volume_m3": 0.021438,
+      "location": [
+        0.0,
+        0.0,
+        0.0
+      ],
+      "rotation_euler": [
+        0.0,
+        0.0,
+        0.0
+      ],
+      "scale": [
+        1.0,
+        1.0,
+        1.0
+      ]
+    },
+    {
+      "name": "win_r_2",
+      "triangles": 20,
+      "closed_solid": true,
+      "signed_volume_m3": 0.021438,
+      "location": [
+        0.0,
+        0.0,
+        0.0
+      ],
+      "rotation_euler": [
+        0.0,
+        0.0,
+        0.0
+      ],
+      "scale": [
+        1.0,
+        1.0,
+        1.0
+      ]
+    },
+    {
+      "name": "win_r_3",
+      "triangles": 20,
+      "closed_solid": true,
+      "signed_volume_m3": 0.021438,
+      "location": [
+        0.0,
+        0.0,
+        0.0
+      ],
+      "rotation_euler": [
+        0.0,
+        0.0,
+        0.0
+      ],
+      "scale": [
+        1.0,
+        1.0,
+        1.0
+      ]
+    },
+    {
+      "name": "winglow_l_0",
+      "triangles": 20,
+      "closed_solid": true,
+      "signed_volume_m3": 0.016642,
+      "location": [
+        0.0,
+        0.0,
+        0.0
+      ],
+      "rotation_euler": [
+        0.0,
+        0.0,
+        0.0
+      ],
+      "scale": [
+        1.0,
+        1.0,
+        1.0
+      ]
+    },
+    {
+      "name": "winglow_l_1",
+      "triangles": 20,
+      "closed_solid": true,
+      "signed_volume_m3": 0.016642,
+      "location": [
+        0.0,
+        0.0,
+        0.0
+      ],
+      "rotation_euler": [
+        0.0,
+        0.0,
+        0.0
+      ],
+      "scale": [
+        1.0,
+        1.0,
+        1.0
+      ]
+    },
+    {
+      "name": "winglow_l_2",
+      "triangles": 20,
+      "closed_solid": true,
+      "signed_volume_m3": 0.016642,
+      "location": [
+        0.0,
+        0.0,
+        0.0
+      ],
+      "rotation_euler": [
+        0.0,
+        0.0,
+        0.0
+      ],
+      "scale": [
+        1.0,
+        1.0,
+        1.0
+      ]
+    },
+    {
+      "name": "winglow_l_3",
+      "triangles": 20,
+      "closed_solid": true,
+      "signed_volume_m3": 0.016643,
+      "location": [
+        0.0,
+        0.0,
+        0.0
+      ],
+      "rotation_euler": [
+        0.0,
+        0.0,
+        0.0
+      ],
+      "scale": [
+        1.0,
+        1.0,
+        1.0
+      ]
+    },
+    {
+      "name": "winglow_r_0",
+      "triangles": 20,
+      "closed_solid": true,
+      "signed_volume_m3": 0.016642,
+      "location": [
+        0.0,
+        0.0,
+        0.0
+      ],
+      "rotation_euler": [
+        0.0,
+        0.0,
+        0.0
+      ],
+      "scale": [
+        1.0,
+        1.0,
+        1.0
+      ]
+    },
+    {
+      "name": "winglow_r_1",
+      "triangles": 20,
+      "closed_solid": true,
+      "signed_volume_m3": 0.016643,
+      "location": [
+        0.0,
+        0.0,
+        0.0
+      ],
+      "rotation_euler": [
+        0.0,
+        0.0,
+        0.0
+      ],
+      "scale": [
+        1.0,
+        1.0,
+        1.0
+      ]
+    },
+    {
+      "name": "winglow_r_2",
+      "triangles": 20,
+      "closed_solid": true,
+      "signed_volume_m3": 0.016643,
+      "location": [
+        0.0,
+        0.0,
+        0.0
+      ],
+      "rotation_euler": [
+        0.0,
+        0.0,
+        0.0
+      ],
+      "scale": [
+        1.0,
+        1.0,
+        1.0
+      ]
+    },
+    {
+      "name": "winglow_r_3",
+      "triangles": 20,
+      "closed_solid": true,
+      "signed_volume_m3": 0.016642,
+      "location": [
+        0.0,
+        0.0,
+        0.0
+      ],
+      "rotation_euler": [
+        0.0,
+        0.0,
+        0.0
+      ],
+      "scale": [
+        1.0,
+        1.0,
+        1.0
+      ]
+    }
+  ],
+  "stage": "authored",
+  "checks": {
+    "meters_and_published_dimensions": true,
+    "ground_at_min_y_zero": true,
+    "centered_in_xz_footprint": true,
+    "front_faces_minus_z": true,
+    "narrow_gauge_wheels": true,
+    "under_triangle_budget": true,
+    "no_image_textures": true,
+    "no_transparency": true,
+    "materials_follow_contract": true,
+    "no_toy_body": true,
+    "no_cameras_or_lights": true,
+    "no_animation_skin_or_constraints": true,
+    "transforms_applied": true,
+    "no_negative_scales": true,
+    "normals_finite_and_unit": true,
+    "no_degenerate_geometry": true,
+    "no_unexpected_objects": true,
+    "glow_set_is_night_only": true,
+    "glow_materials_present": true,
+    "every_object_is_a_closed_solid": true,
+    "every_object_signed_volume_positive": true,
+    "gripman_and_conductor_present": true,
+    "at_least_three_standees_on_running_boards": true
+  },
+  "overall": "PASS"
+}

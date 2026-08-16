@@ -44,13 +44,18 @@ function loadData() {
     read('./_data/neighborhoods.json'),
     read('./_data/streets.json'),
     read('./_data/stats.json'),
-  ]).then(([places, search, parks, neighborhoods, streets, stats]) => ({
+    // Stop index for transit_nearby. Optional: a deployment without it just
+    // loses that one tool rather than failing to answer anything at all.
+    read('./_data/muni-stops.json').catch(() => null),
+  ]).then(([places, search, parks, neighborhoods, streets, stats, muniStops]) => ({
     places,
     search,
     parks,
     neighborhoods,
     streets,
     stats,
+    muniStops: muniStops?.stops || null,
+    muniRoutes: muniStops?.busRoutes || [],
   }));
   return dataPromise;
 }

@@ -12,7 +12,7 @@
 // drops it and the lot goes back to the procedural mass with one warning.
 
 import { BufferAttribute, Vector3 } from 'three';
-import { GLTFLoader } from 'three/addons/loaders/GLTFLoader.js';
+import { createGLTFLoader } from './gltf.js';
 import { mergeGeometries } from 'three/addons/utils/BufferGeometryUtils.js';
 import { createKitCatalog } from './kitplan.js';
 
@@ -76,7 +76,7 @@ function mergePiece(root) {
  * actually asks for are ever fetched.
  */
 export function createKitLoader(catalog, { onWarn = console.warn } = {}) {
-  const loader = new GLTFLoader();
+  const loader = createGLTFLoader();
   const pending = new Map();
   const ready = new Map();
   const failed = new Set();
@@ -113,6 +113,18 @@ export function createKitLoader(catalog, { onWarn = console.warn } = {}) {
   return {
     get(index) {
       return ready.get(index) || null;
+    },
+    /**
+     * Drops a piece's CPU-side merged geometry once the fleet has copied it
+     * into the batch. The entry itself survives — `front`/`triangles` place
+     * every later instance, and a present entry keeps ensure() from
+     * refetching — but the vertex arrays (the bulk of the kit's heap) go.
+     */
+    release(index) {
+      const entry = ready.get(index);
+      if (!entry || !entry.geometry) return;
+      entry.geometry.dispose();
+      entry.geometry = null;
     },
     failed(index) {
       return failed.has(index);

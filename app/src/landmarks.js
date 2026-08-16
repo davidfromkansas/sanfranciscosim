@@ -846,6 +846,14 @@ export function createLandmarks(scene, data) {
     group,
     built,
     useBridgeAsset,
+    // A streamed asset unloaded: the code-built version (where one exists) is
+    // the far stand-in again (rule 3 — never a hole where we can help it).
+    restoreCodeBuilt(id) {
+      const entry = built.find((b) => b.landmark.id === id);
+      if (!entry || !entry.replaced) return;
+      entry.object.visible = true;
+      entry.replaced = false;
+    },
     update() {
       for (const entry of built) updateLandmarkGlow(entry.object);
     },

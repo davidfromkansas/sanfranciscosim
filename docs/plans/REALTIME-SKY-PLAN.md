@@ -24,7 +24,7 @@ good ideas; improve on its gaps:
 | Astronomy math inline in a 12k-line HTML file | One shared, tested module used by BOTH the app and the concierge API |
 | Time scrub offset kept | Live time ONLY (owner's decision) — no scrub UI |
 | Manual `-0.22` clamp keeps night barely lit | Explicit usability floor: minimum light + navy sky so the city is always readable at night |
-| Weather integration | OUT OF SCOPE here — do not add weather, do not add network calls |
+| Weather integration | OUT OF SCOPE **for this plan** — superseded by `WEATHER-PLAN.md`, which added live weather deliberately. This plan still adds none. |
 | Clock chip with weather | Diorama-styled clock: time + date + sunrise/sunset + moon phase |
 
 ## 1. Files you will touch
@@ -268,6 +268,13 @@ Update those paragraphs to describe: live real time, `SF.setClock(...)`,
 `SF.sky`, and the clock panel. Keep the rest of the skill intact.
 
 ## 11. What NOT to do
+
+> **Superseded in part (see `WEATHER-PLAN.md`).** The "no weather, no external
+> APIs" rule below was correct for THIS plan and is still the rule for the
+> astronomy module: `astro.mjs` remains pure local computation with no network
+> call and no key. Live weather now exists, but it arrives through its own feed
+> (`/api/weather`) and its own module — it never reaches into the sun/moon maths.
+
 
 - No weather, no external APIs, no npm packages (`suncalc` etc. — write the
   math in `astro.mjs` instead; it is ~120 lines).

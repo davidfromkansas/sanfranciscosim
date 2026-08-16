@@ -16,9 +16,9 @@ Not integrated: the production manifest, `pipeline/lib/landmarks.mjs`, and app c
 - `validate_city_hall.py` — isolated fresh-scene re-import validator
 - `make_contact_sheet.py` — labelled contact sheet assembly (Pillow)
 - `city-hall.blend` — authoring scene (asset geometry only, no cameras/lights)
-- `city-hall.glb` — final binary deliverable (1.15 MB)
+- `city-hall.glb` — final binary deliverable (1.44 MB)
 - `validation.json` — full object-level machine report
-- `city-hall-{north,east,south,west,top,aerial}.png`, `city-hall-contact-sheet.png`
+- `city-hall-{north,east,south,west,top,aerial}.png`, `city-hall-{night,night-east}.png`, `city-hall-contact-sheet.png`
 - `city-hall-validation-aerial.png` — review render made by the validator from the re-import
 
 Rebuild from this directory:
@@ -53,28 +53,28 @@ Authored in **true-world orientation: Blender +X = east, +Y = true north, +Z = u
 
 | Rule | Result | Evidence |
 |---|---|---|
-| Binary GLB, no external dependencies | PASS | 1.15 MB self-contained `city-hall.glb` |
+| Binary GLB, no external dependencies | PASS | 1.44 MB self-contained `city-hall.glb` |
 | Real-world metres, plausible dimensions | PASS | 122.9836 × 144.92 × 93.75 m AABB (building block ~104 × 130 m skewed 9.62° in plan; height 93.75 m vs. 93.73 m target) |
 | Origin at base centre, min Z ≈ 0 | PASS | bbox min Z = 0.0 m; XY centre offset [0.4954, 0.0] m — 0.4 % of the east–west extent, caused by the grand stair projecting further east than the west portico |
 | Orientation | PASS | +Y = true north, 350.4° heading, east front |
-| Triangle budget | PASS | 17,440 / 27,000 |
-| Applied transforms | PASS | all 8 objects at location 0, rotation 0, scale 1 |
+| Triangle budget | PASS | 20,808 / 27,000 |
+| Applied transforms | PASS | all 10 objects at location 0, rotation 0, scale 1 |
 | Negative scales | PASS | none |
 | Normals outward | PASS | 0 invalid/non-unit loop normals; 0 flipped visible faces across 4,866 deterministic exterior first-hit rays |
 | No degenerate geometry | PASS | 0 degenerate triangles |
 | No image textures | PASS | 0 image-texture nodes, 0 textured materials |
 | No transparency | PASS | every material alpha = 1.0 |
-| Flat-colour `Toy_*` palette, no `Toy_body` | PASS | `Toy_cream`, `Toy_glass`, `Toy_gold`, `Toy_roofc`, `Toy_roofd`, `Toy_sand`, `Toy_stone`, `Toy_trim` |
-| `_Glow` only where it glows | PASS | no `_Glow` materials — City Hall's night identity is external floodlighting on stone, not emissive surfaces |
+| Flat-colour `Toy_*` palette, no `Toy_body` | PASS | `Toy_cream`, `Toy_glass`, `Toy_gold`, `Toy_gold_Glow`, `Toy_roofc`, `Toy_roofd`, `Toy_sand`, `Toy_stone`, `Toy_trim`, `Toy_white_Glow` |
+| `_Glow` only where it glows | PASS | two night materials on lit panes, the drum openings, the gilded dome ribs/ring/medallions and the lantern core — see "Night state" below. Exported emission strength is 0.0 on every material: the app, not the file, decides when they burn |
 | No cameras / lights / animation / armatures / constraints | PASS | 0 / 0 / 0 / 0 / 0 |
-| No unexpected or foreign geometry | PASS | 8 mesh objects, one per palette material, unique names, nothing else in the file |
+| No unexpected or foreign geometry | PASS | 10 mesh objects, one per palette material, unique names, nothing else in the file |
 
 ### Re-import metrics
 
 | Metric | Value |
 |---|---|
-| Object count (all mesh) | 8 |
-| Triangles | 17,440 |
+| Object count (all mesh) | 10 |
+| Triangles | 20,808 |
 | Dimensions (m) | 122.9836 × 144.92 × 93.75 |
 | BBox min (m) | −60.9964, −72.46, 0.0 |
 | BBox max (m) | 61.9872, 72.46, 93.75 |
@@ -82,7 +82,25 @@ Authored in **true-world orientation: Blender +X = east, +Y = true north, +Z = u
 | XY centre offset (m) | 0.4954, 0.0 |
 | Image textures / cameras / lights / animation f-curves | 0 / 0 / 0 / 0 |
 
-Per-object triangles: `CityHall_trim` 6,920 · `CityHall_glass` 2,636 · `CityHall_gold` 2,520 · `CityHall_cream` 2,216 · `CityHall_roofd` 1,148 · `CityHall_stone` 1,136 · `CityHall_roofc` 432 · `CityHall_sand` 432.
+Per-object triangles: `CityHall_trim` 6,920 · `CityHall_gold_Glow` 3,324 · `CityHall_glass` 2,636 · `CityHall_gold` 2,520 · `CityHall_cream` 2,216 · `CityHall_roofd` 1,148 · `CityHall_stone` 1,136 · `CityHall_roofc` 432 · `CityHall_sand` 432 · `CityHall_white_Glow` 44.
+
+## Night state
+
+The app has no per-asset night switch to configure: `app/src/env.js` derives `uNight` from the solar elevation of the current clock — 0 while the sun is above the horizon, ramping to 1 once it is 10° below — and `updateLandmarkGlow` drives the `_Glow` mesh's opacity from it (`0.12 + uNight * 0.95`). So the only thing an asset has to do to have a night state is carry `_Glow` materials; the loader splits them into a second, unlit mesh (a second draw call) and the city's own clock ignites them. The GLB therefore ships with emission strength 0.0 everywhere.
+
+What lights up, and why:
+
+| Surface | Material | Reasoning |
+|---|---|---|
+| Gilded meridian ribs, the dome ring, the eight medallions | `Toy_gold_Glow` | The real dome is floodlit after dark and the gilding is what answers the light. These are second, fractionally fatter tubes/spheres *sheathing* the daytime gold pieces, so the day silhouette is unchanged and the dome keeps its shape against a night sky instead of reading as a black hole. |
+| The 16 drum-colonnade openings | `Toy_gold_Glow` | The rotunda behind them burns all night and is the building's brightest real feature at distance. |
+| Lit panes on the giant-order and basement windows of all four elevations, the corner-pavilion bays, the portico's tall bays, and the north/south centre bays | `Toy_gold_Glow` | Warm office light. One bay in five is deliberately left dark (`occupied()`), so the facade reads as a working building rather than a lantern. |
+| The three ceremonial portal doors under the east portico | `Toy_gold_Glow` | The brightest thing at street level, which is where the grand stair leads the eye. |
+| The lantern core | `Toy_white_Glow` | The beacon at the top — the one cool-white light on the model, so the finial still separates from the warm dome below. |
+
+Nothing on the roofscape, the terrace or the stone base glows: at the city camera those would smear into a bright blob and cost the dome its silhouette.
+
+The night surfaces cost 3,368 triangles (17,440 → 20,808) and one extra draw call for the whole landmark.
 
 ## Design decisions (per `docs/styles/miniature-toy.md` §22)
 
@@ -101,6 +119,8 @@ Excluded from the GLB as required: Civic Center Plaza, lawns, fountains, flagpol
 ## Review renders
 
 The four elevations share one orthographic camera rig (identical scale, framing, sun, exposure, and projection) and are labelled from the researched orientation; the top view shows the dome, lantern, drum colonnade, light courts and the four roof pavilions; `city-hall-aerial.png` uses the style bible's camera (≈38° down, 85 mm long lens, neutral warm background). Every image is the same exported GLB.
+
+`city-hall-night.png` (aerial camera) and `city-hall-night-east.png` (plaza-side, low) review the night state: the studio drops to a cold moonlit key and the `_Glow` materials are given emission *in the render scene only*, standing in for the runtime's dusk ramp. Conversely the daylight renders hide the `_Glow` mesh, because the runtime holds it at 12% opacity while the sun is up — neither adjustment touches the exported file.
 
 ## Draft manifest entry (not applied)
 
@@ -121,7 +141,7 @@ The four elevations share one orthographic camera rig (identical scale, framing,
     144.92,
     93.75
   ],
-  "tris": 17440
+  "tris": 20808
 }
 ```
 

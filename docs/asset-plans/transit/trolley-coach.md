@@ -445,9 +445,21 @@ will be made from.
 - **Two assets, one body.** If the bus plan changes after this one ships, both
   must be rebuilt from the shared script. Note the dependency in both reports.
 
-### 2.16 The 60-foot articulated coach — not a separate model
+### 2.16 The deferred 60-foot articulated variant
 
-Same decision as the hybrid bus (§2.16 there): **reuse this GLB for both
-lengths.** XT60 fleet numbers (7201–7293) point at `muni-trolley-40` exactly as
-XT40 numbers (5701–5885) do. The XT60 is 18.29 m against 12.19 m, otherwise
-identical — not worth a second model or a second draw call at the app's camera.
+Not in scope, for the same reason as the hybrid bus: the 511 SIRI feed resolves
+vehicle **mode** from `LineRef`, and rigid versus articulated is not a mode.
+
+Research kept for a later pass:
+
+| Item | Value |
+|---|---|
+| Model | New Flyer Xcelsior **XT60** |
+| Fleet numbers | 7201–7293 (93 coaches, 2015–2018) |
+| Length | 18.29 m (60 ft); same 2.59 m width |
+| Build | the rigid coach plus a second rear section and bellows, with the pole assembly on the **rear** section |
+| Triangle cap | 4,600 |
+
+`VehicleRef` in the feed is the real fleet number and Muni's ranges are blocked
+by model — 5701–5885 is XT40, 7201–7293 is XT60 — so a lookup table could pick
+the right GLB per vehicle if the variant is ever built.

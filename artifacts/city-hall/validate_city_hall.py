@@ -12,6 +12,9 @@ import bpy
 from mathutils import Vector
 
 ALLOWED_MATERIALS = {"Toy_cream", "Toy_sand", "Toy_trim", "Toy_glass", "Toy_stone", "Toy_roofd", "Toy_roofc", "Toy_gold"}
+# Night surfaces the app ignites through its own `uNight` ramp. The exported
+# file must stay unlit: baked emission would make them burn at noon too.
+ALLOWED_GLOW_MATERIALS = {"Toy_gold_Glow", "Toy_white_Glow"}
 
 
 def rounded(vector):
@@ -102,9 +105,11 @@ def main():
         if alpha < 0.999 or mat.surface_render_method != "DITHERED":
             # Blender's imported opaque glTF materials use DITHERED in 4.5; alpha is the authoritative check.
             if alpha < 0.999: transparent.append(mat.name)
-        compliant = mat.name in ALLOWED_MATERIALS and mat.name.startswith("Toy_") and mat.name != "Toy_body"
+        compliant = (mat.name in ALLOWED_MATERIALS or mat.name in ALLOWED_GLOW_MATERIALS) \
+            and mat.name.startswith("Toy_") and mat.name != "Toy_body"
         if not compliant: off_contract.append(mat.name)
-        if mat.name.endswith("_Glow"): glow_violations.append(mat.name)
+        if mat.name.endswith("_Glow") and mat.name not in ALLOWED_GLOW_MATERIALS: glow_violations.append(mat.name)
+        if emission and emission > 0.0001: glow_violations.append(mat.name)
         material_rows.append({"name": mat.name, "contract_compliant": compliant,
                               "image_texture_nodes": texture_nodes, "alpha": round(alpha, 4),
                               "roughness": round(roughness, 4) if roughness is not None else None,

@@ -4,7 +4,7 @@
 // green rectangle from the hero view without loading any park geometry).
 
 import { BufferAttribute, BufferGeometry, Mesh } from 'three';
-import { createCloudShadedMaterial } from './materials.js';
+import { createTerrainMaterial, setParkGrassQuality } from './materials.js';
 
 const SEGMENTS = 512; // per quadrant -> 1024 across the city, ~15 m spacing
 const MASK = 512; // bathymetry mask resolution over the whole extent
@@ -19,6 +19,8 @@ const KIND_COLORS = {
   4: [0.29, 0.43, 0.26], // pitch
   5: [0.42, 0.45, 0.27], // scrub
   6: [0.4, 0.4, 0.41], // paved
+  7: [0.427, 0.478, 0.29], // marsh
+  8: [0.604, 0.561, 0.502], // rock
 };
 
 // Bare urban ground between the buildings: warm grey, drifting sandier towards
@@ -89,6 +91,7 @@ export function createTerrain(data) {
   const halfD = (maxZ - minZ) / 2;
   const meshes = [];
   const tmp = [0, 0, 0];
+  const material = createTerrainMaterial();
 
   for (let qz = 0; qz < 2; qz++) {
     for (let qx = 0; qx < 2; qx++) {
@@ -101,6 +104,7 @@ export function createTerrain(data) {
       const positions = new Float32Array(count * 3);
       const normals = new Float32Array(count * 3);
       const colors = new Float32Array(count * 3);
+      const kinds = new Float32Array(count);
 
       for (let j = 0; j < side; j++) {
         const z = oz + j * stepZ;
@@ -120,13 +124,14 @@ export function createTerrain(data) {
           const ez = sampleElevation(x, z + stepZ) - sampleElevation(x, z - stepZ);
           const nx = -ex / (2 * stepX);
           const nz = -ez / (2 * stepZ);
+          const slope = Math.hypot(ex / (2 * stepX), ez / (2 * stepZ));
           const len = Math.hypot(nx, 1, nz);
           normals[p] = nx / len;
           normals[p + 1] = 1 / len;
           normals[p + 2] = nz / len;
 
-          const slope = Math.hypot(ex / (2 * stepX), ez / (2 * stepZ));
           const kind = submerged ? 3 : sampleLanduse(x, z);
+          kinds[j * side + i] = kind;
           const preset = KIND_COLORS[kind];
           if (preset) {
             tmp[0] = preset[0];
@@ -144,33 +149,56 @@ export function createTerrain(data) {
         }
       }
 
-      const indices = new Uint32Array(SEGMENTS * SEGMENTS * 6);
-      let k = 0;
-      for (let j = 0; j < SEGMENTS; j++) {
-        for (let i = 0; i < SEGMENTS; i++) {
-          const a = j * side + i;
-          indices[k++] = a;
-          indices[k++] = a + side;
-          indices[k++] = a + 1;
-          indices[k++] = a + 1;
-          indices[k++] = a + side;
-          indices[k++] = a + side + 1;
+      // Two prebuilt index buffers over the same vertices: full 15 m grid and
+      // a stride-2 30 m grid. Dropping a tier swaps the index — a quarter of
+      // the terrain triangles for the price of one setIndex, no rebake.
+      function gridIndex(stride) {
+        const cells = SEGMENTS / stride;
+        const indices = new Uint32Array(cells * cells * 6);
+        let k = 0;
+        for (let j = 0; j < SEGMENTS; j += stride) {
+          for (let i = 0; i < SEGMENTS; i += stride) {
+            const a = j * side + i;
+            indices[k++] = a;
+            indices[k++] = a + side * stride;
+            indices[k++] = a + stride;
+            indices[k++] = a + stride;
+            indices[k++] = a + side * stride;
+            indices[k++] = a + side * stride + stride;
+          }
         }
+        return new BufferAttribute(indices, 1);
       }
+
+      const fullIndex = gridIndex(1);
+      const coarseIndex = gridIndex(2);
 
       const geometry = new BufferGeometry();
       geometry.setAttribute('position', new BufferAttribute(positions, 3));
       geometry.setAttribute('normal', new BufferAttribute(normals, 3));
       geometry.setAttribute('color', new BufferAttribute(colors, 3));
-      geometry.setIndex(new BufferAttribute(indices, 1));
+      geometry.setAttribute('aKind', new BufferAttribute(kinds, 1));
+      geometry.setIndex(fullIndex);
       geometry.computeBoundingSphere();
 
-      const mesh = new Mesh(geometry, createCloudShadedMaterial());
+      const mesh = new Mesh(geometry, material);
       mesh.receiveShadow = true;
       mesh.name = `terrain-${qx}-${qz}`;
+      mesh.userData.terrainIndex = { full: fullIndex, coarse: coarseIndex };
       meshes.push(mesh);
     }
   }
 
-  return meshes;
+  return {
+    meshes,
+    setQuality(tier) {
+      setParkGrassQuality(tier);
+      const coarse = tier === 'low' || tier === 'medium';
+      for (const mesh of meshes) {
+        const { full, coarse: half } = mesh.userData.terrainIndex;
+        const next = coarse ? half : full;
+        if (mesh.geometry.getIndex() !== next) mesh.geometry.setIndex(next);
+      }
+    },
+  };
 }

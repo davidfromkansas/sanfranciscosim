@@ -1,5 +1,7 @@
 // Bootstrap: load the baked city, build the scene, and open on the hero frame —
-// the whole of San Francisco as a diorama, no title card, no fade-in.
+// the whole of San Francisco as a diorama. The boot curtain (boot.js) covers
+// the load with fog and lifts onto the finished frame; behind it the city has
+// always been building, and there is still no style transition of any kind.
 
 import {
   ACESFilmicToneMapping,
@@ -23,21 +25,33 @@ import { createAssets } from './assets.js';
 import { createPiers } from './piers.js';
 import { createAgents } from './agents.js';
 import { createLiveFerries } from './ferries.js';
+import { createLiveMuni } from './muni.js';
+import { createMuniStopLayer } from './munistoplayer.js';
+import { createLiveAircraft } from './aircraft.js';
 import { createCameraRig } from './camera.js';
 import { createSigns } from './signs.js';
 import { createToyPost } from './toypost.js';
-import { QUALITY, createLoader, createUI } from './ui.js';
+import { QUALITY, QUALITY_LADDER, createUI } from './ui.js';
+import { createBootScreen } from './boot.js';
+import { createGovernor } from './governor.js';
 import { createContext } from './context.js';
 import { createFocusOverlay } from './focus.js';
 import { createContextCard, createSearch } from './cards.js';
 import { createConcierge } from './concierge.js';
 import { createSkyClock } from './sky-clock.js';
+import { createWeather } from './weather.js';
+import { createClouds } from './clouds.js';
+import { createRain } from './rain.js';
+import { createFogBanks } from './fogbanks.js';
 import { localDayStart, moonPosition, skySnapshot, sunPosition } from '../../api/_lib/astro.mjs';
 
 const canvas = document.getElementById('view');
-const loader = createLoader();
+const bootScreen = createBootScreen();
 
-const renderer = new WebGLRenderer({ canvas, antialias: true, powerPreference: 'high-performance' });
+// antialias: false is deliberate (PERF-PLAN #7): the diorama always renders
+// through the post pass's offscreen target, so canvas MSAA smoothed a buffer
+// nobody sees. The samples live on the post target instead (toypost.js).
+const renderer = new WebGLRenderer({ canvas, antialias: false, powerPreference: 'high-performance' });
 renderer.outputColorSpace = SRGBColorSpace;
 renderer.toneMapping = ACESFilmicToneMapping;
 renderer.toneMappingExposure = 1.06;
@@ -45,22 +59,39 @@ renderer.shadowMap.enabled = true;
 renderer.shadowMap.type = PCFShadowMap;
 renderer.setSize(window.innerWidth, window.innerHeight, false);
 
+// Mobile browsers confiscate the GL context under memory pressure or after an
+// app switch. preventDefault on the lost event is what makes the context
+// restorable at all; three re-uploads everything it owns on the restored
+// event, and the frame loop sits out the gap so the governor and simulation
+// never see the dead time.
+let contextLost = false;
+canvas.addEventListener('webglcontextlost', (event) => {
+  event.preventDefault();
+  contextLost = true;
+  console.warn('WebGL context lost — pausing until the browser restores it');
+});
+canvas.addEventListener('webglcontextrestored', () => {
+  contextLost = false;
+  console.warn('WebGL context restored — resuming');
+});
+
 const scene = new Scene();
 const camera = new PerspectiveCamera(52, window.innerWidth / window.innerHeight, 4, 80000);
 
 async function boot() {
-  const data = await loadCore((p) => loader.set(p * 0.55));
+  const data = await loadCore((p) => bootScreen.core(p * 0.82));
 
   const env = createEnvironment(scene);
-  for (const mesh of createTerrain(data)) scene.add(mesh);
-  loader.set(0.75);
+  const terrain = createTerrain(data);
+  for (const mesh of terrain.meshes) scene.add(mesh);
+  bootScreen.core(0.9);
   const water = createWater(scene, data.manifest.extent);
   // The diorama plinth: a lifted slab of earth under the city with stratified
   // soil cross-sections on the side faces. Sits inside the clipped water.
   scene.add(createPlinth(data.manifest.extent, data.sampleElevation));
   const landmarks = createLandmarks(scene, data);
   const piers = createPiers(scene, data);
-  loader.set(0.9);
+  bootScreen.core(1);
 
   const context = await createContext(data);
   const city = createCity(scene, data);
@@ -83,10 +114,58 @@ async function boot() {
         }
       }
     },
+    onUnloaded(landmarkId) {
+      landmarks.restoreCodeBuilt(landmarkId);
+    },
   });
   const agents = createAgents(scene, data, city);
   // Real WETA vessels from /api/ferries; falls back to the procedural ferries.
   const ferries = createLiveFerries(scene, data, agents);
+  // The live weather field. Created before the clock so the card can read it
+  // on its very first render.
+  const weather = createWeather({ project: data.project });
+  // ?weather=<preset> pins a showcase state at load, so a dramatic view can be
+  // linked to rather than typed into a console. Live weather is still the
+  // default and there is no control in the UI for this — the city's promise is
+  // that what you see is real, and only an explicit URL opts out of it.
+  // Unknown values are ignored rather than erroring: a bad link shows the real
+  // city, which is the right failure.
+  function applyWeatherFromUrl() {
+    let requested = null;
+    try {
+      requested = new URLSearchParams(window.location.search).get('weather');
+    } catch {
+      return null;
+    }
+    if (!requested) return null;
+    const name = String(requested).toLowerCase();
+    if (!weather.presetNames.includes(name)) {
+      console.warn(`?weather=${requested} is not a known preset (${weather.presetNames.join(', ')}) — showing live weather`);
+      return null;
+    }
+    weather.setOverride({ preset: name });
+    // A linked state should be there on arrival, not ease in over a minute.
+    weather.settle();
+    return name;
+  }
+
+  // Toy clouds read the same field the shadows do, so what floats overhead and
+  // what darkens the ground always agree.
+  const clouds = createClouds(scene, { sampleAt: weather.sampleAt });
+  // Rain falls where the field says it is raining, in a box around the camera.
+  const rain = createRain(scene, { sampleAt: weather.sampleAt, renderer });
+  // Karl with a silhouette. The shader fog dissolves the city with distance;
+  // these are the vapour you can actually see, placed by the same field.
+  const fogBanks = createFogBanks(scene, { sampleAt: weather.sampleAt });
+  // Real Muni buses from /api/muni; when the feed is away this layer is simply
+  // empty — the procedural road traffic never depended on it.
+  const muni = createLiveMuni(scene, data);
+  // Clickable markers over the real bus stops; the shelters themselves are
+  // street furniture placed by the tile worker at the same coordinates.
+  const muniStops = createMuniStopLayer(scene, data, muni);
+  // Real aircraft from /api/flights. Like the Muni layer this one simply stays
+  // empty when the feed is away — nothing else in the city depends on it.
+  const aircraft = createLiveAircraft(scene, data);
   const signs = createSigns(scene, data);
   const post = createToyPost(renderer);
 
@@ -110,10 +189,24 @@ async function boot() {
 
   let quality = QUALITY.high;
   let qualityKey = 'high';
-  // Small screens and integrated GPUs start a tier down; the user can override.
+  // Small screens and integrated GPUs start a tier down; the governor takes it
+  // from there, measuring the frame rather than guessing at the hardware.
   if (window.devicePixelRatio > 1.9 || window.innerWidth < 900) {
     qualityKey = 'medium';
     quality = QUALITY.medium;
+  }
+
+  // Read-only now that the quality select is gone. Nothing writes this key any
+  // more, but a viewer who pinned a tier while the control existed keeps it
+  // rather than being silently moved onto the governor.
+  function readQualityPreference() {
+    try {
+      const saved = window.localStorage.getItem('sf.quality');
+      if (saved === 'auto' || QUALITY[saved]) return saved;
+    } catch {
+      // Safari private windows can reject a read.
+    }
+    return 'auto';
   }
 
   function applyQuality(key) {
@@ -122,11 +215,33 @@ async function boot() {
     renderer.setPixelRatio(Math.min(window.devicePixelRatio, quality.pixelRatio));
     env.setShadowQuality(quality.shadow);
     renderer.shadowMap.enabled = quality.shadow > 0;
-    city.setQuality(quality);
+    // Every visual subsystem answers to the tier (PERF-PLAN #6): the governor
+    // pulls one lever and the whole frame gets cheaper, not just the pixels.
+    city.setQuality(quality, key);
     water.setGlitter(key === 'low' ? 0.6 : 1);
+    water.setQuality(key);
+    agents.setQuality(key);
+    terrain.setQuality(key);
+    clouds.setQuality(key);
+    rain.setQuality(key);
+    fogBanks.setQuality(key);
+    post.setSamples(quality.samples);
     renderer.setSize(window.innerWidth, window.innerHeight, false);
     post.setSize();
   }
+
+  const qualityPreference = readQualityPreference();
+  const governor = createGovernor({
+    tiers: QUALITY,
+    ladder: QUALITY_LADDER,
+    initialTier: qualityPreference === 'auto' ? qualityKey : qualityPreference,
+    mode: qualityPreference,
+    apply: applyQuality,
+    isFlying: () => rig.flying,
+    readStreaming: () => city.stats,
+  });
+  if (qualityPreference !== 'auto') qualityKey = qualityPreference;
+  quality = QUALITY[qualityKey];
 
   // Visual style. The diorama is the only one the app ships: it is applied
   // before the first frame and there is no key, control or URL parameter that
@@ -151,7 +266,6 @@ async function boot() {
     agents.setToy(toy);
     signs.setVisible(toy);
     post.setEnabled(toy);
-    ui.setStyle(toy);
     await city.setTier(toy ? 'toy' : 'base');
   }
 
@@ -188,19 +302,13 @@ async function boot() {
     }
   }
   tickSky();
-  const skyClock = createSkyClock({ read: () => sky });
+  const skyClock = createSkyClock({ read: () => sky, readWeather: () => weather });
+  // After the first poll has had a moment: an override set before any payload
+  // arrives would be overwritten by it.
+  let urlWeather = applyWeatherFromUrl();
+  if (urlWeather) setTimeout(() => { urlWeather = applyWeatherFromUrl(); skyClock.update(); }, 2500);
 
-  const ui = createUI({
-    presets,
-    onPreset(index) {
-      rig.flyTo(presets[index]);
-    },
-    onQuality(key) {
-      applyQuality(key);
-      ui.setQuality(key);
-    },
-  });
-  ui.setQuality(qualityKey);
+  const ui = createUI();
   applyQuality(qualityKey);
 
   // Diorama is the only style this app ships. It is applied here, before the
@@ -222,18 +330,26 @@ async function boot() {
       card.hide();
       overlay.clear();
       focus.entity = null;
+      stopFollowing(); // Escape is the same dismissal as the card's close button
+      return;
+    }
+    // A — fly to an aircraft, lowest first, pressing again for the next one.
+    // Live aircraft can be anywhere and are not in the baked search index, so
+    // without this the only way to find one is to spot it by eye.
+    if (event.key === 'a' || event.key === 'A') {
+      const plane = aircraft.nextAircraft(
+        focus.entity?.kind === 'aircraft' ? focus.entity.id : null
+      );
+      if (plane) selectEntity(plane, { fly: true });
+      else console.info('[aircraft] nothing in the sky right now');
       return;
     }
     if (event.key === 'h' || event.key === 'H') {
       rig.flyTo(presets[0]);
-      ui.setPresetIndex(0);
       return;
     }
     const index = presets.findIndex((preset) => preset.key && preset.key === event.key);
-    if (index >= 0) {
-      rig.flyTo(presets[index]);
-      ui.setPresetIndex(index);
-    }
+    if (index >= 0) rig.flyTo(presets[index]);
   });
 
   window.addEventListener('resize', () => {
@@ -267,6 +383,21 @@ async function boot() {
     if (entity.kind === 'landmark' && entity.camera) {
       return { x: entity.x, z: entity.z, y: ground + (entity.height || 60) / 2, ...entity.camera };
     }
+    if (entity.kind === 'aircraft') {
+      // Frame the airframe where it is DRAWN (compressed altitude), not the
+      // ground beneath it, and stand off far enough that a 40 m airliner drawn
+      // at semantic scale fills a sensible part of the view.
+      return {
+        x: entity.x,
+        z: entity.z,
+        y: entity.displayY,
+        yaw: 210,
+        // Look DOWN on it, the way the diorama looks down on everything else —
+        // the follow camera eases to the same framing once the fly-in lands.
+        pitch: style === 'toy' ? 40 : 32,
+        distance: 420,
+      };
+    }
     if (entity.kind === 'vessel') {
       return { x: entity.x, z: entity.z, y: 20, yaw: 210, pitch: style === 'toy' ? 30 : 22, distance: 300 };
     }
@@ -281,8 +412,59 @@ async function boot() {
     rig.flyTo(target, duration);
   }
 
+  // Camera follow, for entities that move. Clicking an aircraft flies to it
+  // and then TRACKS it — a plane doing 250 kn leaves a static frame within
+  // seconds, so "take me to that plane" is meaningless without this. The rig
+  // keeps its downward diorama pitch throughout: the point is to watch it from
+  // above the city, not to sit in its wake.
+  const FOLLOW_DISTANCE = 400;
+  const FOLLOW_PITCH = 40 * (Math.PI / 180);
+  let following = null; // aircraft id
+
+  function stopFollowing() {
+    // Only when actually following: releaseHold would otherwise also release a
+    // landmark or building focus, which is a different feature that is fine as
+    // it is.
+    if (!following) return;
+    following = null;
+    // Re-anchor to the ground without moving the camera. Skipping this is what
+    // made letting go of a plane yank the view down by the aircraft's altitude.
+    rig.releaseHold();
+  }
+
+  // Any deliberate camera input hands control back to the user immediately.
+  canvas.addEventListener('wheel', stopFollowing, { passive: true });
+  window.addEventListener('keydown', (event) => {
+    if ('wasdqerfWASDQERF'.includes(event.key) || event.key.startsWith('Arrow') ||
+        event.key === 'PageUp' || event.key === 'PageDown') {
+      stopFollowing();
+    }
+  });
+
+  function updateFollow(dt) {
+    if (!following) return;
+    const fresh = aircraft.aircraftEntity(following);
+    if (!fresh) {
+      stopFollowing();
+      return;
+    }
+    // While the initial fly-in is running the rig owns the camera; tracking
+    // takes over when it lands, and eases so the hand-off is not a jump.
+    if (rig.flying) return;
+    const k = 1 - Math.exp(-Math.min(dt, 0.25) * 3.2);
+    rig.state.holdY = true;
+    rig.state.pivot.x += (fresh.x - rig.state.pivot.x) * k;
+    rig.state.pivot.y += (fresh.displayY - rig.state.pivot.y) * k;
+    rig.state.pivot.z += (fresh.z - rig.state.pivot.z) * k;
+    rig.state.distance += (FOLLOW_DISTANCE - rig.state.distance) * k;
+    rig.state.pitch += (FOLLOW_PITCH - rig.state.pitch) * k;
+  }
+
   function selectEntity(entity, { fly = false } = {}) {
     if (!entity) return;
+    // Selecting anything else releases a follow; selecting an aircraft starts
+    // one, whether it came from a click, the A key or the concierge.
+    following = entity.kind === 'aircraft' ? entity.id : null;
     focus.entity = entity;
     focus.history = [entity, ...focus.history.filter((e) => e.id !== entity.id)].slice(0, 3);
     overlay.show(entity, {
@@ -300,6 +482,7 @@ async function boot() {
     onFly: (entity) => flyTo(focusTarget(entity)),
     onAsk: (entity) => concierge.ask(`Tell me about ${entity.title}.`),
     onSelectHistory: (entity) => selectEntity(entity),
+    onClose: () => stopFollowing(),
   });
 
   const search = createSearch({
@@ -355,6 +538,33 @@ async function boot() {
               cat: focus.entity.cat ?? null,
               x: Math.round(focus.entity.x),
               z: Math.round(focus.entity.z),
+              // A clicked aircraft carries its whole state, so "what is this
+              // flight?" is answerable from context alone. Everything here is
+              // the TRUE reading — only the drawn position is compressed.
+              ...(focus.entity.kind === 'aircraft'
+                ? {
+                    aircraft: {
+                      callsign: focus.entity.callsign,
+                      registration: focus.entity.registration,
+                      type: focus.entity.aircraftType,
+                      airframe: focus.entity.name,
+                      altitudeFt: focus.entity.altitudeFt,
+                      speedKt: focus.entity.speedKt,
+                      verticalRateFpm: focus.entity.verticalRateFpm,
+                      headingDeg: focus.entity.heading,
+                      phase: focus.entity.phase,
+                      squawk: focus.entity.squawk,
+                      emergency: focus.entity.emergency,
+                      from: focus.entity.route?.from?.city || null,
+                      fromCode: focus.entity.route?.from?.iata || null,
+                      to: focus.entity.route?.to?.city || null,
+                      toCode: focus.entity.route?.to?.iata || null,
+                      trueDistanceKm: focus.entity.trueDistanceKm
+                        ? Math.round(focus.entity.trueDistanceKm)
+                        : null,
+                    },
+                  }
+                : {}),
             }
           : null,
       };
@@ -373,6 +583,24 @@ async function boot() {
         return;
       }
       if (intent.type === 'focus_entity' || intent.type === 'highlight') {
+        // Live-fleet ids from the muni feed ("SF:8632"): the concierge saw them
+        // in live_data and the bus layer has the current position.
+        // Aircraft ids from the flights feed ("AC:a98edc"): the concierge saw
+        // them in live_data and this layer has the current position.
+        if (typeof intent.id === 'string' && intent.id.startsWith('AC:')) {
+          const plane = aircraft.aircraftEntity(intent.id);
+          if (plane) {
+            selectEntity(plane, { fly: intent.type === 'focus_entity' });
+            return;
+          }
+        }
+        if (typeof intent.id === 'string' && intent.id.startsWith('SF:')) {
+          const bus = muni.busEntity(intent.id);
+          if (bus) {
+            selectEntity(bus, { fly: intent.type === 'focus_entity' });
+            return;
+          }
+        }
         if (typeof intent.id === 'string' && intent.id.startsWith('b:')) {
           const entity = await context.loadBuilding(Number(intent.id.slice(2)), intent.x, intent.z);
           if (entity) {
@@ -411,8 +639,18 @@ async function boot() {
   let vesselCardAge = 0;
   function trackVessel(dt) {
     const selected = focus.entity;
-    if (selected?.kind !== 'vessel') return;
-    const fresh = ferries.vesselEntity(selected.id);
+    const LIVE_KINDS = ['vessel', 'transit', 'aircraft', 'transit-stop'];
+    if (!LIVE_KINDS.includes(selected?.kind)) return;
+    // A stop does not move, but what is coming to it does — refreshing it keeps
+    // the arrival times on an open card honest.
+    const fresh =
+      selected.kind === 'vessel'
+        ? ferries.vesselEntity(selected.id)
+        : selected.kind === 'transit'
+          ? muni.busEntity(selected.id)
+          : selected.kind === 'transit-stop'
+            ? muniStops.stopEntity(selected.id)
+            : aircraft.aircraftEntity(selected.id);
     if (!fresh) return;
     focus.entity = fresh;
     overlay.show(fresh, { toy: style === 'toy', groundY: 0 });
@@ -427,14 +665,65 @@ async function boot() {
   async function pickAt(nx, ny, hasGround) {
     pickPointer.set(nx, ny);
     pickRay.setFromCamera(pickPointer, camera);
+    // Aircraft are picked first: they are small, fast and in front of
+    // everything else on screen, so whatever is behind one is never the more
+    // interesting answer.
+    const plane = aircraft.pickAircraft(pickRay.ray.origin, pickRay.ray.direction);
+    if (plane) return plane;
     const vessel = ferries.pickVessel(pickRay.ray.origin, pickRay.ray.direction);
     if (vessel) return vessel;
+    const bus = muni.pickBus(pickRay.ray.origin, pickRay.ray.direction);
+    if (bus) return bus;
+    const stop = muniStops.pickStop(pickRay.ray.origin, pickRay.ray.direction);
+    if (stop) return stop;
     return context.pick(pickRay.ray.origin, pickRay.ray.direction, hasGround ? groundPoint : null, {
       toy: style === 'toy',
     });
   }
 
+  // HOVER: the floating markers — pins, badges, the aircraft and ferry tags —
+  // are the only things in the scene drawn as UI rather than as city, so they
+  // are the only things that claim the click cursor. A building is pickable too,
+  // but everything is a building; a cursor that turned into a hand over the
+  // whole map would say nothing.
+  //
+  // Only the four marker layers are asked, and they are all synchronous point
+  // tests against at most a few dozen instances. The city's own pick is not
+  // asked: it is async, it streams cell sidecars, and running it every time the
+  // mouse moves would fetch the map for a cursor shape.
+  const hoverRay = new Raycaster();
+  const hoverPointer = new Vector2();
+  let hoverAt = 0;
+  canvas.addEventListener('pointermove', (event) => {
+    // Mid-drag the camera owns the cursor (it sets `grabbing`), and a touch
+    // pointer has no hover state to speak of.
+    if (event.buttons !== 0 || event.pointerType === 'touch') return;
+    const now = performance.now();
+    if (now - hoverAt < 60) return;
+    hoverAt = now;
+    const rect = canvas.getBoundingClientRect();
+    hoverPointer.set(
+      ((event.clientX - rect.left) / rect.width) * 2 - 1,
+      -((event.clientY - rect.top) / rect.height) * 2 + 1
+    );
+    hoverRay.setFromCamera(hoverPointer, camera);
+    const { origin, direction } = hoverRay.ray;
+    const over =
+      aircraft.pickAircraft(origin, direction) ||
+      ferries.pickVessel(origin, direction) ||
+      muni.pickBus(origin, direction) ||
+      muniStops.pickStop(origin, direction);
+    canvas.style.cursor = over ? 'pointer' : 'default';
+  });
+
+  canvas.addEventListener('pointerdown', () => stopFollowing());
   canvas.addEventListener('pointerdown', (event) => {
+    // A second finger means a pinch/twist, not a tap — whatever this press was,
+    // it must not pick on release.
+    if (event.pointerType === 'touch' && press) {
+      press = null;
+      return;
+    }
     if (event.button !== 0) return;
     press = { x: event.clientX, y: event.clientY, at: performance.now() };
   });
@@ -453,7 +742,11 @@ async function boot() {
     pickRay.setFromCamera(pickPointer, camera);
     const hasGround = rig.screenToGround(pickPointer.x, pickPointer.y, groundPoint);
     const entity = await pickAt(pickPointer.x, pickPointer.y, hasGround);
-    if (entity) selectEntity(entity);
+    // Clicking an aircraft TRAVELS to it — everything else in the city stays
+    // put when you click it, but a plane you have not flown to is a speck that
+    // leaves frame before you can read the card. The follow takes over when
+    // the fly-in lands.
+    if (entity) selectEntity(entity, { fly: entity.kind === 'aircraft' });
   });
 
   city.preload(rig.state.pivot.clone());
@@ -468,6 +761,21 @@ async function boot() {
     city,
     agents,
     ferries,
+    clouds,
+    rain,
+    fogBanks,
+    muni,
+    muniStops,
+    aircraft,
+    // Which aircraft the camera is locked to, or null. Exposed because the
+    // follow is otherwise unobservable from outside and QA has to be able to
+    // assert that dismissing the card lets go of the camera.
+    get following() {
+      return following;
+    },
+    stopFollowing,
+    governor,
+    boot: bootScreen,
     landmarks,
     piers,
     presets,
@@ -490,6 +798,52 @@ async function boot() {
     },
     get sky() {
       return sky;
+    },
+    // The eased weather state. Debug only, exactly like setClock: no UI, no
+    // URL parameter, and the model can never set it.
+    get weather() {
+      return weather.snapshot();
+    },
+    // Read the eased field at a world position, the same way the shaders do.
+    // The orientation of that lookup is the easiest thing in this feature to
+    // get silently wrong, so it is checkable: sampleWeather at the Sunset and
+    // at Bayview must disagree the way the feed's districts do.
+    sampleWeather(x, z, key = 'fog') {
+      return weather.sampleAt(x, z, key);
+    },
+    // Skip the 60 s ease and jump to the incoming field — for screenshots and
+    // automated checks, which have no time (or no frame loop) to wait it out.
+    // Dial cloud size and density against the running scene:
+    //   SF.tuneClouds({ size: 1.4, density: 1.2 })  ->  then SF.cloudCoverage()
+    // Dial the fog banks: size, opacity and how readily they appear.
+    tuneBanks(patch) {
+      return fogBanks.tune(patch);
+    },
+    // Fraction of the ground the fog banks actually cover. Counting them hides
+    // the only number that matters.
+    bankCoverage() {
+      return fogBanks.coverage();
+    },
+    tuneClouds(patch) {
+      return clouds.tune(patch);
+    },
+    // The fraction of sky the low deck actually covers. Counting instances
+    // hides this: 39 clouds sounded fine while covering 8.7% of the sky.
+    cloudCoverage() {
+      return clouds.coverage();
+    },
+    settleWeather() {
+      weather.settle();
+      skyClock.update();
+      return weather.snapshot();
+    },
+    // A partial patch merges onto the live field; null returns to live.
+    // SF.setWeather({ preset: 'karl' | 'storm' | 'clear' | 'smoke' }) gives the
+    // canonical demo states, which is how the rare ones get QA'd at all.
+    setWeather(patch) {
+      weather.setOverride(patch === undefined ? null : patch);
+      skyClock.update();
+      return weather.snapshot();
     },
     // null resumes live San Francisco time; a number is epoch ms, a string is
     // anything Date.parse understands ('2026-08-10T02:00:00-07:00').
@@ -537,10 +891,16 @@ async function boot() {
   let frames = 0;
   let fpsAccumulator = 0;
   let fps = 0;
-  let loaderDone = false;
   let assetsRequested = false;
 
   function frame(now) {
+    if (contextLost) {
+      // Keep the loop alive but idle: rendering into a lost context is a
+      // no-op at best, and simulation/governor time must not accumulate.
+      last = now;
+      requestAnimationFrame(frame);
+      return;
+    }
     // Simulation dt is clamped so a stall cannot teleport the city, but the fps
     // readout must use real wall time or it reports the clamp (20) forever.
     const elapsed = (now - last) / 1000;
@@ -556,16 +916,28 @@ async function boot() {
       if (clockOverride === null) tickSky();
     }
 
+    updateFollow(dt);
     rig.update(dt);
+    governor.update(elapsed * 1000);
     pivotWorld.copy(rig.state.pivot);
     context.prefetch(pivotWorld);
     overlay.update(dt);
     city.update(dt, pivotWorld, camera.position, quality);
     agents.update(dt, pivotWorld, camera.position);
     ferries.update(dt);
+    // Weather eases on wall time for the same reason the clouds do: the
+    // simulation clamp would stall the transition below 20 fps.
+    weather.update(Math.min(1, elapsed));
+    clouds.update(Math.min(1, elapsed));
+    // The pivot, not the camera: rain has to fall where the camera is looking.
+    rain.update(dt, pivotWorld, camera.position);
+    fogBanks.update(Math.min(1, elapsed));
+    muni.update(dt, camera);
+    muniStops.update(dt, camera, pivotWorld);
+    aircraft.update(dt, camera);
     trackVessel(dt);
     landmarks.update();
-    assets.update();
+    assets.update(camera.position, dt);
     water.update(camera.position);
     // Clouds drift on wall time so the sky moves at the same rate whatever the
     // frame rate; the simulation clamp would slow them to a crawl below 20 fps.
@@ -576,6 +948,8 @@ async function boot() {
     signs.update(rig.state.distance, rig.state.yaw);
     // Tilt-shift + grade in diorama mode; a straight canvas render otherwise.
     post.render(scene, camera);
+    // nycsim's screen veil, over the finished frame.
+    rain.renderVeil();
 
     // Landmark assets are fetched only once the city is actually on screen.
     if (!assetsRequested) {
@@ -591,12 +965,9 @@ async function boot() {
       fpsAccumulator = 0;
     }
 
-    const progress = 0.9 + city.progress * 0.1;
-    loader.set(progress);
-    if (!loaderDone && city.progress > 0.985) {
-      loaderDone = true;
-      loader.finish();
-    }
+    // The curtain owns its own phase weighting and reveal gate (boot.js); this
+    // is both its proof that the renderer is painting and its stream numbers.
+    bootScreen.rendered(city.stats);
 
     if (ui.debugVisible) {
       const info = renderer.info;
@@ -611,12 +982,16 @@ async function boot() {
           `trees      ${city.stats.trees}  lamps ${city.stats.lamps}`,
           `cars       ${agents.carCount}`,
           `ferries    ${ferries.count}${ferries.live ? ' live' : ' procedural'}`,
+          `muni       ${muni.count}${muni.live ? ` live (${muni.onShapeCount} on-route${muni.degraded ? ', degraded' : ''})` : ' off'}`,
+          `stops      ${muniStops.count} shown / ${muniStops.total}`,
+          `aircraft   ${aircraft.count}${aircraft.live ? ` live (${aircraft.source})` : ' off'}`,
           `altitude   ${(camera.position.y - rig.state.pivot.y).toFixed(0)} m`,
           `zoom       ${rig.state.distance.toFixed(0)} m`,
           `time       ${sky ? sky.localTime : 'fallback'}${clockOverride === null ? '' : ' (held)'}`,
           `sun        ${sky ? `${sky.sun.elevationDeg.toFixed(0)}° el ${sky.sun.azimuthDeg.toFixed(0)}° az` : '—'}`,
           `night      ${shared.uNight.value.toFixed(2)}`,
           `style      ${style}`,
+          `quality    ${governor.mode === 'auto' ? `Auto (${governor.tier})` : governor.tier}`,
         ].join('\n')
       );
     }
@@ -645,6 +1020,9 @@ function toCameraTarget(preset, data) {
 
 boot().catch((error) => {
   console.error(error);
+  // Never leave the user behind the fog: the curtain reports the failure on its
+  // own bar and then lifts, so the message below is readable.
+  bootScreen.fail(error.message);
   const message = document.createElement('div');
   message.className = 'panel';
   message.style.position = 'fixed';

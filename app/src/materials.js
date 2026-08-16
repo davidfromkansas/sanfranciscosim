@@ -3,7 +3,25 @@
 // at dusk, cheap vertical AO, and hashed-dither LOD cross-fades (dithered, never
 // blended, so there is no sorting cost and no visible pop).
 
-import { Color, MeshLambertMaterial, Vector4 } from 'three';
+import {
+  AdditiveBlending,
+  BufferGeometry,
+  Color,
+  DataTexture,
+  DoubleSide,
+  Float32BufferAttribute,
+  LinearFilter,
+  LinearMipmapLinearFilter,
+  MeshBasicMaterial,
+  MeshLambertMaterial,
+  RepeatWrapping,
+  RGBAFormat,
+  SRGBColorSpace,
+  TextureLoader,
+  UnsignedByteType,
+  Vector3,
+  Vector4,
+} from 'three';
 import { shared } from './env.js';
 
 const DITHER = /* glsl */ `
@@ -27,11 +45,20 @@ const DITHER = /* glsl */ `
 `;
 
 // Cloud shadows: two scrolling value-noise octaves in world XZ, sampled per
-// fragment, so soft shadow blankets drift across the city with the wind.
+// fragment, so soft shadow blankets drift across the city with the real wind.
+// How dark a fully overcast cell may go. The toy city has to stay a painted
+// object, so this is deliberately well short of 1.0 — it is an art call, not a
+// physical one.
+export const CLOUD_MAX_SHADE = 0.45;
+
 const CLOUDS = /* glsl */ `
-  uniform float uCloudCover;
+  // uNight is declared by the host shader (every one that injects this block
+  // already had it) — declaring it here too is a GLSL redefinition error.
   uniform vec2 uCloudDrift;
   uniform float uToy;
+  uniform sampler2D uWeatherField;
+  uniform vec2 uWeatherOrigin;
+  uniform vec2 uWeatherScale;
 
   float cloudNoise(vec2 p) {
     vec2 i = floor(p);
@@ -45,19 +72,124 @@ const CLOUDS = /* glsl */ `
   }
 
   float cloudShadow(vec2 world) {
+    // Cover comes from the sky, shape comes from the noise. The field is
+    // sampled by world position, so an overcast Sunset darkens while a clear
+    // Mission does not — a single citywide number cannot do that.
+    // (Weather used to be switched off entirely in diorama mode: "no weather on
+    // the tabletop". David reversed that deliberately — see
+    // docs/plans/WEATHER-PLAN.md §0. Do not put the uToy kill back.)
+    vec2 uv = (world - uWeatherOrigin) * uWeatherScale;
+    float cover = texture2D(uWeatherField, clamp(uv, 0.0, 1.0)).g;
+    // No cloud, no work: skip the two noise evaluations entirely.
+    if (cover < 0.01) return 1.0;
+
     vec2 p = world * 0.00055 + uCloudDrift;
     float n = cloudNoise(p) * 0.65 + cloudNoise(p * 2.3 + 11.0) * 0.35;
     float shade = smoothstep(0.42, 0.72, n);
-    // The diorama is lit like a model on a table: no weather on the tabletop.
-    return 1.0 - shade * uCloudCover * (1.0 - uToy);
+    // MAX_SHADE caps how dark it can ever get: a fully shadowed toy city is a
+    // grey city, and the model has to keep its painted look. uNight fades the
+    // whole term out — cloud shade only means anything while there is sun.
+    return 1.0 - shade * cover * ${CLOUD_MAX_SHADE.toFixed(2)} * (1.0 - uNight * 0.85);
+  }
+`;
+
+// Lightning. Storms only; the flash IS the effect, there is no bolt geometry.
+// (There is deliberately no shader fog here. Fog in this city is the fog-cube
+// GLB, instanced by fogbanks.js, and nothing else — do not reintroduce a
+// screen-space or per-fragment fog term.)
+const FLASH = /* glsl */ `
+  uniform float uFlash;
+  uniform float uWetness;
+
+  vec3 applyFlash(vec3 color) {
+    return color + vec3(0.55, 0.6, 0.75) * uFlash;
   }
 `;
 
 const CLOUD_UNIFORMS = () => ({
-  uCloudCover: shared.uCloudCover,
   uCloudDrift: shared.uCloudDrift,
   uToy: shared.uToy,
+  uNight: shared.uNight,
+  uWeatherField: shared.uWeatherField,
+  uWeatherOrigin: shared.uWeatherOrigin,
+  uWeatherScale: shared.uWeatherScale,
+  uWetness: shared.uWetness,
+  uFlash: shared.uFlash,
 });
+
+// Golden Gate Park gets a real repeating turf texture at the two detailed
+// quality tiers. The sampler is complete from frame one and the old baked
+// vertex colours remain the guaranteed fallback if the PNG cannot be loaded.
+const PARK_GRASS_URL = `${import.meta.env.BASE_URL}textures/grass-platformer-inspired-v2.png`;
+const parkGrassPlaceholder = new DataTexture(
+  new Uint8Array([55, 92, 30, 255]),
+  1,
+  1,
+  RGBAFormat,
+  UnsignedByteType
+);
+parkGrassPlaceholder.needsUpdate = true;
+
+const PARK_GRASS_UNIFORMS = {
+  uParkGrass: { value: parkGrassPlaceholder },
+  uParkGrassReady: { value: 0 },
+  uParkGrassStrength: { value: 1 },
+};
+
+new TextureLoader().load(
+  PARK_GRASS_URL,
+  (texture) => {
+    texture.wrapS = RepeatWrapping;
+    texture.wrapT = RepeatWrapping;
+    texture.minFilter = LinearMipmapLinearFilter;
+    texture.magFilter = LinearFilter;
+    texture.generateMipmaps = true;
+    texture.colorSpace = SRGBColorSpace;
+    texture.needsUpdate = true;
+    PARK_GRASS_UNIFORMS.uParkGrass.value = texture;
+    PARK_GRASS_UNIFORMS.uParkGrassReady.value = 1;
+    parkGrassPlaceholder.dispose();
+  },
+  undefined,
+  () => {
+    console.warn('Golden Gate Park grass texture unavailable — keeping baked ground colours');
+  }
+);
+
+const PARK_GRASS_SHADER = /* glsl */ `
+  uniform sampler2D uParkGrass;
+  uniform float uParkGrassReady;
+  uniform float uParkGrassStrength;
+
+  float kindIs(float kind, float expected) {
+    return 1.0 - step(0.49, abs(kind - expected));
+  }
+
+  float goldenGateParkTurf(vec2 world, float kind) {
+    // The seven baked Golden Gate Park sections form a long, slightly tilted
+    // corridor. The land-kind gate keeps neighbouring blocks and roads out.
+    float along = clamp((-world.x - 300.0) / 6150.0, 0.0, 1.0);
+    float centerZ = -80.0 + along * 330.0;
+    float xMask = smoothstep(-6600.0, -6460.0, world.x)
+      * (1.0 - smoothstep(-260.0, -120.0, world.x));
+    float stripMask = 1.0 - smoothstep(390.0, 440.0, abs(world.y - centerZ));
+    float turfKind = max(max(kindIs(kind, 0.0), kindIs(kind, 1.0)), kindIs(kind, 4.0));
+    return xMask * stripMask * turfKind;
+  }
+
+  vec3 applyGoldenGateParkGrass(vec3 base, vec2 world, float kind) {
+    float mask = goldenGateParkTurf(world, kind) * uParkGrassReady * uParkGrassStrength;
+    if (mask <= 0.001) return base;
+    // One repeat spans roughly 55 m. The source is intentionally enlarged so
+    // its painterly variation survives the park's normal aerial camera.
+    vec3 turf = texture2D(uParkGrass, world * 0.018).rgb;
+    return mix(base, turf, mask * 0.8);
+  }
+`;
+
+export function setParkGrassQuality(tier) {
+  PARK_GRASS_UNIFORMS.uParkGrassStrength.value = tier === 'low' ? 0.55 : tier === 'medium' ? 0.78 : 1;
+}
 
 const HASH = /* glsl */ `
   float hash13(vec3 p) {
@@ -116,7 +248,8 @@ export function createBuildingMaterial({ windows = 1 } = {}) {
         varying float vLocalY;
         ${DITHER}
         ${HASH}
-        ${CLOUDS}`
+        ${CLOUDS}
+        ${FLASH}`
       )
       .replace(
         '#include <clipping_planes_fragment>',
@@ -164,6 +297,13 @@ export function createBuildingMaterial({ windows = 1 } = {}) {
         }
         diffuseColor.rgb *= cloudShadow(vCityWorld.xz);
         totalEmissiveRadiance += emissive;`
+      )
+      .replace(
+        '#include <fog_fragment>',
+        `#include <fog_fragment>
+        // Karl goes on AFTER lighting: fog is atmosphere between the eye and
+        // the surface, not pigment on it.
+        gl_FragColor.rgb = applyFlash(gl_FragColor.rgb);`
       );
   };
 
@@ -189,7 +329,7 @@ const FLAG_DECODE = /* glsl */ `
 
 export function createToyBuildingMaterial() {
   const material = new MeshLambertMaterial({ vertexColors: true, dithering: true });
-  material.uniformsHolder = { uFade: { value: 1 }, uFloor: { value: 3.5 }, uNight: shared.uNight };
+  material.uniformsHolder = { uFade: { value: 1 }, uFloor: { value: 3.5 }, uNight: shared.uNight, ...CLOUD_UNIFORMS() };
 
   material.onBeforeCompile = function patchToy(shader) {
     Object.assign(shader.uniforms, this.uniformsHolder);
@@ -224,6 +364,8 @@ export function createToyBuildingMaterial() {
         varying vec3 vToyNormal;
         varying float vToyWall;
         varying float vFlag;
+        ${CLOUDS}
+        ${FLASH}
         ${DITHER}
         ${HASH}`
       )
@@ -262,7 +404,13 @@ export function createToyBuildingMaterial() {
             totalEmissiveRadiance += diffuseColor.rgb * glowProp * uNight * 1.35;
             diffuseColor.rgb *= mix(1.0, 0.72, uNight);
           }
-        }`
+        }
+        diffuseColor.rgb *= cloudShadow(vToyPos.xz);`
+      )
+      .replace(
+        '#include <fog_fragment>',
+        `#include <fog_fragment>
+        gl_FragColor.rgb = applyFlash(gl_FragColor.rgb);`
       );
   };
 
@@ -279,7 +427,7 @@ export function createToyBuildingMaterial() {
 // tiers' cross-fade instead of popping in.
 export function createKitMaterial() {
   const material = new MeshLambertMaterial({ vertexColors: true, dithering: true });
-  material.uniformsHolder = { uNight: shared.uNight };
+  material.uniformsHolder = { uNight: shared.uNight, ...CLOUD_UNIFORMS() };
 
   material.onBeforeCompile = function patchKit(shader) {
     Object.assign(shader.uniforms, this.uniformsHolder);
@@ -312,6 +460,8 @@ export function createKitMaterial() {
         uniform float uNight;
         varying float vKit;
         varying vec3 vKitPos;
+        ${CLOUDS}
+        ${FLASH}
         ${DITHER}
         ${HASH}`
       )
@@ -329,10 +479,55 @@ export function createKitMaterial() {
           float lit = step(hash13(floor(vKitPos * vec3(1.4, 0.45, 1.4))), 0.58);
           totalEmissiveRadiance += vec3(1.0, 0.78, 0.48) * glass * lit * uNight * 1.5;
           diffuseColor.rgb *= mix(1.0, 0.72, uNight);
-        }`
+        }
+        diffuseColor.rgb *= cloudShadow(vKitPos.xz);`
+      )
+      .replace(
+        '#include <fog_fragment>',
+        `#include <fog_fragment>
+        gl_FragColor.rgb = applyFlash(gl_FragColor.rgb);`
       );
   };
 
+  return material;
+}
+
+// A plain vertex-coloured Lambert whose per-batch-instance colour alpha drives
+// the same ordered-dither fade the kit uses: landmark bodies stream in and out
+// of one BatchedMesh as a stipple, never a pop. The rgb multiplier stays 1 —
+// landmark colours are authored, only the alpha channel is used.
+export function createBatchFadeLambert() {
+  const material = new MeshLambertMaterial({ vertexColors: true, dithering: true });
+  material.uniformsHolder = CLOUD_UNIFORMS();
+  material.onBeforeCompile = function patchBatchFade(shader) {
+    Object.assign(shader.uniforms, this.uniformsHolder);
+    shader.vertexShader = shader.vertexShader
+      .replace('#include <common>', `#include <common>\n        varying vec3 vBatchPos;`)
+      .replace(
+        '#include <worldpos_vertex>',
+        `#include <worldpos_vertex>
+        vBatchPos = (modelMatrix * vec4(transformed, 1.0)).xyz;`
+      );
+    shader.fragmentShader = shader.fragmentShader
+      .replace(
+        '#include <common>',
+        `#include <common>
+        uniform float uNight;
+        varying vec3 vBatchPos;
+        ${DITHER}
+        ${CLOUDS}
+        ${FLASH}`
+      )
+      .replace(
+        '#include <clipping_planes_fragment>',
+        `#include <clipping_planes_fragment>
+        if (vColor.a < 0.999 && ditherThreshold(gl_FragCoord.xy) > vColor.a) discard;`
+      )      .replace(
+        '#include <fog_fragment>',
+        `#include <fog_fragment>
+        gl_FragColor.rgb = applyFlash(gl_FragColor.rgb);`
+      );
+  };
   return material;
 }
 
@@ -344,6 +539,7 @@ export function createFarBuildingMaterial() {
     uQuadFade: { value: new Vector4(1, 1, 1, 1) },
     uNight: shared.uNight,
     uToy: shared.uToy,
+    ...CLOUD_UNIFORMS(),
   };
 
   material.onBeforeCompile = function patchFar(shader) {
@@ -354,7 +550,13 @@ export function createFarBuildingMaterial() {
         `#include <common>
         attribute float aQuad;
         uniform vec4 uQuadFade;
-        varying float vFade;`
+        varying float vFade;
+        varying vec3 vFarPos;`
+      )
+      .replace(
+        '#include <worldpos_vertex>',
+        `#include <worldpos_vertex>
+        vFarPos = (modelMatrix * vec4(transformed, 1.0)).xyz;`
       )
       .replace(
         '#include <begin_vertex>',
@@ -367,10 +569,14 @@ export function createFarBuildingMaterial() {
       .replace(
         '#include <common>',
         `#include <common>
+        // uToy is declared by the CLOUDS chunk below — declaring it here too
+        // is a GLSL redefinition error.
         uniform float uNight;
-        uniform float uToy;
         varying float vFade;
-        ${DITHER}`
+        varying vec3 vFarPos;
+        ${DITHER}
+        ${CLOUDS}
+        ${FLASH}`
       )
       .replace(
         '#include <clipping_planes_fragment>',
@@ -384,7 +590,12 @@ export function createFarBuildingMaterial() {
         totalEmissiveRadiance += vec3(1.0, 0.72, 0.42) * uNight * 0.075 * (1.0 - uToy);
         // In toy mode the far tier is not re-baked: it just goes bright and flat
         // so it reads as more of the same model, out of focus.
-        diffuseColor.rgb = mix(diffuseColor.rgb, pow(diffuseColor.rgb, vec3(0.72)) * 1.1 + 0.06, uToy);`
+        diffuseColor.rgb = mix(diffuseColor.rgb, pow(diffuseColor.rgb, vec3(0.72)) * 1.1 + 0.06, uToy);
+        diffuseColor.rgb *= cloudShadow(vFarPos.xz);`
+      )      .replace(
+        '#include <fog_fragment>',
+        `#include <fog_fragment>
+        gl_FragColor.rgb = applyFlash(gl_FragColor.rgb);`
       );
   };
 
@@ -395,7 +606,7 @@ export function createFarBuildingMaterial() {
 // ground. Asphalt (kind 64) picks up a faint warm sheen at night.
 export function createGroundMaterial() {
   const material = new MeshLambertMaterial({ vertexColors: true, dithering: true });
-  material.uniformsHolder = { uNight: shared.uNight, ...CLOUD_UNIFORMS() };
+  material.uniformsHolder = { uNight: shared.uNight, ...CLOUD_UNIFORMS(), ...PARK_GRASS_UNIFORMS };
   material.polygonOffset = true;
   material.polygonOffsetFactor = -2;
   material.polygonOffsetUnits = -2;
@@ -408,12 +619,12 @@ export function createGroundMaterial() {
         `#include <common>
         attribute float aKind;
         varying float vKind;
-        varying vec2 vGroundWorld;`
+        varying vec3 vGroundWorld;`
       )
       .replace(
         '#include <worldpos_vertex>',
         `#include <worldpos_vertex>
-        vGroundWorld = (modelMatrix * vec4(transformed, 1.0)).xz;`
+        vGroundWorld = (modelMatrix * vec4(transformed, 1.0)).xyz;`
       )
       .replace(
         '#include <begin_vertex>',
@@ -426,19 +637,32 @@ export function createGroundMaterial() {
         `#include <common>
         uniform float uNight;
         varying float vKind;
-        varying vec2 vGroundWorld;
-        ${CLOUDS}`
+        varying vec3 vGroundWorld;
+        ${PARK_GRASS_SHADER}
+        ${CLOUDS}
+        ${FLASH}`
       )
       .replace(
         '#include <color_fragment>',
         `#include <color_fragment>
+        diffuseColor.rgb = applyGoldenGateParkGrass(diffuseColor.rgb, vGroundWorld.xz, vKind);
         // 64 asphalt, 65 sidewalk, 66 paint: only the roadway picks up the
         // warm sodium sheen at night, and the paint stays crisp on top of it.
         float asphalt = step(63.5, vKind) * step(vKind, 64.5);
         float marking = step(65.5, vKind);
-        diffuseColor.rgb *= cloudShadow(vGroundWorld);
+        diffuseColor.rgb *= cloudShadow(vGroundWorld.xz);
+        // Wet ground: darker and slightly cooler, the way tarmac actually goes.
+        diffuseColor.rgb *= mix(1.0, 0.62, uWetness * asphalt);
+        diffuseColor.rgb = mix(diffuseColor.rgb, diffuseColor.rgb * vec3(0.86, 0.92, 1.06), uWetness * asphalt);
         totalEmissiveRadiance += vec3(1.0, 0.72, 0.42) * asphalt * uNight * 0.06;
         totalEmissiveRadiance += vec3(0.85, 0.86, 0.82) * marking * uNight * 0.1;`
+      )
+      .replace(
+        '#include <fog_fragment>',
+        `#include <fog_fragment>
+        // Karl goes on AFTER lighting: fog is atmosphere between the eye and
+        // the surface, not pigment on it.
+        gl_FragColor.rgb = applyFlash(gl_FragColor.rgb);`
       );
   };
 
@@ -447,31 +671,140 @@ export function createGroundMaterial() {
 
 // Terrain and trees: the same drifting cloud shade, so a shadow blanket crosses
 // hillside, park and rooftop as one.
-export function createCloudShadedMaterial() {
+export function createCloudShadedMaterial({ parkGrass = false } = {}) {
   const material = new MeshLambertMaterial({ vertexColors: true, dithering: true });
-  material.uniformsHolder = CLOUD_UNIFORMS();
+  material.uniformsHolder = {
+    ...CLOUD_UNIFORMS(),
+    ...(parkGrass ? PARK_GRASS_UNIFORMS : {}),
+  };
+  material.customProgramCacheKey = () => (parkGrass ? 'cloud-shaded-park-grass-v1' : 'cloud-shaded-v1');
   material.onBeforeCompile = function patchCloudShaded(shader) {
     Object.assign(shader.uniforms, this.uniformsHolder);
     shader.vertexShader = shader.vertexShader
-      .replace('#include <common>', `#include <common>\n        varying vec2 vCloudWorld;`)
+      .replace(
+        '#include <common>',
+        `#include <common>
+        varying vec3 vCloudWorld;
+        ${parkGrass ? 'attribute float aKind; varying float vTerrainKind;' : ''}`
+      )
       .replace(
         '#include <worldpos_vertex>',
         `#include <worldpos_vertex>
-        vCloudWorld = (modelMatrix * vec4(transformed, 1.0)).xz;`
+        vCloudWorld = (modelMatrix * vec4(transformed, 1.0)).xyz;
+        ${parkGrass ? 'vTerrainKind = aKind;' : ''}`
       );
     shader.fragmentShader = shader.fragmentShader
-      .replace('#include <common>', `#include <common>\n        varying vec2 vCloudWorld;\n        ${CLOUDS}`)
+      .replace('#include <common>', `#include <common>
+        uniform float uNight;
+        varying vec3 vCloudWorld;
+        ${parkGrass ? `varying float vTerrainKind;
+        ${PARK_GRASS_SHADER}` : ''}
+        ${CLOUDS}
+        ${FLASH}`)
       .replace(
         '#include <color_fragment>',
         `#include <color_fragment>
-        diffuseColor.rgb *= cloudShadow(vCloudWorld);`
+        ${parkGrass ? 'diffuseColor.rgb = applyGoldenGateParkGrass(diffuseColor.rgb, vCloudWorld.xz, vTerrainKind);' : ''}
+        diffuseColor.rgb *= cloudShadow(vCloudWorld.xz);`
+      .replace(
+        '#include <fog_fragment>',
+        `#include <fog_fragment>
+        // Karl goes on AFTER lighting: fog is atmosphere between the eye and
+        // the surface, not pigment on it.
+        gl_FragColor.rgb = applyFlash(gl_FragColor.rgb);`
+      )
       );
   };
   return material;
 }
 
+export function createTerrainMaterial() {
+  return createCloudShadedMaterial({ parkGrass: true });
+}
+
 export function createTreeMaterial() {
   return createCloudShadedMaterial();
+}
+
+// --------------------------------------------------- streetlight pools ---
+// The disc of light a streetlight throws on the road at night. Shared by both
+// lamp systems: the procedural glow spheres in `city.js` and the kit's modelled
+// `sl_*` poles in `streetkit.js`, so a pool looks the same whichever kind of
+// lamp is standing there.
+//
+// Unit radius, lying in the XZ plane. The falloff lives in RGBA vertex colours
+// rather than a texture or a patched shader: three's AdditiveBlending is
+// (SRC_ALPHA, ONE), so that alpha ramp becomes a soft round wash straight out
+// of MeshBasicMaterial. Two rings, not one — a lone fan puts the whole
+// highlight on a single centre vertex and the pool reads as a cone.
+// 16 segments, not 24: the disc is soft-edged and small on screen, so the extra
+// tessellation is invisible while costing a third of the pool triangle budget —
+// and hero-view night triangles are already the tightest number in PERF-PLAN.
+export function createLampPoolGeometry(segments = 16) {
+  const RINGS = [
+    { r: 0, a: 1 },
+    { r: 0.34, a: 0.72 },
+    { r: 1, a: 0 },
+  ];
+  const positions = [0, 0, 0];
+  const colors = [1, 1, 1, 1];
+  const indices = [];
+  for (let ring = 1; ring < RINGS.length; ring++) {
+    const { r, a } = RINGS[ring];
+    for (let i = 0; i <= segments; i++) {
+      const t = (i / segments) * Math.PI * 2;
+      positions.push(Math.cos(t) * r, 0, Math.sin(t) * r);
+      colors.push(1, 1, 1, a);
+    }
+  }
+  const ringStart = (ring) => 1 + (ring - 1) * (segments + 1);
+  for (let i = 0; i < segments; i++) indices.push(0, ringStart(1) + i, ringStart(1) + i + 1);
+  for (let ring = 1; ring < RINGS.length - 1; ring++) {
+    const inner = ringStart(ring);
+    const outer = ringStart(ring + 1);
+    for (let i = 0; i < segments; i++) {
+      indices.push(inner + i, outer + i, outer + i + 1);
+      indices.push(inner + i, outer + i + 1, inner + i + 1);
+    }
+  }
+  const geometry = new BufferGeometry();
+  geometry.setAttribute('position', new Float32BufferAttribute(positions, 3));
+  geometry.setAttribute('color', new Float32BufferAttribute(colors, 4));
+  geometry.setIndex(indices);
+  return geometry;
+}
+
+// Lays a pool flat on the ground it is standing on rather than on a global
+// horizontal plane. San Francisco's grades are the whole reason this exists: a
+// flat disc on a 20% street floats over a metre clear of the tarmac at its
+// downhill rim and buries itself at the uphill one, which reads as a hovering
+// ellipse rather than light on a road. The normal comes from finite
+// differences on the terrain either side of the lamp.
+//
+// Writes into `out` and returns it. Called at build time, never per frame.
+const GROUND_UP = new Vector3(0, 1, 0);
+const groundNormal = new Vector3();
+export function alignPoolToGround(out, x, z, sampleElevation, probe = 3) {
+  const ex = sampleElevation(x + probe, z) - sampleElevation(x - probe, z);
+  const ez = sampleElevation(x, z + probe) - sampleElevation(x, z - probe);
+  // Gradient (ex, ez) over 2*probe; the surface normal is (-dx, 1, -dz).
+  groundNormal.set(-ex / (2 * probe), 1, -ez / (2 * probe)).normalize();
+  return out.setFromUnitVectors(GROUND_UP, groundNormal);
+}
+
+// Additive so the pool brightens the road rather than painting over it, and
+// depthWrite off so overlapping pools from neighbouring lamps blend instead of
+// fighting each other. Opacity is driven from the night ramp by the owner.
+export function createLampPoolMaterial() {
+  return new MeshBasicMaterial({
+    color: new Color(1.0, 0.76, 0.42),
+    vertexColors: true,
+    transparent: true,
+    opacity: 0,
+    blending: AdditiveBlending,
+    depthWrite: false,
+    side: DoubleSide,
+  });
 }
 
 export const PALETTE_TINT = new Color();

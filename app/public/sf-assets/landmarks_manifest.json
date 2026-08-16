@@ -34,7 +34,7 @@
       73.5321,
       326
     ],
-    "tris": 18412
+    "tris": 20086
   },
   {
     "id": "ferry-building",
@@ -52,7 +52,7 @@
       197.8239,
       74.7
     ],
-    "tris": 12392
+    "tris": 14104
   },
   {
     "id": "transamerica",
@@ -70,7 +70,7 @@
       60.8376,
       260
     ],
-    "tris": 14026
+    "tris": 15666
   },
   {
     "id": "painted-ladies",
@@ -106,6 +106,983 @@
       144.92,
       93.75
     ],
-    "tris": 17440
+    "tris": 20808
+  },
+  {
+    "id": "coit-tower",
+    "file": "coit-tower.glb",
+    "anchor": [
+      -122.4058338,
+      37.8023742
+    ],
+    "targetHeightM": 64,
+    "cat": 0,
+    "name": "Coit Tower",
+    "estimated": false,
+    "dims": [
+      23.8014,
+      23.8014,
+      64
+    ],
+    "tris": 11848
+  },
+  {
+    "id": "conservatory-of-flowers",
+    "file": "conservatory-of-flowers.glb",
+    "anchor": [
+      -122.4602321,
+      37.7725965
+    ],
+    "targetHeightM": 18.3,
+    "cat": 16,
+    "name": "Conservatory of Flowers",
+    "estimated": false,
+    "dims": [
+      78.799,
+      30.9373,
+      18.3
+    ],
+    "tris": 13814
+  },
+  {
+    "id": "cal-academy",
+    "file": "cal-academy.glb",
+    "anchor": [
+      -122.4662432,
+      37.7698424
+    ],
+    "targetHeightM": 19.3,
+    "cat": 16,
+    "name": "California Academy of Sciences",
+    "estimated": false,
+    "dims": [
+      212.5214,
+      207.7346,
+      19.3
+    ],
+    "tris": 22384
+  },
+  {
+    "id": "palace-of-fine-arts",
+    "file": "palace-of-fine-arts.glb",
+    "anchor": [
+      -122.4484012,
+      37.8029215
+    ],
+    "targetHeightM": 49.4,
+    "cat": 0,
+    "name": "Palace of Fine Arts",
+    "estimated": false,
+    "dims": [
+      173.9495,
+      258.3858,
+      49.4
+    ],
+    "tris": 21736
+  },
+  {
+    "id": "de-young",
+    "file": "de-young.glb",
+    "anchor": [
+      -122.4688156,
+      37.7715
+    ],
+    "targetHeightM": 43.9,
+    "cat": 16,
+    "name": "de Young Museum",
+    "estimated": false,
+    "dims": [
+      151.8662,
+      162.5656,
+      43.9
+    ],
+    "tris": 2201
+  },
+  {
+    "id": "st-marys-cathedral",
+    "file": "st-marys-cathedral.glb",
+    "anchor": [
+      -122.4253877,
+      37.7842352
+    ],
+    "targetHeightM": 78.7,
+    "cat": 8,
+    "name": "Cathedral of Saint Mary of the Assumption",
+    "estimated": false,
+    "dims": [
+      94.8154,
+      94.8154,
+      78.7
+    ],
+    "tris": 7074,
+    "yawDeg": 180
+  },
+  {
+    "id": "fairmont",
+    "file": "fairmont-san-francisco.glb",
+    "anchor": [
+      -122.4100666,
+      37.7924244
+    ],
+    "targetHeightM": 99.06,
+    "cat": 7,
+    "name": "Fairmont San Francisco",
+    "estimated": false,
+    "dims": [
+      124.7346,
+      98.395,
+      99.06
+    ],
+    "tris": 13380
+  },
+  {
+    "id": "grace-cathedral",
+    "file": "grace-cathedral.glb",
+    "anchor": [
+      -122.4134339,
+      37.7918333
+    ],
+    "targetHeightM": 75.3,
+    "cat": 8,
+    "name": "Grace Cathedral",
+    "estimated": false,
+    "dims": [
+      109.0939,
+      48.1688,
+      75.3
+    ],
+    "tris": 10814
+  },
+  {
+    "id": "mission-dolores",
+    "file": "mission-dolores.glb",
+    "anchor": [
+      -122.4269098,
+      37.7643109
+    ],
+    "targetHeightM": 41,
+    "cat": 8,
+    "name": "Mission Dolores Basilica",
+    "estimated": true,
+    "dims": [
+      67.21,
+      45.4823,
+      41.0
+    ],
+    "tris": 8386
+  },
+  {
+    "id": "columbus-tower",
+    "file": "columbus-tower.glb",
+    "anchor": [
+      -122.4050266,
+      37.7965554
+    ],
+    "targetHeightM": 29,
+    "cat": 3,
+    "name": "Columbus Tower (Sentinel Building)",
+    "estimated": false,
+    "dims": [
+      19.8831,
+      18.2508,
+      29.0
+    ],
+    "tris": 9360
+  },
+  {
+    "id": "opera-house",
+    "file": "war-memorial-opera-house.glb",
+    "anchor": [
+      -122.420917,
+      37.7786126
+    ],
+    "targetHeightM": 44,
+    "cat": 17,
+    "name": "War Memorial Opera House",
+    "estimated": false,
+    "dims": [
+      113.967,
+      77.687,
+      44
+    ],
+    "tris": 9696
+  },
+  {
+    "id": "555-california",
+    "file": "555-california.glb",
+    "anchor": [
+      -122.4037741,
+      37.7921047
+    ],
+    "targetHeightM": 237.4,
+    "cat": 3,
+    "name": "555 California Street",
+    "estimated": false,
+    "dims": [
+      86.1678,
+      60.8921,
+      237.4
+    ],
+    "tris": 10412
+  },
+  {
+    "id": "362-brannan",
+    "file": "362-brannan.glb",
+    "anchor": [
+      -122.393745,
+      37.780843
+    ],
+    "targetHeightM": 8.6,
+    "cat": 19,
+    "name": "362 Brannan Street",
+    "estimated": false,
+    "dims": [
+      31.2274,
+      30.835,
+      8.6
+    ],
+    "tris": 5904,
+    "loadRadius": 2500
+  },
+  {
+    "id": "380-brannan",
+    "file": "380-brannan.glb",
+    "anchor": [
+      -122.3940217,
+      37.7806308
+    ],
+    "targetHeightM": 12.6,
+    "cat": 3,
+    "name": "380 Brannan Street",
+    "estimated": false,
+    "dims": [
+      31.3134,
+      31.5872,
+      12.6
+    ],
+    "tris": 7760,
+    "loadRadius": 2500
+  },
+  {
+    "id": "550-third",
+    "file": "550-third.glb",
+    "anchor": [
+      -122.3953409,
+      37.7804407
+    ],
+    "targetHeightM": 11.0,
+    "cat": 3,
+    "name": "550 Third Street",
+    "estimated": true,
+    "dims": [
+      49.21,
+      50.41,
+      11.0
+    ],
+    "tris": 6244,
+    "loadRadius": 2500
+  },
+  {
+    "id": "551-third",
+    "file": "551-third.glb",
+    "anchor": [
+      -122.3946431,
+      37.7806625
+    ],
+    "targetHeightM": 6.6,
+    "cat": 21,
+    "name": "551 Third Street (Shell Station)",
+    "estimated": false,
+    "dims": [
+      41.81,
+      41.81,
+      6.6
+    ],
+    "tris": 9541,
+    "loadRadius": 2500
+  },
+  {
+    "id": "375-alabama",
+    "file": "375-alabama.glb",
+    "anchor": [
+      -122.4118477,
+      37.7645633
+    ],
+    "targetHeightM": 22.5,
+    "cat": 19,
+    "name": "375 Alabama Street",
+    "estimated": true,
+    "dims": [
+      67.3172,
+      61.6109,
+      22.5
+    ],
+    "tris": 11604,
+    "loadRadius": 2500
+  },
+  {
+    "id": "letterman",
+    "file": "letterman-digital-arts-center.glb",
+    "anchor": [
+      -122.4494466,
+      37.7997327
+    ],
+    "targetHeightM": 22,
+    "cat": 3,
+    "name": "Letterman Digital Arts Center",
+    "estimated": true,
+    "dims": [
+      312.222,
+      298.157,
+      21.993
+    ],
+    "tris": 18238,
+    "loadRadius": 2500
+  },
+  {
+    "id": "chase-center",
+    "file": "chase-center.glb",
+    "anchor": [
+      -122.3873962,
+      37.7678739
+    ],
+    "targetHeightM": 40.8,
+    "cat": 0,
+    "name": "Chase Center",
+    "estimated": false,
+    "dims": [
+      164.3642,
+      159.1251,
+      40.8
+    ],
+    "tris": 11291,
+    "loadRadius": 2500
+  },
+  {
+    "id": "540-presidio-blvd",
+    "file": "540-presidio-blvd.glb",
+    "anchor": [
+      -122.4519224,
+      37.7966667
+    ],
+    "targetHeightM": 11.5,
+    "cat": 1,
+    "name": "540 Presidio Boulevard",
+    "estimated": true,
+    "dims": [
+      16.6623,
+      22.7566,
+      11.5
+    ],
+    "tris": 3690,
+    "loadRadius": 2500
+  },
+  {
+    "id": "541-presidio",
+    "file": "541-presidio.glb",
+    "anchor": [
+      -122.4518601,
+      37.7969312
+    ],
+    "targetHeightM": 10.0,
+    "cat": 1,
+    "name": "541 Presidio Boulevard",
+    "estimated": true,
+    "dims": [
+      22.259,
+      25.099,
+      10.0
+    ],
+    "tris": 3404,
+    "loadRadius": 2500
+  },
+  {
+    "id": "542-presidio-blvd",
+    "file": "542-presidio-blvd.glb",
+    "anchor": [
+      -122.4516862,
+      37.7971579
+    ],
+    "targetHeightM": 10.6,
+    "cat": 1,
+    "name": "542 Presidio Boulevard",
+    "estimated": true,
+    "dims": [
+      23.608,
+      25.4555,
+      10.6
+    ],
+    "tris": 3092,
+    "loadRadius": 2500
+  },
+  {
+    "id": "543-presidio-blvd",
+    "file": "543-presidio-blvd.glb",
+    "anchor": [
+      -122.4515766,
+      37.7973711
+    ],
+    "targetHeightM": 9.55,
+    "cat": 1,
+    "name": "543 Presidio Blvd",
+    "estimated": true,
+    "dims": [
+      17.1972,
+      17.7268,
+      9.55
+    ],
+    "tris": 2848,
+    "loadRadius": 2500
+  },
+  {
+    "id": "civic-center-courthouse",
+    "file": "civic-center-courthouse.glb",
+    "anchor": [
+      -122.4192537,
+      37.7804897
+    ],
+    "targetHeightM": 29.6,
+    "cat": 18,
+    "name": "Civic Center Courthouse",
+    "estimated": false,
+    "dims": [
+      91.077,
+      51.303,
+      29.6
+    ],
+    "tris": 4712,
+    "loadRadius": 2500
+  },
+  {
+    "id": "bill-graham-civic-auditorium",
+    "file": "bill-graham-civic-auditorium.glb",
+    "anchor": [
+      -122.4173309,
+      37.7780621
+    ],
+    "targetHeightM": 37,
+    "cat": 17,
+    "name": "Bill Graham Civic Auditorium",
+    "estimated": false,
+    "dims": [
+      140.836,
+      100.144,
+      37.0
+    ],
+    "tris": 6396,
+    "loadRadius": 2500
+  },
+  {
+    "id": "505-van-ness",
+    "file": "505-van-ness.glb",
+    "anchor": [
+      -122.4212915,
+      37.7804835
+    ],
+    "targetHeightM": 27.0,
+    "cat": 18,
+    "name": "505 Van Ness Avenue",
+    "estimated": true,
+    "dims": [
+      124.2265,
+      95.3195,
+      27.0
+    ],
+    "tris": 18774,
+    "loadRadius": 2500
+  },
+  {
+    "id": "herbst-theatre",
+    "file": "herbst-theatre.glb",
+    "anchor": [
+      -122.4210157,
+      37.7795789
+    ],
+    "targetHeightM": 31,
+    "cat": 17,
+    "name": "Herbst Theatre (War Memorial Veterans Building)",
+    "estimated": true,
+    "dims": [
+      92.5318,
+      70.7108,
+      31.0
+    ],
+    "tris": 9821,
+    "loadRadius": 2500
+  },
+  {
+    "id": "davies-symphony-hall",
+    "file": "davies-symphony-hall.glb",
+    "anchor": [
+      -122.420603,
+      37.7776227
+    ],
+    "targetHeightM": 35,
+    "cat": 17,
+    "name": "Davies Symphony Hall",
+    "estimated": false,
+    "dims": [
+      124.747,
+      95.0375,
+      35
+    ],
+    "tris": 9518,
+    "loadRadius": 2500
+  },
+  {
+    "id": "101-grove",
+    "file": "101-grove.glb",
+    "anchor": [
+      -122.4186747,
+      37.7781359
+    ],
+    "targetHeightM": 21.4,
+    "cat": 18,
+    "name": "101 Grove Street (Public Health Building)",
+    "estimated": true,
+    "dims": [
+      70.5084,
+      47.4977,
+      21.4
+    ],
+    "tris": 17648,
+    "loadRadius": 2500
+  },
+  {
+    "id": "1008-general-kennedy",
+    "file": "1008-general-kennedy.glb",
+    "anchor": [
+      -122.4514809,
+      37.8007878
+    ],
+    "targetHeightM": 11.9,
+    "cat": 3,
+    "name": "1008 General Kennedy Avenue",
+    "estimated": true,
+    "dims": [
+      55.131,
+      35.473,
+      11.9
+    ],
+    "tris": 5688,
+    "loadRadius": 2500
+  },
+  {
+    "id": "asian-art-museum",
+    "file": "asian-art-museum.glb",
+    "anchor": [
+      -122.4159859,
+      37.7802817
+    ],
+    "targetHeightM": 28.1,
+    "cat": 16,
+    "name": "Asian Art Museum",
+    "estimated": false,
+    "dims": [
+      115.31,
+      65.18,
+      28.1
+    ],
+    "tris": 13176,
+    "loadRadius": 2500
+  },
+  {
+    "id": "350-brannan",
+    "file": "350-brannan.glb",
+    "anchor": [
+      -122.3935234,
+      37.7810229
+    ],
+    "targetHeightM": 13.85,
+    "cat": 3,
+    "name": "350 Brannan Street",
+    "estimated": false,
+    "dims": [
+      33.2738,
+      33.2958,
+      13.85
+    ],
+    "tris": 6770,
+    "loadRadius": 2500
+  },
+  {
+    "id": "171-south-park",
+    "file": "171-south-park.glb",
+    "anchor": [
+      -122.3945219,
+      37.7809
+    ],
+    "targetHeightM": 12.6,
+    "cat": 2,
+    "name": "171 South Park Street",
+    "estimated": false,
+    "dims": [
+      19.2565,
+      18.497,
+      12.6
+    ],
+    "tris": 5808,
+    "loadRadius": 2500
+  },
+  {
+    "id": "101-south-park",
+    "file": "101-south-park.glb",
+    "anchor": [
+      -122.3937582,
+      37.7812624
+    ],
+    "targetHeightM": 10.9,
+    "cat": 3,
+    "name": "Kleiner Perkins (101 South Park)",
+    "estimated": true,
+    "dims": [
+      30.53,
+      29.87,
+      10.9
+    ],
+    "tris": 7502,
+    "loadRadius": 2500
+  },
+  {
+    "id": "155-south-park",
+    "file": "155-south-park.glb",
+    "anchor": [
+      -122.3942202,
+      37.7808993
+    ],
+    "targetHeightM": 10.1,
+    "cat": 1,
+    "name": "155 South Park",
+    "estimated": false,
+    "dims": [
+      25.5223,
+      28.2942,
+      10.1
+    ],
+    "tris": 4048,
+    "loadRadius": 2500
+  },
+  {
+    "id": "135-south-park",
+    "file": "135-south-park.glb",
+    "anchor": [
+      -122.3940203,
+      37.781103
+    ],
+    "targetHeightM": 8.5,
+    "cat": 3,
+    "name": "135 South Park",
+    "estimated": false,
+    "dims": [
+      34.45,
+      25.95,
+      8.5
+    ],
+    "tris": 3836,
+    "loadRadius": 2500
+  },
+  {
+    "id": "165-south-park",
+    "file": "165-south-park.glb",
+    "anchor": [
+      -122.3943764,
+      37.7808599
+    ],
+    "targetHeightM": 9.0,
+    "cat": 1,
+    "name": "165-167 South Park",
+    "estimated": true,
+    "dims": [
+      19.0972,
+      21.9096,
+      9.0
+    ],
+    "tris": 2008,
+    "loadRadius": 2500
+  },
+  {
+    "id": "370-brannan",
+    "file": "370-brannan.glb",
+    "anchor": [
+      -122.3938572,
+      37.7807602
+    ],
+    "targetHeightM": 7.63,
+    "cat": 3,
+    "name": "370 Brannan Street",
+    "estimated": false,
+    "dims": [
+      21.8727,
+      21.7057,
+      7.63
+    ],
+    "tris": 1428,
+    "loadRadius": 2500
+  },
+  {
+    "id": "358-brannan",
+    "file": "358-brannan.glb",
+    "anchor": [
+      -122.393635,
+      37.7809258
+    ],
+    "targetHeightM": 9.6,
+    "cat": 19,
+    "name": "358 Brannan Street",
+    "estimated": true,
+    "dims": [
+      22.9316,
+      23.0609,
+      9.6
+    ],
+    "tris": 3860,
+    "loadRadius": 2500
+  },
+  {
+    "id": "181-south-park",
+    "file": "181-south-park.glb",
+    "anchor": [
+      -122.3945113,
+      37.7807582
+    ],
+    "targetHeightM": 16.5,
+    "cat": 2,
+    "name": "181 South Park",
+    "estimated": false,
+    "dims": [
+      40.8359,
+      40.5282,
+      16.5
+    ],
+    "tris": 4200,
+    "loadRadius": 2500
+  },
+  {
+    "id": "sf-main-library",
+    "file": "sf-main-library.glb",
+    "anchor": [
+      -122.4157709,
+      37.7791281
+    ],
+    "targetHeightM": 28.98,
+    "cat": 15,
+    "name": "San Francisco Main Public Library",
+    "estimated": false,
+    "dims": [
+      116.2429,
+      74.506,
+      28.98
+    ],
+    "tris": 10168,
+    "loadRadius": 2500
+  },
+  {
+    "id": "234-van-ness",
+    "file": "234-van-ness.glb",
+    "anchor": [
+      -122.4193071,
+      37.7780541
+    ],
+    "targetHeightM": 30.12,
+    "cat": 2,
+    "name": "The Kelsey Civic Center (234 Van Ness Avenue)",
+    "estimated": false,
+    "dims": [
+      56.278,
+      46.4274,
+      30.12
+    ],
+    "tris": 11656,
+    "loadRadius": 2500
+  },
+  {
+    "id": "500-third",
+    "file": "500-third.glb",
+    "anchor": [
+      -122.3958224,
+      37.7808279
+    ],
+    "targetHeightM": 26.5,
+    "cat": 3,
+    "name": "500 Third Street",
+    "estimated": false,
+    "dims": [
+      75.2378,
+      76.2383,
+      26.5017
+    ],
+    "tris": 17320,
+    "loadRadius": 2500
+  },
+  {
+    "id": "599-third",
+    "file": "599-third.glb",
+    "anchor": [
+      -122.3942739,
+      37.7804504
+    ],
+    "targetHeightM": 18.3,
+    "cat": 2,
+    "name": "599 Third Street",
+    "estimated": false,
+    "dims": [
+      43.151,
+      42.853,
+      18.3
+    ],
+    "tris": 9384,
+    "loadRadius": 2500
+  },
+  {
+    "id": "civic-center-plaza",
+    "file": "civic-center-plaza.glb",
+    "anchor": [
+      -122.41761,
+      37.7794895
+    ],
+    "targetHeightM": 30.48,
+    "cat": 0,
+    "name": "Civic Center Plaza",
+    "estimated": true,
+    "dims": [
+      146.5287,
+      192.3451,
+      30.48
+    ],
+    "tris": 17728,
+    "loadRadius": 2500
+  },
+  {
+    "id": "earl-warren-building",
+    "file": "earl-warren-building.glb",
+    "anchor": [
+      -122.4178413,
+      37.7806865
+    ],
+    "targetHeightM": 27.0,
+    "cat": 18,
+    "name": "Earl Warren Building",
+    "estimated": false,
+    "dims": [
+      118.94,
+      50.03,
+      27.0
+    ],
+    "tris": 18540,
+    "loadRadius": 2500
+  },
+  {
+    "id": "574-third",
+    "file": "574-third.glb",
+    "anchor": [
+      -122.3950551,
+      37.7801937
+    ],
+    "targetHeightM": 15.4,
+    "cat": 2,
+    "name": "574 Third Street",
+    "estimated": false,
+    "dims": [
+      64.9494,
+      60.1454,
+      15.4
+    ],
+    "tris": 9856,
+    "loadRadius": 2500
+  },
+  {
+    "id": "590-third",
+    "file": "590-third.glb",
+    "anchor": [
+      -122.3946749,
+      37.7800837
+    ],
+    "targetHeightM": 9.5,
+    "cat": 4,
+    "name": "590 Third Street",
+    "estimated": true,
+    "dims": [
+      31.913,
+      31.531,
+      9.5
+    ],
+    "tris": 5312,
+    "loadRadius": 2500
+  },
+  {
+    "id": "592-third",
+    "file": "592-third.glb",
+    "anchor": [
+      -122.3946805,
+      37.780091
+    ],
+    "targetHeightM": 8.2,
+    "cat": 3,
+    "name": "592 Third Street",
+    "estimated": true,
+    "dims": [
+      31.2145,
+      32.2102,
+      8.2
+    ],
+    "tris": 3352,
+    "loadRadius": 2500
+  },
+  {
+    "id": "400-brannan",
+    "file": "400-brannan.glb",
+    "anchor": [
+      -122.3946805,
+      37.7800981
+    ],
+    "targetHeightM": 8.8,
+    "cat": 3,
+    "name": "400 Brannan Street",
+    "estimated": false,
+    "dims": [
+      31.4004,
+      33.7824,
+      8.8
+    ],
+    "tris": 3896,
+    "loadRadius": 2500
+  },
+  {
+    "id": "500-van-ness",
+    "file": "500-van-ness.glb",
+    "anchor": [
+      -122.419922,
+      37.7804082
+    ],
+    "targetHeightM": 17.0,
+    "cat": 2,
+    "name": "500 Van Ness Avenue",
+    "estimated": true,
+    "dims": [
+      43.286,
+      45.097,
+      17.0
+    ],
+    "tris": 9512,
+    "loadRadius": 2500
+  },
+  {
+    "id": "188-south-park",
+    "file": "188-south-park.glb",
+    "anchor": [
+      -122.3950794,
+      37.7810118
+    ],
+    "targetHeightM": 15.93,
+    "cat": 2,
+    "name": "188 South Park",
+    "estimated": false,
+    "dims": [
+      28.5663,
+      28.6103,
+      15.93
+    ],
+    "tris": 3864,
+    "loadRadius": 2500
   }
 ]

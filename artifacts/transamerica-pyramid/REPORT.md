@@ -22,11 +22,11 @@ were rendered from that re-imported GLB, not from the authoring scene.
 
 | Check | Result | Re-imported result |
 |---|---:|---|
-| Binary GLB, self-contained | PASS | One 743 KB `.glb`; no external dependencies |
+| Binary GLB, self-contained | PASS | One 839 KB `.glb`; no external dependencies |
 | Real metre dimensions | PASS | 60.8376 × 60.8376 × 260.0000 m axis-aligned bounding box; 53.3 m shell width across its rotated faces |
 | Origin/base | PASS | bbox min `[-30.4188, -30.4188, 0.0000]`; XY centre `[0.0000, 0.0000]` |
-| Triangle budget | PASS | 14,026 / 24,000 triangles |
-| Applied transforms | PASS | all 70 mesh objects at zero location/rotation, scale 1 |
+| Triangle budget | PASS | 15,666 / 24,000 triangles |
+| Applied transforms | PASS | all 74 mesh objects at zero location/rotation, scale 1 |
 | Negative scales | PASS | none |
 | Normals | PASS | finite/unit loop normals; 12/12 targeted exterior pier probes hit outward faces, 0 flipped |
 | Degenerate geometry | PASS | 0 degenerate triangles |
@@ -42,18 +42,42 @@ facade piers from outside and all pass.
 
 ## Geometry and materials
 
-- Objects: 70 mesh objects
-- Triangles: 14,026
+- Objects: 74 mesh objects
+- Triangles: 15,666
 - Dimensions: `[60.8376, 60.8376, 260.0]` m
 - Bbox min/max: `[-30.4188, -30.4188, 0.0]` / `[30.4188, 30.4188, 260.0]`
 - Minimum Z: `0.0` m
 - XY centre offset: `[0.0, 0.0]` m
 - Materials: `Toy_trim`, `Toy_glass`, `Toy_stone`, `Toy_steel`, `Toy_roofd`, `Toy_white_Glow`, `Toy_red_Glow`
 
-`Toy_white_Glow` is confined to the simplified 32-pane crown-jewel collar near
-the top of the spire. `Toy_red_Glow` is confined to the aviation beacon at the
-tip. Both have emission strength zero in the daylight GLB and are named for the
-app's night pass.
+## Night state
+
+Nothing in the GLB decides day from night. `app/src/assets.js` splits every
+`*_Glow` material into a second, unlit mesh at load, and `updateLandmarkGlow`
+(`app/src/kit.js`) drives that mesh's opacity as `0.12 + uNight * 0.95`.
+`uNight` comes from `app/src/env.js`, which computes the real solar elevation
+for San Francisco: exactly 0 while the sun is up, ramping to exactly 1 once it
+is 10° below the horizon. So the night state is authored here purely as
+geometry wearing a `_Glow` material, and the city turns it on.
+
+`Toy_white_Glow` covers, from the top down: the crown-jewel collar on the spire,
+a slim floodlit cornice under the parapet, the lit office panes, the slot over
+the colonnade, the lobby and the Montgomery Street entrance. `Toy_red_Glow` is
+the aviation beacon at the tip. Both have emission strength zero in the GLB —
+the app's glow mesh is unlit, so emission would be meaningless.
+
+A lit office pane is a separate quad 5 cm proud of its glass, so the daylight
+facade keeps its dark window grid (the pane is only a 12% cream tint by day) and
+the night facade lights up without a second material on the body mesh. Which
+panes are lit is decided by `lit_window()`, a deterministic hash: the rate is
+drawn per floor and shared by all four faces (12–74% of that floor's windows),
+then each pane is picked inside its floor. Rebuilding gives the same pattern,
+and the result reads as offices, not as noise: some floors nearly dark, some
+nearly full, the scatter random within a floor.
+
+`transamerica-pyramid-night.png` and `-night-east.png` show the state; the day
+renders apply the same 0.12 opacity the app uses, so both sides of the ramp are
+reviewable.
 
 ## Visual design
 
@@ -109,7 +133,7 @@ confirmed as 260 m by CTBUH, OSM, Wikidata and multiple institutional sources.
     60.8376,
     260.0
   ],
-  "tris": 14026
+  "tris": 15666
 }
 ```
 

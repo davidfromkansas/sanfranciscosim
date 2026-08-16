@@ -26,8 +26,10 @@ import {
   TOY_GARDEN,
   TOY_HELIPAD,
   TOY_HVAC,
+  TOY_PALE,
   TOY_PALETTE,
   TOY_ROOFS,
+  TOY_ROOF_BRICK,
   TOY_ROOF_RISE,
   TOY_SOLAR,
   TOY_TOWER_GLASS,
@@ -35,6 +37,8 @@ import {
 } from './lib/toy.mjs';
 import { writeBuildingsBlob, writeLandcoverBlob, writeStreetsBlob } from './lib/binio.mjs';
 import { readLandcoverBlob, readStreetsBlob } from './lib/blobread.mjs';
+import { loadHeightmap } from './lib/heightmap.mjs';
+import { loadTreeBlockers } from './lib/treeblockers.mjs';
 import {
   collectNodes,
   crosswalkBars,
@@ -63,6 +67,8 @@ const TREE_MULTIPLIER = 1.5;
 const STREET_REACH = 25; // a prop only faces a street this close (§2.4)
 const MAX_VEHICLES = 4000;
 const TOWER_FLOORS = 6;
+const GARDEN_TREE_FLOORS = 4; // rooftop-garden trees need a real terrace under them
+const ROOF_TREE_VARIANT = 3; // the base scatter only rolls 0-2; 3 renders shrub-scale
 
 // PROP.* bits, packed into bits 3..7 of the record flag byte.
 const PROP_STREET = 1;
@@ -83,6 +89,8 @@ const TEST_CELLS = {
   sunset: [-122.49, 37.753],
   mission: [-122.4185, 37.7585],
   russianhill: [-122.4185, 37.8005],
+  presidio: [-122.4689, 37.8009],
+  fortpoint: [-122.477, 37.8106],
 };
 
 const arg = process.argv.slice(2).find((a) => a.startsWith('--cells='));
@@ -258,6 +266,18 @@ function loreFrame(ring, cx, cz) {
   return { yaw: Math.round((angle / (Math.PI * 2)) * 256) & 255, street: Boolean(street) };
 }
 
+// Placement veto shared with the landcover scatter: it keeps the densified
+// duplicates out of roads, buildings and water, and keeps rooftop-garden trees
+// on the roof they belong to (an OBB corner patch can overhang the footprint).
+let treeBlocked = () => false;
+let onBuilding = () => true;
+const MAIN_POST_STYLE_ZONE = { lon: -122.458479, lat: 37.800197, radius: 500 };
+const [mainPostX, mainPostZ] = project(MAIN_POST_STYLE_ZONE.lon, MAIN_POST_STYLE_ZONE.lat);
+if (!onlyStreets) {
+  const { sampleElevation } = await loadHeightmap();
+  ({ blocked: treeBlocked, onBuilding } = await loadTreeBlockers({ sampleElevation, out: OUT }));
+}
+
 const roofTrees = [];
 let helipads = 0;
 let pitchedCount = 0;
@@ -265,7 +285,7 @@ let garnishCount = 0;
 let tallestToy = 0;
 
 // Garnish is axis-aligned to the roof's own OBB (A.3), inset from the edge.
-function addGarnish(cell, frame, roofY, seed) {
+function addGarnish(cell, frame, roofY, seed, floors) {
   const lenU = frame.maxU - frame.minU;
   const lenV = frame.maxV - frame.minV;
   if (lenU < 6 || lenV < 6) return;
@@ -294,14 +314,16 @@ function addGarnish(cell, frame, roofY, seed) {
     const pv = Math.min(v1, cv + (v1 - v0) * 0.63);
     emit(cell, frameRect(frame, cu, pu, cv, pv), roofY, roofY + 0.3, TOY_GARDEN, seed, TOY_FLAG_GARNISH);
     garnishCount++;
-    const trees = 2 + Math.floor(rnd(seed, 15) * 3);
+    // Only real rooftop terraces get planted: a tree on a garage reads as a
+    // canopy growing through the roof.
+    const trees = floors >= GARDEN_TREE_FLOORS ? 2 + Math.floor(rnd(seed, 15) * 3) : 0;
     for (let i = 0; i < trees; i++) {
       const [x, z] = fromFrame(
         frame,
         cu + rnd(seed, 40 + i) * (pu - cu),
         cv + rnd(seed, 50 + i) * (pv - cv)
       );
-      roofTrees.push([x, roofY + 0.3, z]);
+      if (onBuilding(x, z)) roofTrees.push([x, roofY + 0.3, z]);
     }
   } else if (roll < 0.65) {
     // Solar: a grid of 2 x 1 m panels over roughly half the roof.
@@ -342,6 +364,7 @@ let vehicles = 0;
 let propBuildings = 0;
 let propTrianglesTotal = 0;
 let propTrianglesMax = 0;
+let mainPostBuildings = 0;
 const catCounts = new Array(CATS.length).fill(0);
 
 let buildingId = -1;
@@ -358,6 +381,9 @@ for (const [ringIn, height, baseY, seed] of source.buildings) {
   const [cx, cz] = ringCentroid(ring);
   const cell = cellFor(cx, cz);
   if (!cell) continue;
+  const inMainPost =
+    (cx - mainPostX) ** 2 + (cz - mainPostZ) ** 2 <= MAIN_POST_STYLE_ZONE.radius ** 2;
+  if (inMainPost) mainPostBuildings++;
 
   const floors = Math.max(2, Math.round(height / TOY_FLOOR));
   const toyHeight = Math.min(MAX_HEIGHT, Math.max(MIN_HEIGHT, floors * TOY_FLOOR));
@@ -365,6 +391,7 @@ for (const [ringIn, height, baseY, seed] of source.buildings) {
 
   let palette;
   if (floors > 20) palette = TOY_TOWER_GLASS;
+  else if (inMainPost) palette = TOY_PALE[Math.floor(rnd(seed, 2) * TOY_PALE.length)];
   else if (rnd(seed, 1 + Math.round(cx)) < 0.7) palette = TOY_BASE[Math.floor(rnd(seed, 2) * TOY_BASE.length)];
   else palette = TOY_ACCENT[Math.floor(rnd(seed, 3) * TOY_ACCENT.length)];
 
@@ -393,7 +420,9 @@ for (const [ringIn, height, baseY, seed] of source.buildings) {
     // generated in the worker from the four corners.
     const box = obbRing(ring);
     const wallH = Math.max(TOY_FLOOR, (floors - 1) * TOY_FLOOR);
-    const roofPalette = TOY_ROOFS[Math.floor(rnd(seed, 4) * TOY_ROOFS.length)];
+    const roofPalette = inMainPost
+      ? TOY_ROOF_BRICK
+      : TOY_ROOFS[Math.floor(rnd(seed, 4) * TOY_ROOFS.length)];
     emit(cell, box, baseY, baseY + wallH, palette, seed, TOY_FLAG_PITCHED | flagBits, roofPalette, loreRec);
     pitchedCount++;
     tallestToy = Math.max(tallestToy, wallH + TOY_ROOF_RISE);
@@ -402,7 +431,7 @@ for (const [ringIn, height, baseY, seed] of source.buildings) {
     const top = baseY + toyHeight;
     emit(cell, ring, baseY, top, palette, seed, flagBits, 0, loreRec);
     tallestToy = Math.max(tallestToy, toyHeight);
-    addGarnish(cell, obbFrame(ring), top, seed + Math.round(cx));
+    addGarnish(cell, obbFrame(ring), top, seed + Math.round(cx), floors);
     if (floors > 30 && helipads < MAX_HELIPADS) addHelipad(cell, cx, cz, top, seed);
     measureProps(ring, cx, cz, baseY, top, loreRec, seed);
   }
@@ -472,6 +501,7 @@ if (!onlyStreets) {
     `toy buildings: ${toyRecords} records in ${toyIndex.length} cells, ${(toyBytes / 1e6).toFixed(1)} MB ` +
       `(${pitchedCount} pitched, ${garnishCount} garnish, ${helipads} helipads, tallest ${tallestToy.toFixed(0)} m)`
   );
+  console.log(`Main Post style zone: ${mainPostBuildings} buildings`);
   console.log(
     `lore props: ${propBuildings} buildings, avg ${(propTrianglesTotal / Math.max(1, propBuildings)).toFixed(1)} tris ` +
       `(cap ${propTrianglesMax}), ${vehicles} vehicles, ` +
@@ -619,10 +649,12 @@ for (const file of landFiles.sort()) {
     // Extra half-density pass: a seeded 6 m nudge off every other tree.
     if (hash01(i * 2654435761 + cx * 977 + cz) < TREE_MULTIPLIER - 1) {
       const a = hash01(i * 40503 + 7) * Math.PI * 2;
-      trees.push(x + Math.cos(a) * 6, y, z + Math.sin(a) * 6, base.treeVariant[i]);
+      const nx = x + Math.cos(a) * 6;
+      const nz = z + Math.sin(a) * 6;
+      if (!treeBlocked(nx, nz)) trees.push(nx, y, nz, base.treeVariant[i]);
     }
   }
-  for (const [x, y, z] of roofTreesByCell.get(key) || []) trees.push(x, y, z, 2);
+  for (const [x, y, z] of roofTreesByCell.get(key) || []) trees.push(x, y, z, ROOF_TREE_VARIANT);
 
   const blob = writeLandcoverBlob({
     key,

@@ -17,6 +17,8 @@ const GLYPHS = {
   chat: '<path d="M4 5h16v11H9l-5 4z"/>',
   view: '<circle cx="12" cy="12" r="3"/><path d="M2 12s4-6 10-6 10 6 10 6-4 6-10 6S2 12 2 12z"/>',
   vessel: '<path d="M4 14h16l-2 5H6zM12 14V5l6 4-6 2M7 14v-4h5"/>',
+  transit: '<rect x="5" y="4" width="14" height="13" rx="2"/><path d="M5 12h14M8 20l1-3M16 20l-1-3"/><circle cx="9" cy="15" r=".5"/><circle cx="15" cy="15" r=".5"/>',
+  aircraft: '<path d="M12 3c.9 0 1.4.9 1.4 2v4.2l7.1 4v2l-7.1-2.2V17l2.2 1.6v1.7L12 19.5l-3.6.8v-1.7L10.6 17v-3.9L3.5 15.3v-2l7.1-4V5c0-1.1.5-2 1.4-2z"/>',
 };
 
 const KIND_GLYPH = {
@@ -28,6 +30,9 @@ const KIND_GLYPH = {
   water: 'water',
   view: 'view',
   vessel: 'vessel',
+  transit: 'transit',
+  'transit-stop': 'transit',
+  aircraft: 'aircraft',
 };
 
 const CAT_TONE = [
@@ -73,6 +78,16 @@ function relative(ms, now = Date.now()) {
   return `${-minutes} min ago`;
 }
 
+const OCCUPANCY_LABEL = {
+  empty: 'Empty',
+  manySeatsAvailable: 'Many seats available',
+  fewSeatsAvailable: 'Few seats available',
+  standingRoomOnly: 'Standing room only',
+  crushedStandingRoomOnly: 'Crowded',
+  full: 'Full',
+  notAcceptingPassengers: 'Not accepting passengers',
+};
+
 function when(ms) {
   const time = clock(ms);
   return time ? `${time} (${relative(ms)})` : null;
@@ -85,7 +100,7 @@ function chip(text, tone, glyphName) {
   return node;
 }
 
-export function createContextCard({ onFly, onAsk, onSelectHistory }) {
+export function createContextCard({ onFly, onAsk, onSelectHistory, onClose }) {
   const card = el('div', 'toy-card');
   card.id = 'context-card';
   card.hidden = true;
@@ -118,7 +133,13 @@ export function createContextCard({ onFly, onAsk, onSelectHistory }) {
   document.body.appendChild(card);
 
   let current = null;
-  close.addEventListener('click', () => hide());
+  close.addEventListener('click', () => {
+    // Dismissing the card is also how you let go of whatever it was about —
+    // for a followed aircraft that means handing the camera back.
+    const dismissed = current;
+    hide();
+    onClose?.(dismissed);
+  });
   flyButton.addEventListener('click', () => current && onFly(current));
   askButton.addEventListener('click', () => current && onAsk(current));
 
@@ -190,6 +211,97 @@ export function createContextCard({ onFly, onAsk, onSelectHistory }) {
       }
       fact('Speed', `${entity.speedKn.toFixed(1)} kn`);
       fact('Position reported', relative(entity.recordedAt));
+    } else if (entity.kind === 'transit') {
+      subtitle.textContent = entity.routeName ? `Muni · ${entity.routeName}` : 'Muni';
+      chips.append(chip(entity.demo ? 'Demo bus' : 'Live bus', 'teal', 'transit'));
+      chips.append(chip(entity.route, 'coral'));
+      if (entity.occupancy && OCCUPANCY_LABEL[entity.occupancy]) {
+        chips.append(chip(OCCUPANCY_LABEL[entity.occupancy], 'mustard'));
+      }
+      fact('Bus', `${entity.fleetNumber} · New Flyer XDE40 hybrid`);
+      fact('Headed to', entity.destination || 'Not reported');
+      if (entity.stops?.length) {
+        // The next stops with live ETAs, the way the rider-facing signs put it.
+        for (const [i, stop] of entity.stops.entries()) {
+          fact(i === 0 ? 'Next stop' : 'Then', `${stop.name} · ${when(stop.arrivalAt) || 'no prediction'}`);
+        }
+      } else {
+        fact('Next stop', entity.degraded ? 'No predictions (degraded feed)' : 'No prediction');
+      }
+      fact('Speed', `${Math.round(entity.speedKmh)} km/h`);
+      fact('Position reported', relative(entity.recordedAt));
+    } else if (entity.kind === 'transit-stop') {
+      subtitle.textContent = 'Muni bus stop';
+      chips.append(chip('Bus stop', 'navy', 'transit'));
+      for (const route of entity.routes.slice(0, 6)) chips.append(chip(route, 'coral'));
+      if (entity.routes.length > 6) chips.append(chip(`+${entity.routes.length - 6}`, 'navy'));
+      fact('Routes stopping here', entity.routes.join(' \u00b7 '));
+      // Grouped by route, because "when is the next 38R" is the question a
+      // rider is asking — a flat list of vehicles makes them do the grouping.
+      if (entity.arrivals.length) {
+        for (const group of entity.arrivals) {
+          fact(group.route, group.minutes.map((m) => (m <= 0 ? 'now' : `${m} min`)).join(', '));
+        }
+      } else {
+        fact('Coming soon', 'Nothing predicted in the next few minutes');
+      }
+    } else if (entity.kind === 'aircraft') {
+      // Every number here is the TRUE reading from the transponder. Only the
+      // height the aircraft is DRAWN at is compressed (see aircraft.js dispY),
+      // so the card is never the place that lies.
+      // The route is the most glanceable fact there is, so it headlines when
+      // known: "Airliner \u00b7 B739 \u00b7 SFO \u2192 PVR".
+      const leg =
+        entity.route && (entity.route.from?.iata || entity.route.to?.iata)
+          ? `${entity.route.from?.iata || '?'} \u2192 ${entity.route.to?.iata || '?'}`
+          : null;
+      subtitle.textContent = [entity.name, entity.aircraftType, leg].filter(Boolean).join(' \u00b7 ');
+      chips.append(chip(entity.demo ? 'Demo aircraft' : 'Live aircraft', 'teal', 'aircraft'));
+      if (entity.phase) chips.append(chip(entity.phase, 'navy'));
+      if (entity.emergency) chips.append(chip(entity.emergency, 'coral'));
+      if (entity.military) chips.append(chip('Military', 'mustard'));
+      if (entity.callsign) fact('Callsign', entity.callsign);
+      if (entity.registration && entity.registration !== entity.callsign) {
+        fact('Tail number', entity.registration);
+      }
+      if (entity.aircraftType) fact('Type', entity.aircraftType);
+      // Origin and destination. ADS-B does not broadcast these — they are
+      // looked up from the callsign, so a private flight legitimately has none
+      // and says so rather than showing a blank row.
+      if (entity.route) {
+        const place = (node) =>
+          node
+            ? [node.city, node.iata ? `(${node.iata})` : null].filter(Boolean).join(' ') ||
+              node.name ||
+              'Not reported'
+            : 'Not reported';
+        fact('From', place(entity.route.from));
+        fact('To', place(entity.route.to));
+      } else if (entity.callsign && entity.callsign !== entity.registration) {
+        fact('Route', 'Not published');
+      }
+      fact('Altitude', `${entity.altitudeFt.toLocaleString('en-US')} ft \u00b7 ${entity.altitudeM.toLocaleString('en-US')} m`);
+      fact('Ground speed', `${entity.speedKt} kn \u00b7 ${Math.round(entity.speedKmh)} km/h`);
+      // A vertical rate under ~500 fpm is noise on a barometric encoder, so it
+      // is reported as level rather than as a spurious 40 fpm climb.
+      const fpm = entity.verticalRateFpm;
+      fact(
+        'Vertical rate',
+        Math.abs(fpm) < 500
+          ? 'Level'
+          : `${fpm > 0 ? 'Climbing' : 'Descending'} ${Math.abs(fpm).toLocaleString('en-US')} ft/min`
+      );
+      fact('Heading', `${entity.heading}\u00b0`);
+      // Say plainly that the aircraft is drawn nearer than it is. The distance
+      // is the real one; only the position on screen is compressed.
+      if (entity.scaledPlacement) {
+        fact(
+          'Actually',
+          `${entity.trueDistanceKm.toFixed(1)} km from the city \u00b7 drawn overhead to keep it in view`
+        );
+      }
+      if (entity.squawk) fact('Squawk', entity.squawk);
+      fact('Position reported', relative(entity.recordedAt));
     } else if (entity.kind === 'neighborhood') {
       subtitle.textContent = 'Analysis neighbourhood';
       chips.append(chip('Neighbourhood', 'plum', 'neighborhood'));
@@ -200,7 +312,11 @@ export function createContextCard({ onFly, onAsk, onSelectHistory }) {
 
     // The concierge only knows the baked city, so it has nothing to say about a
     // boat that showed up in a live feed thirty seconds ago.
-    askButton.hidden = entity.kind === 'vessel';
+    // Aircraft DO get the ask button: unlike a ferry or a bus, the concierge
+    // has the whole flights feed through live_data, and the clicked aircraft's
+    // full state rides along in the focus context — so it can actually answer.
+    askButton.hidden =
+      entity.kind === 'vessel' || entity.kind === 'transit' || entity.kind === 'transit-stop';
 
     const bits = [`Source: ${sourceLabel(entity.source)}`];
     if (entity.kind === 'building') bits.push(confidenceLabel(entity.confidence));

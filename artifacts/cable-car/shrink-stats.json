@@ -1,0 +1,322 @@
+{
+ "input_materials": [
+  "Toy_cream",
+  "Toy_glass",
+  "Toy_gold",
+  "Toy_ink",
+  "Toy_maroon",
+  "Toy_mustard",
+  "Toy_mustard_Glow",
+  "Toy_oak",
+  "Toy_p_coral",
+  "Toy_p_cream",
+  "Toy_p_mustard",
+  "Toy_p_navy",
+  "Toy_p_tan",
+  "Toy_p_teal",
+  "Toy_roofd",
+  "Toy_sand",
+  "Toy_sky",
+  "Toy_steel",
+  "Toy_white",
+  "Toy_white_Glow"
+ ],
+ "steps": [
+  {
+   "step": "weld+degenerate",
+   "tris": 3888,
+   "verts": 2396,
+   "objects": 227
+  },
+  {
+   "step": "interior-faces",
+   "tris": 3776,
+   "verts": 2392,
+   "objects": 227
+  },
+  {
+   "step": "limited-dissolve",
+   "tris": 3776,
+   "verts": 2392,
+   "objects": 227
+  },
+  {
+   "step": "join-per-material",
+   "tris": 3776,
+   "verts": 2392,
+   "objects": 20
+  }
+ ],
+ "retessellation": "SKIPPED - grab poles are 8-segment cylinders authored at the 15-120 m vehicle band times the 1.6x render scale; halving them squares off the verticals that carry the open-section read",
+ "input": {
+  "tris": 3888,
+  "verts": 7620,
+  "objects": 227,
+  "faces": 3888
+ },
+ "glow_objects_exempt_from_interior_deletion": [
+  "ceiling_glow",
+  "lamp_lens",
+  "letterboard_glow_l",
+  "letterboard_glow_r",
+  "routeboard_f_glow",
+  "routeboard_r_glow",
+  "winglow_l_0",
+  "winglow_l_1",
+  "winglow_l_2",
+  "winglow_l_3",
+  "winglow_r_0",
+  "winglow_r_1",
+  "winglow_r_2",
+  "winglow_r_3"
+ ],
+ "interior_faces_by_object": {
+  "bench_pan_l": {
+   "faces": 10,
+   "buried_in": [
+    "panel_openl"
+   ]
+  },
+  "bench_pan_r": {
+   "faces": 10,
+   "buried_in": [
+    "panel_openr"
+   ]
+  },
+  "pole_l_0": {
+   "faces": 6,
+   "buried_in": [
+    "runboard_l"
+   ]
+  },
+  "pole_l_1": {
+   "faces": 6,
+   "buried_in": [
+    "runboard_l"
+   ]
+  },
+  "pole_l_2": {
+   "faces": 6,
+   "buried_in": [
+    "runboard_l"
+   ]
+  },
+  "pole_l_3": {
+   "faces": 6,
+   "buried_in": [
+    "runboard_l"
+   ]
+  },
+  "pole_l_4": {
+   "faces": 6,
+   "buried_in": [
+    "runboard_l"
+   ]
+  },
+  "pole_l_5": {
+   "faces": 6,
+   "buried_in": [
+    "runboard_l"
+   ]
+  },
+  "pole_r_0": {
+   "faces": 6,
+   "buried_in": [
+    "runboard_r"
+   ]
+  },
+  "pole_r_1": {
+   "faces": 6,
+   "buried_in": [
+    "runboard_r"
+   ]
+  },
+  "pole_r_2": {
+   "faces": 6,
+   "buried_in": [
+    "runboard_r"
+   ]
+  },
+  "pole_r_3": {
+   "faces": 6,
+   "buried_in": [
+    "runboard_r"
+   ]
+  },
+  "pole_r_4": {
+   "faces": 6,
+   "buried_in": [
+    "runboard_r"
+   ]
+  },
+  "pole_r_5": {
+   "faces": 6,
+   "buried_in": [
+    "runboard_r"
+   ]
+  },
+  "brake_lever": {
+   "faces": 2,
+   "buried_in": [
+    "lever_housing"
+   ]
+  },
+  "cabbench_l": {
+   "faces": 2,
+   "buried_in": [
+    "reveal_cab"
+   ]
+  },
+  "cabbench_r": {
+   "faces": 2,
+   "buried_in": [
+    "reveal_cab"
+   ]
+  },
+  "grip_lever": {
+   "faces": 2,
+   "buried_in": [
+    "lever_housing"
+   ]
+  },
+  "rider_sl0_arm_l": {
+   "faces": 2,
+   "buried_in": [
+    "rider_sl0_torso"
+   ]
+  },
+  "rider_sr0_arm_r": {
+   "faces": 2,
+   "buried_in": [
+    "rider_sr0_torso"
+   ]
+  },
+  "rider_sr1_arm_r": {
+   "faces": 2,
+   "buried_in": [
+    "rider_sr1_torso"
+   ]
+  },
+  "runboard_strip_l": {
+   "faces": 2,
+   "buried_in": [
+    "runboard_l"
+   ]
+  },
+  "runboard_strip_r": {
+   "faces": 2,
+   "buried_in": [
+    "runboard_r"
+   ]
+  },
+  "slot_lever": {
+   "faces": 2,
+   "buried_in": [
+    "gripman_legs"
+   ]
+  }
+ },
+ "interior_faces_removed": 112,
+ "interior_faces_removed_fraction": 0.02881,
+ "interior_face_alarm": false,
+ "pole_face_counts": {
+  "pole_l_0": 9,
+  "pole_l_1": 9,
+  "pole_l_2": 9,
+  "pole_l_3": 9,
+  "pole_l_4": 9,
+  "pole_l_5": 9,
+  "pole_r_0": 9,
+  "pole_r_1": 9,
+  "pole_r_2": 9,
+  "pole_r_3": 9,
+  "pole_r_4": 9,
+  "pole_r_5": 9
+ },
+ "joins": {
+  "grp_Toy_ink": 39,
+  "grp_Toy_oak": 54,
+  "grp_Toy_steel": 3,
+  "grp_Toy_cream": 11,
+  "grp_Toy_mustard_Glow": 13,
+  "grp_Toy_glass": 18,
+  "grp_Toy_p_navy": 12,
+  "grp_Toy_p_tan": 8,
+  "grp_Toy_maroon": 20,
+  "grp_Toy_white": 3,
+  "grp_Toy_gold": 16,
+  "grp_Toy_mustard": 4,
+  "grp_Toy_sand": 2,
+  "grp_Toy_p_mustard": 4,
+  "grp_Toy_p_coral": 4,
+  "grp_Toy_p_teal": 3,
+  "grp_Toy_sky": 7,
+  "grp_Toy_roofd": 4
+ },
+ "poles_survived_join": true,
+ "inverted_solids_after_join": [],
+ "group_signed_volumes": {
+  "grp_Toy_cream": 3.178866,
+  "grp_Toy_glass": 0.182197,
+  "grp_Toy_gold": 0.142932,
+  "grp_Toy_ink": 3.536748,
+  "grp_Toy_maroon": 6.601672,
+  "grp_Toy_mustard": 0.054505,
+  "grp_Toy_mustard_Glow": 0.971303,
+  "grp_Toy_oak": 5.622676,
+  "grp_Toy_p_coral": 0.082559,
+  "grp_Toy_p_mustard": 0.080629,
+  "grp_Toy_p_navy": 0.240451,
+  "grp_Toy_p_tan": 0.058394,
+  "grp_Toy_p_teal": 0.05453,
+  "grp_Toy_roofd": 0.112896,
+  "grp_Toy_sand": 2.535542,
+  "grp_Toy_sky": 2.108606,
+  "grp_Toy_steel": 0.017621,
+  "grp_Toy_white": 0.235518,
+  "lamp_lens": 0.001074,
+  "rider_br0_torso": 0.028028
+ },
+ "merge_vehicle_safe": true,
+ "inverted_note": "A joined per-material group is a UNION of solids, not one solid; its signed volume is the sum of its parts and MUST stay positive, because app/src/agents.js mergeVehicle() reverses any source mesh whose signed volume is negative. A negative group here ships that whole material inside out. Per-object closure is proved before the join by validate_cable_car.py.",
+ "reimport": {
+  "objects": 20,
+  "tris": 3776,
+  "verts": 7436,
+  "materials": [
+   "Toy_cream",
+   "Toy_glass",
+   "Toy_gold",
+   "Toy_ink",
+   "Toy_maroon",
+   "Toy_mustard",
+   "Toy_mustard_Glow",
+   "Toy_oak",
+   "Toy_p_coral",
+   "Toy_p_cream",
+   "Toy_p_mustard",
+   "Toy_p_navy",
+   "Toy_p_tan",
+   "Toy_p_teal",
+   "Toy_roofd",
+   "Toy_sand",
+   "Toy_sky",
+   "Toy_steel",
+   "Toy_white",
+   "Toy_white_Glow"
+  ],
+  "bbox_dims": [
+   2.42,
+   8.4,
+   3.18
+  ],
+  "bbox_min": [
+   -1.21,
+   -4.2,
+   0.0
+  ]
+ },
+ "bbox_ok": true,
+ "material_set_ok": true,
+ "glow_layer_intact": true
+}

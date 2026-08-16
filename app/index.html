@@ -7,14 +7,45 @@
     <link rel="icon" href="/favicon.svg" type="image/svg+xml" />
     <link rel="stylesheet" href="/src/style.css" />
     <link rel="stylesheet" href="/src/ui-theme.css" />
+    <link rel="stylesheet" href="/src/boot.css" />
   </head>
   <body>
     <canvas id="view"></canvas>
-    <div id="loader"><div id="loader-bar"><i></i></div></div>
+    <!-- Boot curtain. Inline markup (not built by JS) so the fog is on screen
+         at first paint, ~20 s before the renderer exists on a cold 4G load.
+         boot.js drives it and removes this whole subtree on reveal. -->
+    <div id="boot">
+      <div class="boot-sky"></div>
+      <div class="boot-grid"><i></i></div>
+      <!-- Tier 1: procedural SVG fog. Costs zero bytes and paints with the
+           stylesheet, so there is fog on screen before any asset exists. -->
+      <div class="boot-fog"><i></i><i></i><i></i><i></i></div>
+      <!-- Tier 2: two Blender-rendered fog halves that slide apart on reveal,
+           plus sparse foreground wisps for depth. Pure upgrades — if either
+           never arrives, the SVG tier below just stays. -->
+      <div class="boot-doors"><i></i><i></i></div>
+      <div class="boot-wisps"><i></i><i></i></div>
+      <!-- Soft dark pool under the console: white fog would otherwise swallow
+           the neon. Sibling of .boot-core so the power-down flash cannot
+           brighten it. -->
+      <div class="boot-veil"></div>
+      <div class="boot-core">
+        <div class="boot-frame">
+          <div class="boot-bar">
+            <span class="boot-fill"></span>
+            <span class="boot-scan"></span>
+          </div>
+          <div class="boot-readout">
+            <span class="boot-status">INITIALIZING</span>
+            <span class="boot-pct">0%</span>
+          </div>
+        </div>
+      </div>
+      <div class="boot-scanlines"></div>
+    </div>
     <div id="attribution">
       © OpenStreetMap contributors, Overture Maps Foundation, City &amp; County of San Francisco, USGS
     </div>
-    <div id="hud"></div>
     <div id="debug" hidden></div>
     <script type="module" src="/src/main.js"></script>
   </body>

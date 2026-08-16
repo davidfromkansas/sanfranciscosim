@@ -260,6 +260,39 @@
   font-weight: 700;
 }
 
+/* The weather line, on the same rhythm as .clock-sky above it. */
+.clock-weather {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  margin-top: 4px;
+  font-size: 11.5px;
+  font-weight: 700;
+}
+
+.clock-weather[hidden] {
+  display: none;
+}
+
+.clock-aqi {
+  padding: 1px 7px;
+  font-size: 9.5px;
+  letter-spacing: 0.3px;
+}
+
+/* .chip sets display:inline-flex, which wins over the [hidden] attribute's
+   default display:none — without this the empty pill renders as a stray blob. */
+.chip[hidden] {
+  display: none;
+}
+
+/* On a narrow screen the wind goes and the temperature stays. */
+@media (max-width: 479px) {
+  .clock-wind {
+    display: none;
+  }
+}
+
 .sky-glyph {
   width: 16px;
   height: 16px;

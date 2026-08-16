@@ -650,6 +650,7 @@ function planFurniture(streetBlobs, streetClasses, plan) {
     market: plan.market,
     commercial: plan.commercial,
     exclusions: plan.exclusions,
+    busStops: plan.busStops,
     limit: plan.limit,
   });
 }
@@ -782,7 +783,11 @@ function buildGround(
           lamps.push(
             px[k] + t2[1] * side * reach + originX,
             py[k] + curb + 6.5,
-            pz[k] - t2[0] * side * reach + originZ
+            pz[k] - t2[0] * side * reach + originZ,
+            // The road surface under the lamp. Carried rather than re-sampled
+            // from the terrain: the pool of light has to land on the baked
+            // street, which sits on its own kerb lift above the ground.
+            py[k] + curb
           );
         }
       }

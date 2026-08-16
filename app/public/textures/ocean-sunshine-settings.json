@@ -1,0 +1,27 @@
+{
+  "texture": "ocean-sunshine-inspired.png",
+  "wrapMode": "repeat",
+  "filterMode": "linear-mipmap-linear",
+  "speed": 2.37,
+  "waveScale": 1,
+  "glintThreshold": 0.75,
+  "highlightBloom": 1.1,
+  "distanceSheen": 0.65,
+  "layerA": {
+    "direction": [
+      0.02,
+      0.013
+    ],
+    "scaleMultiplier": 1,
+    "rotationRadians": 0
+  },
+  "layerB": {
+    "direction": [
+      -0.011,
+      0.024
+    ],
+    "scaleMultiplier": 1.17,
+    "rotationRadians": 0.31,
+    "weight": 2
+  }
+}

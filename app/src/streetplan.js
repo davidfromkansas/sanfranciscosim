@@ -35,7 +35,6 @@ export const ANCHOR_STRIDE = 5; // piece, x, y, z, yaw
 
 const LAMP_SPACING = 40;
 const LAMP_INSET = 0.8; // from the kerb edge, per plan §2.2
-const SHELTER_SPACING = 250;
 const NODE_CLEAR = 9; // keep furniture off the corner itself
 // Mirrors the bake (pipeline/lib/streetscape.mjs): a zebra band starts this far
 // past the intersection box and runs this far up the approach. The planner has
@@ -49,6 +48,29 @@ const CLUSTER_STEP = 20;
 const CLUSTER_SPAN = 40; // ≤2 special pieces per 40 m of frontage
 const MARKET_REACH = 22;
 const COMMERCIAL_REACH = 32;
+
+// Half a piece's plan footprint, from the measured GLB dimensions. Two pieces
+// whose footprints touch would z-fight (and, on a pair of lamps, glow twice),
+// so a candidate has to clear whatever already stands there.
+const FOOTPRINT = {
+  sl_standard: 0.5,
+  sl_pathofgold: 0.8,
+  sl_residential: 0.5,
+  traffic_signal: 0.5,
+  hydrant: 0.4,
+  mailbox: 0.4,
+  muni_shelter: 2.4,
+  bench: 1.0,
+  trashcan: 0.4,
+  planter: 0.6,
+  newsboxes: 0.9,
+  bikerack: 1.2,
+  cafe_set: 1.2,
+  market_stall: 1.8,
+  parklet: 3.1,
+};
+const RADIUS = PIECES.map((id) => FOOTPRINT[id]);
+const GAP = 0.3; // breathing room between two neighbouring footprints
 
 // Deterministic and position-based: the same metre of street hashes the same
 // way in every session, on every machine, regardless of streaming order.
@@ -205,6 +227,7 @@ export function planStreetFurniture(job) {
     market,
     commercial,
     exclusions,
+    busStops = [],
     limit = 4000,
   } = job;
   // A junction is only whole once every arm is in hand, and a group's blobs stop
@@ -260,6 +283,19 @@ export function planStreetFurniture(job) {
     return false;
   };
 
+  // Streets are baked per cell, so a centreline that straddles a cell edge can
+  // reach the planner twice, and independent passes can pick the same metre of
+  // kerb. Both end as pieces standing inside each other unless the ground is
+  // claimed as it is used.
+  const taken = grid(8);
+  const claimed = (piece, x, z) => {
+    const r = RADIUS[piece] + GAP;
+    return taken.near(x, z, r + 3.1, (o) => {
+      const reach = r + RADIUS[o.piece];
+      return (o.x - x) * (o.x - x) + (o.z - z) * (o.z - z) < reach * reach;
+    });
+  };
+
   const nodes = junctionNodes(haloRoads.length ? roads.concat(haloRoads) : roads);
   const nodeGrid = grid(32);
   for (const node of nodes) nodeGrid.add(node.x, node.z, node);
@@ -299,13 +335,52 @@ export function planStreetFurniture(job) {
     if (clear > 0 && nearNode(x, z, clear)) return false;
     if (crossing && onCrossing(x, z)) return false;
     if (excluded(x, z)) return false;
+    if (claimed(piece, x, z)) return false;
     out.push(piece, x, y, z, yaw);
+    taken.add(x, z, { piece, x, z });
     return true;
   }
 
   // A piece's front is -Y in Blender, which the yup export turns into +Z here,
   // so yaw is the angle that swings +Z onto the facing direction.
   const facing = (fx, fz) => Math.atan2(fx, fz);
+
+  // Road samples in a coarse grid, so orienting a stop is a local lookup rather
+  // than a scan of every centreline in the cell.
+  //
+  // The halo is in here for the same reason it completes junctions. A street is
+  // baked into whichever tile it began in, so a road can run well inside this
+  // group while every one of its samples belongs to the neighbour — and a bus
+  // stop on it is then owned by a group that cannot see the road it stands on.
+  // Measured on Fillmore at Sutter: zero road samples within 48 m of three
+  // adjacent stops, in a group whose edge is 92 m away, with a lamp standing a
+  // metre from each (lamps are walked along the roads, so they came from the
+  // neighbour). Reading the halo answers where the kerb is; it still places
+  // nothing along it.
+  const roadGrid = grid(32);
+  for (const road of haloRoads.length ? roads.concat(haloRoads) : roads) {
+    const halfW = road.width / 2;
+    for (let k = 0; k < road.n; k++) {
+      roadGrid.add(road.px[k], road.pz[k], { x: road.px[k], y: road.py[k], z: road.pz[k], halfW });
+    }
+  }
+
+  /** Nearest road centreline sample to a point, within ~48 m. */
+  function nearestRoad(x, z) {
+    let best = null;
+    let bestD = 48 * 48;
+    // grid.near takes a visitor and stops early on a truthy return; this one
+    // always returns false because it wants the nearest, not the first.
+    roadGrid.near(x, z, 48, (s) => {
+      const d = (s.x - x) * (s.x - x) + (s.z - z) * (s.z - z);
+      if (d < bestD) {
+        bestD = d;
+        best = s;
+      }
+      return false;
+    });
+    return best ? { ...best, dist: Math.sqrt(bestD) } : null;
+  }
 
   // ----------------------------------------------------------- signals ---
   // Signals go down before anything else: they carry meaning (this crossing is
@@ -340,6 +415,36 @@ export function planStreetFurniture(job) {
         if (place(P.traffic_signal, x, y, z, facing(-a.dirX * sa, -a.dirZ * sa), opts)) heads++;
       }
     }
+  }
+
+  // --------------------------------------------------- BUS SHELTERS ---
+  // Shelters used to be walked along every major road at a fixed spacing with a
+  // hash for a coin flip, which put them in places no bus has ever stopped. They
+  // now stand only where Muni actually calls: `busStops` is the cell's slice of
+  // the GTFS stop table (app/src/munistops.js), so every shelter marks a real
+  // stop and every real stop in frame gets one.
+  for (let i = 0; i + 1 < busStops.length; i += 2) {
+    const sx = busStops[i];
+    const sz = busStops[i + 1];
+    if (!owns(sx, sz)) continue;
+    const near = nearestRoad(sx, sz);
+    if (!near) continue;
+    // Face the shelter across the carriageway: its back goes to the buildings,
+    // its opening to the road the bus pulls up on.
+    const toRoad = Math.atan2(near.x - sx, near.z - sz);
+    // A GTFS stop is surveyed at the kerb, which the baked sidewalk may sit a
+    // metre or two off; nudge onto the footway rather than rejecting the stop.
+    const push = Math.min(2.5, Math.max(0, near.dist - near.halfW - 1.2));
+    const px = sx + Math.sin(toRoad + Math.PI) * push;
+    const pz = sz + Math.cos(toRoad + Math.PI) * push;
+    // needSidewalk/crossing are relaxed deliberately: a real stop sits at a real
+    // corner, and dropping it because the baked footway is a metre narrow would
+    // reintroduce exactly the fiction this replaces.
+    place(P.muni_shelter, px, near.y + 0.15, pz, toRoad, {
+      needSidewalk: false,
+      crossing: false,
+      clear: 6,
+    });
   }
 
   // ------------------------------------------------------------- lamps ---
@@ -396,23 +501,8 @@ export function planStreetFurniture(job) {
       });
     }
 
-    // ------------------------------------------- shelters and mailboxes ---
-    if (road.klass <= 2 && sw.width >= 4) {
-      walk(road, SHELTER_SPACING, 60 + hash(road.px[0], road.pz[0], 31) * 80, (x, y, z, tx, tz) => {
-        const side = hash(x, z, 37) < 0.5 ? 1 : -1;
-        const nx = tz * side;
-        const nz = -tx * side;
-        // Centred on the footway so the shelter's back is off the shopfronts.
-        const off = halfW + sw.width / 2;
-        const sx = x + nx * off;
-        const sz = z + nz * off;
-        if (shopScore(sx, sz) >= 1 || hash(x, z, 41) < 0.45) {
-          place(P.muni_shelter, sx, y + sw.curb, sz, facing(-nx, -nz), { clear: 16 });
-        }
-      });
-    }
 
-    // ------------------------------------------- commercial frontage ---
+  // ------------------------------------------- commercial frontage ---
     // Clusters, not scatter: a stretch that scores as a shopping street gets a
     // small designed group, then 40 m of quiet before the next one.
     let cooldown = 0;

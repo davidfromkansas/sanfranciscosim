@@ -1,0 +1,48 @@
+{
+ "day_near": {
+  "mean_abs_rgb_pct": 0.0219,
+  "max_px_delta": 38,
+  "fg_pixels": 381241
+ },
+ "day_far": {
+  "mean_abs_rgb_pct": 0.0214,
+  "max_px_delta": 13,
+  "fg_pixels": 22725
+ },
+ "night_near": {
+  "mean_abs_rgb_pct": 0.0047,
+  "max_px_delta": 16,
+  "fg_pixels": 381241
+ },
+ "night_far": {
+  "mean_abs_rgb_pct": 0.0055,
+  "max_px_delta": 15,
+  "fg_pixels": 22725
+ },
+ "elev_n": {
+  "mean_abs_rgb_pct": 0.0174,
+  "max_px_delta": 41,
+  "fg_pixels": 165823
+ },
+ "elev_e": {
+  "mean_abs_rgb_pct": 0.0268,
+  "max_px_delta": 35,
+  "fg_pixels": 165109
+ },
+ "elev_s": {
+  "mean_abs_rgb_pct": 0.0128,
+  "max_px_delta": 35,
+  "fg_pixels": 162923
+ },
+ "elev_w": {
+  "mean_abs_rgb_pct": 0.0088,
+  "max_px_delta": 43,
+  "fg_pixels": 162866
+ },
+ "night_front": {
+  "mean_abs_rgb_pct": 0.0511,
+  "max_px_delta": 64,
+  "fg_pixels": 354099,
+  "note": "added: the standard A/B azimuth looks at the rear, where this asset has no glow surfaces"
+ }
+}

@@ -1,0 +1,524 @@
+{
+ "file_bytes": {
+  "raw": 184296,
+  "gzip9": 30179
+ },
+ "objects": 63,
+ "total_tris": 2848,
+ "total_verts": 5868,
+ "primitives_est": 63,
+ "top20": [
+  {
+   "name": "eave_fascia",
+   "tris": 288,
+   "verts": 528,
+   "dims": [
+    16.519,
+    17.26,
+    0.42
+   ],
+   "materials": [
+    "Toy_trim"
+   ]
+  },
+  {
+   "name": "basement",
+   "tris": 164,
+   "verts": 324,
+   "dims": [
+    15.351,
+    15.451,
+    0.9
+   ],
+   "materials": [
+    "Toy_stone"
+   ]
+  },
+  {
+   "name": "walls",
+   "tris": 164,
+   "verts": 324,
+   "dims": [
+    15.07,
+    15.171,
+    6.1
+   ],
+   "materials": [
+    "Toy_white"
+   ]
+  },
+  {
+   "name": "chimney",
+   "tris": 108,
+   "verts": 216,
+   "dims": [
+    0.947,
+    1.09,
+    1.43
+   ],
+   "materials": [
+    "Toy_brick"
+   ]
+  },
+  {
+   "name": "chimney_cap",
+   "tris": 108,
+   "verts": 216,
+   "dims": [
+    1.224,
+    1.367,
+    0.22
+   ],
+   "materials": [
+    "Toy_brick"
+   ]
+  },
+  {
+   "name": "porch_canopy",
+   "tris": 108,
+   "verts": 216,
+   "dims": [
+    2.419,
+    4.116,
+    0.45
+   ],
+   "materials": [
+    "Toy_trim"
+   ]
+  },
+  {
+   "name": "porch_slab",
+   "tris": 108,
+   "verts": 216,
+   "dims": [
+    2.369,
+    4.202,
+    0.9
+   ],
+   "materials": [
+    "Toy_stone"
+   ]
+  },
+  {
+   "name": "porch_step",
+   "tris": 108,
+   "verts": 216,
+   "dims": [
+    1.029,
+    3.228,
+    0.45
+   ],
+   "materials": [
+    "Toy_stone"
+   ]
+  },
+  {
+   "name": "porch_hip",
+   "tris": 80,
+   "verts": 162,
+   "dims": [
+    2.276,
+    3.974,
+    0.753
+   ],
+   "materials": [
+    "Toy_red"
+   ]
+  },
+  {
+   "name": "roof_hip",
+   "tris": 80,
+   "verts": 162,
+   "dims": [
+    16.354,
+    17.095,
+    2.129
+   ],
+   "materials": [
+    "Toy_red"
+   ]
+  },
+  {
+   "name": "door_recess",
+   "tris": 44,
+   "verts": 96,
+   "dims": [
+    0.389,
+    1.233,
+    2.25
+   ],
+   "materials": [
+    "Toy_ink"
+   ]
+  },
+  {
+   "name": "porch_post_n",
+   "tris": 44,
+   "verts": 96,
+   "dims": [
+    0.519,
+    0.519,
+    2.4
+   ],
+   "materials": [
+    "Toy_trim"
+   ]
+  },
+  {
+   "name": "porch_post_s",
+   "tris": 44,
+   "verts": 96,
+   "dims": [
+    0.519,
+    0.519,
+    2.4
+   ],
+   "materials": [
+    "Toy_trim"
+   ]
+  },
+  {
+   "name": "porch_ridge_cap",
+   "tris": 44,
+   "verts": 96,
+   "dims": [
+    0.682,
+    2.393,
+    0.127
+   ],
+   "materials": [
+    "Toy_red"
+   ]
+  },
+  {
+   "name": "roof_hip_cap_nne_front",
+   "tris": 44,
+   "verts": 96,
+   "dims": [
+    8.617,
+    6.012,
+    2.367
+   ],
+   "materials": [
+    "Toy_red"
+   ]
+  },
+  {
+   "name": "roof_hip_cap_nne_rear",
+   "tris": 44,
+   "verts": 96,
+   "dims": [
+    6.012,
+    8.617,
+    2.367
+   ],
+   "materials": [
+    "Toy_red"
+   ]
+  },
+  {
+   "name": "roof_hip_cap_ssw_front",
+   "tris": 44,
+   "verts": 96,
+   "dims": [
+    6.012,
+    8.617,
+    2.367
+   ],
+   "materials": [
+    "Toy_red"
+   ]
+  },
+  {
+   "name": "roof_hip_cap_ssw_rear",
+   "tris": 44,
+   "verts": 96,
+   "dims": [
+    8.617,
+    6.012,
+    2.367
+   ],
+   "materials": [
+    "Toy_red"
+   ]
+  },
+  {
+   "name": "roof_ridge_cap",
+   "tris": 44,
+   "verts": 96,
+   "dims": [
+    0.551,
+    1.292,
+    0.17
+   ],
+   "materials": [
+    "Toy_red"
+   ]
+  },
+  {
+   "name": "win_front_lo_n_sill",
+   "tris": 44,
+   "verts": 96,
+   "dims": [
+    0.352,
+    1.324,
+    0.13
+   ],
+   "materials": [
+    "Toy_trim"
+   ]
+  }
+ ],
+ "vertex_attrs": [
+  "NORMAL"
+ ],
+ "materials": [
+  {
+   "name": "Toy_brick",
+   "glow": false,
+   "user_objects": 2
+  },
+  {
+   "name": "Toy_glass",
+   "glow": false,
+   "user_objects": 19
+  },
+  {
+   "name": "Toy_glass_Glow",
+   "glow": true,
+   "user_objects": 5
+  },
+  {
+   "name": "Toy_ink",
+   "glow": false,
+   "user_objects": 1
+  },
+  {
+   "name": "Toy_red",
+   "glow": false,
+   "user_objects": 8
+  },
+  {
+   "name": "Toy_stone",
+   "glow": false,
+   "user_objects": 3
+  },
+  {
+   "name": "Toy_trim",
+   "glow": false,
+   "user_objects": 23
+  },
+  {
+   "name": "Toy_trim_Glow",
+   "glow": true,
+   "user_objects": 1
+  },
+  {
+   "name": "Toy_white",
+   "glow": false,
+   "user_objects": 1
+  }
+ ],
+ "textures": [],
+ "bbox": {
+  "dims": [
+   17.1972,
+   17.7268,
+   9.55
+  ],
+  "min": [
+   -8.5986,
+   -8.8634,
+   0.0
+  ],
+  "origin_offset_xy": [
+   0.0,
+   0.0
+  ],
+  "base_z": 0.0
+ },
+ "duplicate_mesh_groups": [
+  {
+   "signature": {
+    "verts": 96,
+    "tris": 44,
+    "dims": [
+     1.3245,
+     0.3522,
+     0.13
+    ]
+   },
+   "objects": [
+    "win_nne_lo_f_sill",
+    "win_nne_lo_r_sill",
+    "win_nne_up_f_sill",
+    "win_nne_up_r_sill",
+    "win_ssw_lo_c_sill",
+    "win_ssw_lo_f_sill",
+    "win_ssw_lo_r_sill",
+    "win_ssw_up_c_sill",
+    "win_ssw_up_f_sill",
+    "win_ssw_up_r_sill"
+   ]
+  },
+  {
+   "signature": {
+    "verts": 96,
+    "tris": 44,
+    "dims": [
+     0.3522,
+     1.3245,
+     0.13
+    ]
+   },
+   "objects": [
+    "win_front_lo_n_sill",
+    "win_front_lo_s_sill",
+    "win_front_up_c_sill",
+    "win_front_up_n_sill",
+    "win_front_up_s_sill",
+    "win_rear_lo_c_sill",
+    "win_rear_lo_s_sill",
+    "win_rear_up_c_sill",
+    "win_rear_up_s_sill"
+   ]
+  },
+  {
+   "signature": {
+    "verts": 24,
+    "tris": 12,
+    "dims": [
+     1.1124,
+     0.3713,
+     1.65
+    ]
+   },
+   "objects": [
+    "win_nne_lo_f_fill",
+    "win_nne_lo_r_fill",
+    "win_nne_up_f_fill",
+    "win_nne_up_r_fill",
+    "win_ssw_lo_c_fill",
+    "win_ssw_lo_f_fill",
+    "win_ssw_lo_r_fill",
+    "win_ssw_up_c_fill",
+    "win_ssw_up_f_fill",
+    "win_ssw_up_r_fill"
+   ]
+  },
+  {
+   "signature": {
+    "verts": 24,
+    "tris": 12,
+    "dims": [
+     0.3713,
+     1.1124,
+     1.65
+    ]
+   },
+   "objects": [
+    "win_front_lo_n_fill",
+    "win_front_lo_s_fill",
+    "win_front_up_c_fill",
+    "win_front_up_n_fill",
+    "win_front_up_s_fill",
+    "win_rear_lo_c_fill",
+    "win_rear_lo_s_fill",
+    "win_rear_up_c_fill",
+    "win_rear_up_s_fill"
+   ]
+  },
+  {
+   "signature": {
+    "verts": 96,
+    "tris": 44,
+    "dims": [
+     0.5188,
+     0.5188,
+     2.4
+    ]
+   },
+   "objects": [
+    "porch_post_n",
+    "porch_post_s"
+   ]
+  },
+  {
+   "signature": {
+    "verts": 96,
+    "tris": 44,
+    "dims": [
+     8.6175,
+     6.012,
+     2.367
+    ]
+   },
+   "objects": [
+    "roof_hip_cap_nne_front",
+    "roof_hip_cap_ssw_rear"
+   ]
+  },
+  {
+   "signature": {
+    "verts": 96,
+    "tris": 44,
+    "dims": [
+     6.012,
+     8.6175,
+     2.367
+    ]
+   },
+   "objects": [
+    "roof_hip_cap_nne_rear",
+    "roof_hip_cap_ssw_front"
+   ]
+  },
+  {
+   "signature": {
+    "verts": 24,
+    "tris": 12,
+    "dims": [
+     0.99,
+     0.225,
+     1.55
+    ]
+   },
+   "objects": [
+    "win_nne_up_r_glow",
+    "win_ssw_lo_f_glow",
+    "win_ssw_up_c_glow"
+   ]
+  },
+  {
+   "signature": {
+    "verts": 24,
+    "tris": 12,
+    "dims": [
+     0.225,
+     0.99,
+     1.55
+    ]
+   },
+   "objects": [
+    "win_front_lo_s_glow",
+    "win_front_up_n_glow"
+   ]
+  }
+ ],
+ "dup_redundant_tris": 1120,
+ "join_candidates": {
+  "Toy_brick": 2,
+  "Toy_glass": 19,
+  "Toy_glass_Glow": 5,
+  "Toy_red": 8,
+  "Toy_stone": 3,
+  "Toy_trim": 23
+ },
+ "degenerate_tris": 0,
+ "coincident_vert_pairs": 4320,
+ "over_tess": {
+  "near_distance_m": 26.59,
+  "one_px_world_m": 0.0179,
+  "note": "cylinders whose chord error < one_px_world_m can halve segments"
+ }
+}

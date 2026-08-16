@@ -14,7 +14,16 @@ rediscover it. Everything below is measured from `origin/main`.
 
 ---
 
-## The headline: live Muni positions are one parameter away
+## LANDED: the live-data path shipped for motor coaches
+
+The hybrid-bus live layer described below is implemented (MUNI-LIVE-PROMPT.md):
+`api/_lib/feeds/muni.mjs` (GTFS-Realtime, not SIRI — owner decision 2026-08-12),
+`pipeline/muni-shapes.mjs` + `tiles/muni-shapes.bin`, and `app/src/muni.js`.
+The four remaining modes (trolley / LRV / streetcar / cable) plug into the same
+layer as new entries in its mode→model map once their GLBs exist — the feed
+already tags every vehicle's mode. Everything below stays as background.
+
+## The original finding: live Muni positions are one parameter away
 
 `api/ferries.mjs` normalises **511.org's SIRI VehicleMonitoring feed** for the
 ferry fleet, and its own source comment names the answer:
@@ -36,39 +45,7 @@ same treatment the ferries already got:
 - The optional-key discipline of AGENTS rule 4: without `MUNI_511_KEY` the
   endpoint answers `{ live: false }` and procedural/roaming vehicles stay
 
-**Verified 2026-08-12, 08:26 PDT** with a live `agency=SF` request: **all five
-Muni vehicle families report positions.** 695 vehicles in the feed, 527 in
-service, 58 distinct lines.
-
-| Family | Vehicles live | `LineRef` values |
-|---|---|---|
-| Hybrid bus | 329 | numbered routes (`38`, `29`, `9`, `38R`…) |
-| Trolley coach | 108 | `49`, `22`, `1`, `24`, `30`, `45`… |
-| Metro LRV | 65 | `J` `K` `L` `M` `N` `T` |
-| Historic streetcar | 9 | **`F`** — "MARKET & WHARVES" |
-| Cable car | 6 | **`PM`** Powell–Mason, **`PH`** Powell–Hyde, **`CA`** California Street |
-
-Details that matter for the mapping:
-
-- **Cable car line codes are `PM` / `PH` / `CA`**, not spelled-out names.
-- **The F line's 9 vehicles all carry PCC fleet numbers (1006–1080)**, so they are
-  genuinely historic streetcars. No Milan cars (1807–1895) were in service at the
-  sample time — only 11 exist.
-- **Bus substitution is visible and must be handled.** A midnight sample showed
-  `FBUS` ("MARKET & WHARVES BUS") on hybrid-bus fleet numbers, plus `NBUS`,
-  `KBUS`, `NOWL`, `LOWL`. **Map on `VehicleRef`, not `LineRef` alone** — a
-  `LineRef` of `F` at 1am may be a bus. The fleet-number blocks are authoritative.
-- **Fleet-number blocks confirmed in the wild**: LRV4 2xxx (65), XT40 5701–5885
-  (90), XT60 7201–7293 (18), XDE60 6500–6730 (156), XDE40 8601–8969 (173).
-  Cable cars use 1–2 digit numbers. A block of 8531–8560 also appeared — the
-  32-foot ENC E-Z Rider II, a sixth bus type not covered by any plan.
-- **The 60-foot artics are not a minority**: 156 XDE60 against 173 XDE40. The
-  deferred articulated variant is closer to half the bus fleet than a rarity —
-  worth revisiting the decision to cut it.
-- **71% of vehicles have a null `LineRef`** at night, 24% by day (168 of 695) —
-  deadheading or out of service. Filter on non-null `LineRef` before placing.
-
-Three further things to check when that work starts:
+Three things to check when that work starts:
 
 - **The 60 requests/hour key limit is shared.** `api/ferries.mjs` budgets against
   it carefully (90 s memoisation, a per-hour timetable cap). A second agency
@@ -101,8 +78,8 @@ entries = entries.filter((entry) => (entry.weight ?? 1) > 0);
 manifest's `weight` field is read **only** as a `> 0` filter — it does not
 weight anything.
 
-Consequence: adding the 5 transit types these plans define would make Muni
-**~26% of San Francisco's traffic**, roughly 190 transit vehicles against 530
+Consequence: adding the ~13 transit types these plans define would make Muni
+**~48% of San Francisco's traffic**, roughly 350 transit vehicles against 370
 cars, under the current spawner.
 
 The fix is small — build a cumulative weight table at load, sample it with the
@@ -181,8 +158,9 @@ per-type scale override.
   three baked-livery GLBs at three draw calls. See that plan's §2.6.
 - **Every manifest entry is a permanent draw call.** `loadVehicles()` builds one
   `InstancedMesh` per entry, `frustumCulled = false`, alive for the session. The
-  five plans add 5 types = 5 calls against the 300-call budget of AGENTS rule 2.
-  Each deferred variant picked up later adds one more.
+  five plans add ~13 types = ~13 calls against the 300-call budget of AGENTS
+  rule 2. That arithmetic already shaped the plans' variant counts; it also caps
+  how many more variants can ever be added.
 - **`commuter-bus.glb` stays.** It is a plausible non-Muni coach (charter,
   shuttle). Deleting it when the Muni buses land would be a regression.
 - **Articulation bending** (LRV, artic coaches) is a runtime feature, not a

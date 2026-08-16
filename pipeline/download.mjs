@@ -1,8 +1,19 @@
 // Downloads every raw source into pipeline/data/. Idempotent: existing files
 // are kept unless FORCE=1.
+//
+// This script plus `loredata.mjs` must together produce EVERY file the bake
+// reads. That invariant was broken once and cost a landmark integration a full
+// session: `overture_buildings.geojsonseq` was fetched by hand in some early
+// session and then simply inherited from worktree to worktree, so nobody
+// noticed it was missing from here. On a clean checkout the bake then ran to
+// completion and silently produced a WORSE city — `overtureAdded: 0`, tallest
+// procedural building 175.4 m instead of 244.4 m, the whole post-2015 SoMa
+// skyline flattened — and `validate.mjs` caught it only because it happens to
+// assert a height range. If you add a source, add its download here.
 
+import { spawn } from 'node:child_process';
 import { createWriteStream, existsSync, statSync } from 'node:fs';
-import { mkdir, writeFile } from 'node:fs/promises';
+import { mkdir, rename, writeFile } from 'node:fs/promises';
 import { Readable } from 'node:stream';
 import { pipeline } from 'node:stream/promises';
 import { BBOX } from './lib/geo.mjs';
@@ -60,6 +71,51 @@ async function buildings() {
   );
 }
 
+// Overture Maps buildings: the gap-fill source `buildings.mjs` uses for current
+// heights, because the 2010 DataSF refresh predates the post-2015 skyline.
+// Overture publishes GeoParquet only, so this shells out to Overture's own CLI
+// rather than adding a parquet reader to the repo — the same pattern
+// `loredata.mjs` already uses for Overture Places. Not a repo dependency: a
+// one-time local tool, and a missing CLI fails loudly with the install command.
+function overtureBuildings(name) {
+  if (exists(name)) {
+    console.log(`= ${name} (cached, ${(statSync(localPath(name)).size / 1e6).toFixed(1)} MB)`);
+    return Promise.resolve();
+  }
+  const tmp = `${localPath(name).pathname}.part`;
+  console.log(`↓ ${name} <- overturemaps CLI`);
+  return new Promise((resolve, reject) => {
+    const child = spawn(
+      'overturemaps',
+      [
+        'download',
+        `--bbox=${BBOX.minLon},${BBOX.minLat},${BBOX.maxLon},${BBOX.maxLat}`,
+        '-f',
+        'geojsonseq',
+        '--type=building',
+        '-o',
+        tmp,
+      ],
+      { stdio: ['ignore', 'inherit', 'inherit'] }
+    );
+    child.on('error', (err) =>
+      reject(
+        new Error(
+          `overturemaps CLI unavailable (${err.message}). Install it with ` +
+            '`pip3 install overturemaps`. Without it buildings.mjs silently ' +
+            'skips the height gap-fill and the downtown skyline bakes flat.'
+        )
+      )
+    );
+    child.on('close', async (code) => {
+      if (code !== 0) return reject(new Error(`overturemaps exited ${code}`));
+      await rename(tmp, localPath(name).pathname);
+      console.log(`  done (${(statSync(localPath(name)).size / 1e6).toFixed(1)} MB)`);
+      resolve();
+    });
+  });
+}
+
 // DataSF street centerlines, paged through the Socrata API.
 async function streets() {
   if (exists('streets_datasf.geojson')) {
@@ -101,8 +157,9 @@ const OVERPASS_QUERIES = {
   relation["leisure"~"^(park|garden|golf_course|nature_reserve)$"](${BB});
   way["landuse"~"^(grass|forest|cemetery|recreation_ground|meadow|village_green)$"](${BB});
   relation["landuse"~"^(grass|forest|cemetery|recreation_ground)$"](${BB});
-  way["natural"~"^(beach|sand|wood|scrub|water|grassland)$"](${BB});
+  way["natural"~"^(beach|sand|wood|scrub|water|grassland|wetland|bare_rock|cliff)$"](${BB});
   relation["natural"~"^(wood|water|beach)$"](${BB});
+  relation["natural"="wetland"](${BB});
 );
 out geom;`,
   'osm_features.json': `[out:json][timeout:600];
@@ -171,6 +228,8 @@ async function overpass() {
 
 await ensureDir();
 await buildings();
+await overtureBuildings('overture_buildings.geojsonseq');
 await streets();
 await overpass();
 console.log('all raw data present');
+console.log('next: `npm run loredata` for the identity sources lore.mjs needs');

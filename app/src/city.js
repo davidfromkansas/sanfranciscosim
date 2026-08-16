@@ -15,6 +15,7 @@ import {
   CylinderGeometry,
   DynamicDrawUsage,
   IcosahedronGeometry,
+  InstancedBufferAttribute,
   InstancedMesh,
   Matrix4,
   Mesh,
@@ -25,19 +26,23 @@ import {
 } from 'three';
 import { mergeGeometries } from 'three/addons/utils/BufferGeometryUtils.js';
 import {
+  alignPoolToGround,
   createBuildingMaterial,
   createFarBuildingMaterial,
   createGroundMaterial,
+  createLampPoolGeometry,
+  createLampPoolMaterial,
   createToyBuildingMaterial,
   createTreeMaterial,
 } from './materials.js';
 import { shared } from './env.js';
-import { tileUrl } from './data.js';
+import { fetchTileBin, tileUrl } from './data.js';
 import { catalogForWorker } from './kitplan.js';
 import { createKitLoader, loadKitIndex } from './kitassets.js';
 import { createKitFleet } from './kitfleet.js';
 import { landmarkExclusions, loadKitZones } from './kitzones.js';
 import { GROUP_LIMIT, createStreetHints, createStreetKitFleet, loadStreetKit } from './streetkit.js';
+import { loadBusStops, stopsInBounds } from './munistops.js';
 
 const GROUP = 2000;
 const CHUNK = 1000;
@@ -45,12 +50,25 @@ const NEAR_ENTER = 2400;
 const NEAR_EXIT = 3100;
 const TREE_RANGE = 3400;
 const LAMP_RANGE = 2600;
+// The pool of light a lamp throws on the road. Shorter than LAMP_RANGE: the
+// lamp head still reads as a bright dot from far off, but the pool is a
+// ground-level detail that stops earning its fill rate well before that.
+const POOL_RANGE = 1500;
+const POOL_RADIUS = 7.5; // m; a ~6.5 m lamp lights a little wider than it is tall
+const POOL_LIFT = 0.08; // m above the road, clear of z-fighting with the ribbon
 // Kerb faces, centre dashes and zebras: built per ground group while the camera
 // is near it, dropped again behind. Sub-pixel at this range, so nothing pops.
 const DETAIL_ENTER = 1800;
 const DETAIL_EXIT = 2400;
 const FADE_SPEED = 2.2; // per second
 const STREETS_MAGIC = 0x53465301; // "SFS1", mirrored from pipeline/lib/binio.mjs
+const LANDCOVER_MAGIC = 0x4c465301; // "SFL1"
+const TREE_SPECIES = [
+  { scale: [1, 1, 1], tint: [1, 1, 1] },
+  { scale: [0.72, 1.35, 0.72], tint: [0.78, 0.5, 0.78] },
+  { scale: [0.66, 1.55, 0.66], tint: [1.15, 0.7, 1] },
+  { scale: [0.82, 1.2, 0.82], tint: [1.35, 0.9, 1.05] },
+];
 
 class WorkerPool {
   constructor(size) {
@@ -109,6 +127,22 @@ function makeAttributes(geometry, data) {
   geometry.setAttribute('normal', new BufferAttribute(data.normals, 3));
   geometry.setAttribute('color', new BufferAttribute(data.colors, 3, true));
   geometry.setIndex(new BufferAttribute(data.indices, 1));
+}
+
+// three keeps a CPU copy of every array it uploads; for the fully-built city
+// that is hundreds of MB the app never reads again — the exact duplication
+// that pushes iOS Safari past its memory watchdog. Static city geometry drops
+// its arrays the moment the GPU has them (bounds are computed before upload;
+// picking never raycasts these meshes — context.pick works off baked cell
+// data; only the SF.pick debug helper loses these tiers). Rebuilds create
+// fresh geometry from blobs, so eviction and tier swaps are unaffected.
+function releaseArray() {
+  this.array = null;
+}
+function releaseAfterUpload(geometry) {
+  for (const attribute of Object.values(geometry.attributes)) attribute.onUpload(releaseArray);
+  if (geometry.index) geometry.index.onUpload(releaseArray);
+  return geometry;
 }
 
 function treeArchetype() {
@@ -183,14 +217,27 @@ export function createCity(scene, data) {
   const palette = manifest.palette.map((p) => p.color.map((c) => Math.round(c * 255)));
   const pool = new WorkerPool(Math.max(2, Math.min(6, (navigator.hardwareConcurrency || 4) - 1)));
 
-  const blobCache = new Map(); // `${kind}:${cellKey}` -> ArrayBuffer
+  // LRU: tile blobs are only inputs to geometry builds, and the browser's
+  // immutable HTTP cache makes a refetch near-free — holding every cell's raw
+  // buffer forever is what grows long sessions toward the mobile tab-kill
+  // threshold. `blobsSeen` keeps the tiles readout monotonic under eviction.
+  const blobCache = new Map(); // `${kind}:${cellKey}` -> ArrayBuffer, oldest first
+  const BLOB_CACHE_MAX = 200;
+  const blobsSeen = new Set();
   const brokenStreets = new Set(); // warned once per unusable street tile
+  const brokenLandcover = new Set(); // warned once per unusable landcover tile
   const groups = new Map();
   const chunks = new Map();
   const stats = {
     cellsLoaded: 0,
     cellsTotal: 0,
     nearChunks: 0,
+    // Groups in the grid. farGroups/groundGroups count the meshes actually in
+    // the scene, so the ratio against this is "how much of the frame is built"
+    // — which is what the boot curtain's reveal gate watches. Cell counts
+    // cannot answer that: most cells belong to tiers the opening view never
+    // draws.
+    groupsTotal: 0,
     farGroups: 0,
     groundGroups: 0,
     groundDetail: 0,
@@ -207,12 +254,14 @@ export function createCity(scene, data) {
   let onPathsReady = () => {};
 
   const groundMaterial = createGroundMaterial();
-  const quality = { windows: 1 };
+  const quality = { windows: 1, poolScale: 1, poolStrength: 1 };
   const treeMaterial = createTreeMaterial();
   const lampMaterial = new MeshBasicMaterial({ color: new Color(1.0, 0.82, 0.55), transparent: true, opacity: 0 });
+  const lampPoolMaterial = createLampPoolMaterial();
   const treeGeometry = treeArchetype();
   const toyTreeGeometry = toyTreeArchetype();
   const lampGeometry = new SphereGeometry(0.9, 6, 4);
+  const lampPoolGeometry = createLampPoolGeometry();
 
   // Diorama tier. `toy` holds the lazily fetched toy index (palette + street
   // classes); the cell grid, hysteresis and bookkeeping are shared with the base
@@ -252,10 +301,15 @@ export function createCity(scene, data) {
   // the kit fails to load, `streetkit.fleet` stays null and the streets are the
   // layer 1 streets, with one warning.
   const streetkit = { fleet: null, hints: null, exclusions: null, warned: false };
+  // One fetch+parse of the baked stop table, shared with the marker layer.
+  const busStopsReady = loadBusStops();
   const streetkitReady = (async () => {
     try {
       const loaded = await loadStreetKit();
       streetkit.fleet = createStreetKitFleet(scene, loaded, data.sampleElevation);
+      // The governor may already have picked a tier before the kit finished
+      // loading; a fresh fleet starts at whatever is current.
+      if (quality.tier) streetkit.fleet.setQuality(quality.tier);
       streetkit.hints = createStreetHints(manifest, data.contextCells);
       streetkit.exclusions = landmarkExclusions(manifest, data.project);
     } catch (error) {
@@ -338,6 +392,7 @@ export function createCity(scene, data) {
         groundMesh: null,
         trees: null,
         lamps: null,
+        lampPools: null,
         quadFade: [1, 1, 1, 1],
         requested: false,
         groundRequested: false,
@@ -397,12 +452,29 @@ export function createCity(scene, data) {
   }
   stats.cellsTotal =
     indexes.buildings.cells.length + indexes.streets.cells.length + indexes.landcover.cells.length;
+  stats.groupsTotal = groups.size;
 
   const inflight = new Map();
+  function cacheBlob(id, buffer) {
+    blobCache.set(id, buffer);
+    if (!blobsSeen.has(id)) {
+      blobsSeen.add(id);
+      stats.cellsLoaded++;
+    }
+    while (blobCache.size > BLOB_CACHE_MAX) {
+      blobCache.delete(blobCache.keys().next().value);
+    }
+  }
+
   async function blob(kind, cellKey) {
     const id = `${kind}:${cellKey}`;
     const cached = blobCache.get(id);
-    if (cached) return cached;
+    if (cached) {
+      // Refresh recency so the working set survives and only stale cells fall out.
+      blobCache.delete(id);
+      blobCache.set(id, cached);
+      return cached;
+    }
     const existing = inflight.get(id);
     if (existing) return existing;
 
@@ -414,11 +486,8 @@ export function createCity(scene, data) {
     if (concurrent) return concurrent;
 
     const request = (async () => {
-      const res = await fetch(tileUrl(`${kind}/${cellKey}.bin`));
-      if (!res.ok) throw new Error(`${id}: ${res.status}`);
-      const buffer = await res.arrayBuffer();
-      blobCache.set(id, buffer);
-      stats.cellsLoaded++;
+      const buffer = await fetchTileBin(`${kind}/${cellKey}.bin`);
+      cacheBlob(id, buffer);
       return buffer;
     })();
     inflight.set(id, request);
@@ -452,6 +521,7 @@ export function createCity(scene, data) {
     makeAttributes(geometry, result);
     geometry.setAttribute('aQuad', new BufferAttribute(result.quads, 1));
     geometry.computeBoundingSphere();
+    releaseAfterUpload(geometry);
     const material = createFarBuildingMaterial();
     const mesh = new Mesh(geometry, material);
     mesh.position.set(g.originX, 0, g.originZ);
@@ -492,6 +562,29 @@ export function createCity(scene, data) {
     return loaded.filter(Boolean);
   }
 
+  // Same guarantee for landcover: a renamed/missing diorama tile falls back to
+  // the base-tier landcover with one warning, no hole.
+  async function landcoverBlobs(cells) {
+    const loaded = await Promise.all(
+      cells.map(async (cell) => {
+        const usable = (buf) =>
+          buf && buf.byteLength > 32 && new DataView(buf).getUint32(0, true) === LANDCOVER_MAGIC;
+        let buffer = await blob(kinds().landcover, cell.key).catch(() => null);
+        if (!buffer) buffer = await blob(kinds().landcover, cell.key).catch(() => null);
+        if (usable(buffer)) return { buffer };
+        const id = `${kinds().landcover}:${cell.key}`;
+        if (!brokenLandcover.has(id)) {
+          brokenLandcover.add(id);
+          console.warn(`landcover tile ${id} unusable — falling back to base landcover`);
+        }
+        if (kinds().landcover === TIERS.base.landcover) return null;
+        const fallback = await blob(TIERS.base.landcover, cell.key).catch(() => null);
+        return fallback ? { buffer: fallback } : null;
+      })
+    );
+    return loaded.filter(Boolean);
+  }
+
   async function buildGround(g) {
     if (g.groundRequested) return;
     g.groundRequested = true;
@@ -499,9 +592,7 @@ export function createCity(scene, data) {
     const toyTier = tier === 'toy';
     const [streets, landcover] = await Promise.all([
       streetBlobs(g.streetCells),
-      Promise.all(
-        g.landcoverCells.map(async (cell) => ({ buffer: await blob(kinds().landcover, cell.key) }))
-      ),
+      landcoverBlobs(g.landcoverCells),
     ]);
     const result = await pool.run({
       type: 'ground',
@@ -519,6 +610,7 @@ export function createCity(scene, data) {
       makeAttributes(geometry, result);
       geometry.setAttribute('aKind', new BufferAttribute(result.kinds, 1));
       geometry.computeBoundingSphere();
+    releaseAfterUpload(geometry);
       const mesh = new Mesh(geometry, groundMaterial);
       mesh.position.set(g.originX, 0, g.originZ);
       mesh.receiveShadow = true;
@@ -533,20 +625,37 @@ export function createCity(scene, data) {
       const trees = new InstancedMesh(toyTier ? toyTreeGeometry : treeGeometry, treeMaterial, count);
       const matrix = new Matrix4();
       const dummy = new Object3D();
+      const instanceColors = new Float32Array(count * 3);
       for (let i = 0; i < count; i++) {
         const x = result.trees[i * 4];
         const y = result.trees[i * 4 + 1];
         const z = result.trees[i * 4 + 2];
         const variant = result.trees[i * 4 + 3];
+        const size = variant & 3;
+        const profile = TREE_SPECIES[variant >> 2] || TREE_SPECIES[0];
         dummy.position.set(x, y, z);
-        const s = 0.62 + variant * 0.26 + ((x * 7.3 + z * 3.1) % 1) * 0.35;
-        dummy.scale.set(s, s * (0.85 + variant * 0.2), s);
+        // Variant 3 is a rooftop-garden tree: shrub-scale so it reads as
+        // planting, not a lollipop standing on the roof.
+        const s =
+          size === 3
+            ? 0.34 + ((x * 7.3 + z * 3.1) % 1) * 0.12
+            : 0.62 + size * 0.26 + ((x * 7.3 + z * 3.1) % 1) * 0.35;
+        dummy.scale.set(
+          s * profile.scale[0],
+          size === 3 ? s : s * (0.85 + size * 0.2) * profile.scale[1],
+          s * profile.scale[2]
+        );
         dummy.rotation.y = ((x * 13.7 + z * 5.3) % 1) * Math.PI * 2;
         dummy.updateMatrix();
         matrix.copy(dummy.matrix);
         trees.setMatrixAt(i, matrix);
+        instanceColors[i * 3] = profile.tint[0];
+        instanceColors[i * 3 + 1] = profile.tint[1];
+        instanceColors[i * 3 + 2] = profile.tint[2];
       }
       trees.instanceMatrix.needsUpdate = true;
+      trees.instanceColor = new InstancedBufferAttribute(instanceColors, 3);
+      trees.instanceColor.needsUpdate = true;
       trees.castShadow = false;
       trees.receiveShadow = false;
       trees.frustumCulled = true;
@@ -559,21 +668,42 @@ export function createCity(scene, data) {
     }
 
     if (result.lamps.length > 0) {
-      const count = result.lamps.length / 3;
+      const count = result.lamps.length / 4;
       const lamps = new InstancedMesh(lampGeometry, lampMaterial, count);
+      const pools = new InstancedMesh(lampPoolGeometry, lampPoolMaterial, count);
       const dummy = new Object3D();
       for (let i = 0; i < count; i++) {
-        dummy.position.set(result.lamps[i * 3], result.lamps[i * 3 + 1], result.lamps[i * 3 + 2]);
+        const x = result.lamps[i * 4];
+        const y = result.lamps[i * 4 + 1];
+        const z = result.lamps[i * 4 + 2];
+        const roadY = result.lamps[i * 4 + 3];
+        dummy.position.set(x, y, z);
         dummy.scale.setScalar(1);
         dummy.updateMatrix();
         lamps.setMatrixAt(i, dummy.matrix);
+        // The pool lies on the road under the head, not at the head, and tilts
+        // with the grade so it stays on the tarmac instead of hovering.
+        dummy.position.set(x, roadY + POOL_LIFT, z);
+        alignPoolToGround(dummy.quaternion, x, z, data.sampleElevation);
+        dummy.scale.set(POOL_RADIUS, 1, POOL_RADIUS);
+        dummy.updateMatrix();
+        pools.setMatrixAt(i, dummy.matrix);
+        dummy.quaternion.identity();
       }
       lamps.instanceMatrix.needsUpdate = true;
       lamps.instanceMatrix.setUsage(DynamicDrawUsage);
       lamps.visible = false;
       lamps.name = `lamps-${g.key}`;
       scene.add(lamps);
+      pools.instanceMatrix.needsUpdate = true;
+      pools.instanceMatrix.setUsage(DynamicDrawUsage);
+      pools.visible = false;
+      pools.name = `lamp-pools-${g.key}`;
+      // After the road ribbon, so the additive wash lands on top of it.
+      pools.renderOrder = 3;
+      scene.add(pools);
       g.lamps = lamps;
+      g.lampPools = pools;
       g.lampCount = count;
       stats.lamps += count;
     }
@@ -603,11 +733,21 @@ export function createCity(scene, data) {
           streetkit.hints(g.originX, g.originZ, g.originX + GROUP, g.originZ + GROUP),
           streetBlobs(haloCellsFor(g)),
         ]);
+        // Real bus stops for this cell. The worker cannot fetch, so the slice
+        // rides along with the job the same way the streetkit hints do.
+        const stopTable = await busStopsReady;
         plan = {
           ...hints,
           halo,
           bounds: [g.originX, g.originZ, g.originX + GROUP, g.originZ + GROUP],
           exclusions: streetkit.exclusions,
+          busStops: stopsInBounds(
+            stopTable,
+            g.originX,
+            g.originZ,
+            g.originX + GROUP,
+            g.originZ + GROUP,
+          ),
           limit: GROUP_LIMIT,
         };
       }
@@ -635,6 +775,7 @@ export function createCity(scene, data) {
     makeAttributes(geometry, result);
     geometry.setAttribute('aKind', new BufferAttribute(result.kinds, 1));
     geometry.computeBoundingSphere();
+    releaseAfterUpload(geometry);
     const mesh = new Mesh(geometry, groundMaterial);
     mesh.position.set(g.originX, 0, g.originZ);
     mesh.receiveShadow = true;
@@ -731,6 +872,7 @@ export function createCity(scene, data) {
     // The lore flag byte: night profile, glow and band suppression per vertex.
     if (result.flag) geometry.setAttribute('aFlag', new BufferAttribute(result.flag, 1));
     geometry.computeBoundingSphere();
+    releaseAfterUpload(geometry);
     const material = toyTier
       ? createToyBuildingMaterial()
       : createBuildingMaterial({ windows: quality.windows });
@@ -768,7 +910,7 @@ export function createCity(scene, data) {
     stats.lamps -= g.lampCount || 0;
     g.treeCount = 0;
     g.lampCount = 0;
-    for (const key of ['groundMesh', 'trees', 'lamps']) {
+    for (const key of ['groundMesh', 'trees', 'lamps', 'lampPools']) {
       const obj = g[key];
       if (!obj) continue;
       scene.remove(obj);
@@ -819,16 +961,16 @@ export function createCity(scene, data) {
     onPathsReady(paths);
 
     // Drop the outgoing tier's blobs so repeated toggles do not grow the cache.
-    for (const id of [...blobCache.keys()]) {
+    const dropped = (id) => {
       const kind = id.slice(0, id.indexOf(':'));
-      if (kind === previous.streets || kind === previous.landcover || kind === previous.buildings) {
-        blobCache.delete(id);
-      }
-    }
+      return kind === previous.streets || kind === previous.landcover || kind === previous.buildings;
+    };
+    for (const id of [...blobCache.keys()]) if (dropped(id)) blobCache.delete(id);
+    for (const id of [...blobsSeen]) if (dropped(id)) blobsSeen.delete(id);
 
-    // cellsLoaded counts blobs held for the current tier, so the tile readout
-    // stays coherent instead of accumulating across swaps.
-    stats.cellsLoaded = blobCache.size;
+    // cellsLoaded counts cells fetched for the current tier, so the tile
+    // readout stays coherent instead of accumulating across swaps.
+    stats.cellsLoaded = blobsSeen.size;
 
     for (const g of reload) buildGround(g).catch((err) => console.warn('ground reload failed', g.key, err));
   }
@@ -899,7 +1041,11 @@ export function createCity(scene, data) {
       // kit lamps for. Where kit lamps stand, they are the lamp — two glows in
       // one place read as a bloom bug.
       if (g.lamps) {
-        g.lamps.visible = shared.uNight.value > 0.08 && dist < LAMP_RANGE && !g.furniture;
+        const lit = shared.uNight.value > 0.08 && !g.furniture;
+        g.lamps.visible = lit && dist < LAMP_RANGE;
+        // Same either/or as the head: where the kit's real lamps stand, their
+        // own pools light the road and this group must not double them.
+        if (g.lampPools) g.lampPools.visible = lit && dist < POOL_RANGE * quality.poolScale;
       }
       if (dist < DETAIL_ENTER && !g.detailRequested) {
         buildGroundDetail(g).catch((err) => console.warn('streetscape failed', g.key, err));
@@ -908,6 +1054,7 @@ export function createCity(scene, data) {
       }
     }
     lampMaterial.opacity = Math.min(0.85, shared.uNight.value * 0.95);
+    lampPoolMaterial.opacity = Math.min(1, shared.uNight.value * 1.1) * quality.poolStrength;
     if (streetkit.fleet) streetkit.fleet.update();
   }
 
@@ -927,12 +1074,26 @@ export function createCity(scene, data) {
     get progress() {
       return stats.cellsTotal ? stats.cellsLoaded / stats.cellsTotal : 0;
     },
-    setQuality(q) {
+    setQuality(q, tier) {
       quality.windows = q.windows;
+      quality.tier = tier;
+      // Lamp pools are fill rate, so the tier scales both how far they reach
+      // and how hard they hit.
+      quality.poolScale = q.poolScale;
+      quality.poolStrength = q.poolStrength;
       for (const c of chunks.values()) {
         // The toy tier has no procedural window grid to turn down.
         const windows = c.material?.uniformsHolder.uWindows;
         if (windows) windows.value = q.windows;
+      }
+      // Street furniture answers to the same knob: the placement stays
+      // planned, only the per-class meshes hide (PERF-PLAN #6).
+      if (tier && streetkit.fleet) {
+        // Hand over the tier's own pool numbers rather than only its name: the
+        // kit used to re-derive them from the name, so editing the QUALITY
+        // table had no effect on the lamps.
+        streetkit.fleet.setQuality(tier, q);
+        stats.furnitureDraws = streetkit.fleet.drawCalls;
       }
     },
   };

@@ -21,7 +21,7 @@ import {
 } from './lib/geo.mjs';
 import { ringArea, ringBBox, ringCentroid, simplifyRing } from './lib/poly.mjs';
 import { loadHeightmap } from './lib/heightmap.mjs';
-import { LANDMARKS } from './lib/landmarks.mjs';
+import { exclusionZones } from './lib/landmarks.mjs';
 import { PALETTE, makeDistrictLookup } from './lib/districts.mjs';
 import { writeBuildingsBlob } from './lib/binio.mjs';
 
@@ -37,9 +37,9 @@ const OCC_RES = 5; // occupancy raster resolution in meters
 const { sampleElevation } = await loadHeightmap();
 const paletteAt = makeDistrictLookup(project);
 
-const exclusions = LANDMARKS.map((l) => {
-  const [x, z] = project(l.lon, l.lat);
-  return { x, z, r2: l.exclude * l.exclude, id: l.id };
+const exclusions = exclusionZones().map((zone) => {
+  const [x, z] = project(zone.lon, zone.lat);
+  return { x, z, r2: zone.r * zone.r, id: zone.id };
 });
 
 // A bridge is a kilometres-long structure, so a circle around its anchor only
@@ -301,6 +301,19 @@ console.log(`DataSF: ${dsRead} features -> ${datasfCount} buildings`);
 const overturePath = new URL('overture_buildings.geojsonseq', DATA).pathname;
 let overtureAdded = 0;
 let overtureFixed = 0;
+// Missing Overture is not a "skip the optional pass" case: without it the bake
+// runs to completion and quietly ships a flattened downtown (tallest procedural
+// building 175.4 m instead of 244.4 m, ~3.3k buildings absent). A silent
+// degradation that still produces committable tiles is worse than a crash, so
+// this refuses rather than continues. `npm run download` fetches the file.
+if (!existsSync(overturePath) && process.env.ALLOW_NO_OVERTURE !== '1') {
+  throw new Error(
+    'pipeline/data/overture_buildings.geojsonseq is missing. Run `npm run download`. ' +
+      'Baking without it drops ~3,300 buildings and flattens the post-2015 skyline ' +
+      '(DataSF heights date from 2010) — set ALLOW_NO_OVERTURE=1 if you really ' +
+      'want a DataSF-only bake, and do not commit those tiles.'
+  );
+}
 if (existsSync(overturePath)) {
   console.log('gap-filling from Overture Maps...');
   const rl = createInterface({

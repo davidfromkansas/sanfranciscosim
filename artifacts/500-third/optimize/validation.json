@@ -1,0 +1,102 @@
+{
+ "input": {
+  "tris": 17320,
+  "verts": 35184,
+  "objects": 546,
+  "primitives": 547,
+  "materials": [
+   "Toy_glass",
+   "Toy_glassl",
+   "Toy_glassl_Glow",
+   "Toy_ink",
+   "Toy_navy",
+   "Toy_red",
+   "Toy_roofd",
+   "Toy_sand",
+   "Toy_steel",
+   "Toy_stone",
+   "Toy_trim",
+   "Toy_white",
+   "Toy_white_Glow"
+  ],
+  "bbox_dims": [
+   75.23859,
+   76.2383,
+   26.5
+  ],
+  "bbox_min": [
+   -37.61869,
+   -38.11882,
+   0.0
+  ],
+  "center_xy": [
+   0.0006,
+   0.00034
+  ]
+ },
+ "output": {
+  "tris": 17320,
+  "verts": 31545,
+  "objects": 13,
+  "primitives": 14,
+  "materials": [
+   "Toy_glass",
+   "Toy_glassl",
+   "Toy_glassl_Glow",
+   "Toy_ink",
+   "Toy_navy",
+   "Toy_red",
+   "Toy_roofd",
+   "Toy_sand",
+   "Toy_steel",
+   "Toy_stone",
+   "Toy_trim",
+   "Toy_white",
+   "Toy_white_Glow"
+  ],
+  "bbox_dims": [
+   75.2378,
+   76.2383,
+   26.50169
+  ],
+  "bbox_min": [
+   -37.61869,
+   -38.11882,
+   0.0
+  ],
+  "center_xy": [
+   0.00021,
+   0.00034
+  ]
+ },
+ "output_signed_volumes": {
+  "Mesh_0": 609088330230.5,
+  "Mesh_1": 548630.666667,
+  "Mesh_2": 1226505193.333337,
+  "Mesh_3": 63971772.499999,
+  "Mesh_4": 2830583286.499988,
+  "Mesh_5": 2091754.666667,
+  "Mesh_6": 2100856.0,
+  "Mesh_7": 377138720.166666,
+  "Mesh_8": 374090594.999999,
+  "Mesh_9": 707709962.000001,
+  "Mesh_10": 2096237039.500011,
+  "Mesh_11": 8262861236.666665,
+  "Mesh_12": 31396499.333333
+ },
+ "inverted_solids": [],
+ "ray_test_output": {
+  "rays": 22500,
+  "hits": 16411,
+  "flipped": 0,
+  "flipped_fraction": 0.0
+ },
+ "gates": {
+  "G1_materials_identical": true,
+  "G2_bbox_ok": true,
+  "G2_origin_ok": true,
+  "G2_volumes_positive": true,
+  "G2_ray_flip_ok": true,
+  "G5_primitives_ok": true
+ }
+}
