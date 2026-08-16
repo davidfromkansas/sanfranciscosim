@@ -13,8 +13,9 @@ this file is what shipped, and every deviation is listed in §4.
 |---|---|
 | Manifest id | `524-second` |
 | File | `524-second.glb` |
+| File size | **160,572 B** raw, meshopt-compressed (was 344,840 B pre-optimize, −53.4%) |
 | Triangles | **5,620** (budget 11,000) |
-| Objects | 105 mesh objects (the loader merges these to 2 draw calls) |
+| Objects / draw submeshes | 10 objects, 11 primitives after stage 4 (was 105 / 106); the loader merges these to 2 draw calls |
 | Dimensions (axis-aligned) | 35.998 x 35.766 x 9.900 m |
 | Building along its own axes | 20.92 m frontage x 29.63 m deep |
 | min Z / XY centre offset | 0.000 m / (0.000, 0.000) |
@@ -32,7 +33,9 @@ consequence of the 45.6° real-world heading, not a scale error.
 ## 2. Validation — `validation.json`
 
 `overall: PASS`. Fresh factory-reset scene, re-importing the exported GLB; the authoring
-`.blend` was not inspected.
+`.blend` was not inspected. Re-run after the stage-4 shipping swap, so these are the
+**packed** file's numbers — which is the run that matters, because the sliver failure mode
+described in `optimize/REPORT.md` §3 shows up only in the packed file.
 
 | Check | Result |
 |---|---|
@@ -48,7 +51,7 @@ consequence of the 45.6° real-world heading, not a scale error.
 | no_animation_skin_or_constraints | PASS |
 | transforms_applied | PASS |
 | no_negative_scales | PASS |
-| normals_outward_signed_volume | PASS — all 105 shells enclose positive volume |
+| normals_outward_signed_volume | PASS — all 10 shipped shells enclose positive volume |
 | normals_outward_ray_residual_within_tolerance | PASS |
 | no_degenerate_geometry | PASS |
 | no_unexpected_objects | PASS |
@@ -181,7 +184,21 @@ were made by the modeller before presentation.
 taken — at 2.5 km a 9.9 m building is far below a pixel, so the absence of its baked
 stand-in beyond the radius is illegible.
 
-## 8. Integration notes
+## 8. Stage 4 — optimize
+
+Run 16 August 2026 per `docs/asset-pipeline/GLB-OPTIMIZE-PROMPT.md` v2; full detail in
+`optimize/REPORT.md`. Headline: 344,840 B → **160,572 B** raw (−53.4%), 106 → 11 draw
+submeshes, triangles and bounding box unchanged, worst A/B pixel delta 0.034% against
+2–4% gates, all gates G1–G8 PASS. Phase B's limited-dissolve step was **deliberately
+skipped** — this asset has two stacked coplanar ring bands (parapet and coping) following
+the full footprint, the documented sliver trap; the stage-2 contract validator was re-run
+against the *packed* file after the swap and returns `overall: PASS` with zero invalid
+loop normals, confirming the skip was correct.
+
+The pre-optimize original is archived at `optimize/input/524-second.glb`. The numbers in
+§1 and §2 of this report are the **shipped** ones.
+
+## 9. Integration notes
 
 - **New landmark (Case B).** Needs a `pipeline/lib/landmarks.mjs` entry and a tile
   re-bake, or the baked procedural building on this footprint will intersect the GLB.

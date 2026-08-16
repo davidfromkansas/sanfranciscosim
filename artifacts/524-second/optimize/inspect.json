@@ -1,0 +1,642 @@
+{
+ "file_bytes": {
+  "raw": 344840,
+  "gzip9": 54989
+ },
+ "objects": 105,
+ "total_tris": 5620,
+ "total_verts": 11432,
+ "primitives_est": 106,
+ "top20": [
+  {
+   "name": "coping",
+   "tris": 288,
+   "verts": 528,
+   "dims": [
+    35.998,
+    35.766,
+    0.12
+   ],
+   "materials": [
+    "Toy_brick"
+   ]
+  },
+  {
+   "name": "parapet",
+   "tris": 288,
+   "verts": 528,
+   "dims": [
+    35.798,
+    35.566,
+    0.24
+   ],
+   "materials": [
+    "Toy_brick"
+   ]
+  },
+  {
+   "name": "body",
+   "tris": 108,
+   "verts": 216,
+   "dims": [
+    35.775,
+    35.543,
+    8.96
+   ],
+   "materials": [
+    "Toy_brick",
+    "Toy_steel"
+   ]
+  },
+  {
+   "name": "condenser",
+   "tris": 108,
+   "verts": 216,
+   "dims": [
+    1.473,
+    1.473,
+    0.64
+   ],
+   "materials": [
+    "Toy_steel"
+   ]
+  },
+  {
+   "name": "entry_bay",
+   "tris": 108,
+   "verts": 216,
+   "dims": [
+    1.965,
+    1.984,
+    4.45
+   ],
+   "materials": [
+    "Toy_stone"
+   ]
+  },
+  {
+   "name": "exhaust0",
+   "tris": 108,
+   "verts": 216,
+   "dims": [
+    0.794,
+    0.794,
+    0.45
+   ],
+   "materials": [
+    "Toy_roofd"
+   ]
+  },
+  {
+   "name": "exhaust1",
+   "tris": 108,
+   "verts": 216,
+   "dims": [
+    0.794,
+    0.794,
+    0.45
+   ],
+   "materials": [
+    "Toy_roofd"
+   ]
+  },
+  {
+   "name": "exhaust2",
+   "tris": 108,
+   "verts": 216,
+   "dims": [
+    0.794,
+    0.794,
+    0.45
+   ],
+   "materials": [
+    "Toy_roofd"
+   ]
+  },
+  {
+   "name": "exhaust3",
+   "tris": 108,
+   "verts": 216,
+   "dims": [
+    0.794,
+    0.794,
+    0.45
+   ],
+   "materials": [
+    "Toy_roofd"
+   ]
+  },
+  {
+   "name": "exhaust4",
+   "tris": 108,
+   "verts": 216,
+   "dims": [
+    0.794,
+    0.794,
+    0.45
+   ],
+   "materials": [
+    "Toy_roofd"
+   ]
+  },
+  {
+   "name": "merlon_f0",
+   "tris": 108,
+   "verts": 216,
+   "dims": [
+    0.961,
+    0.966,
+    0.58
+   ],
+   "materials": [
+    "Toy_stone"
+   ]
+  },
+  {
+   "name": "merlon_f1",
+   "tris": 108,
+   "verts": 216,
+   "dims": [
+    0.961,
+    0.966,
+    0.58
+   ],
+   "materials": [
+    "Toy_stone"
+   ]
+  },
+  {
+   "name": "merlon_f2",
+   "tris": 108,
+   "verts": 216,
+   "dims": [
+    0.961,
+    0.966,
+    0.58
+   ],
+   "materials": [
+    "Toy_stone"
+   ]
+  },
+  {
+   "name": "merlon_f3",
+   "tris": 108,
+   "verts": 216,
+   "dims": [
+    0.961,
+    0.966,
+    0.58
+   ],
+   "materials": [
+    "Toy_stone"
+   ]
+  },
+  {
+   "name": "merlon_f4",
+   "tris": 108,
+   "verts": 216,
+   "dims": [
+    0.961,
+    0.966,
+    0.58
+   ],
+   "materials": [
+    "Toy_stone"
+   ]
+  },
+  {
+   "name": "merlon_f5",
+   "tris": 108,
+   "verts": 216,
+   "dims": [
+    0.961,
+    0.966,
+    0.58
+   ],
+   "materials": [
+    "Toy_stone"
+   ]
+  },
+  {
+   "name": "merlon_f6",
+   "tris": 108,
+   "verts": 216,
+   "dims": [
+    0.961,
+    0.966,
+    0.58
+   ],
+   "materials": [
+    "Toy_stone"
+   ]
+  },
+  {
+   "name": "merlon_f7",
+   "tris": 108,
+   "verts": 216,
+   "dims": [
+    0.961,
+    0.966,
+    0.58
+   ],
+   "materials": [
+    "Toy_stone"
+   ]
+  },
+  {
+   "name": "merlon_f8",
+   "tris": 108,
+   "verts": 216,
+   "dims": [
+    0.961,
+    0.966,
+    0.58
+   ],
+   "materials": [
+    "Toy_stone"
+   ]
+  },
+  {
+   "name": "merlon_t0",
+   "tris": 108,
+   "verts": 216,
+   "dims": [
+    0.967,
+    0.96,
+    0.58
+   ],
+   "materials": [
+    "Toy_stone"
+   ]
+  }
+ ],
+ "vertex_attrs": [
+  "NORMAL"
+ ],
+ "materials": [
+  {
+   "name": "Toy_brick",
+   "glow": false,
+   "user_objects": 5
+  },
+  {
+   "name": "Toy_glass",
+   "glow": false,
+   "user_objects": 30
+  },
+  {
+   "name": "Toy_glass_Glow",
+   "glow": true,
+   "user_objects": 5
+  },
+  {
+   "name": "Toy_glassl",
+   "glow": false,
+   "user_objects": 3
+  },
+  {
+   "name": "Toy_gold_Glow",
+   "glow": true,
+   "user_objects": 1
+  },
+  {
+   "name": "Toy_ink",
+   "glow": false,
+   "user_objects": 2
+  },
+  {
+   "name": "Toy_roofd",
+   "glow": false,
+   "user_objects": 30
+  },
+  {
+   "name": "Toy_steel",
+   "glow": false,
+   "user_objects": 4
+  },
+  {
+   "name": "Toy_stone",
+   "glow": false,
+   "user_objects": 26
+  }
+ ],
+ "textures": [],
+ "bbox": {
+  "dims": [
+   35.9981,
+   35.7656,
+   9.9
+  ],
+  "min": [
+   -17.9991,
+   -17.8828,
+   0.0
+  ],
+  "origin_offset_xy": [
+   0.0,
+   0.0
+  ],
+  "base_z": 0.0
+ },
+ "duplicate_mesh_groups": [
+  {
+   "signature": {
+    "verts": 216,
+    "tris": 108,
+    "dims": [
+     0.9611,
+     0.9662,
+     0.58
+    ]
+   },
+   "objects": [
+    "merlon_f0",
+    "merlon_f1",
+    "merlon_f2",
+    "merlon_f3",
+    "merlon_f4",
+    "merlon_f5",
+    "merlon_f6",
+    "merlon_f7",
+    "merlon_f8"
+   ]
+  },
+  {
+   "signature": {
+    "verts": 216,
+    "tris": 108,
+    "dims": [
+     0.794,
+     0.794,
+     0.45
+    ]
+   },
+   "objects": [
+    "exhaust0",
+    "exhaust1",
+    "exhaust2",
+    "exhaust3",
+    "exhaust4"
+   ]
+  },
+  {
+   "signature": {
+    "verts": 96,
+    "tris": 44,
+    "dims": [
+     1.6712,
+     1.639,
+     2.2
+    ]
+   },
+   "objects": [
+    "taber_g0_frame",
+    "taber_g1_frame",
+    "taber_g2_frame",
+    "taber_g3_frame",
+    "taber_g4_frame",
+    "taber_g5_frame",
+    "taber_g6_frame",
+    "taber_g7_frame",
+    "taber_g8_frame"
+   ]
+  },
+  {
+   "signature": {
+    "verts": 216,
+    "tris": 108,
+    "dims": [
+     0.9675,
+     0.9598,
+     0.58
+    ]
+   },
+   "objects": [
+    "merlon_t0",
+    "merlon_t1",
+    "merlon_t2"
+   ]
+  },
+  {
+   "signature": {
+    "verts": 216,
+    "tris": 108,
+    "dims": [
+     2.389,
+     2.3947,
+     0.22
+    ]
+   },
+   "objects": [
+    "skylight0",
+    "skylight1",
+    "skylight2"
+   ]
+  },
+  {
+   "signature": {
+    "verts": 216,
+    "tris": 108,
+    "dims": [
+     2.7856,
+     2.7915,
+     0.16
+    ]
+   },
+   "objects": [
+    "skylight_kerb0",
+    "skylight_kerb1",
+    "skylight_kerb2"
+   ]
+  },
+  {
+   "signature": {
+    "verts": 64,
+    "tris": 28,
+    "dims": [
+     1.6433,
+     1.6101,
+     3.05
+    ]
+   },
+   "objects": [
+    "taber_u0_frame",
+    "taber_u1_frame",
+    "taber_u2_frame",
+    "taber_u3_frame",
+    "taber_u4_frame",
+    "taber_u5_frame",
+    "taber_u6_frame",
+    "taber_u7_frame",
+    "taber_u8_frame"
+   ]
+  },
+  {
+   "signature": {
+    "verts": 96,
+    "tris": 44,
+    "dims": [
+     1.7847,
+     1.8081,
+     2.95
+    ]
+   },
+   "objects": [
+    "front_g0_frame",
+    "front_g2_frame",
+    "front_g3_frame",
+    "front_g4_frame",
+    "front_g5_frame"
+   ]
+  },
+  {
+   "signature": {
+    "verts": 64,
+    "tris": 28,
+    "dims": [
+     1.756,
+     1.78,
+     3.05
+    ]
+   },
+   "objects": [
+    "front_u0_frame",
+    "front_u1_frame",
+    "front_u2_frame",
+    "front_u3_frame",
+    "front_u4_frame",
+    "front_u5_frame"
+   ]
+  },
+  {
+   "signature": {
+    "verts": 24,
+    "tris": 12,
+    "dims": [
+     1.5476,
+     1.5211,
+     1.88
+    ]
+   },
+   "objects": [
+    "taber_g0_fill",
+    "taber_g1_fill",
+    "taber_g2_fill",
+    "taber_g3_fill",
+    "taber_g4_fill",
+    "taber_g5_fill",
+    "taber_g6_fill",
+    "taber_g7_fill",
+    "taber_g8_fill"
+   ]
+  },
+  {
+   "signature": {
+    "verts": 24,
+    "tris": 12,
+    "dims": [
+     1.5056,
+     1.4782,
+     2.73
+    ]
+   },
+   "objects": [
+    "taber_u0_fill",
+    "taber_u1_fill",
+    "taber_u2_fill",
+    "taber_u3_fill",
+    "taber_u4_fill",
+    "taber_u5_fill",
+    "taber_u6_fill",
+    "taber_u7_fill",
+    "taber_u8_fill"
+   ]
+  },
+  {
+   "signature": {
+    "verts": 24,
+    "tris": 12,
+    "dims": [
+     1.6233,
+     1.6435,
+     2.73
+    ]
+   },
+   "objects": [
+    "front_u0_fill",
+    "front_u1_fill",
+    "front_u2_fill",
+    "front_u3_fill",
+    "front_u4_fill",
+    "front_u5_fill"
+   ]
+  },
+  {
+   "signature": {
+    "verts": 24,
+    "tris": 12,
+    "dims": [
+     1.666,
+     1.6856,
+     2.63
+    ]
+   },
+   "objects": [
+    "front_g0_fill",
+    "front_g2_fill",
+    "front_g3_fill",
+    "front_g4_fill",
+    "front_g5_fill"
+   ]
+  },
+  {
+   "signature": {
+    "verts": 24,
+    "tris": 12,
+    "dims": [
+     1.384,
+     1.402,
+     2.45
+    ]
+   },
+   "objects": [
+    "front_u1_glow",
+    "front_u3_glow",
+    "front_u5_glow"
+   ]
+  },
+  {
+   "signature": {
+    "verts": 24,
+    "tris": 12,
+    "dims": [
+     1.2636,
+     1.2395,
+     2.45
+    ]
+   },
+   "objects": [
+    "taber_u2_glow",
+    "taber_u6_glow"
+   ]
+  }
+ ],
+ "dup_redundant_tris": 3172,
+ "join_candidates": {
+  "Toy_brick": 5,
+  "Toy_glass": 30,
+  "Toy_glass_Glow": 5,
+  "Toy_glassl": 3,
+  "Toy_ink": 2,
+  "Toy_roofd": 30,
+  "Toy_steel": 4,
+  "Toy_stone": 26
+ },
+ "degenerate_tris": 0,
+ "coincident_vert_pairs": 8416,
+ "over_tess": {
+  "near_distance_m": 54.0,
+  "one_px_world_m": 0.0364,
+  "note": "cylinders whose chord error < one_px_world_m can halve segments"
+ }
+}
