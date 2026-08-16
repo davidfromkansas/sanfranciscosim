@@ -225,6 +225,21 @@
       "notes": "Live-data vehicle; spawned by muni.js from /api/muni for PM/PH/CA cable car routes. Powell single-ended cable car."
     },
     {
+      "id": "muni-lrv",
+      "file": "vehicles/muni-lrv.glb",
+      "kind": "lrv",
+      "dims": [
+        2.696,
+        5.419,
+        24.42
+      ],
+      "targetLengthM": 22.86,
+      "front": "-Z",
+      "tris": 59992,
+      "weight": 0,
+      "notes": "Live-data vehicle; spawned by muni.js from /api/muni for Metro lines (J/K/L/M/N/T). Siemens S200 SF (LRV4). Photoreal source conformed by tools/conform-lrv-glb.mjs (cab +X -> -Z, min y 0, materials -> Toy_*, lights -> *_Glow, cabin interior stripped); it is deliberately NOT toy-diorama styled and is well over the 5,000-tri vehicle cap in docs/asset-plans/transit/muni-metro-lrv.md — owner decision 2026-08-15. Height 5.419 m includes the raised pantograph."
+    },
+    {
       "id": "passenger-airplane",
       "file": "vehicles/passenger-airplane.glb",
       "kind": "aircraft",
