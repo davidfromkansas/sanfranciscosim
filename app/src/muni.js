@@ -78,9 +78,20 @@ const BADGE_COLS = 8;
 const BADGE_ROWS = 8;
 const BADGE_W = 7.2; // metres, square quad: the tail needs vertical room
 const BADGE_H = 7.2;
-// Height of the QUAD CENTRE. The tail tip sits ~0.36 x BADGE_H below centre, so
-// this lands the point just above the 5.5 m roof (3.42 m body x 1.6 carScale).
-const BADGE_Y = 8.6;
+// Where the TAIL TIP goes: just above the 5.5 m roof (3.42 m body x 1.6
+// carScale). The quad centre is derived from it, not fixed, because the bubble
+// grows with distance and its tail grows with it — see BADGE_TAIL_DROP.
+const BADGE_TIP_Y = 6.0;
+// How far the tail tip hangs below the quad centre, at scale 1. The centre is
+// therefore BADGE_TIP_Y + BADGE_TAIL_DROP * scale, which at scale 1 is the 8.6 m
+// this used to be pinned at.
+//
+// Scaling the WHOLE height by the zoom scale (the old `8.6 * scale`) is what
+// detached a badge from its bus: measured on the deployed build, a bus 8.4 km
+// out was 4 px wide with its bubble 150 px above it, on an 845 px viewport. The
+// bubble has to scale — that is what keeps it legible from the hero view — but
+// the tip it points with does not, so only the tail's own growth belongs here.
+const BADGE_TAIL_DROP = 0.36 * BADGE_H;
 // Badges follow the ZOOM, not a fixed distance in metres. A radius tuned for
 // street level shows nothing from the air, which is where this camera spends
 // most of its time; one tuned for the air carpets the Mission at street level.
@@ -1211,7 +1222,9 @@ export function createLiveMuni(scene, data) {
           // Proportional to THIS bubble's distance => constant size on screen,
           // which is the whole point: a bubble 6 km away is drawn 6 km-sized.
           const scaleAt = Math.max(BADGE_SCALE_MIN, Math.min(BADGE_SCALE_MAX, dist / BADGE_REF_DIST));
-          dummy.position.set(state.x, y + BADGE_Y * scaleAt, state.z);
+          // Pin the TIP, derive the centre: the bubble scales, the point it
+          // aims with does not drift up off the roof.
+          dummy.position.set(state.x, y + BADGE_TIP_Y + BADGE_TAIL_DROP * scaleAt, state.z);
           dummy.quaternion.copy(camQ);
           dummy.scale.setScalar(scaleAt * fade);
           dummy.updateMatrix();
