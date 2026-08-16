@@ -1,0 +1,273 @@
+{
+ "rows": [
+  {
+   "name": "ground / streets / landcover",
+   "objects": 85,
+   "tris": 4488960,
+   "visibleTris": 4321296,
+   "bytes": 155980552,
+   "instances": 13188,
+   "MB": 148.8
+  },
+  {
+   "name": "trees (instanced)",
+   "objects": 53,
+   "tris": 28255136,
+   "visibleTris": 2333240,
+   "bytes": 18115360,
+   "instances": 271684,
+   "MB": 17.3
+  },
+  {
+   "name": "terrain",
+   "objects": 4,
+   "tris": 2097152,
+   "visibleTris": 2097152,
+   "bytes": 67272864,
+   "instances": 4,
+   "MB": 64.2
+  },
+  {
+   "name": "far city (2km prism meshes)",
+   "objects": 58,
+   "tris": 1747310,
+   "visibleTris": 1747310,
+   "bytes": 62787496,
+   "instances": 58,
+   "MB": 59.9
+  },
+  {
+   "name": "near buildings (full detail)",
+   "objects": 22,
+   "tris": 760451,
+   "visibleTris": 760451,
+   "bytes": 66529032,
+   "instances": 22,
+   "MB": 63.4
+  },
+  {
+   "name": "other: vehicle-taxi",
+   "objects": 1,
+   "tris": 406560,
+   "visibleTris": 406560,
+   "bytes": 238976,
+   "instances": 44,
+   "MB": 0.2
+  },
+  {
+   "name": "sky / weather / props",
+   "objects": 6,
+   "tris": 365050,
+   "visibleTris": 365050,
+   "bytes": 3778884,
+   "instances": 1062,
+   "MB": 3.6
+  },
+  {
+   "name": "other: vehicle-minivan-cream",
+   "objects": 1,
+   "tris": 310366,
+   "visibleTris": 310366,
+   "bytes": 162892,
+   "instances": 49,
+   "MB": 0.2
+  },
+  {
+   "name": "other: vehicle-minivan-lavender",
+   "objects": 1,
+   "tris": 297698,
+   "visibleTris": 297698,
+   "bytes": 162764,
+   "instances": 47,
+   "MB": 0.2
+  },
+  {
+   "name": "other: vehicle-minivan-teal",
+   "objects": 1,
+   "tris": 297698,
+   "visibleTris": 297698,
+   "bytes": 162764,
+   "instances": 47,
+   "MB": 0.2
+  },
+  {
+   "name": "other: vehicle-minivan-orange",
+   "objects": 1,
+   "tris": 291364,
+   "visibleTris": 291364,
+   "bytes": 162700,
+   "instances": 46,
+   "MB": 0.2
+  },
+  {
+   "name": "other: vehicle-delivery-truck",
+   "objects": 1,
+   "tris": 280048,
+   "visibleTris": 280048,
+   "bytes": 153592,
+   "instances": 46,
+   "MB": 0.1
+  },
+  {
+   "name": "other: vehicle-minivan-mint",
+   "objects": 1,
+   "tris": 278696,
+   "visibleTris": 278696,
+   "bytes": 162572,
+   "instances": 44,
+   "MB": 0.2
+  },
+  {
+   "name": "other: vehicle-waymo",
+   "objects": 1,
+   "tris": 278024,
+   "visibleTris": 278024,
+   "bytes": 170608,
+   "instances": 46,
+   "MB": 0.2
+  },
+  {
+   "name": "other: vehicle-sedan-coral",
+   "objects": 1,
+   "tris": 263304,
+   "visibleTris": 263304,
+   "bytes": 146008,
+   "instances": 46,
+   "MB": 0.1
+  },
+  {
+   "name": "other: vehicle-sedan-grape",
+   "objects": 1,
+   "tris": 251856,
+   "visibleTris": 251856,
+   "bytes": 145880,
+   "instances": 44,
+   "MB": 0.1
+  },
+  {
+   "name": "other: vehicle-sedan-red",
+   "objects": 1,
+   "tris": 246132,
+   "visibleTris": 246132,
+   "bytes": 145816,
+   "instances": 43,
+   "MB": 0.1
+  },
+  {
+   "name": "other: vehicle-sedan-mustard",
+   "objects": 1,
+   "tris": 223236,
+   "visibleTris": 223236,
+   "bytes": 145560,
+   "instances": 39,
+   "MB": 0.1
+  },
+  {
+   "name": "other: vehicle-commuter-bus",
+   "objects": 1,
+   "tris": 215072,
+   "visibleTris": 215072,
+   "bytes": 124304,
+   "instances": 44,
+   "MB": 0.1
+  },
+  {
+   "name": "building kit (batched)",
+   "objects": 1,
+   "tris": 198872,
+   "visibleTris": 198872,
+   "bytes": 23864640,
+   "instances": 1,
+   "MB": 22.8
+  },
+  {
+   "name": "other: Mesh",
+   "objects": 63,
+   "tris": 93870,
+   "visibleTris": 72496,
+   "bytes": 5130496,
+   "instances": 1120,
+   "MB": 4.9
+  },
+  {
+   "name": "water",
+   "objects": 1,
+   "tris": 128,
+   "visibleTris": 128,
+   "bytes": 3360,
+   "instances": 1,
+   "MB": 0
+  },
+  {
+   "name": "moving agents",
+   "objects": 21,
+   "tris": 6,
+   "visibleTris": 6,
+   "bytes": 5614546,
+   "instances": 4,
+   "MB": 5.4
+  },
+  {
+   "name": "other: focus-glow",
+   "objects": 1,
+   "tris": 12,
+   "visibleTris": 0,
+   "bytes": 840,
+   "instances": 1,
+   "MB": 0
+  },
+  {
+   "name": "other: focus-ring",
+   "objects": 1,
+   "tris": 80,
+   "visibleTris": 0,
+   "bytes": 3104,
+   "instances": 1,
+   "MB": 0
+  },
+  {
+   "name": "street lamps + light pools",
+   "objects": 100,
+   "tris": 3448620,
+   "visibleTris": 0,
+   "bytes": 5385240,
+   "instances": 82110,
+   "MB": 5.1
+  }
+ ],
+ "totals": {
+  "meshes": 429,
+  "tris": 45095701,
+  "MB": 397.3
+ },
+ "renderInfo": {
+  "calls": 1,
+  "triangles": 2,
+  "geometries": 121,
+  "textures": 18,
+  "programs": 35
+ },
+ "cityStats": {
+  "cellsLoaded": 1760,
+  "cellsTotal": 1656,
+  "nearChunks": 22,
+  "groupsTotal": 61,
+  "farGroups": 58,
+  "groundGroups": 57,
+  "groundDetail": 3,
+  "trees": 271684,
+  "lamps": 41055,
+  "kitInstances": 24963,
+  "kitPieceTypes": 162,
+  "kitPlaced": 24963,
+  "kitConsidered": 36247,
+  "furniture": 5589,
+  "furnitureDraws": 20
+ },
+ "heapMB": 1065.5,
+ "governor": {
+  "mode": "auto",
+  "tier": "high"
+ },
+ "pixelRatio": 1
+}

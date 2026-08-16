@@ -17,10 +17,15 @@ export const QUALITY = {
   // quarter of the fill. Combined with `low`'s smaller nearScale (fewer lamps
   // exist at all) and its 0.85 pixelRatio, a half-size pool at half strength
   // lands near a fifth of what `high` pays for them.
-  ultra: { label: 'Ultra', pixelRatio: 2, shadow: 4096, nearScale: 1.35, treeScale: 1.3, windows: 1, samples: 4, poolScale: 1.35, poolStrength: 1 },
-  high: { label: 'High', pixelRatio: 1.5, shadow: 3072, nearScale: 1, treeScale: 1, windows: 1, samples: 4, poolScale: 1, poolStrength: 1 },
-  medium: { label: 'Medium', pixelRatio: 1, shadow: 2048, nearScale: 0.75, treeScale: 0.7, windows: 1, samples: 2, poolScale: 0.7, poolStrength: 0.9 },
-  low: { label: 'Low', pixelRatio: 0.85, shadow: 0, nearScale: 0.5, treeScale: 0.45, windows: 0, samples: 0, poolScale: 0.5, poolStrength: 0.5 },
+  // groundScale: how far from the pivot street/landcover/tree/lamp groups stay
+  // resident. The single biggest memory lever there is — the city used to hold
+  // every group forever, which is what put phones over their tab budget.
+  // vehicleDetail: how far the hand-made vehicle models reach before traffic
+  // falls back to the procedural car shell.
+  ultra: { label: 'Ultra', pixelRatio: 2, shadow: 4096, nearScale: 1.35, treeScale: 1.3, windows: 1, samples: 4, poolScale: 1.35, poolStrength: 1, groundScale: 1.25, vehicleDetail: 1000 },
+  high: { label: 'High', pixelRatio: 1.5, shadow: 3072, nearScale: 1, treeScale: 1, windows: 1, samples: 4, poolScale: 1, poolStrength: 1, groundScale: 1, vehicleDetail: 800 },
+  medium: { label: 'Medium', pixelRatio: 1, shadow: 2048, nearScale: 0.75, treeScale: 0.7, windows: 1, samples: 2, poolScale: 0.7, poolStrength: 0.9, groundScale: 0.8, vehicleDetail: 550 },
+  low: { label: 'Low', pixelRatio: 0.85, shadow: 0, nearScale: 0.5, treeScale: 0.45, windows: 0, samples: 0, poolScale: 0.5, poolStrength: 0.5, groundScale: 0.6, vehicleDetail: 350 },
 };
 export const QUALITY_LADDER = ['low', 'medium', 'high', 'ultra'];
 

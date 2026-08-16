@@ -38,6 +38,11 @@ const BIRD_COUNT = 90;
 // without a rebuild.
 const LOW_CAPS = { cars: 320, peds: 160, birds: 45 };
 const CAR_RANGE = 2200;
+// Vehicle LOD. The hand-made models are ~6k triangles each and at street level
+// several hundred of them are on screen — most a few pixels wide. Inside this
+// radius traffic is the real fleet; outside it the same car keeps driving as
+// the ~100-triangle procedural shell, so the road never empties.
+const FLEET_RANGE = 800;
 // Vehicle geometry is base-origin, and the renderer lifts every car this far
 // off its path so street cars clear the road ribbon.
 const CAR_LIFT = 0.2;
@@ -582,8 +587,8 @@ export function createAgents(scene, data, city) {
       fleet.push(mesh);
     }
     fleetCursors = new Int32Array(fleet.length);
+    // The procedural pool stays in the scene as the distance LOD.
     carMesh.count = 0;
-    carMesh.visible = false;
   }
 
   const cars = [];
@@ -904,12 +909,13 @@ export function createAgents(scene, data, city) {
   let pedScale = 1;
   let toy = false;
   let carCap = CAR_COUNT;
+  let fleetRange = FLEET_RANGE;
   let pedCap = PED_COUNT;
   let birdCap = BIRD_COUNT;
 
   function paintCars(list) {
-    // Fleet colours are baked into the models; only the fallback pool is tinted.
-    if (fleet.length) return;
+    // Fleet colours are baked into the models; the procedural pool is tinted —
+    // it is both the no-fleet fallback and the distance LOD.
     for (let i = 0; i < CAR_COUNT; i++) {
       paint.set(list[i % list.length]);
       carColors[i * 3] = paint.r;
@@ -1018,6 +1024,7 @@ export function createAgents(scene, data, city) {
     }
 
     let visibleCars = 0;
+    let farCars = 0;
     fleetCursors.fill(0);
     for (let i = 0; i < Math.min(cars.length, carCap); i++) {
       const car = cars[i];
@@ -1028,13 +1035,14 @@ export function createAgents(scene, data, city) {
       if (car.d > total) car.d -= total;
       if (car.d < 0) car.d += total;
       samplePolyline(car.path.points, cumulative, total, car.d, position, tangent);
-      if (position.distanceTo(cameraPos) > CAR_RANGE * 1.6) continue;
+      const range = position.distanceTo(cameraPos);
+      if (range > CAR_RANGE * 1.6) continue;
       const offset = (car.path.width / 4) * car.lane * car.dir;
       dummy.position.set(position.x + tangent.z * offset, position.y + CAR_LIFT, position.z - tangent.x * offset);
       dummy.rotation.set(0, Math.atan2(tangent.x * car.dir, tangent.z * car.dir), 0);
       dummy.scale.setScalar(carScale);
       dummy.updateMatrix();
-      if (fleet.length) {
+      if (fleet.length && range < fleetRange) {
         // Slot i always drives the same vehicle type, so every type is on the
         // road with the same frequency.
         const type = i % fleet.length;
@@ -1042,10 +1050,11 @@ export function createAgents(scene, data, city) {
         if (fleetCursors[type] >= mesh.instanceMatrix.count) continue;
         mesh.setMatrixAt(fleetCursors[type]++, dummy.matrix);
       } else {
-        carMesh.setMatrixAt(visibleCars, dummy.matrix);
-        carMesh.instanceColor.array[visibleCars * 3] = carColors[i * 3];
-        carMesh.instanceColor.array[visibleCars * 3 + 1] = carColors[i * 3 + 1];
-        carMesh.instanceColor.array[visibleCars * 3 + 2] = carColors[i * 3 + 2];
+        carMesh.setMatrixAt(farCars, dummy.matrix);
+        carMesh.instanceColor.array[farCars * 3] = carColors[i * 3];
+        carMesh.instanceColor.array[farCars * 3 + 1] = carColors[i * 3 + 1];
+        carMesh.instanceColor.array[farCars * 3 + 2] = carColors[i * 3 + 2];
+        farCars++;
       }
       if (night > 0.15 || toy) {
         dummy.position.y += 0.55;
@@ -1057,16 +1066,13 @@ export function createAgents(scene, data, city) {
       }
       visibleCars++;
     }
-    if (fleet.length) {
-      for (let t = 0; t < fleet.length; t++) {
-        fleet[t].count = fleetCursors[t];
-        fleet[t].instanceMatrix.needsUpdate = true;
-      }
-    } else {
-      carMesh.count = visibleCars;
-      carMesh.instanceMatrix.needsUpdate = true;
-      carMesh.instanceColor.needsUpdate = true;
+    for (let t = 0; t < fleet.length; t++) {
+      fleet[t].count = fleetCursors[t];
+      fleet[t].instanceMatrix.needsUpdate = true;
     }
+    carMesh.count = farCars;
+    carMesh.instanceMatrix.needsUpdate = true;
+    carMesh.instanceColor.needsUpdate = true;
     lightMesh.count = night > 0.15 || toy ? visibleCars : 0;
     lightMesh.instanceMatrix.needsUpdate = true;
     lightMesh.material.opacity = toy ? Math.max(0.5, Math.min(0.85, night)) : Math.min(0.8, night);
@@ -1190,8 +1196,11 @@ export function createAgents(scene, data, city) {
     group,
     update,
     setToy,
-    setQuality(tier) {
+    setQuality(tier, q) {
       const low = tier === 'low';
+      // Vehicle detail reach is a tier lever like every other: the cheap tiers
+      // pull the real models in close and let the shells cover the rest.
+      fleetRange = q?.vehicleDetail ?? FLEET_RANGE;
       carCap = low ? LOW_CAPS.cars : CAR_COUNT;
       pedCap = low ? LOW_CAPS.peds : PED_COUNT;
       birdCap = low ? LOW_CAPS.birds : BIRD_COUNT;
