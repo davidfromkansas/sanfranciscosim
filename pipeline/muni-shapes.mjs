@@ -218,19 +218,42 @@ async function main() {
   const shapeIndex = new Map(); // shapeId -> idx
   const shapeMeta = [];
   const floats = [];
+  // Subdivide any segment longer than this so vehicles can snap and walls
+  // can follow terrain. The GTFS shapes have long straight jumps (up to 3.5km)
+  // that leave no intermediate points for projection — 1299 segments over 500m
+  // in the original bake. 100m is fine enough for snapping and terrain without
+  // bloating the file.
+  const SUBDIVIDE_M = 100;
   for (const [id, pts] of rawShapes) {
     pts.sort((a, b) => a[0] - b[0]);
     const flat = [];
     for (const [, x, z] of pts) flat.push(x, z);
     const slim = simplify(flat, SIMPLIFY_TOLERANCE_M);
+    // Subdivide long segments: insert interpolated points every SUBDIVIDE_M.
+    const sub = [];
+    for (let i = 0; i < slim.length; i += 2) {
+      if (i > 0) {
+        const px = slim[i - 2], pz = slim[i - 1];
+        const cx = slim[i], cz = slim[i + 1];
+        const segLen = Math.hypot(cx - px, cz - pz);
+        if (segLen > SUBDIVIDE_M) {
+          const steps = Math.ceil(segLen / SUBDIVIDE_M);
+          for (let j = 1; j < steps; j++) {
+            const t = j / steps;
+            sub.push(px + (cx - px) * t, pz + (cz - pz) * t);
+          }
+        }
+      }
+      sub.push(slim[i], slim[i + 1]);
+    }
     const vertexOffset = floats.length / 3;
     let s = 0;
-    for (let i = 0; i < slim.length; i += 2) {
-      if (i > 0) s += Math.hypot(slim[i] - slim[i - 2], slim[i + 1] - slim[i - 1]);
-      floats.push(slim[i], slim[i + 1], s);
+    for (let i = 0; i < sub.length; i += 2) {
+      if (i > 0) s += Math.hypot(sub[i] - sub[i - 2], sub[i + 1] - sub[i - 1]);
+      floats.push(sub[i], sub[i + 1], s);
     }
     shapeIndex.set(id, shapeMeta.length);
-    shapeMeta.push({ vertexOffset, vertexCount: slim.length / 2, lengthM: Math.round(s) });
+    shapeMeta.push({ vertexOffset, vertexCount: sub.length / 2, lengthM: Math.round(s) });
   }
 
   // Per route+direction: the most-used shape is the default; trips on any

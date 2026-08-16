@@ -117,17 +117,18 @@ const MAX_PICK_DISTANCE = 9000;
 // Route glow: a vertical wall of light tracing each active route's shape,
 // rising from the ground to this height. Visible at the hero view without
 // dominating the skyline.
-const ROUTE_GLOW_HEIGHT = 500;
-// Per-mode colors for the route glow walls (RGB 0-1).
+const ROUTE_GLOW_HEIGHT = 50;
+// Per-mode neon colors for the route glow walls (RGB 0-1, saturated).
 const ROUTE_GLOW_COLORS = {
-  bus: [1.0, 0.72, 0.25], // warm amber
-  trolley: [0.25, 0.85, 0.78], // teal
-  lrv: [0.65, 0.4, 0.95], // violet
-  streetcar: [0.95, 0.45, 0.4], // coral
-  cable: [0.95, 0.82, 0.3], // gold
+  bus: [1.0, 0.2, 0.05], // neon red-orange
+  trolley: [0.1, 0.95, 0.4], // neon green
+  lrv: [0.6, 0.1, 1.0], // neon purple
+  streetcar: [1.0, 0.1, 0.6], // neon pink
+  cable: [1.0, 0.95, 0.1], // neon yellow
 };
 // Daytime minimum opacity; at night the full glow formula applies.
-const ROUTE_GLOW_DAY_OPACITY = 0.15;
+// Both halved from original values (0.15 -> 0.075 day, night formula * 0.5).
+const ROUTE_GLOW_DAY_OPACITY = 0.01875;
 
 // Module-scope scratch: the update loop and the picker must not allocate.
 const dummy = new Object3D();
@@ -906,16 +907,20 @@ export function createLiveMuni(scene, data) {
         const x0 = F[o], z0 = F[o + 1];
         const x1 = F[q], z1 = F[q + 1];
 
+        // Sample terrain elevation so walls sit on the ground, not through hills.
+        const y0 = data.sampleElevation ? data.sampleElevation(x0, z0) : 0;
+        const y1 = data.sampleElevation ? data.sampleElevation(x1, z1) : 0;
+
         // Four corners of the wall segment: bottom and top at each end.
         const v = positions.length / 3;
-        // bottom-left (x0, 0, z0)
-        positions.push(x0, 0, z0);
-        // top-left (x0, height, z0)
-        positions.push(x0, ROUTE_GLOW_HEIGHT, z0);
-        // bottom-right (x1, 0, z1)
-        positions.push(x1, 0, z1);
-        // top-right (x1, height, z1)
-        positions.push(x1, ROUTE_GLOW_HEIGHT, z1);
+        // bottom-left (x0, y0, z0)
+        positions.push(x0, y0, z0);
+        // top-left (x0, y0 + height, z0)
+        positions.push(x0, y0 + ROUTE_GLOW_HEIGHT, z0);
+        // bottom-right (x1, y1, z1)
+        positions.push(x1, y1, z1);
+        // top-right (x1, y1 + height, z1)
+        positions.push(x1, y1 + ROUTE_GLOW_HEIGHT, z1);
 
         // Color all four vertices with the mode color
         for (let j = 0; j < 4; j++) colors.push(color[0], color[1], color[2]);
@@ -956,7 +961,10 @@ export function createLiveMuni(scene, data) {
       routeGlowDirty = false;
     }
     if (routeGlowMesh) {
-      routeGlowMesh.material.opacity = Math.max(ROUTE_GLOW_DAY_OPACITY, nightOpacity);
+      // Slow pulse: 0.5-1.0 brightness factor over ~4 seconds.
+      const pulse = 0.75 + 0.25 * Math.sin(now * 0.0015);
+      const baseOpacity = Math.max(ROUTE_GLOW_DAY_OPACITY, nightOpacity * 0.125);
+      routeGlowMesh.material.opacity = baseOpacity * pulse;
     }
 
     const camQ = camera.quaternion;
