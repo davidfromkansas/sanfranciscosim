@@ -484,11 +484,13 @@ export function createLiveMuni(scene, data) {
       if (bus.mode !== 'bus') continue; // other modes wait for their models
 
       // Stale payload (CDN cache hit): mark everyone seen so they aren't
-      // dropped, but don't touch positions or speeds — the frame loop's
-      // dead-reckon extrapolation keeps them moving along their shapes.
+      // dropped, and keep lastFixAt current so the stale-drop check in the
+      // frame loop doesn't evict a bus that is still being reported. Don't
+      // touch positions or speeds — the frame loop's dead-reckon extrapolation
+      // keeps them moving along their shapes.
       if (stale) {
         const state = buses.get(bus.id);
-        if (state) state.seen = true;
+        if (state) { state.seen = true; state.lastFixAt = now; }
         continue;
       }
 
@@ -518,6 +520,7 @@ export function createLiveMuni(scene, data) {
           stops: bus.stops || [],
           recordedAt: bus.recordedAt ?? now,
           lastFixAt: now,
+          lastFreshFixAt: now,
           misses: 0,
           seen: true,
           index: -1,
@@ -531,13 +534,15 @@ export function createLiveMuni(scene, data) {
       // Same fix as the previous poll (server re-fetched from 511 but this
       // vehicle hasn't reported a new position)? Keep dead-reckoning — don't
       // reset target/speed, which would freeze the bus at the stale target.
+      // Update lastFixAt so the stale-drop check doesn't evict it.
       if (bus.recordedAt != null && state.recordedAt === bus.recordedAt) {
         state.seen = true;
         state.misses = 0;
+        state.lastFixAt = now;
         continue;
       }
 
-      const gap = Math.max(1, (now - state.lastFixAt) / 1000);
+      const gap = Math.max(1, (now - state.lastFreshFixAt) / 1000);
       const prevFixX = state.fixX;
       const prevFixZ = state.fixZ;
       state.fixX = x;
@@ -548,6 +553,7 @@ export function createLiveMuni(scene, data) {
       state.stops = bus.stops || [];
       state.recordedAt = bus.recordedAt ?? now;
       state.lastFixAt = now;
+      state.lastFreshFixAt = now;
       state.seen = true;
 
       const tripChanged = state.tripId !== bus.tripId;
@@ -802,7 +808,7 @@ export function createLiveMuni(scene, data) {
         // the advance clamp freezes it in place. Capped at DEAD_RECKON_MAX_S
         // seconds since the last fresh fix (ferries use the same pattern).
         if (lead < DWELL_STEP_M && state.targetSpeed > 0) {
-          const sinceFresh = (now - state.lastFixAt) / 1000;
+          const sinceFresh = (now - state.lastFreshFixAt) / 1000;
           if (sinceFresh < DEAD_RECKON_MAX_S) {
             state.targetS += state.targetSpeed * dt;
             lead = state.targetS - state.s;
