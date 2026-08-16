@@ -983,5 +983,41 @@ export function createLiveMuni(scene, data) {
         drawn: state.index >= 0,
       }));
     },
+    // Detailed diagnostic dump for debugging movement issues. Call
+    // SF.muni.debug() from the console and paste the output back.
+    debug() {
+      const now = Date.now();
+      const all = [...buses.values()];
+      const summary = {
+        total: all.length,
+        drawn: all.filter((s) => s.index >= 0).length,
+        onShape: all.filter((s) => s.shapeIdx >= 0).length,
+        moving: all.filter((s) => s.speed > 0.5).length,
+        targetMoving: all.filter((s) => s.targetSpeed > 0.5).length,
+        frozen: all.filter((s) => s.index >= 0 && s.speed < 0.5 && s.targetSpeed < 0.5).length,
+        live,
+        degraded,
+        demo,
+        lastFetchedAt: lastFetchedAt ? new Date(lastFetchedAt).toLocaleTimeString() : null,
+      };
+      const rows = all.slice(0, 20).map((s) => ({
+        id: s.id,
+        route: s.route,
+        speed: +s.speed.toFixed(1),
+        targetSpeed: +s.targetSpeed.toFixed(1),
+        s: Math.round(s.s),
+        targetS: Math.round(s.targetS),
+        lead: Math.round(s.targetS - s.s),
+        freshAgeS: Math.round((now - s.lastFreshFixAt) / 1000),
+        fixAgeS: Math.round((now - s.lastFixAt) / 1000),
+        onShape: s.shapeIdx >= 0,
+        drawn: s.index >= 0,
+        deadReckon: s.shapeIdx >= 0 && s.targetS - s.s < DWELL_STEP_M && s.targetSpeed > 0,
+      }));
+      console.log('=== SF.muni.debug ===');
+      console.log('summary:', summary);
+      console.table(rows);
+      return { summary, rows };
+    },
   };
 }
