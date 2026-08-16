@@ -91,14 +91,10 @@ const BADGE_RADIUS_MIN = 300;
 // 8000 m of orbit (~5350 m of height) where the visible ground spans roughly
 // 15 km, so a 2600 m cap left the whole skyline unlabelled — MAX_BADGES is what
 // bounds clutter, not the radius, so the radius may as well cover what is on
-// screen.
-const BADGE_RADIUS_MAX = window.innerWidth < 900 ? 33000 : 11000;
-// Mobile screens are narrower, so a user zooming in from the hero view passes
-// through more zoom levels before badges are close enough to read. The radius-
-// per-metre is 3x wider on small screens (200% wider) and the max radius is
-// raised to match, so badges appear at 3x the elevation and cover 3x the ground
-// area — visible sooner on a phone while MAX_BADGES still bounds clutter.
-const BADGE_RADIUS_PER_M = window.innerWidth < 900 ? 6.6 : 2.2;
+// screen. Desktop expanded 200% (3x) to match mobile so tags show at the hero
+// view on load; both platforms use the same values now.
+const BADGE_RADIUS_MAX = 33000;
+const BADGE_RADIUS_PER_M = 6.6;
 // Camera distance at which a bubble is drawn at its authored size; scale is
 // proportional to distance either side of it, so screen size stays put.
 const BADGE_REF_DIST = 420;
@@ -108,8 +104,10 @@ const BADGE_SCALE_MIN = 0.85;
 // at 9 was the second reason the high view looked empty — the bubbles were
 // there, drawn at half the size they needed, i.e. a few pixels.
 const BADGE_SCALE_MAX = 26;
-// Hard ceiling on how many shout at once, whatever the radius.
-const MAX_BADGES = 18;
+// Hard ceiling on how many shout at once, whatever the radius. Raised from 18
+// to 60 so the hero view on load shows tags across the whole city, not just a
+// cluster near the camera center. The InstancedMesh cap is 512, so 60 is safe.
+const MAX_BADGES = 60;
 
 const PICK_RADIUS = 16;
 const MAX_PICK_DISTANCE = 9000;
