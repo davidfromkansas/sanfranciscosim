@@ -2525,6 +2525,15 @@ export const LANDMARKS = [
     // silhouettes against the sky. yaw 0.
     camera: { distance: 160, yaw: 0, pitch: 26 },
   },
+  {
+    id: '318Brannan',
+    name: '318 Brannan Street',
+    lon: -122.3927890,
+    lat: 37.7816014,
+    height: 8.6,
+    exclude: 8,
+    camera: { distance: 180, yaw: 15, pitch: 28 },
+  },
 ];
 
 // Parks/green spaces the landcover bake must match at least one source polygon
