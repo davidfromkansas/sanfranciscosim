@@ -1369,5 +1369,328 @@
     ],
     "tris": 16008,
     "loadRadius": 2500
+  },
+  {
+    "id": "21-south-park",
+    "file": "21-south-park.glb",
+    "anchor": [
+      -122.3931063,
+      37.7817676
+    ],
+    "targetHeightM": 11.73,
+    "cat": 3,
+    "name": "21-29 South Park",
+    "estimated": true,
+    "dims": [
+      47.3614,
+      51.4933,
+      11.73
+    ],
+    "tris": 8664,
+    "loadRadius": 2500
+  },
+  {
+    "id": "22-south-park",
+    "file": "22-south-park.glb",
+    "anchor": [
+      -122.3936099,
+      37.7823247
+    ],
+    "targetHeightM": 14.22,
+    "cat": 7,
+    "name": "Hotel Madrid (22\u201324 South Park)",
+    "estimated": false,
+    "dims": [
+      36.0194,
+      31.8393,
+      14.22
+    ],
+    "tris": 6708,
+    "loadRadius": 2500
+  },
+  {
+    "id": "26-south-park",
+    "file": "26-south-park.glb",
+    "anchor": [
+      -122.3937438,
+      37.7822369
+    ],
+    "targetHeightM": 9.05,
+    "cat": 3,
+    "name": "26\u201328 South Park",
+    "estimated": false,
+    "dims": [
+      25.9379,
+      26.042,
+      9.05
+    ],
+    "tris": 2512,
+    "loadRadius": 2500
+  },
+  {
+    "id": "35-south-park",
+    "file": "35-south-park.glb",
+    "anchor": [
+      -122.3933378,
+      37.7815714
+    ],
+    "targetHeightM": 13.4,
+    "cat": 3,
+    "name": "Accel (35 South Park)",
+    "estimated": true,
+    "dims": [
+      42.0586,
+      40.2991,
+      13.4
+    ],
+    "tris": 6980,
+    "loadRadius": 2500
+  },
+  {
+    "id": "41-south-park",
+    "file": "41-south-park.glb",
+    "anchor": [
+      -122.3934793,
+      37.7815036
+    ],
+    "targetHeightM": 10.6,
+    "cat": 1,
+    "name": "41-43 South Park",
+    "estimated": true,
+    "dims": [
+      22.4556,
+      22.4731,
+      10.6
+    ],
+    "tris": 6380,
+    "loadRadius": 2500
+  },
+  {
+    "id": "46-south-park",
+    "file": "46-south-park.glb",
+    "anchor": [
+      -122.3938219,
+      37.7821864
+    ],
+    "targetHeightM": 16.15,
+    "cat": 2,
+    "name": "44-46 South Park",
+    "estimated": false,
+    "dims": [
+      27.9295,
+      27.6198,
+      16.15
+    ],
+    "tris": 4505,
+    "loadRadius": 2500
+  },
+  {
+    "id": "58-south-park",
+    "file": "58-south-park.glb",
+    "anchor": [
+      -122.3938881,
+      37.7821223
+    ],
+    "targetHeightM": 16.9,
+    "cat": 2,
+    "name": "54-58 South Park",
+    "estimated": true,
+    "dims": [
+      28.3764,
+      28.4853,
+      16.9
+    ],
+    "tris": 4664,
+    "loadRadius": 2500
+  },
+  {
+    "id": "76-south-park",
+    "file": "76-south-park.glb",
+    "anchor": [
+      -122.3940170,
+      37.7820261
+    ],
+    "targetHeightM": 16.28,
+    "cat": 2,
+    "name": "76–82 South Park",
+    "estimated": true,
+    "dims": [
+      26.6145,
+      26.0241,
+      16.28
+    ],
+    "tris": 4376,
+    "loadRadius": 2500
+  },
+  {
+    "id": "84-south-park",
+    "file": "84-south-park.glb",
+    "anchor": [
+      -122.3940683,
+      37.7819794
+    ],
+    "targetHeightM": 13.2,
+    "cat": 1,
+    "name": "84 South Park",
+    "estimated": true,
+    "dims": [
+      26.0856,
+      26.2918,
+      13.2
+    ],
+    "tris": 6900,
+    "loadRadius": 2500
+  },
+  {
+    "id": "92-south-park",
+    "file": "92-south-park.glb",
+    "anchor": [
+      -122.3941549,
+      37.7819082
+    ],
+    "targetHeightM": 13.28,
+    "cat": 2,
+    "name": "92 South Park (86-96 South Park)",
+    "estimated": false,
+    "dims": [
+      31.8607,
+      32.0512,
+      13.28
+    ],
+    "tris": 7736,
+    "loadRadius": 2500
+  },
+  {
+    "id": "95-jack-london-alley",
+    "file": "95-jack-london-alley.glb",
+    "anchor": [
+      -122.393443,
+      37.781346
+    ],
+    "targetHeightM": 8.4,
+    "cat": 8,
+    "name": "Gran Oriente Filipino Masonic Temple (95 Jack London Alley)",
+    "estimated": true,
+    "dims": [
+      16.1965,
+      16.0932,
+      8.4
+    ],
+    "tris": 3888,
+    "loadRadius": 2500
+  },
+  {
+    "id": "96-south-park",
+    "file": "96-south-park.glb",
+    "anchor": [
+      -122.3941704,
+      37.7818909
+    ],
+    "targetHeightM": 13.7,
+    "cat": 2,
+    "name": "86\u201396 South Park",
+    "estimated": true,
+    "dims": [
+      31.8092,
+      27.6214,
+      13.7
+    ],
+    "tris": 6312,
+    "loadRadius": 2500
+  },
+  {
+    "id": "300-brannan",
+    "file": "300-brannan.glb",
+    "anchor": [
+      -122.3925543,
+      37.7818313
+    ],
+    "targetHeightM": 25.2,
+    "cat": 3,
+    "name": "300 Brannan Street",
+    "estimated": false,
+    "dims": [
+      47.531,
+      49.2868,
+      25.2
+    ],
+    "tris": 12964,
+    "loadRadius": 2500
+  },
+  {
+    "id": "318-brannan",
+    "file": "318-brannan.glb",
+    "anchor": [
+      -122.3927890,
+      37.7816014
+    ],
+    "targetHeightM": 8.6,
+    "cat": 3,
+    "name": "318 Brannan Street",
+    "estimated": true,
+    "dims": [
+      29.6469,
+      30.1767,
+      8.6
+    ],
+    "tris": 2972,
+    "loadRadius": 2500
+  },
+  {
+    "id": "326-brannan",
+    "file": "326-brannan.glb",
+    "anchor": [
+      -122.3928965,
+      37.781508
+    ],
+    "targetHeightM": 5.9,
+    "cat": 6,
+    "name": "326 Brannan Street (JAX Vineyards)",
+    "estimated": false,
+    "dims": [
+      22.3069,
+      22.3614,
+      5.9
+    ],
+    "tris": 6148,
+    "loadRadius": 2500
+  },
+  {
+    "id": "334-brannan",
+    "file": "334-brannan.glb",
+    "anchor": [
+      -122.3930344,
+      37.7814147
+    ],
+    "targetHeightM": 13.4,
+    "cat": 19,
+    "name": "334 Brannan Street (Sherman and Clay Building)",
+    "estimated": true,
+    "dims": [
+      30.1763,
+      30.6477,
+      13.4
+    ],
+    "tris": 5916,
+    "loadRadius": 2500
+  },
+  {
+    "id": "340-brannan",
+    "file": "340-brannan.glb",
+    "anchor": [
+      -122.3932324,
+      37.7812786
+    ],
+    "targetHeightM": 17.79,
+    "cat": 3,
+    "name": "340 Brannan Street",
+    "estimated": false,
+    "dims": [
+      41.0527,
+      40.6775,
+      17.79
+    ],
+    "tris": 8871,
+    "loadRadius": 2500
   }
 ]

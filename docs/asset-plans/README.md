@@ -62,11 +62,13 @@ route, and the park plans depend on it (§E8 of the parks README).
 | [War Memorial Opera House](./war-memorial-opera-house.md) | `opera-house` | 44 m | new landmark |
 | [Herbst Theatre (War Memorial Veterans Building)](./herbst-theatre.md) | `herbst-theatre` | ~31 m (estimated) | new landmark |
 | [Fairmont San Francisco](./fairmont-san-francisco.md) | `fairmont` | 99 m | new landmark |
+| [334 Brannan Street (Sherman and Clay Building)](./334-brannan.md) | `334-brannan` | 13.4 m (estimated) | new landmark |
 | [350 Brannan Street](./350-brannan.md) | `350-brannan` | 13.85 m | new landmark |
 | [362 Brannan Street](./362-brannan.md) | `362-brannan` | 8.6 m | new landmark |
 | [370 Brannan Street](./370-brannan.md) | `370-brannan` | 7.63 m | new landmark |
 | [358 Brannan Street](./358-brannan.md) | `358-brannan` | 9.6 m (estimated) | new landmark |
 | [380 Brannan Street](./380-brannan.md) | `380-brannan` | 12.6 m | new landmark |
+| [318 Brannan Street](./318-brannan.md) | `318-brannan` | 8.6 m (estimated) | new landmark |
 | [550 Third Street](./550-third.md) | `550-third` | 11 m | new landmark |
 | [551 Third Street (Shell Service Station)](./551-third.md) | `551-third` | 6.6 m | new landmark |
 | [375 Alabama Street (Ames Harris Neville Co.)](./375-alabama.md) | `375-alabama` | 22.5 m | new landmark |
@@ -102,6 +104,7 @@ route, and the park plans depend on it (§E8 of the parks README).
 | [590 Third Street](./590-third.md) | `590-third` | 9.5 m (estimated) | new landmark |
 | [592 Third Street](./592-third.md) | `592-third` | 8.2 m (estimated) | new landmark |
 | [400 Brannan Street](./400-brannan.md) | `400-brannan` | 8.8 m | new landmark |
+| [300 Brannan Street (Blinn Estate Building)](./300-brannan.md) | `300-brannan` | 25.2 m (penthouse crest; 21.34 m parapet) | new landmark |
 | [188 South Park (South Park Lofts)](./188-south-park.md) | `188-south-park` | 15.93 m (LiDAR-derived) | new landmark |
 | [150 South Park](./150-south-park.md) | `150-south-park` | 8.0 m | new landmark |
 | [160 South Park](./160-south-park.md) | `160-south-park` | 9.4 m (LiDAR-derived) | new landmark |
@@ -113,12 +116,27 @@ route, and the park plans depend on it (§E8 of the parks README).
 | [140 South Park](./140-south-park.md) | `140-south-park` | 10.68 m (LiDAR-derived) | new landmark |
 | [126 South Park](./126-south-park.md) | `126-south-park` | 7.6 m (LiDAR-derived) | new landmark |
 | [102 South Park (The Park View)](./102-south-park.md) | `102-south-park` | 14.0 m (estimated) | new landmark |
+| [86–96 South Park (Levy Design Partners, 1996)](./96-south-park.md) | `96-south-park` | 13.7 m (LiDAR-derived maximum) | new landmark |
 | [2 South Park (544 Second Street, Kohler warehouse)](./2-south-park.md) | `2-south-park` | 17.72 m (LiDAR-derived) | new landmark |
+| [27 South Park (centre of the 21–29 warehouse)](./27-south-park.md) | `27-south-park` | 10.2 m (LiDAR-derived) | not shipped — superseded by `21-south-park` |
 | [South Park (64 South Park)](./64-south-park.md) | `64-south-park` | 21.04 m (vertical extent — the asset is terrain-draped; the 15.0 m elm crest is estimated) | new landmark |
+| [35 South Park (Accel)](./35-south-park.md) | `35-south-park` | 13.4 m (penthouse crest, photogrammetric/estimated; parapet 10.4 m) | new landmark |
 | [524 Second Street (522–524)](./524-second.md) | `524-second` | 9.9 m (estimated) | new landmark |
 | [501 Second Street](./501-second.md) | `501-second` | 37.7 m | new landmark |
+| [21–29 South Park](./21-south-park.md) | `21-south-park` | 11.73 m (LiDAR maximum, read as the roof bulkhead; the 10.20 m cornice crest is estimated) | new landmark |
+| [Hotel Madrid (22–24 South Park)](./22-south-park.md) | `22-south-park` | 14.22 m (LiDAR-derived) | new landmark |
+| [26–28 South Park (51 Taber Place)](./26-south-park.md) | `26-south-park` | 9.05 m (LiDAR-derived) | new landmark |
+| [41–43 South Park](./41-south-park.md) | `41-south-park` | 10.6 m (estimated, photogrammetric) | new landmark |
+| [44–46 South Park](./46-south-park.md) | `46-south-park` | 16.15 m (LiDAR-derived) | new landmark |
+| [54–58 South Park](./58-south-park.md) | `58-south-park` | 16.9 m (estimated — LiDAR max; parapet 13.6 m) | new landmark |
+| [76–82 South Park](./76-south-park.md) | `76-south-park` | 16.28 m (LiDAR max, attributed to the roof-stair penthouse — see its 2.15 risk 1; roof deck 13.08 m measured) | new landmark |
+| [84 South Park](./84-south-park.md) | `84-south-park` | 13.2 m (LiDAR-derived, roof pergola crest; parapet 11.5 m) | new landmark |
+| [92 South Park (86–96 South Park)](./92-south-park.md) | `92-south-park` | 13.28 m (LiDAR-derived) | new landmark |
+| [95 Jack London Alley (Gran Oriente Filipino Masonic Temple)](./95-jack-london-alley.md) | `95-jack-london-alley` | 8.4 m (estimated — LiDAR roof deck 7.84 m plus a derived parapet) | new landmark |
+| [326 Brannan Street (JAX Vineyards Wine Court)](./326-brannan.md) | `326-brannan` | 5.9 m (shed parapet; LiDAR deck 5.66 m) | new landmark |
+| [340 Brannan Street](./340-brannan.md) | `340-brannan` | 17.79 m | new landmark |
 
-## Shared contract (all 75)
+## Shared contract (all 93)
 
 - Style: `docs/styles/miniature-toy.md` (authoritative for artistic decisions)
 - Technical contract: `.agents/skills/sf-asset-check/SKILL.md` (authoritative for the GLB)

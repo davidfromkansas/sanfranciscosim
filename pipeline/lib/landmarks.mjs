@@ -340,6 +340,46 @@ export const LANDMARKS = [
     exclude: 7,
     camera: { distance: 190, yaw: 315, pitch: 26 },
   },
+  // 326 Brannan (JAX Vineyards Wine Court) — the NARROWEST exclusion window in
+  // this registry, 1.04 m wide, and the reason is geometric rather than sloppy.
+  // The parcel is a 7.98 x 24.32 m infill slot carrying TWO DataSF footprints
+  // and BOTH have to go: the 5.66 m shed block would z-fight the modelled shed
+  // and the court block would stand inside the modelled garden. Measured
+  // against the pipeline's OWN cleaned rings (simplifyRing 0.6 m + ringCentroid,
+  // i.e. the metric excluded() actually uses), from this anchor:
+  //
+  //   own court  201006.0135574 (95.2 m2) centroid 4.57 m  nearest vertex 3.54 m
+  //   own shed   201006.0157667 (61.6 m2) centroid 6.80 m  nearest vertex 3.54 m
+  //   NEIGHBOUR  201006.0007711 = 334 Brannan (462 m2, h 12.14 m):
+  //                                         centroid 14.10 m nearest vertex 4.58 m
+  //   neighbour  201006.0008516 = 318 Brannan (429 m2, h  8.11 m):        12.22 m
+  //
+  //   exclude 3.0-3.5 m -> drops 0  (asset stays buried under the baked blocks)
+  //   exclude 3.9-4.5 m -> drops 2  (correct: both SF3775012 polygons)
+  //   exclude 4.6 m+    -> drops 3  (eats 334 Brannan, holes the block face)
+  //
+  // The vertex that closes the window, local (3920.45, -1271.10), is PHYSICALLY
+  // SHARED: it belongs to 334 Brannan's ring AND to both of 326's rings — the
+  // party-wall corner, which the DataSF traces agree on exactly. No re-tracing
+  // buys margin. Moving the anchor does not either: a numeric search finds a
+  // 6.88 m window 4.60 m away, and displacing a 24 m lot by 4.6 m to buy
+  // exclusion margin is what AGENTS rule 5 forbids.
+  //
+  // No Overture twin can appear on either parcel to spoil this: the Overture
+  // gap-fill in buildings.mjs only ADDS a footprint where
+  // occupiedFraction(bbox) <= 0.25, and DataSF already occupies both bboxes; its
+  // height-correction branch is gated on h >= 20 m, far above either building.
+  //
+  // 4 is the midpoint, with 0.46 m of margin at each end. Do NOT raise it.
+  {
+    id: '326Brannan',
+    name: '326 Brannan Street',
+    lon: -122.3928965,
+    lat: 37.7815080,
+    height: 5.9,
+    exclude: 4,
+    camera: { distance: 120, yaw: 45, pitch: 34 },
+  },
   {
     id: '380Brannan',
     name: '380 Brannan Street',
@@ -373,6 +413,39 @@ export const LANDMARKS = [
     height: 13.85,
     exclude: 8,
     camera: { distance: 230, yaw: 80, pitch: 26 },
+  },
+  // The Blinn Estate Building (1912) at the east corner of 2nd and Brannan — six
+  // storeys, 70 ft to the parapet, full-lot. The widest exclusion window in this
+  // family, because the building fills its lot and its nearest neighbour is a
+  // street away. Measured against the real bake inputs (both buildings_datasf and
+  // overture_buildings, which each trace this footprint):
+  //
+  //   target: DataSF SF3775008 (1,140 m2, h 20.84) centroid 1.09 m, vertices 20.13 m
+  //           Overture twin    (1,123 m2, h 21)    centroid 1.27 m, vertices 22.84 m
+  //   nearest NEIGHBOUR: SF3775181 (1,353 m2, h 17.77) nearest vertex 21.42 m
+  //
+  //   exclude  2-21 m -> drops 2 rings  (correct: the target and its Overture twin)
+  //   exclude 22 m    -> drops 3  (eats SF3775181 on its nearest vertex)
+  //   exclude 24 m    -> drops 5
+  //
+  // TWO rings is the correct answer, not one — DataSF and Overture both carry this
+  // building. 12 m is the middle of the safe band: 11 m of headroom under the
+  // neighbour and ~11 m over the centroids that actually do the catching. Do not
+  // raise past 20 without re-running the measurement.
+  {
+    id: '300Brannan',
+    name: '300 Brannan Street',
+    lon: -122.3925543,
+    lat: 37.7818313,
+    height: 25.2,
+    exclude: 12,
+    // camera.yaw is 180 - true bearing (camera.js apply() puts the eye at
+    // pivot + (sin yaw, sin pitch, cos yaw)*distance with +z south). The view
+    // this building wants is straight down the cant's outward normal, 95.1 deg
+    // true, which is also the bisector of the two frontage normals — so
+    // 180 - 95.1 = 85. yaw 95 would be the mirror image and stare at the party
+    // wall. Verified from a rendered frame, not from the arithmetic.
+    camera: { distance: 260, yaw: 85, pitch: 26 },
   },
   {
     // Through lot with party walls on both long sides, so the exclusion window
@@ -1722,6 +1795,72 @@ export const LANDMARKS = [
     camera: { distance: 200, yaw: 90, pitch: 26 },
   },
   {
+    // 86-96 South Park: Toby S. Levy's 1996 six-unit live/work condominium, and
+    // the only Modernist building on the oval. ONE surveyed 435 m2 corner parcel
+    // (block 3775, lots 116-121 -- six condominium lots on one polygon) carrying
+    // TWO baked footprints: the 208.7 m2 front block on South Park and the
+    // 81.0 m2 rear bar down Jack London Alley, with an open paved court between
+    // them. "92 South Park" is one of six unit addresses on it, all five of the
+    // others created by a single 2003 address-assignment permit against 86.
+    //
+    // The exclusion window is 5.04 < r < 10.77 and BOTH ends are set by CENTROID
+    // tests rather than vertices, which is unusual -- excluded() drops a
+    // footprint when its centroid OR any ring vertex is inside the radius, and
+    // sizing this one off vertices alone gives the wrong answer at both ends.
+    // Measured from THIS anchor (the shipped GLB's bbox centre, 1.06 m from the
+    // footprints' OBB centre) against the two files the bake actually reads
+    // (pipeline/data/buildings_datasf.geojson and
+    // overture_buildings.geojsonseq), after simplifyRing(0.6):
+    //
+    //       polygon                              centroid   vertex
+    //       own front block   (DataSF)             6.02 m    0.64 m
+    //       own twin 552799e9 (Overture, h 10.8)   6.06 m    2.27 m
+    //       own rear bar      (DataSF)            10.16 m    4.18 m
+    //       own twin ea748f47 (Overture, 4 flr)    5.04 m   12.36 m   <- floor
+    //       84 South Park     (Overture, h 11)    10.77 m   13.56 m   <- ceiling
+    //       84 South Park     (DataSF)            10.94 m   13.66 m
+    //       76-82 South Park  (DataSF)            17.96 m   14.73 m
+    //
+    // So r must EXCEED 5.04 -- below that the Overture gap-fill re-adds OSM way
+    // 113545691 straight through the asset. That way carries no `height` tag at
+    // all, but overtureHeight() falls through to num_floors * 3.2 + 1 = 13.8 m,
+    // and addBuilding() returns null on exclusion so markOccupied() never runs
+    // and occupiedFraction() cannot block it. And r must stay UNDER 10.77, or
+    // 84 South Park disappears and leaves a hole where a real building stands
+    // (AGENTS rules 3 and 5): the two buildings share a party wall, so 84's
+    // centroids sit CLOSER to this anchor than its own nearest vertices do.
+    // 7.8 sits in the middle with 2.76 m below and 2.97 m of margin above, both
+    // far larger than the bake's 0.6 m SIMPLIFY_TOLERANCE.
+    //
+    // VERIFIED AGAINST THE BAKE, not just against the source files: cell 23_13
+    // goes 201 -> 199 and drops exactly these two footprints and nothing else.
+    // Their baked ring centroids sit 1.61 m and 9.79 m from this anchor -- the
+    // bake's own simplifyRing/orientRing pass moves an area-weighted centroid on
+    // a strongly notched ring by a few metres, so the source-file numbers above
+    // are the SIZING method, and these are the proof. The nearest surviving
+    // neighbour in the baked cell is 84 South Park at 12.82 m, which leaves 5.0 m
+    // of real margin above 7.8 rather than the 2.97 m the source files predicted.
+    // Nothing was gap-filled back in.
+    //
+    // No clearTrees: the street trees on the South Park frontage are real, they
+    // are in every photograph of this building from 1996 to 2025, and at 7.8 m
+    // the radius does not reach the kerb line.
+    // See docs/asset-plans/92-south-park.md 2.13 and
+    // artifacts/92-south-park/REFERENCE.md 7.
+    id: '92SouthPark',
+    name: '92 South Park (86-96 South Park)',
+    lon: -122.3941549,
+    lat: 37.7819082,
+    height: 13.28,
+    exclude: 7.8,
+    // Camera bearing = 180 - yaw (camera.js apply(): the offset is
+    // (sin yaw, ., cos yaw) and +z is south), so yaw 45 stands the camera at
+    // bearing 135 = SE, square onto the South Park front and looking straight
+    // at the corner tower. Same value as 132SouthPark, whose front faces the
+    // same way.
+    camera: { distance: 200, yaw: 45, pitch: 26 },
+  },
+  {
     // A 0.86-acre PARK, not a building — the second such entry after
     // civicCenterPlaza, and the first where the buildings job has nothing to do
     // at all.
@@ -1778,6 +1917,71 @@ export const LANDMARKS = [
     // three-quarter that shows the whole thing; the axis is the composition.
     // Verified by render, not derived on paper (the 592Third lesson).
     camera: { distance: 400, yaw: 315, pitch: 24 },
+  },
+  {
+    // 21-29 South Park, the 1919 unreinforced-brick warehouse closing the
+    // south-east side of the oval at its Second Street end. Two storeys of
+    // painted brick to a 9.50 m deck, a corbelled cornice at 10.20 m and a
+    // stair/lift bulkhead at 11.73 m (the LiDAR maximum, and the asset's crest).
+    // Office since 1991; Redpoint Ventures took the ground floor in 2016.
+    //
+    // The one landmark on this oval whose STREET WALL BENDS: 19.69 m facing
+    // NW 315.7 deg, a re-entrant corner, then 12.07 m facing WNW 286.7 deg,
+    // because the lot fronts the curve of the oval where it closes. Party walls
+    // on the other three sides (17-19 South Park NE, the Brannan row SE,
+    // 35 South Park SW), so only the bent front is exposed.
+    //
+    // ANCHOR NOTE — this entry does NOT use the footprint's OBB centre, and that
+    // is deliberate, not an oversight to be tidied later. The footprint is a
+    // skewed quadrilateral (its front is cut on a 29 deg diagonal), so its OBB
+    // centre and its WORLD-AXIS-ALIGNED bbox centre are 2.63 m apart.
+    // placeGeneric() seats the MODEL'S ORIGIN at the anchor and the contract
+    // makes that origin the model's XY bbox centre, so anchoring on the OBB
+    // centre would put the building 2.63 m west of its real footprint (AGENTS
+    // rule 5). The value below is the AABB centre; the area centroid is 1.63 m
+    // away and the OBB centre 2.63 m.
+    //
+    // excluded() in buildings.mjs drops a footprint when its centroid OR any
+    // ring vertex falls inside the radius. Measured from THIS anchor against the
+    // real committed bake inputs, after projection and simplifyRing(0.6):
+    //
+    //    1.68 m  own DataSF footprint SF3775042 (1115 m2), via CENTROID
+    //            -> the floor when only DataSF is in play
+    //    4.74 m  Overture db50f6d6 (= OSM way 112759868, "27"), via centroid
+    //    7.93 m  Overture 11e21079 (= OSM way 112759863, "21"), via centroid
+    //   14.60 m  Overture 428ebb71 (= OSM way 112759865, "29"), via centroid
+    //            -> the FLOOR, because OSM/Overture trace this ONE building as
+    //               THREE, and the third piece's centroid is 14.6 m out
+    //   17.29 m  Overture b59deafe (17-19 South Park), nearest VERTEX
+    //            -> the CEILING, and the binding constraint
+    //   18.79 m  DataSF SF3775046 (the same neighbour), nearest vertex
+    //   19.58 m  Overture be4a983e / b57e2786 (318 / 326 Brannan), nearest vertex
+    //   20.78 m  DataSF SF3775100, nearest vertex
+    //
+    // Safe window (14.60, 17.29) m and 16 is its midpoint: 1.40 m clear of the
+    // floor, 1.29 m clear of the ceiling. It is a narrow window and it is narrow
+    // for a specific reason — Overture's three-way split of one surveyed
+    // building. In practice Overture is gap-fill only (occupiedFraction > 0.25
+    // skips it) and DataSF covers this parcel, so the floor is really 1.68 m;
+    // 16 is chosen to be correct either way. Do NOT raise past 17 — at 17.29
+    // this starts deleting 17-19 South Park, which has no GLB to replace it.
+    //
+    // No clearTrees: this is a paved party-wall block with no landcover inside
+    // the footprint. The crape myrtles in front are street trees in the road
+    // reserve, outside the exclusion's job.
+    id: '21SouthPark',
+    name: '21-29 South Park',
+    lon: -122.3931063,
+    lat: 37.7817676,
+    height: 11.73,
+    exclude: 16,
+    // App yaw = 180 - the compass bearing the camera stands at. The two front
+    // planes face 315.7 and 286.7 deg and every other side is a party wall, so
+    // the only informative eye is out over the park: bearing 300 -> yaw 240.
+    // That splits the two planes, so the bend reads as a bend and both ranks of
+    // openings stay open. Standing square on either normal collapses the other
+    // plane and the bend with it. Verified by render (the 592Third lesson).
+    camera: { distance: 170, yaw: 240, pitch: 26 },
   },
   {
     // 522-524 Second Street, the 1923 brick warehouse on the Taber Place corner.
@@ -1842,6 +2046,524 @@ export const LANDMARKS = [
     // the camera due WEST — the bisector of the Second Street elevation
     // (225.4 deg) and the Bryant Street elevation (315.4 deg).
     camera: { distance: 420, yaw: 270, pitch: 26 },
+  },
+  {
+    // 22-24 South Park, the Hotel Madrid: a 1915 residential hotel (built as the
+    // Eimoto Hotel) run by Mission Housing since 1987, and the third building in
+    // the South Park Scattered Sites rehabilitation with 102SouthPark and
+    // 106SouthPark.
+    //
+    // This lon/lat is the surveyed parcel's AREA CENTROID and deliberately
+    // differs from the manifest anchor (-122.3936099, 37.7823247), which is the
+    // model's bbox centre 4.8 m away. The lot is a trapezoid, so those two points
+    // are not the same, and only the area centroid works as an exclusion centre:
+    // measured from the bbox centre the safe band is EMPTY, because 10 South
+    // Park's Overture ring comes within 5.20 m while this building's own Overture
+    // ring is still 5.23 m out. Nothing downstream cares — LANDMARKS lon/lat
+    // drives only the camera pivot and the search result position.
+    //
+    // exclude: 4.5 is the middle of a (2.21, 6.90) m band measured against BOTH
+    // bake inputs with excluded()'s real test (centroid OR any ring vertex).
+    // Floor = this building's own Overture ring at 2.21 m, not its DataSF one at
+    // 0.63: addBuilding() returns null on exclusion so markOccupied() never runs,
+    // and a smaller radius lets the Overture gap-fill re-add the building on top
+    // of the asset. Ceiling = 26-28 South Park's DataSF ring at 6.90 m.
+    // Expect the re-bake to drop exactly two rings, both this building's.
+    id: '22SouthPark',
+    name: 'Hotel Madrid (22-24 South Park)',
+    lon: -122.3936498,
+    lat: 37.7822952,
+    height: 14.22,
+    exclude: 4.5,
+    // camera.yaw is 180 - the compass bearing the camera stands at (the offset is
+    // (sin yaw, ., cos yaw) and this project's +z is SOUTH). The street frontage
+    // is a 31 deg arc whose chord normal is 159.4 deg, so yaw 21 stands the
+    // camera south-south-east of the building, out over the oval, looking back at
+    // the curved facade and the cornice.
+    camera: { distance: 190, yaw: 21, pitch: 26 },
+  },
+  {
+    // 26-28 South Park (51 Taber Place): a 1907 two-storey through-lot sliver,
+    // 6.69 m of frontage against 30.13 m of depth, and the low notch between the
+    // Hotel Madrid and 44-46 South Park.
+    //
+    // height 9.05 is the LiDAR MEDIAN deck (8.35 m) plus a conventional parapet,
+    // NOT the 13.59 m LiDAR maximum: that maximum matches 44-46 South Park's own
+    // roof-plane median (13.52 m) to 7 cm on a 7.65 m-wide raster footprint
+    // dilated into both taller party walls. See artifacts/26-south-park/REPORT.md.
+    //
+    // exclude: 3.4 is the middle of a (2.20, 4.60) m band — the tightest in the
+    // South Park set — measured against both bake inputs. Floor = this building's
+    // own Overture ring; ceiling = 44-46 South Park's nearest DataSF vertex, with
+    // only 1.2 m of margin, so re-check the drop list against origin/main's
+    // registry after any merge that lands 46SouthPark.
+    id: '26SouthPark',
+    name: '26-28 South Park',
+    lon: -122.3937438,
+    lat: 37.7822369,
+    height: 9.05,
+    exclude: 3.4,
+    // Front faces 135.2 deg, so yaw 45 stands the camera south-east, over the
+    // oval. Closer and flatter than its neighbour: the recognition here is the
+    // 4.5:1 slot proportion and the step against both neighbours, which a high
+    // pitch flattens away.
+    camera: { distance: 165, yaw: 45, pitch: 24 },
+  },
+  {
+    // 35 South Park — Accel's San Francisco office. A 1920 industrial building
+    // on the NE arc of the oval (block/lot 3775/102), wearing the grandest street
+    // elevation on the park: five giant round-arched bays in pale ashlar under a
+    // rope-enriched architrave, a lettered frieze and a tall blank parapet. A
+    // 2020-23 ground-up renovation (permits 202008222419 and its 2023 roof-trellis
+    // submittal) added a set-back penthouse and a clipped hedge running the whole
+    // front parapet — the two things the app's downward camera reads first.
+    //
+    // height is the PENTHOUSE crest, and it is estimated: the DataSF LiDAR is a
+    // 2010 product and predates the penthouse entirely (its max is 12.44 m). 13.4 m
+    // is photogrammetric from two Jan 2025 Street View captures, +-0.7 m, the
+    // largest error term being the penthouse's setback. The front parapet is
+    // 10.4 m. See artifacts/35-south-park/REFERENCE.md section 2.
+    //
+    // excluded() drops a footprint when its centroid OR any ring vertex falls
+    // inside the radius. Measured from this anchor against the actual bake input
+    // (DataSF footprints primary, Overture/OSM gap-fill):
+    //
+    //    0.42 m  this building's own OSM ring (way 112759864), via CENTROID
+    //    1.36 m  this building's own DataSF footprint (SF3775102), via centroid
+    //   10.68 m  nearest neighbour VERTEX — 41-43 South Park (SF3775040), the
+    //            party-wall Victorian on the SW. This is the binding constraint.
+    //   12.87 m  the same neighbour via OSM (way 112759867)
+    //   15.51 m  the rear neighbour (SF3775015)
+    //   24.73 m  27 South Park (way 112759868), across the 7.34 m NE gap
+    //
+    // Safe window is therefore (1.4, 10.68) m and 6 sits in the middle of it with
+    // 4.6 m of margin on each side — the most comfortable window in the South Park
+    // set, unlike 135SouthPark's 1.5 m one. Do NOT raise past 10: at 10.68 this
+    // starts deleting the party-wall Victorian, which has no GLB to replace it.
+    //
+    // No clearTrees: this is a building, and the oval's scatter is already handled
+    // by 64SouthPark's 80 m zone.
+    id: '35SouthPark',
+    name: 'Accel (35 South Park)',
+    lon: -122.3933378,
+    lat: 37.7815714,
+    height: 13.4,
+    exclude: 6,
+    // App yaw = 180 - the true bearing the camera stands at. The arcade faces
+    // 315.9 deg (NW) across the street into the park, so the camera has to stand
+    // to the NW: bearing 315 -> yaw 225, square onto the one elevation that
+    // carries the design. Verified against the -aerial render, not derived on
+    // paper (the 592Third lesson).
+    camera: { distance: 130, yaw: 225, pitch: 24 },
+  },
+  {
+    // 1911 Edwardian two-flat on the north-east rim of the South Park oval,
+    // 7.3 m of frontage against 24 m of depth. Party walls on both sides, so
+    // this is one of the tightest exclusion zones in the registry and the
+    // radius is MEASURED against the committed bake input, not guessed.
+    //
+    // `excluded()` in pipeline/buildings.mjs drops a footprint when its
+    // centroid OR any ring vertex falls inside the circle, and the bake reads
+    // DataSF first then gap-fills from Overture. Both datasets trace this
+    // building, so a correct radius drops TWO rings, not one. Measured from
+    // this lon/lat against pipeline/data/buildings_datasf.geojson and
+    // pipeline/data/overture_buildings.geojsonseq:
+    //
+    //    0.57 m  DataSF SF3775040 centroid   — ours, must go
+    //    1.83 m  Overture 177 m2 centroid    — ours, must go
+    //    3.73 m  DataSF SF3775039 vertex     — 45-49 South Park, must survive
+    //    8.71 m  Overture 272 m2             — 45-49 South Park
+    //   11.08 m  Overture 791 m2             — 35 South Park
+    //   12.12 m  DataSF SF3775102            — 35 South Park
+    //
+    // Safe window (1.83, 3.73) m; 2.8 sits in it with 0.97 m of margin below
+    // and 0.93 m above. That window is nearly five times wider than the one at
+    // the manifest anchor (2.74, 3.16), which is why this lon/lat is offset
+    // 1.50 m from it — these are independent fields, and app/src/assets.js
+    // places the GLB from the MANIFEST anchor alone. The 1.5 m offset also
+    // moves the search/camera target, which is negligible on a 7 m building
+    // flown to from 150 m.
+    //
+    // No clearTrees: the street tree in front of this house is real and the
+    // oval's furniture sits inside the park, outside the lot.
+    id: '41SouthPark',
+    name: '41-43 South Park',
+    lon: -122.3934867,
+    lat: 37.7815158,
+    height: 10.6,
+    exclude: 2.8,
+    // camera.js puts the eye at target + distance*(sin yaw, ., cos yaw) with +x
+    // east and +z south, so camera bearing = 180 - yaw; the 315.22 deg facade
+    // wants yaw 225, standing north-west out over the park, square onto the two
+    // bays. 150 m suits a 10.6 m building (cf. 165-167 at 160 for 9.0 m,
+    // 160 South Park at 155 for 9.4 m, 135 South Park at 150 for 8.5 m).
+    camera: { distance: 150, yaw: 225, pitch: 26 },
+  },
+  {
+    // 44-46 South Park, the 2008 four-level glass-fronted infill house on the
+    // north-west rim of the oval. Twentieth South Park building in the manifest.
+    // 46 is the ground-floor commercial unit, 44 the flats above.
+    //
+    // Exclusion sized against the REAL bake input, by nearest ring VERTEX as
+    // well as centroid — excluded() in buildings.mjs fires on either, and the
+    // bake reads buildings_datasf.geojson FIRST and gap-fills from
+    // overture_buildings.geojsonseq. addBuilding() returns null on exclusion so
+    // markOccupied() never runs, which means the Overture twin of an excluded
+    // DataSF footprint is re-attempted and has to be caught by the same circle.
+    // Measured from this anchor:
+    //
+    //    0.26 m  this building's DataSF footprint SF3775217, via its centroid
+    //    1.42 m  this building's Overture/OSM way 124884347 (h=14), via its
+    //            centroid -> the FLOOR: below this the procedural twin survives
+    //    4.95 m  26-28 South Park, DataSF SF3775049 (h=8.35), nearest ring
+    //            VERTEX -> the CEILING, and a vertex it SHARES with this
+    //            building's ring (party wall)
+    //    8.79 m  22-24 South Park rear wing, Overture (h=7.7), centroid
+    //    9.26 m  54-58 South Park, DataSF SF3775219 (h=13.5), centroid
+    //    9.36 m  54-58 South Park, Overture (h=14), centroid
+    //   13.53 m  22-24 South Park, Overture (h=12), nearest vertex
+    //   14.50 m  22-24 South Park, DataSF SF3775048, nearest vertex
+    //
+    // Safe window (1.42, 4.95) m. 3 sits with 1.58 m of margin below and 1.95 m
+    // above. excluded() fires on BOTH rings, but the observable cell-count delta
+    // is -1, not -2: before this entry existed the DataSF ring was added and
+    // markOccupied() ran, so the Overture twin was already being rejected as a
+    // duplicate. Now the DataSF ring is excluded, markOccupied() never runs, and
+    // the twin is re-attempted — and caught by the same circle. Measured:
+    // verify-rebake.mjs reports cell 23_13 moving 201 -> 200 and nothing else in
+    // the city; anything other than -1 there means something is wrong.
+    // Do NOT raise past 4.5: at 4.95 this starts deleting 26-28 South Park and
+    // leaves a hole two doors up the street wall. No clearTrees — at 3 m it
+    // clears nothing, which is right, because the street tree in front of the
+    // south-west end belongs to the park's rim planting.
+    id: '46SouthPark',
+    name: '44-46 South Park',
+    lon: -122.3938219,
+    lat: 37.7821864,
+    height: 16.15,
+    exclude: 3,
+    // Camera offset is (sin yaw, ., cos yaw) with +z south, so app yaw =
+    // 180 - true bearing. This building's one public face looks 135.2 deg, so
+    // yaw 45 stands the camera south-east over the park, looking north-west at
+    // the glazed front. It is the only view of this building worth flying to.
+    camera: { distance: 130, yaw: 45, pitch: 24 },
+  },
+  {
+    // 54-58 South Park: a 2009 four-storey mixed-use infill on the north-west
+    // rim of the oval, holding three condominium lots (3775/219 = 58, the
+    // ground-floor commercial condo; /220 = 56; /221 = 54, the penthouse). It
+    // replaced a two-storey office demolished in 2005 and was built as one half
+    // of a pair with 44-46 South Park next door under the same permit set.
+    // Nine and a half metres of frontage, thirty metres deep, party walls on
+    // BOTH flanks. Height 16.9 m is the roof-office crest; the main parapet is
+    // 13.6 m (see docs/asset-plans/58-south-park.md 2.1 and the height caveat
+    // in artifacts/58-south-park/REFERENCE.md).
+    //
+    // Exclusion sized against BOTH files the bake actually reads
+    // (pipeline/data/buildings_datasf.geojson and overture_buildings.geojsonseq,
+    // 17 Aug 2026), remembering that excluded() fires on a footprint's CENTROID
+    // or ANY ring vertex, whichever is closer:
+    //
+    //   ring                                    vertex   centroid   trigger
+    //   this building, Overture 9c9ab1d7        13.31 m    1.31 m     1.31 m
+    //   this building, DataSF SF3775219         14.13 m    2.26 m     2.26 m  <- the floor
+    //   70 South Park, Overture 7c04d454        13.36 m    7.75 m     7.75 m  <- the ceiling
+    //   44-46 South Park, DataSF SF3775217      14.03 m    9.33 m     9.33 m
+    //   70 South Park, DataSF SF3775053         13.68 m   10.37 m    10.37 m
+    //   44-46 South Park, Overture 71b35ab5     13.31 m   11.57 m    11.57 m
+    //
+    // TWO rings are this building — DataSF and Overture both trace it — and both
+    // have to go, or the survivor bakes a procedural block straight through the
+    // asset. So the safe window is (2.26, 7.75) and 5 sits dead centre with
+    // 2.74 m below and 2.75 m above. Do NOT raise past 7.7: at 7.75 this starts
+    // deleting 70 South Park and leaving a hole in a continuous street wall
+    // (AGENTS rule 5).
+    //
+    // Note why the window is so much wider than 106 South Park's (2.1) despite
+    // the same party-wall geometry: every ring here is caught by its CENTROID,
+    // not by a vertex. The shared party-wall edges are 30 m long, so their
+    // endpoints sit ~13-14 m from this anchor and the vertex test never fires
+    // inside the useful range. Both flanks are exact party walls all the same —
+    // the neighbours' parcels share these edges vertex-for-vertex.
+    //
+    // No clearTrees: the two mature street trees in front of this building are
+    // real, they are what makes the January 2025 pano useless above the ground
+    // floor, and at 5 m this radius clears no street furniture anyway.
+    id: '58SouthPark',
+    name: '54-58 South Park',
+    lon: -122.3938881,
+    lat: 37.7821223,
+    height: 16.9,
+    exclude: 5,
+    // app/src/camera.js places the rig at (sin(yaw), sin(pitch), cos(yaw)) x
+    // distance from the pivot, and this project's +z is SOUTH, so yaw 45 puts
+    // the camera south-east of the building — over the oval, looking north-west
+    // at the South Park front (135.2 deg), which is the only elevation of it
+    // worth flying to. Same value as 106 South Park on the same rim.
+    camera: { distance: 150, yaw: 45, pitch: 26 },
+  },
+  {
+    // A 1906 post-earthquake flats building on the NORTH-WEST rim of the South
+    // Park oval, party-walled to 70 South Park on the north-east and 84 on the
+    // south-west. 6.90 x 29.70 m — more than four times deeper than it is wide.
+    //
+    // `height` is the MEASURED ROOF DECK (DataSF LiDAR median over 763 cells),
+    // not the manifest's `targetHeightM` of 16.28. The manifest number
+    // normalizes the asset's tallest geometry, which is the roof-stair
+    // penthouse; this number is what a search or concierge card should say the
+    // building is. Same deliberate split as `64SouthPark` (15.0 here against
+    // 21.0415 in the manifest).
+    //
+    // MEASURED ON THE SIMPLIFIED RING. `addBuilding()` in buildings.mjs runs
+    // `simplifyRing(ring, 0.6)` BEFORE it calls `excluded()`, and on this site
+    // that matters in both directions: it pushes 84 South Park's nearest vertex
+    // out from 3.64 m to 3.97 m and pulls this footprint's own OSM centroid in
+    // from 1.92 m to 1.83 m. Distances from the anchor below, against the
+    // simplified rings the gate actually sees:
+    //
+    //   0.18 m  this footprint's centroid (DataSF SF3775054) — always caught
+    //   1.83 m  this footprint's centroid (OSM way/124884340) — the real FLOOR,
+    //           because the Overture gap-fill re-adds it if the radius misses
+    //   3.97 m  84 South Park nearest vertex (DataSF SF3775055) — the CEILING
+    //   5.52 m  84 South Park nearest vertex (OSM way/113545687)
+    //   7.20 m  70 South Park centroid (DataSF SF3775053)
+    //   7.34 m  70 South Park centroid (OSM way/124884345)
+    //
+    // The bake reads DataSF first and gap-fills from Overture (OSM geometry),
+    // so both rows bind. Safe window (1.83, 3.97); 2.9 sits dead centre with
+    // 1.07 m either side. Do not raise past 3.5 without re-running audit.mjs
+    // check 1.6 — beyond 3.97 it starts eating 84 South Park, which is a real
+    // standing building.
+    //
+    // No `clearTrees`: the street trees in front of this building are real and
+    // are in every photograph of it.
+    id: '76SouthPark',
+    name: '76-82 South Park',
+    lon: -122.3940170,
+    lat: 37.7820261,
+    height: 13.08,
+    exclude: 2.9,
+    // camera.js sets position = pivot + distance * (sin yaw, sin pitch, cos yaw)
+    // with +x east and +z SOUTH, so yaw 45 stands the camera south-east —
+    // square onto the 135 deg South Park front, which is the only elevation of
+    // this building worth flying to. 130 m rather than the ~90 m its height
+    // suggests, because the building is 29.70 m long and needs the room.
+    camera: { distance: 130, yaw: 45, pitch: 26 },
+  },
+  {
+    // A 6.99 x 30.07 m sliver on the north-west rim of the South Park oval —
+    // the thinnest lot in this set, thinner than 106SouthPark four doors along.
+    // 1907, raised 2 -> 3 storeys by a 1992-94 vertical addition; the
+    // bounding-box top is the roof-deck pergola at 13.20 m, not the 11.50 m
+    // parapet. See docs/asset-plans/84-south-park.md 2.13.
+    //
+    // THE lon/lat BELOW IS NOT THE MANIFEST ANCHOR, deliberately. Placement uses
+    // the DataSF parcel centroid (-122.3940683, 37.7819798); this circle is
+    // centred 0.84 m away, on bearing 344 deg. The reason is that TWO rings have
+    // to be dropped here — the DataSF footprint and the Overture/OSM trace of the
+    // same building sit 2.7 m apart, because OSM traces the whole lot depth while
+    // the LiDAR footprint stops at the rear wing's open terrace — while both party
+    // walls have neighbour vertices under 4 m out. Measured with the metric
+    // excluded() uses (centroid OR any ring vertex inside the circle):
+    //
+    //   registry point                own rings gone by   nearest neighbour   window
+    //   manifest anchor (parcel)              2.00 m            3.43 m        1.43 m
+    //   DataSF LiDAR area centroid            2.66 m            3.70 m        1.04 m
+    //   OSM OBB centre                        2.67 m            3.27 m        0.60 m
+    //   THIS POINT                            1.48 m            3.73 m        2.25 m
+    //
+    // Full trigger table from this point:
+    //   1.47 m  this building, OSM way/113545687 (Overture proxy)  <- must go
+    //   1.48 m  this building, DataSF SF3775055                    <- must go
+    //   3.73 m  86-96 South Park  (SF3775116 / 201006.0022147)     <- must survive
+    //   3.86 m  76-82 South Park  (SF3775054 / 201006.0026693)     <- must survive
+    //   4.36 m  OSM way/113545685, untagged, on the 86-96 lot      <- must survive
+    //   4.89 m  76-82 South Park, OSM way/124884340                <- must survive
+    //
+    // exclude: 2.6 sits in the middle of (1.48, 3.73) with 1.12 m of margin below
+    // and 1.13 m above — the widest band available anywhere near this building and
+    // more than double what the manifest anchor would give.
+    //
+    // The lot's own 16 m2 rear structure (201006.0168103) triggers at ~14 m and
+    // therefore SURVIVES the bake, which is correct: it is a real outbuilding and
+    // the asset models its own version of it. If QA shows a doubled rear volume,
+    // the fix is to model it OUT of the GLB, not to widen this radius past 3.73
+    // and delete a neighbour (AGENTS rule 5).
+    //
+    // No clearTrees: the large street tree in front of this building is real and
+    // is in every photograph of it; at 2.6 m the radius clears no street furniture
+    // in any case.
+    id: '84SouthPark',
+    name: '84 South Park',
+    lon: -122.3940709,
+    lat: 37.7819871,
+    height: 13.2,
+    exclude: 2.6,
+    // app/src/camera.js places the rig at (sin(yaw), sin(pitch), cos(yaw)) x
+    // distance from the pivot, and this project's +z is SOUTH, so yaw 45 puts the
+    // camera south-east of the building — over the oval, looking north-west at the
+    // street elevation, which is the only view of it worth flying to. Same
+    // convention as 106SouthPark.
+    camera: { distance: 150, yaw: 45, pitch: 26 },
+  },
+  {
+    // Gran Oriente Filipino Masonic Temple, 1951 — the third building of the
+    // Gran Oriente complex, after 106SouthPark. The anchor is the DataSF LiDAR
+    // area centroid and NOT the OSM one: OSM way/71211338 traces this building
+    // 6.6 m too deep at the rear (DataSF assigns that strip to 41-43 South
+    // Park, and Bing z20 shows a tree in a yard there), so its centroid sits
+    // 2.64 m too far north-east. That 2.64 m is the whole ballgame here.
+    //
+    // Measured from THIS point the exclusion window is (2.64, 7.07) m:
+    //   this building, DataSF 201006.0108499   triggers at 0.05 m (centroid)
+    //   this building, OSM/Overture trace      triggers at 2.64 m (centroid)
+    //   45-49 South Park, DataSF 201006.0014671        7.07 m (ring vertex)
+    //   41-43 South Park, DataSF 201006.0038546        7.10 m (ring vertex)
+    //   the warehouse SE, DataSF 201006.0003676        7.83 m (ring vertex)
+    // 4.8 leaves 2.16 m of margin below and 2.27 m above, and must drop TWO
+    // footprints, not one — DataSF traces this building and so does Overture,
+    // and an excluded DataSF ring never calls markOccupied(), so the Overture
+    // gap-fill would re-add it.
+    //
+    // Measured from the OSM centroid instead the window collapses to
+    // (2.60, 4.47), because OSM's own trace SHARES two ring vertices with
+    // 41-43 South Park at 5.41 m. Moving the anchor onto the real footprint
+    // centre was the fix, not a bigger radius.
+    id: '95JackLondonAlley',
+    name: 'Gran Oriente Filipino Masonic Temple (95 Jack London Alley)',
+    lon: -122.393443,
+    lat: 37.781346,
+    height: 8.4,
+    exclude: 4.8,
+    // Camera offset is (sin yaw, ., cos yaw) with +z south, so the convention
+    // that stands the camera in front of a facade of bearing B is yaw = 180-B.
+    // The alley elevation faces 225.9 deg, giving yaw 314 — south-west of the
+    // building, over Jack London Alley, looking north-east at the one doorway
+    // this building exists for. 120 m is deliberately close: an 8.4 m building
+    // whose entire content is a 2.9 m arch is a pink dot from 420.
+    camera: { distance: 120, yaw: 314, pitch: 24 },
+  },
+  {
+    // 86-96 South Park — Toby Levy's own 1996 live/work loft building, four
+    // residential units over two commercial spaces, on the CORNER of South Park
+    // and Jack London Alley. The only piece of authored modern architecture in
+    // the South Park set, and the only landmark in the manifest with a
+    // cylindrical rooftop drum.
+    //
+    // This site is the worst case in the row for source duplication: BOTH bake
+    // inputs split the building in half, and differently. DataSF carries two
+    // LiDAR rings for lot SF3775116 (208.7 m2 over the front and northeast,
+    // 81.0 m2 over the rear southwest); the Overture/OSM gap-fill carries two
+    // more (way/113545685, untagged, and way/113545691, misaddressed
+    // "92 Jack London Alley"). All four are copies of THIS building and all four
+    // must go.
+    //
+    // Sized against the REAL bake input, on the SIMPLIFIED rings the bake
+    // actually builds (simplifyRing(ring, 0.6) — measure on those, not the raw
+    // ones, or this entry looks impossible). excluded() in buildings.mjs fires
+    // on ring centroid OR any ring vertex; distances from this anchor:
+    //
+    //    2.54 m  DataSF SF3775116 / 201006.0022147  (h 11.15, front+NE)  vertex
+    //    3.31 m  Overture 9de15a80bf == OSM way/113545685 (h 10.8)       vertex
+    //    3.71 m  DataSF SF3775116 / 201006.0149656  (h 12.32, rear SW)   vertex
+    //    4.99 m  Overture aaf221991f == OSM way/113545691 (h 4)          centroid
+    //            -> the FLOOR: under 5.00 m at least one copy survives and the
+    //               asset sits inside a procedural building
+    //   12.30 m  DataSF SF3775055 (84 South Park, h 11.36)               centroid
+    //            -> the CEILING, and the binding constraint
+    //   12.41 m  Overture 3df1e9b461 (84 South Park, h 11)               centroid
+    //   16.03 m  DataSF SF3775054 (76-82 South Park)                     vertex
+    //   19.10 m  Overture 5128010cd5 (76-82 South Park)                  vertex
+    //
+    // Safe window (5.00, 12.30) m. 8 sits near the middle with 3.00 m of margin
+    // below and 4.30 m above, and drops exactly four footprints — all four
+    // copies of this building, nothing else.
+    //
+    // Note that 84 South Park's DataSF ring SHARES two party-wall vertices with
+    // our front footprint, 7.5 m and 15.3 m from this anchor. The 7.5 m one is
+    // nearly collinear with its neighbours and simplifyRing(0.6) removes it,
+    // which is the only reason the ceiling is 12.30 m and not 7.5 m. Raw-ring
+    // measurement would have made this entry impossible.
+    //
+    // The anchor is the modelled footprint's axis-aligned BBOX centre, not the
+    // lot centroid: the L-shaped plan (a 6.42 x 8.73 m open yard at the Taber
+    // Place / 84 South Park inside corner) pushes the bbox 2.26 m northwest of
+    // the lot centre, and anchoring on the bbox centre is what lets the asset
+    // contract's "centred in x/y" hold exactly. The lot's own area centroid is
+    // -122.3941704, 37.7819114 and DataSF's EAS point for "96 SOUTH PARK" is
+    // -122.3941549, 37.7819114 — 1.4 m apart, which cross-checks the projection.
+    id: '96SouthPark',
+    name: '86–96 South Park',
+    lon: -122.3941704,
+    lat: 37.7818909,
+    height: 13.7,
+    exclude: 8,
+    // Camera offset is (sin yaw, ., cos yaw) with +z south, so bearing =
+    // 180 - yaw. The South Park front faces 135.1 deg and the exposed Jack
+    // London Alley flank 225.2 deg, so bearing 180 — due south — is the
+    // bisector: both street elevations sit at 45 deg to the lens and the drum
+    // silhouettes against the sky. yaw 0.
+    camera: { distance: 160, yaw: 0, pitch: 26 },
+  },
+  {
+    id: '318Brannan',
+    name: '318 Brannan Street',
+    lon: -122.3927890,
+    lat: 37.7816014,
+    height: 8.6,
+    exclude: 8,
+    camera: { distance: 180, yaw: 15, pitch: 28 },
+  },
+  {
+    // 334 Brannan Street, the 1929 "Sherman and Clay" building — a three-storey
+    // reinforced-concrete loft on a 21.08 x 21.13 m square lot, four doors
+    // northeast of 350 Brannan and a contributor to the South End Historic
+    // District. Gold frieze, gilt pier caps, pink Deco panels on the entry tower.
+    //
+    // Exclusion sized against the REAL bake input (both passes:
+    // pipeline/data/buildings_datasf.geojson AND overture_buildings.geojsonseq),
+    // with the rule excluded() actually uses — centroid OR ANY ring vertex:
+    //
+    //   THIS BUILDING IS TRACED TWICE and both rings must go:
+    //     0.49 m  Overture 879ad29f (h=12), by CENTROID
+    //     2.04 m  DataSF SF3775101 (h=12.14), by CENTROID
+    //   the neighbours, all reached by VERTEX, never by centroid:
+    //    10.96 m  Overture b57e2786 (h=5.3) — the 326 Brannan garden structure,
+    //             which SHARES the 10.96 m vertex with our own Overture ring, so
+    //             this is a hard ceiling that no radius can climb past
+    //    11.82 m  Overture 4a643109 (h=3.1)
+    //    12.07 m  DataSF SF3775012 (326 Brannan, both of its volumes)
+    //    13.40 m  DataSF SF3775015 (340 Brannan, h=14.82) — the party wall
+    //
+    //   exclude  2 m    -> drops 1  (WRONG: misses the DataSF ring, leaving a
+    //                     12.14 m procedural block inside the GLB)
+    //   exclude 3-10 m  -> drops 2  (correct: both rings of this building only)
+    //   exclude 11 m    -> drops 3  (eats the 326 Brannan garden structure)
+    //   exclude 13 m    -> drops 7  (eats both neighbours and a fourth lot)
+    //
+    // 6 m sits in the middle of the (2.04, 10.96) window. Do NOT raise it past
+    // 10. Note that 6 m does not reach this footprint's own vertices at 12.07 m
+    // and does not need to — the centroid test does all the work here.
+    id: '334Brannan',
+    name: '334 Brannan Street',
+    lon: -122.3930344,
+    lat: 37.7814147,
+    height: 13.4,
+    exclude: 6,
+    // Camera offset is (sin yaw, ., cos yaw) with +z south, so yaw 90 stands the
+    // camera due EAST — the bisector of the Brannan Street front (135.1 deg) and
+    // the exposed northeast flank (46.1 deg), which is the pair the app's aerial
+    // camera sees. Square-on from the southeast would show the blind party wall.
+    camera: { distance: 210, yaw: 90, pitch: 26 },
+  },
+  {
+    id: '340Brannan',
+    name: '340 Brannan Street',
+    lon: -122.3932324,
+    lat: 37.7812786,
+    height: 17.79,
+    exclude: 8,
+    camera: { distance: 240, yaw: 10, pitch: 26 },
   },
 ];
 

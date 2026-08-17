@@ -1,0 +1,95 @@
+{
+ "input_materials": [
+  "Toy_bronze",
+  "Toy_glass",
+  "Toy_glass_Glow",
+  "Toy_glassl",
+  "Toy_ink",
+  "Toy_roofd",
+  "Toy_rust",
+  "Toy_sage",
+  "Toy_steel",
+  "Toy_stone",
+  "Toy_trim",
+  "Toy_white",
+  "Toy_white_Glow"
+ ],
+ "steps": [
+  {
+   "step": "weld+degenerate",
+   "tris": 8880,
+   "verts": 4788
+  },
+  {
+   "step": "interior-faces",
+   "tris": 8880,
+   "verts": 4788
+  },
+  {
+   "step": "limited-dissolve-skipped",
+   "tris": 8880,
+   "verts": 4788
+  },
+  {
+   "step": "join-per-material",
+   "tris": 8880,
+   "verts": 4788
+  },
+  {
+   "step": "prune-uvs",
+   "tris": 8880,
+   "verts": 4788
+  }
+ ],
+ "input": {
+  "tris": 8880,
+  "verts": 17999,
+  "objects": 176
+ },
+ "interior_faces_removed": 0,
+ "joins": {
+  "grp_Toy_glassl": 3,
+  "grp_Toy_ink": 6,
+  "grp_Toy_steel": 20,
+  "grp_Toy_trim": 66,
+  "grp_Toy_roofd": 3,
+  "grp_Toy_glass": 36,
+  "grp_Toy_rust": 3,
+  "grp_Toy_glass_Glow": 6,
+  "grp_Toy_white_Glow": 6,
+  "grp_Toy_sage": 3,
+  "grp_Toy_bronze": 22
+ },
+ "uv_layers_removed": 1,
+ "inverted_solids": [],
+ "reimport": {
+  "objects": 13,
+  "materials": [
+   "Toy_bronze",
+   "Toy_glass",
+   "Toy_glass_Glow",
+   "Toy_glassl",
+   "Toy_ink",
+   "Toy_roofd",
+   "Toy_rust",
+   "Toy_sage",
+   "Toy_steel",
+   "Toy_stone",
+   "Toy_trim",
+   "Toy_white",
+   "Toy_white_Glow"
+  ],
+  "bbox_dims": [
+   41.0527,
+   40.6775,
+   17.79
+  ],
+  "bbox_min": [
+   -20.5415,
+   -20.4575,
+   0.0
+  ]
+ },
+ "bbox_ok": true,
+ "material_set_ok": true
+}
