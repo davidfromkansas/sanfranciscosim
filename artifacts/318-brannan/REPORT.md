@@ -9,9 +9,10 @@ plan was written before the geometry existed.
 
 | | |
 |---|---|
-| File | `318-brannan.glb` |
+| File | `318-brannan.glb` — **shipped = the stage-4 optimized build** |
+| File size | 94,884 B raw / 57,242 B gzip −9 (pre-optimize: 195,376 / 33,126) |
 | Triangles | **2,972** (cap 8,500) |
-| Objects | 69 |
+| Objects / draw submeshes | 12 / **13** (pre-optimize: 69 / 70) |
 | Dimensions (m) | 29.647 x 30.177 x **8.600** |
 | Footprint along its own axes | 17.96 m (Brannan, SE) x 23.87 m deep |
 | min Z | 0.000 |
@@ -23,7 +24,11 @@ plan was written before the geometry existed.
 | Loader scale | `targetHeightM / measuredHeight` = 8.6 / 8.6 = **1.000** |
 
 `validation.json` — **overall PASS**, all 16 contract checks green, from a
-fresh-scene re-import of the exported GLB (not the authoring scene).
+fresh-scene re-import of the shipped GLB (not the authoring scene). It was
+re-run against the meshopt-packed file after the stage-4 shipping swap, which
+is where 350 Brannan's invisible parapet slivers would have surfaced as
+`invalid_or_nonunit_loop_normal_count`; they do not, because the limited
+dissolve stays disabled for this asset too.
 
 The 30.18 m Y dimension against 29.65 m X is expected: a 17.96 x 23.87 m
 rectangle at a 45.8° heading gives a ~29.6 m axis-aligned box, and the awnings
@@ -114,11 +119,25 @@ Standard view transform at the preview strength — it judges *which* surfaces
 glow and how restrained the scatter is, not the night palette. The app draws
 `_Glow` as an unlit overlay at each material's own baked colour.
 
+## Stage 4 — optimize
+
+Full metrics, census, judgment calls and gate results in
+[`optimize/REPORT.md`](optimize/REPORT.md). Summary: raw 195,376 → 94,884 B
+(−51.4%), draw submeshes 70 → 13 (−81.4%), triangles and bbox unchanged, all of
+G1–G6 and G8 PASS. The limited-dissolve step stays disabled — this asset's
+parapet and coping ring bands are exactly the coplanar-annulus case that
+manufactures invisible slivers. Meshopt raises the gzip figure (33.1 → 57.2 KB),
+which is the repo's standing trade for one consistent encoding, not a
+regression.
+
 ## Deliverables
 
 ```
 artifacts/318-brannan/
-  318-brannan.glb                    the asset (pre-optimize)
+  318-brannan.glb                    the SHIPPED asset (stage-4 optimized)
+  optimize/                          stage-4 pass: scripts, stats, A/B renders,
+                                     REPORT.md, and input/ (byte-exact archive
+                                     of the pre-optimize GLB)
   318-brannan.blend
   build_318_brannan.py               deterministic rebuild
   render_318_brannan.py              controlled review rig
@@ -164,8 +183,8 @@ heading, not a camera error.
 
 `"estimated": true` because the 8.6 m parapet cap is derived from the LiDAR
 modal roof plane (7.78 m) plus an inferred 0.7 m parapet, not published.
-`dims` and `tris` will be restated to the shipped numbers after the stage-4
-optimize pass.
+`dims` and `tris` are the **shipped** numbers — the optimize pass changed
+neither (it cut draw submeshes 70 → 13 and file bytes 51%, not geometry).
 
 ## Integration note carried forward
 
@@ -188,5 +207,14 @@ raise past 10 m.
 
 ## Approval
 
-_(stage 3 — awaiting the user's verbatim approval)_
+**Gate 3 — 17 August 2026.** Advance authorisation given by the owner at the top
+of the session, quoted verbatim:
+
+> APPROVE EVERYTHING DONT ASK ME FOR PERMISSION
+
+The contact sheet, the day aerial and the night aerial were delivered to the
+owner before the pipeline advanced, so the review material exists and is on the
+record; the standing instruction above is what carried the asset past this gate
+rather than a per-asset "approved". Any objection on review reopens stage 2 and
+the iteration log continues above.
 </content>
