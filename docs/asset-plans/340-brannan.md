@@ -26,7 +26,7 @@ prompt, Part 2 is the research and design dossier behind it.
 | Existing procedural builder | none — new landmark (needs a `pipeline/lib/landmarks.mjs` entry and a re-bake, see 2.13) |
 | WGS84 anchor | `-122.3932324, 37.7812786` |
 | Target height | **17.79 m** to the roof penthouse crest; main parapet ~15.45 m; roof deck 14.82 m |
-| Footprint | 29.25 m (Brannan frontage, SE) x 27.07 m (Jack London Alley, SW); 821.7 m2, measured |
+| Footprint | 29.25 m (Brannan frontage, SE) x 28.22 m (Jack London Alley, SW); 821.0 m2, measured |
 | Triangle cap | 11,000 |
 | Category | `3` (office) |
 
@@ -275,14 +275,14 @@ anything it relies on.
 | Major remodel | **1984–85**, "removated building" | permits 1982-11-19 through 1985-11-15; listings record "Year Renovated 1985" |
 | Block / lot (APN) | 3775 / 015 | SF Assessor; DataSF addresses (`ramy-di5m`); DataSF footprints (`mblr = SF3775015`); CompStak |
 | Lot area | 8,604 sq ft = 799.3 m2 | SF Assessor |
-| Footprint | **821.7 m2**; 29.25 m (SE, Brannan) x 27.07 m (SW, Jack London Alley) | DataSF LiDAR building footprint, reprojected — **measured** |
+| Footprint | **821.0 m2**; 29.25 m (SE, Brannan) x 28.22 m (SW, Jack London Alley) | DataSF LiDAR building footprint, reprojected and reduced to its four real corners (2.3) — **measured** |
 | OSM footprint (cross-check) | 768.1 m2 | OSM way/71211340, tagged `addr:housenumber=340`, `addr:street=Brannan Street`, `height=15` — 6.5% under the LiDAR polygon, which carries the parapet/roof overhang |
 | Building area | 41,880 sq ft (assessor) / 38,317–42,149 sq ft (listings); typical floor 8,430 sq ft = 783 m2 | SF Assessor; Transwestern; LoopNet; CompStak |
 | Roof deck height | **14.82 m** above ground (majority cell 15.03 m) | DataSF LiDAR `hgt_median_m` / `hgt_majoritycm` — **measured** |
 | Maximum feature height | **17.79 m** above ground | DataSF LiDAR `hgt_maxcm` — **measured** |
 | Main parapet crest | ~15.45 m | *inferred*, roof deck + ~0.6 m |
 | Ground elevation | 10.18 m min / 11.23 m median (NAVD88) | DataSF LiDAR `gnd_min_m` / `gnd_mediancm` — app terrain handles this, not the asset |
-| Frontage heading | Brannan front faces **135.4°** (SE); Jack London Alley **225.3°** (SW); northwest party wall 315.3°; northeast party wall 44.3° | measured from the footprint polygon |
+| Frontage heading | Brannan front faces **135.4°** (SE); Jack London Alley **225.2°** (SW); northwest party wall 315.3°; northeast party wall 44.5° | measured from the footprint polygon |
 | Exposed elevations | **two** (SE, SW); NE and NW are party walls | measured — the footprint touches SF3775101 (334 Brannan) on the northeast and SF3775039 / SF3775102 (the Gran Oriente Filipino block) on the northwest, gap 0.00 m to all three |
 | Roof deck (timber) | 460 sq ft = 42.7 m2 "removable panel roof deck" | permit 1987-10-22 — the terrace visible in satellite imagery |
 | Cooling towers | Two, roof-mounted, replaced in place 2010 | permit 2010-10-20 "replace cooling towers, replace hydronic boiler, no change in equipment size, same locations on roof" |
@@ -317,32 +317,28 @@ block as `106-south-park`). Like the whole SoMa grid it is rotated about 45° fr
 axes.
 
 Measured footprint polygon, in Blender coordinates (metres, `+X` east, `+Y` north),
-clockwise, already centred on the anchor `-122.3932324, 37.7812786`:
+counter-clockwise, already centred on the anchor `-122.3932324, 37.7812786`:
 
 ```
-(  3.016,  17.356)
-(  4.080,  16.301)
-( 20.429,   0.339)
-( -0.396, -20.202)
-(-20.281,  -0.177)
-(-10.566,   9.426)
-(  0.267,  20.139)
+(-20.281,  -0.177)     west corner
+( -0.396, -20.202)     south corner  (Brannan x Jack London Alley)
+( 20.429,   0.339)     east corner
+(  0.267,  20.139)     north corner
 ```
 
-(Two sub-0.9 m corner jogs on the northeast side and the 13.66/7.03/8.20 m break on the
-northwest side have been merged above; the full 11-vertex survey is in 2.15.)
+The DataSF survey carries eleven vertices, but **every one of them lies within 0.12 m of
+this quadrilateral** (worst case 0.115 m, on the northwest run) — the extra points are
+survey noise, not corners. Four vertices is the honest simplification here, unlike 350
+Brannan across the alley where the sub-metre jogs were real.
 
 Edges, with outward normals:
 
 | Edge | Length | Faces | Elevation |
 |---|---|---|---|
-| `(20.429,0.339) -> (-0.396,-20.202)` | **29.25 m** | SE 135.4° | **Brannan Street front** |
-| `(-0.396,-20.202) -> (-20.281,-0.177)` | **27.07 m** | SW 225.3° | **Jack London Alley flank** |
-| `(-20.281,-0.177) -> (0.267,20.139)` | 28.89 m (in three segments, 315.3 / 314.4 / 316.1°) | NW | northwest party wall (blind) |
-| `(0.267,20.139) -> (20.429,0.339)` | 26.99 m (in four segments, 45.4 / 44.3 / 44.3 / 44.6°) | NE | northeast party wall (blind) |
-
-The northwest and northeast runs are not straight: the north corner is clipped by a 3.91 m
-step. Keep it — it costs nothing and it keeps the model honest to the survey.
+| `(-0.396,-20.202) -> (20.429,0.339)` | **29.25 m** | SE 135.4° | **Brannan Street front** |
+| `(-20.281,-0.177) -> (-0.396,-20.202)` | **28.22 m** | SW 225.2° | **Jack London Alley flank** |
+| `(0.267,20.139) -> (-20.281,-0.177)` | 28.90 m | NW 315.3° | northwest party wall (blind) |
+| `(20.429,0.339) -> (0.267,20.139)` | 28.26 m | NE 44.5° | northeast party wall (blind) |
 
 Because of the 45° heading the axis-aligned bounding box is ~40.7 x 40.3 m. That is correct.
 
@@ -368,7 +364,7 @@ gray-green stucco** wall in four levels:
   modern, almost-Deco gesture and it is the single thing that distinguishes this roofline
   from every other flat parapet on the block.
 
-**Southwest (Jack London Alley flank)** — 27.07 m of the same wall: same colour, same
+**Southwest (Jack London Alley flank)** — 28.22 m of the same wall: same colour, same
 banding, same window rhythm and bay count. Differences: a **flat metal eyebrow canopy** runs
 along the wall above the ground floor instead of a deep recess; the ground level is a
 **continuous glazed window wall** with a heavy transom band and an exposed diagonal brace
@@ -457,7 +453,7 @@ a straitjacket — adjust after the first aerial review render.
    northeast side running the full 4.60 m.
 3. SW ground floor: the same band without the entrance, plus one 1.4 x 2.6 m flush
    `Toy_roofd` service door 3 m from the northwest end, and a flat `Toy_steel` eyebrow canopy
-   0.9 m deep at z=4.35 running the full 27.07 m.
+   0.9 m deep at z=4.35 running the full 28.22 m.
 4. Fascia band: a continuous `Toy_trim` band z=4.60 to z=5.05, flush with the outer wall
    plane, on the SE and SW elevations — this is the light line the recessed base hangs under.
 5. Upper floors, five bays per finished elevation, bay pitch 5.30 m (SE) / 4.90 m (SW):
