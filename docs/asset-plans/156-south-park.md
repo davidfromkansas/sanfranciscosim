@@ -568,15 +568,23 @@ not a target.
 - **New landmark.** Add a `pipeline/lib/landmarks.mjs` entry (`id: '156SouthPark'`,
   `lon: -122.3948748`, `lat: 37.7813535`, `height: 8.7`) and re-bake the affected tiles,
   or the baked procedural building on this exact footprint will intersect the GLB.
-- **The exclusion radius must be very tight, and tighter than 155's neighbourhood
-  suggests.** Measured against neighbour *vertices*, not centroids: the nearest vertex of
-  150 South Park's footprint is **4.02 m** from this anchor and the nearest vertex of
-  158-160's is **7.06 m**. `exclude` must stay **below 4 m** or the re-bake eats 150.
-  Start at `exclude: 3` — the same value 155 South Park settled on — and run the drop-count
-  check that 380 Brannan documents: the re-bake must drop **exactly one** procedural
-  footprint. Punching a hole in this row is far more visible than the building itself.
-- A `camera` preset is optional at this size; if one is added,
-  `{ distance: 170, yaw: 297, pitch: 26 }` looks back at the front from over the oval.
+- **`exclude: 3`, and the window is [2.6, 3.4) — measured, not guessed.** This is a
+  party-wall row, so the neighbours' rings SHARE vertices with this one, and `excluded()`
+  drops a footprint when its centroid *or any ring vertex* falls inside. Measured from this
+  anchor against the real bake input (DataSF **and** Overture, both of which the bake
+  reads): this footprint's centroid sits at 1.62 m (DataSF) and 2.48 m (Overture), while
+  the shared party-wall vertex with 150 South Park sits at 3.40 m (Overture) and 4.01 m
+  (DataSF). Below 2.6 m the Overture footprint survives and a 6 m procedural block stands
+  inside the model; at 3.4 m the shared vertex takes 150 South Park out and punches a hole
+  in the row. A drop simulation over both sources confirms **r = 3 removes exactly one
+  footprint per source**. Re-run that simulation before changing the value.
+- **`camera: { distance: 180, yaw: 63, pitch: 26 }`.** App yaw = **180 − true bearing**,
+  not bearing − 180: `apply()` in `app/src/camera.js` offsets the camera by
+  `(sin yaw, ·, cos yaw)` with +z pointing south, so a front at 117.3° wants yaw 62.7.
+  That puts the camera east-south-east, out over the South Park oval, looking back at the
+  only designed elevation. (The same construction is documented on `592Third`; note that
+  `155SouthPark`'s `yaw: 147` uses the opposite sign convention and is not the model to
+  copy.)
 - `loadRadius`: the default formula gives `max(2500, 8.7 * 30) = 2500` m. Take the default,
   as 155 South Park, 380 Brannan and 550 Third did.
 - **Batch it.** This is now the eighth individual South Park row building with a plan. A

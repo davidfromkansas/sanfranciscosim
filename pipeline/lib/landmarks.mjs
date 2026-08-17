@@ -1112,6 +1112,45 @@ export const LANDMARKS = [
     camera: { distance: 200, yaw: 90, pitch: 26 },
   },
   {
+    // 156 South Park Street (1924) — the Anchor Packing Co. warehouse, and the
+    // one building of the South Park Historic District's twenty-three
+    // contributors that the 2009 Page & Turnbull survey found UNALTERED.
+    //
+    // The tightest exclusion window in this registry after 155 South Park, and
+    // for the same reason: this is a party-wall row, so the neighbours' rings
+    // SHARE vertices with this one and `excluded()` drops a footprint when its
+    // centroid OR ANY ring vertex falls inside. Measured against the real bake
+    // input (DataSF + Overture, from this anchor):
+    //
+    //   1.62 m  this footprint's centroid, DataSF SF3775066
+    //   2.48 m  this footprint's centroid, Overture 13c3c919 (h=6)
+    //   3.40 m  SHARED party-wall vertex with 150 South Park, Overture 8fdc6a7d
+    //   4.01 m  SHARED party-wall vertex with 150 South Park, DataSF SF3775065
+    //
+    // So the safe window is [2.6, 3.4): below 2.6 the Overture footprint
+    // survives and a 6 m procedural block stands inside the model; at 3.4 the
+    // shared vertex takes 150 South Park out with it and punches a hole in the
+    // row. 3 sits in the middle with ~0.5 m of margin at both ends. A drop
+    // simulation over both sources confirms r=3 removes EXACTLY ONE footprint
+    // per source. Do not change this without re-running that simulation.
+    //
+    // height is the LiDAR MAXIMUM (8.74 m), the two-storey street bar's parapet
+    // crest — not the 5.67 m median or OSM's height=6, which both describe the
+    // single-storey shed behind it that covers most of the lot.
+    //
+    // App yaw = 180 − true bearing (see the note on 592Third, and camera.js
+    // `apply()`: the offset is (sin yaw, ·, cos yaw) with +z south). The front
+    // faces 117.3°, so yaw 63 puts the camera east-south-east, out over the
+    // South Park oval, looking back at the only designed elevation.
+    id: '156SouthPark',
+    name: '156 South Park',
+    lon: -122.3948748,
+    lat: 37.7813535,
+    height: 8.7,
+    exclude: 3,
+    camera: { distance: 180, yaw: 63, pitch: 26 },
+  },
+  {
     // A 5-acre PLAZA, not a building, and the exclusion has to do two different
     // jobs at two different radii — which is why this is the first entry to
     // carry `clearTreesRadius`.

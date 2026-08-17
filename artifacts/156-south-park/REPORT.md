@@ -161,7 +161,23 @@ skipped because this asset has three coplanar parapet ring bands — the 350-bra
 trap. The packed file was then re-run through the stage-2 contract validator: PASS, 16 of
 16.
 
-## 9. Approval
+## 9. Stage 5 — integration values (measured, not from the plan)
+
+Two numbers in the plan's §2.13 were wrong on paper and were corrected against the code
+and the bake input during integration:
+
+- **`exclude: 3`, window [2.6, 3.4).** The plan reasoned from OSM neighbour vertices. The
+  bake reads DataSF *and* Overture, and in Overture this footprint's centroid is 2.48 m
+  from the anchor while the party-wall vertex shared with 150 South Park is only 3.40 m.
+  Below 2.6 the Overture block survives *inside* the model; at 3.4 the shared vertex takes
+  150 South Park out. A drop simulation over both sources confirms r = 3 removes exactly
+  one footprint per source.
+- **`camera: { distance: 180, yaw: 63, pitch: 26 }`.** The plan suggested yaw 297 from
+  `bearing − 180`. That is the wrong sign: `apply()` in `app/src/camera.js` offsets by
+  `(sin yaw, ·, cos yaw)` with +z south, so **app yaw = 180 − true bearing** = 62.7 for a
+  front at 117.3°. Yaw 297 would have parked the camera behind the building on Taber Place.
+
+## 10. Approval
 
 Standing approval given by the user at the start of the session, quoted verbatim,
 16 August 2026:
