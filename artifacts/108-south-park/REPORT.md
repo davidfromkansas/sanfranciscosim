@@ -9,16 +9,17 @@ and the plan disagree, this file is what shipped.
 
 | | |
 |---|---|
-| File | `108-south-park.glb` |
+| File | `108-south-park.glb` — **shipped = the stage-4 optimized build**, 96,196 B (93.9 KB) raw |
 | Triangles | **3,516** (cap 9,000; validator budget 6,000) |
-| Objects | 53 |
+| Objects | 11 shipped (53 as authored; joined per material at stage 4) |
 | Dimensions | 26.159 x 25.719 x **8.450** m |
 | min Z / XY centre offset | 0.000 m / (0.000, 0.000) |
 | Materials | 10, all `Toy_*`, 2 `_Glow`, no textures, no alpha |
 | Manifest anchor | **−122.3944817, 37.7816789** |
 | targetHeightM | **8.45** (front cornice crest) |
 | Front / rear heading | 135.35° / 315.35° true |
-| Validation | `validation.json` — **overall PASS**, all 16 checks |
+| Draw submeshes | 13 shipped (58 as authored) |
+| Validation | `validation.json` — **overall PASS**, all 16 checks, re-run on the shipped file |
 
 The axis-aligned XY box is 26.2 x 25.7 m for a building that is 6.43 x 29.75 m.
 That is the ~135° real-world heading plus the awnings' 0.80 m projection, not a
@@ -169,6 +170,15 @@ building-aligned face:
 ```
 
 `loadRadius`: the default rule `max(2500, 8.45 * 30)` gives 2500 m. Taken as-is.
+
+## Stage 4 — optimize
+
+Full detail in `optimize/REPORT.md`. Headline: 215,656 → **96,196 B raw
+(−55.4%)**, 53 → **11 objects**, 58 → **13 draw submeshes**, triangles and bbox
+unchanged, all eight gates PASS, worst A/B pixel delta 0.13% against a 2%/4%
+limit. The pre-optimize original is archived at
+`optimize/input/108-south-park.glb`. The numbers in this report and in
+`validation.json` are the **shipped** numbers.
 
 ## Integration warning (Case B)
 
