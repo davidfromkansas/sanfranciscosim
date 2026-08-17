@@ -202,3 +202,67 @@ Recorded as a standing pre-approval covering stages 3 through 5 of
 `docs/asset-pipeline/ADDRESS-TO-ASSET.md` for this building. No per-iteration
 approval was sought; the review iterations in §6 were self-directed against the
 style bible.
+
+## 9. Stage 5 — local integration QA (batch mode)
+
+Run 17 August 2026 against this worktree's own Vite dev server, driven in real
+headless Chrome over CDP. (The in-app Browser pane throttles `requestAnimationFrame`
+when hidden, which stops the streaming scan and looks exactly like a broken
+`loadRadius`; headless Chrome runs the real loop.) The served manifest was checked
+first — 74 entries, `22-south-park` present — because a dev server pointed at the
+wrong tree is the failure mode that wastes the most time here.
+
+| Check | Result |
+|---|---|
+| Placement | `uniform x1.0000 at 3862, -1362` — the loader's `targetHeightM / measuredHeight` lands on **exactly 1.0** |
+| Orientation | camera preset yaw 21°, and the curved facade faces the oval in the render |
+| Terrain seating | sits on the South Park rim with no gap or sink at the party walls |
+| Streaming | `entries 74, live 18, failed 0` at `loadRadius: 2500` |
+| Draw calls | **57** max per frame at the landmark, against a 300 budget |
+| Night glow | five upper windows lit unevenly plus the warm taqueria band; distinctly different from the baked neighbours' office grids |
+| `pipeline/audit.mjs` 1.6 | **PASS** — 83 zones over 80 landmarks clear |
+| Cell 23_13 | `origin/main` 201 buildings → re-baked **200**; the only ring left within 12 m of the anchor is 26–28 South Park next door, at 10.5 m |
+
+Draw calls were measured by hooking `renderer.render` and keeping the per-frame
+maximum. The in-app stats overlay reads `1`, because `toypost.js` renders a
+fullscreen quad after the scene and three resets `renderer.info` on every
+`render()`.
+
+**The −1 cell delta is the right number, not a missed drop.** Only one procedural
+footprint existed on this site before the re-bake: DataSF's `SF3775048`. Its
+Overture twin was already suppressed by `markOccupied`. After the re-bake both are
+excluded, so nothing gets gap-filled back in — which is exactly what the 2.21 m
+floor in the exclusion band buys. A radius below it would have left the count at
+201 with the Overture ring standing on top of the asset.
+
+### Fallback drill
+
+With `app/public/sf-assets/landmarks/22-south-park.glb` moved aside: the app
+boots, all 74 manifest entries load, 18 other landmarks go live, nothing crashes,
+and the rest of the city renders normally.
+
+**Honest finding: the site is then an empty lot, not a procedural block.** For a
+Case B landmark the exclusion has already removed that footprint from the baked
+tiles, so there is no baked building left to degrade to. This is inherent to
+Case B rather than a defect in this asset, and it is worth knowing that AGENTS
+rule 3's "never a hole" holds for Case A landmarks (where `app/src/landmarks.js`
+still builds the procedural version) but cannot hold for a Case B one whose
+exclusion has shipped.
+
+Note also that Vite answers a missing `app/public/...` path with the SPA
+`index.html` and HTTP 200, so the drill produces a GLTFLoader parse failure rather
+than a fetch failure — do not go looking for a 404.
+
+### Batch-mode handoff
+
+The re-bake was run in full (all twelve stages) and QA'd on, then discarded with
+`git checkout -- app/public/tiles api/_data`. `git diff --name-only origin/main`
+lists nothing under `app/public/tiles/` or `api/_data/`. The branch carries source
+only: the GLB, its manifest entry, its `pipeline/lib/landmarks.mjs` entry, the
+asset plan and this artifacts directory. The city gets baked once for the whole
+batch by `docs/asset-pipeline/BATCH-INTEGRATE.md`.
+
+One trap worth repeating: `node pipeline/compress-assets.mjs` walks **all** of
+`app/public/sf-assets/` and re-compressed `vehicles/passenger-airplane.glb`, which
+was never packed and is not part of this change. It was reverted. This asset was
+correctly skipped as already carrying `EXT_meshopt_compression` from stage 4.
