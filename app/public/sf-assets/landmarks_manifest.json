@@ -1369,5 +1369,24 @@
     ],
     "tris": 16008,
     "loadRadius": 2500
+  },
+  {
+    "id": "21-south-park",
+    "file": "21-south-park.glb",
+    "anchor": [
+      -122.3931063,
+      37.7817676
+    ],
+    "targetHeightM": 11.73,
+    "cat": 3,
+    "name": "21-29 South Park",
+    "estimated": true,
+    "dims": [
+      47.3614,
+      51.4933,
+      11.73
+    ],
+    "tris": 8664,
+    "loadRadius": 2500
   }
 ]

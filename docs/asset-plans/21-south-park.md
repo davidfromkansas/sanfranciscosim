@@ -736,10 +736,50 @@ building, not a skyline piece, and `alwaysLoaded` would be wrong.
 
   The intersection of the two windows is **(14.60, 17.29) m**, and `exclude: 16` is the
   working answer: it clears every one of this building's own representations in either
-  input and stops 1.29 m short of the first neighbour vertex. **Verify it against the
-  committed input before believing it**, count the footprints dropped in the affected
-  cells, and if the margin above turns out to be thinner than 1 m prefer
-  `extraExclusions` circles on the three own-footprint centroids over one large radius.
+  input and stops 1.29 m short of the first neighbour vertex.
+
+  **Measured against the real committed bake inputs** (`pipeline/data/buildings_datasf.geojson`
+  and `pipeline/data/overture_buildings.geojsonseq`, after `project()` and
+  `simplifyRing(0.6)` — i.e. the exact rings `excluded()` sees), 16 August 2026:
+
+  ```
+     1.68 m  own DataSF SF3775042, via centroid
+     4.74 m  Overture db50f6d6 (= OSM 112759868, "27"), via centroid
+     7.93 m  Overture 11e21079 (= OSM 112759863, "21"), via centroid
+    14.60 m  Overture 428ebb71 (= OSM 112759865, "29"), via centroid   <- FLOOR
+    17.29 m  Overture b59deafe (17-19 South Park), nearest vertex      <- CEILING
+    18.79 m  DataSF SF3775046 (same neighbour), nearest vertex
+    19.58 m  Overture be4a983e / b57e2786 (318 / 326 Brannan), nearest vertex
+  ```
+
+  Confirmed: window **(14.60, 17.29) m**, `exclude: 16` is its midpoint. Shipped.
+
+### 2.13b The 27 South Park collision — read this before batch integration
+
+A parallel session is building **`27-south-park`** on branch `pipeline/27-south-park`,
+scoped to **OSM way `112759868` alone** (408 m², 12.19 × 33.5 m, anchor
+−122.3931439, 37.7817369). That is the **middle third of this same building** —
+APN 3775-042, the parcel the assessor records as one 24,680 sq ft, two-storey structure,
+and which DataSF surveys as one 1,115 m² footprint with one continuous facade, one
+cornice and one uninterrupted window rank.
+
+**The two assets overlap and only one of them can ship.** This asset takes the whole
+parcel, and that is the defensible scope for three reasons:
+
+1. **The bake input is one polygon.** `excluded()` sees DataSF's single 1,115 m²
+   footprint. A 408 m² sub-asset either leaves the procedural block standing over most of
+   the parcel, or has to own an exclusion radius that deletes the whole parcel anyway —
+   in which case the other two thirds are empty ground with no GLB.
+2. **The assessor and the facade agree it is one building** — one lot, one build year,
+   one cornice line, one window rank that runs across all three addresses without a break.
+3. **OSM's three-way split is a tracing artefact**, not a property line: the three ways
+   sum to 1,114 m² against DataSF's 1,115 m², i.e. the same outline drawn in pieces.
+
+Recommendation for `BATCH-INTEGRATE.md`: **ship `21-south-park` and drop `27-south-park`**,
+keeping the 27 dossier's research (it found a DPR 523D contributor table that this plan's
+search did not surface — fold that into REFERENCE.md §1 before discarding). If the owner
+prefers the finer grain instead, then all three addresses need assets *and* the exclusion
+has to move to whichever one owns the parcel — do not ship a partial set.
 
 - **Party-wall collateral is likely and may be unavoidable.** 17–19 South Park, 35 South
   Park and the Brannan row all share the party-wall lines, so some of their ring vertices

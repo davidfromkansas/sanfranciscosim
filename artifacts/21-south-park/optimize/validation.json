@@ -32,7 +32,7 @@
  },
  "output": {
   "tris": 8664,
-  "verts": 15456,
+  "verts": 15457,
   "objects": 9,
   "primitives": 9,
   "materials": [
@@ -65,8 +65,8 @@
   "entry_door": 0.829112,
   "grp_Toy_glass": 12.262788,
   "grp_Toy_glassl_Glow": 0.611405,
-  "grp_Toy_mustard_Glow": 0.941748,
-  "grp_Toy_roofd": 133.715525,
+  "grp_Toy_mustard_Glow": 0.499912,
+  "grp_Toy_roofd": 130.581936,
   "grp_Toy_sash": 12.402836,
   "grp_Toy_steel": 74.967936,
   "grp_Toy_stone": 28.938625,

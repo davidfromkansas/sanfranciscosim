@@ -390,7 +390,7 @@ def loft_bay(tag, edge, u, sash, stone, glass, glow_mat=None, w=BAY_W):
         # from 400 m, and keeping it short in Z keeps the daytime alpha tint (a
         # closed shell is two blended layers, not one) off most of the glazing.
         face_panel(f"{tag}_glow", edge, u,
-                   rect_profile(inner - 0.56, GLASS_Z0 + 0.45, GLASS_Z1 - 0.35),
+                   rect_profile(inner - 0.56, GLASS_Z0 + 0.72, GLASS_Z1 - 0.68),
                    0.13, 0.20, glow_mat)
 
 
@@ -518,7 +518,11 @@ def build():
     # --- roof: an empty park-side apron, then the equipment field -------------
     # Placed on the main front's own (u, v) frame, v measured INWARD (negative).
     # The apron runs to v = -13; nothing is allowed in front of that line.
-    uv_box("bulkhead", EDGE_FRONT, -6.80, -15.40, 5.60, 4.00, Z_DECK, Z_BULKHEAD, roofd)
+    # The box stops BELOW the cap. An earlier build ran both to Z_BULKHEAD, which
+    # left two coplanar top faces and z-fought into a mottled patch on the roof at
+    # the app's own aerial camera — caught in the stage-5 local QA, not in the rig.
+    uv_box("bulkhead", EDGE_FRONT, -6.80, -15.40, 5.60, 4.00,
+           Z_DECK, Z_BULKHEAD - 0.14, roofd)
     uv_box("bulkhead_cap", EDGE_FRONT, -6.80, -15.40, 5.92, 4.32,
            Z_BULKHEAD - 0.22, Z_BULKHEAD, stone)
 
