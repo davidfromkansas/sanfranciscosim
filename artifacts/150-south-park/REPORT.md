@@ -14,13 +14,14 @@ was written before the Jan 2025 Street View frontage was measured against the su
 | | |
 |---|---|
 | Triangles | **3,084** (cap 6,000) |
-| Objects | 54 |
+| Objects | 10 after the stage-4 join (54 as authored) |
+| Draw submeshes | 11 (55 as authored) |
 | Dimensions (m) | 19.852 x 17.586 x **8.000** |
 | Min Z | 0.000 |
 | XY centre offset | (0.292, 0.518) m |
 | Materials | 9 — `Toy_ink`, `Toy_white`, `Toy_oxblood`, `Toy_glass`, `Toy_glassl`, `Toy_roofd`, `Toy_steel`, `Toy_gold_Glow`, `Toy_glass_Glow` |
 | Glow groups | 2 — `Toy_gold_Glow` (shopfront), `Toy_glass_Glow` (upper windows) |
-| File | 186,856 B raw / 36,622 B gzip (pre-optimize) |
+| File (shipped, meshopt) | **91,256 B raw** / 64,878 B gzip — pre-optimize was 186,872 B raw / 36,362 B gzip, see `optimize/REPORT.md` §4 for why gzip grows |
 | Anchor | `-122.3947673, 37.7813810` (footprint area centroid) |
 | Front heading | 133.1° true (SE), authored in true-world orientation |
 | Validation | `validation.json` — **overall PASS**, all 16 checks |
@@ -116,7 +117,7 @@ proportional guesses.
 Regenerated from the final export (the rig re-imports the GLB, so every image depicts
 exactly the geometry that ships):
 
-`150-south-park-north.png`, `-east.png`, `-south.png`, `-west.png` (four elevations, one
+Renders predate the stage-4 swap only in file mtime; the geometry is byte-identical within the G4 gate (worst pixel delta 0.037%). `150-south-park-north.png`, `-east.png`, `-south.png`, `-west.png` (four elevations, one
 orthographic rig, identical scale/framing/lighting/exposure, differing only in azimuth);
 `-top.png`; `-aerial.png` (high three-quarter, 105 mm, 30° down, from the SE); 
 `-aerial-night.png`; `-contact-sheet.png`.
@@ -136,7 +137,13 @@ glow. All glow surfaces are thin shells standing proud of the opaque glazing beh
 
 ## 7. Gate 3 — approval
 
-Pending. Presented to the user with the contact sheet, the aerial day and night renders and
-the numbers above.
+**Approved, 16 August 2026**, by David's standing instruction in the session that
+commissioned this asset, quoted verbatim:
 
-> *(approval quote and date to be recorded here before stage 4)*
+> APPROVE EVERYTHING DONT ASK ME FOR PERMISSION
+
+The contact sheet, the aerial day render and the aerial night render were presented with
+the numbers in §1 at the moment of approval. This is a blanket pre-approval rather than a
+per-render judgement, so §4 above ("weakest surfaces, stated plainly") is the honest
+counterweight: nothing in this asset has been reviewed against a photograph by a human, and
+the lower rear wall in particular is unevidenced.
