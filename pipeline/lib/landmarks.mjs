@@ -374,6 +374,39 @@ export const LANDMARKS = [
     exclude: 8,
     camera: { distance: 230, yaw: 80, pitch: 26 },
   },
+  // The Blinn Estate Building (1912) at the east corner of 2nd and Brannan — six
+  // storeys, 70 ft to the parapet, full-lot. The widest exclusion window in this
+  // family, because the building fills its lot and its nearest neighbour is a
+  // street away. Measured against the real bake inputs (both buildings_datasf and
+  // overture_buildings, which each trace this footprint):
+  //
+  //   target: DataSF SF3775008 (1,140 m2, h 20.84) centroid 1.09 m, vertices 20.13 m
+  //           Overture twin    (1,123 m2, h 21)    centroid 1.27 m, vertices 22.84 m
+  //   nearest NEIGHBOUR: SF3775181 (1,353 m2, h 17.77) nearest vertex 21.42 m
+  //
+  //   exclude  2-21 m -> drops 2 rings  (correct: the target and its Overture twin)
+  //   exclude 22 m    -> drops 3  (eats SF3775181 on its nearest vertex)
+  //   exclude 24 m    -> drops 5
+  //
+  // TWO rings is the correct answer, not one — DataSF and Overture both carry this
+  // building. 12 m is the middle of the safe band: 11 m of headroom under the
+  // neighbour and ~11 m over the centroids that actually do the catching. Do not
+  // raise past 20 without re-running the measurement.
+  {
+    id: '300Brannan',
+    name: '300 Brannan Street',
+    lon: -122.3925543,
+    lat: 37.7818313,
+    height: 25.2,
+    exclude: 12,
+    // camera.yaw is 180 - true bearing (camera.js apply() puts the eye at
+    // pivot + (sin yaw, sin pitch, cos yaw)*distance with +z south). The view
+    // this building wants is straight down the cant's outward normal, 95.1 deg
+    // true, which is also the bisector of the two frontage normals — so
+    // 180 - 95.1 = 85. yaw 95 would be the mirror image and stare at the party
+    // wall. Verified from a rendered frame, not from the arithmetic.
+    camera: { distance: 260, yaw: 85, pitch: 26 },
+  },
   {
     // Through lot with party walls on both long sides, so the exclusion window
     // is narrow: this footprint's simplified ring centroid sits 0.96 m from the
