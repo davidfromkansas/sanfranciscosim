@@ -102,6 +102,7 @@ route, and the park plans depend on it (§E8 of the parks README).
 | [590 Third Street](./590-third.md) | `590-third` | 9.5 m (estimated) | new landmark |
 | [592 Third Street](./592-third.md) | `592-third` | 8.2 m (estimated) | new landmark |
 | [400 Brannan Street](./400-brannan.md) | `400-brannan` | 8.8 m | new landmark |
+| [300 Brannan Street (Blinn Estate Building)](./300-brannan.md) | `300-brannan` | 25.2 m (penthouse crest; 21.34 m parapet) | new landmark |
 | [188 South Park (South Park Lofts)](./188-south-park.md) | `188-south-park` | 15.93 m (LiDAR-derived) | new landmark |
 | [150 South Park](./150-south-park.md) | `150-south-park` | 8.0 m | new landmark |
 | [160 South Park](./160-south-park.md) | `160-south-park` | 9.4 m (LiDAR-derived) | new landmark |
