@@ -12,7 +12,7 @@ Built: 16 August 2026, Blender 5.2.0 LTS, headless, from
 | | Value |
 |---|---|
 | Triangles | **5,916** (cap 9,000) |
-| Objects | 109 |
+| Objects (shipped, after the optimize join) | 15 — 109 in the authored GLB |
 | Dimensions (axis-aligned) | 30.176 x 30.648 x **13.400** m |
 | Building along its own axes | 21.08 m (Brannan frontage) x 21.13 m deep |
 | Min Z | 0.000 m |
@@ -21,7 +21,8 @@ Built: 16 August 2026, Blender 5.2.0 LTS, headless, from
 | Glow groups | 2 (`Toy_gold_Glow`, `Toy_glass_Glow`) |
 | Anchor | -122.3930344, 37.7814147 |
 | Front heading | 135.1° true (SE), Brannan Street |
-| File (pre-optimize) | see `optimize/` for the shipped numbers |
+| File, raw | **176,264 B** shipped (365,324 B authored, −51.8%) |
+| Draw submeshes | **16** shipped (110 authored) |
 
 Height stack as built: roof deck **12.15 m** (LiDAR median 12.14, measured),
 parapet coping crest **13.10 m**, gold pier caps **13.40 m** = the bounding-box
@@ -30,8 +31,10 @@ top, so the loader's `targetHeightM / measuredHeight` lands on exactly 1.0.
 ## Validation
 
 `validate_334_brannan.py` factory-resets Blender, imports **only the exported
-GLB**, and validates the re-import. `validation.json` — **overall PASS**, every
-check true:
+GLB**, and validates the re-import. The committed `validation.json` is the run
+against the **shipped** (stage-4, meshopt-packed) file — **overall PASS**, every
+check true. The authored pre-optimize GLB passed the same run identically
+(5,916 tris, 109 objects, 31,500 rays / 0 flipped, 109/109 positive volumes):
 
 | Check | Result |
 |---|---|
@@ -47,8 +50,9 @@ check true:
 | no animation, skin or constraints | PASS |
 | transforms applied | PASS |
 | no negative scales | PASS |
-| normals outward — per-object signed volume | PASS (109 / 109 positive) |
+| normals outward — per-object signed volume | PASS (15 / 15 positive; 109 / 109 before the join) |
 | normals outward — ray test | PASS (31,500 first hits, **0** flipped, 0.000% residual) |
+| stored loop normals finite and unit (the gltfpack trap) | PASS (0 invalid) |
 | no degenerate geometry | PASS |
 | no unexpected objects | PASS |
 
@@ -120,6 +124,18 @@ Approved by David in the session brief of 16 August 2026, verbatim:
 
 Recorded here as the standing approval that advances this asset past gate 3. No
 per-render feedback was given, because none was requested.
+
+## Stage 4 — optimize
+
+Full detail in `optimize/REPORT.md`. Summary: Phase B welded 8,980 coincident
+vertex pairs and joined 109 objects into 15 (one per material); the limited
+dissolve was **skipped by rule** because the parapet and coping are coplanar ring
+bands; Phase C packed with `gltfpack@0.24 -c -km -kn -noq`. Result 365,324 →
+**176,264 B** raw (−51.8%) and 110 → **16** draw submeshes, with triangles, bbox,
+origin and the 14-material set all unchanged, and a maximum A/B pixel delta of
+0.0067% across day/night × near/far. All gates G1-G6, G8 PASS (G7 n/a). The
+optimized file is now the shipping `334-brannan.glb`; the authored original is
+archived at `optimize/input/334-brannan.glb`.
 
 ## Draft manifest entry
 
