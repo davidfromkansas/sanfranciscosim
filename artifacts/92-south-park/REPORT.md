@@ -4,7 +4,7 @@ Asset: `92-south-park.glb` — the 1996 six-unit live/work condominium at **86�
 Park Street** (block 3775, lots 116–121), by Toby S. Levy, FAIA. "92 South Park" is one
 of its six unit addresses; see `REFERENCE.md` §1.
 
-**Status: stage 2 gate PASS, stage 4 gate PASS.** `validation.json` is all-PASS on a
+**Status: stage 2 gate PASS, stage 3 approved, stage 4 gate PASS, stage 5 local QA PASS.** `validation.json` is all-PASS on a
 fresh-scene re-import of the **shipped** GLB — i.e. the optimized file, re-validated
 after the stage-4 shipping swap. The optimize pass is reported separately in
 [`optimize/REPORT.md`](./optimize/REPORT.md); the pre-optimize original is archived at
@@ -13,9 +13,9 @@ after the stage-4 shipping swap. The optimize pass is reported separately in
 | | |
 |---|---|
 | Triangles | **7,736** (cap 12,000) |
-| Objects | 17 shipped (195 as authored; joined per material at stage 4) |
-| File size | **250,640 bytes** raw shipped (535,408 pre-optimize, −53.2%) |
-| Draw submeshes | 19 shipped (201 pre-optimize) |
+| Objects | 16 shipped (195 as authored; joined per material at stage 4) |
+| File size | **249,832 bytes** raw shipped (535,412 pre-optimize, −53.3%) |
+| Draw submeshes | 17 shipped (201 pre-optimize) |
 | Dimensions | 31.861 × 32.051 × **13.28** m |
 | min Z | 0.0000 |
 | XY centre offset | 0.0000, 0.0000 |
@@ -122,6 +122,7 @@ it is meant to be seen only when the camera is over the building.
 | 3 | Tower 4.30 m / 0.40 m proud; oversailing copper cube added | Tower reads; deck has a subject. Court still dark from above |
 | 4 | Court paving → `Toy_greige`; redundant parapet ring merged | 7,720 tris, all-PASS |
 | 5 | **Every plinth-level opening re-based from the plinth face** (`base_d = PLINTH_PROJ`). The stage-4 A/B render caught the two garage doors as solid z-fight speckle *in the input*; the same defect had the shopfront and entry frames buried inside the plinth on all three street elevations | **Accepted.** 7,736 tris, all-PASS; elevation pixel deltas fell from 0.18%/0.32% to 0.0005%/0.0001%. See `optimize/REPORT.md` |
+| 6 | **Roof decks `Toy_roofd` → `Toy_steel`**, forced by the stage-5 app measurement: an up-facing `Toy_roofd` plane renders rgb(9,9,12) in the diorama against rgb(94,103,112) on this asset's own `Toy_steel` parapet caps in the same frame | **Shipped.** Roofs now measure rgb(94,105,111) in the app. See §9 |
 
 ## 7. Known gaps carried forward
 
@@ -146,3 +147,43 @@ Recorded 2026-08-16. The pipeline's stage-3 human gate is therefore satisfied by
 standing instruction rather than by a per-asset review; the contact sheet, the day and
 night aerials and the numbers above are presented in the session's final report so the
 approval can be withdrawn retrospectively if the asset does not hold up.
+
+## 9. Stage 5 — local integration QA (batch mode)
+
+Case B. Manifest entry + `pipeline/lib/landmarks.mjs` entry (`92SouthPark`, `exclude: 7.8`)
++ a full twelve-stage re-bake, verified locally, then the bake thrown away so this branch
+ships source only (`ADDRESS-TO-ASSET.md`, "Batch mode").
+
+| # | Check | Result |
+|---|---|---|
+| 1 | Asset re-validated on the shipped GLB | **PASS** — all 16 contract checks |
+| 2 | GLB in `app/public/sf-assets/landmarks/` | **PASS** — 249,832 bytes, meshopt |
+| 3 | Manifest entry, `camelId()` round trip | **PASS** — `92-south-park` → `92SouthPark`, matches the registry id |
+| 4 | Case B registry entry + re-bake | **PASS** — twelve stages, `validation passed`, `landmark in extent: 92 South Park — cell 23_13` |
+| 5 | Exclusion drops exactly this building | **PASS** — cell 23_13 goes **201 → 199**; the two dropped ring centroids are 1.61 m and 9.79 m from the anchor, the nearest survivor (84 South Park) is 12.82 m out, and nothing was gap-filled back in |
+| 6 | `pipeline/audit.mjs` 1.6 | **PASS** — "no procedural footprint inside a bespoke landmark exclusion zone — 83 zones over 80 landmarks clear" |
+| 7 | Loads in the app at its real anchor | **PASS** — `sf-assets: 92-south-park merged 19 objects / 15 materials -> batched (5345 tris body)` |
+| 8 | Scale | **PASS** — `uniform x1.0000` (13.28 / 13.28) |
+| 9 | Orientation and terrain seating | **PASS** — front square onto the oval, party wall flush against 84 South Park, no float and no sink |
+| 10 | Day appearance | **PASS after one fix** — see below |
+| 11 | Night glow | **PASS** — two warm shopfronts and the entry in the plinth, five cool upper windows |
+| 12 | Draw calls | **PASS** — **101** direct-render calls with 67 landmarks live (budget < 300) |
+| 13 | Fallback drill | **PASS** — GLB renamed away: `failed: 1`, no exception, boot still clears, 67 other landmarks and 1,179 cells still render |
+| 14 | Bake discarded before commit | **PASS** — `git diff --name-only origin/main` lists nothing under `app/public/tiles/` or `api/_data/` |
+
+**The one fix (check 10).** The first app check measured every roof deck at
+**rgb(9,9,12)** — black — against **rgb(94,103,112)** on this asset's own `Toy_steel`
+parapet caps in the same frame, and **rgb(97,110,120)** on 132 South Park's `Toy_steel`
+roof membrane. `Toy_roofd` (`45454a`) has too little luminance for the diorama's ambient,
+which is far below the stage-2 Blender rig's, and every large up-facing surface here was
+`Toy_roofd` — so from the app's camera the whole landmark was a hole in the row. The
+roof decks moved to `Toy_steel` (also the truthful choice: a zinc-clad building whose
+2026 aerial imagery shows mid-gray roofs), the asset was rebuilt and the stage-4 pass
+re-run. Roofs now measure **rgb(94,105,111)**. Precedent: `108-south-park`, 2026-08-16.
+
+**QA harness note.** The in-app preview pane runs its tab hidden, which throttles rAF and
+stalls the streamed-asset scan entirely — `SF.assets.stats()` sat at `far: 56, loading: 0`
+with the camera parked on the anchor. Every measurement above was taken in a foregrounded
+headless Chrome over CDP (`--disable-backgrounding-occluded-windows
+--disable-renderer-backgrounding --disable-background-timer-throttling`), which is the
+only way this check is meaningful.

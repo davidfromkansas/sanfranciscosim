@@ -20,7 +20,7 @@
   "fg_pixels": 28108
  },
  "elev_n": {
-  "mean_abs_rgb_pct": 0.0065,
+  "mean_abs_rgb_pct": 0.0064,
   "max_px_delta": 3,
   "fg_pixels": 277683
  },

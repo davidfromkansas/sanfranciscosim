@@ -1722,6 +1722,72 @@ export const LANDMARKS = [
     camera: { distance: 200, yaw: 90, pitch: 26 },
   },
   {
+    // 86-96 South Park: Toby S. Levy's 1996 six-unit live/work condominium, and
+    // the only Modernist building on the oval. ONE surveyed 435 m2 corner parcel
+    // (block 3775, lots 116-121 -- six condominium lots on one polygon) carrying
+    // TWO baked footprints: the 208.7 m2 front block on South Park and the
+    // 81.0 m2 rear bar down Jack London Alley, with an open paved court between
+    // them. "92 South Park" is one of six unit addresses on it, all five of the
+    // others created by a single 2003 address-assignment permit against 86.
+    //
+    // The exclusion window is 5.04 < r < 10.77 and BOTH ends are set by CENTROID
+    // tests rather than vertices, which is unusual -- excluded() drops a
+    // footprint when its centroid OR any ring vertex is inside the radius, and
+    // sizing this one off vertices alone gives the wrong answer at both ends.
+    // Measured from THIS anchor (the shipped GLB's bbox centre, 1.06 m from the
+    // footprints' OBB centre) against the two files the bake actually reads
+    // (pipeline/data/buildings_datasf.geojson and
+    // overture_buildings.geojsonseq), after simplifyRing(0.6):
+    //
+    //       polygon                              centroid   vertex
+    //       own front block   (DataSF)             6.02 m    0.64 m
+    //       own twin 552799e9 (Overture, h 10.8)   6.06 m    2.27 m
+    //       own rear bar      (DataSF)            10.16 m    4.18 m
+    //       own twin ea748f47 (Overture, 4 flr)    5.04 m   12.36 m   <- floor
+    //       84 South Park     (Overture, h 11)    10.77 m   13.56 m   <- ceiling
+    //       84 South Park     (DataSF)            10.94 m   13.66 m
+    //       76-82 South Park  (DataSF)            17.96 m   14.73 m
+    //
+    // So r must EXCEED 5.04 -- below that the Overture gap-fill re-adds OSM way
+    // 113545691 straight through the asset. That way carries no `height` tag at
+    // all, but overtureHeight() falls through to num_floors * 3.2 + 1 = 13.8 m,
+    // and addBuilding() returns null on exclusion so markOccupied() never runs
+    // and occupiedFraction() cannot block it. And r must stay UNDER 10.77, or
+    // 84 South Park disappears and leaves a hole where a real building stands
+    // (AGENTS rules 3 and 5): the two buildings share a party wall, so 84's
+    // centroids sit CLOSER to this anchor than its own nearest vertices do.
+    // 7.8 sits in the middle with 2.76 m below and 2.97 m of margin above, both
+    // far larger than the bake's 0.6 m SIMPLIFY_TOLERANCE.
+    //
+    // VERIFIED AGAINST THE BAKE, not just against the source files: cell 23_13
+    // goes 201 -> 199 and drops exactly these two footprints and nothing else.
+    // Their baked ring centroids sit 1.61 m and 9.79 m from this anchor -- the
+    // bake's own simplifyRing/orientRing pass moves an area-weighted centroid on
+    // a strongly notched ring by a few metres, so the source-file numbers above
+    // are the SIZING method, and these are the proof. The nearest surviving
+    // neighbour in the baked cell is 84 South Park at 12.82 m, which leaves 5.0 m
+    // of real margin above 7.8 rather than the 2.97 m the source files predicted.
+    // Nothing was gap-filled back in.
+    //
+    // No clearTrees: the street trees on the South Park frontage are real, they
+    // are in every photograph of this building from 1996 to 2025, and at 7.8 m
+    // the radius does not reach the kerb line.
+    // See docs/asset-plans/92-south-park.md 2.13 and
+    // artifacts/92-south-park/REFERENCE.md 7.
+    id: '92SouthPark',
+    name: '92 South Park (86-96 South Park)',
+    lon: -122.3941549,
+    lat: 37.7819082,
+    height: 13.28,
+    exclude: 7.8,
+    // Camera bearing = 180 - yaw (camera.js apply(): the offset is
+    // (sin yaw, ., cos yaw) and +z is south), so yaw 45 stands the camera at
+    // bearing 135 = SE, square onto the South Park front and looking straight
+    // at the corner tower. Same value as 132SouthPark, whose front faces the
+    // same way.
+    camera: { distance: 200, yaw: 45, pitch: 26 },
+  },
+  {
     // A 0.86-acre PARK, not a building — the second such entry after
     // civicCenterPlaza, and the first where the buildings job has nothing to do
     // at all.

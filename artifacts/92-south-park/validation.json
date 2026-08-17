@@ -3,8 +3,8 @@
   "validator": "Blender 5.2.0 LTS",
   "fresh_isolated_scene": true,
   "reimported_final_glb": true,
-  "object_count": 17,
-  "mesh_object_count": 17,
+  "object_count": 16,
+  "mesh_object_count": 16,
   "triangle_count": 7736,
   "triangle_budget": 12000,
   "dimensions_m": [
@@ -180,7 +180,7 @@
   ],
   "front_heading_deg_true": 135.1,
   "target_height_m": 13.28,
-  "signed_volume_outward_objects": 17,
+  "signed_volume_outward_objects": 16,
   "signed_volume_inverted_objects": [],
   "object_details": [
     {
@@ -374,46 +374,27 @@
       ]
     },
     {
-      "name": "grp_Toy_roofd_Toy_rust",
-      "triangles": 88,
-      "location": [
-        0.0,
-        0.0,
-        0.0
-      ],
-      "rotation_euler": [
-        0.0,
-        0.0,
-        0.0
-      ],
-      "scale": [
-        1.0,
-        1.0,
-        1.0
-      ]
-    },
-    {
-      "name": "grp_Toy_roofd_Toy_steel",
-      "triangles": 176,
-      "location": [
-        0.0,
-        0.0,
-        0.0
-      ],
-      "rotation_euler": [
-        0.0,
-        0.0,
-        0.0
-      ],
-      "scale": [
-        1.0,
-        1.0,
-        1.0
-      ]
-    },
-    {
       "name": "grp_Toy_rust",
       "triangles": 56,
+      "location": [
+        0.0,
+        0.0,
+        0.0
+      ],
+      "rotation_euler": [
+        0.0,
+        0.0,
+        0.0
+      ],
+      "scale": [
+        1.0,
+        1.0,
+        1.0
+      ]
+    },
+    {
+      "name": "grp_Toy_rust_Toy_steel",
+      "triangles": 88,
       "location": [
         0.0,
         0.0,
@@ -451,7 +432,7 @@
     },
     {
       "name": "grp_Toy_steel",
-      "triangles": 844,
+      "triangles": 1020,
       "location": [
         0.0,
         0.0,

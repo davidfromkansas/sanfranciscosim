@@ -147,7 +147,15 @@ PALETTE_HEX = {
     "Toy_glass": "2a4d73",     # every window
     "Toy_glassl": "6f95b8",    # shopfronts and the roof skylight
     "Toy_sand": "ece4d4",      # the two roll-up garage doors on the alley
-    "Toy_roofd": "45454a",     # roof decks
+    # Roof decks. NOT Toy_roofd (45454a): measured in the running app at 1 PM,
+    # an up-facing Toy_roofd plane reads rgb(9,9,12) -- black -- while this
+    # asset's own Toy_steel parapet caps read rgb(94,103,112) in the same frame,
+    # and 132 South Park's Toy_steel roof membrane reads rgb(97,110,120). The
+    # diorama carries far less ambient than the stage-2 Blender rig, so a value
+    # that looks like dark charcoal in the review renders is a hole in the city.
+    # Toy_steel is also the truthful choice: this is a zinc-clad building and
+    # 2026 aerial imagery shows mid-gray roofs on it, not black ones.
+    "Toy_roofd": "45454a",     # stair treads only
     # The court paving: warm gray slate. It is deliberately the LIGHTEST large
     # surface on the asset, because from the app's downward camera a court floor
     # in the roof colour is not a court at all — it is another roof.
@@ -485,6 +493,9 @@ def build():
     m_roofd = material("Toy_roofd")
     m_trim = material("Toy_trim")
     m_greige = material("Toy_greige")
+    # The roof-deck material. Separate name from m_steel so the intent is
+    # legible, same value because the app measurement forced it (see PALETTE_HEX).
+    m_deck = material("Toy_steel")
     m_red = material("Toy_ioorange")
     m_glassl = material("Toy_glassl")
 
@@ -511,9 +522,9 @@ def build():
     # Two sub-volumes with a 0.35 m step between them, plus the raked parapet
     # that ties the low one up into the tower.
     st_box("A1_body", 0.0, STEP_S, 0.0, FRONT_T1, Z_PLINTH, Z_DECK_A,
-           m_steel, m_roofd)
+           m_steel, m_deck)
     st_box("A2_body", STEP_S, S, STEP_D, FRONT_T1, Z_PLINTH, Z_DECK_A,
-           m_steel, m_roofd)
+           m_steel, m_deck)
     # A2's fourth storey is a rust band — the horizontal weathering-metal course
     # that runs across the north-east half of the frontage.
     panel("A2_rustband", "t", STEP_D, -1, STEP_S, S, Z_F3, Z_DECK_A, 0.0, 0.09, m_rust)
@@ -525,7 +536,7 @@ def build():
 
     # ====================================================== MASS A' — corner tower
     st_box("tower_body", -TOWER_PROJ, TOWER_S1, -TOWER_PROJ, TOWER_T1,
-           Z_PLINTH, Z_CREST, m_rust, m_roofd)
+           Z_PLINTH, Z_CREST, m_rust, m_deck)
     # The red column, floor to crest, on the outer corner. Fattened to 0.42 m
     # from a real ~0.2 m so it survives at the app's camera (style bible s.9).
     RC = 0.42
@@ -537,12 +548,12 @@ def build():
     # floor (1996 photograph 8912EXT). From the app's camera it is the one thing
     # that stops the front block's 14 x 16 m deck reading as a bare plate.
     st_box("A1_cube", 1.30, 4.60, FRONT_T1 - 3.40, FRONT_T1 + 0.55, Z_F3, Z_RAKE_HI,
-           m_rust, m_roofd)
+           m_rust, m_deck)
     panel("A1_cube_glass", "s", 4.60, +1, FRONT_T1 - 3.05, FRONT_T1 + 0.20,
           Z_F3 + 0.45, Z_RAKE_HI - 0.45, 0.0, 0.09, material("Toy_glass"))
 
     # ========================================================= MASS B — rear bar
-    st_box("B_body", 0.0, REAR_S1, FRONT_T1, T, Z_PLINTH, Z_DECK_B, m_steel, m_roofd)
+    st_box("B_body", 0.0, REAR_S1, FRONT_T1, T, Z_PLINTH, Z_DECK_B, m_steel, m_deck)
     st_ring("B_parapet", 0.0, REAR_S1, FRONT_T1, T, Z_DECK_B, Z_PAR_B, 0.28, m_steel)
     # Its court face is the Cor-Ten volume from the 1996 courtyard photograph.
     panel("B_courtface", "s", REAR_S1, +1, FRONT_T1 + 0.4, T - 0.4, Z_PLINTH, Z_DECK_B,
@@ -555,7 +566,7 @@ def build():
     _raked_alley_panel("B_shingle", SH_T0, T, Z_PLINTH + 1.10, Z_DECK_B, m_cocoa)
 
     # ======================================================== MASS C — party arm
-    st_box("C_body", ARM_S0, S, FRONT_T1, ARM_T1, Z_PLINTH, Z_DECK_C, m_steel, m_roofd)
+    st_box("C_body", ARM_S0, S, FRONT_T1, ARM_T1, Z_PLINTH, Z_DECK_C, m_steel, m_deck)
     st_ring("C_parapet", ARM_S0, S, FRONT_T1, ARM_T1, Z_DECK_C, Z_PAR_C, 0.28, m_steel)
 
     # ============================================================== THE COURT

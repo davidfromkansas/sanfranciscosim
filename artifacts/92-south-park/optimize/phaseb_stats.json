@@ -55,10 +55,9 @@
   "stripe_rear"
  ],
  "joins": {
-  "grp_Toy_roofd_Toy_steel": 4,
-  "grp_Toy_roofd_Toy_rust": 2,
+  "grp_Toy_steel": 9,
+  "grp_Toy_rust_Toy_steel": 2,
   "grp_Toy_glass": 41,
-  "grp_Toy_steel": 5,
   "grp_Toy_rust": 2,
   "grp_Toy_ink": 96,
   "grp_Toy_glass_Glow": 7,
@@ -73,7 +72,7 @@
  },
  "inverted_solids": [],
  "reimport": {
-  "objects": 17,
+  "objects": 16,
   "materials": [
    "Toy_bluestone",
    "Toy_cocoa",

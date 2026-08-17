@@ -10,12 +10,12 @@ Run of `docs/asset-pipeline/GLB-OPTIMIZE-PROMPT.md` against
 
 | | Input | Shipped | Δ |
 |---|---|---|---|
-| Raw bytes | 535,408 | **250,640** | **−53.2%** |
-| gzip -9 bytes | 75,497 | 156,926 | +107.9% (see note) |
+| Raw bytes | 535,412 | **249,832** | **−53.3%** |
+| gzip -9 bytes | 75,497 | 156,835 | +107.7% (see note) |
 | Triangles | 7,736 | 7,736 | 0 |
 | Vertices | 16,708 | 16,767 | +59 (glTF re-splits for flat shading) |
-| Objects | 195 | **17** | −91.3% |
-| Draw submeshes (primitives) | 201 | **19** | −90.5% |
+| Objects | 195 | **16** | −91.8% |
+| Draw submeshes (primitives) | 201 | **17** | −91.5% |
 | Materials | 15 | 15 | 0 |
 | bbox dims | 31.8607 × 32.0512 × 13.28 | identical | 0 |
 | bbox min | −15.93033, −16.0256, 0.0 | identical | 0 |
@@ -25,7 +25,7 @@ Run of `docs/asset-pipeline/GLB-OPTIMIZE-PROMPT.md` against
 the output is meshopt-compressed, which is already entropy-coded and gzips badly. The
 comparison to make is against the rest of the shipped set, not against the input:
 `135-south-park` ships 108,524 raw / 79,703 gzip, `188-south-park` 119,312 / 61,724,
-`551-third` 252,408 / 168,650. At **250,640 / 156,926** this asset sits alongside
+`551-third` 252,408 / 168,650. At **249,832 / 156,835** this asset sits alongside
 `551-third` — it is the second-largest asset on the South Park oval because it carries
 roughly twice the triangles of its neighbours (three masses, a modelled court, and a
 deliberately non-repeating facade), and it is well inside the 500 KB budget in
@@ -63,10 +63,10 @@ faces are coplanar annuli, a strictly-coplanar dissolve merges each into one ngo
 re-triangulating an annulus emits sub-millimetre slivers that only the stage-2 contract
 validator sees, two steps later and after the shipping swap.
 
-Joins: `Toy_ink` 96 objects → 1, `Toy_glass` 41 → 1, `Toy_roofd` 8 → 1, `Toy_glass_Glow`
-7 → 1, and eleven smaller groups. Two multi-material groups stay their own meshes
-(`Toy_roofd+Toy_steel` ×4, `Toy_roofd+Toy_rust` ×2 — the mass boxes whose top face is a
-roof deck).
+Joins: `Toy_ink` 96 objects → 1, `Toy_glass` 41 → 1, `Toy_glass_Glow` 7 → 1, and twelve
+smaller groups. After the stage-5 colour fix `Toy_roofd` is down to the eight court-stair
+treads, and the mass boxes join straight into the `Toy_steel` group because their top
+faces are now the same material as their walls.
 
 ## Phase C — meshopt
 
@@ -83,13 +83,13 @@ API; `-noq` keeps float32 attributes, which the merge paths need.
 | Gate | Result | Evidence |
 |---|---|---|
 | G1 Contract | **PASS** | material name set identical (15/15); `Toy_gold_Glow` and `Toy_glass_Glow` still their own objects and materials; no `Toy_body` in a landmark; node names intact |
-| G2 Transform | **PASS** | bbox dims and min identical to 6 dp; XY origin 0,0; all 17 signed volumes positive; 22,500-ray visibility test, 15,572 hits, **0 flipped** |
-| G3 Round-trip | **PASS** | `g3check` (pinned three ^0.185.1) reports `G3-OK`, 19 meshes, 7,736 tris, 15 materials, correct bbox, no decode errors |
+| G2 Transform | **PASS** | bbox dims and min identical to 6 dp; XY origin 0,0; all 16 signed volumes positive; 22,500-ray visibility test, 15,577 hits, **0 flipped** |
+| G3 Round-trip | **PASS** | `g3check` (pinned three ^0.185.1) reports `G3-OK`, 17 meshes, 7,736 tris, 15 materials, correct bbox, no decode errors |
 | G4 Appearance | **PASS** | table below; **worst 0.0078%** against a 2% (aerial) / 4% (elevation) gate |
-| G5 Draw calls | **PASS** | 201 → 19 primitives |
-| G6 Size | **PASS** | −53.2% raw; 250,640 bytes against the 500 KB landmark budget |
+| G5 Draw calls | **PASS** | 201 → 17 primitives |
+| G6 Size | **PASS** | −53.3% raw; 249,832 bytes against the 500 KB landmark budget |
 | G7 Stage-2 re-validation | **PASS** | `blender -b --python ../validate_92_south_park.py --` on the **shipped** file: all 16 contract checks, 31,492 ray first-hits, 0 flipped |
-| G8 Determinism | **PASS** | the pass was re-run three times end to end (see below); same input bytes give the same output bytes |
+| G8 Determinism | **PASS** | the pass was re-run four times end to end (see below); same input bytes give the same output bytes |
 
 ### G4 pixel deltas (`diffs.json`)
 
@@ -99,12 +99,30 @@ API; `-noq` keeps float32 attributes, which the merge paths need.
 | day_far | 0.0039% | 8 |
 | night_near | 0.0008% | 8 |
 | night_far | 0.0078% | 42 |
-| elev_n | 0.0065% | 3 |
+| elev_n | 0.0064% | 3 |
 | elev_e | 0.0011% | 4 |
 | elev_s | 0.0005% | 5 |
 | elev_w | 0.0001% | 2 |
 
-## The defect this pass found in the asset
+## The colour defect stage 5 found, and why it came back here
+
+After the pass above, the stage-5 app check measured the shipped asset in the running
+diorama and found every roof deck rendering at **rgb(9,9,12)** — black — while this same
+asset's `Toy_steel` parapet caps read **rgb(94,103,112)** in the same frame and
+132 South Park's `Toy_steel` roof membrane read **rgb(97,110,120)**. The cause was the
+palette, not the merge: `Toy_roofd` (`45454a`) simply has too little luminance for the
+diorama's ambient, which is far lower than the stage-2 Blender rig's three suns plus 0.30
+world ambient. Every large up-facing surface on this building was `Toy_roofd`, so from
+the app's downward camera the whole landmark was a hole in the row.
+
+Fixed by moving the roof decks to `Toy_steel` — also the truthful choice on a zinc-clad
+building whose 2026 aerial imagery shows mid-gray roofs — and the pass was re-run from
+the rebuilt input. Roofs now measure **rgb(94,105,111)** in the app, matching the caps.
+`Toy_roofd` survives only on the court stair treads. The precedent is
+`108-south-park` (2026-08-16), where a dark green needed roughly 3x its luminance for the
+same reason.
+
+## The z-fighting defect this pass found in the asset
 
 The **first** run of this pass reported elev_s at 0.18% and elev_w at 0.32% with max
 deltas of 147 and 163 — an order of magnitude worse than every other view, and all of it
