@@ -134,4 +134,11 @@ stage-4 output before the manifest entry ships.
 
 ## Approval
 
-_(stage 3)_
+Stage 3 presented on 17 August 2026 (contact sheet, aerial day and night, numbers).
+Approved under the session's standing instruction, quoted verbatim:
+
+> "APPROVE EVERYTHING DONT ASK ME FOR PERMISSION"
+
+That is a blanket pre-approval given at the start of the run, not a judgement on
+these particular renders. Recorded as such so a later reader knows no one looked at
+the images before stage 4 began.
