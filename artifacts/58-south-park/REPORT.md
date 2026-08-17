@@ -9,21 +9,30 @@ this report and `REFERENCE.md` are correct.
 
 ## 1. Headline numbers
 
-| | As built (pre-approval) |
-|---|---|
-| Triangles | **4,664** (cap 10,000) |
-| Objects | 81 |
-| Dimensions (AABB) | 28.3764 × 28.4853 × 16.90 m |
-| Min Z | 0.0 |
-| XY centre offset | (0.136, −0.124) m |
-| Materials | 10, all `Toy_*`, flat, opaque, untextured |
-| Glow materials | `Toy_glass_Glow` |
-| File, raw | 281,428 B (pre-optimize) |
-| Contract validation | **PASS on all 16 checks** (`validation.json`) |
-| Anchor | `-122.3938881, 37.7821223` (assessor parcel centroid) |
-| Target height | 16.9 m — bbox top normalized exactly, so loader scale = 1.0 |
-| Parapet crest | 13.6 m |
-| Front heading | 135.2° true (south-east, onto South Park) |
+Both columns are real: the asset was built, approved, then optimized in stage 4
+(`optimize/REPORT.md`). **The shipped column is what the manifest describes.**
+
+| | As built | **Shipped (post-optimize)** |
+|---|---|---|
+| Triangles | 4,664 (cap 10,000) | **4,664** |
+| Objects | 81 | **11** |
+| Draw submeshes | 83 | **13** |
+| Dimensions (AABB) | 28.3764 × 28.4853 × 16.90 m | identical to 5 dp |
+| Min Z | 0.0 | 0.0 |
+| XY centre offset | (0.136, −0.124) m | identical |
+| Materials | 10, all `Toy_*`, flat, opaque, untextured | 10, identical set |
+| Glow materials | `Toy_glass_Glow` | identical |
+| File, raw | 281,428 B | **165,288 B (−41.3%)** |
+| Contract validation | PASS on all 16 checks | **PASS on all 16 checks** |
+| Anchor | `-122.3938881, 37.7821223` (assessor parcel centroid) | unchanged |
+| Target height | 16.9 m — bbox top normalized exactly, so loader scale = 1.0 | unchanged |
+| Parapet crest | 13.6 m | unchanged |
+| Front heading | 135.2° true (south-east, onto South Park) | unchanged |
+
+Compression is `EXT_meshopt_compression` without `KHR_mesh_quantization`, matching
+`pipeline/compress-assets.mjs`. Full stage-4 detail in `optimize/REPORT.md`; the headline is
+83 → 13 draw submeshes and a deliberate skip of the limited dissolve, because this asset's
+three coplanar ring bands are exactly the case that manufactures invisible slivers.
 
 The AABB is ~28.4 × 28.5 m for a 9.73 × 30.10 m building. That is the expected consequence
 of authoring at the real 45.2° SoMa heading, not a scale error.
@@ -109,13 +118,14 @@ proud again inside it, and the eye reads the ring as a reveal. The rear elevatio
 four-storey block is reached by placing panels on `EDGE_REAR` at a negative offset, because
 that wall stands 4.5 m in front of the rear lot line.
 
-All 81 objects pass the per-object signed-volume test outward, and the 31,500-ray cast test
-returns 0 flipped visible faces.
+All objects pass the per-object signed-volume test outward — 81 as built, 11 after stage 4's
+per-material join — and the 31,500-ray cast test returns 0 flipped visible faces in both.
 
 ## 5. Validation
 
 `validation.json`, written by `validate_58_south_park.py` from a **fresh-scene re-import of
-the exported GLB** (never the authoring scene). All 16 checks PASS:
+the exported GLB** (never the authoring scene). It was re-run after the stage-4 shipping
+swap, so the numbers below describe the **packed file that ships**. All 16 checks PASS:
 
 | Check | Result |
 |---|---|
@@ -131,7 +141,7 @@ the exported GLB** (never the authoring scene). All 16 checks PASS:
 | no animation, skin or constraints | PASS |
 | transforms applied | PASS |
 | no negative scales | PASS |
-| normals outward, signed volume | PASS (81/81) |
+| normals outward, signed volume | PASS (11/11 after the stage-4 per-material join) |
 | normals outward, ray residual | PASS (0.0%) |
 | no degenerate geometry | PASS (0) |
 | no unexpected objects | PASS |
@@ -153,7 +163,7 @@ the exported GLB** (never the authoring scene). All 16 checks PASS:
 - Batch mode: bake, QA the bake, then `git checkout -- app/public/tiles api/_data` and commit
   source only.
 
-## 7. Draft manifest entry
+## 7. Manifest entry (shipped numbers)
 
 ```json
 {
