@@ -593,6 +593,12 @@ export function createLiveFerries(scene, data, agents) {
     get count() {
       return bodyMesh ? bodyMesh.count : 0;
     },
+    // Live vessels in the same entity shape a pick produces. The terminal
+    // markers need route, origin and next-call to say "there is a boat inbound",
+    // which the debug `vessels` view below deliberately omits.
+    liveEntities() {
+      return [...vessels.values()].map(entityFor);
+    },
     // Vessel table for debugging / automated checks.
     get vessels() {
       return [...vessels.values()].map((state) => ({
