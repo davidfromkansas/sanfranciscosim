@@ -921,6 +921,40 @@ export const LANDMARKS = [
     camera: { distance: 160, yaw: 350, pitch: 26 },
   },
   {
+    // 1924 shopfront-and-flat on the north-west rim of the oval, arched upper
+    // window under a red barrel-tile pent. Two things about this site are worth
+    // reading before touching the numbers.
+    //
+    // 1. lon/lat is NOT the manifest anchor. The manifest anchor
+    //    (-122.394862, 37.7812804) is where the BUILDING stands — the area
+    //    centroid of the built footprint, which is the front ~26.5 m of a 36 m
+    //    lot. This point is the centroid of the DataSF LiDAR footprint, which is
+    //    the polygon the bake actually reads, and which covers the whole lot
+    //    including the rear yard. They are 4.89 m apart. Measured from the
+    //    manifest anchor no workable radius exists at all: it sits 3.0 m from
+    //    156's nearest vertex and 4.89 m from the baked polygon's own centroid.
+    //
+    // 2. The window is one-sided, not two. `excluded()` in buildings.mjs drops a
+    //    footprint whose centroid OR any ring vertex is inside the circle, so
+    //    from this point our own building triggers at 0.00 m (its own centroid)
+    //    and the ceiling is 156 South Park's shared party-line vertex at 1.70 m.
+    //    Measured against committed tile 23_13, not guessed. 1.2 leaves 0.5 m.
+    //
+    // No clearTrees: there is a real street tree in front of this building — it
+    // is the 17.05 m first-return peak in the LiDAR record — and it should stay.
+    id: '160SouthPark',
+    name: '160 South Park',
+    lon: -122.3949116,
+    lat: 37.7812949,
+    height: 9.4,
+    exclude: 1.2,
+    // camera.js puts the eye at target + distance*(sin yaw, ., cos yaw) with +x
+    // east and +z south, so camera bearing = 180 - yaw; the 108.1 deg facade
+    // wants yaw 72, standing out over the park. 155 m suits a 9.4 m building
+    // (cf. 165-167 at 160 for 9.0 m, 135 at 150 for 8.5 m).
+    camera: { distance: 155, yaw: 72, pitch: 26 },
+  },
+  {
     // A 43.2 x 13.8 m slab running the full depth of the block, from the South
     // Park oval back to the Varney Place alley, sharing a party wall with 171
     // South Park. That party wall makes the exclusion radius unusually

@@ -1122,5 +1122,24 @@
     ],
     "tris": 2356,
     "loadRadius": 2500
+  },
+  {
+    "id": "160-south-park",
+    "file": "160-south-park.glb",
+    "anchor": [
+      -122.394862,
+      37.7812804
+    ],
+    "targetHeightM": 9.4,
+    "cat": 3,
+    "name": "160 South Park",
+    "estimated": false,
+    "dims": [
+      25.7951,
+      17.7692,
+      9.4
+    ],
+    "tris": 3792,
+    "loadRadius": 2500
   }
 ]
