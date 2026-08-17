@@ -1206,6 +1206,55 @@ export const LANDMARKS = [
     exclude: 28,
     camera: { distance: 320, yaw: 232, pitch: 24 },
   },
+  {
+    // 1913 flats on the north-west arc of the South Park oval. The lot carries
+    // TWO baked footprints — the flats 8.5 m south-east of the anchor and the
+    // rear cottage 10.4 m north-west of it — and the anchor itself sits in the
+    // open courtyard between them, because that is where the GLB's bounding-box
+    // centre has to be. No single radius works. Measured from each candidate
+    // centre against the rings the bake actually sees (DataSF ynuv-fyni after
+    // simplifyRing(0.6)), remembering that excluded() drops a footprint whose
+    // ring CENTROID or any vertex is inside:
+    //
+    //   from the anchor:          3.59 m  126 South Park vertex  <- the ceiling
+    //                             3.78 m  own front block, nearest vertex
+    //                             8.49 m  own front block, ring centroid
+    //                            10.40 m  own rear block, ring centroid
+    //   from the front centroid:  0.00 m  own front block centroid
+    //                             5.86 m  126 South Park vertex
+    //   from the rear centroid:   0.00 m  own rear block centroid
+    //                             5.31 m  136 South Park vertex
+    //
+    // So the anchor cannot reach either of this lot's own centroids (8.5 /
+    // 10.4 m) without eating 126 South Park at 3.59 m, and 136 South Park goes
+    // at 9.8 m. Neither has a GLB to replace it and the failure is silent.
+    // Hence one zone per structure, each sitting on its footprint's ring
+    // centroid and dropping it by the centroid test, exactly as 551Third's
+    // kiosk zone does. Margins 2.9 m and 2.3 m.
+    //
+    // The 2 m zone at the anchor drops nothing today. It is the guard against
+    // the Overture gap-fill pass re-filling a lot that markOccupied() no longer
+    // sees as occupied once the DataSF footprints are excluded: a whole-lot
+    // Overture polygon would centre within ~0.6 m of the anchor and sail past
+    // both other zones. Do NOT raise it — 126 South Park's vertex is 3.59 m out.
+    // See docs/asset-plans/132-south-park.md 2.13.
+    id: '132SouthPark',
+    name: '130-134 South Park',
+    lon: -122.3946173,
+    lat: 37.7815393,
+    height: 12.07,
+    exclude: 2,
+    extraExclusions: [
+      { lon: -122.3945566, lat: 37.7814859, r: 3 }, // front flats
+      { lon: -122.3947038, lat: 37.7816116, r: 3 }, // rear cottage
+    ],
+    // Camera bearing = 180 - yaw (camera.js apply(): offset is
+    // (sin yaw, ., cos yaw) and +z is south), so yaw 45 stands the camera at
+    // bearing 135 = SE, square onto the park front. Same value as 380Brannan,
+    // whose front faces the same way. No `key`: at 12 m this is texture in the
+    // block, not a destination.
+    camera: { distance: 200, yaw: 45, pitch: 26 },
+  },
 ];
 
 // Parks/green spaces the landcover bake must match at least one source polygon
