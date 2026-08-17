@@ -1692,5 +1692,24 @@
     ],
     "tris": 5916,
     "loadRadius": 2500
+  },
+  {
+    "id": "340-brannan",
+    "file": "340-brannan.glb",
+    "anchor": [
+      -122.3932324,
+      37.7812786
+    ],
+    "targetHeightM": 17.79,
+    "cat": 3,
+    "name": "340 Brannan Street",
+    "estimated": false,
+    "dims": [
+      41.0527,
+      40.6775,
+      17.79
+    ],
+    "tris": 8871,
+    "loadRadius": 2500
   }
 ]

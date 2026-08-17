@@ -2616,6 +2616,15 @@ export const LANDMARKS = [
     // camera sees. Square-on from the southeast would show the blind party wall.
     camera: { distance: 210, yaw: 90, pitch: 26 },
   },
+  {
+    id: '340Brannan',
+    name: '340 Brannan Street',
+    lon: -122.3932324,
+    lat: 37.7812786,
+    height: 17.79,
+    exclude: 8,
+    camera: { distance: 240, yaw: 10, pitch: 26 },
+  },
 ];
 
 // Parks/green spaces the landcover bake must match at least one source polygon
