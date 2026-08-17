@@ -202,7 +202,8 @@ const MAX_PICK_DISTANCE = 9000;
 // rising from the ground to this height. Visible at the hero view without
 // dominating the skyline.
 const ROUTE_GLOW_HEIGHT = 50;
-// Per-mode neon colors for the route glow walls (RGB 0-1, saturated).
+// Per-mode neon colors for the route glow walls (RGB 0-1, saturated). Read as
+// emitted light, so they are tuned bright for additive blending after dark.
 const ROUTE_GLOW_COLORS = {
   bus: [1.0, 0.2, 0.05], // neon red-orange
   trolley: [0.1, 0.95, 0.4], // neon green
@@ -210,11 +211,22 @@ const ROUTE_GLOW_COLORS = {
   streetcar: [1.0, 0.1, 0.6], // neon pink
   cable: [1.0, 0.95, 0.1], // neon yellow
 };
-// Opacity floor an active route's wall never drops below. Additive light has
-// to fight a bright sky and sunlit ground, so daylight needs about as much
-// alpha as night to read at all — anything under ~0.05 disappears completely,
-// which is why the wall looked like a night-only feature.
-const ROUTE_GLOW_DAY_OPACITY = 0.1;
+// Daytime palette. Additive light cannot beat sunlight, so by day the wall is
+// alpha-blended paint instead — and paint needs the opposite treatment from
+// neon: deeper, denser hues that contrast against pale streets and rooftops,
+// where the night colours (especially the yellow and green) wash straight out.
+const ROUTE_GLOW_DAY_COLORS = {
+  bus: [0.85, 0.1, 0.02], // deep vermillion
+  trolley: [0.0, 0.55, 0.25], // forest green
+  lrv: [0.35, 0.05, 0.75], // deep violet
+  streetcar: [0.8, 0.0, 0.4], // magenta
+  cable: [0.9, 0.5, 0.0], // amber
+};
+// Alpha of a daylight wall (NormalBlending). High enough to read as a solid
+// coloured curtain from the hero view without hiding the city behind it.
+const ROUTE_GLOW_DAY_OPACITY = 0.45;
+// uNight below this counts as day: the palette and blend mode swap here.
+const ROUTE_GLOW_NIGHT_AT = 0.5;
 
 // Module-scope scratch: the update loop and the picker must not allocate.
 const dummy = new Object3D();
@@ -536,6 +548,11 @@ export function createLiveMuni(scene, data) {
   const activeRouteShapes = new Map(); // shapeIdx -> mode
   let routeGlowMesh = null;
   let routeGlowDirty = false;
+  // Both vertex-colour palettes for the current geometry, and which one is
+  // bound right now (starts on the day palette — setRouteGlowDay corrects it
+  // on the first frame if the city boots after dark).
+  let routeGlowPalettes = null;
+  let routeGlowIsDay = true;
 
   // ------------------------------------------------------------- subway
 
@@ -678,14 +695,15 @@ export function createLiveMuni(scene, data) {
     badge = buildBadgeMesh(atlas);
     scene.add(badge.mesh);
 
-    // Route glow mesh: a single dynamic BufferGeometry rendered as a
-    // transparent additive wall. Rebuilt when the active route set changes.
+    // Route glow mesh: a single dynamic BufferGeometry rendered as one
+    // transparent wall. Rebuilt when the active route set changes; the blend
+    // mode starts where routeGlowIsDay does and setRouteGlowDay flips it.
     routeGlowMesh = new Mesh(
       new BufferGeometry(),
       new MeshBasicMaterial({
         vertexColors: true,
         transparent: true,
-        blending: 2, // AdditiveBlending
+        blending: 1, // NormalBlending (day); AdditiveBlending after dark
         depthWrite: false,
         side: 2, // DoubleSide — visible from both sides of the wall
       }),
@@ -1118,12 +1136,14 @@ export function createLiveMuni(scene, data) {
     // bottom-right, top-right. Vertex colors carry the mode color.
     const positions = [];
     const colors = [];
+    const dayColors = [];
     const indices = [];
 
     for (const [shapeIdx, { mode, route }] of activeRouteShapes) {
       const shape = meta.shapes[shapeIdx];
       if (!shape) continue;
       const color = ROUTE_GLOW_COLORS[mode] || ROUTE_GLOW_COLORS.bus;
+      const dayColor = ROUTE_GLOW_DAY_COLORS[mode] || ROUTE_GLOW_DAY_COLORS.bus;
       const base = shape.vertexOffset * 3;
       const count = shape.vertexCount;
       // A wall marks where you can catch this route, so it ends at the portal
@@ -1156,8 +1176,11 @@ export function createLiveMuni(scene, data) {
         // top-right (x1, y1 + height, z1)
         positions.push(x1, y1 + ROUTE_GLOW_HEIGHT, z1);
 
-        // Color all four vertices with the mode color
-        for (let j = 0; j < 4; j++) colors.push(color[0], color[1], color[2]);
+        // Color all four vertices with the mode color, in both palettes
+        for (let j = 0; j < 4; j++) {
+          colors.push(color[0], color[1], color[2]);
+          dayColors.push(dayColor[0], dayColor[1], dayColor[2]);
+        }
 
         // Two triangles: (v, v+1, v+2) and (v+1, v+3, v+2)
         indices.push(v, v + 1, v + 2, v + 1, v + 3, v + 2);
@@ -1166,10 +1189,31 @@ export function createLiveMuni(scene, data) {
 
     const geo = routeGlowMesh.geometry;
     geo.setAttribute('position', new BufferAttribute(new Float32Array(positions), 3));
-    geo.setAttribute('color', new BufferAttribute(new Float32Array(colors), 3));
+    // Both palettes are baked once here; the frame loop only swaps which
+    // attribute is bound, so the day/night flip allocates nothing.
+    routeGlowPalettes = {
+      night: new BufferAttribute(new Float32Array(colors), 3),
+      day: new BufferAttribute(new Float32Array(dayColors), 3),
+    };
+    geo.setAttribute('color', routeGlowPalettes[routeGlowIsDay ? 'day' : 'night']);
     geo.setIndex(indices);
     geo.computeVertexNormals();
     routeGlowMesh.visible = positions.length > 0;
+  }
+
+  // Swap palette + blend mode when the scene crosses dusk/dawn. Additive keeps
+  // the neon beam glowing after dark; NormalBlending makes the same wall an
+  // opaque painted curtain by day, which is the only way it survives sunlight.
+  function setRouteGlowDay(isDay) {
+    if (isDay === routeGlowIsDay) return;
+    routeGlowIsDay = isDay;
+    if (!routeGlowMesh) return;
+    const mat = routeGlowMesh.material;
+    mat.blending = isDay ? 1 : 2; // NormalBlending : AdditiveBlending
+    mat.needsUpdate = true;
+    if (routeGlowPalettes) {
+      routeGlowMesh.geometry.setAttribute('color', routeGlowPalettes[isDay ? 'day' : 'night']);
+    }
   }
 
   // ---------------------------------------------------------------- frame
@@ -1195,9 +1239,11 @@ export function createLiveMuni(scene, data) {
       routeGlowDirty = false;
     }
     if (routeGlowMesh) {
-      // Slow pulse: 0.5-1.0 brightness factor over ~4 seconds.
+      // Slow pulse: 0.75-1.0 brightness factor over ~4 seconds.
       const pulse = 0.75 + 0.25 * Math.sin(now * 0.0015);
-      const baseOpacity = Math.max(ROUTE_GLOW_DAY_OPACITY, nightOpacity * 0.125);
+      const night = shared.uNight.value ?? 0;
+      setRouteGlowDay(night < ROUTE_GLOW_NIGHT_AT);
+      const baseOpacity = routeGlowIsDay ? ROUTE_GLOW_DAY_OPACITY : nightOpacity * 0.125;
       routeGlowMesh.material.opacity = baseOpacity * pulse;
     }
 
