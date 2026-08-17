@@ -24,7 +24,9 @@ the lot.
 | Bounding box | 22.3069 × 22.3614 × **5.9000** m |
 | Min Z | 0.000 |
 | XY centre offset | (0.1884, −0.1945) m |
-| Triangles | **6,148** of a 12,000 budget, in 182 objects |
+| Triangles | **6,148** of a 12,000 budget |
+| Objects (shipped) | **19** — 182 as authored, joined per material at stage 4 |
+| File size (shipped) | **202,500 bytes** raw, meshopt-compressed |
 | Brannan frontage heading | 135.15° true (SE) |
 | Registry case | **B** — new landmark, needs a registry entry and a tile re-bake |
 
@@ -139,6 +141,7 @@ green:
 | Check | Result |
 |---|---|
 | Triangles | 6,148 / 12,000 |
+| Objects | 19 (shipped, post-optimize) |
 | Dimensions | 22.3069 × 22.3614 × 5.9000 m |
 | `crest_normalized_to_target` | 5.9000 vs 5.9 target — loader scale 1.0 |
 | `base_at_z_zero` | min Z 0.000 |
@@ -170,6 +173,27 @@ Contract detail:
   signed-volume normals test meaningful on a model that is not a union of
   closed solids in the usual sense
 
+## 6b. Stage 4 — optimize
+
+Run and fully reported in [`optimize/REPORT.md`](./optimize/REPORT.md).
+**All gates PASS**; `421,252 → 202,500` raw bytes (−51.9 %), `183 → 20`
+primitives, triangles unchanged, day renders pixel-identical.
+
+Two departures from `GLB-OPTIMIZE-PROMPT.md`, both measured:
+
+- **The Phase B weld was skipped.** It costs +50 KB raw and +1,910 vertices on
+  this asset, because ~180 deliberately flat-shaded boxes have split vertices at
+  every corner by design — the weld merges them and the exporter then re-splits
+  them worse. Four packed variants are tabulated in the optimize report.
+- **The limited dissolve was skipped**, as the prompt itself instructs for
+  assets with coplanar ring bands. `ShedParapet` is one, and this is the failure
+  that bit `350-brannan`. The shipped file reports
+  `invalid_or_nonunit_loop_normal_count: 0`.
+
+The shipped optimized GLB was re-run through the stage-2 contract validator
+above and passes every check, so the numbers in this report are the shipped
+numbers.
+
 ## 7. Renders
 
 | File | What it shows |
@@ -189,7 +213,18 @@ alpha rather than showing them solid.
 
 Stage 3 of `docs/asset-pipeline/ADDRESS-TO-ASSET.md`.
 
-> Pending — see §9.
+Approval for this asset is a **standing pre-authorization given at invocation**,
+17 August 2026, quoted verbatim:
+
+> APPROVE EVERYTHING DONT ASK ME FOR PERMISSION
+
+Recorded honestly for what it is: a blanket instruction to run the pipeline
+without stopping, not a per-asset judgement of these renders. The contact sheet,
+the aerial, the top view and the night render were presented at this gate, and
+the pipeline advanced on that instruction rather than on feedback about the
+images. If the design is later judged wrong, §2 and §4 are the record of what
+was decided and why, and stage 2 is re-runnable from
+`build_326_brannan.py` alone.
 
 ## 9. Known limitations carried forward
 

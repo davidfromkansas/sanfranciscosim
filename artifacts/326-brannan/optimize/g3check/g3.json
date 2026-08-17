@@ -1,0 +1,35 @@
+{
+ "ok": true,
+ "meshes": 20,
+ "tris": 6148,
+ "materials": [
+  "Toy_bark",
+  "Toy_bulb_Glow",
+  "Toy_canopy",
+  "Toy_charcoal",
+  "Toy_coral",
+  "Toy_coral_Glow",
+  "Toy_cream",
+  "Toy_fire_Glow",
+  "Toy_glass",
+  "Toy_glass_Glow",
+  "Toy_ink",
+  "Toy_olive",
+  "Toy_plaster",
+  "Toy_roofd",
+  "Toy_steel",
+  "Toy_stone",
+  "Toy_terra",
+  "Toy_vine"
+ ],
+ "bbox_dims": [
+  22.3069,
+  5.9,
+  22.3614
+ ],
+ "bbox_min": [
+  -10.9651,
+  0,
+  -10.9862
+ ]
+}

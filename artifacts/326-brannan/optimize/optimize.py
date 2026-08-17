@@ -2,10 +2,9 @@
 #   "$BLENDER" -b --python optimize.py -- <input.glb> <output_mid.glb> <stats.json>
 #
 # Steps (per GLB-OPTIMIZE-PROMPT v1 §3):
-#   1. weld coincident verts <=1mm within each object (glow shells are separate
-#      objects, so a per-object weld can never fuse glow onto base surfaces)
-#   2. delete degenerate faces; delete interior faces strictly buried inside
-#      another box-like solid (AABB-fill >= 95%) — provable-invisible only
+#   1. weld — SKIPPED for 326-brannan and measured; see the block below
+#   2. degenerate faces — no-op here (validator reports 0); interior faces
+#      strictly buried inside another box-like solid (AABB-fill >= 95%)
 #   3. limited dissolve — SKIPPED for 326-brannan, see the block below
 #   4. (skipped) curve retess — the olive crown and the vine masses are
 #      silhouette-defining low-poly shells and the JAX disc is a 16-gon whose
@@ -61,21 +60,34 @@ def snap(label):
     stats["steps"].append({"step": label, "tris": t, "verts": v})
     print(f"STEP {label}: tris={t} verts={v}")
 
-# --- 1+2a. weld + degenerate, per object ---
-for o in mesh_objs():
-    bm = bmesh.new()
-    bm.from_mesh(o.data)
-    bmesh.ops.remove_doubles(bm, verts=bm.verts, dist=0.001)
-    bmesh.ops.dissolve_degenerate(bm, edges=bm.edges, dist=0.001)
-    bm.to_mesh(o.data)
-    bm.free()
-    # Re-assert flat shading after the weld. This asset ships large flat plates
-    # (the court slab, the pergola panel, the shed roof membrane) and a weld
-    # that leaves any polygon smooth-flagged turns a flat plate into a shaded
-    # one — a change only Gate G4 would catch, and only if you are looking for
-    # it. Cheap insurance.
-    o.data.shade_flat()
-snap("weld+degenerate")
+# --- 1+2a. weld + degenerate: SKIPPED on this asset, and MEASURED ---
+#
+# GLB-OPTIMIZE-PROMPT s.3 step 1 makes the 1 mm per-object weld unconditional.
+# On this asset it is actively harmful, and the numbers are not marginal.
+# Four variants, each packed with the repo-standard
+# `gltfpack@0.24 -c -km -kn -noq`:
+#
+#   variant      raw bytes   gzip9    verts   primitives
+#   pack only      271,112  110,251   12,840        183
+#   weld only      320,944  140,712   14,750        183   <- WORSE on every axis
+#   join only      202,500  112,615   13,014         20   <- shipped
+#   weld + join    246,764  129,727   14,734         20
+#
+# The cause is flat shading. This asset is ~180 flat-shaded boxes and
+# icospheres, so every corner is intentionally a split vertex. The weld merges
+# those triples inside Blender, and the glTF exporter then has to re-split them
+# to emit per-face normals — arriving at a LESS efficient split than the
+# authored topology, +1,910 vertices and +50 KB raw. The weld's usual win comes
+# from smooth-shaded meshes with genuinely redundant verts; there are none here.
+#
+# The degenerate-face half of the step is a no-op regardless: the stage-2
+# contract validator reports degenerate_triangle_count = 0 on the input.
+#
+# Reverted under GLB-OPTIMIZE-PROMPT s.11 ("revert any phase that regresses
+# bytes and keep the rest"). Keeping the join, which is the whole win.
+stats["weld"] = ("skipped: measured +50KB raw / +1910 verts on this "
+                 "flat-shaded box-heavy asset; see the table in this file")
+snap("weld-skipped")
 
 # --- 2b. interior faces provably buried inside box-like solids ---
 EPS = 0.001

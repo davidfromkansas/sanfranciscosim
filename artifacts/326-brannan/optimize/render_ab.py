@@ -11,7 +11,11 @@ GLB, PREFIX = argv[0], argv[1]
 
 RES = (960, 720)
 FOV_DEG = 40.0
-AZIMUTH = math.radians(45.0)   # fixed 3/4 view from the south-west
+AZIMUTH = math.radians(135.0)  # from the SE: square onto the Brannan
+                               # frontage and straight down the court's
+                               # own axis. A SW view (the generic
+                               # default) looks at the blind party wall
+                               # and would judge nothing that matters.
 ELEV = math.radians(42.0)
 
 bpy.ops.wm.read_factory_settings(use_empty=True)
