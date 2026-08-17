@@ -16,6 +16,12 @@ from mathutils import Vector
 
 argv = sys.argv[sys.argv.index("--") + 1:]
 INPUT, OUTPUT, STATS = argv[0], argv[1], argv[2]
+# --no-weld: skip step 1's 1 mm weld. On a flat-shaded, box-heavy asset the
+# "coincident vertex pairs" the census counts are not waste, they ARE the
+# flat-shading topology: the weld merges them in Blender and the exporter then
+# re-splits them to emit per-face normals, landing on a LESS efficient split
+# than the authored one. Measured for this asset in REPORT.md s."Judgment calls".
+DO_WELD = "--no-weld" not in argv
 
 bpy.ops.wm.read_factory_settings(use_empty=True)
 bpy.ops.import_scene.gltf(filepath=INPUT)
@@ -63,11 +69,13 @@ def snap(label):
 for o in mesh_objs():
     bm = bmesh.new()
     bm.from_mesh(o.data)
-    bmesh.ops.remove_doubles(bm, verts=bm.verts, dist=0.001)
+    if DO_WELD:
+        bmesh.ops.remove_doubles(bm, verts=bm.verts, dist=0.001)
     bmesh.ops.dissolve_degenerate(bm, edges=bm.edges, dist=0.001)
     bm.to_mesh(o.data)
     bm.free()
-snap("weld+degenerate")
+stats["welded"] = DO_WELD
+snap("weld+degenerate" if DO_WELD else "degenerate-only (weld skipped)")
 
 # --- 2b. interior faces provably buried inside box-like solids ---
 EPS = 0.001

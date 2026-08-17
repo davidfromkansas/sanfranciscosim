@@ -145,3 +145,57 @@ Approved under the session's standing instruction, quoted verbatim:
 That is a blanket pre-approval given at the start of the run, not a judgement on
 these particular renders. Recorded as such so a later reader knows no one looked at
 the images before stage 4 began.
+
+---
+
+## Stage 5 — integration (batch mode), 17 August 2026
+
+**Case B**, new landmark. Integrated per `docs/asset-plans/INTEGRATION-PROMPT.md`
+Part 1, with Step 7 replaced by the pipeline's stop-and-ask.
+
+### Local QA
+
+| Item | Result | Evidence |
+|---|---|---|
+| Re-validation of the shipping GLB | **PASS** | fresh-scene re-import, all 15 contract checks `true` after the stage-4 swap |
+| Manifest entry | **PASS** | appended as text, `+19 lines, 0 other lines touched` — `JSON.stringify` would have rewritten `11.0`→`11` across six other landmarks |
+| id mapping | **PASS** | `camelId('300-brannan')` = `300Brannan`, which is the `pipeline/lib/landmarks.mjs` id |
+| Case B registry entry | **PASS** | `pipeline/lib/landmarks.mjs`, `exclude: 12`, camera `{260, yaw 85, pitch 26}` |
+| Exclusion radius, measured | **PASS** | safe band **2–21 m**; 12 m drops exactly the target's two rings (DataSF `SF3775008` + its Overture twin); 22 m would eat `SF3775181` on its nearest vertex at 21.42 m |
+| Re-bake | **PASS** | full chain `terrain → bridges → buildings → streets → landcover → validate → lore → toy → notables → context → muni-shapes` |
+| `pipeline/audit.mjs` check 1.6 | **PASS** | "no procedural footprint inside a bespoke landmark exclusion zone — 83 zones over 80 landmarks clear" |
+| `pipeline/verify-rebake.mjs` | **PASS** | "584 of 585 cells unchanged; 23_13 201 → 200 ← 300Brannan"; nearest surviving footprint 21.4 m against the 12 m radius |
+| Single building on site | **PASS** | one footprint dropped, no procedural twin, no baked block poking through — settled from the tile, not from a frame |
+| Merge line + scale | **PASS** | `sf-assets: 300-brannan merged 12 objects / 10 materials -> batched (7715 tris body); uniform x1.0000 at 3955, -1308` — **scale exactly 1.0000**, position exactly the projected anchor |
+| Orientation | **PASS** | the canted corner faces the Second/Brannan intersection; both frontages face their own streets |
+| Terrain seating | **PASS** | no float, no sink (see `qa-local-day.jpg`) |
+| Night glow | **PASS** | only the intended `_Glow` surfaces light: the cant stripe over its lit ground-floor band, plus the scattered frontage bays (see `qa-local-night.jpg`) |
+| Draw calls (budget < 300) | **PASS** | **110** at the landmark, **123** at night, **106** at street level downtown — measured by hooking `renderer.render` and taking the per-frame max, because the stats overlay reads the post-pass quad and always says 1 |
+| `npm run lint` / `npm test` / `npm run build` | **PASS** | eslint clean, 26/26 tests, build OK |
+| Fallback drill | **PASS** | GLB moved aside → app boots, area renders, exactly one warning `sf-assets: 300-brannan failed to load (…)`, `failed: 1`, and the site is empty ground inside the exclusion zone, which is the expected Case B behaviour (see `qa-local-fallback.jpg`). Vite answers a missing `public/` path with the SPA `index.html` and HTTP 200, so the symptom is a parse failure rather than a 404 — a dev-server artifact, not an asset problem |
+
+QA was run in headless Chrome over CDP against the Vite dev server, because
+`preview_start` had all five dev-server slots held by parallel landmark sessions.
+
+### Camera preset
+
+`camera.yaw` is `180 − true bearing`. The view this building wants is straight down
+the cant's outward normal, 95.1° true — which is also the bisector of the two
+frontage normals — so the preset is **yaw 85**, not 95. Verified from a rendered
+frame (`qa-local-day.jpg`), not from the arithmetic: yaw 95 is the mirror image and
+would stare at the north-west party wall.
+
+### Batch mode
+
+Other landmarks are in flight in sibling worktrees, so per `ADDRESS-TO-ASSET.md`
+"Batch mode" the bake was **run for the QA above and then discarded**
+(`git checkout -- app/public/tiles api/_data`). This branch commits **source only**:
+the GLB, its manifest entry, its `landmarks.mjs` entry, the asset plan and
+`artifacts/300-brannan/`. Sanity check passes —
+`git diff --name-only origin/main` lists nothing under `app/public/tiles/` or
+`api/_data/`. The city is re-baked once for the whole batch by
+`docs/asset-pipeline/BATCH-INTEGRATE.md`.
+
+### Not done, deliberately
+
+Push, PR, deploy and production QA are the user's call and have not been run.

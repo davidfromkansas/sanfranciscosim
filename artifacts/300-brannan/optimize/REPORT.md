@@ -12,13 +12,41 @@ Run 17 August 2026 per `docs/asset-pipeline/GLB-OPTIMIZE-PROMPT.md` v2, with
 | Raw bytes | 828,164 (808.8 KB) | **339,932 (332.0 KB)** | **−59.0%** |
 | gzip −9 bytes | 126,601 | 211,007 | +66.7% (expected — see note) |
 | Triangles | 12,964 | 12,964 | 0 |
-| Vertices | 25,754 | 7,198 | **−72.0%** |
+| Vertices | 25,754 | 7,198 in Blender / 23,692 as emitted | −72.0% pre-export |
 | Objects / nodes | 362 | 11 | −96.9% |
 | Draw submeshes (primitives) | 363 | **12** | **−96.7%** |
 | Materials | 10 | 10 | identical set |
 | bbox dims | 47.531 × 49.2868 × 25.2 | 47.531 × 49.2868 × 25.2 | 0 |
 | origin offset XY | (−0.123, +0.001) | (−0.123, +0.001) | 0 |
 | Ray-flip fraction | 0.000000 | 0.000000 | 0 |
+
+## Variant measurement — is the weld actually helping?
+
+A parallel pass on `326-brannan` (17 Aug 2026) found that Phase B's unconditional
+1 mm weld makes *flat-shaded, box-heavy* assets **worse**: the coincident vertex
+pairs the census counts are the flat-shading topology, not waste, and welding them
+in Blender only makes the exporter re-split them into a less efficient layout.
+This asset is ~360 flat-shaded boxes, so that finding had to be tested rather than
+assumed. All four variants packed with the repo standard `gltfpack@0.24 -c -km -kn -noq`:
+
+| variant | raw | gzip9 | verts as emitted | prims |
+|---|---|---|---|---|
+| input (authored, unpacked) | 828,164 | 126,601 | 25,754 | 363 |
+| pack only | 499,316 | 174,062 | 25,754 | 363 |
+| join only (no weld) | 367,336 | 205,747 | 27,216 | 12 |
+| **weld + join (shipped)** | **339,932** | 211,007 | 23,692 | **12** |
+
+**The weld helps here, by 27 KB.** The difference from `326-brannan` is the bevel:
+this asset runs a 2-segment `Bevel` over every chunky solid, which leaves genuinely
+redundant vertices along the beveled edges that are *not* flat-shading splits. Join
+is still the dominant win (−132 KB, 363 → 12 primitives); the weld is a real but
+secondary −27 KB on top. Kept, and `optimize.py` now carries a `--no-weld` flag so
+the next asset can re-measure in one command instead of re-deriving this.
+
+**On the honest baseline.** Meshopt is mandatory at intake, so the comparison a
+reader should care about is against *gltfpack alone*: 499,316 → 339,932 = **−31.9%**.
+The −59.0% headline in the table above is against the unpacked authored file, which
+is not a thing that could ever have shipped. Both are quoted; neither alone.
 
 **On the gzip number.** Meshopt buffers are already entropy-coded, so gzipping
 them costs bytes rather than saving them. What the CDN serves is
@@ -35,7 +63,7 @@ files that already carry `EXT_meshopt_compression`). 332 KB is inside the
 
 | Technique | Predicted | Actual |
 |---|---|---|
-| Weld coincident verts ≤ 1 mm | 18,556 coincident pairs | −18,556 verts (25,754 → 7,198) |
+| Weld coincident verts ≤ 1 mm | 18,556 coincident pairs | −18,556 verts in Blender (25,754 → 7,198); −27 KB packed, measured against a no-weld variant |
 | Degenerate faces | 0 found | 0 |
 | Interior faces buried in a solid | unknown | **0** — see below |
 | Limited dissolve | ~0.4% of tris | **skipped by rule** — see below |
@@ -93,7 +121,7 @@ contract validator re-run on the packed shipping file still passes
 | **G3 Round-trip** | PASS | re-imports in Blender; `g3check` (pinned three 0.185.1) reports `G3-OK`, 12 meshes, 12,964 tris, 10 materials, no decode errors |
 | **G4 Appearance** | PASS | mean abs RGB delta: day near 0.044%, day far 0.042%, night near 0.056%, night far 0.077%, elevations 0.004–0.058% — all two orders of magnitude inside the 2%/4% gates. Looked at every diff: the ×8-amplified images are black except for single-pixel anti-aliasing noise on silhouette edges and window-frame borders. No missing elements, no silhouette change, no shading artifacts, nothing a player could notice |
 | **G5 Draw submeshes** | PASS | 363 → 12 |
-| **G6 Size** | PASS with note | −59.0% against a 60% target; the shortfall is accounted for by the buried-face waste in judgment call 2, which is silhouette-adjacent geometry the occluder rule cannot prove invisible |
+| **G6 Size** | PASS with note | −59.0% against the unpacked input (60% target) and −31.9% against the gltfpack-alone baseline. The shortfall is accounted for by the buried-face waste in judgment call 2, which is silhouette-adjacent geometry the occluder rule cannot prove invisible |
 | **G7 GPU budget** | n/a | `ALLOW_BAKE: no`, no textures added |
 | **G8 Hygiene** | PASS | re-import object/material/bbox check inside `optimize.py`; deterministic re-run reproduces the output byte-for-byte; no `.blend1` files |
 
