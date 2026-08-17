@@ -19,6 +19,7 @@ import {
   BufferAttribute,
   BufferGeometry,
   CanvasTexture,
+  Color,
   DynamicDrawUsage,
   InstancedBufferAttribute,
   InstancedMesh,
@@ -194,18 +195,27 @@ const ROUTE_GLOW_COLORS = {
 // alpha-blended paint instead — and paint needs the opposite treatment from
 // neon: deeper, denser hues that contrast against pale streets and rooftops,
 // where the night colours (especially the yellow and green) wash straight out.
+// Contrast here is against the DIORAMA, not against black, so each hue is
+// picked to be what the city underneath is not — the transit green in
+// particular is pulled toward teal, because forest green over Golden Gate
+// Park is a route you cannot find.
 const ROUTE_GLOW_DAY_COLORS = {
-  bus: [0.85, 0.1, 0.02], // deep vermillion
-  trolley: [0.0, 0.55, 0.25], // forest green
-  lrv: [0.35, 0.05, 0.75], // deep violet
-  streetcar: [0.8, 0.0, 0.4], // magenta
-  cable: [0.9, 0.5, 0.0], // amber
+  bus: [0.88, 0.04, 0.02], // deep vermillion
+  trolley: [0.0, 0.42, 0.44], // deep teal — reads against park green
+  lrv: [0.33, 0.03, 0.78], // deep violet
+  streetcar: [0.82, 0.0, 0.42], // magenta
+  cable: [0.92, 0.52, 0.0], // amber
 };
+// The toy theme's warm ink, used to outline the daylight ribbon. A coloured
+// edge only contrasts where the city behind it happens to be a different
+// colour; an ink line contrasts everywhere, which is exactly why the UI cards
+// are drawn this way.
+const ROUTE_GLOW_INK = [0.13, 0.09, 0.07];
 // Overall alpha of the ribbon, per palette. These multiply the shader's own
 // profile (see ROUTE_GLOW_PROFILE), which already spends most of its alpha on
 // the two edges, so they are far higher than the flat-curtain values they
 // replaced — at the old night 0.125 the white core simply wasn't white.
-const ROUTE_GLOW_DAY_OPACITY = 0.62;
+const ROUTE_GLOW_DAY_OPACITY = 0.8;
 const ROUTE_GLOW_NIGHT_OPACITY = 0.62;
 // uNight below this counts as day: the palette and blend mode swap here.
 const ROUTE_GLOW_NIGHT_AT = 0.5;
@@ -218,16 +228,24 @@ const ROUTE_GLOW_NIGHT_AT = 0.5;
 // which is also what lets you see the city through it.
 //   coreWhite: how far the edges wash out to white (the "hot" core)
 //   body:      alpha of the transparent interior
+//   bodyFall:  how fast the interior thins with height (1 = linear, 2+ = only
+//              a skirt near the street)
 //   topEdge:   width of the top rim, as a fraction of wall height
 //   baseEdge:  width of the ground flare
+//   ink:       width of the dark outline along the top (0 = none)
 const ROUTE_GLOW_PROFILE = {
   // After dark the core goes properly white-hot and the interior nearly
   // vanishes, so the route reads as a drawn line of light over the city.
-  night: { coreWhite: 0.92, body: 0.42, topEdge: 0.075, baseEdge: 0.16 },
+  // No ink: the wall is emitted light against a dark city, and additive
+  // blending cannot draw a dark line anyway.
+  night: { coreWhite: 0.92, body: 0.27, bodyFall: 2.2, topEdge: 0.075, baseEdge: 0.16, ink: 0 },
   // By day the same ribbon has to survive sunlight (this is what PR #141/#143
-  // were about), so the interior keeps real paint in it and the core whitens
-  // less — a white edge on a pale street is an invisible edge.
-  day: { coreWhite: 0.4, body: 1.0, topEdge: 0.055, baseEdge: 0.13 },
+  // were about) AND be findable from the hero altitude, where a rim alone is
+  // a hairline. So daylight fills the interior nearly to the top (bodyFall 1
+  // instead of 2.2, i.e. a linear fade rather than a skirt), whitens the core
+  // less — a white edge on a pale street is an invisible edge — and outlines
+  // the whole thing in warm ink.
+  day: { coreWhite: 0.3, body: 1.0, bodyFall: 1.0, topEdge: 0.05, baseEdge: 0.13, ink: 0.05 },
 };
 
 // Module-scope scratch: the update loop and the picker must not allocate.
@@ -1108,8 +1126,11 @@ export function createLiveMuni(scene, data) {
     routeGlowUniforms = {
       uCoreWhite: { value: profile.coreWhite },
       uBody: { value: profile.body },
+      uBodyFall: { value: profile.bodyFall },
       uTopEdge: { value: profile.topEdge },
       uBaseEdge: { value: profile.baseEdge },
+      uInk: { value: profile.ink },
+      uInkColor: { value: new Color(...ROUTE_GLOW_INK) },
     };
     material.onBeforeCompile = (shader) => {
       Object.assign(shader.uniforms, routeGlowUniforms);
@@ -1122,8 +1143,11 @@ export function createLiveMuni(scene, data) {
           `#include <common>
           uniform float uCoreWhite;
           uniform float uBody;
+          uniform float uBodyFall;
           uniform float uTopEdge;
           uniform float uBaseEdge;
+          uniform float uInk;
+          uniform vec3 uInkColor;
           varying float vRibbon;`
         )
         .replace(
@@ -1135,10 +1159,15 @@ export function createLiveMuni(scene, data) {
           // The interior is brightest where the light spills off the street
           // and thins upward, so the wall has a direction: it is lit FROM the
           // route, not uniformly filled.
-          float body = uBody * pow(1.0 - vRibbon, 2.2);
+          float body = uBody * pow(1.0 - vRibbon, uBodyFall);
           float edge = clamp(top + base * 0.85, 0.0, 1.0);
           gl_FragColor.rgb = mix(gl_FragColor.rgb, vec3(1.0), edge * uCoreWhite);
-          gl_FragColor.a = clamp(body * 0.35 + top + base * 0.8, 0.0, 1.0) * opacity;`
+          float alpha = clamp(body * 0.55 + top + base * 0.8, 0.0, 1.0);
+          // Ink outline (day only): a dark line capping the ribbon, so it is
+          // legible over a white rooftop and a dark street alike.
+          float ink = uInk > 0.0 ? smoothstep(1.0 - uInk, 1.0 - uInk * 0.35, vRibbon) : 0.0;
+          gl_FragColor.rgb = mix(gl_FragColor.rgb, uInkColor, ink);
+          gl_FragColor.a = max(alpha, ink) * opacity;`
         );
     };
     return material;
@@ -1244,8 +1273,10 @@ export function createLiveMuni(scene, data) {
       const profile = ROUTE_GLOW_PROFILE[isDay ? 'day' : 'night'];
       routeGlowUniforms.uCoreWhite.value = profile.coreWhite;
       routeGlowUniforms.uBody.value = profile.body;
+      routeGlowUniforms.uBodyFall.value = profile.bodyFall;
       routeGlowUniforms.uTopEdge.value = profile.topEdge;
       routeGlowUniforms.uBaseEdge.value = profile.baseEdge;
+      routeGlowUniforms.uInk.value = profile.ink;
     }
   }
 
