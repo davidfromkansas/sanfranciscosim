@@ -374,6 +374,36 @@ export const LANDMARKS = [
     exclude: 8,
     camera: { distance: 230, yaw: 80, pitch: 26 },
   },
+  // 340 Brannan St (1911, stucco over reinforced concrete) — the corner lot on the
+  // OTHER side of Jack London Alley from 350, and the tallest building on this
+  // block face at 17.79 m. Party walls on the northeast (334 Brannan) and the
+  // northwest (the Gran Oriente Filipino block); Brannan and the alley are the two
+  // finished faces. Measured against the real bake input, DataSF AND Overture,
+  // for the 96 rings within 120 m of this anchor:
+  //
+  //   exclude  2-14 m -> drops 2  (correct: SF3775015 at centroid 0.00 m, and its
+  //                                Overture twin at centroid 1.76 m — this site is
+  //                                traced by both sources, so 2 is the right answer,
+  //                                not a sign the radius is too big)
+  //   exclude 15 m    -> drops 5  (eats SF3775039, the Gran Oriente Filipino block)
+  //   exclude 16 m    -> drops 7  (also SF3775102)
+  //   exclude 17 m    -> drops 8  (also SF3775101, 334 Brannan)
+  //
+  // The binding limit is a SHARED party-wall vertex: SF3775039's nearest vertex is
+  // 14.16 m, which is exactly our own footprint's nearest vertex, because the two
+  // rings meet on the property line. 8 m is the middle of the safe band. Note that
+  // our own footprint reaches 20.43 m from the anchor — do NOT reason "the radius
+  // has to cover the building"; the centroid test alone drops it, and covering the
+  // footprint would take out three neighbours.
+  {
+    id: '340Brannan',
+    name: '340 Brannan Street',
+    lon: -122.3932324,
+    lat: 37.7812786,
+    height: 17.79,
+    exclude: 8,
+    camera: { distance: 240, yaw: 10, pitch: 26 },
+  },
   {
     // Through lot with party walls on both long sides, so the exclusion window
     // is narrow: this footprint's simplified ring centroid sits 0.96 m from the

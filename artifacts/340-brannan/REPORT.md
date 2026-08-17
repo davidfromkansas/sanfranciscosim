@@ -182,3 +182,87 @@ The contact sheet, the aerial day and night renders and the shipped numbers were
 presented to the user at this gate before stage 4 began. The standing approval
 covers the pipeline's internal gates only: stage 5 still ends at a local commit
 and asks before any push, PR or deploy.
+
+## Stage 5 — local integration QA (batch mode)
+
+Case **B** (new landmark). Registry entry `340Brannan` added to
+`pipeline/lib/landmarks.mjs` with `exclude: 8` and
+`camera: { distance: 240, yaw: 10, pitch: 26 }`; manifest entry appended as
+**text**, not via `JSON.stringify`, so no other entry's number formatting moved
+(the diff is +19 lines and nothing else). Full re-bake run and QA'd, then
+discarded per "Batch mode" in `docs/asset-pipeline/ADDRESS-TO-ASSET.md`.
+
+**Exclusion radius, measured against the real bake input** (DataSF *and*
+Overture, 96 rings within 120 m of the anchor):
+
+| radius | rings dropped | |
+|---|---|---|
+| 2–14 m | **2** | SF3775015 (centroid 0.00 m) + its Overture twin (centroid 1.76 m) — this site is traced by both sources |
+| 15 m | 5 | eats SF3775039, the Gran Oriente Filipino block |
+| 16 m | 7 | also SF3775102 |
+| 17 m | 8 | also SF3775101, 334 Brannan |
+
+The binding limit is a **shared party-wall vertex**: SF3775039's nearest vertex
+is 14.16 m, which is exactly our own footprint's nearest vertex, because the two
+rings meet on the property line. `exclude: 8` sits in the middle of the safe
+band. Our own footprint reaches 20.43 m from the anchor and that is fine — the
+centroid test alone drops it.
+
+In the actual bake only **one** footprint was dropped: the Overture pass
+gap-fills, so it never added a second ring where DataSF had already occupied the
+site.
+
+| Check | Result | Evidence |
+|---|---|---|
+| Re-validation of the shipped GLB | **PASS** | fresh-scene contract validator, all 16 checks, on the meshopt-packed file |
+| Manifest entry | **PASS** | +19 lines, valid JSON, 74 entries; no other entry touched |
+| id mapping | **PASS** | `camelId('340-brannan')` → `340Brannan`, matches the registry id |
+| Case B registry + re-bake | **PASS** | `npm run loredata … context muni-shapes` full chain, exit 0 |
+| `pipeline/audit.mjs` check 1.6 | **PASS** | "no procedural footprint inside a bespoke landmark exclusion zone — 83 zones over 80 landmarks clear" |
+| `pipeline/verify-rebake.mjs` | **PASS** | "584 of 585 cells unchanged; 23_13 201 → 200 ← 340Brannan"; nearest surviving footprint 14.2 m vs 8 m radius |
+| Single building at the site | **PASS** | day screenshot — one building, no procedural twin, no baked block, no z-fighting |
+| Scale factor | **PASS** | `sf-assets: 340-brannan merged 14 objects / 13 materials -> batched (5393 tris body); uniform x1.0000 at 3895, -1247` |
+| Orientation | **PASS** | the two window-lined faces front Brannan and Jack London Alley; the two blind party walls face 334 Brannan and the Gran Oriente block |
+| Terrain seating | **PASS** | sits on the sidewalk grade, no float, no sink |
+| Night glow | **PASS** | night screenshot — lobby band, "340" sign and a scatter of lit windows only; parapet, penthouse and roof furniture stay dark |
+| Draw calls | **PASS** | 101/frame average over 30 frames at the landmark, budget 300 |
+| Fallback drill | **PASS** | GLB served as a real 404 → `failed: 1`, app boots, everything else renders, **exactly one** warning; the site is empty ground inside the exclusion zone, which is the expected Case B result |
+| `npm run lint` / `npm run build` | **PASS** | eslint clean; build ✓ |
+| Batch-mode sanity | **PASS** | `git diff --name-only origin/main` lists nothing under `app/public/tiles/` or `api/_data/` |
+
+QA screenshots: `artifacts/340-brannan/qa/{day,night,wide,drill-day,drill-night,drill-wide}.png`,
+machine-readable results in `qa/qa.json` and `qa/drill.json`, harness in
+`artifacts/340-brannan/qa_local.mjs`.
+
+Three audit checks fail on this branch and on `origin/main` alike — **1.2b**
+(p95 building height, a property of the DataSF 2010 roof-median heights),
+**1.3c** (Telegraph Hill terrain, a Terrarium DEM artefact) and **1.7b** (one
+sampled tree offshore). None of them involve this landmark, this cell or any
+exclusion zone, and `verify-rebake` proves only cell 23_13 moved.
+
+### How the QA was run
+
+`preview_start` refused with *"Maximum 5 dev servers per folder reached; 5 belong
+to other chats"* — parallel landmark sessions hold every slot and stopping
+theirs is not an option. The QA therefore drives `app/dist` in real headless
+Chrome over CDP (`artifacts/340-brannan/qa_local.mjs`), which is the technique
+`pipeline/landmark-streaming-check.mjs` already uses. Two things about that
+harness are worth keeping:
+
+- **Wait for THIS landmark, not for "some landmark is live".** The 18 resident
+  entries (bridges, skyline pieces) all merge during boot and satisfy
+  `stats().live > 0` long before the streaming scan reaches a 2.5 km entry.
+  Polling the aggregate made a perfectly healthy streamed asset look like a
+  broken `loadRadius` twice before the harness switched to
+  `SF.assets.placed.has('340Brannan')`.
+- **The fallback drill returns a real 404** from the harness's own file server
+  rather than renaming the GLB. Vite's dev server answers a missing public path
+  with `index.html` and HTTP 200, so the rename trick cannot produce a fetch
+  failure at all; a 404 makes the drill honest and leaves the file in place.
+
+## Ship decision
+
+_Stage 5 ends here by design: the pipeline replaces INTEGRATION-PROMPT Step 7
+with a stop. The branch `pipeline/340-brannan` is committed locally, source only.
+Push / PR / deploy await the user's explicit go-ahead, and the city is baked once
+for the whole batch by `docs/asset-pipeline/BATCH-INTEGRATE.md`._
