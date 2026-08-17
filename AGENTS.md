@@ -68,7 +68,7 @@ All UI (cards, search, concierge panel) follows the toy theme: cream card stock,
 
 ## Live vehicle motion (the regression that keeps coming back)
 
-"The buses are frozen" and "parked coaches are cluttering the city" have each been fixed several times (9e9accd8, 10b388aa, 5f0ea041, 73bb2a96, 4cd32464) and each fix was later undone by an unrelated pass through `app/src/muni.js`. The rules therefore no longer live inline in the renderer: they are pure functions in **`app/src/muni-motion.js`**, locked by **`app/test/muni-motion.test.mjs`** (`cd app && npm test`, also run by CI). Read that file's header before touching anything that decides whether a vehicle moves or leaves the scene, and never inline a copy of one of its rules back into `muni.js`.
+"The buses are frozen" and "parked coaches are cluttering the city" have each been fixed several times (9e9accd8, 10b388aa, 5f0ea041, 73bb2a96, 4cd32464) and each fix was later undone by an unrelated pass through `app/src/muni.js`. The rules therefore no longer live inline in the renderer: they are pure functions in **`app/src/muni-motion.js`**, locked by **`app/test/muni-motion.test.mjs`** (`cd app && npm test`, and `npm run build` runs it first, so a broken rule fails the Vercel build). Read that file's header before touching anything that decides whether a vehicle moves or leaves the scene, and never inline a copy of one of its rules back into `muni.js`.
 
 The four invariants a live-feed layer must keep (they apply to ferries and aircraft too):
 
