@@ -8,10 +8,10 @@
 // 1. THE WALLS ARE ALWAYS ON. A bus wall lights only where a live vehicle is
 //    working, because a beam over a street with no service on it is a lie about
 //    the timetable. A ferry alignment is not a street — it is the crossing
-//    itself, and nothing else in the Bay marks it. Drawing all seven keeps the
+//    itself, and nothing else in the Bay marks it. Drawing all fourteen keeps the
 //    network legible at 3 a.m. and keeps the geometry static, so there is no
 //    rebuild when the fleet changes and no cost to a quiet night.
-// 2. ONE SHAPE PER ROUTE. The feed publishes 43 shapes for 7 routes — the same
+// 2. ONE SHAPE PER ROUTE. The feeds publish 67 shapes for 14 routes — the same
 //    crossing appears up to four times as separate trip patterns. Drawing them
 //    all would stack four coincident walls on one corridor and blow it out to
 //    four times the intended brightness, so each route contributes its longest
@@ -52,9 +52,10 @@ const QUALITY = {
   medium: { height: WALL_HEIGHT, all: true },
   low: { height: WALL_HEIGHT * 0.7, all: false },
 };
-// Routes whose crossing is mostly outside the water plane; the low tier keeps
-// the ones you can actually see end to end.
-const OFF_SCENE_ROUTES = new Set(['VJO', 'RCH', 'HB']);
+// Routes whose crossing mostly leaves the water plane; the low tier keeps the
+// ones you can follow end to end. Ids are operator-namespaced, because the
+// agencies reuse each other's short codes.
+const OFF_SCENE_ROUTES = new Set(['SB:VJO', 'SB:RCH', 'SB:HB', 'GF:LSSF']);
 
 // A livery colour is picked for a printed timetable, not for emitted light, so
 // each one is read twice: brightened to neon for the additive night pass, and

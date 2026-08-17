@@ -1,10 +1,10 @@
 // Ferry terminal markers: the clickable layer over the berths WETA boats
 // actually tie up at, baked by pipeline/ferry-shapes.mjs.
 //
-// This is the bus-stop layer's problem two orders of magnitude smaller — nine
+// This is the bus-stop layer's problem two orders of magnitude smaller — fourteen
 // berths in the water plane against 2,976 bus stops — so almost none of
 // munistoplayer.js's machinery is needed here. No declutter grid, no view-cell
-// competition, no altitude ceiling: nine markers never crowd a frame, and a
+// competition, no altitude ceiling: fourteen markers never crowd a frame, and a
 // ferry terminal is a place worth seeing from the hero view, which is exactly
 // the argument that made a bus stop's pin disappear above 1,050 m.
 //
@@ -258,7 +258,8 @@ export function createFerryTerminals(scene, data, ferries) {
       // Every route that calls here, from the GTFS bake — true whether or not a
       // boat is sailing right now, which a live-vessel list alone cannot say.
       routes,
-      gates: berth.gates,
+      stops: berth.stops,
+      operators: berth.operators,
       vessels: vesselsFor(berth),
       source: 'weta',
       confidence: 3,
@@ -299,6 +300,11 @@ export function createFerryTerminals(scene, data, ferries) {
     setQuality,
     pickTerminal,
     terminalEntity,
+    // Names of every berth inside the water plane — for automated checks and
+    // for answering "is Sausalito on the map" without a pick.
+    berthNames() {
+      return berths.map((b) => b.name);
+    },
     get count() {
       return mesh ? mesh.count : 0;
     },

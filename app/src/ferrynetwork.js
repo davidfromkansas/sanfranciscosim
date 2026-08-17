@@ -1,19 +1,24 @@
 // The SF Bay Ferry network as baked geometry: route alignments across the Bay,
 // the terminals boats tie up at, and each route's official livery colour.
 //
-// Baked by pipeline/ferry-shapes.mjs from 511's GTFS static for agency SB
-// (WETA). One parse, shared by everything that needs it — the terminal markers
-// and, when the route walls land, those too — because the browser cache makes
-// the fetch free but a second JSON parse of the chunk is not.
+// Baked by pipeline/ferry-shapes.mjs from 511's GTFS static for ALL FOUR ferry
+// operators — SB (SF Bay Ferry), GF (Golden Gate), AF (Angel Island–Tiburon)
+// and TF (Treasure Island) — so Sausalito, Tiburon, Larkspur, Angel Island and
+// Treasure Island are on the map alongside the WETA crossings. Route ids are
+// namespaced by operator ("GF:SSSF"), because the agencies reuse each other's
+// short codes and stop ids freely.
 //
-// Golden Gate Ferry (agency GF, Sausalito and Larkspur) is a DIFFERENT feed and
-// is not in here; its boats are legitimately absent from the Bay today.
+// Only SB publishes live vessel positions, so the other three contribute route
+// walls and terminals but never a moving hull.
+//
+// One parse, shared by the terminal markers, the route walls and the badges:
+// the browser cache makes the fetch free but a second parse of the chunk is not.
 
 const URL = `${import.meta.env.BASE_URL}tiles/ferry-shapes.bin`;
 const MAGIC = 0x46525931; // 'FRY1'
 
 // The Bay is one 30 km x 30 km water plane centred on the projection origin
-// (app/src/water.js). Four of the fifteen terminals are outside it — Harbor Bay,
+// (app/src/water.js). Five berths are outside it — Harbor Bay, Larkspur,
 // Richmond, Vallejo and Mare Island — and a marker out there would float over
 // void. Same inset ferries.js uses for hulls, for the same reason.
 export const SCENE_HALF_EXTENT = 15000 - 500;
@@ -52,69 +57,93 @@ function parse(buf) {
     lengthM: s.lengthM,
   }));
 
-  // The Ferry Building is three separate gate stops (E/F/G) about 30 m apart
-  // sharing parent_station 7201. Three markers there would collide into an
-  // unreadable smear, so gates are grouped onto their parent and drawn once, at
-  // the mean of the gates. Everything else is its own group of one.
+  // Four operators serve the same water, so the same physical dock appears
+  // several times: the Ferry Building is three SB gate stops (E/F/G) AND two GF
+  // gates (B/C), and Tiburon is one stop in the GF feed and another in the AF
+  // feed. Grouping by parent_station alone only catches the first case, because
+  // parent stations never cross agencies. So berths are clustered by DISTANCE:
+  // anything within MERGE_M of an existing cluster joins it and contributes its
+  // routes. 250 m is measured, not guessed: SB's Ferry Building gates and the
+  // GF/TF gates on the same building sit 233 m apart, so anything tighter draws
+  // two pins on the flagship terminal. It does also merge Oakland Ferry
+  // Terminal with the Water Shuttle dock 205 m away, which is the right answer
+  // for a pin — they are both Jack London Square, two minutes' walk apart.
+  const MERGE_M = 250;
   const terminals = (meta.terminals || []).map((t) => ({ ...t, routes: t.routes || [] }));
-  const groups = new Map();
+  const clusters = [];
   for (const t of terminals) {
-    const key = t.parent || t.id;
-    let g = groups.get(key);
-    if (!g) {
-      groups.set(key, (g = { id: key, name: t.name, x: 0, z: 0, members: [], routes: new Set() }));
+    const hit = clusters.find((c) => Math.hypot(c.x - t.x, c.z - t.z) <= MERGE_M);
+    if (hit) {
+      hit.members.push(t);
+      hit.x = hit.members.reduce((sum, m) => sum + m.x, 0) / hit.members.length;
+      hit.z = hit.members.reduce((sum, m) => sum + m.z, 0) / hit.members.length;
+    } else {
+      clusters.push({ members: [t], x: t.x, z: t.z });
     }
-    g.members.push(t);
-    for (const r of t.routes) g.routes.add(r);
   }
-  const berths = [];
-  for (const g of groups.values()) {
-    g.x = g.members.reduce((sum, t) => sum + t.x, 0) / g.members.length;
-    g.z = g.members.reduce((sum, t) => sum + t.z, 0) / g.members.length;
-    // A grouped berth is named for the shared place, not for whichever gate
-    // happened to sort first: "San Francisco Ferry Building Gate E" is the wrong
-    // label for a pin standing over all three.
-    if (g.members.length > 1) g.name = commonName(g.members.map((t) => t.name)) || g.name;
-    berths.push({
-      id: g.id,
-      name: g.name,
-      x: g.x,
-      z: g.z,
-      gates: g.members.length,
-      routes: [...g.routes].sort(),
-      inScene: inScene(g.x, g.z),
-    });
-  }
+
+  const berths = clusters.map((c) => {
+    c.title = berthName(c.members);
+    const routes = new Set();
+    const operators = new Set();
+    for (const m of c.members) {
+      for (const r of m.routes) routes.add(r);
+      operators.add(m.operator);
+    }
+    return {
+      // Named for the stop the cluster is titled after, so an id is stable
+      // across a re-bake as long as that stop exists.
+      id: c.title.id,
+      name: c.title.name,
+      x: c.x,
+      z: c.z,
+      stops: c.members.length,
+      operators: [...operators].sort(),
+      routes: [...routes].sort(),
+      inScene: inScene(c.x, c.z),
+    };
+  });
   berths.sort((a, b) => a.name.localeCompare(b.name));
 
   return { routes, shapes, verts, terminals, berths };
 }
 
-// Longest shared leading words of a set of gate names — "San Francisco Ferry
-// Building Gate E/F/G" collapses to "San Francisco Ferry Building".
+// What to call a cluster of stops, and which stop lends it its id.
 //
-// The trailing qualifier has to go with it: the shared run of those three names
-// ends in "Gate", because only the letter after it differs, and a pin labelled
-// "…Ferry Building Gate" reads as a truncation bug rather than a place.
-const QUALIFIER = /^(gate|berth|slip|dock|pier|terminal)$/i;
+// The feeds name the same dock several ways, and two of those names carry
+// service caveats rather than places: Golden Gate calls Angel Island "Angel
+// Island-No Service to Tiburon" and Tiburon "Tiburon-No Service to Angel
+// Island". Those belong on a timetable, not on a pin — and a pin is not
+// claiming anything about service, so trimming them is legible, not inaccurate.
+// Gate suffixes go the same way, since the pin stands over all the gates.
+const CAVEAT = /\s*[-–—]\s*no service.*$/i;
+const GATE_SUFFIX = /\s*[-–—]?\s*\bgate\s+\w+$/i;
 
-function commonName(names) {
-  if (!names.length) return null;
-  const split = names.map((n) => n.split(/\s+/));
-  const head = [];
-  for (let i = 0; i < split[0].length; i++) {
-    const word = split[0][i];
-    if (!split.every((parts) => parts[i] === word)) break;
-    head.push(word);
+function tidyName(name) {
+  return String(name).replace(CAVEAT, '').replace(GATE_SUFFIX, '').replace(/[\s,–—-]+$/, '').trim();
+}
+
+function berthName(members) {
+  const tallies = new Map();
+  for (const m of members) {
+    const name = tidyName(m.name) || m.name;
+    const entry = tallies.get(name) || { name, count: 0, id: m.id };
+    entry.count++;
+    tallies.set(name, entry);
   }
-  // Only when the shared run actually stops short of a member's full name: if
-  // every gate is called the same thing, "Terminal" is the name, not a dangling
-  // qualifier, and stripping it would rename the place.
-  const truncates = split.some((parts) => parts.length > head.length);
-  if (truncates) {
-    while (head.length > 1 && QUALIFIER.test(head[head.length - 1])) head.pop();
-  }
-  return head.join(' ').replace(/[\s,-]+$/, '') || null;
+  let candidates = [...tallies.values()];
+  // A name that EXTENDS another candidate is the more specific one, and wins
+  // outright: the Ferry Building cluster offers both "San Francisco" (Golden
+  // Gate's and Treasure Island's word for it) and "San Francisco Ferry
+  // Building", and the vaguer one would otherwise win on a count tie.
+  const extended = candidates.filter((c) =>
+    candidates.some((other) => other !== c && c.name.startsWith(`${other.name} `))
+  );
+  if (extended.length) candidates = extended;
+  // Otherwise most-used wins, and ties go to the shortest, which is reliably
+  // the plain place name ("Angel Island" over "Ayala Cove Pier - Angel Island").
+  const best = candidates.sort((a, b) => b.count - a.count || a.name.length - b.name.length)[0];
+  return { id: best.id, name: best.name };
 }
 
 // Resolves to the parsed network, or null if the bake is missing or malformed.

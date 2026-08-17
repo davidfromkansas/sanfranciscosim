@@ -44,14 +44,30 @@ import { simplify } from './lib/poly.mjs';
 
 const HERE = path.dirname(fileURLToPath(import.meta.url));
 const DATA = path.join(HERE, 'data');
-const ZIP = path.join(DATA, 'ferry-gtfs.zip');
-const EXTRACT = path.join(DATA, 'ferry-gtfs');
+const zipFor = (op) => path.join(DATA, `ferry-gtfs-${op}.zip`);
+const extractFor = (op) => path.join(DATA, `ferry-gtfs-${op}`);
 const OUT = path.join(HERE, '../app/public/tiles/ferry-shapes.bin');
 const OUT_STOPS = path.join(HERE, '../api/_data/ferry-stops.json');
 
 // Written and read as UInt32LE, same convention as muni-shapes.bin's 'MUN1'.
 const MAGIC = 0x46525931; // 'FRY1'
-const AGENCY = 'SB'; // SB = SF Bay Ferry / WETA. GF (Golden Gate) is a separate feed.
+// ALL FOUR of 511's ferry operators, not just WETA. Baking SB alone left the
+// Sausalito, Tiburon, Larkspur, Angel Island and Treasure Island crossings
+// missing from a map of the Bay, which is exactly the sort of hole the "data
+// accuracy is the product" rule exists to prevent.
+//
+// Only SB publishes live vessel positions (measured: GF, AF and TF all return
+// zero vehicles from SIRI VehicleMonitoring at a weekday commute hour, when
+// Golden Gate's Sausalito boats are certainly running). So the other three
+// contribute route walls and terminals but never a moving hull — which is
+// honest: we can say where the crossing goes without claiming to know where the
+// boat is.
+const OPERATORS = [
+  { id: 'SB', name: 'San Francisco Bay Ferry', live: true },
+  { id: 'GF', name: 'Golden Gate Ferry', live: false },
+  { id: 'AF', name: 'Angel Island Tiburon Ferry', live: false },
+  { id: 'TF', name: 'Treasure Island Ferry', live: false },
+];
 // Open water, so unlike the Muni bake there is no terrain to follow and no
 // street to sit on — the shapes only need to be smooth enough to draw.
 const SIMPLIFY_TOLERANCE_M = 15;
@@ -64,19 +80,18 @@ const MAX_RAW_BYTES = 400 * 1024;
 
 // ------------------------------------------------------------------ download
 
-async function download(key) {
+async function download(key, op) {
   mkdirSync(DATA, { recursive: true });
-  const url = `https://api.511.org/transit/datafeeds?operator_id=${AGENCY}&api_key=${encodeURIComponent(key)}`;
-  console.log('[ferry-shapes] downloading GTFS static…');
+  const url = `https://api.511.org/transit/datafeeds?operator_id=${op}&api_key=${encodeURIComponent(key)}`;
+  console.log(`[ferry-shapes] ${op}: downloading GTFS static…`);
   const res = await fetch(url);
-  if (!res.ok) throw new Error(`datafeeds HTTP ${res.status}`);
-  writeFileSync(ZIP, Buffer.from(await res.arrayBuffer()));
-  console.log(`[ferry-shapes] ${ZIP} (${(readFileSync(ZIP).length / 1e3).toFixed(0)} KB)`);
+  if (!res.ok) throw new Error(`${op} datafeeds HTTP ${res.status}`);
+  writeFileSync(zipFor(op), Buffer.from(await res.arrayBuffer()));
 }
 
-function extract() {
-  mkdirSync(EXTRACT, { recursive: true });
-  execFileSync('unzip', ['-o', '-q', ZIP, '-d', EXTRACT]);
+function extract(op) {
+  mkdirSync(extractFor(op), { recursive: true });
+  execFileSync('unzip', ['-o', '-q', zipFor(op), '-d', extractFor(op)]);
 }
 
 // ------------------------------------------------------------------ csv
@@ -104,8 +119,10 @@ function splitCsv(line) {
   return out;
 }
 
-async function eachRow(file, fn) {
-  const rl = createInterface({ input: createReadStream(path.join(EXTRACT, file)), crlfDelay: Infinity });
+async function eachRow(op, file, fn) {
+  const full = path.join(extractFor(op), file);
+  if (!existsSync(full)) return;
+  const rl = createInterface({ input: createReadStream(full), crlfDelay: Infinity });
   let header = null;
   for await (const raw of rl) {
     const line = raw.replace(/^﻿/, '');
@@ -133,149 +150,163 @@ async function main() {
     (process.env.FERRY_511_KEY || '').trim() ||
     (process.env.MUNI_511_KEY || '').trim();
 
-  if (argv.includes('--fresh') || !existsSync(ZIP)) {
+  const cached = OPERATORS.every((op) => existsSync(zipFor(op.id)));
+  if (argv.includes('--fresh') || !cached) {
     if (!key) {
       // Part of `npm run all`, which must not fail for want of an optional key.
       // The committed .bin is the shipped artifact; leaving it alone is correct.
       console.warn(
-        '[ferry-shapes] no 511 key and no cached GTFS zip — leaving the committed ' +
+        '[ferry-shapes] no 511 key and no cached GTFS zips — leaving the committed ' +
           'app/public/tiles/ferry-shapes.bin as is. Set FERRY_511_KEY to re-bake.',
       );
       return;
     }
-    await download(key);
+    for (const op of OPERATORS) await download(key, op.id);
   } else {
-    console.log('[ferry-shapes] using cached zip (pass --fresh to re-download)');
+    console.log('[ferry-shapes] using cached zips (pass --fresh to re-download)');
   }
-  extract();
 
-  // routes.txt — 7 routes, each with an official livery colour that the route
-  // walls and terminal pins are drawn in.
-  const routes = new Map(); // routeId -> { name, color, textColor }
-  await eachRow('routes.txt', (cols, h) => {
-    const id = cols[h.route_id];
-    if (!id) return;
-    routes.set(id, {
-      name: cols[h.route_long_name] || cols[h.route_short_name] || id,
-      color: hex(cols[h.route_color]),
-      textColor: hex(cols[h.route_text_color]),
-    });
-  });
-  console.log(`[ferry-shapes] routes: ${routes.size}`);
-
-  // trips.txt — which shapes each route runs, and which trips call where.
-  const trips = new Map(); // tripId -> { routeId, shapeId }
-  const shapeUse = new Map(); // shapeId -> routeId
-  await eachRow('trips.txt', (cols, h) => {
-    const routeId = cols[h.route_id];
-    const tripId = cols[h.trip_id];
-    const shapeId = cols[h.shape_id];
-    if (!routes.has(routeId) || !tripId) return;
-    trips.set(tripId, { routeId, shapeId: shapeId || null });
-    if (shapeId) shapeUse.set(shapeId, routeId);
-  });
-  console.log(`[ferry-shapes] trips: ${trips.size}, shapes used: ${shapeUse.size}`);
-
-  // shapes.txt — project, simplify, subdivide, arc-length.
-  const rawShapes = new Map(); // shapeId -> [[seq, x, z], ...]
-  await eachRow('shapes.txt', (cols, h) => {
-    const id = cols[h.shape_id];
-    if (!shapeUse.has(id)) return;
-    const [x, z] = project(Number(cols[h.shape_pt_lon]), Number(cols[h.shape_pt_lat]));
-    let arr = rawShapes.get(id);
-    if (!arr) rawShapes.set(id, (arr = []));
-    arr.push([Number(cols[h.shape_pt_sequence]), x, z]);
-  });
-
-  const shapeIndex = new Map(); // shapeId -> idx
+  // Everything is namespaced by operator: SB stop 7201 and a GF stop could
+  // otherwise collide, and four agencies serve the same Ferry Building.
+  const routesOut = {};
   const shapeMeta = [];
   const floats = [];
-  for (const [id, pts] of rawShapes) {
-    pts.sort((a, b) => a[0] - b[0]);
-    const flat = [];
-    for (const [, x, z] of pts) flat.push(x, z);
-    const slim = simplify(flat, SIMPLIFY_TOLERANCE_M);
-    const sub = [];
-    for (let i = 0; i < slim.length; i += 2) {
-      if (i > 0) {
-        const px = slim[i - 2];
-        const pz = slim[i - 1];
-        const cx = slim[i];
-        const cz = slim[i + 1];
-        const segLen = Math.hypot(cx - px, cz - pz);
-        if (segLen > SUBDIVIDE_M) {
-          const steps = Math.ceil(segLen / SUBDIVIDE_M);
-          for (let j = 1; j < steps; j++) {
-            const t = j / steps;
-            sub.push(px + (cx - px) * t, pz + (cz - pz) * t);
+  const terminals = [];
+
+  for (const op of OPERATORS) {
+    extract(op.id);
+
+    const routes = new Map(); // raw routeId -> { name, color, textColor }
+    await eachRow(op.id, 'routes.txt', (cols, h) => {
+      const id = cols[h.route_id];
+      if (!id) return;
+      routes.set(id, {
+        name: cols[h.route_long_name] || cols[h.route_short_name] || id,
+        color: hex(cols[h.route_color]),
+        textColor: hex(cols[h.route_text_color]),
+      });
+    });
+
+    const trips = new Map(); // tripId -> { routeId, shapeId }
+    const shapeUse = new Map(); // shapeId -> raw routeId
+    await eachRow(op.id, 'trips.txt', (cols, h) => {
+      const routeId = cols[h.route_id];
+      const tripId = cols[h.trip_id];
+      const shapeId = cols[h.shape_id];
+      if (!routes.has(routeId) || !tripId) return;
+      trips.set(tripId, { routeId, shapeId: shapeId || null });
+      if (shapeId) shapeUse.set(shapeId, routeId);
+    });
+
+    const rawShapes = new Map(); // shapeId -> [[seq, x, z], ...]
+    await eachRow(op.id, 'shapes.txt', (cols, h) => {
+      const id = cols[h.shape_id];
+      if (!shapeUse.has(id)) return;
+      const [x, z] = project(Number(cols[h.shape_pt_lon]), Number(cols[h.shape_pt_lat]));
+      let arr = rawShapes.get(id);
+      if (!arr) rawShapes.set(id, (arr = []));
+      arr.push([Number(cols[h.shape_pt_sequence]), x, z]);
+    });
+
+    const shapeIndex = new Map(); // shapeId -> index into the GLOBAL shapeMeta
+    for (const [id, pts] of rawShapes) {
+      pts.sort((a, b) => a[0] - b[0]);
+      const flat = [];
+      for (const [, x, z] of pts) flat.push(x, z);
+      const slim = simplify(flat, SIMPLIFY_TOLERANCE_M);
+      const sub = [];
+      for (let i = 0; i < slim.length; i += 2) {
+        if (i > 0) {
+          const px = slim[i - 2];
+          const pz = slim[i - 1];
+          const cx = slim[i];
+          const cz = slim[i + 1];
+          const segLen = Math.hypot(cx - px, cz - pz);
+          if (segLen > SUBDIVIDE_M) {
+            const steps = Math.ceil(segLen / SUBDIVIDE_M);
+            for (let j = 1; j < steps; j++) {
+              const t = j / steps;
+              sub.push(px + (cx - px) * t, pz + (cz - pz) * t);
+            }
           }
         }
+        sub.push(slim[i], slim[i + 1]);
       }
-      sub.push(slim[i], slim[i + 1]);
+      if (sub.length < 4) continue; // a one-point "shape" draws nothing
+      const vertexOffset = floats.length / 3;
+      let arc = 0;
+      for (let i = 0; i < sub.length; i += 2) {
+        if (i > 0) arc += Math.hypot(sub[i] - sub[i - 2], sub[i + 1] - sub[i - 1]);
+        floats.push(sub[i], sub[i + 1], arc);
+      }
+      shapeIndex.set(id, shapeMeta.length);
+      shapeMeta.push({ vertexOffset, vertexCount: sub.length / 2, lengthM: Math.round(arc) });
     }
-    const vertexOffset = floats.length / 3;
-    let s = 0;
-    for (let i = 0; i < sub.length; i += 2) {
-      if (i > 0) s += Math.hypot(sub[i] - sub[i - 2], sub[i + 1] - sub[i - 1]);
-      floats.push(sub[i], sub[i + 1], s);
-    }
-    shapeIndex.set(id, shapeMeta.length);
-    shapeMeta.push({ vertexOffset, vertexCount: sub.length / 2, lengthM: Math.round(s) });
-  }
-  const totalKm = shapeMeta.reduce((sum, s) => sum + s.lengthM, 0) / 1000;
-  console.log(
-    `[ferry-shapes] shapes: ${shapeMeta.length}, ${floats.length / 3} vertices, ${totalKm.toFixed(0)} km of route`,
-  );
 
-  const routesOut = {};
-  for (const [routeId, r] of routes) {
-    const shapes = [];
-    for (const [shapeId, owner] of shapeUse) {
-      if (owner !== routeId) continue;
-      const idx = shapeIndex.get(shapeId);
-      if (idx !== undefined && !shapes.includes(idx)) shapes.push(idx);
+    for (const [routeId, r] of routes) {
+      const shapes = [];
+      for (const [shapeId, owner] of shapeUse) {
+        if (owner !== routeId) continue;
+        const idx = shapeIndex.get(shapeId);
+        if (idx !== undefined && !shapes.includes(idx)) shapes.push(idx);
+      }
+      routesOut[`${op.id}:${routeId}`] = {
+        name: r.name,
+        color: r.color,
+        textColor: r.textColor,
+        operator: op.id,
+        operatorName: op.name,
+        // Only SB has AVL, so only SB routes can ever carry a moving hull.
+        live: op.live,
+        shapes,
+      };
     }
-    routesOut[routeId] = { name: r.name, color: r.color, textColor: r.textColor, shapes };
-  }
 
-  // stop_times.txt — which routes call at each stop.
-  const stopRoutes = new Map(); // stopId -> Set(routeId)
-  await eachRow('stop_times.txt', (cols, h) => {
-    const trip = trips.get(cols[h.trip_id]);
-    if (!trip) return;
-    const stopId = cols[h.stop_id];
-    let set = stopRoutes.get(stopId);
-    if (!set) stopRoutes.set(stopId, (set = new Set()));
-    set.add(trip.routeId);
-  });
-
-  // stops.txt — THE TRAP: this file mixes real terminals with the Ferry
-  // Building's parent station and its four street entrances. Only
-  // location_type 0 is a place a boat ties up; the rest would plant pins in the
-  // middle of the Embarcadero. The Ferry Building is three separate gate stops
-  // (E/F/G, ~30 m apart) sharing parent_station 7201, so `parent` is kept and
-  // the client groups by it rather than drawing three colliding markers.
-  const terminals = [];
-  let skipped = 0;
-  await eachRow('stops.txt', (cols, h) => {
-    const id = cols[h.stop_id];
-    if ((cols[h.location_type] || '0').trim() !== '0') {
-      skipped++;
-      return;
-    }
-    const [x, z] = project(Number(cols[h.stop_lon]), Number(cols[h.stop_lat]));
-    terminals.push({
-      id,
-      name: cols[h.stop_name] || id,
-      x: +x.toFixed(1),
-      z: +z.toFixed(1),
-      parent: (cols[h.parent_station] || '').trim() || null,
-      routes: [...(stopRoutes.get(id) || [])].sort(),
+    const stopRoutes = new Map(); // raw stopId -> Set(namespaced routeId)
+    await eachRow(op.id, 'stop_times.txt', (cols, h) => {
+      const trip = trips.get(cols[h.trip_id]);
+      if (!trip) return;
+      const stopId = cols[h.stop_id];
+      let set = stopRoutes.get(stopId);
+      if (!set) stopRoutes.set(stopId, (set = new Set()));
+      set.add(`${op.id}:${trip.routeId}`);
     });
-  });
+
+    // THE TRAP: stops.txt mixes real terminals with parent stations and street
+    // entrances. Only location_type 0 is a place a boat ties up; the rest would
+    // plant pins inland.
+    let skipped = 0;
+    await eachRow(op.id, 'stops.txt', (cols, h) => {
+      const id = cols[h.stop_id];
+      if ((cols[h.location_type] || '0').trim() !== '0') {
+        skipped++;
+        return;
+      }
+      const [x, z] = project(Number(cols[h.stop_lon]), Number(cols[h.stop_lat]));
+      terminals.push({
+        id: `${op.id}:${id}`,
+        name: cols[h.stop_name] || id,
+        operator: op.id,
+        x: +x.toFixed(1),
+        z: +z.toFixed(1),
+        parent: (cols[h.parent_station] || '').trim() ? `${op.id}:${cols[h.parent_station].trim()}` : null,
+        routes: [...(stopRoutes.get(id) || [])].sort(),
+      });
+    });
+    const opRoutes = Object.keys(routesOut).filter((k) => k.startsWith(`${op.id}:`)).length;
+    console.log(
+      `[ferry-shapes] ${op.id} ${op.name}: ${opRoutes} routes, ` +
+        `${terminals.filter((t) => t.operator === op.id).length} terminals` +
+        `${skipped ? ` (skipped ${skipped} station/entrance rows)` : ''}` +
+        `${op.live ? '' : ', no live positions'}`,
+    );
+  }
+
   terminals.sort((a, b) => a.name.localeCompare(b.name));
+  const totalKm = shapeMeta.reduce((sum, sh) => sum + sh.lengthM, 0) / 1000;
   console.log(
-    `[ferry-shapes] terminals: ${terminals.length} (skipped ${skipped} station/entrance rows)`,
+    `[ferry-shapes] TOTAL: ${Object.keys(routesOut).length} routes, ${shapeMeta.length} shapes, ` +
+      `${floats.length / 3} vertices, ${totalKm.toFixed(0)} km, ${terminals.length} terminals`,
   );
 
   // ------------------------------------------------------------- serialise
