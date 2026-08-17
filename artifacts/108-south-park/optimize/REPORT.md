@@ -7,12 +7,17 @@ Stage 4 of `docs/asset-pipeline/ADDRESS-TO-ASSET.md`, executing
 
 **Result: all gates PASS. The optimized GLB is now the shipping file.**
 
+> Re-run on 16 Aug 2026 against the **recoloured** build (stage-5 QA found the
+> first palette rendered as a black slab in the app — see `../REPORT.md` pass 3).
+> Geometry is byte-for-byte the same shape; only material colours moved, so every
+> count below is unchanged and only the byte totals shift by a handful.
+
 ## Metrics
 
 | | input | shipped | delta |
 |---|---|---|---|
-| File, raw | 215,656 B (210.6 KB) | **96,196 B (93.9 KB)** | **−55.4%** |
-| File, gzip -9 | 41,375 B (40.4 KB) | 65,521 B (64.0 KB) | **+58.3%** — see §Size |
+| File, raw | 215,652 B (210.6 KB) | **96,180 B (93.9 KB)** | **−55.4%** |
+| File, gzip -9 | 41,408 B (40.4 KB) | 65,500 B (64.0 KB) | **+58.2%** — see §Size |
 | Objects | 53 | **11** | −79% |
 | Draw submeshes (primitives) | 58 | **13** | −78% |
 | Triangles | 3,516 | 3,516 | 0 |
@@ -96,7 +101,7 @@ the stage-2 validator.
 
 ### Size
 
-Raw bytes fell 55.4%. **Gzipped bytes rose 58.3%**, which is expected and is not
+Raw bytes fell 55.4%. **Gzipped bytes rose 58.2%**, which is expected and is not
 a regression: meshopt-compressed buffers are already entropy-coded, so gzip has
 nothing left to find and adds overhead. What ships over the wire from Vercel is
 the raw file with `Content-Encoding` negotiated per-asset; the number that
@@ -116,16 +121,16 @@ orthographic elevations.
 
 | view | mean abs RGB delta | max px delta |
 |---|---|---|
-| day near | 0.0077% | 35 |
-| day far | 0.0076% | 7 |
-| night near | 0.0019% | 10 |
-| night far | 0.0016% | 2 |
-| elev N | 0.0038% | 29 |
-| elev E | 0.1304% | 31 |
-| elev S | 0.1043% | 29 |
-| elev W | 0.0032% | 42 |
+| day near | 0.0046% | 43 |
+| day far | 0.0045% | 15 |
+| night near | 0.0022% | 10 |
+| night far | 0.0021% | 3 |
+| elev N | 0.0034% | 36 |
+| elev E | 0.1299% | 31 |
+| elev S | 0.1041% | 30 |
+| elev W | 0.0028% | 42 |
 
-Gate G4 allows 2% far / 4% near. The worst view is **0.13%**, sixteen times
+Gate G4 allows 2% far / 4% near. The worst view is **0.13%**, fifteen times
 under the tightest limit.
 
 **Looking at the diffs, honestly:** the ×8-amplified diff row is black except
@@ -157,7 +162,7 @@ runtime path.
 ## Shipping swap
 
 `108-south-park.optimized.glb` copied over `../108-south-park.glb`. The
-pre-optimize original is archived at `input/108-south-park.glb` (215,656 B).
+pre-optimize original is archived at `input/108-south-park.glb` (215,652 B).
 The asset's `../validation.json` was regenerated from the shipped file and still
 reports **overall PASS** on all 16 stage-2 checks, now at 11 objects /
 3,516 triangles.

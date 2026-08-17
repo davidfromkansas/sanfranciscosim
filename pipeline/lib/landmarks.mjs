@@ -952,6 +952,50 @@ export const LANDMARKS = [
     camera: { distance: 190, yaw: 315, pitch: 26 },
   },
   {
+    // The first landmark on the NORTH rim of the South Park oval, and a
+    // party-wall row building attached on BOTH flanks — 104-106 (the Gran
+    // Oriente Filipino Hotel, 11 m) north-east and 112 (6 m) south-west, both
+    // sharing vertices with this footprint at 0.00 m in OSM. That reads like the
+    // 165 South Park situation, where no radius centred on the manifest anchor
+    // worked at all, so the window was measured rather than assumed — against
+    // the two sources the bake actually consumes
+    // (pipeline/data/buildings_datasf.geojson and
+    // overture_buildings.geojsonseq), and remembering that excluded() drops a
+    // footprint when its centroid OR any ring vertex is inside the radius:
+    //
+    //   polygon                                   vertex   centroid   trigger
+    //   this building, Overture 86058388          15.04 m    0.21 m     0.21 m
+    //   this building, DataSF SF3775059            4.09 m    0.71 m     0.71 m
+    //   104-106 South Park, DataSF SF3775058       4.64 m    7.91 m     4.64 m  <- the ceiling
+    //   112 South Park, Overture 0675706c          9.62 m    6.28 m     6.28 m
+    //   112 South Park, DataSF SF3775060          10.71 m    6.62 m     6.62 m
+    //   104-106 South Park, Overture aa14bd23     10.43 m    6.74 m     6.74 m
+    //
+    // So the safe band is (0.71, 4.64) and it is wider than 165's because the
+    // two DataSF rings here are NOT vertex-coincident the way the OSM ways are.
+    // 2.7 sits in the middle with ~2 m of margin at both ends, and a sweep
+    // confirms every radius from 0.8 to 4.6 drops exactly these two rings and
+    // nothing else. Do NOT raise it past 4.6: at 4.7 the Gran Oriente Filipino
+    // — a National Register-nominated building with no hand-built replacement —
+    // disappears from the baked city and nothing crashes to tell you.
+    //
+    // Both Overture and DataSF have to be cleared, not just DataSF: addBuilding()
+    // returns null on exclusion so markOccupied() never runs, and the Overture
+    // gap-fill would re-add this building afterwards. 2.7 clears both.
+    id: '108SouthPark',
+    name: '108-110 South Park (South Park Cafe)',
+    lon: -122.3944817,
+    lat: 37.7816789,
+    height: 8.45,
+    exclude: 2.7,
+    // camera.js apply() puts the eye at target + distance*(sin yaw, ., cos yaw)
+    // with +x east and +z south, so bearing = 180 - yaw and yaw 45 stands the
+    // camera at 135 deg — square onto the shopfront. Same derivation as
+    // 380Brannan, whose SE-facing front also carries yaw 45. 150 m suits an
+    // 8.45 m building (cf. 135 South Park at 150 for 8.5 m).
+    camera: { distance: 150, yaw: 45, pitch: 26 },
+  },
+  {
     // The new Main Library, one block south of the Old Main across Fulton, on a
     // near-identical 106 x 57 m block. Same radius rule as its neighbour and for
     // the same reason: excluded() drops a footprint when its centroid OR ANY ring

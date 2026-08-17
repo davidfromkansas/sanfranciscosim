@@ -1,7 +1,7 @@
 {
  "file_bytes": {
-  "raw": 215656,
-  "gzip9": 41375
+  "raw": 215652,
+  "gzip9": 41408
  },
  "objects": 53,
  "total_tris": 3516,
@@ -70,7 +70,7 @@
     7.8
    ],
    "materials": [
-    "Toy_roofd",
+    "Toy_stone",
     "Toy_verdigris"
    ]
   },
@@ -175,7 +175,7 @@
     0.45
    ],
    "materials": [
-    "Toy_trim"
+    "Toy_steel"
    ]
   },
   {
@@ -189,7 +189,7 @@
    ],
    "materials": [
     "Toy_glass",
-    "Toy_trim"
+    "Toy_steel"
    ]
   },
   {
@@ -203,7 +203,7 @@
    ],
    "materials": [
     "Toy_glass",
-    "Toy_trim"
+    "Toy_steel"
    ]
   },
   {
@@ -217,7 +217,7 @@
    ],
    "materials": [
     "Toy_glass",
-    "Toy_trim"
+    "Toy_steel"
    ]
   },
   {
@@ -231,7 +231,7 @@
    ],
    "materials": [
     "Toy_glass",
-    "Toy_trim"
+    "Toy_steel"
    ]
   },
   {
@@ -304,19 +304,19 @@
    "user_objects": 19
   },
   {
-   "name": "Toy_roofd",
+   "name": "Toy_steel",
+   "glow": false,
+   "user_objects": 9
+  },
+  {
+   "name": "Toy_stone",
    "glow": false,
    "user_objects": 1
   },
   {
-   "name": "Toy_steel",
-   "glow": false,
-   "user_objects": 4
-  },
-  {
    "name": "Toy_trim",
    "glow": false,
-   "user_objects": 6
+   "user_objects": 1
   },
   {
    "name": "Toy_trim_Glow",
@@ -529,8 +529,7 @@
   "Toy_glass_Glow": 3,
   "Toy_ink": 5,
   "Toy_mint": 19,
-  "Toy_steel": 4,
-  "Toy_trim": 6,
+  "Toy_steel": 9,
   "Toy_verdigris": 6
  },
  "degenerate_tris": 0,

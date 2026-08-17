@@ -449,25 +449,31 @@ machinery (`prism`, `rim`, `front_rect`, `edge_return`).
 
 ### 2.8 Materials and palette
 
+> **Superseded in part by `artifacts/108-south-park/REPORT.md`.** The hexes below
+> are the SHIPPED ones. The plan first specified `#35493e` / `#4f6858` and a dark
+> `Toy_roofd` deck; all three were corrected during stage-5 QA after the asset
+> rendered as a black slab in the running app. REPORT beats plan.
+
 | Material | Hex | Used for | Palette status |
 |---|---|---|---|
-| `Toy_verdigris` | `35493e` | body, parapet, bulkhead, pilasters, all four elevations | **off-palette, deliberate** — the palette entry is `9fb8a8`, far too pale. The style bible's SF exception (painted facades are saturated identity) covers it, and 165 South Park set the precedent of keeping the palette NAME while overriding the hex. WARN, not FAIL; recorded in REPORT.md |
-| `Toy_mint` | `4f6858` | cornice, modillions, belt course, window casings | **off-palette, deliberate** — a lighter green so the crown and the belt read as articulation rather than as a flat wall. Same justification |
+| `Toy_verdigris` | `587a66` | body, parapet, bulkhead, pilasters, all four elevations | **off-palette, deliberate** — the palette entry is `9fb8a8`, far too pale. The style bible's SF exception (painted facades are saturated identity) covers it, and 165 South Park set the precedent of keeping the palette NAME while overriding the hex. WARN, not FAIL; recorded in REPORT.md |
+| `Toy_mint` | `7f9d8b` | cornice, modillions, belt course, window casings | **off-palette, deliberate** — a lighter green so the crown and the belt read as articulation rather than as a flat wall. Same justification |
 | `Toy_gold` | `caa64a` | the sign fascia, and nothing else | on palette. Using it anywhere else destroys the one identity cue |
-| `Toy_trim` | `f3efe6` | transom band, window sills, skylight frames | on palette |
+| `Toy_trim` | `f3efe6` | transom band, window sills | on palette |
 | `Toy_ink` | `3a3530` | awnings, entry recess, rear carriage door frame | on palette |
 | `Toy_glass` | `2a4d73` | display glazing, upper windows, rear glazing, skylight glass | on palette |
-| `Toy_roofd` | `45454a` | roof deck | on palette |
-| `Toy_steel` | `9aa0a6` | roof mechanical block | on palette |
+| `Toy_stone` | `d9d2c2` | roof deck — a LIGHT membrane | on palette |
+| `Toy_steel` | `9aa0a6` | roof mechanical block, skylight frames, roof hatch, rear louver | on palette |
 | `Toy_trim_Glow` | `f3efe6` | the transom band at night — the hero glow | day colour matches `Toy_trim` |
 | `Toy_glass_Glow` | `6f95b8` | two lit upper windows and one display bay | day colour matches the established glow neighbour |
 
 ### 2.9 Top surface
 
-Flat membrane roof, `Toy_roofd`, ringed by a 0.22 m dark green parapet. On it:
+Flat **light** membrane roof, `Toy_stone`, ringed by a 0.22 m green parapet. On it:
 
-- **four skylights** in a line down the long axis, 0.9 x 1.3 m, cream frames with dark
-  glass, 0.26 m tall. Satellite imagery shows a run of dark rectangles along the spine of
+- **four skylights** in a line down the long axis, 1.25 x 1.8 m, grey frames with
+  dark glass, 0.30 m tall (shipped sizes; the plan's original 0.9 x 1.3 m
+  vanished from the app's camera). Satellite imagery shows a run of dark rectangles along the spine of
   this roof; a regular line of four is the graphic simplification (§10, §26).
 - **one low mechanical block**, 2.0 x 1.6 x 0.50, in the rear third, `Toy_steel`.
 - nothing else, and **nothing above 8.45 m** — the cornice is the crest so the loader's

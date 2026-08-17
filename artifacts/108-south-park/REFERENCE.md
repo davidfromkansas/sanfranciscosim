@@ -118,16 +118,18 @@ from the app's camera) — the fascia is a plain gold band. The oval leaded moti
 collapse to one pale stripe. The clapboard boards are not modelled; the belt
 course is all the horizontality the walls get. The carriage door's divided
 lights become one pane. The downspout, camera, utility box and vent stack detail
-are dropped. The colour value is lifted one step (see §7).
+are dropped. The colour value is lifted two steps and the roof deck is light
+(see §7).
 
 ## 7. Deliberate departures from the reference
 
 | Departure | Why |
 |---|---|
-| Body green authored at **#35493e**, lighter than the real paint | the real paint photographs near-black. A near-black 6.4 m sliver between an 11 m pale neighbour and a navy one reads from the air as a **gap in the row**, not a building. Style bible §7 SF exception + §29 (readability over realism) |
+| Body green authored at **#587a66**, two steps lighter than the real paint | the real paint photographs near-black. A near-black 6.4 m sliver between an 11 m pale neighbour and a navy one reads from the air as a **gap in the row**, not a building — and at one step up (#35493e) it still rendered as a literal black slab in the running app, measured at `rgb(5,5,6)`. Style bible §7 SF exception + §29 (readability over realism) |
 | `Toy_verdigris` and `Toy_mint` carry off-palette hexes | the palette has no dark green. Both keep the palette NAME so the contract check and the loader's merge path are unaffected — the precedent is 165 South Park's `Toy_steel`. **WARN, not FAIL** |
 | Cornice / belt / casings in a *lighter green*, not cream | the real trim is green too. A cream cornice would be a lie that happens to be in the palette; one step lighter is what makes the crown read as articulation |
 | Skylights and roof furniture sized up | §9 semantic scale — at real size they vanish from the app's camera |
+| Roof deck authored as a **light** membrane (`Toy_stone` #d9d2c2) | matches the 2026 satellite imagery of this row, which the plan's original dark `Toy_roofd` deck did not. It was also what turned the asset into a silhouette in the app — reference error and rendering failure in one |
 | Night state shows the shopfront lit although the unit was vacant in Jan 2025 | §16 storytelling on a building whose whole identity is its shopfront. Recorded so it is not mistaken for a research error |
 
 ## 8. Uncertainties
@@ -137,6 +139,9 @@ are dropped. The colour value is lifted one step (see §7).
 - **The third upper window is inferred.** Two are clearly visible in the Jan 2025
   pano; the third is placed on the bay rhythm behind the large ficus that stands
   in front of this building in every recent capture.
+- **The roof is a light membrane, established late.** The satellite read was only
+  checked properly during stage-5 QA, after the dark deck failed visually. It is
+  now the shipped roof, but it rests on one imagery source.
 - **The roof skylight count and spacing are read off satellite imagery only** —
   four evenly spaced is the graphic simplification of a run of dark rectangles,
   not a survey.

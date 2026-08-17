@@ -29,7 +29,8 @@ Design (see REFERENCE.md for the sources behind every number):
 * the shopfront rhythm underneath it is green bulkhead / plate glass / two black
   awnings / a pale leaded-transom band, with the entry recessed at the
   south-west end;
-* the roof is flat with a line of four skylights and one low mechanical block.
+* the roof is a LIGHT membrane, flat, with a line of four skylights and one low
+  mechanical block.
   NOTHING on it rises above the cornice crest, so the loader's
   targetHeightM / measuredHeight scale lands at exactly 1.0;
 * night state: the transom band is the hero glow (a warm strip the width of the
@@ -141,23 +142,33 @@ VENT_SIDE, VENT_H, VENT_OFF = 0.26, 0.58, 1.45
 BEVEL_W, BEVEL_SEG = 0.10, 2
 
 PALETTE_HEX = {
-    "Toy_verdigris": "35493e",  # the body, all four elevations, the parapet and
+    "Toy_verdigris": "587a66",  # the body, all four elevations, the parapet and
                                 # the bulkhead. OFF-PALETTE and deliberate: the
-                                # palette entry is #9fb8a8, far too pale to
-                                # stand for a building painted this dark. The
-                                # style bible's SF exception — painted facades
-                                # ARE saturated identity here — sanctions it,
-                                # and 165 South Park set the precedent of
-                                # keeping the palette NAME while overriding the
-                                # hex so the contract check and the loader's
-                                # merge path are unaffected. A WARN, not a FAIL;
-                                # recorded in REPORT.md. The value is lifted one
-                                # step from the real paint, which photographs
-                                # near-black: a near-black 6.4 m sliver between
-                                # an 11 m pale neighbour and a navy one reads
-                                # from the air as a GAP in the row, not as a
-                                # building.
-    "Toy_mint": "4f6858",       # cornice, modillions, belt course, window
+                                # palette entry is #9fb8a8, too pale to stand
+                                # for a building painted this dark. The style
+                                # bible's SF exception — painted facades ARE
+                                # saturated identity here — sanctions it, and
+                                # 165 South Park set the precedent of keeping
+                                # the palette NAME while overriding the hex so
+                                # the contract check and the loader's merge path
+                                # are unaffected. A WARN, not a FAIL.
+                                #
+                                # THE VALUE IS TWO STEPS UP FROM THE REAL PAINT
+                                # AND THAT IS NOT NEGOTIABLE. First authored at
+                                # #35493e, one step up, which looked correct in
+                                # the Blender studio rig and rendered as a
+                                # LITERAL BLACK SLAB in the app: the diorama
+                                # lighting has low ambient, and at a linear
+                                # luminance of 0.06 the green is gone, the
+                                # cornice is gone and only the gold band and the
+                                # skylights survive. Measured in a local build
+                                # at 1 PM, 70 m out: the front wall came back
+                                # rgb(5,5,6) against rgb(118,117,111) on the
+                                # neighbour. #587a66 is ~3x the luminance and
+                                # still leaves this the darkest building on the
+                                # rim, which is the cue. Do not "correct" it
+                                # back toward the photograph.
+    "Toy_mint": "7f9d8b",       # cornice, modillions, belt course, window
                                 # casings and sills. Also off-palette (#8fd0a8
                                 # is a bright mint) and for the same reason: the
                                 # real trim is green too, and a cream cornice
@@ -171,8 +182,19 @@ PALETTE_HEX = {
     "Toy_trim": "f3efe6",       # leaded transom band, skylight frames
     "Toy_ink": "3a3530",        # awnings, entry recess, rear door frame
     "Toy_glass": "2a4d73",
-    "Toy_roofd": "45454a",      # the flat roof plane
-    "Toy_steel": "9aa0a6",      # roof mechanical block, rear louver
+    "Toy_stone": "d9d2c2",      # the flat roof plane — a LIGHT membrane, which
+                                # is what the 2026 satellite imagery actually
+                                # shows on this row and what the neighbours read
+                                # as in the app. First authored as Toy_roofd
+                                # (#45454a) on the assumption that a flat SoMa
+                                # roof is dark; in the local build that roof
+                                # rendered black, swallowed the skylight line
+                                # and made the whole asset a silhouette. Being
+                                # wrong about the reference and wrong about the
+                                # rendering happened to be the same mistake.
+    "Toy_steel": "9aa0a6",      # roof mechanical block, skylight frames, roof
+                                # hatch, rear louver — mid grey now reads
+                                # against the light deck, where cream did not
     "Toy_trim_Glow": "f3efe6",  # the transom band at night — the hero glow
     "Toy_glass_Glow": "6f95b8",
 }
@@ -460,7 +482,7 @@ def build():
     # building: both party flanks are blind, so everything else here is applied
     # to the two 6.4 m ends and the roof.
     prism("body", FOOTPRINT, 0.0, Z_DECK, mats["Toy_verdigris"],
-          mat_top=mats["Toy_roofd"])
+          mat_top=mats["Toy_stone"])
 
     # ---------------------------------------------------------------- parapet
     # A low lip around the whole roof in the body colour. The roof is the
@@ -698,7 +720,7 @@ def build():
             spine_rect(sf, SKY_ALONG, SKY_ACROSS),
             Z_DECK,
             Z_DECK + SKY_H,
-            mats["Toy_trim"],
+            mats["Toy_steel"],
             mat_top=mats["Toy_glass"],
         )
     prism(
@@ -706,7 +728,7 @@ def build():
         spine_rect(HATCH_S, HATCH_SIDE, HATCH_SIDE),
         Z_DECK,
         Z_DECK + HATCH_H,
-        mats["Toy_trim"],
+        mats["Toy_steel"],
     )
     prism(
         "mech",

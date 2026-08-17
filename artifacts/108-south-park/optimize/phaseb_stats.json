@@ -5,8 +5,8 @@
   "Toy_gold",
   "Toy_ink",
   "Toy_mint",
-  "Toy_roofd",
   "Toy_steel",
+  "Toy_stone",
   "Toy_trim",
   "Toy_trim_Glow",
   "Toy_verdigris"
@@ -45,9 +45,8 @@
   "grp_Toy_verdigris": 5,
   "grp_Toy_glass": 8,
   "grp_Toy_glass_Glow": 3,
-  "grp_Toy_steel": 4,
-  "grp_Toy_trim": 2,
-  "grp_Toy_glass_Toy_trim": 4
+  "grp_Toy_steel": 5,
+  "grp_Toy_glass_Toy_steel": 4
  },
  "inverted_solids": [],
  "reimport": {
@@ -58,8 +57,8 @@
    "Toy_gold",
    "Toy_ink",
    "Toy_mint",
-   "Toy_roofd",
    "Toy_steel",
+   "Toy_stone",
    "Toy_trim",
    "Toy_trim_Glow",
    "Toy_verdigris"

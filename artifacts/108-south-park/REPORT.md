@@ -14,7 +14,7 @@ and the plan disagree, this file is what shipped.
 | Objects | 11 shipped (53 as authored; joined per material at stage 4) |
 | Dimensions | 26.159 x 25.719 x **8.450** m |
 | min Z / XY centre offset | 0.000 m / (0.000, 0.000) |
-| Materials | 10, all `Toy_*`, 2 `_Glow`, no textures, no alpha |
+| Materials | 10, all `Toy_*` (`verdigris` `mint` `gold` `trim` `ink` `glass` `stone` `steel` + 2 `_Glow`), no textures, no alpha |
 | Manifest anchor | **−122.3944817, 37.7816789** |
 | targetHeightM | **8.45** (front cornice crest) |
 | Front / rear heading | 135.35° / 315.35° true |
@@ -82,17 +82,30 @@ bible §18 and the pipeline's stage-2 override.
 | 1 | The roof carried four small skylights in the middle third and 8 m of blank deck at the street end — the end the app's camera actually looks at. Style bible §10 failure. | Skylights enlarged to 1.80 x 1.25 m and moved forward, plus a pale stair hatch near the street end, a mechanical block in the rear third and two vent stacks. |
 | 2 | With the black hole fixed, the entry became a green door on a green wall and vanished. | Leaf in `Toy_ink`, with a lighter-green casing (two jambs + head) drawing it as an object. The pale transom band already runs across the top of the bay, so no separate fanlight. |
 | 2 | The gold sign and the cornice overhung the party lines by 3-5 cm, showing as slivers outside the silhouette in the flank elevations. | Both trimmed flush to the frontage; the cornice dies are what wrap the corners. |
+| **3 (in-app)** | **The whole building rendered as a literal black slab in the running app.** The Blender studio rig said the dark green was fine; the diorama's low-ambient lighting said otherwise. Measured in the local build at 1 PM from 70 m: front wall `rgb(5,5,6)`, roof `rgb(4,4,6)`, gold band `rgb(4,5,6)`, against `rgb(118,117,111)` on the neighbour's wall. Only the skylights and the transom survived. | Body `#35493e -> #587a66`, trim `#4f6858 -> #7f9d8b` (~3x luminance, still the darkest building on the rim). |
+| **3 (in-app)** | The roof was `Toy_roofd` #45454a on the assumption that a flat SoMa roof is dark. It rendered black, swallowed the skylight line and turned the asset into a silhouette from the app's camera — **and it was also wrong about the reference**: the 2026 satellite imagery shows a LIGHT membrane roof on this row. | Roof deck `Toy_roofd -> Toy_stone` #d9d2c2; skylight frames and roof hatch `Toy_trim -> Toy_steel` so they still read against a light deck. |
 
 Nothing above 8.45 m at any pass — the crest normalization was asserted by the
 validator on every run.
 
+**Pass 3 is the lesson worth carrying forward: the Blender review rig is not the
+app.** A colour that reads correctly under a three-sun tabletop rig with 0.30
+ambient can be gone entirely in the diorama. Judge dark assets in the running
+app before believing the renders.
+
 ## Corrections and judgment calls
 
-- **The body green is lighter than the building.** The real paint reads
+- **The body green is two steps lighter than the building.** The real paint reads
   near-black in shade. A near-black 6.4 m sliver, standing between an 11 m pale
   stucco neighbour and a navy one, reads from the app's camera as a *gap in the
-  row* rather than as a building. `#35493e` is the same colour one value step up.
-  Style bible §29: readability over realism.
+  row* rather than as a building — and at one step up (`#35493e`) it still did,
+  measurably, in the running app. `#587a66` is the same colour at ~3x the
+  luminance and still leaves this the darkest building on the rim, which is the
+  cue. Style bible §29: readability over realism. **Do not correct it back toward
+  the photograph.**
+- **The roof is a light membrane, not dark.** Corrected against the satellite
+  imagery during stage-5 QA; the original dark deck was both a reference error
+  and a rendering failure.
 - **Green trim, not cream trim.** The palette's cream `Toy_trim` was the easy
   choice and would have been wrong — every piece of trim on this building is
   green. A lighter green does the same legibility job truthfully.
@@ -205,3 +218,80 @@ Stage 3 gate — user's approval, quoted verbatim with date:
 
 > "APPROVE EVERYTHING DONT ASK ME FOR PERMISSION" — David, 16 August 2026
 > (given up front, in the pipeline invocation, covering every gate in this run)
+
+
+## Stage 5 — local integration QA
+
+Case B. Registry entry `108SouthPark` (`exclude: 2.7`), manifest entry, GLB in
+`app/public/sf-assets/landmarks/`, full twelve-stage re-bake run and QA'd, then
+**discarded per batch mode** — this branch ships source only.
+
+### Exclusion radius, measured
+
+`excluded()` drops a footprint when its centroid OR any ring vertex is inside the
+radius, and the bake reads DataSF first then gap-fills from Overture, so both
+sources bind. Measured from the manifest anchor against
+`pipeline/data/buildings_datasf.geojson` and `overture_buildings.geojsonseq`:
+
+| polygon | vertex | centroid | trigger |
+|---|---|---|---|
+| this building, Overture `86058388` | 15.04 m | 0.21 m | **0.21 m** |
+| this building, DataSF `SF3775059` | 4.09 m | 0.71 m | **0.71 m** |
+| 104-106 South Park, DataSF `SF3775058` | 4.64 m | 7.91 m | **4.64 m** ← the ceiling |
+| 112 South Park, Overture `0675706c` | 9.62 m | 6.28 m | 6.28 m |
+| 112 South Park, DataSF `SF3775060` | 10.71 m | 6.62 m | 6.62 m |
+| 104-106 South Park, Overture `aa14bd23` | 10.43 m | 6.74 m | 6.74 m |
+
+Safe band **(0.71, 4.64)**; a sweep confirms every radius from 0.8 to 4.6 drops
+exactly this building's two rings and nothing else. Shipped **2.7**, the middle,
+with ~2 m of margin at both ends. At 4.7 the Gran Oriente Filipino — National
+Register-nominated, no hand-built replacement — vanishes from the baked city.
+
+### Re-bake outcome
+
+Twelve stages (`terrain … muni-shapes`) against a warm `pipeline/data` snapshot,
+2 min 20 s. `node audit.mjs` check **1.6 PASS** (66 zones over 65 landmarks
+clear); 1.2b, 1.3c and 1.7b fail on `main` already and are unrelated.
+`node verify-rebake.mjs`: **584 of 585 cells unchanged**, `23_13 217 -> 215`.
+
+Decoding the tile before and after, exactly **one** footprint disappeared within
+26 m of the anchor — this building's, centroid 1.0 m away. Both party-wall
+neighbours survive (104-106 at 8.48 m, 112 at 6.42 m). The second dropped
+footprint in the cell sits **93.5 m away**, 3.1 m from `188SouthPark`'s anchor
+and inside its 5 m radius: 188 South Park was merged source-only in batch mode
+(`0ce3c647`), so `main`'s tiles are stale against its registry entry and this
+bake caught it up. Not caused by this change, and discarded with the rest of the
+bake.
+
+### QA table
+
+| item | result | evidence |
+|---|---|---|
+| Re-validation of the shipped GLB | **PASS** | fresh-scene re-import, 16/16 checks, 3,516 tris, crest 8.450 m |
+| Manifest entry | **PASS** | 59 entries, valid JSON, served by the dev server |
+| id mapping | **PASS** | `camelId('108-south-park')` → `108SouthPark`, matches the registry |
+| Case B registry + re-bake | **PASS** | `exclude: 2.7` measured, above |
+| audit 1.6 | **PASS** | 66 zones clear |
+| Single building on the site | **PASS** | tile decode: own footprint dropped, both neighbours standing; screenshot shows one building |
+| Scale factor | **PASS** | console `uniform x1.0000 at 3785, -1291` |
+| Orientation | **PASS** | shopfront faces the park; camera preset yaw 45 (bearing 135) lands square on it |
+| Terrain seating | **PASS** | no float, no sink; ground pivot 9.5 m vs DataSF `gnd_min` 8.77 m |
+| Night glow | **PASS** | transom band + one display bay + two upper windows; nothing else lights |
+| Draw calls | **PASS** | 99 with 53 landmarks live (budget < 300) |
+| Streaming | **PASS** | `loadRadius` 2500 m; 41 far / 18 live on boot, 53 live at the site, 0 failed |
+| Fallback drill | **PASS** | GLB moved aside → app boots, `failed: 1`, one console warning, empty ground on the lot (Case B expected), both neighbours intact. Vite answers the missing file with `index.html` at 200, so the warning is a parse failure, not a 404 |
+| `npm run lint` | **PASS** | eslint clean |
+| `npm run build` | **PASS** | built in 1.68 s |
+| Batch-mode sanity | **PASS** | `git diff --name-only origin/main` lists **nothing** under `app/public/tiles/` or `api/_data/` |
+| Deployed QA | **not run** | stage 5 ends at a local verification and a ship decision (ADDRESS-TO-ASSET §5) |
+
+### One finding worth recording
+
+While the **unoptimized** 53-object / 58-primitive build was staged in `app/`
+for a quick colour check, 25 landmarks — including this one — failed with
+`THREE.BatchedMesh: Reserved space request exceeds the maximum buffer size` once
+53 assets were resident at once. With the **shipped** 11-object / 13-primitive
+build, the identical camera and pump gives `failed: 0`. The shared batch reserves
+by geometry count, so one asset carrying 45 extra primitives is enough to
+exhaust it for everybody. That is the concrete reason stage 4's submesh collapse
+is not cosmetic, and the reason the optimized file is the one that ships.

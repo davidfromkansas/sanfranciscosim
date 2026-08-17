@@ -1084,5 +1084,24 @@
     ],
     "tris": 3864,
     "loadRadius": 2500
+  },
+  {
+    "id": "108-south-park",
+    "file": "108-south-park.glb",
+    "anchor": [
+      -122.3944817,
+      37.7816789
+    ],
+    "targetHeightM": 8.45,
+    "cat": 5,
+    "name": "108-110 South Park (South Park Cafe)",
+    "estimated": true,
+    "dims": [
+      26.159,
+      25.7189,
+      8.45
+    ],
+    "tris": 3516,
+    "loadRadius": 2500
   }
 ]

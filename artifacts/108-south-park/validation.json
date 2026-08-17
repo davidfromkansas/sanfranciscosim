@@ -33,8 +33,8 @@
     "Toy_gold",
     "Toy_ink",
     "Toy_mint",
-    "Toy_roofd",
     "Toy_steel",
+    "Toy_stone",
     "Toy_trim",
     "Toy_trim_Glow",
     "Toy_verdigris"
@@ -76,14 +76,14 @@
       "glow": false
     },
     {
-      "name": "Toy_roofd",
+      "name": "Toy_steel",
       "image_texture_nodes": [],
       "alpha": 1.0,
       "roughness": 0.85,
       "glow": false
     },
     {
-      "name": "Toy_steel",
+      "name": "Toy_stone",
       "image_texture_nodes": [],
       "alpha": 1.0,
       "roughness": 0.85,
@@ -203,7 +203,7 @@
       ]
     },
     {
-      "name": "grp_Toy_glass_Toy_trim",
+      "name": "grp_Toy_glass_Toy_steel",
       "triangles": 432,
       "location": [
         0.0,
@@ -261,26 +261,7 @@
     },
     {
       "name": "grp_Toy_steel",
-      "triangles": 408,
-      "location": [
-        0.0,
-        0.0,
-        0.0
-      ],
-      "rotation_euler": [
-        0.0,
-        0.0,
-        0.0
-      ],
-      "scale": [
-        1.0,
-        1.0,
-        1.0
-      ]
-    },
-    {
-      "name": "grp_Toy_trim",
-      "triangles": 136,
+      "triangles": 516,
       "location": [
         0.0,
         0.0,
@@ -319,6 +300,25 @@
     {
       "name": "sign",
       "triangles": 44,
+      "location": [
+        0.0,
+        0.0,
+        0.0
+      ],
+      "rotation_euler": [
+        0.0,
+        0.0,
+        0.0
+      ],
+      "scale": [
+        1.0,
+        1.0,
+        1.0
+      ]
+    },
+    {
+      "name": "transom",
+      "triangles": 28,
       "location": [
         0.0,
         0.0,
