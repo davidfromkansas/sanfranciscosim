@@ -266,10 +266,16 @@ DataSF footprint is re-attempted and has to be caught by the same circle.
 | 22–24 South Park, DataSF SF3775048 | 14.50 m | nearest vertex |
 
 Safe window **(1.42, 4.95) m**; `exclude: 3` sits with 1.58 m of margin below and
-1.95 m above. A correct exclusion here drops **exactly two rings** — the DataSF
-footprint and its Overture twin. If `verify-rebake.mjs` reports one or three,
-something is wrong. Do not raise past 4.5: at 4.95 this starts deleting 26–28
-South Park, whose LiDAR ring shares a party-wall vertex with this one.
+1.95 m above. Do not raise past 4.5: at 4.95 this starts deleting 26–28 South
+Park, whose LiDAR ring shares a party-wall vertex with this one.
+
+**`excluded()` fires on both rings, but the observable delta is −1, not −2.**
+Before this entry existed, the DataSF ring was added and `markOccupied()` ran, so
+the Overture twin was *already* being rejected as a duplicate. Now the DataSF
+ring is excluded, `markOccupied()` never runs, and the twin is re-attempted — and
+caught by the same circle. Measured after the re-bake: `verify-rebake.mjs`
+reports cell `23_13` moving **201 → 200** and **584 of 585 cells unchanged**.
+Anything other than −1 there means something is wrong.
 
 Do **not** set `clearTrees`: at 3 m the radius clears nothing, which is correct —
 the street tree in front of the south-west end belongs to the park's rim
@@ -299,7 +305,73 @@ no slivers. Curve retessellation was skipped: halving the five 10-segment
 cylinders would clear the one-pixel chord test by only 30% and they are the
 asset's only round forms.
 
-## 8. Gate 3 — approval
+## 8. Stage 5 — local integration QA (Case B, batch mode)
+
+Run 17 August 2026 against a local production build (`npm run build`, which also
+runs the app's own test suite) served statically on `127.0.0.1:5246` and driven
+in headless Chrome over CDP. `preview_start` was out of dev-server slots (5 held
+by other sessions), which is the documented fallback for this repo.
+
+Evidence in `qa/`: `local-day.png`, `local-night.png`, `local-wide.png`,
+`fallback-drill.png`.
+
+| # | Check | Result |
+|---|---|---|
+| 1 | re-validation of the shipped GLB before touching `app/` | **PASS** — 16/16, §5 |
+| 2 | asset dropped in, `compress-assets.mjs` clean | **PASS** — already meshopt, reported `skip (already compressed)`; byte-identical to the artifact |
+| 3 | manifest entry | **PASS** — pure 19-line append, JSON valid, 74 entries |
+| 4 | id mapping `46-south-park` → `46SouthPark` | **PASS** — `camelId()` round-trips |
+| 4 | Case B registry entry + re-bake | **PASS** — full chain terrain → … → muni-shapes, exit 0 |
+| 4 | `audit.mjs` check 1.6 (no procedural footprint in an exclusion zone) | **PASS** — 83 zones over 80 landmarks clear |
+| 4 | `verify-rebake.mjs` | **PASS** — 584/585 cells unchanged; cell `23_13` 201 → 200; nearest surviving footprint 4.9 m vs a 3 m radius |
+| 5 | loader merge line | **PASS** — `sf-assets: 46-south-park merged 11 objects / 10 materials -> batched (2442 tris body); uniform x1.0000 at 3843, -1347` |
+| 5 | scale factor | **PASS** — **x1.0000** exactly |
+| 5 | exactly one building, no procedural twin, no z-fighting | **PASS** — see `qa/local-day.png` |
+| 5 | footprint size against the neighbours | **PASS** — reads as a 9.5 m frontage in a party-wall row |
+| 5 | orientation — the glazed front faces the park | **PASS** |
+| 5 | terrain seating | **PASS** — no floating, no sinking |
+| 5 | night glow | **PASS** — only the ground-floor band and the upper panes light; roof and flanks stay dark (`qa/local-night.png`) |
+| 5 | draw calls < 300 (AGENTS rule 2) | **PASS** — 50.5/frame here, 47/frame downtown FiDi, 49/frame in the Mission (per-frame averages over ~900 frames with `info.autoReset` off) |
+| 5 | `landmark-streaming-check.mjs` against the build | **PASS** — all 6 checks; 74 entries, 0 failed loads through load/fade/release/re-approach; 76–125 draw calls/frame |
+| 6 | fallback drill | **PASS** — see below |
+| 7 | `npm test` (via build) and `npm run lint` | **PASS** |
+
+**Fallback drill.** With the GLB removed from the served build, the app boots
+normally, the area renders, and the console carries exactly one warning —
+`sf-assets: 46-south-park failed to load` — and **no errors**. The site is empty
+ground inside the exclusion zone, which is the expected Case B outcome (there is
+no code-built landmark on this footprint to fall back to; the procedural one was
+carved out). Every neighbour is still standing and the street wall is intact on
+both sides — `qa/fallback-drill.png`. The file was restored afterwards.
+
+**Frame rate is reported honestly as not measured.** Headless SwiftShader runs
+uncapped at 219–240 fps, which says only that nothing stalls; it is not a device
+frame rate and must not be quoted as one. The real guardrail is the draw-call
+number above, which is measured.
+
+Four console warnings are present in every run and are unrelated: `weather`,
+`sf-ferries`, `sf-muni` and `aircraft` all report their feed unavailable, because
+a static file server has no `/api` routes.
+
+**Batch mode: the bake was run, QA'd, and then thrown away.** `git checkout --
+app/public/tiles api/_data` after the QA above, so this branch is source-only.
+Sanity check passes: `git diff --name-only origin/main` lists nothing under
+`app/public/tiles/` or `api/_data/`. The city gets baked once for the whole batch
+by `docs/asset-pipeline/BATCH-INTEGRATE.md`.
+
+**Not done, deliberately:** no push, no PR, no deploy, no production QA. The
+pipeline replaces integration Step 7 with a stop, and the session's standing
+approval covered the asset, not shipping.
+
+**Pre-existing audit failures, not caused by this landmark.** `audit.mjs` reports
+29 passed / 3 failed / 1 informational. The three failures are **1.2b** (p95
+building height 13.9 m against an expected 25–120 m band the DataSF source
+cannot satisfy), **1.3c** (Telegraph Hill terrain 90.5 m from the Terrarium DEM
+against a surveyed 84 m) and **1.7b** (1 of 792 sampled trees more than 30 m
+offshore). All three are recorded as failing on `main` in the reports for 102,
+108, 132 and 135 South Park. Not re-baselined here.
+
+## 9. Gate 3 — approval
 
 Approval for this asset was given in advance, in the session's opening
 instruction, verbatim:
