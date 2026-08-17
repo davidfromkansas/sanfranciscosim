@@ -1,6 +1,6 @@
 {
- "generated": "2026-08-14T00:15:48.280Z",
- "buildings": 174731,
+ "generated": "2026-08-17T04:33:23.886Z",
+ "buildings": 174715,
  "cells": 596,
  "categories": [
   {
@@ -21,28 +21,28 @@
    "cat": 2,
    "id": "apartments",
    "label": "Apartments",
-   "count": 14015,
+   "count": 14012,
    "night": 0
   },
   {
    "cat": 3,
    "id": "office",
    "label": "Office",
-   "count": 2748,
+   "count": 2741,
    "night": 3
   },
   {
    "cat": 4,
    "id": "retail",
    "label": "Retail",
-   "count": 8040,
+   "count": 8039,
    "night": 1
   },
   {
    "cat": 5,
    "id": "restaurant_cafe",
    "label": "Restaurant / Café",
-   "count": 2841,
+   "count": 2838,
    "night": 1
   },
   {
@@ -91,7 +91,7 @@
    "cat": 12,
    "id": "clinic",
    "label": "Clinic",
-   "count": 1387,
+   "count": 1386,
    "night": 2
   },
   {
@@ -140,7 +140,7 @@
    "cat": 19,
    "id": "industrial",
    "label": "Industrial",
-   "count": 2029,
+   "count": 2028,
    "night": 3
   },
   {
@@ -190,22 +190,22 @@
   {
    "sub": "apartments",
    "label": "Apartments",
-   "count": 5320
+   "count": 5319
   },
   {
    "sub": "shop",
    "label": "Shop",
-   "count": 2155
+   "count": 2156
   },
   {
    "sub": "office",
    "label": "Office",
-   "count": 1885
+   "count": 1883
   },
   {
    "sub": "restaurant",
    "label": "Restaurant",
-   "count": 1825
+   "count": 1823
   },
   {
    "sub": "hotel",
@@ -215,12 +215,12 @@
   {
    "sub": "salon",
    "label": "Salon",
-   "count": 1028
+   "count": 1027
   },
   {
    "sub": "clinic",
    "label": "Clinic",
-   "count": 960
+   "count": 959
   },
   {
    "sub": "house",
@@ -240,7 +240,7 @@
   {
    "sub": "factory",
    "label": "Factory",
-   "count": 688
+   "count": 687
   },
   {
    "sub": "church",
@@ -250,7 +250,7 @@
   {
    "sub": "cafe",
    "label": "Café",
-   "count": 526
+   "count": 525
   },
   {
    "sub": "preschool",
@@ -418,19 +418,14 @@
    "count": 60
   },
   {
-   "sub": "yoga_studio",
-   "label": "Yoga studio",
-   "count": 57
-  },
-  {
    "sub": "fire_station",
    "label": "Fire station",
    "count": 57
   },
   {
-   "sub": "bookstore",
-   "label": "Bookstore",
-   "count": 56
+   "sub": "yoga_studio",
+   "label": "Yoga studio",
+   "count": 57
   },
   {
    "sub": "self_storage",
@@ -440,6 +435,11 @@
   {
    "sub": "museum",
    "label": "Museum",
+   "count": 56
+  },
+  {
+   "sub": "bookstore",
+   "label": "Bookstore",
    "count": 56
   },
   {
@@ -493,13 +493,13 @@
    "count": 43
   },
   {
-   "sub": "warehouse",
-   "label": "Warehouse",
+   "sub": "temple",
+   "label": "Temple",
    "count": 40
   },
   {
-   "sub": "temple",
-   "label": "Temple",
+   "sub": "warehouse",
+   "label": "Warehouse",
    "count": 40
   },
   {
@@ -543,13 +543,13 @@
    "count": 31
   },
   {
-   "sub": "concert_hall",
-   "label": "Concert hall",
+   "sub": "brewery",
+   "label": "Brewery",
    "count": 29
   },
   {
-   "sub": "brewery",
-   "label": "Brewery",
+   "sub": "concert_hall",
+   "label": "Concert hall",
    "count": 29
   },
   {
@@ -573,13 +573,13 @@
    "count": 17
   },
   {
-   "sub": "ev_charging",
-   "label": "EV charging",
+   "sub": "synagogue",
+   "label": "Synagogue",
    "count": 15
   },
   {
-   "sub": "synagogue",
-   "label": "Synagogue",
+   "sub": "ev_charging",
+   "label": "EV charging",
    "count": 15
   },
   {
@@ -603,14 +603,19 @@
    "count": 5
   },
   {
+   "sub": "aquarium",
+   "label": "Aquarium",
+   "count": 4
+  },
+  {
    "sub": "food_hall",
    "label": "Food hall",
    "count": 4
   },
   {
-   "sub": "aquarium",
-   "label": "Aquarium",
-   "count": 4
+   "sub": "science_center",
+   "label": "Science center",
+   "count": 3
   },
   {
    "sub": "marina",
@@ -620,11 +625,6 @@
   {
    "sub": "greenhouse",
    "label": "Greenhouse",
-   "count": 3
-  },
-  {
-   "sub": "science_center",
-   "label": "Science center",
    "count": 3
   },
   {
@@ -654,18 +654,18 @@
   }
  ],
  "sources": {
-  "landuse": 140684,
-  "business": 10210,
-  "heuristic": 7280,
+  "business": 10206,
+  "overture": 6651,
+  "landuse": 140676,
   "osm": 8617,
-  "overture": 6655,
+  "heuristic": 7280,
   "datasf": 1285
  },
  "confidence": [
-  147964,
-  15322,
-  4492,
-  6953
+  147956,
+  15316,
+  4491,
+  6952
  ],
  "streets": {
   "named": 2509,
