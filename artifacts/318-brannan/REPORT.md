@@ -186,6 +186,66 @@ modal roof plane (7.78 m) plus an inferred 0.7 m parapet, not published.
 `dims` and `tris` are the **shipped** numbers — the optimize pass changed
 neither (it cut draw submeshes 70 → 13 and file bytes 51%, not geometry).
 
+## Stage 5 — integration (Case B, BATCH MODE)
+
+Run of `docs/asset-plans/INTEGRATION-PROMPT.md` Part 1 on 17 August 2026, with
+ADDRESS-TO-ASSET's two amendments: the stage-4 output was integrated **as-is**
+(no re-export, no re-compression — `cmp` confirms the file in
+`app/public/sf-assets/landmarks/` is byte-identical to the artifact), and Step 7
+is replaced by a stop.
+
+`BATCH: yes`, so the re-bake was **run in full and QA'd against**, then thrown
+away before committing (`git checkout -- app/public/tiles api/_data`). The
+committed change is source only.
+
+| # | Check | Result | Evidence |
+|---|---|---|---|
+| 1 | Re-validation of the shipped GLB | **PASS** | fresh-scene re-import, 16/16 contract checks; 2,972 tris, 29.647 × 30.177 × 8.600 m, min Z 0.000, 11 `Toy_*` materials, no textures/alpha/cameras/lights |
+| 2 | Asset dropped in unmodified | **PASS** | `cmp` byte-identical to `artifacts/318-brannan/318-brannan.glb` |
+| 3 | Manifest entry | **PASS** | appended as text (19-line diff, no collateral rewrites of neighbouring entries' float formatting) |
+| 4 | id mapping | **PASS** | `camelId('318-brannan')` → `318Brannan`, present in `SF.assets.placed` and matching the new `pipeline/lib/landmarks.mjs` id |
+| 4b | Case B registry entry | **PASS** | `318Brannan`, `exclude: 8`, camera `{180, 15, 28}` |
+| 4c | Re-bake | **PASS** | full chain `terrain → … → context → muni-shapes`, exit 0 |
+| 4d | Audit check 1.6 | **PASS** | "no procedural footprint inside a bespoke landmark exclusion zone — 83 zones over 80 landmarks clear" |
+| 4e | `verify-rebake` | **PASS** | 584 of 585 cells unchanged; only `23_13` moved, 201 → 200; nearest surviving footprint 11.1 m vs the 8 m radius |
+| 5 | Exactly one building on the site | **PASS** | nearest baked footprint corner is **3.14 m outside** the GLB's 17.96 × 23.87 m rectangle (measured against the baked pick boxes in `ctx/23_13.json`); no twin, no z-fighting |
+| 6 | Loader scale | **PASS** | `sf-assets: 318-brannan merged 13 objects / 11 materials -> batched (1895 tris body); uniform x1.0000 at 3934, -1282` |
+| 7 | Anchor round-trip | **PASS** | `SF.goTo` lands the pivot at x 3934.379, z −1282.419 — the projected anchor to 3 mm |
+| 8 | Orientation | **PASS** | the two awning bands face Brannan Street; no `yawDeg` override needed |
+| 9 | Terrain seating | **PASS** | asset base at y 11.764 (app terrain) against DataSF `gnd_min` 11.56 m NAVD88; not floating, not sunk |
+| 10 | Night glow | **PASS** | only the intended surfaces light: the second-floor ribbon in two groups, two storefront bays, two SW flank bays, the warm entrance strip. Awnings, roof, NE flank and rear stay dark |
+| 11 | Draw calls | **PASS** | 76 at the landmark, **89** at street level downtown (budget 300) |
+| 12 | Fallback drill | **PASS** | see below |
+| 13 | Lint + build | **PASS** | `npm run lint` clean; `npm run build` clean |
+| 14 | Batch sanity check | **PASS** | `git diff --name-only origin/main` lists **0** files under `app/public/tiles/` or `api/_data/` |
+| 15 | Deployed QA | **not run** | the pipeline stops before push/PR/deploy and asks; the batch is deployed once by `BATCH-INTEGRATE.md` |
+
+### Fallback drill
+
+The GLB was renamed out of the served build and the page reloaded:
+
+- the app boots and the whole area renders — no hole, no crash;
+- **exactly one** console warning:
+  `sf-assets: 318-brannan failed to load (Unexpected token '<', "<!doctype "... is not valid JSON)`,
+  and `SF.assets.stats().failed === 1` with everything else still live;
+- the site is **empty ground inside the exclusion zone** — the expected Case B
+  outcome, since there is no code-built version of this landmark to fall back to.
+
+Note the warning wording differs from the integration prompt's example
+("— keeping the code-built landmark") for that same reason: nothing is kept
+because nothing procedural exists here. The file was restored afterwards and
+verified byte-identical.
+
+### Known non-blocking audit failures
+
+`node pipeline/audit.mjs` reports 29 passed / 3 failed. All three failures are
+pre-existing citywide data characteristics unrelated to this landmark, and they
+are the same three the batch's siblings see: 1.2b (95th-percentile building
+height 13.9 m against a 25-120 m expectation — DataSF's own source p95 is
+12.4 m), 1.3c (Telegraph Hill Terrarium DEM reads 90.5 m against a surveyed
+84 m), 1.7b (1 of 792 sampled trees more than 30 m offshore). Reported rather
+than hidden; none of them moved as a result of this bake.
+
 ## Integration note carried forward
 
 `pipeline/lib/landmarks.mjs` entry `id: '318Brannan'`, **`exclude: 8`**, measured

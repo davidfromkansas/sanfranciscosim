@@ -374,6 +374,43 @@ export const LANDMARKS = [
     exclude: 8,
     camera: { distance: 230, yaw: 80, pitch: 26 },
   },
+  // 318 Brannan St (1961) — the 1960s office box eight lots northeast, and the
+  // only free-standing building in this Brannan family: a 4.75 m side yard on
+  // the northeast, a 5.7 m rear yard, an open neighbour's yard southwest.
+  //
+  // Measured from this anchor against the real bake input, DataSF and Overture
+  // scanned separately:
+  //
+  //   own DataSF ring SF3775100      centroid  0.01 m
+  //   own Overture twin (451 m2)     centroid  4.68 m
+  //   326 Brannan, Overture rings    vertex   10.93 m   <- the binding constraint
+  //   326 Brannan, DataSF SF3775012  vertex   11.07 m
+  //
+  //   exclude 5-10 m -> drops this building only
+  //   exclude 11 m   -> also eats 326 Brannan, which has no GLB to replace it
+  //
+  // 8 m is the middle of the (4.68, 10.93) window. Do not raise past 10.
+  //
+  // Note which of those rings the BAKE actually sees, because the raw scan is
+  // misleading here: Overture is gap-fill only (`occupiedFraction(bbox) > 0.25`
+  // in buildings.mjs skips any Overture footprint overlapping a DataSF one), so
+  // this parcel's Overture twin never enters the bake and `verify-rebake` shows
+  // cell 23_13 going 201 -> 200 — ONE footprint, not the two a source-level scan
+  // predicts. The 4.68 m figure is therefore a latent lower bound, not an active
+  // one, and it only becomes binding if DataSF ever loses this footprint. Keep 8
+  // rather than tightening toward 5 on the theory that tighter is always safer.
+  //
+  // Verified after the re-bake: nearest surviving footprint 11.1 m (a 21.4 m
+  // building), clear of the 8 m radius; audit 1.6 passes over all 83 zones.
+  {
+    id: '318Brannan',
+    name: '318 Brannan Street',
+    lon: -122.3927890,
+    lat: 37.7816014,
+    height: 8.6,
+    exclude: 8,
+    camera: { distance: 180, yaw: 15, pitch: 28 },
+  },
   {
     // Through lot with party walls on both long sides, so the exclusion window
     // is narrow: this footprint's simplified ring centroid sits 0.96 m from the
