@@ -1,6 +1,6 @@
 {
- "generated": "2026-08-17T04:33:23.886Z",
- "buildings": 174715,
+ "generated": "2026-08-17T19:23:01.930Z",
+ "buildings": 174696,
  "cells": 596,
  "categories": [
   {
@@ -14,42 +14,42 @@
    "cat": 1,
    "id": "house",
    "label": "House",
-   "count": 124515,
+   "count": 124512,
    "night": 0
   },
   {
    "cat": 2,
    "id": "apartments",
    "label": "Apartments",
-   "count": 14012,
+   "count": 14009,
    "night": 0
   },
   {
    "cat": 3,
    "id": "office",
    "label": "Office",
-   "count": 2741,
+   "count": 2734,
    "night": 3
   },
   {
    "cat": 4,
    "id": "retail",
    "label": "Retail",
-   "count": 8039,
+   "count": 8033,
    "night": 1
   },
   {
    "cat": 5,
    "id": "restaurant_cafe",
    "label": "Restaurant / Café",
-   "count": 2838,
+   "count": 2840,
    "night": 1
   },
   {
    "cat": 6,
    "id": "bar",
    "label": "Bar",
-   "count": 524,
+   "count": 523,
    "night": 1
   },
   {
@@ -63,7 +63,7 @@
    "cat": 8,
    "id": "worship",
    "label": "Place of worship",
-   "count": 633,
+   "count": 632,
    "night": 3
   },
   {
@@ -190,22 +190,22 @@
   {
    "sub": "apartments",
    "label": "Apartments",
-   "count": 5319
+   "count": 5318
   },
   {
    "sub": "shop",
    "label": "Shop",
-   "count": 2156
+   "count": 2152
   },
   {
    "sub": "office",
    "label": "Office",
-   "count": 1883
+   "count": 1880
   },
   {
    "sub": "restaurant",
    "label": "Restaurant",
-   "count": 1823
+   "count": 1825
   },
   {
    "sub": "hotel",
@@ -215,7 +215,7 @@
   {
    "sub": "salon",
    "label": "Salon",
-   "count": 1027
+   "count": 1026
   },
   {
    "sub": "clinic",
@@ -245,7 +245,7 @@
   {
    "sub": "church",
    "label": "Church",
-   "count": 570
+   "count": 569
   },
   {
    "sub": "cafe",
@@ -300,7 +300,7 @@
   {
    "sub": "hardware_store",
    "label": "Hardware store",
-   "count": 226
+   "count": 225
   },
   {
    "sub": "theater",
@@ -355,7 +355,7 @@
   {
    "sub": "tech_hq",
    "label": "Tech office",
-   "count": 132
+   "count": 133
   },
   {
    "sub": "supermarket",
@@ -418,14 +418,19 @@
    "count": 60
   },
   {
+   "sub": "yoga_studio",
+   "label": "Yoga studio",
+   "count": 57
+  },
+  {
    "sub": "fire_station",
    "label": "Fire station",
    "count": 57
   },
   {
-   "sub": "yoga_studio",
-   "label": "Yoga studio",
-   "count": 57
+   "sub": "bookstore",
+   "label": "Bookstore",
+   "count": 56
   },
   {
    "sub": "self_storage",
@@ -435,11 +440,6 @@
   {
    "sub": "museum",
    "label": "Museum",
-   "count": 56
-  },
-  {
-   "sub": "bookstore",
-   "label": "Bookstore",
    "count": 56
   },
   {
@@ -493,13 +493,13 @@
    "count": 43
   },
   {
-   "sub": "temple",
-   "label": "Temple",
+   "sub": "warehouse",
+   "label": "Warehouse",
    "count": 40
   },
   {
-   "sub": "warehouse",
-   "label": "Warehouse",
+   "sub": "temple",
+   "label": "Temple",
    "count": 40
   },
   {
@@ -535,7 +535,7 @@
   {
    "sub": "wine_bar",
    "label": "Wine bar",
-   "count": 32
+   "count": 31
   },
   {
    "sub": "ice_cream",
@@ -543,13 +543,13 @@
    "count": 31
   },
   {
-   "sub": "brewery",
-   "label": "Brewery",
+   "sub": "concert_hall",
+   "label": "Concert hall",
    "count": 29
   },
   {
-   "sub": "concert_hall",
-   "label": "Concert hall",
+   "sub": "brewery",
+   "label": "Brewery",
    "count": 29
   },
   {
@@ -573,13 +573,13 @@
    "count": 17
   },
   {
-   "sub": "synagogue",
-   "label": "Synagogue",
+   "sub": "ev_charging",
+   "label": "EV charging",
    "count": 15
   },
   {
-   "sub": "ev_charging",
-   "label": "EV charging",
+   "sub": "synagogue",
+   "label": "Synagogue",
    "count": 15
   },
   {
@@ -603,19 +603,14 @@
    "count": 5
   },
   {
-   "sub": "aquarium",
-   "label": "Aquarium",
-   "count": 4
-  },
-  {
    "sub": "food_hall",
    "label": "Food hall",
    "count": 4
   },
   {
-   "sub": "science_center",
-   "label": "Science center",
-   "count": 3
+   "sub": "aquarium",
+   "label": "Aquarium",
+   "count": 4
   },
   {
    "sub": "marina",
@@ -625,6 +620,11 @@
   {
    "sub": "greenhouse",
    "label": "Greenhouse",
+   "count": 3
+  },
+  {
+   "sub": "science_center",
+   "label": "Science center",
    "count": 3
   },
   {
@@ -654,17 +654,17 @@
   }
  ],
  "sources": {
-  "business": 10206,
-  "overture": 6651,
-  "landuse": 140676,
-  "osm": 8617,
+  "landuse": 140666,
+  "business": 10202,
   "heuristic": 7280,
+  "osm": 8614,
+  "overture": 6649,
   "datasf": 1285
  },
  "confidence": [
-  147956,
-  15316,
-  4491,
+  147946,
+  15309,
+  4489,
   6952
  ],
  "streets": {
