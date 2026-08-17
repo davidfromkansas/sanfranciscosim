@@ -159,14 +159,28 @@ PALETTE_HEX = {
                              # everything. The real paint is a cool blue
                              # charcoal ~#4a505a; #45454a is the nearest palette
                              # entry and is on-palette, which is the tiebreak.
-    "Toy_ink": "3a3530",     # roof plane, base bulkhead, tie-plates, rear door.
-                             # One clear step darker than the walls so the plan
-                             # outline reads from directly overhead.
+    "Toy_ink": "3a3530",     # base bulkhead, tie-plates, rear door, door reveal
     "Toy_brick": "c96f4a",   # THE TILE EAVE, and nothing else. It is the only
                              # saturated colour on the building and the whole
                              # reason the roof reads from the app's camera.
     "Toy_glass": "2a4d73",
-    "Toy_steel": "9aa0a6",   # the muntin bars only. Toy_trim (#f3efe6) was the
+    "Toy_steel": "9aa0a6",   # THE ROOF PLANE, and the muntin bars.
+                             #
+                             # The roof was Toy_ink (#3a3530) for two builds, on
+                             # the theory that a roof darker than its walls makes
+                             # the plan outline read from directly overhead. In
+                             # the actual city that theory is wrong twice. A
+                             # 166 m2 plane at #3a3530 under the diorama's
+                             # lighting is a BLACK HOLE between a mustard
+                             # neighbour and a cream one — the outline reads, but
+                             # nothing else does, and the red tile band has
+                             # nothing to sit against. And it is not what is
+                             # there: the aerial shows a light-grey capsheet like
+                             # every other flat roof on this block. #9aa0a6 is
+                             # both the accurate value and the legible one, and
+                             # the dark Toy_roofd parapet now supplies the rim.
+                             #
+                             # For the muntins: Toy_trim (#f3efe6) was the
                              # first choice and blew the windows out to near-
                              # white at city distance, which made the darkest
                              # building on the block read as the lightest. The
@@ -480,7 +494,7 @@ def build():
     # The surveyed lot truncated to the built depth. The party flanks are blind
     # and the rear is barely seen, so everything else here is applied to the
     # street elevation.
-    prism("body", FOOTPRINT, 0.0, Z_DECK, mats["Toy_roofd"], mat_top=mats["Toy_ink"])
+    prism("body", FOOTPRINT, 0.0, Z_DECK, mats["Toy_roofd"], mat_top=mats["Toy_steel"])
 
     # ---------------------------------------------------------------- parapet
     # A low lip around the roof in the wall colour. The roof is the surface the

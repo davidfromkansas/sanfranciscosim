@@ -181,6 +181,86 @@ These are the shipped (post-optimize) numbers. The registry entry for
 `pipeline/lib/landmarks.mjs` uses the **exclusion** point, not this anchor — see the plan's
 2.13; the measured window is `0 < exclude < 1.70 m` and the value is `1.2`.
 
+## Stage 5 — integration (Case B, BATCH mode)
+
+Executed `docs/asset-plans/INTEGRATION-PROMPT.md` Part 1 with the batch-mode amendment
+from `ADDRESS-TO-ASSET.md`: the bake was run and QA'd against it, then thrown away, and
+only source is committed.
+
+### QA table
+
+| Item | Result |
+|---|---|
+| Re-validation of the shipped GLB in a fresh Blender scene | **PASS** — all 16 contract checks, `validation.json` |
+| GLB dropped in, `compress-assets.mjs` run | **PASS** — skipped as already meshopt-compressed (stage 4 packed it) |
+| Manifest entry | **PASS** — 59 entries, valid JSON, `dims`/`tris` from the measurement |
+| id → registry mapping | **PASS** — `camelId('160-south-park')` = `160SouthPark`, present in `pipeline/lib/landmarks.mjs` |
+| Case B registry entry + re-bake | **PASS** — full twelve-stage chain from a warm `pipeline/data` cache |
+| `verify-rebake.mjs` | **PASS** — 584 of 585 cells unchanged; only `23_13` moved |
+| audit check 1.6 | **PASS** — 66 zones over 65 landmarks clear |
+| Single building at the site | **PASS** — nearest surviving footprint 1.70 m against a 1.2 m radius; hiding the landmark batch leaves bare ground |
+| Merge line | **PASS** — `sf-assets: 160-south-park merged 10 objects / 8 materials -> batched (2121 tris body); uniform x1.0000 at 3752, -1247` |
+| Scale factor | **PASS** — exactly **1.0000** |
+| Orientation | **PASS** — facade faces the park; authored at 108.13° true, loader applies no rotation |
+| Terrain seating | **PASS** — sits on grade, no float, no sink; local terrain 6.0–7.3 m |
+| Night glow | **PASS** — only the arch (hero, `Toy_glassl_Glow`) and the storefront (accent, `Toy_glass_Glow`) light; nothing else |
+| Draw calls | **PASS** — peak 95 with the whole neighbourhood live, against the 300 ceiling. The asset adds **zero**: it goes into the shared `landmark-bodies`/`landmark-glow` batch, and both have `frustumCulled = false` |
+| Fallback drill | **PASS** — see below |
+| `npm run lint` / `npm run build` | **PASS** — clean |
+| Batch sanity: `git diff --name-only origin/main` under `app/public/tiles/` or `api/_data/` | **PASS** — nothing |
+
+Evidence: `integration/in-app-day.jpg`, `integration/in-app-night-glow.png`,
+`integration/in-app-fallback-drill.jpg`.
+
+### The re-bake dropped two footprints, and only one of them is mine
+
+`verify-rebake.mjs` reports cell `23_13` going 217 → 215. The second is not a radius that
+over-reached:
+
+| Removed | Why |
+|---|---|
+| 220 m², 9.7 m, at 0.01 m from the exclusion point | this building — correct |
+| 565 m², 15.4 m, at 34.60 m | **188 South Park's** exclusion, `exclude: 5`, which its centroid sits 0.06 m from |
+
+`188SouthPark` was merged to `main` as a source-only batch commit
+(`0ce3c647 feat: integrate 188 South Park landmark (batch, source-only)`) *after* the last
+city re-bake, so `origin/main`'s committed tiles still carry its procedural block. Any full
+bake now settles that debt too. This is the batch design working as intended, and it is one
+more reason the bake here is discarded rather than committed — `BATCH-INTEGRATE.md` will
+bake the whole set once and land both exclusions together.
+
+### Fallback drill
+
+Renamed `app/dist/sf-assets/landmarks/160-south-park.glb`, cold-reloaded:
+
+- the app **booted** and the neighbourhood rendered;
+- **exactly one** warning, naming this asset and nothing else:
+  `sf-assets: 160-south-park failed to load (fetch for ".../160-south-park.glb" responded with 404: File not found)`;
+- zero errors; the other 34 landmarks merged normally;
+- the site is **empty ground inside the exclusion zone** — the expected Case B outcome,
+  since there is no procedural builder for this id.
+
+Note on the warning text: `INTEGRATION-PROMPT.md` predicts the suffix
+"— keeping the code-built landmark". That suffix belongs to the single-shot `warn()` on the
+*resident* path (`assets.js:434`). A `loadRadius` entry fails on the streamed path
+(`assets.js:560`), which deliberately logs per-asset without the suffix — "each streamed
+asset that fails is its own finding". The observed message is the correct one for a
+streamed landmark, not a missing case.
+
+### Not done, and why
+
+**Production QA is not run.** `ADDRESS-TO-ASSET.md` stage 5 replaces the integration
+prompt's Step 7 with a stop: no push, no PR, no deploy without the owner's explicit
+instruction. Local verification is complete and the branch is source-only, ready for
+`BATCH-INTEGRATE.md`.
+
+**The local verification used the built `dist/` served statically, not `npm run dev`.** The
+five-dev-server cap was fully taken by the parallel South Park sessions. The app under test
+is the production build of this branch; the only modification was an rAF shim injected into
+the gitignored `dist/index.html`, because the Browser pane does not composite while hidden
+and the app drives itself with plain `requestAnimationFrame`. Nothing in the repo was
+changed for testing.
+
 ## Approval
 
 Granted in advance, 16 August 2026, verbatim:

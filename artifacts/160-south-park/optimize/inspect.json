@@ -70,8 +70,8 @@
     8.81
    ],
    "materials": [
-    "Toy_ink",
-    "Toy_roofd"
+    "Toy_roofd",
+    "Toy_steel"
    ]
   },
   {
@@ -297,7 +297,7 @@
   {
    "name": "Toy_ink",
    "glow": false,
-   "user_objects": 6
+   "user_objects": 5
   },
   {
    "name": "Toy_roofd",
@@ -312,7 +312,7 @@
   {
    "name": "Toy_steel",
    "glow": false,
-   "user_objects": 12
+   "user_objects": 13
   }
  ],
  "textures": [],
@@ -521,9 +521,9 @@
  "dup_redundant_tris": 524,
  "join_candidates": {
   "Toy_glass": 6,
-  "Toy_ink": 6,
+  "Toy_ink": 5,
   "Toy_roofd": 23,
-  "Toy_steel": 12
+  "Toy_steel": 13
  },
  "degenerate_tris": 0,
  "coincident_vert_pairs": 5490,
