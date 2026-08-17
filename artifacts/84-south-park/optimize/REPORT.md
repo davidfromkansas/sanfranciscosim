@@ -111,14 +111,14 @@ Not run. `ALLOW_BAKE: no`.
 
 | View | Mean abs RGB delta | Max pixel delta |
 |---|---|---|
-| day near | 0.0065% | 24 |
-| day far | 0.0066% | 6 |
+| day near | 0.0065% | 20 |
+| day far | 0.0064% | 7 |
 | night near | 0.0038% | 9 |
 | night far | 0.0039% | 5 |
-| elevation N | 0.0136% | 153 |
-| elevation E | 0.0135% | 29 |
+| elevation N | 0.0133% | 153 |
+| elevation E | 0.0131% | 28 |
 | elevation S | 0.0055% | 33 |
-| elevation W | 0.0054% | 81 |
+| elevation W | 0.0052% | 81 |
 
 **Looked at, honestly:** the input and optimized rows of the contact sheet are
 indistinguishable. The ×8-amplified diff row is black except for single-pixel
@@ -138,7 +138,7 @@ present at night. Nothing here is visible to a player.
 | **G1** contract | **PASS** | material set identical (12 in, 12 out); both `_Glow` materials separate; no `Toy_body` in this asset; no manifest-named nodes to preserve |
 | **G2** geometry | **PASS** | bbox identical to 5 dp; origin unchanged; signed volumes positive for all 11 objects, `inverted_solids: []`; ray flipped fraction 0.000073 against a 0.0015 gate |
 | **G3** round-trip | **PASS** | re-imports in Blender; `g3check` → `G3-OK`, 12 meshes, 6,900 tris, 12 materials, bbox matches, no decode errors |
-| **G4** appearance | **PASS** | all eight views ≤ 0.0136% mean, against gates of 2% far / 4% near |
+| **G4** appearance | **PASS** | all eight views ≤ 0.0133% mean, against gates of 2% far / 4% near |
 | **G5** draw submeshes | **PASS** | 67 → 12 |
 | **G6** size | **PASS on raw, qualified on gzip** | −51.6% raw; +103.6% gzipped — see below |
 | **G7** GPU budget | n/a | bake mode not used |
