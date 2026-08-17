@@ -137,7 +137,7 @@ route, and the park plans depend on it (§E8 of the parks README).
 | [340 Brannan Street](./340-brannan.md) | `340-brannan` | 17.79 m | new landmark |
 | [45–49 South Park (Gran Oriente Filipino Residence)](./49-south-park.md) | `49-south-park` | 13.0 m (LiDAR-derived) | new landmark |
 
-## Shared contract (all 93)
+## Shared contract (all 94)
 
 - Style: `docs/styles/miniature-toy.md` (authoritative for artistic decisions)
 - Technical contract: `.agents/skills/sf-asset-check/SKILL.md` (authoritative for the GLB)
