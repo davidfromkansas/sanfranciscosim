@@ -2077,6 +2077,49 @@ export const LANDMARKS = [
     // paper (the 592Third lesson).
     camera: { distance: 130, yaw: 225, pitch: 24 },
   },
+  {
+    // 1911 Edwardian two-flat on the north-east rim of the South Park oval,
+    // 7.3 m of frontage against 24 m of depth. Party walls on both sides, so
+    // this is one of the tightest exclusion zones in the registry and the
+    // radius is MEASURED against the committed bake input, not guessed.
+    //
+    // `excluded()` in pipeline/buildings.mjs drops a footprint when its
+    // centroid OR any ring vertex falls inside the circle, and the bake reads
+    // DataSF first then gap-fills from Overture. Both datasets trace this
+    // building, so a correct radius drops TWO rings, not one. Measured from
+    // this lon/lat against pipeline/data/buildings_datasf.geojson and
+    // pipeline/data/overture_buildings.geojsonseq:
+    //
+    //    0.57 m  DataSF SF3775040 centroid   — ours, must go
+    //    1.83 m  Overture 177 m2 centroid    — ours, must go
+    //    3.73 m  DataSF SF3775039 vertex     — 45-49 South Park, must survive
+    //    8.71 m  Overture 272 m2             — 45-49 South Park
+    //   11.08 m  Overture 791 m2             — 35 South Park
+    //   12.12 m  DataSF SF3775102            — 35 South Park
+    //
+    // Safe window (1.83, 3.73) m; 2.8 sits in it with 0.97 m of margin below
+    // and 0.93 m above. That window is nearly five times wider than the one at
+    // the manifest anchor (2.74, 3.16), which is why this lon/lat is offset
+    // 1.50 m from it — these are independent fields, and app/src/assets.js
+    // places the GLB from the MANIFEST anchor alone. The 1.5 m offset also
+    // moves the search/camera target, which is negligible on a 7 m building
+    // flown to from 150 m.
+    //
+    // No clearTrees: the street tree in front of this house is real and the
+    // oval's furniture sits inside the park, outside the lot.
+    id: '41SouthPark',
+    name: '41-43 South Park',
+    lon: -122.3934867,
+    lat: 37.7815158,
+    height: 10.6,
+    exclude: 2.8,
+    // camera.js puts the eye at target + distance*(sin yaw, ., cos yaw) with +x
+    // east and +z south, so camera bearing = 180 - yaw; the 315.22 deg facade
+    // wants yaw 225, standing north-west out over the park, square onto the two
+    // bays. 150 m suits a 10.6 m building (cf. 165-167 at 160 for 9.0 m,
+    // 160 South Park at 155 for 9.4 m, 135 South Park at 150 for 8.5 m).
+    camera: { distance: 150, yaw: 225, pitch: 26 },
+  },
 ];
 
 // Parks/green spaces the landcover bake must match at least one source polygon
