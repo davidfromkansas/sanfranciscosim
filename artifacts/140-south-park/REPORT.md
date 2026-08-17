@@ -8,7 +8,8 @@ Plan: `docs/asset-plans/140-south-park.md` · Dossier: `REFERENCE.md` (outranks 
 | | |
 |---|---|
 | Triangles | **3,136** (budget 7,000) |
-| Objects | 87 mesh, nothing else |
+| Objects | **11** mesh after the stage-4 join (87 as authored), nothing else |
+| File size | **87,540 B** raw, meshopt-compressed (212,588 B pre-optimize) |
 | Dimensions (m) | 26.229 × 26.167 × **10.680** |
 | bbox min / max Z | 0.000 / 10.680 |
 | XY centre offset | (0.175, −0.206) m |
@@ -40,7 +41,7 @@ rewritten to say so rather than to assert a rectangle.
 | No animation, skinning or constraints | PASS |
 | Transforms applied | PASS |
 | No negative scales | PASS |
-| Normals outward — per-object signed volume (87/87) | PASS |
+| Normals outward — per-object signed volume (11/11 shipped; 87/87 as authored) | PASS |
 | Normals outward — 31,500 visibility rays, 0 flipped first hits (0.000% residual) | PASS |
 | No degenerate geometry | PASS |
 | No unexpected objects or leaked foreign geometry | PASS |
@@ -85,6 +86,15 @@ building. Logged here in the same form as 155 South Park's `Toy_peach` and 380 B
 
 Final: **3,136 triangles**, all gates PASS.
 
+## Stage 4 — optimize
+
+Run in the same session; see `optimize/REPORT.md` for the full metrics, census, gates and
+A/B verification. Headline: **212,588 → 87,540 bytes (−58.8%)**, 87 objects → 11,
+88 draw submeshes → 12, triangles and bounding box unchanged, worst A/B pixel delta
+0.0194% against a 2%/4% gate. The optimized file is now the shipping GLB; the
+pre-optimize original is archived at `optimize/input/140-south-park.glb`. The numbers in
+"Shipped numbers" above are the post-optimize ones.
+
 ## Deliverables
 
 ```
@@ -100,6 +110,7 @@ artifacts/140-south-park/
   validation.json
   REFERENCE.md
   REPORT.md
+  optimize/                    stage 4: scripts, A/B renders, gates, archived input
 ```
 
 ## Approval (stage 3)
