@@ -66,6 +66,19 @@ LLM agent over the city's data. Rules it must keep: answers city facts ONLY from
 
 All UI (cards, search, concierge panel) follows the toy theme: cream card stock, warm-ink 2px borders, HARD offset shadows (zero blur), candy accent pills, rounded chunky type, press-down button physicality. No gradients, no glassmorphism, no pure black/white. Theme tokens live in the app's ui-theme stylesheet — if a color/shadow isn't a token, it doesn't ship.
 
+## Live vehicle motion (the regression that keeps coming back)
+
+"The buses are frozen" and "parked coaches are cluttering the city" have each been fixed several times (9e9accd8, 10b388aa, 5f0ea041, 73bb2a96, 4cd32464) and each fix was later undone by an unrelated pass through `app/src/muni.js`. The rules therefore no longer live inline in the renderer: they are pure functions in **`app/src/muni-motion.js`**, locked by **`app/test/muni-motion.test.mjs`** (`cd app && npm test`, also run by CI). Read that file's header before touching anything that decides whether a vehicle moves or leaves the scene, and never inline a copy of one of its rules back into `muni.js`.
+
+The four invariants a live-feed layer must keep (they apply to ferries and aircraft too):
+
+1. **Dwell is a displacement test, never a speed reading.** GTFS-RT `speed` is an instantaneous sample — 260 of 507 Muni vehicles report exactly 0 at any instant. `fixStep` (metres between consecutive fixes) is the only dwell evidence; the reported speed may only bias how fast an already-moving vehicle runs.
+2. **Measure that displacement fix-to-fix, never render-position-to-target.** Dead reckoning legitimately drives a vehicle past its target, so `targetS - s` goes negative on a bus that just covered 900 m.
+3. **Vehicles keep moving between fixes.** Fresh fixes are up to ~120 s apart (60 s poll vs 90 s TTL, worse in degraded mode) and identical payloads are normal, so a moving vehicle extrapolates along its shape (`DEAD_RECKON_MAX_S`) instead of stopping at the last target.
+4. **Liveness and freshness are different clocks.** `lastFixAt` (bumped by every poll that mentions the vehicle, stale payloads included) decides whether it still exists; `lastFreshFixAt` (bumped only by a new fix) drives speed, dormancy and the dead-reckon cap. Merging them evicted the whole fleet every 3 minutes.
+
+The flip side is removal: a vehicle the data says is parked, on layover, or off its alignment sinks out of the scene, and one the feed stops reporting is dropped. If you change any threshold here, change it in `muni-motion.js` with a test, and verify on the deployed site that vehicles both MOVE and DISAPPEAR when they should.
+
 ## QA norms for every change
 
 Screenshot-verify on the DEPLOYED site, not just localhost: hero view + the affected area, day and night, cold cache-cleared load boots the diorama first-frame, budgets hold (rule 2), picking/search/cards still work, and the fallback drill passes (rename the asset/data you added → app degrades gracefully). Honest reporting: a FAIL with explanation is acceptable; a hidden one is not.
@@ -76,3 +89,4 @@ Screenshot-verify on the DEPLOYED site, not just localhost: hero view + the affe
 - Socrata/DataSF bulk downloads occasionally throttle — a free app token raises limits.
 - The tile loader's cross-fade uses hashed-alpha discard with distance hysteresis; visible LOD pops are always a bug.
 - 404s in console = missing tile/resource — root-cause them, don't ignore.
+- Anything touching live vehicles: run `cd app && npm test` before shipping. A failure there means you are re-introducing a bug the city has already shipped once (see "Live vehicle motion").
