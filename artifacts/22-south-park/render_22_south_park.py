@@ -165,7 +165,7 @@ def light_glow():
             # 6.0 (the 165 South Park value) blew every lit window to flat white
             # here, because this facade's openings are larger and there are four
             # of them on a 7.3 m front. 3.2 keeps the glass colour readable.
-            bsdf.inputs["Emission Strength"].default_value = 3.2
+            bsdf.inputs["Emission Strength"].default_value = 1.8
 
 
 def fade_glow():
@@ -177,6 +177,12 @@ def fade_glow():
         if not bsdf:
             continue
         bsdf.inputs["Alpha"].default_value = 0.12
+        # The build script leaves every _Glow material at Emission Strength 1.0
+        # so the night pass only has to scale it. Dropping Alpha alone is not
+        # enough: an emissive surface still emits at 12% alpha, and on a wide
+        # hero shopfront shell that washes the whole ground floor pale in the
+        # DAY render — i.e. it judges a facade the app never shows.
+        bsdf.inputs["Emission Strength"].default_value = 0.0
         mat.surface_render_method = "BLENDED"
 
 

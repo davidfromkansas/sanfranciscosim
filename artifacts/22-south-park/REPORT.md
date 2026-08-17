@@ -13,17 +13,17 @@ shipped.
 | | |
 |---|---|
 | Triangles | **6,708** (cap 9,000) |
-| Objects | 169 |
+| Objects | 12 after stage 4 (169 as built) |
 | Dimensions | 36.019 × 31.839 × **14.220** m |
 | Footprint in plan | 445.2 m² (surveyed parcel 444.5 m²) |
 | min Z | 0.000 m |
 | XY centre offset | 0.000, 0.000 m |
-| Materials | 11 — `Toy_glass`, `Toy_glassl_Glow`, `Toy_ink`, `Toy_mustard_Glow`, `Toy_navy`, `Toy_roofd`, `Toy_rust`, `Toy_sand`, `Toy_steel`, `Toy_stone`, `Toy_verdigris` |
+| Materials | 12 — `Toy_glass`, `Toy_glassl_Glow`, `Toy_ink`, `Toy_mustard_Glow`, `Toy_navy`, `Toy_roofd`, `Toy_rust`, `Toy_sand`, `Toy_steel`, `Toy_stone`, `Toy_trim`, `Toy_verdigris` |
 | Glow groups | 2 (`Toy_glassl_Glow`, `Toy_mustard_Glow`) |
-| GLB on disk | 480 KB uncompressed (pre-optimize) |
+| GLB on disk | **178.3 KB** meshopt-compressed (stage 4); 441.2 KB pre-optimize |
 | `targetHeightM` | 14.22 — bbox top is the cornice crown, so the loader's scale is **1.0** |
 | Manifest anchor | `-122.3936099, 37.7823247` |
-| Validation | **PASS**, all 16 checks — `validation.json` |
+| Validation | **PASS**, all 16 checks, re-run against the shipped optimized file — `validation.json` |
 
 The XY bounding box is 36.0 × 31.8 m for a building whose longest side is
 36.28 m. That is the axis-aligned bound of a **trapezoid** standing at 45° to the
