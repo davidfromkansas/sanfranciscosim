@@ -1388,5 +1388,24 @@
     ],
     "tris": 8664,
     "loadRadius": 2500
+  },
+  {
+    "id": "22-south-park",
+    "file": "22-south-park.glb",
+    "anchor": [
+      -122.3936099,
+      37.7823247
+    ],
+    "targetHeightM": 14.22,
+    "cat": 7,
+    "name": "Hotel Madrid (22\u201324 South Park)",
+    "estimated": false,
+    "dims": [
+      36.0194,
+      31.8393,
+      14.22
+    ],
+    "tris": 6708,
+    "loadRadius": 2500
   }
 ]
