@@ -97,13 +97,28 @@ route, and the park plans depend on it (§E8 of the parks README).
 | [Civic Center Plaza](./civic-center-plaza.md) | `civic-center-plaza` | 30.48 m (flagpole crest) | new landmark |
 | [250 Van Ness Avenue (171–195 Grove Street)](./250-van-ness.md) | `250-van-ness` | 10.0 m (estimated) | new landmark |
 | [Earl Warren Building](./earl-warren-building.md) | `earl-warren-building` | 27.0 m | new landmark |
+| [560 Third Street](./560-third.md) | `560-third` | 7.2 m (LiDAR-derived) | new landmark |
 | [574 Third Street (566–586 Third)](./574-third.md) | `574-third` | 15.4 m | new landmark |
 | [590 Third Street](./590-third.md) | `590-third` | 9.5 m (estimated) | new landmark |
 | [592 Third Street](./592-third.md) | `592-third` | 8.2 m (estimated) | new landmark |
 | [400 Brannan Street](./400-brannan.md) | `400-brannan` | 8.8 m | new landmark |
 | [188 South Park (South Park Lofts)](./188-south-park.md) | `188-south-park` | 15.93 m (LiDAR-derived) | new landmark |
+| [150 South Park](./150-south-park.md) | `150-south-park` | 8.0 m | new landmark |
+| [160 South Park](./160-south-park.md) | `160-south-park` | 9.4 m (LiDAR-derived) | new landmark |
+| [132 South Park (130–134 South Park)](./132-south-park.md) | `132-south-park` | 12.07 m (LiDAR-derived) | new landmark |
+| [104–106 South Park (Gran Oriente Filipino Hotel)](./106-south-park.md) | `106-south-park` | 11.58 m | new landmark |
+| [108–110 South Park (South Park Cafe)](./108-south-park.md) | `108-south-park` | 8.45 m (estimated) | new landmark |
+| [156 South Park Street (Anchor Packing Co.)](./156-south-park.md) | `156-south-park` | 8.7 m (LiDAR-derived) | new landmark |
+| [166–168 South Park](./168-south-park.md) | `168-south-park` | 10.44 m (LiDAR-derived) | new landmark |
+| [140 South Park](./140-south-park.md) | `140-south-park` | 10.68 m (LiDAR-derived) | new landmark |
+| [126 South Park](./126-south-park.md) | `126-south-park` | 7.6 m (LiDAR-derived) | new landmark |
+| [102 South Park (The Park View)](./102-south-park.md) | `102-south-park` | 14.0 m (estimated) | new landmark |
+| [2 South Park (544 Second Street, Kohler warehouse)](./2-south-park.md) | `2-south-park` | 17.72 m (LiDAR-derived) | new landmark |
+| [South Park (64 South Park)](./64-south-park.md) | `64-south-park` | 21.04 m (vertical extent — the asset is terrain-draped; the 15.0 m elm crest is estimated) | new landmark |
+| [524 Second Street (522–524)](./524-second.md) | `524-second` | 9.9 m (estimated) | new landmark |
+| [501 Second Street](./501-second.md) | `501-second` | 37.7 m | new landmark |
 
-## Shared contract (all 60)
+## Shared contract (all 75)
 
 - Style: `docs/styles/miniature-toy.md` (authoritative for artistic decisions)
 - Technical contract: `.agents/skills/sf-asset-check/SKILL.md` (authoritative for the GLB)
@@ -245,6 +260,15 @@ footprint shares a party wall with the 54 m Hiram W. Johnson slab and a 0.5 m ce
 that boundary samples the tower. Treat a single-cell `hgt_max` on a party wall as
 unusable. That plan's 2.14 is also the set's clearest exclusion-radius trap: the usual
 half-diagonal would have deleted the neighbour.
+
+150 South Park is the tightest exclusion case in the set and the one that shows *why* the
+half-diagonal rule is wrong rather than merely risky. Its own footprint has to be cleared
+by its **centroid** (3.24 m from the anchor), because its nearest ring vertex — 6.10 m — is
+a party-wall node it **shares with 156 South Park**, whose nearest vertex is therefore also
+6.10 m. Any radius that reaches our corner reaches the neighbour's, so the safe window is
+3.24 < r < 6.10 and the half-diagonal (~9.5 m) would have taken out both neighbours. Size
+the radius from `excluded()`'s actual test — centroid **or** any vertex — against both bake
+sources, not from the building's own dimensions.
 
 The executing agent is expected to re-verify height, anchor, footprint and
 orientation before modelling — the dossier is a head start, not a citation.

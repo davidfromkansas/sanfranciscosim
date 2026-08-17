@@ -1084,5 +1084,290 @@
     ],
     "tris": 3864,
     "loadRadius": 2500
+  },
+  {
+    "id": "150-south-park",
+    "file": "150-south-park.glb",
+    "anchor": [
+      -122.3947673,
+      37.781381
+    ],
+    "targetHeightM": 8.0,
+    "cat": 3,
+    "name": "150 South Park",
+    "estimated": false,
+    "dims": [
+      19.8521,
+      17.5855,
+      8.0
+    ],
+    "tris": 3084,
+    "loadRadius": 2500
+  },
+  {
+    "id": "560-third",
+    "file": "560-third.glb",
+    "anchor": [
+      -122.3951188,
+      37.7804142
+    ],
+    "targetHeightM": 7.2,
+    "cat": 3,
+    "name": "560 Third Street",
+    "estimated": false,
+    "dims": [
+      23.9031,
+      24.0636,
+      7.2
+    ],
+    "tris": 2356,
+    "loadRadius": 2500
+  },
+  {
+    "id": "160-south-park",
+    "file": "160-south-park.glb",
+    "anchor": [
+      -122.394862,
+      37.7812804
+    ],
+    "targetHeightM": 9.4,
+    "cat": 3,
+    "name": "160 South Park",
+    "estimated": false,
+    "dims": [
+      25.7951,
+      17.7692,
+      9.4
+    ],
+    "tris": 3792,
+    "loadRadius": 2500
+  },
+  {
+    "id": "132-south-park",
+    "file": "132-south-park.glb",
+    "anchor": [
+      -122.3946173,
+      37.7815393
+    ],
+    "targetHeightM": 12.07,
+    "cat": 2,
+    "name": "130-134 South Park",
+    "estimated": false,
+    "dims": [
+      26.6844,
+      26.7064,
+      12.07
+    ],
+    "tris": 3928,
+    "loadRadius": 2500
+  },
+  {
+    "id": "106-south-park",
+    "file": "106-south-park.glb",
+    "anchor": [
+      -122.3944099,
+      37.7817221
+    ],
+    "targetHeightM": 11.58,
+    "cat": 2,
+    "name": "Gran Oriente Filipino Hotel (104\u2013106 South Park)",
+    "estimated": false,
+    "dims": [
+      26.3728,
+      26.3678,
+      11.58
+    ],
+    "tris": 3920,
+    "loadRadius": 2500
+  },
+  {
+    "id": "108-south-park",
+    "file": "108-south-park.glb",
+    "anchor": [
+      -122.3944817,
+      37.7816789
+    ],
+    "targetHeightM": 8.45,
+    "cat": 5,
+    "name": "108-110 South Park (South Park Cafe)",
+    "estimated": true,
+    "dims": [
+      26.159,
+      25.7189,
+      8.45
+    ],
+    "tris": 3516,
+    "loadRadius": 2500
+  },
+  {
+    "id": "156-south-park",
+    "file": "156-south-park.glb",
+    "anchor": [
+      -122.3948748,
+      37.7813535
+    ],
+    "targetHeightM": 8.7,
+    "cat": 3,
+    "name": "156 South Park",
+    "estimated": false,
+    "dims": [
+      29.94,
+      23.72,
+      8.7
+    ],
+    "tris": 4020,
+    "loadRadius": 2500
+  },
+  {
+    "id": "168-south-park",
+    "file": "168-south-park.glb",
+    "anchor": [
+      -122.3949862,
+      37.7811327
+    ],
+    "targetHeightM": 10.44,
+    "cat": 3,
+    "name": "166-168 South Park",
+    "estimated": false,
+    "dims": [
+      25.7032,
+      25.5037,
+      10.44
+    ],
+    "tris": 3504,
+    "loadRadius": 2500
+  },
+  {
+    "id": "140-south-park",
+    "file": "140-south-park.glb",
+    "anchor": [
+      -122.3947379,
+      37.7814643
+    ],
+    "targetHeightM": 10.68,
+    "cat": 3,
+    "name": "140 South Park",
+    "estimated": false,
+    "dims": [
+      26.2293,
+      26.167,
+      10.68
+    ],
+    "tris": 3136,
+    "loadRadius": 2500
+  },
+  {
+    "id": "126-south-park",
+    "file": "126-south-park.glb",
+    "anchor": [
+      -122.3945863,
+      37.7816006
+    ],
+    "targetHeightM": 7.6,
+    "cat": 3,
+    "name": "126 South Park",
+    "estimated": false,
+    "dims": [
+      26.7382,
+      26.5868,
+      7.6
+    ],
+    "tris": 4560,
+    "loadRadius": 2500
+  },
+  {
+    "id": "102-south-park",
+    "file": "102-south-park.glb",
+    "anchor": [
+      -122.3943678,
+      37.7817707
+    ],
+    "targetHeightM": 14.0,
+    "cat": 7,
+    "name": "The Park View (102 South Park)",
+    "estimated": true,
+    "dims": [
+      27.2532,
+      27.1464,
+      14.0
+    ],
+    "tris": 8100,
+    "loadRadius": 2500
+  },
+  {
+    "id": "2-south-park",
+    "file": "2-south-park.glb",
+    "anchor": [
+      -122.3932364,
+      37.7824236
+    ],
+    "targetHeightM": 17.72,
+    "cat": 3,
+    "name": "2 South Park",
+    "estimated": false,
+    "dims": [
+      36.2984,
+      36.2984,
+      17.72
+    ],
+    "tris": 4716,
+    "loadRadius": 2500
+  },
+  {
+    "id": "64-south-park",
+    "file": "64-south-park.glb",
+    "anchor": [
+      -122.3939704,
+      37.7815903
+    ],
+    "targetHeightM": 21.0415,
+    "cat": 0,
+    "name": "South Park",
+    "estimated": true,
+    "dims": [
+      122.4585,
+      121.0471,
+      21.0415
+    ],
+    "tris": 11436,
+    "loadRadius": 2500
+  },
+  {
+    "id": "524-second",
+    "file": "524-second.glb",
+    "anchor": [
+      -122.393433,
+      37.7825731
+    ],
+    "targetHeightM": 9.9,
+    "cat": 19,
+    "name": "524 Second Street",
+    "estimated": true,
+    "dims": [
+      35.9981,
+      35.7656,
+      9.9
+    ],
+    "tris": 5620,
+    "loadRadius": 2500
+  },
+  {
+    "id": "501-second",
+    "file": "501-second.glb",
+    "anchor": [
+      -122.3929683,
+      37.7831785
+    ],
+    "targetHeightM": 37.7,
+    "cat": 3,
+    "name": "501 Second Street",
+    "estimated": false,
+    "dims": [
+      83.1067,
+      82.8064,
+      37.7
+    ],
+    "tris": 16008,
+    "loadRadius": 2500
   }
 ]
