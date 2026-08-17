@@ -567,17 +567,22 @@ straitjacket — adjust after the first aerial review render.
 
 Flat colors only, from the `sf-asset-check` palette.
 
+> **Amended after the build.** `Toy_bone` and `Toy_wood` as first written are not
+> palette keys, and two of the colour calls below were reversed at stage 2. The
+> table is the shipped one; `artifacts/106-south-park/REPORT.md` records why.
+
 | Material | Hex | Used for |
 |---|---|---|
-| `Toy_bone` | `#efe7d8` | the upper two storeys' stucco — the building's body colour |
-| `Toy_steel` | `#9aa0a6` | the ground-floor stucco band and the storefront bulkhead |
-| `Toy_ink` | `#3a3530` | sign band, vestibule recess and door, service entrance, fire escape, PV |
-| `Toy_trim` | `#f3efe6` | cornice, window trim and sills, storefront mullions, skylight kerbs, sign inset |
+| `Toy_cream` | `#f2ede3` | the upper two storeys' stucco — the building's body colour — and the roof parapet |
+| `Toy_steel` | `#9aa0a6` | ground-floor stucco band, storefront bulkhead, rooftop mechanical plant, flank grooves |
+| `Toy_ink` | `#3a3530` | sign band, vestibule recess and door, rear service entrance, fire escape, PV array |
+| `Toy_trim` | `#f3efe6` | cornice, dentil course, window trim and sills, storefront mullions, skylight kerbs, sign inset |
 | `Toy_glass` | `#2a4d73` | all windows, the storefront band, the skylight tops |
-| `Toy_wood` | `#8a6a4a` | the exposed south-west flank strip above 108 South Park |
-| `Toy_roofd` | `#45454a` | the flat roof plane and the rear elevation |
-| `Toy_glass_Glow` | `#2a4d73` | four lit upper windows at night |
-| `Toy_trim_Glow` | `#f3efe6` | a thin warm spill in the vestibule recess at night |
+| `Toy_sand` | `#ece4d4` | the exposed south-west flank strip above 108 South Park (was `Toy_rust`; **reversed** — see REPORT 2) |
+| `Toy_stone` | `#d9d2c2` | the flat roof deck (was `Toy_roofd`; **reversed** — the aerial shows a pale cool-roof membrane, see REPORT 3) |
+| `Toy_roofd` | `#45454a` | the Taber Place rear elevation |
+| `Toy_glassl_Glow` | `#6f95b8` | four lit upper windows at night |
+| `Toy_trim_Glow` | `#f3efe6` | a thin warm spill at the head of the vestibule opening at night |
 
 Two notes on colour:
 
@@ -588,9 +593,12 @@ Two notes on colour:
   between them — but the hues are not. `Toy_bone` over `Toy_steel` over `Toy_ink`
   reproduces the relation with palette entries; if better photography turns up and it
   is, say, a warm gray rather than an off-white, say so in `REPORT.md` and adjust.
-- `Toy_wood` on the flank strip is doing real work: it is the one warm accent on an
-  otherwise neutral building and it is what makes the stepped-silhouette cue legible
-  from the aerial camera. Do not neutralise it into the body colour.
+- The flank strip was *intended* to be the one warm accent, on the argument that it
+  carries the stepped-silhouette cue. That was reversed at stage 2: a saturated
+  29.7 m band read as a painted racing stripe from the app's camera, and the
+  January 2025 Street View pano shows pale wall above 108–110's roofline, not
+  brown — the 2020–21 repaint almost certainly covered the boarding. The step reads
+  for free in the baked city, because the shorter neighbour is really there.
 
 **Night state (required).** Glow surfaces must be thin shells proud of the opaque
 glazing — the app renders `_Glow` in a separate layer that is ~12% alpha by day, so a
