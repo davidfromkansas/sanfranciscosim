@@ -19,7 +19,8 @@ Miniature GLB for the SF-SIM toy-diorama city. Built from
 | Metric | Value | Budget / expected |
 |---|---|---|
 | Triangles | **4,560** | ≤ 7,000 |
-| Objects | 82 | — |
+| Objects (shipped, post-optimize) | **9** | joined per material at stage 4 |
+| Objects (as built, pre-optimize) | 82 | — |
 | Dimensions (m) | **26.738 × 26.587 × 7.600** | ~26.7 × 26.6 at a 45° heading |
 | bbox min / max | (-12.979, -13.776, 0.000) / (13.759, 12.810, 7.600) | — |
 | min Z | **0.0000** | ≤ 0.5 |
@@ -33,7 +34,9 @@ Miniature GLB for the SF-SIM toy-diorama city. Built from
 | Degenerate triangles | 0 | 0 |
 | Signed-volume outward objects | 82 / 82 | all |
 | Normal ray test | 0 flipped of 31,500 first hits (0.000%) | ≤ 0.15% |
-| File size | 286 KB raw, **64 KB gzip** | ≤ 500 KB compressed |
+| File size (as built) | 286 KB raw | — |
+| **File size (shipped, meshopt)** | **124 KB raw**, 85 KB gzip | ≤ 500 KB compressed |
+| Draw submeshes (shipped) | **10** (from 83) | ≤ input |
 
 Scale check: the bounding-box top lands on **7.600 m exactly**, so the loader's
 `targetHeightM / measuredHeight` is 1.0.
@@ -242,6 +245,19 @@ Case B — new landmark. Needs a `pipeline/lib/landmarks.mjs` entry and a tile r
 `exclude: 3.5` (window 2.19 < r < 4.67 m; see the plan's §2.13), `camera: { distance: 130,
 yaw: 45, pitch: 26 }`. Batch mode applies — seven other South Park addresses are in
 flight, so the bake is run and QA'd but discarded before committing.
+
+## Stage 4 — optimize (shipped numbers)
+
+The shipping file is the stage-4 output: **292,460 → 126,664 bytes (−56.7%)**,
+**83 → 10 draw submeshes**, 82 → 9 objects, triangles unchanged at 4,560,
+appearance identical (max mean pixel delta 0.0751%). All gates G1–G6 and G8 pass;
+G7 is N/A (no bake). Full detail, including why limited dissolve was skipped for
+this asset's coplanar ring band, is in `optimize/REPORT.md`. The pre-optimize
+original is archived at `optimize/input/126-south-park.glb`.
+
+The numbers in the tables above are the **shipped** ones — `validation.json` was
+re-run against the packed file and passes every check, with the waist still
+measuring 4.007 m and the light wells still counting 2 south-west + 1 north-east.
 
 ## Approval
 
