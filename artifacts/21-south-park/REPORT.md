@@ -9,18 +9,18 @@ Dossier: `REFERENCE.md` (which beats the plan wherever they disagree)
 | | |
 |---|---|
 | Triangles | **8,664** (cap 9,000) |
-| Objects | 130 mesh objects, all closed positive-volume solids |
+| Objects | **9** after the stage-4 join (130 as authored), all positive-volume |
 | Dimensions (AABB) | **47.361 × 51.493 × 11.730 m** |
 | Oriented footprint | 32.749 × 40.676 m, 1,115.1 m² |
 | `min Z` | 0.000 |
 | XY centre offset | (−0.336, +0.132) m — cornice and bulkhead overhang; the footprint itself centres to (0.003, −0.005) |
 | Crest | **11.730 m**, the stair/lift bulkhead — loader scale lands on 1.0 |
 | Cornice crest | 10.20 m; roof deck 9.50 m |
-| File | 504,136 bytes raw, **88,163 bytes gzipped** (budget ≤ 500 KB compressed) |
+| File | **236,856 bytes** shipped (pre-optimize 504,136; see `optimize/REPORT.md`) |
 | Materials | 9, all `Toy_*`, flat, opaque, no textures, no `Toy_body` |
 | Glow materials | `Toy_mustard_Glow`, `Toy_glassl_Glow` |
 | Validation | `validation.json` — **overall PASS**, all 16 checks true |
-| Normals | per-object signed volume clean on all 130 objects; 31,500 visibility rays, **0.0 %** flipped |
+| Normals | per-object signed volume clean on all 9 shipped objects; 31,500 visibility rays, **0.0 %** flipped; `invalid_or_nonunit_loop_normal_count: 0` |
 | Anchor | −122.3931063, 37.7817676 |
 | Front headings | 315.7° (main plane) and 286.7° (angled plane) |
 
@@ -108,6 +108,15 @@ is therefore a normal 0.0 and `targetHeightM` is a real height, not a vertical e
   consequence of the heading, not a scale error; the validator asserts the AABB range
   explicitly so it cannot be mistaken for one.
 
+## 3b. Stage 4 — optimize
+
+`optimize/REPORT.md` has the full record. Summary: 504,136 → **236,856 bytes**
+(−53.0 %), 130 → **9** draw submeshes, triangles and bounding box unchanged, all eight
+gates PASS, and the stage-2 contract validator re-run on the shipped packed file still
+reports **overall PASS** with zero invalid loop normals. The limited-dissolve step was
+deliberately skipped — this asset has four coplanar ring bands and that step is the one
+that can manufacture invisible slivers (the `350-brannan` failure).
+
 ## 4. Reproduce
 
 ```
@@ -134,7 +143,12 @@ bend with it.
 
 ## 6. Approval
 
-*Awaiting stage 3.*
+Standing approval given by David in the session prompt, 16 August 2026, verbatim:
+
+> APPROVE EVERYTHING DONT ASK ME FOR PERMISSION
+
+The contact sheet, the day aerial and the night aerial were presented at the stage-3 gate
+with the numbers above before the pipeline advanced. No revision round was requested.
 
 ## 7. Draft manifest entry
 
@@ -156,4 +170,5 @@ bend with it.
 `estimated: true` because the crest is a LiDAR maximum *interpreted* as a bulkhead and the
 cornice line is read off photographs. `cat: 3` is Office — what the building has been since
 1991 and what every permit since then calls it; the assessor's "Industrial" describes 1919.
-`dims` and `tris` are the pre-optimize figures and are updated at stage 4.
+`dims` and `tris` are the shipped, post-optimize figures — the stage-4 pass changed
+neither (130 objects joined to 9, 504,136 → 236,856 bytes, geometry untouched).
