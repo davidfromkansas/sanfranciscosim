@@ -1,0 +1,42 @@
+{
+ "day_near": {
+  "mean_abs_rgb_pct": 0.0224,
+  "max_px_delta": 57,
+  "fg_pixels": 338889
+ },
+ "day_far": {
+  "mean_abs_rgb_pct": 0.0283,
+  "max_px_delta": 53,
+  "fg_pixels": 24006
+ },
+ "night_near": {
+  "mean_abs_rgb_pct": 0.0059,
+  "max_px_delta": 7,
+  "fg_pixels": 338889
+ },
+ "night_far": {
+  "mean_abs_rgb_pct": 0.0068,
+  "max_px_delta": 3,
+  "fg_pixels": 24006
+ },
+ "elev_n": {
+  "mean_abs_rgb_pct": 0.0154,
+  "max_px_delta": 21,
+  "fg_pixels": 246632
+ },
+ "elev_e": {
+  "mean_abs_rgb_pct": 0.0161,
+  "max_px_delta": 124,
+  "fg_pixels": 244208
+ },
+ "elev_s": {
+  "mean_abs_rgb_pct": 0.0241,
+  "max_px_delta": 30,
+  "fg_pixels": 245948
+ },
+ "elev_w": {
+  "mean_abs_rgb_pct": 0.027,
+  "max_px_delta": 28,
+  "fg_pixels": 244905
+ }
+}

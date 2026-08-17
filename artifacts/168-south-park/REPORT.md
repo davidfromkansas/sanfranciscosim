@@ -7,10 +7,18 @@ Built: 16 August 2026, Blender 5.2.0 LTS, `build_168_south_park.py`
 
 ## 1. Shipped numbers
 
+These are the numbers of the **shipped** file, i.e. after stage 4
+(`optimize/REPORT.md`). The pre-optimize build is archived at
+`optimize/input/168-south-park.glb`; where the two differ the pre-optimize
+figure is given in brackets.
+
 | | |
 |---|---|
-| Triangles | **3,504** (budget 6,000) |
-| Objects | 52 |
+| File size | **99,096 bytes raw** [209,080 pre-optimize, −52.6%] |
+| Triangles | **3,504** (budget 6,000) — unchanged by the optimize pass |
+| Vertices | **1,852** [7,044] |
+| Objects | **8** [52] |
+| Draw submeshes | **9** [53] |
 | Materials | 8 — `Toy_brick`, `Toy_glass`, `Toy_glass_Glow`, `Toy_ink`, `Toy_steel`, `Toy_stone`, `Toy_trim_Glow`, `Toy_white` |
 | Glow groups | 2 — `Toy_glass_Glow` (two lit second-floor windows), `Toy_trim_Glow` (shopfront spill) |
 | AABB dimensions | 25.703 × 25.504 × 10.440 m |
@@ -21,7 +29,7 @@ Built: 16 August 2026, Blender 5.2.0 LTS, `build_168_south_park.py`
 | Crest | **10.440 m** — the gable crown, exactly on target, so the loader's `targetHeightM / measuredHeight` lands at 1.0 |
 | Anchor | `-122.3949862, 37.7811327` |
 | Front heading | 135° true (SE), authored, no rotation at load |
-| Validation | `validation.json` — **all 16 checks PASS** |
+| Validation | `validation.json` — **all 16 checks PASS**, regenerated against the shipped (meshopt-packed) file |
 
 ## 2. Deliverables
 
@@ -179,5 +187,6 @@ three worth a minute of the owner's time before this ships to production.
 }
 ```
 
-`dims` and `tris` will be restated after stage 4 (optimize) if the optimizer
-changes them.
+Restated after stage 4: the optimize pass left `dims` and `tris` unchanged
+(3,504 triangles, same bounding box); it changed only the encoding — 209,080 →
+99,096 bytes, 52 → 8 nodes, 53 → 9 draw submeshes. See `optimize/REPORT.md`.
