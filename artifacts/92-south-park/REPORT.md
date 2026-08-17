@@ -4,14 +4,18 @@ Asset: `92-south-park.glb` — the 1996 six-unit live/work condominium at **86�
 Park Street** (block 3775, lots 116–121), by Toby S. Levy, FAIA. "92 South Park" is one
 of its six unit addresses; see `REFERENCE.md` §1.
 
-**Status: stage 2 gate PASS.** `validation.json` is all-PASS on a fresh-scene re-import
-of the exported GLB.
+**Status: stage 2 gate PASS, stage 4 gate PASS.** `validation.json` is all-PASS on a
+fresh-scene re-import of the **shipped** GLB — i.e. the optimized file, re-validated
+after the stage-4 shipping swap. The optimize pass is reported separately in
+[`optimize/REPORT.md`](./optimize/REPORT.md); the pre-optimize original is archived at
+`optimize/input/92-south-park.glb`.
 
 | | |
 |---|---|
-| Triangles | **7,720** (cap 12,000) |
-| Objects | 195 |
-| File size | 529,192 bytes raw (pre-optimize) |
+| Triangles | **7,736** (cap 12,000) |
+| Objects | 17 shipped (195 as authored; joined per material at stage 4) |
+| File size | **250,640 bytes** raw shipped (535,408 pre-optimize, −53.2%) |
+| Draw submeshes | 19 shipped (201 pre-optimize) |
 | Dimensions | 31.861 × 32.051 × **13.28** m |
 | min Z | 0.0000 |
 | XY centre offset | 0.0000, 0.0000 |
@@ -116,7 +120,8 @@ it is meant to be seen only when the camera is over the building.
 | 1 | First build, 7,692 tris | Raked parapet read as a sloping roof; a strip of bare plinth beside the tower; the court read as another roof plane |
 | 2 | `st_raked_ring`, mass A extended to s = 0 | Deck visible, plinth strip gone. Tower still weak; deck still a bare plate |
 | 3 | Tower 4.30 m / 0.40 m proud; oversailing copper cube added | Tower reads; deck has a subject. Court still dark from above |
-| 4 | Court paving → `Toy_greige`; redundant parapet ring merged | **Accepted.** 7,720 tris, all-PASS |
+| 4 | Court paving → `Toy_greige`; redundant parapet ring merged | 7,720 tris, all-PASS |
+| 5 | **Every plinth-level opening re-based from the plinth face** (`base_d = PLINTH_PROJ`). The stage-4 A/B render caught the two garage doors as solid z-fight speckle *in the input*; the same defect had the shopfront and entry frames buried inside the plinth on all three street elevations | **Accepted.** 7,736 tris, all-PASS; elevation pixel deltas fell from 0.18%/0.32% to 0.0005%/0.0001%. See `optimize/REPORT.md` |
 
 ## 7. Known gaps carried forward
 
@@ -130,3 +135,14 @@ it is meant to be seen only when the camera is over the building.
   branches produce a GLB, a manifest entry and an exclusion zone for one building; only
   one can be merged. Flagged again here so it is not lost between the plan's 2.15 and the
   batch integrator.
+
+## 8. Stage 3 — approval
+
+Pre-authorised by David at the top of the session, quoted verbatim:
+
+> APPROVE EVERYTHING DONT ASK ME FOR PERMISSION
+
+Recorded 2026-08-16. The pipeline's stage-3 human gate is therefore satisfied by a
+standing instruction rather than by a per-asset review; the contact sheet, the day and
+night aerials and the numbers above are presented in the session's final report so the
+approval can be withdrawn retrospectively if the asset does not hold up.

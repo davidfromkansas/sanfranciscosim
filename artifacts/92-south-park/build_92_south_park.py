@@ -451,17 +451,23 @@ def window(tag, axis, plane, out, a0, a1, z0, z1, base_d=0.0, glow=None, sunshad
               z1 + 0.02, z1 + 0.16, base_d, base_d + 0.52, m_ink)
 
 
-def shopfront(tag, axis, plane, out, a0, a1, z0, z1, lit=True):
+def shopfront(tag, axis, plane, out, a0, a1, z0, z1, lit=True, base_d=PLINTH_PROJ):
     """A ground-floor commercial bay in the tile plinth: ink frame, teal-blue
-    glazing, warm glow behind it."""
+    glazing, warm glow behind it.
+
+    `base_d` defaults to PLINTH_PROJ because the tile plinth stands proud of the
+    body wall these openings are dimensioned against: authored at base_d = 0
+    every frame is buried inside the plinth and every glass panel z-fights with
+    its outer face. That was the first build's defect on all three elevations."""
     m_ink = material("Toy_ink")
-    panel(f"{tag}_frame", axis, plane, out, a0, a1, z0, z1, 0.0, 0.07, m_ink)
+    panel(f"{tag}_frame", axis, plane, out, a0, a1, z0, z1,
+          base_d, base_d + 0.07, m_ink)
     panel(f"{tag}_glass", axis, plane, out, a0 + 0.16, a1 - 0.16, z0 + 0.16, z1 - 0.16,
-          0.0, 0.15, material("Toy_glassl"))
+          base_d, base_d + 0.15, material("Toy_glassl"))
     if lit:
         panel(f"{tag}_glow", axis, plane, out,
               a0 + 0.26, a1 - 0.26, z0 + 0.26, z1 - 0.26,
-              0.14, 0.19, material("Toy_gold_Glow"))
+              base_d + 0.14, base_d + 0.19, material("Toy_gold_Glow"))
 
 
 def build():
@@ -586,12 +592,13 @@ def build():
     # 92 (in A1) — a recessed residential entry, and the upper windows.
     shopfront("shop86", "t", -TOWER_PROJ, -1, 0.55, 3.35, 0.75, Z_PLINTH - 0.35)
     shopfront("shop92", "t", 0.0, -1, 4.55, 8.30, 0.75, Z_PLINTH - 0.35)
+    PD = PLINTH_PROJ
     panel("entry_recess", "t", 0.0, -1, 8.85, 10.35, 0.0, Z_PLINTH - 0.30,
-          0.0, 0.07, m_ink)
+          PD, PD + 0.07, m_ink)
     panel("entry_door", "t", 0.0, -1, 9.05, 10.15, 0.0, Z_PLINTH - 0.55,
-          0.07, 0.13, m_red)
+          PD, PD + 0.13, m_red)
     panel("entry_glow", "t", 0.0, -1, 9.20, 10.00, 0.30, Z_PLINTH - 0.75,
-          0.13, 0.18, material("Toy_gold_Glow"))
+          PD + 0.09, PD + 0.18, material("Toy_gold_Glow"))
     shopfront("shop_ne", "t", STEP_D, -1, 11.10, 13.90, 0.75, Z_PLINTH - 0.35,
               lit=False)
 
@@ -627,11 +634,18 @@ def build():
     # ========================================== JACK LONDON ALLEY (s = 0)
     # Two beige roll-up garage doors in the plinth, then sparse punched windows.
     for i, (t0, t1) in enumerate(((5.10, 7.90), (8.60, 11.40))):
+        # Both layers are measured from the PLINTH's outer face (PLINTH_PROJ),
+        # not from the body wall behind it, and the leaf starts at that face
+        # rather than at the frame's front face. Authored the other way round,
+        # the ink frame is buried inside the plinth and the leaf's front face
+        # lands exactly in the plinth's own outer plane — the first build's
+        # garage doors were solid z-fight speckle for both reasons.
         panel(f"garage{i}_frame", "s", 0.0, -1, t0, t1, 0.30, Z_PLINTH - 0.55,
-              0.0, 0.06, m_ink)
+              PLINTH_PROJ, PLINTH_PROJ + 0.06, m_ink)
         panel(f"garage{i}_leaf", "s", 0.0, -1, t0 + 0.14, t1 - 0.14, 0.44,
-              Z_PLINTH - 0.69, 0.06, 0.12, m_sand)
-    panel("alley_service", "s", 0.0, -1, 12.60, 13.70, 0.0, 2.55, 0.0, 0.08, m_ink)
+              Z_PLINTH - 0.69, PLINTH_PROJ, PLINTH_PROJ + 0.12, m_sand)
+    panel("alley_service", "s", 0.0, -1, 12.60, 13.70, 0.0, 2.55,
+          PLINTH_PROJ, PLINTH_PROJ + 0.08, m_ink)
 
     ALLEY_WINS = [
         (5.30, 6.55, 0, None), (7.40, 8.40, 0, None), (10.20, 11.60, 0, "Toy_glass_Glow"),
@@ -669,10 +683,11 @@ def build():
     for i, (a0, a1) in enumerate(((FRONT_T1 + 1.40, FRONT_T1 + 3.00),
                                   (FRONT_T1 + 4.20, FRONT_T1 + 5.60))):
         panel(f"court_glow{i}", "s", ARM_S0, -1, a0, a1, 0.55, 2.35,
-              0.02, 0.10, material("Toy_gold_Glow"))
+              PLINTH_PROJ + 0.02, PLINTH_PROJ + 0.10, material("Toy_gold_Glow"))
 
     # ============================================================= THE REAR
-    panel("rear_service", "t", T, +1, 1.60, 3.00, 0.0, 2.60, 0.0, 0.08, m_ink)
+    panel("rear_service", "t", T, +1, 1.60, 3.00, 0.0, 2.60,
+          PLINTH_PROJ, PLINTH_PROJ + 0.08, m_ink)
     for i, (a0, a1, band) in enumerate(((1.30, 2.60, 1), (4.10, 5.60, 1),
                                         (2.20, 4.80, 2))):
         z0, z1 = WIN_BANDS[band]
