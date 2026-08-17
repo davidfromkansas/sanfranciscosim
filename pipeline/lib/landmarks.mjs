@@ -1843,6 +1843,41 @@ export const LANDMARKS = [
     // (225.4 deg) and the Bryant Street elevation (315.4 deg).
     camera: { distance: 420, yaw: 270, pitch: 26 },
   },
+  {
+    // 22-24 South Park, the Hotel Madrid: a 1915 residential hotel (built as the
+    // Eimoto Hotel) run by Mission Housing since 1987, and the third building in
+    // the South Park Scattered Sites rehabilitation with 102SouthPark and
+    // 106SouthPark.
+    //
+    // This lon/lat is the surveyed parcel's AREA CENTROID and deliberately
+    // differs from the manifest anchor (-122.3936099, 37.7823247), which is the
+    // model's bbox centre 4.8 m away. The lot is a trapezoid, so those two points
+    // are not the same, and only the area centroid works as an exclusion centre:
+    // measured from the bbox centre the safe band is EMPTY, because 10 South
+    // Park's Overture ring comes within 5.20 m while this building's own Overture
+    // ring is still 5.23 m out. Nothing downstream cares — LANDMARKS lon/lat
+    // drives only the camera pivot and the search result position.
+    //
+    // exclude: 4.5 is the middle of a (2.21, 6.90) m band measured against BOTH
+    // bake inputs with excluded()'s real test (centroid OR any ring vertex).
+    // Floor = this building's own Overture ring at 2.21 m, not its DataSF one at
+    // 0.63: addBuilding() returns null on exclusion so markOccupied() never runs,
+    // and a smaller radius lets the Overture gap-fill re-add the building on top
+    // of the asset. Ceiling = 26-28 South Park's DataSF ring at 6.90 m.
+    // Expect the re-bake to drop exactly two rings, both this building's.
+    id: '22SouthPark',
+    name: 'Hotel Madrid (22-24 South Park)',
+    lon: -122.3936498,
+    lat: 37.7822952,
+    height: 14.22,
+    exclude: 4.5,
+    // camera.yaw is 180 - the compass bearing the camera stands at (the offset is
+    // (sin yaw, ., cos yaw) and this project's +z is SOUTH). The street frontage
+    // is a 31 deg arc whose chord normal is 159.4 deg, so yaw 21 stands the
+    // camera south-south-east of the building, out over the oval, looking back at
+    // the curved facade and the cornice.
+    camera: { distance: 190, yaw: 21, pitch: 26 },
+  },
 ];
 
 // Parks/green spaces the landcover bake must match at least one source polygon
