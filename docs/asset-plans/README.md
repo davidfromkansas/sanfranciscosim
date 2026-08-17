@@ -107,6 +107,7 @@ route, and the park plans depend on it (§E8 of the parks README).
 | [160 South Park](./160-south-park.md) | `160-south-park` | 9.4 m (LiDAR-derived) | new landmark |
 | [132 South Park (130–134 South Park)](./132-south-park.md) | `132-south-park` | 12.07 m (LiDAR-derived) | new landmark |
 | [104–106 South Park (Gran Oriente Filipino Hotel)](./106-south-park.md) | `106-south-park` | 11.58 m | new landmark |
+| [108–110 South Park (South Park Cafe)](./108-south-park.md) | `108-south-park` | 8.45 m (estimated) | new landmark |
 
 ## Shared contract (all 61)
 
