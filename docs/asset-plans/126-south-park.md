@@ -679,10 +679,22 @@ and their openings ~800; roof furniture ~700; rear ~200.
   4.7 m away even though their *walls* are 0.6 m away. A squarer building wedged between
   the same two neighbours would have had no valid window at all.
 
-  **Verify empirically during the re-bake**: procedural footprints dropped must be
-  **exactly one**, and audit 1.6 must report no intrusion. If the count is 0 the radius
-  is under our own ring and must go up; if it is 2 or more it is eating a neighbour and
-  must come down.
+  **Verify empirically during the re-bake.** Expect **two** procedural footprints
+  dropped, not one — and check *which* two rather than counting them.
+
+  This is where this building departs from its siblings. 135 South Park's rule ("exactly
+  one, or the radius is wrong") assumes each real building reaches the bake as a single
+  footprint. Here it does not: 126 is traced by **both** sources and the Overture
+  gap-fill did not dedupe it against DataSF, so the pre-bake city carried *two
+  overlapping procedural buildings* on this one footprint — the DataSF ring
+  (`SF3775061`, 178.6 m²) and an Overture ring (195.3 m²). A correct exclusion removes
+  both. Confirmed at `exclude: 3.5` against the actual bake input: dropped = 2, and both
+  are ours; the first survivor is 112 South Park at 4.67 m.
+
+  So the test is: **every dropped ring must have its centroid within ~2.2 m of the
+  anchor.** A drop of 0 means the radius is under our own ring and must go up; a drop
+  that includes a ring whose centroid is 6 m or more away means it is eating a
+  neighbour and must come down. Audit check 1.6 must also report no intrusion.
 
 - `loadRadius`: the skill's default formula gives `max(2500, 7.6 * 30) = 2500` m. Take
   the default.

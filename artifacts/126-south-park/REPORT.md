@@ -259,6 +259,55 @@ The numbers in the tables above are the **shipped** ones — `validation.json` w
 re-run against the packed file and passes every check, with the waist still
 measuring 4.007 m and the light wells still counting 2 south-west + 1 north-east.
 
+## Stage 5 — integration (local QA, batch mode)
+
+Case B. Registry entry `126SouthPark` added to `pipeline/lib/landmarks.mjs`
+(`exclude: 3.5`, `camera: { distance: 130, yaw: 45, pitch: 26 }`), manifest entry
+appended, GLB copied to `app/public/sf-assets/landmarks/`. `camelId()` maps
+`126-south-park` -> `126SouthPark`, matching the registry id, so the procedural version
+is hidden rather than doubled. `node pipeline/compress-assets.mjs` reports
+`skip (already compressed)` — the stage-4 output is the shipped asset and was not
+re-encoded.
+
+| QA item | Result | Evidence |
+|---|---|---|
+| Re-validation before touching the app | PASS | fresh-scene re-import, all 18 checks, waist 4.007 m |
+| Manifest entry / id mapping | PASS | `126-south-park` -> `126SouthPark`; 59 manifest entries, no duplicate ids |
+| Registry entry parses | PASS | `LANDMARKS` imports clean, 65 entries, no duplicate ids |
+| **Case B re-bake** | PASS | full chain terrain -> ... -> context -> muni-shapes, exit 0 |
+| **Exclusion drops only this building** | PASS | 2 rings dropped, both ours (DataSF `SF3775061` 178.6 m² at 2.19 m; Overture 195.3 m² at 0.01 m); first survivor 112 South Park at 4.67 m |
+| **Audit check 1.6** | PASS | "no procedural footprint inside a bespoke landmark exclusion zone — 66 zones over 65 landmarks clear" |
+| **verify-rebake** | PASS | 584 of 585 cells unchanged; only 23_13 moved (217 -> 215); nearest surviving footprint 5.0 m vs 3.5 m radius |
+| Loader merge line | PASS | `sf-assets: 126-south-park merged 10 objects / 9 materials -> batched (2600 tris body); uniform x1.0000 at 3776, -1282` |
+| **Scale factor** | PASS | **x1.0000** — authored height and `targetHeightM` agree exactly |
+| Exactly one building on the site | PASS | no procedural twin, no baked block poking through, no z-fighting |
+| Orientation | PASS | the 6.90 m front faces South Park; the long axis runs back into the block at 45° |
+| Terrain seating | PASS | no float, no sink |
+| Night glow | PASS | only the skylights, light-well heads and the two intended front windows light |
+| Draw calls | PASS | **92** against the 300 budget; the landmark joins the shared `BatchedMesh` and adds none |
+| **Fallback drill** | PASS | GLB renamed -> exactly one warning, `sf-assets: 126-south-park failed to load`; 52 other landmarks still live; app boots, area renders, site is empty ground inside the exclusion zone (expected for Case B); file restored byte-identical |
+| Lint / build | PASS | `eslint src` clean; `vite build` OK |
+| **Batch-mode source-only branch** | PASS | `git diff --name-only origin/main` lists nothing under `app/public/tiles/` or `api/_data/` |
+
+**Two notes on the local QA rig**, both environmental rather than asset defects:
+
+- The Browser pane runs hidden, which throttles `requestAnimationFrame` to a stop, so
+  the streaming pump and the LOD cross-fade had to be driven by hand
+  (`SF.assets.update(SF.camera.position, dt)` — note it takes a *position*, not the
+  camera; passing the camera makes every distance `NaN` and silently releases every
+  landmark). One frame renders per screenshot, so the hashed-alpha tile cross-fade never
+  finishes settling and the QA screenshots carry a dither haze that the real app does
+  not.
+- Under Vite the missing GLB returns `index.html` with a 200 rather than a 404, so the
+  fallback warning reads `Unexpected token '<'` instead of a clean fetch error. The
+  degradation path is the same and it fired exactly once.
+
+**Dossier correction from the re-bake:** the plan predicted "exactly one" procedural
+footprint dropped, inheriting 135 South Park's rule. It is **two**, and both are this
+building — 126 reaches the bake as two overlapping rings because the Overture gap-fill
+did not dedupe it against DataSF. The plan's §2.13 has been corrected to test *which*
+rings are dropped (every one within ~2.2 m of the anchor) rather than how many.
+
 ## Approval
 
 Presented at pipeline stage 3 on 16 August 2026.
