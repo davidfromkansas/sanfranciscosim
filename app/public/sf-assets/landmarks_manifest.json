@@ -1597,5 +1597,24 @@
     ],
     "tris": 3888,
     "loadRadius": 2500
+  },
+  {
+    "id": "96-south-park",
+    "file": "96-south-park.glb",
+    "anchor": [
+      -122.3941704,
+      37.7818909
+    ],
+    "targetHeightM": 13.7,
+    "cat": 2,
+    "name": "86\u201396 South Park",
+    "estimated": true,
+    "dims": [
+      31.8092,
+      27.6214,
+      13.7
+    ],
+    "tris": 6312,
+    "loadRadius": 2500
   }
 ]

@@ -2430,6 +2430,68 @@ export const LANDMARKS = [
     // whose entire content is a 2.9 m arch is a pink dot from 420.
     camera: { distance: 120, yaw: 314, pitch: 24 },
   },
+  {
+    // 86-96 South Park — Toby Levy's own 1996 live/work loft building, four
+    // residential units over two commercial spaces, on the CORNER of South Park
+    // and Jack London Alley. The only piece of authored modern architecture in
+    // the South Park set, and the only landmark in the manifest with a
+    // cylindrical rooftop drum.
+    //
+    // This site is the worst case in the row for source duplication: BOTH bake
+    // inputs split the building in half, and differently. DataSF carries two
+    // LiDAR rings for lot SF3775116 (208.7 m2 over the front and northeast,
+    // 81.0 m2 over the rear southwest); the Overture/OSM gap-fill carries two
+    // more (way/113545685, untagged, and way/113545691, misaddressed
+    // "92 Jack London Alley"). All four are copies of THIS building and all four
+    // must go.
+    //
+    // Sized against the REAL bake input, on the SIMPLIFIED rings the bake
+    // actually builds (simplifyRing(ring, 0.6) — measure on those, not the raw
+    // ones, or this entry looks impossible). excluded() in buildings.mjs fires
+    // on ring centroid OR any ring vertex; distances from this anchor:
+    //
+    //    2.54 m  DataSF SF3775116 / 201006.0022147  (h 11.15, front+NE)  vertex
+    //    3.31 m  Overture 9de15a80bf == OSM way/113545685 (h 10.8)       vertex
+    //    3.71 m  DataSF SF3775116 / 201006.0149656  (h 12.32, rear SW)   vertex
+    //    4.99 m  Overture aaf221991f == OSM way/113545691 (h 4)          centroid
+    //            -> the FLOOR: under 5.00 m at least one copy survives and the
+    //               asset sits inside a procedural building
+    //   12.30 m  DataSF SF3775055 (84 South Park, h 11.36)               centroid
+    //            -> the CEILING, and the binding constraint
+    //   12.41 m  Overture 3df1e9b461 (84 South Park, h 11)               centroid
+    //   16.03 m  DataSF SF3775054 (76-82 South Park)                     vertex
+    //   19.10 m  Overture 5128010cd5 (76-82 South Park)                  vertex
+    //
+    // Safe window (5.00, 12.30) m. 8 sits near the middle with 3.00 m of margin
+    // below and 4.30 m above, and drops exactly four footprints — all four
+    // copies of this building, nothing else.
+    //
+    // Note that 84 South Park's DataSF ring SHARES two party-wall vertices with
+    // our front footprint, 7.5 m and 15.3 m from this anchor. The 7.5 m one is
+    // nearly collinear with its neighbours and simplifyRing(0.6) removes it,
+    // which is the only reason the ceiling is 12.30 m and not 7.5 m. Raw-ring
+    // measurement would have made this entry impossible.
+    //
+    // The anchor is the modelled footprint's axis-aligned BBOX centre, not the
+    // lot centroid: the L-shaped plan (a 6.42 x 8.73 m open yard at the Taber
+    // Place / 84 South Park inside corner) pushes the bbox 2.26 m northwest of
+    // the lot centre, and anchoring on the bbox centre is what lets the asset
+    // contract's "centred in x/y" hold exactly. The lot's own area centroid is
+    // -122.3941704, 37.7819114 and DataSF's EAS point for "96 SOUTH PARK" is
+    // -122.3941549, 37.7819114 — 1.4 m apart, which cross-checks the projection.
+    id: '96SouthPark',
+    name: '86–96 South Park',
+    lon: -122.3941704,
+    lat: 37.7818909,
+    height: 13.7,
+    exclude: 8,
+    // Camera offset is (sin yaw, ., cos yaw) with +z south, so bearing =
+    // 180 - yaw. The South Park front faces 135.1 deg and the exposed Jack
+    // London Alley flank 225.2 deg, so bearing 180 — due south — is the
+    // bisector: both street elevations sit at 45 deg to the lens and the drum
+    // silhouettes against the sky. yaw 0.
+    camera: { distance: 160, yaw: 0, pitch: 26 },
+  },
 ];
 
 // Parks/green spaces the landcover bake must match at least one source polygon
