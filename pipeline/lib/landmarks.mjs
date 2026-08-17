@@ -340,6 +340,46 @@ export const LANDMARKS = [
     exclude: 7,
     camera: { distance: 190, yaw: 315, pitch: 26 },
   },
+  // 326 Brannan (JAX Vineyards Wine Court) — the NARROWEST exclusion window in
+  // this registry, 1.04 m wide, and the reason is geometric rather than sloppy.
+  // The parcel is a 7.98 x 24.32 m infill slot carrying TWO DataSF footprints
+  // and BOTH have to go: the 5.66 m shed block would z-fight the modelled shed
+  // and the court block would stand inside the modelled garden. Measured
+  // against the pipeline's OWN cleaned rings (simplifyRing 0.6 m + ringCentroid,
+  // i.e. the metric excluded() actually uses), from this anchor:
+  //
+  //   own court  201006.0135574 (95.2 m2) centroid 4.57 m  nearest vertex 3.54 m
+  //   own shed   201006.0157667 (61.6 m2) centroid 6.80 m  nearest vertex 3.54 m
+  //   NEIGHBOUR  201006.0007711 = 334 Brannan (462 m2, h 12.14 m):
+  //                                         centroid 14.10 m nearest vertex 4.58 m
+  //   neighbour  201006.0008516 = 318 Brannan (429 m2, h  8.11 m):        12.22 m
+  //
+  //   exclude 3.0-3.5 m -> drops 0  (asset stays buried under the baked blocks)
+  //   exclude 3.9-4.5 m -> drops 2  (correct: both SF3775012 polygons)
+  //   exclude 4.6 m+    -> drops 3  (eats 334 Brannan, holes the block face)
+  //
+  // The vertex that closes the window, local (3920.45, -1271.10), is PHYSICALLY
+  // SHARED: it belongs to 334 Brannan's ring AND to both of 326's rings — the
+  // party-wall corner, which the DataSF traces agree on exactly. No re-tracing
+  // buys margin. Moving the anchor does not either: a numeric search finds a
+  // 6.88 m window 4.60 m away, and displacing a 24 m lot by 4.6 m to buy
+  // exclusion margin is what AGENTS rule 5 forbids.
+  //
+  // No Overture twin can appear on either parcel to spoil this: the Overture
+  // gap-fill in buildings.mjs only ADDS a footprint where
+  // occupiedFraction(bbox) <= 0.25, and DataSF already occupies both bboxes; its
+  // height-correction branch is gated on h >= 20 m, far above either building.
+  //
+  // 4 is the midpoint, with 0.46 m of margin at each end. Do NOT raise it.
+  {
+    id: '326Brannan',
+    name: '326 Brannan Street',
+    lon: -122.3928965,
+    lat: 37.7815080,
+    height: 5.9,
+    exclude: 4,
+    camera: { distance: 120, yaw: 45, pitch: 34 },
+  },
   {
     id: '380Brannan',
     name: '380 Brannan Street',

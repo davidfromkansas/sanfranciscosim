@@ -132,6 +132,7 @@ route, and the park plans depend on it (§E8 of the parks README).
 | [84 South Park](./84-south-park.md) | `84-south-park` | 13.2 m (LiDAR-derived, roof pergola crest; parapet 11.5 m) | new landmark |
 | [92 South Park (86–96 South Park)](./92-south-park.md) | `92-south-park` | 13.28 m (LiDAR-derived) | new landmark |
 | [95 Jack London Alley (Gran Oriente Filipino Masonic Temple)](./95-jack-london-alley.md) | `95-jack-london-alley` | 8.4 m (estimated — LiDAR roof deck 7.84 m plus a derived parapet) | new landmark |
+| [326 Brannan Street (JAX Vineyards Wine Court)](./326-brannan.md) | `326-brannan` | 5.9 m (shed parapet; LiDAR deck 5.66 m) | new landmark |
 
 ## Shared contract (all 76)
 
