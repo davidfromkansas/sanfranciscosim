@@ -115,10 +115,11 @@ route, and the park plans depend on it (§E8 of the parks README).
 | [102 South Park (The Park View)](./102-south-park.md) | `102-south-park` | 14.0 m (estimated) | new landmark |
 | [2 South Park (544 Second Street, Kohler warehouse)](./2-south-park.md) | `2-south-park` | 17.72 m (LiDAR-derived) | new landmark |
 | [South Park (64 South Park)](./64-south-park.md) | `64-south-park` | 21.04 m (vertical extent — the asset is terrain-draped; the 15.0 m elm crest is estimated) | new landmark |
+| [54–58 South Park](./58-south-park.md) | `58-south-park` | 16.9 m (estimated — LiDAR max; parapet 13.6 m) | new landmark |
 | [524 Second Street (522–524)](./524-second.md) | `524-second` | 9.9 m (estimated) | new landmark |
 | [501 Second Street](./501-second.md) | `501-second` | 37.7 m | new landmark |
 
-## Shared contract (all 75)
+## Shared contract (all 76)
 
 - Style: `docs/styles/miniature-toy.md` (authoritative for artistic decisions)
 - Technical contract: `.agents/skills/sf-asset-check/SKILL.md` (authoritative for the GLB)
