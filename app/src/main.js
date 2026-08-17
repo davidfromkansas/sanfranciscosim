@@ -28,6 +28,7 @@ import { createLiveFerries } from './ferries.js';
 import { createLiveMuni } from './muni.js';
 import { createMuniStopLayer } from './munistoplayer.js';
 import { createFerryTerminals } from './ferryterminals.js';
+import { createFerryRoutes } from './ferryroutes.js';
 import { createLiveAircraft } from './aircraft.js';
 import { createCameraRig } from './camera.js';
 import { createSigns } from './signs.js';
@@ -168,6 +169,10 @@ async function boot() {
   // carry the route lines. Nine of the fifteen terminals are inside the water
   // plane; the rest (Vallejo, Richmond, Harbor Bay, Mare Island) are off-scene.
   const ferryTerminals = createFerryTerminals(scene, data, ferries);
+  // Route walls along every ferry alignment, in each service's livery colour.
+  // Unlike the bus walls these are always on: a crossing is not a street, and
+  // nothing else in the Bay marks where the boats actually go.
+  const ferryRoutes = createFerryRoutes(scene);
   // Real aircraft from /api/flights. Like the Muni layer this one simply stays
   // empty when the feed is away — nothing else in the city depends on it.
   const aircraft = createLiveAircraft(scene, data);
@@ -231,6 +236,7 @@ async function boot() {
     rain.setQuality(key);
     fogBanks.setQuality(key);
     ferryTerminals.setQuality(key);
+    ferryRoutes.setQuality(key);
     post.setSamples(quality.samples);
     renderer.setSize(window.innerWidth, window.innerHeight, false);
     post.setSize();
@@ -778,6 +784,7 @@ async function boot() {
     muni,
     muniStops,
     ferryTerminals,
+    ferryRoutes,
     aircraft,
     // Which aircraft the camera is locked to, or null. Exposed because the
     // follow is otherwise unobservable from outside and QA has to be able to
@@ -947,6 +954,7 @@ async function boot() {
     muni.update(dt, camera);
     muniStops.update(dt, camera, pivotWorld);
     ferryTerminals.update(dt, camera, pivotWorld);
+    ferryRoutes.update();
     aircraft.update(dt, camera);
     trackVessel(dt);
     landmarks.update();
@@ -998,6 +1006,7 @@ async function boot() {
           `muni       ${muni.count}${muni.live ? ` live (${muni.onShapeCount} on-route${muni.degraded ? ', degraded' : ''})` : ' off'}`,
           `stops      ${muniStops.count} shown / ${muniStops.total}`,
           `berths     ${ferryTerminals.count} shown / ${ferryTerminals.total}`,
+          `ferry rts  ${ferryRoutes.routes}${ferryRoutes.visible ? '' : ' (hidden)'}`,
           `aircraft   ${aircraft.count}${aircraft.live ? ` live (${aircraft.source})` : ' off'}`,
           `altitude   ${(camera.position.y - rig.state.pivot.y).toFixed(0)} m`,
           `zoom       ${rig.state.distance.toFixed(0)} m`,
