@@ -1551,6 +1551,44 @@ export const LANDMARKS = [
     exclude: 5,
     camera: { distance: 170, yaw: 45, pitch: 26 },
   },
+  {
+    // 1907 wood-frame light-industrial loft at the WEST TIP of the South Park
+    // oval — the district survey's only "wood frame instead of brick" building.
+    // A 6.84 x 29.81 m stick at 45 deg, so the exclusion radius is derived
+    // rather than guessed. `excluded()` in pipeline/buildings.mjs drops a
+    // footprint when its AREA centroid (ringCentroid) OR any ring vertex falls
+    // inside the circle, and the bake reads DataSF first then gap-fills from
+    // Overture (which carries OSM geometry), so both sources bind. Measured
+    // from this anchor:
+    //
+    //                                    nearest vertex   area centroid
+    //   own footprint (DataSF SF3775064)      9.54 m          0.09 m
+    //   own footprint (OSM way/124884359)     6.64 m          1.38 m  <- lower bound
+    //   150 South Park (DataSF SF3775065)     5.27 m  <- upper bound   9.56 m
+    //   150 South Park (OSM way/124884352)    6.64 m          9.27 m
+    //   136 South Park (DataSF SF3775063)     9.57 m         13.58 m
+    //
+    // Safe window 1.38 < r < 5.27. 3 sits in the middle with 1.62 m of headroom
+    // over the binding self-centroid and 2.27 m below the binding neighbour
+    // vertex — both comfortably larger than the bake's 0.6 m SIMPLIFY_TOLERANCE.
+    // Do NOT raise it: 150 South Park is an existing 8 m building on the oval
+    // with no GLB behind it, and above 5.3 its party-wall vertex falls inside
+    // the circle and the bake punches a hole in the row that nothing fills.
+    //
+    // The anchor is the DataSF OBB centre rather than the OSM centroid
+    // specifically because it widens this window; from the OSM centroid the
+    // safe band is only 1.46-3.99 m. The two are 1.38 m apart.
+    id: '140SouthPark',
+    name: '140 South Park',
+    lon: -122.3947379,
+    lat: 37.7814643,
+    height: 10.68,
+    exclude: 3,
+    // camera.js puts the eye at target + distance*(sin yaw, ., cos yaw) with +x
+    // east and +z south, so yaw 45 stands south-east of the building — square
+    // onto the South Park front, the only elevation with any ornament on it.
+    camera: { distance: 150, yaw: 45, pitch: 26 },
+  },
 ];
 
 // Parks/green spaces the landcover bake must match at least one source polygon

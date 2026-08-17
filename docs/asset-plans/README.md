@@ -110,6 +110,7 @@ route, and the park plans depend on it (§E8 of the parks README).
 | [108–110 South Park (South Park Cafe)](./108-south-park.md) | `108-south-park` | 8.45 m (estimated) | new landmark |
 | [156 South Park Street (Anchor Packing Co.)](./156-south-park.md) | `156-south-park` | 8.7 m (LiDAR-derived) | new landmark |
 | [166–168 South Park](./168-south-park.md) | `168-south-park` | 10.44 m (LiDAR-derived) | new landmark |
+| [140 South Park](./140-south-park.md) | `140-south-park` | 10.68 m (LiDAR-derived) | new landmark |
 
 ## Shared contract (all 61)
 
