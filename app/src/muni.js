@@ -33,6 +33,21 @@ import { mergeGeometries } from 'three/addons/utils/BufferGeometryUtils.js';
 
 import { createGLTFLoader } from './gltf.js';
 import { shared } from './env.js';
+// Whether a vehicle is moving, dwelling, or has no business being in the scene
+// is decided in muni-motion.js: pure, tested rules. Read its header before
+// touching anything below that calls into it — every one of those rules is a
+// bug this city has already shipped, and app/test/muni-motion.test.mjs keeps
+// them fixed.
+import {
+  DWELL_STEP_M,
+  PROVISIONAL_LEAD_M,
+  STALE_MS,
+  deadReckonAdvance,
+  dormantReason,
+  seedSpeed,
+  shouldDrop,
+  targetSpeedFor,
+} from './muni-motion.js';
 
 const MANIFEST = `${import.meta.env.BASE_URL}sf-assets/vehicles_manifest.json`;
 const SHAPES_URL = `${import.meta.env.BASE_URL}tiles/muni-shapes.bin`;
@@ -42,55 +57,19 @@ const CAPACITY = 512;
 const POLL_MS = 60 * 1000;
 const POLL_JITTER_MS = 5 * 1000;
 const DEMO_POLL_MS = 20 * 1000;
-const STALE_MS = 3 * 60 * 1000; // no fix for this long -> the bus fades out
-const MISSES_TO_DROP = 2;
 
 // The street fleet renders at 1.6x (agents.js carScale); the live buses must
 // match it or they read as toys among toys.
 const CAR_SCALE = 1.6;
 
-// Movement tuning against the acceptance bar: stopped must read as stopped.
-// Displacement across one fix gap below which a bus is standing still. A
-// speed READING of 0 means nothing here — see the note in apply().
-const DWELL_STEP_M = 14; // ~one 40-foot coach at 1.6x
+// Rendering-side motion tuning (the rules that decide moving vs dwelling live
+// in muni-motion.js; these only shape how that decision is animated).
 const DECEL = 3.2; // m/s^2 easing into a stop (~2 s from cruise)
 const ACCEL = 1.4; // m/s^2 pulling away
 const CATCHUP_FACTOR = 1.3; // max overspeed while closing a gap to the fix
-const MAX_SPEED = 20; // m/s hard cap (45 mph); transit never exceeds it
 const SNAP_LIMIT_M = 150; // a fix further than this off-shape -> dead-reckon
 const SNAP_WINDOW_M = 1200; // how far along the shape a projection may jump
 const HEADING_EASE = 2.4; // rad/s toward the tangent
-// Cap on how far past the last fresh fix a bus may extrapolate along its
-// shape (seconds). The poll interval is 60 s and the server TTL is 90 s, so
-// fresh fixes arrive at most ~120 s apart in normal mode; 120 s of dead-reckon
-// bridges that gap. Beyond it the bus eases to a stop and waits for real data
-// (or drops at STALE_MS). Same pattern as ferries' DEAD_RECKON_MAX_S.
-const DEAD_RECKON_MAX_S = 120;
-
-// ------------------------------------------------- in service, or parked?
-//
-// The feed reports every vehicle the agency has switched on, which at 7 a.m.
-// includes coaches idling in yards, trains on a terminal layover and runs that
-// have not started yet. Drawn like any other vehicle they read as a parked
-// fleet, which is the complaint these knobs answer: a vehicle only stays in the
-// scene while the data says it is working.
-//
-// A FIRST fix has no previous position to compare against, so its only movement
-// evidence is GTFS-RT's instantaneous `speed` — worthless on its own (see the
-// note in apply()): measured on the live feed, 65 of the 144 vehicles reporting
-// exactly 0 had moved more than 20 m 100 s later. So a vehicle whose own
-// predictions say it is working gets a modest provisional speed on its first
-// fix instead of standing still until the second one lands.
-const PROVISIONAL_SPEED = 5; // m/s, ~18 km/h: Muni's average scheduled speed
-const PROVISIONAL_LEAD_M = 150; // how far that guess may run before it waits
-// Displacement-free fix span after which a vehicle is standing, not rolling.
-// One poll gap plus slack, so a single missed fix can't trip it.
-const STILL_MS = 100 * 1000;
-// Standing this long with no movement at all -> yard, layover, or off shift.
-const PARK_HIDE_MS = 5 * 60 * 1000;
-// Standing, and the next predicted stop is this far out (or there is none while
-// the feed is predicting for others) -> the run hasn't started yet.
-const LAYOVER_LEAD_MS = 5 * 60 * 1000;
 // Seconds a vehicle takes to sink out of / rise back into the scene, so a
 // service change reads as arriving or leaving rather than as popping.
 const HIDE_FADE_S = 1.2;
@@ -718,36 +697,11 @@ export function createLiveMuni(scene, data) {
 
   // ---------------------------------------------------------------- fixes
 
-  // Do the vehicle's own predictions say it is working right now? No
-  // predictions while the feed is publishing them for others means "not yet";
-  // no predictions anywhere (degraded mode) means unknown, so assume working.
-  function inService(stops, at) {
-    const eta = stops?.[0]?.arrivalAt ?? null;
-    if (eta == null) return !predictionsSeen;
-    return eta - at < LAYOVER_LEAD_MS;
-  }
-
-  // Speed to start a newly sighted vehicle at. See PROVISIONAL_SPEED.
-  function seedSpeed(bus, now) {
-    if (Number.isFinite(bus.speedMs) && bus.speedMs > 0) return Math.min(MAX_SPEED, bus.speedMs);
-    return inService(bus.stops, now) ? PROVISIONAL_SPEED : 0;
-  }
-
-  // Why this vehicle does not belong in the scene right now, or null. Measured
-  // in FIX time, not wall clock: a stale payload delivers no new fixes, and
-  // that must freeze this clock rather than quietly empty the city.
-  function dormantReason(state) {
-    const still = state.lastFreshFixAt - state.movedAt;
-    if (still > PARK_HIDE_MS) return 'parked';
-    if (still > STILL_MS && !inService(state.stops, state.lastFreshFixAt)) return 'layover';
-    return null;
-  }
-
   // Everything that keeps a vehicle out of the scene. Demo runs are exempt:
   // they exist to exercise the dwell and dead-reckon paths.
   function hiddenReason(state) {
     if (demo) return null;
-    return dormantReason(state) ?? (state.shapeIdx < 0 ? 'offRoute' : null);
+    return dormantReason(state, predictionsSeen) ?? (state.shapeIdx < 0 ? 'offRoute' : null);
   }
 
   function apply(list, now, stale) {
@@ -787,8 +741,8 @@ export function createLiveMuni(scene, data) {
           // Seeded from the fix, not zero: otherwise every bus stands still for
           // a full poll after it appears, and a page load shows a frozen fleet.
           // A reported 0 is not evidence of standing still — seedSpeed().
-          speed: seedSpeed(bus, now),
-          targetSpeed: seedSpeed(bus, now),
+          speed: seedSpeed(bus, now, predictionsSeen),
+          targetSpeed: seedSpeed(bus, now, predictionsSeen),
           shapeIdx: -1,
           s: 0,
           targetS: 0,
@@ -873,31 +827,24 @@ export function createLiveMuni(scene, data) {
         }
       }
 
-      // How fast to run so the bus covers the ground it actually covered.
-      //
-      // DWELL IS A DISPLACEMENT TEST, NOT A SPEED READING. GTFS-RT's `speed` is
-      // an instantaneous sample at the fix moment, and 260 of 507 Muni vehicles
-      // report exactly 0 at any given instant — every one sitting at a light or
-      // a stop when the sample was taken. Reading that as "parked" froze half
-      // the fleet on every poll even though those buses had plainly moved
-      // hundreds of metres since their previous fix. Only a bus that has not
-      // MOVED between two fixes is dwelling; the reported speed merely biases
-      // how fast it runs once we know it has.
+      // How fast to run so the bus covers the ground it actually covered:
+      // targetSpeedFor() owns the dwell rule (invariants 1 and 2 — displacement
+      // between FIXES, never the reported speed, never gapS).
       const reported = Number.isFinite(bus.speedMs) ? bus.speedMs : null;
       const fixStep = Math.hypot(x - prevFixX, z - prevFixZ);
+      const onShape = state.shapeIdx >= 0;
       // Two fixes in hand: the guess is over, and this is the only place that
       // can honestly say the vehicle moved.
       state.provisional = false;
       if (fixStep >= DWELL_STEP_M) state.movedAt = now;
-      if (state.shapeIdx >= 0) {
-        // DWELL IS A DISPLACEMENT TEST: did the bus actually move between
-        // fixes? gapS (targetS - s) can't answer this — dead-reckon may have
-        // already driven the bus past the new target, making gapS negative
-        // even though the bus moved 900 m. fixStep is the honest metric.
-        const gapS = Math.max(0, state.targetS - state.s);
-        state.targetSpeed = fixStep < DWELL_STEP_M ? 0 : Math.min(MAX_SPEED, Math.max(gapS / gap, fixStep / gap, (reported ?? 0) * 0.6));
-      } else {
-        state.targetSpeed = fixStep < DWELL_STEP_M ? 0 : Math.min(MAX_SPEED, fixStep / gap);
+      state.targetSpeed = targetSpeedFor({
+        fixStep,
+        gapSeconds: gap,
+        gapS: state.targetS - state.s,
+        reported,
+        onShape,
+      });
+      if (!onShape) {
         state.deadYaw = fixStep > 4 ? Math.atan2(x - prevFixX, z - prevFixZ) : state.deadYaw;
       }
     }
@@ -908,7 +855,7 @@ export function createLiveMuni(scene, data) {
         continue;
       }
       state.misses += 1;
-      if (state.misses >= MISSES_TO_DROP || now - state.lastFixAt > STALE_MS) buses.delete(id);
+      if (shouldDrop(state, now)) buses.delete(id);
     }
 
     // Rebuild the active route set for the glow walls. Only routes with at
@@ -1292,15 +1239,18 @@ export function createLiveMuni(scene, data) {
         // hits — without it, the bus reaches targetS, lead hits zero, and
         // the advance clamp freezes it in place. Capped at DEAD_RECKON_MAX_S
         // seconds since the last fresh fix (ferries use the same pattern).
-        if (lead < DWELL_STEP_M && state.targetSpeed > 0) {
-          const sinceFresh = (now - state.lastFreshFixAt) / 1000;
-          // A vehicle still running on its first-fix guess only rolls
-          // PROVISIONAL_LEAD_M before waiting for real data, so a genuinely
-          // parked one drifts half a block, not half a route.
-          if (sinceFresh < DEAD_RECKON_MAX_S && (!state.provisional || state.targetS < state.provisionalCap)) {
-            state.targetS += state.targetSpeed * dt;
-            lead = state.targetS - state.s;
-          }
+        const extra = deadReckonAdvance({
+          lead,
+          targetSpeed: state.targetSpeed,
+          sinceFreshS: (now - state.lastFreshFixAt) / 1000,
+          provisional: state.provisional,
+          targetS: state.targetS,
+          provisionalCap: state.provisionalCap,
+          dt,
+        });
+        if (extra > 0) {
+          state.targetS += extra;
+          lead = state.targetS - state.s;
         }
         const boost = lead > 200 ? CATCHUP_FACTOR : 1;
         const advance = Math.min(Math.max(0, lead + 12), state.speed * boost * dt);

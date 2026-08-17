@@ -19,4 +19,12 @@ export default [
       'no-console': 'off',
     },
   },
+  {
+    files: ['test/**/*.mjs'],
+    languageOptions: {
+      ecmaVersion: 2023,
+      sourceType: 'module',
+      globals: { ...globals.node },
+    },
+  },
 ];

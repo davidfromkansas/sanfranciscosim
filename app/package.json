@@ -9,9 +9,10 @@
   },
   "scripts": {
     "dev": "vite",
-    "build": "vite build && node scripts/compress-tiles.mjs",
+    "build": "npm test && vite build && node scripts/compress-tiles.mjs",
     "preview": "vite preview",
-    "lint": "eslint src"
+    "lint": "eslint src test",
+    "test": "node --test test/muni-motion.test.mjs"
   },
   "dependencies": {
     "three": "0.185.1"
