@@ -1780,6 +1780,71 @@ export const LANDMARKS = [
     camera: { distance: 400, yaw: 315, pitch: 24 },
   },
   {
+    // 21-29 South Park, the 1919 unreinforced-brick warehouse closing the
+    // south-east side of the oval at its Second Street end. Two storeys of
+    // painted brick to a 9.50 m deck, a corbelled cornice at 10.20 m and a
+    // stair/lift bulkhead at 11.73 m (the LiDAR maximum, and the asset's crest).
+    // Office since 1991; Redpoint Ventures took the ground floor in 2016.
+    //
+    // The one landmark on this oval whose STREET WALL BENDS: 19.69 m facing
+    // NW 315.7 deg, a re-entrant corner, then 12.07 m facing WNW 286.7 deg,
+    // because the lot fronts the curve of the oval where it closes. Party walls
+    // on the other three sides (17-19 South Park NE, the Brannan row SE,
+    // 35 South Park SW), so only the bent front is exposed.
+    //
+    // ANCHOR NOTE — this entry does NOT use the footprint's OBB centre, and that
+    // is deliberate, not an oversight to be tidied later. The footprint is a
+    // skewed quadrilateral (its front is cut on a 29 deg diagonal), so its OBB
+    // centre and its WORLD-AXIS-ALIGNED bbox centre are 2.63 m apart.
+    // placeGeneric() seats the MODEL'S ORIGIN at the anchor and the contract
+    // makes that origin the model's XY bbox centre, so anchoring on the OBB
+    // centre would put the building 2.63 m west of its real footprint (AGENTS
+    // rule 5). The value below is the AABB centre; the area centroid is 1.63 m
+    // away and the OBB centre 2.63 m.
+    //
+    // excluded() in buildings.mjs drops a footprint when its centroid OR any
+    // ring vertex falls inside the radius. Measured from THIS anchor against the
+    // real committed bake inputs, after projection and simplifyRing(0.6):
+    //
+    //    1.68 m  own DataSF footprint SF3775042 (1115 m2), via CENTROID
+    //            -> the floor when only DataSF is in play
+    //    4.74 m  Overture db50f6d6 (= OSM way 112759868, "27"), via centroid
+    //    7.93 m  Overture 11e21079 (= OSM way 112759863, "21"), via centroid
+    //   14.60 m  Overture 428ebb71 (= OSM way 112759865, "29"), via centroid
+    //            -> the FLOOR, because OSM/Overture trace this ONE building as
+    //               THREE, and the third piece's centroid is 14.6 m out
+    //   17.29 m  Overture b59deafe (17-19 South Park), nearest VERTEX
+    //            -> the CEILING, and the binding constraint
+    //   18.79 m  DataSF SF3775046 (the same neighbour), nearest vertex
+    //   19.58 m  Overture be4a983e / b57e2786 (318 / 326 Brannan), nearest vertex
+    //   20.78 m  DataSF SF3775100, nearest vertex
+    //
+    // Safe window (14.60, 17.29) m and 16 is its midpoint: 1.40 m clear of the
+    // floor, 1.29 m clear of the ceiling. It is a narrow window and it is narrow
+    // for a specific reason — Overture's three-way split of one surveyed
+    // building. In practice Overture is gap-fill only (occupiedFraction > 0.25
+    // skips it) and DataSF covers this parcel, so the floor is really 1.68 m;
+    // 16 is chosen to be correct either way. Do NOT raise past 17 — at 17.29
+    // this starts deleting 17-19 South Park, which has no GLB to replace it.
+    //
+    // No clearTrees: this is a paved party-wall block with no landcover inside
+    // the footprint. The crape myrtles in front are street trees in the road
+    // reserve, outside the exclusion's job.
+    id: '21SouthPark',
+    name: '21-29 South Park',
+    lon: -122.3931063,
+    lat: 37.7817676,
+    height: 11.73,
+    exclude: 16,
+    // App yaw = 180 - the compass bearing the camera stands at. The two front
+    // planes face 315.7 and 286.7 deg and every other side is a party wall, so
+    // the only informative eye is out over the park: bearing 300 -> yaw 240.
+    // That splits the two planes, so the bend reads as a bend and both ranks of
+    // openings stay open. Standing square on either normal collapses the other
+    // plane and the bend with it. Verified by render (the 592Third lesson).
+    camera: { distance: 170, yaw: 240, pitch: 26 },
+  },
+  {
     // 522-524 Second Street, the 1923 brick warehouse on the Taber Place corner.
     // Third bespoke landmark on block 3775, with 358 and 370-400 Brannan.
     //
