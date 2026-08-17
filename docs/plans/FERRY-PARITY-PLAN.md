@@ -5,7 +5,15 @@ Muni has since gained route geometry, real stops, badges, per-mode vehicles and 
 tested motion kernel. This plan closes that gap. It is four workstreams; W1 is a
 bug fix and should land first.
 
-**What ships today:** `/api/ferries` (511 SIRI VehicleMonitoring, agency `SB` =
+**STATUS 2026-08-17: all four workstreams are built and committed on
+`docs/ferry-parity`, unpushed.** W1 `509658fd2`, W3 `4291c48c9`, W2 `565b210ce`,
+W4 `92fa2e690`. Outstanding follow-ups, both flagged in code: migrate `muni.js`
+onto the shared `app/src/routewall.js` (its own copy of the ribbon shader is
+still there, unverifiable here because `vite preview` serves no `/api/muni`),
+and QA the whole set on the DEPLOYED site — everything below was verified in
+headless Chrome against a local build, which cannot exercise the live feeds.
+
+**What shipped before this work:** `/api/ferries` (511 SIRI VehicleMonitoring, agency `SB` =
 WETA), `app/src/ferries.js` — 15 live vessels as one instanced GLB with wakes,
 bobbing, clickable cards, and procedural fallback. No route lines, no terminals,
 no badge, no tested motion rules.
