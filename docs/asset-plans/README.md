@@ -114,6 +114,7 @@ route, and the park plans depend on it (§E8 of the parks README).
 | [126 South Park](./126-south-park.md) | `126-south-park` | 7.6 m (LiDAR-derived) | new landmark |
 | [102 South Park (The Park View)](./102-south-park.md) | `102-south-park` | 14.0 m (estimated) | new landmark |
 | [2 South Park (544 Second Street, Kohler warehouse)](./2-south-park.md) | `2-south-park` | 17.72 m (LiDAR-derived) | new landmark |
+| [27 South Park (centre of the 21–29 warehouse)](./27-south-park.md) | `27-south-park` | 10.2 m (LiDAR-derived) | new landmark |
 | [South Park (64 South Park)](./64-south-park.md) | `64-south-park` | 21.04 m (vertical extent — the asset is terrain-draped; the 15.0 m elm crest is estimated) | new landmark |
 | [524 Second Street (522–524)](./524-second.md) | `524-second` | 9.9 m (estimated) | new landmark |
 | [501 Second Street](./501-second.md) | `501-second` | 37.7 m | new landmark |
@@ -121,7 +122,7 @@ route, and the park plans depend on it (§E8 of the parks README).
 | [Hotel Madrid (22–24 South Park)](./22-south-park.md) | `22-south-park` | 14.22 m (LiDAR-derived) | new landmark |
 | [26–28 South Park (51 Taber Place)](./26-south-park.md) | `26-south-park` | 9.05 m (LiDAR-derived) | new landmark |
 
-## Shared contract (all 75)
+## Shared contract (all 76)
 
 - Style: `docs/styles/miniature-toy.md` (authoritative for artistic decisions)
 - Technical contract: `.agents/skills/sf-asset-check/SKILL.md` (authoritative for the GLB)
