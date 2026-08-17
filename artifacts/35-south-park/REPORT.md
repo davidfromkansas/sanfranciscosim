@@ -141,3 +141,36 @@ the numbers in §1.
 > "APPROVE EVERYTHING DONT ASK ME FOR PERMISSION" — David, 16 August 2026
 
 Blanket approval given with the pipeline invocation, ahead of the presentation.
+
+## 9. Stage-5 local QA (17 August 2026)
+
+Run in real headless Chrome over CDP against a static server on `app/dist`
+(`preview_start` was out of dev-server slots — the documented escape hatch). Screenshots
+are held outside the repo at the session scratchpad; the numbers below are from
+`qa.json` / `qa2.json`.
+
+| check | result | evidence |
+|---|---|---|
+| Re-validation of the shipped GLB | **PASS** | `validation.json`, all 16 checks, 6,980 tris, 10 objects |
+| Manifest entry | **PASS** | 19 insertions, 0 deletions — appended as text, no other entry touched |
+| id mapping | **PASS** | `camelId('35-south-park')` → `35SouthPark`, which is the registry id |
+| Case B registry + re-bake | **PASS** | `pipeline/lib/landmarks.mjs` entry added; full chain re-baked (`terrain → bridges → buildings → streets → landcover → validate → lore → toy → notables → context → muni-shapes`) |
+| audit 1.6 | **PASS** | "83 zones over 80 landmarks clear". 1.2b / 1.3c / 1.7b fail on `main` already and are unrelated |
+| `verify-rebake` | **PASS** | "584 of 585 cells unchanged; 23_13 201 → 200 ← 35SouthPark"; nearest surviving footprint 10.7 m against the 6 m radius |
+| Single building on the site | **PASS** | exactly one procedural footprint dropped; no twin, no baked block through the model, no z-fighting |
+| Scale factor | **PASS** | `sf-assets: 35-south-park merged 10 objects / 10 materials -> batched (4759 tris body); uniform x1.0000 at 3886, -1279` — 1.0000, and the position matches the surveyed anchor to the metre |
+| Orientation | **PASS** | the arcade faces north-west across the street into the park; camera preset `yaw 225` looks square onto it |
+| Terrain seating | **PASS** | sits flat on the sidewalk, no float, no sink |
+| Night glow | **PASS** | five lit arches with the mullion grid reading dark against them, four gold sconces; nothing else lights |
+| Draw calls (AGENTS rule 2) | **PASS** | **103–105** at the landmark, **88–96** downtown, against the 300 budget. Measured by hooking `renderer.render` and taking the per-frame max — the stats overlay reads 1 because `toypost` resets `renderer.info` |
+| Fallback drill | **PASS** | GLB served as a real 404: exactly one warning (`sf-assets: 35-south-park failed to load (… 404 …)`), `failed: 1`, app boots, the other 67 landmarks render, and the site is empty ground inside the exclusion zone — expected for Case B |
+| lint | **PASS** | `npm run lint` clean |
+| build | **PASS** | `npm run build` clean |
+| Deployed QA | **not run** | batch mode — see below |
+
+**Batch mode.** `BATCH: yes`, so the bake was run for this QA and then discarded
+(`git checkout -- app/public/tiles api/_data`) and only source was committed: the GLB,
+the manifest entry, the registry entry, the plan and this artifacts folder.
+`git diff --name-only origin/main` lists nothing under `app/public/tiles/` or
+`api/_data/`. The city is re-baked once for the whole batch by
+`docs/asset-pipeline/BATCH-INTEGRATE.md`, which is also where the PR is opened.
