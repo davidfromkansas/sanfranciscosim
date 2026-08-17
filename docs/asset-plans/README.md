@@ -102,8 +102,9 @@ route, and the park plans depend on it (§E8 of the parks README).
 | [592 Third Street](./592-third.md) | `592-third` | 8.2 m (estimated) | new landmark |
 | [400 Brannan Street](./400-brannan.md) | `400-brannan` | 8.8 m | new landmark |
 | [188 South Park (South Park Lofts)](./188-south-park.md) | `188-south-park` | 15.93 m (LiDAR-derived) | new landmark |
+| [150 South Park](./150-south-park.md) | `150-south-park` | 8.0 m | new landmark |
 
-## Shared contract (all 60)
+## Shared contract (all 61)
 
 - Style: `docs/styles/miniature-toy.md` (authoritative for artistic decisions)
 - Technical contract: `.agents/skills/sf-asset-check/SKILL.md` (authoritative for the GLB)
@@ -245,6 +246,15 @@ footprint shares a party wall with the 54 m Hiram W. Johnson slab and a 0.5 m ce
 that boundary samples the tower. Treat a single-cell `hgt_max` on a party wall as
 unusable. That plan's 2.14 is also the set's clearest exclusion-radius trap: the usual
 half-diagonal would have deleted the neighbour.
+
+150 South Park is the tightest exclusion case in the set and the one that shows *why* the
+half-diagonal rule is wrong rather than merely risky. Its own footprint has to be cleared
+by its **centroid** (3.24 m from the anchor), because its nearest ring vertex — 6.10 m — is
+a party-wall node it **shares with 156 South Park**, whose nearest vertex is therefore also
+6.10 m. Any radius that reaches our corner reaches the neighbour's, so the safe window is
+3.24 < r < 6.10 and the half-diagonal (~9.5 m) would have taken out both neighbours. Size
+the radius from `excluded()`'s actual test — centroid **or** any vertex — against both bake
+sources, not from the building's own dimensions.
 
 The executing agent is expected to re-verify height, anchor, footprint and
 orientation before modelling — the dossier is a head start, not a citation.
