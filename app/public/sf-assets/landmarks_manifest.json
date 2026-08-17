@@ -1445,5 +1445,24 @@
     ],
     "tris": 4968,
     "loadRadius": 2500
+  },
+  {
+    "id": "35-south-park",
+    "file": "35-south-park.glb",
+    "anchor": [
+      -122.3933378,
+      37.7815714
+    ],
+    "targetHeightM": 13.4,
+    "cat": 3,
+    "name": "Accel (35 South Park)",
+    "estimated": true,
+    "dims": [
+      42.0586,
+      40.2991,
+      13.4
+    ],
+    "tris": 6980,
+    "loadRadius": 2500
   }
 ]

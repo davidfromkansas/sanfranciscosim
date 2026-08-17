@@ -116,6 +116,7 @@ route, and the park plans depend on it (§E8 of the parks README).
 | [2 South Park (544 Second Street, Kohler warehouse)](./2-south-park.md) | `2-south-park` | 17.72 m (LiDAR-derived) | new landmark |
 | [27 South Park (centre of the 21–29 warehouse)](./27-south-park.md) | `27-south-park` | 10.2 m (LiDAR-derived) | new landmark |
 | [South Park (64 South Park)](./64-south-park.md) | `64-south-park` | 21.04 m (vertical extent — the asset is terrain-draped; the 15.0 m elm crest is estimated) | new landmark |
+| [35 South Park (Accel)](./35-south-park.md) | `35-south-park` | 13.4 m (penthouse crest, photogrammetric/estimated; parapet 10.4 m) | new landmark |
 | [524 Second Street (522–524)](./524-second.md) | `524-second` | 9.9 m (estimated) | new landmark |
 | [501 Second Street](./501-second.md) | `501-second` | 37.7 m | new landmark |
 | [21–29 South Park](./21-south-park.md) | `21-south-park` | 11.73 m (LiDAR maximum, read as the roof bulkhead; the 10.20 m cornice crest is estimated) | new landmark |
