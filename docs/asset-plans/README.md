@@ -117,8 +117,9 @@ route, and the park plans depend on it (§E8 of the parks README).
 | [South Park (64 South Park)](./64-south-park.md) | `64-south-park` | 21.04 m (vertical extent — the asset is terrain-draped; the 15.0 m elm crest is estimated) | new landmark |
 | [524 Second Street (522–524)](./524-second.md) | `524-second` | 9.9 m (estimated) | new landmark |
 | [501 Second Street](./501-second.md) | `501-second` | 37.7 m | new landmark |
+| [84 South Park](./84-south-park.md) | `84-south-park` | 13.2 m (LiDAR-derived, roof pergola crest; parapet 11.5 m) | new landmark |
 
-## Shared contract (all 75)
+## Shared contract (all 76)
 
 - Style: `docs/styles/miniature-toy.md` (authoritative for artistic decisions)
 - Technical contract: `.agents/skills/sf-asset-check/SKILL.md` (authoritative for the GLB)
