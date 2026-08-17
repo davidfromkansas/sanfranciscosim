@@ -13,17 +13,17 @@ shipped.
 | | |
 |---|---|
 | Triangles | **2,512** (cap 6,000) |
-| Objects | 57 |
+| Objects | 8 after stage 4 (57 as built) |
 | Dimensions | 25.938 × 26.042 × **9.050** m |
 | Footprint in plan | 30.13 × 6.69 m = 201.6 m² |
 | min Z | 0.000 m |
 | XY centre offset | 0.000, 0.000 m |
 | Materials | 8 — `Toy_glass`, `Toy_glassl_Glow`, `Toy_ink`, `Toy_roofd`, `Toy_steel`, `Toy_stone`, `Toy_trim`, `Toy_trim_Glow` |
 | Glow groups | 2 (`Toy_glassl_Glow`, `Toy_trim_Glow`) |
-| GLB on disk | 168 KB uncompressed (pre-optimize) |
+| GLB on disk | **71.1 KB** meshopt-compressed (stage 4); 163.6 KB pre-optimize |
 | `targetHeightM` | 9.05 — bbox top is the parapet, so the loader's scale is **1.0** |
 | Manifest anchor | `-122.3937438, 37.7822369` |
-| Validation | **PASS**, all 16 checks — `validation.json` |
+| Validation | **PASS**, all 16 checks, re-run against the shipped optimized file — `validation.json` |
 
 The XY bounding box is ~26.0 × 26.0 m for a 6.69 × 30.13 m building. That is the
 exact consequence of a 315.18° real-world heading, not a scale error.
