@@ -1,0 +1,273 @@
+{
+ "rows": [
+  {
+   "name": "trees (instanced)",
+   "objects": 53,
+   "tris": 28255136,
+   "visibleTris": 4347928,
+   "bytes": 18115360,
+   "instances": 271684,
+   "MB": 17.3
+  },
+  {
+   "name": "ground / streets / landcover",
+   "objects": 84,
+   "tris": 4132134,
+   "visibleTris": 3996630,
+   "bytes": 158170704,
+   "instances": 10506,
+   "MB": 150.8
+  },
+  {
+   "name": "terrain",
+   "objects": 4,
+   "tris": 2097152,
+   "visibleTris": 2097152,
+   "bytes": 67272864,
+   "instances": 4,
+   "MB": 64.2
+  },
+  {
+   "name": "far city (2km prism meshes)",
+   "objects": 58,
+   "tris": 1747310,
+   "visibleTris": 1747310,
+   "bytes": 70837864,
+   "instances": 58,
+   "MB": 67.6
+  },
+  {
+   "name": "near buildings (full detail)",
+   "objects": 18,
+   "tris": 630263,
+   "visibleTris": 630263,
+   "bytes": 73220696,
+   "instances": 18,
+   "MB": 69.8
+  },
+  {
+   "name": "building kit (batched)",
+   "objects": 1,
+   "tris": 198872,
+   "visibleTris": 198872,
+   "bytes": 23864640,
+   "instances": 1,
+   "MB": 22.8
+  },
+  {
+   "name": "sky / weather / props",
+   "objects": 6,
+   "tris": 118918,
+   "visibleTris": 100446,
+   "bytes": 3776132,
+   "instances": 1019,
+   "MB": 3.6
+  },
+  {
+   "name": "other: Mesh",
+   "objects": 63,
+   "tris": 83046,
+   "visibleTris": 61672,
+   "bytes": 5071168,
+   "instances": 193,
+   "MB": 4.8
+  },
+  {
+   "name": "water",
+   "objects": 1,
+   "tris": 128,
+   "visibleTris": 128,
+   "bytes": 3360,
+   "instances": 1,
+   "MB": 0
+  },
+  {
+   "name": "other: vehicle-sedan-coral",
+   "objects": 1,
+   "tris": 0,
+   "visibleTris": 0,
+   "bytes": 143064,
+   "instances": 0,
+   "MB": 0.1
+  },
+  {
+   "name": "other: vehicle-sedan-grape",
+   "objects": 1,
+   "tris": 0,
+   "visibleTris": 0,
+   "bytes": 143064,
+   "instances": 0,
+   "MB": 0.1
+  },
+  {
+   "name": "other: vehicle-sedan-mustard",
+   "objects": 1,
+   "tris": 0,
+   "visibleTris": 0,
+   "bytes": 143064,
+   "instances": 0,
+   "MB": 0.1
+  },
+  {
+   "name": "other: vehicle-sedan-red",
+   "objects": 1,
+   "tris": 0,
+   "visibleTris": 0,
+   "bytes": 143064,
+   "instances": 0,
+   "MB": 0.1
+  },
+  {
+   "name": "other: vehicle-minivan-cream",
+   "objects": 1,
+   "tris": 0,
+   "visibleTris": 0,
+   "bytes": 159756,
+   "instances": 0,
+   "MB": 0.2
+  },
+  {
+   "name": "other: vehicle-minivan-lavender",
+   "objects": 1,
+   "tris": 0,
+   "visibleTris": 0,
+   "bytes": 159756,
+   "instances": 0,
+   "MB": 0.2
+  },
+  {
+   "name": "other: vehicle-minivan-mint",
+   "objects": 1,
+   "tris": 0,
+   "visibleTris": 0,
+   "bytes": 159756,
+   "instances": 0,
+   "MB": 0.2
+  },
+  {
+   "name": "other: vehicle-minivan-orange",
+   "objects": 1,
+   "tris": 0,
+   "visibleTris": 0,
+   "bytes": 159756,
+   "instances": 0,
+   "MB": 0.2
+  },
+  {
+   "name": "other: vehicle-minivan-teal",
+   "objects": 1,
+   "tris": 0,
+   "visibleTris": 0,
+   "bytes": 159756,
+   "instances": 0,
+   "MB": 0.2
+  },
+  {
+   "name": "other: vehicle-taxi",
+   "objects": 1,
+   "tris": 0,
+   "visibleTris": 0,
+   "bytes": 236160,
+   "instances": 0,
+   "MB": 0.2
+  },
+  {
+   "name": "other: vehicle-waymo",
+   "objects": 1,
+   "tris": 0,
+   "visibleTris": 0,
+   "bytes": 167664,
+   "instances": 0,
+   "MB": 0.2
+  },
+  {
+   "name": "other: vehicle-commuter-bus",
+   "objects": 1,
+   "tris": 0,
+   "visibleTris": 0,
+   "bytes": 121488,
+   "instances": 0,
+   "MB": 0.1
+  },
+  {
+   "name": "other: vehicle-delivery-truck",
+   "objects": 1,
+   "tris": 0,
+   "visibleTris": 0,
+   "bytes": 150648,
+   "instances": 0,
+   "MB": 0.1
+  },
+  {
+   "name": "moving agents",
+   "objects": 21,
+   "tris": 0,
+   "visibleTris": 0,
+   "bytes": 5614354,
+   "instances": 1,
+   "MB": 5.4
+  },
+  {
+   "name": "other: focus-glow",
+   "objects": 1,
+   "tris": 12,
+   "visibleTris": 0,
+   "bytes": 840,
+   "instances": 1,
+   "MB": 0
+  },
+  {
+   "name": "other: focus-ring",
+   "objects": 1,
+   "tris": 80,
+   "visibleTris": 0,
+   "bytes": 3104,
+   "instances": 1,
+   "MB": 0
+  },
+  {
+   "name": "street lamps + light pools",
+   "objects": 100,
+   "tris": 3448620,
+   "visibleTris": 0,
+   "bytes": 5385240,
+   "instances": 82110,
+   "MB": 5.1
+  }
+ ],
+ "totals": {
+  "meshes": 424,
+  "tris": 40711671,
+  "MB": 413.3
+ },
+ "renderInfo": {
+  "calls": 1,
+  "triangles": 2,
+  "geometries": 167,
+  "textures": 18,
+  "programs": 34
+ },
+ "cityStats": {
+  "cellsLoaded": 1728,
+  "cellsTotal": 1656,
+  "nearChunks": 18,
+  "groupsTotal": 61,
+  "farGroups": 58,
+  "groundGroups": 57,
+  "groundDetail": 2,
+  "trees": 271684,
+  "lamps": 41055,
+  "kitInstances": 19279,
+  "kitPieceTypes": 165,
+  "kitPlaced": 19279,
+  "kitConsidered": 27731,
+  "furniture": 4347,
+  "furnitureDraws": 20
+ },
+ "heapMB": 291,
+ "governor": {
+  "mode": "auto",
+  "tier": "high"
+ },
+ "pixelRatio": 1
+}
