@@ -21,7 +21,7 @@ prompt, Part 2 is the research and design dossier behind it.
 |---|---|
 | Manifest id | `132-south-park` |
 | Existing procedural builder | none — new landmark (needs a `pipeline/lib/landmarks.mjs` entry and a re-bake, see 2.13) |
-| WGS84 anchor | `-122.3946190, 37.7815407` (bounding-box centre of the built form, measured — falls in the courtyard between the two structures, see 2.3) |
+| WGS84 anchor | `-122.3946173, 37.7815393` (bounding-box centre of the built form, measured — falls in the courtyard between the two structures, see 2.3) |
 | Target height | **12.07 m** to the front block's cornice crest; roof deck 11.77 m; rear cottage crest 8.75 m — LiDAR-derived, see 2.1 and 2.15 |
 | Footprint | two rectangles on a 6.689 × 29.974 m lot: front flats 6.689 × 10.30 m, rear cottage 6.689 × 10.98 m, 8.70 m courtyard between; measured |
 | Triangle cap | 9,000 |
@@ -90,8 +90,9 @@ this dossier shows at all.
   surround, the belt course at each floor line, the cornice band, and the outer frame
   of the whole facade. This is the building's identity — carry it hard.
 - The **oxblood ground-floor base**, visually a plinth rather than a storey, with the
-  **black segmental-arched carriage gate** on the south-west half — the passage through
-  to the courtyard — and a single square sash window on the north-east half
+  **black segmental-arched carriage gate** on the north-east half — the passage through
+  to the courtyard, against the party wall shared with 126 — and a single square sash
+  window on the south-west half
 - The **gray shingled hipped false-mansard hood** tucked under the cornice, spanning
   between the two bay tops over the recessed centre
 - A designed roof: light membrane deck, parapet/cornice ring, one skylight, two slim
@@ -261,8 +262,8 @@ draft entry in `REPORT.md`. Do not edit the production manifest in this task.
   "id": "132-south-park",
   "file": "132-south-park.glb",
   "anchor": [
-    -122.3946190,
-    37.7815407
+    -122.3946173,
+    37.7815393
   ],
   "targetHeightM": 12.07,
   "cat": 2,
@@ -400,7 +401,7 @@ actually does:
 Both blocks run the full 6.689 m lot width, party wall to party wall.
 
 Footprint polygons in **Blender coordinates** (metres, `+X` east, `+Y` north), already
-centred on the anchor `-122.3946190, 37.7815407`:
+centred on the anchor `-122.3946173, 37.7815393`:
 
 ```
 front block                     rear cottage
@@ -413,8 +414,8 @@ front block                     rear cottage
 The bay faces sit 0.55 m proud of the front wall, on the line
 `(13.151, −8.450) → (8.403, −13.162)`.
 
-**The anchor is in the courtyard.** `-122.3946190, 37.7815407` is the bounding-box centre
-of the built form (`s = 3.345`, `t = 14.715`) and there is no geometry within 4.4 m of it
+**The anchor is in the courtyard.** `-122.3946173, 37.7815393` is the bounding-box centre
+of the built form (`s = 3.345`, `t = 14.75`) and there is no geometry within 4.4 m of it
 in either direction. That is correct: the loader centres the GLB's bounding box on the
 anchor, and the alternative — anchoring on one of the two blocks — would put the other
 one 19 m off its surveyed position. It does mean the exclusion design in 2.13 cannot use
@@ -423,7 +424,7 @@ in mid-air.
 
 For reference, the area centroid of the built form is `t = 15.29`, 0.58 m behind the
 bbox centre. The DataSF assessor point for the parcel is `-122.3946212, 37.7815424`,
-0.25 m from the anchor — an independent confirmation.
+0.3 m from the anchor — an independent confirmation.
 
 Because of the 45° heading the axis-aligned bounding box is ~26.3 × 26.3 m for a lot
 that is 6.7 × 30.0 m. That is correct.
@@ -437,11 +438,13 @@ even so, because that frame is square-on and unobstructed.
 
 Bottom to top:
 
-- **The oxblood base, 0 → 2.24 m.** Dark red-brown, painted, reading as a plinth rather
-  than a storey. Two openings: a square four-light sash window on the north-east half,
-  and on the south-west half a **wide segmental-arched opening filled with a black metal
-  gate** — the carriage passage through to the courtyard, with brick reveal visible at
-  the jambs. The address numerals sit between them.
+- **The oxblood base, 0 → 2.10 m.** Dark red-brown, painted, reading as a plinth rather
+  than a storey. Two openings: on the **north-east** half a **wide segmental-arched
+  opening filled with a black metal gate** — the carriage passage through to the
+  courtyard, with brick reveal visible at the jambs — and a square four-light sash window
+  on the south-west half. The address numerals sit between them. (Amended at stage 2:
+  the first draft of this section had the two mirrored. Read the drone frame with
+  north-east on the RIGHT — the camera looks north-west at a south-east-facing front.)
 - **Three residential floors, 2.24 → 11.77 m**, each 3.18 m, in **horizontal lap siding**
   a very pale warm gray-white.
 - **Two projecting square bays**, ~2.80 m wide each, running all three floors from the
@@ -582,7 +585,7 @@ Flat colors only, from the `sf-asset-check` palette.
 | `Toy_ink` | `#3a3530` | window and gate recesses, the arch soffit |
 | `Toy_sand` | `#ece4d4` | rear cottage walls |
 | `Toy_rust` | `#a86444` | the courtyard deck and stair |
-| `Toy_glass_Glow` | `#2a4d73` | the lit bay windows at night |
+| `Toy_gold_Glow` | `#caa64a` | the lit bay windows at night — warm lamplight (amended at stage 2; `Toy_glass_Glow` at the base glass colour reads cold, and `Toy_gold_Glow` is the shipped set's established warm-window glow) |
 
 Two palette notes to record in `REPORT.md`:
 
@@ -667,8 +670,8 @@ touching the trim.
   "id": "132-south-park",
   "file": "132-south-park.glb",
   "anchor": [
-    -122.3946190,
-    37.7815407
+    -122.3946173,
+    37.7815393
   ],
   "targetHeightM": 12.07,
   "cat": 2,
@@ -702,13 +705,13 @@ vertex** falls inside a zone:
 
 | Distance | What |
 |---|---|
-| 3.60 m | **126 South Park (SF3775061), nearest vertex — the ceiling** |
-| 3.94 m | this lot's own front block, nearest vertex |
-| 6.13 m | this lot's own rear block, nearest vertex |
+| 3.59 m | **126 South Park (SF3775061), nearest vertex — the ceiling** |
+| 3.78 m | this lot's own front block, nearest vertex |
+| 6.31 m | this lot's own rear block, nearest vertex |
 | 8.49 m | own front block, ring centroid |
 | 10.40 m | own rear block, ring centroid |
 
-So the usable window at the anchor is `(0, 3.60)` and **nothing this lot owns is inside
+So the usable window at the anchor is `(0, 3.59)` and **nothing this lot owns is inside
 it**. A single radius that reaches either of this lot's own centroids at 8.49 / 10.40 m
 would delete 126 South Park, and at 9.6 m it would also take 136. 126 and 136 have no
 GLB to replace them, and the failure is silent.
@@ -729,7 +732,7 @@ bbox is less than 25% occupied. Overture is not known to carry a building here (
 not, and Overture's SF buildings are largely OSM), but if it does, a whole-lot polygon
 would have its centroid within ~0.6 m of the anchor and would sail straight through the
 two off-centre zones and reappear as a procedural box inside the model. `exclude: 2` at
-the anchor catches that centroid with 1.60 m of clearance to 126's vertex. **Verify this
+the anchor catches that centroid with 1.59 m of clearance to 126's vertex. **Verify this
 at re-bake time rather than trusting the argument** — `node pipeline/verify-rebake.mjs`
 reports what is left standing in each zone.
 
@@ -749,11 +752,11 @@ Proposed registry entry:
   // Overture gap-fill pass re-filling a lot that `markOccupied()` no longer sees
   // as occupied once the DataSF footprints are excluded — a whole-lot Overture
   // polygon would centre within ~0.6 m of the anchor and miss both other zones.
-  // Do not raise it: 126 South Park's vertex is at 3.60 m and it has no GLB.
+  // Do not raise it: 126 South Park's vertex is at 3.59 m and it has no GLB.
   id: '132SouthPark',
   name: '130-134 South Park',
-  lon: -122.3946190,
-  lat: 37.7815407,
+  lon: -122.3946173,
+  lat: 37.7815393,
   height: 12.07,
   exclude: 2,
   extraExclusions: [
