@@ -4,12 +4,12 @@ Built 16–17 August 2026 from `docs/asset-plans/27-south-park.md`, on branch
 `pipeline/27-south-park`. **This report beats the plan** wherever the two
 disagree.
 
-## Shipped numbers (pre-optimize)
+## Shipped numbers (post-optimize — stage 4 has run)
 
 | | |
 |---|---|
 | File | `27-south-park.glb` |
-| Objects | 77 |
+| Objects | 11 (77 before the stage-4 join-per-material pass) |
 | Triangles | **4,968** (cap 7,000) |
 | Dimensions | 32.613 × 32.507 × **10.200** m |
 | Footprint | 12.19 m frontage × 33.55 m deep, long axis 134.8°/314.8° |
@@ -17,8 +17,8 @@ disagree.
 | Crest | parapet coping at **exactly 10.20 m** → loader scale 1.0 |
 | Materials | 11, all `Toy_*`, flat, no textures, no alpha, no `Toy_body` |
 | Glow groups | 2 — `Toy_gold_Glow` (ground-floor bays), `Toy_glass_Glow` (2 of 6 arches) |
-| Raw / gzip | 289 KB / 51 KB |
-| Validation | `validation.json` — **overall PASS**, 16/16 checks |
+| Raw file | **136 KB** meshopt-compressed (289 KB before stage 4) |
+| Validation | `validation.json` — **overall PASS**, 16/16 checks, re-run on the PACKED shipping file |
 
 The ~32.6 × 32.5 m axis-aligned XY box is the expected consequence of a 314.8°
 real-world heading on a 12.19 × 33.55 m building, not a squared-up footprint.
@@ -163,6 +163,19 @@ Consequence: until 21 South Park (sibling branch `pipeline/21-south-park`) and
 party walls in this asset are finished blind faces with the parapet carried
 across rather than raw slabs.
 
+## Stage 4 — optimize
+
+Run in full; see `optimize/REPORT.md`. 289 → **136 KB** raw (−53.0%), 78 → **12**
+draw submeshes, 9,812 → **2,632** vertices, triangles and bounding box unchanged.
+Worst A/B pixel delta 0.043% against a 2–4% gate. All gates G1–G6, G8 PASS
+(G7 n/a, no bake). The limited-dissolve step was deliberately skipped — this
+asset has three coplanar ring bands and the step measured worth zero triangles
+on it. The pre-optimize original is archived at `optimize/input/27-south-park.glb`.
+
 ## Approval
 
-Pending. See §"Stage 3" of `docs/asset-pipeline/ADDRESS-TO-ASSET.md`.
+Batch approval given with the pipeline invocation on 16 August 2026:
+**"APPROVE EVERYTHING DONT ASK ME FOR PERMISSION"** (quoted verbatim, `BATCH: yes`).
+The contact sheet, aerial and night renders were presented at stage 3 before
+stage 4 began. Push/PR/deploy still require a separate explicit instruction —
+the pipeline ends at a locally verified, source-only branch.
