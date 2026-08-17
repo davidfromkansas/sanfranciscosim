@@ -192,3 +192,45 @@ file is now the shipping file; the pre-optimize original is archived at
 Standing approval for this pipeline run, quoted verbatim per stage 3. The contact
 sheet, the aerial day and night renders and the numbers above were produced and
 presented; no revision was requested.
+
+## Gate 5 — local integration QA (Case B, batch mode)
+
+Verified against a production build of `app/dist` served on :5209 and driven in
+headless Chrome over CDP. `preview_start` was out of slots (five dev servers
+belonging to other chats), which is the documented fallback. Software WebGL, so
+frame rate is environment-limited and not reported as a measurement.
+
+| Check | Result | Evidence |
+|---|---|---|
+| Re-validation of the shipped GLB | **PASS** | fresh-scene re-import of the packed file, all 16 contract checks, 3,888 tris, 13 materials |
+| GLB in place | **PASS** | `app/public/sf-assets/landmarks/95-jack-london-alley.glb`, byte-identical to the artifact; served 200, `Content-Length: 112904` |
+| Manifest entry | **PASS** | 19-line append, JSON valid, no other entry reformatted (appended as text — `JSON.stringify` rewrites `11.0`→`11` across unrelated landmarks) |
+| id mapping | **PASS, after a correction** | `camelId('95-jack-london-alley')` → `95JackLondonAlley`. The plan's §2.13 drafted `95JackLondon`, which would **not** have matched and would have left the procedural building standing under the GLB. Registry uses the correct id |
+| Case B registry entry | **PASS** | `pipeline/lib/landmarks.mjs`, `exclude: 4.8`, `camera: { distance: 120, yaw: 314, pitch: 24 }` |
+| Exclusion against the real bake input | **PASS** | measured before baking: DataSF drops **1** ring (`201006.0108499`, centroid, 0.05 m); Overture drops **1** ring (centroid, 2.64 m); nearest spared ring 7.07 m. Two rings, one source each, exactly as the plan predicted |
+| Tile re-bake | **PASS** | full chain terrain→muni-shapes. `lore.json` in 156.5 s; 230,771 toy building records in 585 cells; context 596 sidecars, all four context validations ok |
+| `verify-rebake` | **PASS** | `584 of 585 cells unchanged; 23_13 201 → 200 ← 95JackLondonAlley`; nearest surviving footprint **7.1 m vs 4.8 m radius** (and it is 13.2 m tall) |
+| audit 1.6 | **PASS** | "no procedural footprint inside a bespoke landmark exclusion zone — 83 zones over 80 landmarks clear". The three audit FAILs present (1.2b p95 height, 1.3c Telegraph Hill DEM, 1.7b one offshore tree) are the pre-existing baseline — identical in the 135-south-park, 126-south-park and 101-grove worktrees' committed `audit.json` |
+| Single building on the site | **PASS** | no procedural twin, no baked block poking through, no z-fighting |
+| Scale factor | **PASS** | `sf-assets: 95-jack-london-alley merged 14 objects / 13 materials -> batched (2141 tris body); uniform x1.0000 at 3877, -1254` |
+| Orientation | **PASS** | the alley facade faces the alley; the entrance reads square-on from the `yaw: 314` preset |
+| Terrain seating | **PASS** | base flush with the sidewalk, no float, no sink |
+| Night glow | **PASS** | only the two globes and the gold emblem light; the rest of the building goes dark while the warehouse next door is fully lit |
+| Draw calls < 300 | **PASS** | peak scene-pass draw calls (measured with the render wrapper from `.agents/skills/testing-sf-3d/SKILL.md` §"Measuring draw calls" — the overlay always reads 1): **96** at the landmark, **92** downtown at street level, **106** downtown at night |
+| Fallback drill | **PASS with one honest note** | GLB renamed, cache cleared, reloaded: the app boots, the block renders, the site is **empty ground** inside the exclusion zone (expected for Case B), both neighbours intact, no crash. **The warning fires twice, not once** — `assets.js:560` (the streaming re-attempt path) logs `sf-assets: … failed to load (…)` without the once-only `warned` guard that `warn()` at `assets.js:362` has, and without its " — keeping the code-built landmark" suffix. Pre-existing loader behaviour, not caused by this asset; flagged as separate work rather than fixed inside a landmark integration |
+| lint / test / build | **PASS** | `eslint src test` clean; 26/26 node tests pass; `vite build` ok; `compress-tiles` 3315 tiles 56.8 → 31.8 MB |
+| Batch-mode handoff | **PASS** | bake discarded with `git checkout -- app/public/tiles api/_data`; `git diff --name-only origin/main` lists **0** files under `app/public/tiles/` or `api/_data/` |
+
+**One observation, not a defect.** The `Toy_roofd` `#45454a` deck renders close to
+pure black in the app, far darker than in the Blender rig. This is the documented
+`Toy_roofd` behaviour across the whole landmark set, not something this asset
+introduces: a control screenshot of **135 South Park**, which shipped with the same
+deck material, is equally black under the same camera and clock. The deck was left
+alone for consistency with the shipped set, and the real roof genuinely is a dark
+membrane against white neighbours. The `Toy_steel` membrane patch and the two
+`Toy_rust` vent boxes are what keep it from being a featureless void, and they do
+read — better, in fact, than 135's single vent cowl.
+
+**Step 7 is replaced by a stop**, per `ADDRESS-TO-ASSET.md` stage 5: no push, no PR,
+no deploy. The branch `pipeline/95-jack-london-alley` is a source-only Case B branch
+awaiting `docs/asset-pipeline/BATCH-INTEGRATE.md`.
