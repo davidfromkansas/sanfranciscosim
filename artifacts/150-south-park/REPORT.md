@@ -153,3 +153,50 @@ the numbers in §1 at the moment of approval. This is a blanket pre-approval rat
 per-render judgement, so §4 above ("weakest surfaces, stated plainly") is the honest
 counterweight: nothing in this asset has been reviewed against a photograph by a human, and
 the lower rear wall in particular is unevidenced.
+
+## 8. Gate 5 — local QA (stage 5, batch mode)
+
+Run against `npm run dev` on the re-baked tree, 16 August 2026.
+
+| Check | Result |
+|---|---|
+| Console merge line | `sf-assets: 150-south-park merged 11 objects / 9 materials -> batched (1847 tris body); uniform x1.0000 at 3760, -1258` — **PASS** |
+| Uniform scale ≈ 1.0 | **exactly 1.000000** — PASS |
+| Placed at the real anchor | x 3760.30, z −1258.06, matching the anchor's projected coords — PASS |
+| Exactly one building on the site | PASS — the re-baked cell leaves nothing inside 4.5 m; closest surviving footprint 6.10 m (156 South Park's party wall). No procedural twin, no z-fighting |
+| Terrain seating | PASS — seated at y **8.09 m** (Terrarium DEM) against DataSF `gnd_min_m` 7.76 m NAVD88; neighbours 155 at 8.55 m, 188 at 6.41 m, 135 at 9.41 m. No floating, no sinking |
+| Orientation | PASS — the SE front faces South Park Street; the wedge's straight NE wall abuts 140 |
+| Night pass | PASS — at 10:15 PM only the warm `Toy_gold_Glow` shopfront and the two cool `Toy_glass_Glow` upper windows light; rear and roof stay dark |
+| Draw calls | PASS — 78–93 at street level over the site, day and night, against the 300 budget. The asset itself adds none: it renders out of the shared landmark `BatchedMesh` pair |
+| Streaming | PASS — `loadRadius` 2500 m; the entry streams in on approach, `failed: 0` |
+| Fallback drill (mandatory) | **PASS** — see below |
+
+**Fallback drill.** With `150-south-park.glb` renamed away and the page reloaded: the app
+booted normally and the whole area rendered; the loader emitted **exactly one** warning —
+
+```
+sf-assets: 150-south-park failed to load (Unexpected token '<', "<!doctype "... is not valid JSON)
+```
+
+— `failed: 1` with all 39 other landmarks merging and batching normally, no crash and no
+console error. Case B, so the site degrades to **empty ground inside the exclusion zone**,
+which is what the screenshot shows and is expected. The warning's shape is worth recording:
+Vite answers a missing `public/` file with `index.html` at **HTTP 200**, so the failure
+surfaces as a JSON parse error rather than a 404. The asset was restored byte-identical
+afterwards.
+
+Two honest caveats about the QA harness rather than the asset:
+
+- The Browser pane throttles `requestAnimationFrame`, so the streaming pump and the tile
+  cross-fade had to be driven by hand (`SF.assets.update(camera.position, dt)`). Screenshots
+  taken mid-fade show the loader's hashed-alpha dithering across the whole scene. That is
+  the harness, not a LOD pop.
+- Frame rate was not measured. Driving frames manually makes any fps reading meaningless;
+  the draw-call budget was measured instead, and the asset adds zero draw calls by
+  construction.
+
+**Batch mode.** The bake was run and verified for this QA and then discarded
+(`git checkout -- app/public/tiles api/_data`). The branch carries source only:
+`git diff --name-only origin/main` lists zero files under `app/public/tiles/` or
+`api/_data/`. The city is rebuilt once for the whole batch by
+`docs/asset-pipeline/BATCH-INTEGRATE.md`.
