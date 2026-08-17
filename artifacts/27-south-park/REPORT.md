@@ -172,6 +172,59 @@ Worst A/B pixel delta 0.043% against a 2–4% gate. All gates G1–G6, G8 PASS
 asset has three coplanar ring bands and the step measured worth zero triangles
 on it. The pre-optimize original is archived at `optimize/input/27-south-park.glb`.
 
+## Stage 5 — integration QA (batch mode, source-only)
+
+Case **B** (new landmark). Manifest entry appended, `27SouthPark` added to
+`pipeline/lib/landmarks.mjs` with `exclude: 15`, full re-bake run
+(`terrain → bridges → buildings → streets → landcover → validate → lore → toy →
+notables → context → muni-shapes`), QA done on the baked tree, then the bake
+discarded and source committed — per "Batch mode" in
+`docs/asset-pipeline/ADDRESS-TO-ASSET.md`.
+
+| QA item | result | evidence |
+|---|---|---|
+| Re-validation before touching `app/` | **PASS** | `validation.json` 16/16 on the packed shipping GLB |
+| id round-trip `27-south-park` → `27SouthPark` | **PASS** | matches the registry id; height and anchor agree exactly |
+| `pipeline/audit.mjs` check 1.6 | **PASS** | "83 zones over 80 landmarks clear" |
+| `pipeline/verify-rebake.mjs` | **PASS** | 584 of 585 cells unchanged; only `23_13` moved, 201 → 200 buildings; nearest surviving footprint **20.1 m** vs the 15 m radius |
+| Exclusion behaved as measured | **PASS** | exactly one footprint dropped (the merged `SF3775042`); no Overture ring backfilled |
+| Loader merge + scale | **PASS** | `sf-assets: 27-south-park merged 12 objects / 11 materials -> batched (2909 tris body); uniform x1.0000 at 3903, -1297` — scale exactly 1.0000, position matches the projected anchor |
+| Exactly one building on the site | **PASS** | no procedural twin, no baked block, no z-fighting (day/top shots) |
+| Footprint size and orientation | **PASS** | narrow stick with the arcade facing the park at 314.8°; reads correctly against its neighbours |
+| Terrain seating | **PASS** | no float, no sink |
+| Night glow | **PASS** | only the two ground-floor bays (warm) and two arched windows (cool); flanks, rear and roof dark |
+| Fallback drill | **PASS** | GLB renamed → app boots, neighbourhood renders, one `sf-assets: 27-south-park failed to load (… 404)` warning per attempt, zero uncaught errors, site is empty ground inside the exclusion zone (expected for Case B). Restored afterwards |
+| Lint / tests / build | **PASS** | `npm run lint` clean; `node --test test/asset-loading.test.mjs` 6/6; `npm run build` succeeded (3,315 tiles compressed) |
+| Draw-call budget | **NOT MEASURED** | see below |
+| Batch sanity check | **PASS** | `git diff --name-only origin/main -- app/public/tiles api/_data` lists nothing |
+
+Screenshots: `integration/local-qa-day.png`, `-top`, `-wide`, `-night`,
+`-fallback`, plus the CDP driver `integration/qa.mjs`.
+
+**The draw-call budget could not be measured and is reported as such.** All five
+dev-server slots were held by other sessions, so QA ran against `app/dist` in
+headless Chrome over CDP. That context falls back to SwiftShader and floods
+`GL_INVALID_OPERATION: glDrawArraysInstanced: Vertex buffer is not big enough`,
+after which `renderer.info` is meaningless — the app's own debug overlay
+reported "draw calls 1 / triangles 0.00 M" for a frame that visibly contains
+37,978 trees and 1,295 loaded tiles. Rather than quote that as a pass, what IS
+verified is the structural claim the budget rests on: the console line says
+`-> batched`, i.e. this landmark joined the shared `BatchedMesh` pair, and a
+scene-graph probe found only `landmarks / landmark-assets / landmark-bodies /
+landmark-glow` with no per-landmark mesh added. Per `AGENTS.md` that is
+**2 draw calls no matter how many landmarks exist**, so this integration adds
+zero. A real budget reading needs a GPU-backed browser and should be taken at
+the batch level.
+
+**The exclusion hole is real and visible.** The day and top shots show bare
+ground on both flanks: 21 South Park (455 m²) to the north-east and 29 South
+Park (253 m²) to the south-west, both removed with this building's own
+procedural mass because DataSF traces all three as one polygon. The fallback
+screenshot shows the full 1,115 m² of it. This is documented, unavoidable and
+was the choice against an invisible landmark — see the Integration warning
+above and plan §2.13. 21 South Park is a sibling branch in this batch; 29 has
+no GLB and will stay bare until one exists.
+
 ## Approval
 
 Batch approval given with the pipeline invocation on 16 August 2026:
