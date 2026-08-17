@@ -549,10 +549,14 @@ have one either.** `Toy_ink` at `3a3530` is a warm near-black and is the right
 answer; do not reach for a custom darker value. The `Toy_stone` roof and the
 `Toy_steel` rail are what keep the mass from reading as a hole punched in the row.
 
-**Night state (required).** Glow surfaces must be thin shells proud of the opaque
-glazing — the app renders `_Glow` in a separate layer that is ~12% alpha by day,
-so a primary surface must never be authored as glow, and a closed shell counts
-twice (keep every glow surface a single open face). This building gets the
+**Night state (required).** Glow surfaces must be thin **closed** shells proud of
+the opaque glazing — the app renders `_Glow` in a separate layer that is ~12%
+alpha by day, so a primary surface must never be authored as glow. Author them
+closed, not as open faces: the normals contract runs a per-object signed-volume
+test and an open plane has none. A closed shell is two alpha layers, so it reads
+~23% by day rather than 12% — cover only the lower half of each opening, in a
+desaturated colour, and keep the fill, glow and frame planes at distinct offsets
+so no two are coplanar. This building gets the
 **quietest night state in the South Park set**, on purpose: it is a small leased
 office on a residential oval, and at night it should be the dark gap. Hero glow:
 a thin warm spill (`Toy_trim_Glow`) inside the entry notch — which is also what
@@ -700,7 +704,7 @@ camera does not fly down. One glazed panel with one frame band, per floor.
 - [ ] The roof deck sits at 8.35 m and the open deck floor at 4.30 m
 - [ ] Triangles at or under 6,000
 - [ ] Materials all `Toy_*`, flat, no textures, no alpha, no `Toy_body`
-- [ ] `_Glow` only on the two lit windows and the entry notch; every glow surface a single open face proud of the opaque glazing
+- [ ] `_Glow` only on the two lit windows and the entry notch; each a thin closed shell proud of the opaque glazing, covering at most the lower half of its opening
 - [ ] Both party walls have no openings and are finished walls, not raw extrusion sides
 - [ ] No lantern, notice board, bike racks or camera in the export
 - [ ] No cameras, lights, animations, armatures, constraints
