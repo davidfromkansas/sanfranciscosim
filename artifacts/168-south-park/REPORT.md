@@ -190,3 +190,56 @@ three worth a minute of the owner's time before this ships to production.
 Restated after stage 4: the optimize pass left `dims` and `tris` unchanged
 (3,504 triangles, same bounding box); it changed only the encoding — 209,080 →
 99,096 bytes, 52 → 8 nodes, 53 → 9 draw submeshes. See `optimize/REPORT.md`.
+
+## 10. Integration (stage 5, batch mode)
+
+Executed 16 August 2026 per `docs/asset-plans/INTEGRATION-PROMPT.md` Part 1,
+**Case B** (new landmark), with the batch-mode ending from
+`docs/asset-pipeline/ADDRESS-TO-ASSET.md`.
+
+### Local QA
+
+| Check | Result | Evidence |
+|---|---|---|
+| Re-validation of the shipped GLB | **PASS** | `validation.json`, all 16 checks, run against the meshopt-packed file |
+| Manifest entry | **PASS** | appended to `app/public/sf-assets/landmarks_manifest.json` (entry 59); no existing entry reformatted |
+| id mapping | **PASS** | `camelId('168-south-park')` → `168SouthPark`, which is the `pipeline/lib/landmarks.mjs` id |
+| Registry entry (Case B) | **PASS** | `168SouthPark`, `exclude: 5`, camera `{distance: 170, yaw: 45, pitch: 26}` — yaw 45 puts the camera on bearing 135 (`bearing = (180 − yaw) mod 360`), i.e. square onto the South Park front |
+| Re-bake | **PASS** | full chain: terrain → bridges → buildings → streets → landcover → validate → lore → toy → notables → context → muni-shapes. `lore` before `context`, as required. `muni-shapes` no-opped without `MUNI_511_KEY` and left the committed `muni-shapes.bin` alone |
+| audit 1.6 | **PASS** | `no procedural footprint inside a bespoke landmark exclusion zone — 66 zones over 65 landmarks clear` |
+| verify-rebake | **PASS** | `new since origin/main: 168SouthPark @ 23_13`; 584 of 585 cells unchanged; cell 23_13 217 → 215 buildings (exactly the two predicted: DataSF `SF3775070` and its Overture twin `8b933808`); nearest surviving footprint **11.9 m** vs the 5 m radius |
+| Exactly one building on the site | **PASS** | screenshot — no procedural twin, no z-fighting, 164 South Park still standing on the north-east party wall |
+| Scale factor | **PASS** | console: `sf-assets: 168-south-park merged 9 objects / 8 materials -> batched (2071 tris body); uniform x1.0000 at 3741, -1231` — exactly 1.0000, and the position matches the anchor's projection (3741.035, −1230.609) |
+| Orientation | **PASS** | the brick front faces bearing 135° onto South Park; the white roof runs NW to the rear yard |
+| Terrain seating | **PASS** | flush, no floating or sinking |
+| Night glow | **PASS** | at 22:15 only the two outer second-floor windows and the shopfront spill light; roof, flanks and rear stay dark |
+| Draw calls | **PASS** | peak 78 against the < 300 budget (measured by wrapping `renderer.render`, per the testing skill — the stats overlay always reads 1) |
+| Fallback drill | **PASS** | with the GLB renamed the app booted normally, the block rendered, and the console carried exactly one warning: `sf-assets: 168-south-park failed to load (Unexpected token '<', "<!doctype "...)`. The site was empty ground inside the exclusion zone, which is the documented Case B expectation — there is no code-built version of this building to fall back to, so the "keeping the code-built landmark" wording in the prompt is the Case A form and does not appear here. File restored and byte-compared afterwards; the asset re-merged on the next load |
+| lint + build | **PASS** | `npm run lint` clean; `npm run build` succeeded |
+
+### Notes and honest caveats
+
+- **`loadRadius: 2500`**, the default `max(2500, 10.44 × 30)`. Beyond it this site
+  is a gap rather than a procedural stand-in, which is the Case B trade — but a
+  10 m building at 2.5 km is far below a pixel, so the absence is illegible.
+- **The `GL_INVALID_OPERATION: glDrawArraysInstanced` warnings in the console are
+  pre-existing**, not caused by this asset: they appear before any landmark
+  loads and they were still there during the fallback drill with this GLB
+  removed. Same for `fog banks: fog-cube.glb unavailable — setMeshoptDecoder
+  must be called before loading compressed files`.
+- **Three `pipeline/audit.mjs` checks fail and all three are pre-existing and
+  citywide**, unrelated to this landmark: 1.2b (p95 building height 13.9 m vs a
+  25–120 m band — a property of the DataSF source), 1.3c (Telegraph Hill terrain
+  90.5 m from the Terrarium DEM vs a surveyed 84 m) and 1.7b (one of 793 sampled
+  trees more than 30 m offshore). Check 1.6, the one this integration owns,
+  passes.
+- **The dev server was started with `npm run dev` from a shell** rather than
+  through the managed preview tool, which refused because five dev servers in
+  this folder already belong to other sessions. It was stopped afterwards.
+- **The bake was run and then discarded** (batch mode). `git checkout --
+  app/public/tiles api/_data` reverted 1,976 regenerated tile files and 2
+  `api/_data` files. Sanity check passes: `git diff --name-only origin/main`
+  lists nothing under `app/public/tiles/` or `api/_data/`. The city gets baked
+  once for the whole batch by `docs/asset-pipeline/BATCH-INTEGRATE.md`.
+- **Not done, by design:** no push, no PR, no deploy, no production QA. The
+  pipeline ends at a locally verified, source-only branch and asks.

@@ -952,6 +952,62 @@ export const LANDMARKS = [
     camera: { distance: 190, yaw: 315, pitch: 26 },
   },
   {
+    // 166-168 South Park: a 1912 two-storey red-brick office loft on the
+    // north-west rim, one lot wide and five lots deep — 6.10 m of frontage
+    // running 29.82 m back. Party walls on BOTH flanks: the OSM ring shares
+    // nodes with 188 South Park (way 124884339, SW) and 164 South Park (way
+    // 124884357, NE). targetHeight is the raised central parapet crown (LiDAR
+    // max 10.44 m); the roof deck behind it is the LiDAR median, 7.98 m.
+    //
+    // The anchor is the OSM ring's area centroid, NOT the DataSF LiDAR
+    // centroid — the opposite of the choice made for 165-167 and 188 next door,
+    // and deliberately so. On their wide, near-square footprints the two
+    // centroids differ by centimetres. On a 6 m sliver they are 1.08 m apart
+    // and the DataSF outline is inflated 1.3 m across a 6.10 m width, so
+    // anchoring on it would place the model over a metre off its own party
+    // walls. The OSM ring is also the topologically correct one: it is the
+    // outline the shared walls actually follow.
+    //
+    // excluded() drops a footprint when its centroid OR any ring vertex falls
+    // inside the radius. Measured from this anchor against the ACTUAL bake
+    // input (DataSF + the Overture gap-fill, projected and simplified at the
+    // 0.6 m tolerance):
+    //
+    //    0.00 m  this building's own Overture footprint (8b933808..., =
+    //            OSM way 124884342), via centroid — the trigger
+    //    1.07 m  this building's own DataSF footprint (SF3775070), via
+    //            centroid — the FLOOR
+    //    2.95 m  188 South Park's front (SF3775125), nearest vertex
+    //    3.28 m  188 South Park's front (Overture 9f571039...), nearest vertex
+    //            — both already dropped by 188SouthPark's own zone, so a
+    //            radius past them changes nothing
+    //    8.05 m  OSM way 124884355 (Overture c73e5800..., height 15 m,
+    //            208 m2 — 188's rear block), nearest vertex — the CEILING
+    //    9.93 m  164 South Park (Overture 31645c36...), nearest vertex
+    //   10.04 m  164 South Park (SF3775069), nearest vertex
+    //   12.60 m  160 South Park (SF3775067), nearest vertex
+    //
+    // The safe window is (1.07, 8.05) — 7.0 m wide. 5 sits in it with 3.93 m
+    // of margin below and 3.05 m above, and matches every other South Park rim
+    // landmark. The larger margin is deliberately on the floor side: that bound
+    // is a LiDAR centroid, the value most likely to move in a data refresh,
+    // while the ceiling is an OSM trace. Verified on the re-bake: exactly one
+    // footprint dropped beyond what 188SouthPark already drops, and 164 South
+    // Park still standing. Do not widen past 8 without re-running audit 1.6.
+    //
+    // Aside, out of scope here: way 124884355 bakes as a 15 m procedural block
+    // immediately behind the 188 South Park landmark asset. That is a
+    // pre-existing condition of 188's integration, not something this zone
+    // creates, and it wants its own look.
+    id: '168SouthPark',
+    name: '166-168 South Park',
+    lon: -122.3949862,
+    lat: 37.7811327,
+    height: 10.44,
+    exclude: 5,
+    camera: { distance: 170, yaw: 45, pitch: 26 },
+  },
+  {
     // The new Main Library, one block south of the Old Main across Fulton, on a
     // near-identical 106 x 57 m block. Same radius rule as its neighbour and for
     // the same reason: excluded() drops a footprint when its centroid OR ANY ring
