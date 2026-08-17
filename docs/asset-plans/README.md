@@ -62,6 +62,7 @@ route, and the park plans depend on it (§E8 of the parks README).
 | [War Memorial Opera House](./war-memorial-opera-house.md) | `opera-house` | 44 m | new landmark |
 | [Herbst Theatre (War Memorial Veterans Building)](./herbst-theatre.md) | `herbst-theatre` | ~31 m (estimated) | new landmark |
 | [Fairmont San Francisco](./fairmont-san-francisco.md) | `fairmont` | 99 m | new landmark |
+| [334 Brannan Street (Sherman and Clay Building)](./334-brannan.md) | `334-brannan` | 13.4 m (estimated) | new landmark |
 | [350 Brannan Street](./350-brannan.md) | `350-brannan` | 13.85 m | new landmark |
 | [362 Brannan Street](./362-brannan.md) | `362-brannan` | 8.6 m | new landmark |
 | [370 Brannan Street](./370-brannan.md) | `370-brannan` | 7.63 m | new landmark |

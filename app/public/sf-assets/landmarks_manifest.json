@@ -1673,5 +1673,24 @@
     ],
     "tris": 6148,
     "loadRadius": 2500
+  },
+  {
+    "id": "334-brannan",
+    "file": "334-brannan.glb",
+    "anchor": [
+      -122.3930344,
+      37.7814147
+    ],
+    "targetHeightM": 13.4,
+    "cat": 19,
+    "name": "334 Brannan Street (Sherman and Clay Building)",
+    "estimated": true,
+    "dims": [
+      30.1763,
+      30.6477,
+      13.4
+    ],
+    "tris": 5916,
+    "loadRadius": 2500
   }
 ]
