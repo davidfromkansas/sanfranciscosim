@@ -1,0 +1,113 @@
+{
+ "input": {
+  "tris": 6312,
+  "verts": 12724,
+  "objects": 155,
+  "primitives": 155,
+  "materials": [
+   "Toy_ash",
+   "Toy_bronze",
+   "Toy_glass",
+   "Toy_glassl_Glow",
+   "Toy_ink",
+   "Toy_mustard_Glow",
+   "Toy_orange",
+   "Toy_slate",
+   "Toy_steel",
+   "Toy_steel_l",
+   "Toy_stone",
+   "Toy_teal",
+   "Toy_trim",
+   "Toy_verdigris"
+  ],
+  "bbox_dims": [
+   31.80922,
+   27.62142,
+   13.7
+  ],
+  "bbox_min": [
+   -15.90461,
+   -13.97015,
+   0.0
+  ],
+  "center_xy": [
+   0.0,
+   -0.15944
+  ]
+ },
+ "output": {
+  "tris": 6312,
+  "verts": 12085,
+  "objects": 14,
+  "primitives": 14,
+  "materials": [
+   "Toy_ash",
+   "Toy_bronze",
+   "Toy_glass",
+   "Toy_glassl_Glow",
+   "Toy_ink",
+   "Toy_mustard_Glow",
+   "Toy_orange",
+   "Toy_slate",
+   "Toy_steel",
+   "Toy_steel_l",
+   "Toy_stone",
+   "Toy_teal",
+   "Toy_trim",
+   "Toy_verdigris"
+  ],
+  "bbox_dims": [
+   31.80922,
+   27.62142,
+   13.7
+  ],
+  "bbox_min": [
+   -15.90461,
+   -13.97015,
+   0.0
+  ],
+  "center_xy": [
+   0.0,
+   -0.15944
+  ]
+ },
+ "output_signed_volumes": {
+  "arch_soffit": 17.340865,
+  "grp_Toy_ash": 29.58704,
+  "grp_Toy_bronze": 228.337401,
+  "grp_Toy_glass": 16.092054,
+  "grp_Toy_glassl_Glow": 1.511158,
+  "grp_Toy_ink": 28.981545,
+  "grp_Toy_mustard_Glow": 0.856099,
+  "grp_Toy_orange": 1.602907,
+  "grp_Toy_slate": 45.631064,
+  "grp_Toy_steel": 208.208839,
+  "grp_Toy_steel_l": 4215.644287,
+  "grp_Toy_stone": 5.861836,
+  "grp_Toy_teal": 2.126189,
+  "grp_Toy_verdigris": 0.819634
+ },
+ "output_open_shells": [],
+ "inverted_solids": [],
+ "ray_test_output": {
+  "rays": 22500,
+  "hits": 16234,
+  "flipped": 0,
+  "flipped_fraction": 0.0
+ },
+ "ray_test_input": {
+  "rays": 22500,
+  "hits": 16234,
+  "flipped": 0,
+  "flipped_fraction": 0.0
+ },
+ "ray_flip_delta": 0.0,
+ "gates": {
+  "G1_materials_identical": true,
+  "G2_bbox_ok": true,
+  "G2_origin_ok": true,
+  "G2_volumes_positive": true,
+  "G2_ray_flip_ok": true,
+  "G5_primitives_ok": true
+ }
+}
