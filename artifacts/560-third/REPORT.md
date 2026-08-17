@@ -1,16 +1,20 @@
 # 560 Third Street — build report
 
-**Status:** built and validated (all-PASS), pre-approval.
+**Status:** built, approved, optimized and re-validated (all-PASS). The shipping
+`560-third.glb` is the **stage-4 optimized** file; the pre-optimize original is
+archived at `optimize/input/560-third.glb`. Optimize pass:
+[`optimize/REPORT.md`](./optimize/REPORT.md).
 Plan: [`docs/asset-plans/560-third.md`](../../docs/asset-plans/560-third.md).
 Dossier: [`REFERENCE.md`](./REFERENCE.md). Machine report:
 [`validation.json`](./validation.json).
 
-## Numbers
+## Numbers (as shipped, after stage 4)
 
 | | |
 |---|---|
+| File | **67,892 bytes** raw (141,796 before optimize, −52.1%); 48,019 gzip -9 |
 | Triangles | **2,356** (cap 8,000) |
-| Objects | 33 mesh objects |
+| Objects | **8** mesh objects / 8 draw submeshes (33 before optimize) |
 | Dimensions | 23.90 × 24.06 × **7.20** m (the XY box is the 44°-rotated footprint's AABB) |
 | min Z | 0.0000 |
 | XY centre offset | (−0.151, −0.081) m |
@@ -19,7 +23,7 @@ Dossier: [`REFERENCE.md`](./REFERENCE.md). Machine report:
 | Anchor | −122.3951188, 37.7804142 |
 | Front heading | outward normal 44.1° true; long axis 43.9° |
 | Textures / transparency / cameras / lights / animation | none |
-| Files | `560-third.glb`, `560-third.blend`, `build_560_third.py`, `render_560_third.py`, `validate_560_third.py`, `make_contact_sheet.py`, 8 renders |
+| Files | `560-third.glb` (shipped, optimized), `560-third.blend`, `build_560_third.py`, `render_560_third.py`, `validate_560_third.py`, `make_contact_sheet.py`, 8 renders, `optimize/` |
 
 ## Gate 2 — validation
 
@@ -80,6 +84,19 @@ differ.
 7. The aerial camera was refit (78 mm at 3.6× span, 36° down) after the first
    review render cropped the building.
 
+## Gate 3 — approval
+
+Approved 16 August 2026 by David, standing approval given at the start of the
+run, quoted verbatim:
+
+> APPROVE EVERYTHING DONT ASK ME FOR PERMISSION
+
+The contact sheet, the aerial day render and the aerial night render were
+presented with the numbers above before the pipeline advanced to stage 4. No
+revision iterations were requested. Note that this approval covers the asset and
+the local pipeline only — push, PR and deploy were **not** authorised and the
+run still stops before them.
+
 ## What the asset is
 
 A single near-black box on the traced footprint, 7.20 m to a flat parapet with a
@@ -125,6 +142,21 @@ Not applied — integration is a separate job
   distances into this lot — 11.17 m from 550's anchor, 16.35 m from 574's — say
   the safe band is small and in the same 8–10 m family as its neighbours. See
   `docs/asset-plans/560-third.md` §2.13.
+
+## Gate 4 — optimize
+
+`optimize/REPORT.md` has the full pass. Headline: 141,796 → **67,892 bytes**
+(−52.1%) and **33 → 8 draw submeshes**, with triangles, bbox and origin
+unchanged and the material set identical. All gates G1–G6 and G8 PASS (G7 n/a,
+no bake). Worst A/B pixel delta 0.014% against a 2%/4% budget; the night pair
+was checked specifically to confirm the `_Glow` split survived gltfpack. Phase B's
+limited-dissolve step was skipped on the prompt's own rule — this asset has three
+coplanar ring bands (parapet, coping, membrane inset) and dissolving them
+manufactures sliver normals that only appear after the shipping swap.
+
+The renders and `validation.json` in this folder were regenerated from the
+**shipped** file, so every number and image here describes what integration will
+pick up.
 
 ## Reproduce
 
