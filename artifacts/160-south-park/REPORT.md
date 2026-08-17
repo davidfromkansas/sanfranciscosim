@@ -10,17 +10,18 @@ disagree, this file is what was built and why.
 |---|---|
 | Asset | `artifacts/160-south-park/160-south-park.glb` |
 | Triangles | **3,792** (cap 7,000) |
-| Objects | 50 |
+| Objects | 9 (50 before stage 4 joined them per material) |
 | Dimensions | **25.795 × 17.769 × 9.400 m** |
 | Min Z / XY centre | 0.000 / (0.000, 0.000) |
 | Materials | `Toy_brick`, `Toy_glass`, `Toy_glass_Glow`, `Toy_glassl_Glow`, `Toy_ink`, `Toy_roofd`, `Toy_rust`, `Toy_steel` |
 | Glow groups | 2 — the arched window (hero) and the storefront (accent) |
-| File size | 229,048 B raw / 53,426 B gzip (pre-optimize) |
+| File size | **103,120 B raw** / 74,588 B gzip (meshopt; 229,048 / 53,163 before stage 4) |
 | Manifest anchor | **`-122.3948620, 37.7812804`** |
 | Registry / exclusion point | `-122.3949116, 37.7812949` |
 | `targetHeightM` | **9.4** |
 | Facade heading | 108.13° true |
-| Validation | **all-PASS**, `validation.json` |
+| Draw submeshes | 10 (51 before stage 4) |
+| Validation | **all-PASS**, `validation.json`, re-run against the shipped optimized file |
 
 The 25.8 × 17.8 m XY box is the ~108° rotation of a 6.2 × 26.5 m strip, not a 26 m
 building. That is expected and is checked explicitly by the validator.
@@ -129,7 +130,7 @@ bottom.
 | No cameras or lights | PASS |
 | No animation, skinning or constraints | PASS |
 | Transforms applied, no negative scales | PASS |
-| Normals outward — per-object signed volume | PASS (50/50 positive) |
+| Normals outward — per-object signed volume | PASS (9/9 positive) |
 | Normals outward — ray test | PASS (31,500 first hits, 0 flipped, 0.000% residual) |
 | No degenerate geometry | PASS (0) |
 | No unexpected objects | PASS |
@@ -141,6 +142,16 @@ All regenerated from the final export. `-facade.png` is the square-on street ele
 its own scale; `-east/-west/-north/-south.png` share one rig framed to the 26 m dimension
 and are named for the nearest compass direction to each building-aligned face;
 `-top.png`, `-aerial.png`, `-aerial-night.png`, and `-contact-sheet.png`.
+
+## Stage 4 — optimize
+
+Run and reported in `optimize/REPORT.md`. Raw bytes −55.0%, draw submeshes 51 → 10,
+vertices 7,480 → 1,990 at the weld, triangles unchanged, all gates G1–G8 PASS, worst
+A/B pixel delta 0.0218% against a 2% allowance. The limited-dissolve step was skipped
+deliberately: this asset's three full-footprint coplanar ring bands are the exact
+`350-brannan` sliver trap. The optimized file is now the shipping GLB; the pre-optimize
+original is archived at `optimize/input/160-south-park.glb`. Every render in this
+directory was regenerated from the shipped file afterwards.
 
 ## Draft manifest entry
 
@@ -166,10 +177,16 @@ and are named for the nearest compass direction to each building-aligned face;
 }
 ```
 
-`dims` and `tris` will be restated after stage 4 (optimize). The registry entry for
+These are the shipped (post-optimize) numbers. The registry entry for
 `pipeline/lib/landmarks.mjs` uses the **exclusion** point, not this anchor — see the plan's
 2.13; the measured window is `0 < exclude < 1.70 m` and the value is `1.2`.
 
 ## Approval
 
-Pending — presented for review at stage 3.
+Granted in advance, 16 August 2026, verbatim:
+
+> "APPROVE EVERYTHING DONT ASK ME FOR PERMISSION"
+
+Given with the pipeline invocation (`BUILDING: 160 S Park St`, `BATCH: yes`), so stage 3
+was satisfied without a separate round trip. The contact sheet, the aerial day and night
+renders and the numbers above were presented at the gate rather than requested at it.
