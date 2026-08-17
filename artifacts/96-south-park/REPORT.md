@@ -199,3 +199,123 @@ Recorded as a blanket pre-approval covering this gate. The contact sheet, the
 day and night aerials and the numbers in §1 were presented at the same time so
 the approval is reviewable after the fact rather than before it, and the open
 risks in §3 stand and are not waived by it.
+
+---
+
+## 7. Stage 5 — integration (batch mode)
+
+Executed 17 August 2026 per `docs/asset-plans/INTEGRATION-PROMPT.md` Part 1 with
+the batch-mode amendment in `docs/asset-pipeline/ADDRESS-TO-ASSET.md`.
+
+**Case B**, as recorded at stage 0: no procedural builder for this id.
+
+| Step | Result |
+|---|---|
+| 1. Re-validate | PASS — fresh-scene re-import of the shipped GLB, all 16 contract checks true, 6,312 tris / 14 objects / 31.809 × 27.621 × 13.700 m / min Z 0 / XY centre `[0.000, -0.159]` |
+| 2. Drop in | `app/public/sf-assets/landmarks/96-south-park.glb`, 181,952 bytes, copied byte-for-byte, not re-exported |
+| 3. Manifest | one entry appended **as text**, +19 lines, no other entry touched (a `JSON.stringify` round-trip rewrites `11.0` → `11` across unrelated landmarks) |
+| 4. Registry + re-bake | `96SouthPark` added to `pipeline/lib/landmarks.mjs` with `exclude: 8`; full twelve-stage bake run |
+| 5. Local verify | PASS — see below |
+| 6. Fallback drill | PASS — see below |
+| 7. Ship | replaced by a stop, per the pipeline doc |
+
+### The re-bake
+
+Ran `terrain → bridges → buildings → streets → landcover → validate → lore →
+toy → notables → context → muni-shapes` on this branch, with `pipeline/out/`
+regenerated from scratch (never seeded from another worktree) and
+`pipeline/data/` symlinked from a same-day warm cache. `buildings` and `lore`
+were run with `--max-old-space-size=12288`.
+
+```
+node pipeline/verify-rebake.mjs
+  new since origin/main: 96SouthPark @ 23_13
+  584 of 585 cells unchanged
+  23_13    201 -> 199  <- 96SouthPark
+  ok   96SouthPark   16.0 m vs 8 m radius  (nearest is 13.1 m tall)
+  PASS  only the new landmarks' cells moved, and every asset has clear ground under it
+
+node pipeline/audit.mjs
+  1.6    PASS    no procedural footprint inside a bespoke landmark exclusion zone
+                 83 zones over 80 landmarks clear
+  29 passed, 3 failed  (1.2b, 1.3c, 1.7b — all three fail on main already)
+```
+
+**Two footprints dropped, not the four the plan predicted, and that is correct.**
+The plan measured four source rings over this lot. Only the two DataSF rings
+were ever *baked*: the Overture gap-fill runs second and skips anything whose
+area `markOccupied` already claims, so the two Overture/OSM copies never entered
+the tile in the first place. The exclusion still has to cover them — it is what
+stops the gap-fill re-adding a building into the ground the DataSF drop just
+freed — and it does.
+
+**Direct tile check** (decoded `app/public/tiles/buildings/23_13.bin`,
+point-in-polygon against the asset's real footprint rather than a radius):
+exactly one surviving footprint touches the asset outline, and it penetrates by
+**0.347 m** at lot coordinates `(s 6.87, t -13.71)` — the shared party-wall
+corner with 84 South Park at the South Park frontage. That is unavoidable
+collateral of a party-wall site: the two buildings share a survey vertex, so any
+radius that clears it (≥ 12.30 m) deletes 84 South Park and leaves a hole in the
+street wall. 0.35 m is well inside a wall thickness and invisible at diorama
+scale. 84's baked block runs to 23.5 m absolute over a 10.4 m base — 13.1 m
+tall, 0.6 m shorter than this asset — so the two abut cleanly.
+
+### Step 5 — local verification
+
+Driven against `app/dist` in real headless Chrome. **`requestAnimationFrame`
+does not run in that context** (measured: 0 callbacks in 3 s under
+`--headless=new` + swiftshader), so the app's frame loop never ticks and nothing
+streams on its own — `SF.assets.update(camera.position, dt)` and
+`SF.city.update(dt, pivot, cameraPos, QUALITY.high)` were pumped by hand on a
+200 ms `setInterval`. Without that the run reports `far: 56, live: 18` with the
+camera parked on the landmark, which looks exactly like a broken `loadRadius`
+and is not.
+
+| Check | Result |
+|---|---|
+| Merge line | `sf-assets: 96-south-park merged 14 objects / 14 materials -> batched (3932 tris body); uniform x1.0000 at 3813, -1314` |
+| Scale | **x1.0000** — authored crest and `targetHeightM` agree exactly |
+| Placement | batched at `3813, -1314`; the projected anchor is `3814.19, -1314.42` |
+| One building | PASS — no procedural twin, no baked block through the asset, no z-fighting (confirmed both visually and from the tile) |
+| Footprint size | PASS — reads correctly against 84 South Park and the 102/106 row |
+| Orientation | PASS — the South Park front faces the oval, the alley flank faces Jack London Alley, the blind party wall faces 84 |
+| Terrain seating | PASS — no floating, no sinking |
+| Night | PASS — only the two commercial fronts (warm) and a scatter of loft windows (blue) light; the cylinder stays dark |
+| Streaming | 74 entries, 68 live, 0 failed with the camera in South Park |
+| Draw calls | **86** at the landmark, 100 at 550 m, **117** street level in the Mission, **97** street level downtown — all under the 300 iron rule |
+| Console | no page exceptions, no failed requests (other than the offline weather feed, which is a local-run artifact) |
+
+### Step 6 — fallback drill
+
+The GLB path was served a **real 404** by the harness rather than renaming the
+file (Vite's dev server answers a missing public path with the SPA `index.html`
+and HTTP 200, which does not exercise the same path):
+
+```
+[warning] sf-assets: 96-south-park failed to load
+          (fetch for ".../sf-assets/landmarks/96-south-park.glb" responded with 404: Not Found)
+stats: {"entries":74,"far":6,"loading":0,"live":67,"fading":0,"failed":1}
+```
+
+Exactly one warning, `failed: 1`, every other landmark still live, the app boots
+and the area renders, draw calls unchanged at 86, no exceptions. The site is
+**empty ground inside the exclusion zone** — expected for Case B, and visible in
+the drill screenshot as a bare corner with its street light still standing.
+
+### Batch mode
+
+The bake was run and QA'd, then discarded:
+`git checkout -- app/public/tiles api/_data`. The commit is **source only** —
+the GLB, the manifest entry, the registry entry, the plan and this artifacts
+folder. Verified: `git diff --name-only origin/main` lists nothing under
+`app/public/tiles/` or `api/_data/`. The city gets rebuilt once for the whole
+batch by `docs/asset-pipeline/BATCH-INTEGRATE.md`.
+
+`npm run lint` and `npm run build` in `app/` both pass.
+
+### Note for whoever bakes the batch
+
+This branch leaves one exclusion pending in the committed tiles, exactly as the
+other source-only branches do. When the batch bake runs, cell **23_13** will go
+down by two footprints on this landmark's account (201 → 199 measured against
+`origin/main` on 17 Aug 2026), plus whatever the sibling branches carry.
