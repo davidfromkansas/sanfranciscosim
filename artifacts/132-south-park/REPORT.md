@@ -222,3 +222,81 @@ Given at the start of the session as blanket approval for every gate in
 Integration is a separate job — `docs/asset-plans/INTEGRATION-PROMPT.md` plus the
 Case B exclusion design in `docs/asset-plans/132-south-park.md` §2.13, which is the
 most intricate in the registry and must not be adjusted without re-measuring.
+
+## 9. Stage 5 — local integration QA (batch mode)
+
+Case B. `camelId('132-south-park')` = `132SouthPark`, matching the registry id.
+
+**Re-bake.** Full chain run: `terrain bridges buildings streets landcover validate
+lore toy notables context muni-shapes`. `muni-shapes` printed the expected
+"no 511 key ... leaving the committed file as is".
+
+| Check | Result |
+|---|---|
+| `node pipeline/audit.mjs` check 1.6 | **PASS** — 68 zones over 65 landmarks clear |
+| `node pipeline/verify-rebake.mjs` | **PASS** — only 23_13 moved, 217 → 214 buildings |
+| zone clearances after the bake | anchor 3.6 m vs r=2; front 5.9 m vs r=3; rear 5.3 m vs r=3 |
+
+**Exactly the two intended footprints were dropped, and nothing else.** Diffing cell
+23_13 against `origin/main` for every footprint within 400 m of the anchor:
+
+| | centroid | height | verdict |
+|---|---|---|---|
+| dropped | (3778.0, −1268.7) | 12.4 m | this lot's front flats |
+| dropped | (3764.5, −1283.2) | 9.2 m | this lot's rear cottage |
+| dropped | (3732.0, −1214.3) | 15.4 m | **not ours** — 58 m away, inside `188SouthPark`'s existing 5 m zone. `188SouthPark` is on `origin/main` but the committed tiles predate it, which is what batch mode produces: source-only branches whose bake is deferred to `BATCH-INTEGRATE.md`. |
+| **survived** | (3777.8, −1278.9) | 9.6 m | **126 South Park** — spared, 3.59 m from the anchor |
+| **survived** | (3759.3, −1279.7) | 5.6 m | **136 South Park** — spared |
+
+Zero collateral. The three-zone design in §2.13 of the plan did exactly what it was
+sized to do.
+
+**Runtime, local dev server (Vite 8.2, `http://localhost:5132`):**
+
+| Check | Result |
+|---|---|
+| manifest served | 200, entry present and byte-correct |
+| GLB served | 200, `model/gltf-binary`, 126,760 B |
+| loader merge line | `132SouthPark … uniform x1.0000 at 3773, -1276` |
+| scale | **exactly 1.0000** — authored height and `targetHeightM` agree |
+| position | world (3773, −1276) = the surveyed anchor |
+| asset system | 59 entries, 53 live, 6 far, **0 failed** |
+| batching | one `landmark-bodies` + one `landmark-glow` mesh, 52 instances each, `frustumCulled: false` |
+| draw calls | **92** (budget < 300) |
+| one building on the site | yes — no procedural twin, no baked block poking through, no z-fighting |
+| footprint size / orientation | correct against the block; the front faces the park at 135° |
+| terrain seating | sits flat, no float or sink (terrain y 8.82 m vs LiDAR ground 8.98 m) |
+| night | only the intended `_Glow` surfaces light — five warm gold bay windows plus the one on the cottage's courtyard face; roof, cornice and base stay dark |
+
+**Fallback drill (mandatory, AGENTS rule 3).** GLB renamed away, page reloaded:
+
+- the app boots and the whole city renders — no crash, no hole
+- **exactly one** warning:
+  `sf-assets: 132-south-park failed to load (Unexpected token '<', "<!doctype "... is not valid JSON)`
+  — one, and only one, from the asset system. The JSON wording is the known dev-server
+  gotcha: Vite answers a missing static file with `index.html` and a 200, so the loader
+  parses HTML instead of receiving a 404. In production the same path 404s and produces
+  the same single warning.
+- every other asset still loaded: `live: 52, failed: 1`. One failure does not cascade.
+- Case B, as expected: the site is **empty ground inside the exclusion zone**, with 126
+  and 136 South Park standing either side. Noted, not a defect.
+- file restored; `npm run lint` clean; `npm run build` succeeded (950 kB JS / 269 kB gzip,
+  3,315 tiles compressed).
+
+**Batch mode.** The bake was run and used for the QA above, then discarded
+(`git checkout -- app/public/tiles api/_data`). `git diff --name-only origin/main`
+lists nothing under `app/public/tiles/` or `api/_data/`. The branch carries source only:
+the GLB, the manifest entry, the registry entry, this plan and `artifacts/132-south-park/`.
+
+**Environment notes, recorded so the next session does not re-discover them:**
+
+- All five preview-manager dev-server slots were held by concurrent sessions, so Vite
+  was started directly and the Browser pane attached to `http://localhost:5132`.
+- The Browser pane goes hidden between tool calls, which stalls `requestAnimationFrame`
+  and therefore the streaming pump. Landmark promotion had to be driven by hand with
+  `SF.assets.update(camera.position, dt)`. Do **not** also call `SF.assets.load()` by
+  hand: a second manifest load collides with the app's own and reports ~34 spurious
+  `failed` entries. Every number above is from a clean reload.
+- Three `audit.mjs` checks unrelated to this landmark fail on this branch and on
+  `origin/main` alike — 1.2b (p95 height), 1.3c (Telegraph Hill Terrarium DEM 90.5 m vs
+  surveyed 84 m), 1.7b (1 of 793 sampled trees offshore). Pre-existing baseline.
