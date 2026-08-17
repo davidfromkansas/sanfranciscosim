@@ -125,6 +125,7 @@ route, and the park plans depend on it (§E8 of the parks README).
 | [41–43 South Park](./41-south-park.md) | `41-south-park` | 10.6 m (estimated, photogrammetric) | new landmark |
 | [44–46 South Park](./46-south-park.md) | `46-south-park` | 16.15 m (LiDAR-derived) | new landmark |
 | [54–58 South Park](./58-south-park.md) | `58-south-park` | 16.9 m (estimated — LiDAR max; parapet 13.6 m) | new landmark |
+| [76–82 South Park](./76-south-park.md) | `76-south-park` | 16.28 m (LiDAR max, attributed to the roof-stair penthouse — see its 2.15 risk 1; roof deck 13.08 m measured) | new landmark |
 
 ## Shared contract (all 76)
 
