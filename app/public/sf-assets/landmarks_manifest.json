@@ -1084,5 +1084,24 @@
     ],
     "tris": 3864,
     "loadRadius": 2500
+  },
+  {
+    "id": "560-third",
+    "file": "560-third.glb",
+    "anchor": [
+      -122.3951188,
+      37.7804142
+    ],
+    "targetHeightM": 7.2,
+    "cat": 3,
+    "name": "560 Third Street",
+    "estimated": false,
+    "dims": [
+      23.9031,
+      24.0636,
+      7.2
+    ],
+    "tris": 2356,
+    "loadRadius": 2500
   }
 ]

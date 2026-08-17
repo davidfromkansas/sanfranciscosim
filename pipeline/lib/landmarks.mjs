@@ -387,6 +387,36 @@ export const LANDMARKS = [
     exclude: 8,
     camera: { distance: 190, yaw: 260, pitch: 34 },
   },
+  {
+    // The 1941 infill sliver between 550 and 574 — 30 x 80 ft, party walls on
+    // THREE sides (550 wraps behind it), and the lowest roof on the block face
+    // at 7.2 m against 11.0 and 11.05 next door. Its exclusion window is the
+    // widest in this family despite the tightest site, because the gate that
+    // catches it is its own CENTROID, not a vertex: the ring is only 246 m2, so
+    // the centroid sits 0.82 m from the anchor (Overture's copy 0.17 m) while
+    // its own vertices are 12.6 m out. Measured against the real bake input:
+    //
+    //   exclude  2-11 m -> drops 1  (correct: SF3776007 + its Overture twin)
+    //   exclude 12 m    -> drops 2  (eats the Overture ring of 574, vertex 11.65 m)
+    //   exclude 13 m    -> drops 3  (eats DataSF SF3776008, 574 proper, 12.55 m)
+    //   exclude 15 m    -> drops 4  (eats 550 Third, SF3776005, 14.02 m)
+    //
+    // The band is 0.82 < r <= 11.65. 8 is the value 550Third and 551Third already
+    // use on this block and leaves 3.6 m of headroom to the nearest neighbour.
+    id: '560Third',
+    name: '560 Third Street',
+    lon: -122.3951188,
+    lat: 37.7804142,
+    height: 7.2,
+    exclude: 8,
+    // Camera offset is (sin yaw east, cos yaw south) — +z is south — so yaw 135
+    // is east and NORTH of the pivot: the eye stands on Third Street looking
+    // south-west, square onto the outward normal of the one elevation this
+    // building has (44.1 deg). Rendered before it was believed: yaw 45 is the
+    // mirror image and points at the blind south-east party wall.
+    // No `key`: at 7.2 m this is texture in the block, not a destination.
+    camera: { distance: 150, yaw: 135, pitch: 30 },
+  },
   // 574 Third (the 1907 apartment block at 566-586 Third), the largest footprint
   // in this family at 1,906 m2 — which is exactly why the tight 8-12 m radii used
   // on the small Brannan lots do not transfer. THREE footprints stand on this
