@@ -241,14 +241,17 @@ per-material contract compliance. Render at least one review image from the
 re-imported asset. Write `artifacts/160-south-park/validation.json` and
 `artifacts/160-south-park/REPORT.md`.
 
-Two expected results that are **not** faults, and must be stated rather than "fixed":
+One expected result that is **not** a fault, and must be stated rather than "fixed":
 
 - The axis-aligned XY bounding box will be roughly **25.3 × 17.5 m** even though the
   building is 6.2 × 26.5 m. That is the consequence of the ~108° heading, not a scale error.
-- The XY *bounding-box* centre will sit about **(+0.2, +1.4) m** from the origin, because
-  the model is centred on the design footprint's **area centroid** (which is what the
-  manifest anchor is) and the plan is a bent strip. Keep the area centroid at the origin;
-  record the bbox offset in `REPORT.md`.
+
+**Anchor convention** (as in `artifacts/165-south-park/build_165_south_park.py`): author the
+polygon in world metres relative to the *design anchor* (the design footprint's area
+centroid, given in 2.3), then recentre the model so its XY **bounding-box** centre is the
+origin — contract rule 2 — and move the anchor by the same vector. The build script must
+print the resulting manifest anchor; that printed value, not 2.3's design anchor, is what
+goes in the manifest. On a bent strip the two are about 1.4 m apart.
 
 ## Manifest draft
 
@@ -395,9 +398,11 @@ The design footprint is therefore the parcel truncated at **166.4 m²**, which i
 because the lot's bend is not symmetric), leaving a rear yard of about 50 m². That
 reproduces the Planning floor area to within 2.5%.
 
-Measured design polygon, in Blender coordinates (metres, `+X` east, `+Y` north), already
-centred on the manifest anchor `-122.3948669, 37.7812686`. The eleven short segments at
-the start are the oval's curve and may be simplified to two:
+Measured design polygon, in Blender coordinates (metres, `+X` east, `+Y` north), relative to
+the **design anchor** `-122.3948669, 37.7812686` — the polygon's own area centroid. (The
+*manifest* anchor is this point moved by the recentring shift the build applies; see Part 1's
+anchor convention.) The eleven short segments at the start are the oval's curve and may be
+simplified to two:
 
 ```
 ( 12.873,  -1.497)  ─┐   north end of the street frontage
@@ -426,8 +431,8 @@ Read as two pieces:
 
 Because of the ~108° facade heading the axis-aligned bounding box is **25.3 × 17.5 m**.
 That is correct and is not a scale error. The bounding-box centre sits about
-(+0.2, +1.4) m from the area centroid; keep the **area centroid** at the origin, because
-that is what the manifest anchor is, and record the offset.
+(+0.2, +1.4) m from the area centroid, so the recentring shift is about that much and the
+manifest anchor lands about 1.4 m north-north-east of the design anchor above.
 
 ### 2.4 What each side shows
 
@@ -666,7 +671,7 @@ a visitor sees is "Office".
 
   | Field | Value | Why |
   |---|---|---|
-  | manifest `anchor` | `-122.3948669, 37.7812686` | area centroid of the **design** (built) footprint — where the building actually stands |
+  | manifest `anchor` | design anchor `-122.3948669, 37.7812686` plus the build's recentring shift (~1.4 m NNE) | the **design** (built) footprint, as the model is actually centred — where the building stands |
   | registry `lon`/`lat` | `-122.3949116, 37.7812949` | area centroid of the **DataSF LiDAR footprint**, which is the polygon the bake actually reads |
 
   They are 4.89 m apart, because the LiDAR polygon includes the rear yard and the design
@@ -739,8 +744,8 @@ a visitor sees is "Office".
 
 - [ ] Fresh-scene re-import of the exported GLB (never validate the authoring scene)
 - [ ] `min Z` within 0.5 m of 0
-- [ ] XY *area centroid* at the origin; bounding-box centre offset ~(+0.2, +1.4) m,
-      recorded in `REPORT.md` rather than "corrected"
+- [ ] XY bounding-box centre at the origin (within ~0.01 m), and the recentring shift
+      carried into the manifest anchor and printed by the build script
 - [ ] Bounding-box top exactly 9.40 m (loader scale lands at 1.0) — or the stack's crest if
       one is confirmed taller, flagged explicitly rather than clipped
 - [ ] Dimensions plausible in meters and consistent with 2.1 (XY bbox ~25.3 × 17.5 m is expected)
