@@ -1,7 +1,7 @@
 {
  "file_bytes": {
-  "raw": 537592,
-  "gzip9": 98267
+  "raw": 537588,
+  "gzip9": 98264
  },
  "objects": 165,
  "total_tris": 9262,
@@ -280,14 +280,14 @@
    "user_objects": 24
   },
   {
-   "name": "Toy_glass_Glow",
-   "glow": true,
-   "user_objects": 8
-  },
-  {
    "name": "Toy_glassl",
    "glow": false,
    "user_objects": 2
+  },
+  {
+   "name": "Toy_glassl_Glow",
+   "glow": true,
+   "user_objects": 8
   },
   {
    "name": "Toy_ink",
@@ -933,8 +933,8 @@
  "dup_redundant_tris": 3564,
  "join_candidates": {
   "Toy_glass": 24,
-  "Toy_glass_Glow": 8,
   "Toy_glassl": 2,
+  "Toy_glassl_Glow": 8,
   "Toy_ink": 15,
   "Toy_navy": 4,
   "Toy_roofd": 4,

@@ -20,7 +20,7 @@ model existed.
 | min Z / XY centre offset | 0.000 m / (0.000, 0.000) |
 | File (shipped, post-stage-4) | **219,356 B** raw, 141,289 B gzip — from 537,592 B raw |
 | Materials | 11, all `Toy_*`, flat, opaque, no textures |
-| Glow | `Toy_glass_Glow`, `Toy_trim_Glow` — 90 faces, all open single-layer strips |
+| Glow | `Toy_glassl_Glow`, `Toy_trim_Glow` — 90 faces, all open single-layer strips |
 | Front heading | 315.8° (NW) · flank 225.8° (SW) · party 45.8° · rear 135.8° |
 | Manifest anchor | `-122.3935929, 37.7814646` |
 | Target height | 13.00 m → loader scale exactly **1.0** |
@@ -37,7 +37,7 @@ at `optimize/input/49-south-park.glb`.
 
 ## Corrections to the dossier, made during the build
 
-Five, all documented in the build script at the point of change.
+Six, all documented in the build script at the point of change.
 
 **1. The body colour is off-palette, and that was a deliberate reversal.** The plan
 specified `Toy_stone` (`#d9d2c2`) for the body against `Toy_trim` (`#f3efe6`) for the
@@ -116,6 +116,26 @@ face makes a ray's first hit ambiguous; overlapping solids are the supported mod
 And this file's own `glow_strips_face_outward` check was rewritten: it used to dot each
 glow face against the model centre, which is the *same* mistake, and it now casts a ray
 inward along each face's own normal and requires that face to be the first thing hit.
+
+**6. The lit windows were the wrong colour, and only the app showed it.** The bay
+glow was authored as `Toy_glass_Glow` (`#2a4d73`) — the dark navy of *unlit* glass. In
+the Blender night render it looked fine, because the render pushes emission strength to
+3–4 and even a dark colour goes bright. The app does not multiply by anything: it draws
+`_Glow` in a separate **unlit** layer at `opacity = 0.12 + 0.95·uNight`, so at night the
+surface shows its raw base colour. At 22:30 in the running scene the "lit" bays were
+barely distinguishable from the dark ones, against neighbours whose windows were plainly
+bright.
+
+The glow is now `Toy_glassl_Glow` (`#6f95b8`) — the palette's lit-window colour, and the
+same entry `106-south-park` uses for the same job — and the night render's emission
+strength dropped from 4.2 back to 3.2, because 4.2 had been covering for the dark colour.
+Re-checked in the app: the turret now reads as the lit hero and the uneven scatter across
+the other bays reads as apartments.
+
+This is exactly what the night half of the local QA exists to catch, and it is worth
+recording that a night render can flatter a glow colour into looking right when the
+runtime will not. The rebuild went back through stage 4 in full; the material name set
+changed, so every optimize gate was re-run rather than assumed.
 
 ## Design decisions worth recording
 
@@ -228,3 +248,81 @@ Presented: contact sheet, aerial day and night renders, and the numbers above.
 Recorded verbatim per `docs/asset-pipeline/ADDRESS-TO-ASSET.md` gate 3. No revision
 rounds were requested after presentation; the four corrections above were made by the
 build session itself before presenting, in response to its own review renders.
+
+## Integration (stage 5, batch mode)
+
+Case **B** — a new landmark. Run of `docs/asset-plans/INTEGRATION-PROMPT.md` Part 1 with
+its Step 7 replaced by a stop, per `ADDRESS-TO-ASSET.md`.
+
+| Step | Result |
+|---|---|
+| 1. Re-validate before touching the app | **PASS** — fresh-scene re-import of the shipped GLB, all 17 checks; `validation.json` |
+| 2. GLB into `app/public/sf-assets/landmarks/` | byte-identical to `artifacts/49-south-park/49-south-park.glb` (219,384 B) |
+| 3. Manifest entry | appended **as text**, so the other 73 entries are untouched: `git diff --stat` shows 19 insertions, 0 deletions |
+| 4. Registry + re-bake | `49SouthPark` added to `pipeline/lib/landmarks.mjs`, `exclude: 3`; full chain re-baked (`terrain → … → context → muni-shapes`, exit 0) |
+| `audit.mjs` 1.6 | **PASS** — "no procedural footprint inside a bespoke landmark exclusion zone", 83 zones over 80 landmarks clear |
+| `verify-rebake.mjs` | **PASS** — 584 of 585 cells unchanged; only `23_13` moved, 201 → 200; nearest surviving footprint 7.2 m against a 3 m radius |
+| 5. Local QA | see below |
+| 6. Fallback drill | see below |
+| 7. Ship | **stopped**, per the pipeline. Source-only branch; the ship decision is the user's |
+
+### Step 5 — local QA (`npm run dev`, port 4049)
+
+- **Loader line:** `sf-assets: 49-south-park merged 14 objects / 11 materials -> batched
+  (4954 tris body); uniform x1.0000 at 3864, -1267`. The **x1.0000** is the number that
+  matters: the authored crown height and `targetHeightM` agree exactly. 14 objects
+  matches the optimized asset's 14 primitives, and it goes into the shared batch — no new
+  draw calls.
+- **Exactly one building.** No procedural twin, no baked block poking through, no
+  z-fighting. The exclusion took the one ring it should have.
+- **Neighbours intact.** 41–43 South Park (party wall, 7.2 m from the anchor) and the
+  Gran Oriente Masonic Temple at the rear of the same lot are both still standing, which
+  is the whole point of a 3 m radius on a party-wall site.
+- **Orientation.** The rounded corner turret faces the South Park × Jack London Alley
+  corner; the park front looks out over the oval; the party wall abuts 41–43. Authored
+  world heading, no `yawDeg` override.
+- **Footprint and terrain.** Plan size reads correctly against the neighbouring blocks;
+  the building sits on the terrain with no float and no sink.
+- **Night.** Swept to 22:30. Only the intended `_Glow` surfaces light: the corner turret
+  on both storeys as the hero, an uneven scatter across the other bays, and a warm spill
+  in the two entrance recesses. Nothing else. *This is the step that found correction 6
+  above* — the first pass had the bays lit in the dark navy of unlit glass and they
+  barely read.
+- **Budgets (AGENTS rule 2).** 76 draw calls at street level over South Park at
+  1280 × 720, 102 at 1440 × 900 — against a 300 hard gate. 3.2 M triangles in frame.
+  Measured by forcing a frame and reading `renderer.info`, because the browser pane
+  throttles `requestAnimationFrame` while it is hidden.
+
+### Step 6 — fallback drill (mandatory)
+
+`app/public/sf-assets/landmarks/49-south-park.glb` renamed away, page reloaded:
+
+- The app **booted and rendered normally** — no crash, no hole in the terrain, no error
+  in the console beyond Vite's own HMR socket.
+- The site became **empty ground inside the exclusion zone**, which is the correct Case B
+  outcome and is called out as expected in the integration prompt.
+- Neighbours, streets, crossings and the rest of the block were unaffected.
+- Proof the drill was real, not cached: during it `GET /sf-assets/landmarks/49-south-park.glb`
+  returned Vite's 2,340-byte SPA fallback; after restoring it returned **200, 219,384
+  bytes, `glTF` magic**, byte-identical to the artifact.
+
+**One assertion in the drill was not isolated, and is reported as such:** the prompt asks
+for *exactly one* `sf-assets: … — keeping the code-built landmark` console warning. The
+browser pane retains console history across reloads and throttles the animation frames
+that drive the streaming asset loader, so a clean single-warning count could not be taken
+in this environment. The behavioural half of the drill — graceful degradation to empty
+ground with the app still running — is confirmed. Anyone re-running this on a foregrounded
+browser should check the warning count.
+
+### Batch mode
+
+Other landmarks are in flight, so per `ADDRESS-TO-ASSET.md` the bake was **run, used for
+QA, and then discarded**: `git checkout -- app/public/tiles api/_data`. The sanity check
+passes — `git diff --name-only origin/main` lists nothing under `app/public/tiles/` or
+`api/_data/`. The city gets baked once for the whole batch by
+`docs/asset-pipeline/BATCH-INTEGRATE.md`.
+
+For the record, the bake it discarded touched 524 files under `app/public/tiles/` while
+changing the building count of exactly **one** cell. That gap is the churn
+`verify-rebake.mjs` exists to see through, and it is why a landmark branch must not carry
+a bake.

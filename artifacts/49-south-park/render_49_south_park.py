@@ -158,10 +158,13 @@ def light_glow():
     """Preview the app's night pass: emission up on every _Glow material."""
     for mat, bsdf in glow_materials():
         if bsdf:
-            # The glow here is a single-layer strip, not a closed shell, so it
-            # takes a stronger push than 106's boxes did before the glass colour
-            # starts to blow out.
-            bsdf.inputs["Emission Strength"].default_value = 4.2
+            # 3.2, the 106 South Park value, for the same reason: the lit
+            # windows are Toy_glassl_Glow (6f95b8) and a stronger push blows
+            # them to flat white. The first pass here used 4.2, which was
+            # covering for a glow colour that was too dark to read in the app -
+            # exactly the flattery a night render must not provide. See
+            # REPORT.md 6.
+            bsdf.inputs["Emission Strength"].default_value = 3.2
 
 
 def fade_glow():

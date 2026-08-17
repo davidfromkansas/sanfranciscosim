@@ -1,14 +1,17 @@
 # 45–49 South Park — GLB optimize pass (stage 4)
 
 Run of `docs/asset-pipeline/GLB-OPTIMIZE-PROMPT.md` against
-`artifacts/49-south-park/`, 17 August 2026.
+`artifacts/49-south-park/`, 17 August 2026. Run twice: the second time after local QA
+sent the asset back to stage 2 for a glow-colour fix (../REPORT.md 6). Because that
+changed the material name set, every gate was re-run from Phase A rather than assumed;
+the numbers below are the second run.
 `ASSET_CLASS: landmark`, `ALLOW_MESHOPT: yes`, `ALLOW_BAKE: no`.
 
 ## Metrics
 
 | | Input | Optimized | Δ |
 |---|---|---|---|
-| File, raw | 537,592 B (525.0 KB) | **219,356 B (214.2 KB)** | **−59.2%** |
+| File, raw | 537,588 B (525.0 KB) | **219,384 B (214.2 KB)** | **−59.2%** |
 | File, gzip -9 | 98,285 B (96.0 KB) | 141,289 B (138.0 KB) | +43.8% — see G6 |
 | Objects / nodes | 165 | **12** | −92.7% |
 | Draw submeshes (primitives, via GLTFLoader) | 167 | **14** | −91.6% |
@@ -112,8 +115,8 @@ four orthographic elevations. `diff_ab.py` → `diffs.json`, `renders/contact_sh
 |---|---|---|
 | day near | 0.0123% | 32 |
 | day far | 0.0106% | 11 |
-| night near | 0.0722% | 39 |
-| night far | 0.0797% | 21 |
+| night near | 0.1520% | 66 |
+| night far | 0.1684% | 38 |
 | elev N (park front) | 0.0223% | 32 |
 | elev E (party wall) | 0.0114% | 28 |
 | elev S (rear) | 0.0084% | 18 |
@@ -124,9 +127,11 @@ shared edges — the cornice steps, the bay frames, the basement/water-table joi
 is the 1 mm weld changing which duplicated vertex an anti-aliased edge samples, one
 sub-pixel wide. Nothing is missing, no silhouette moved, no shading changed, and the
 turret, the seven bay bulges, the rosettes and the lit-window pattern are identical in
-both rows. The night deltas are the largest of the eight and are still 25× inside the
-2% far tolerance; they are higher only because the night frames are mostly near-black,
-so the same absolute edge difference is a larger fraction of a small mean.
+both rows. The night deltas are the largest of the eight and are still 12× inside the
+2% far tolerance; they are higher only because the night frames are mostly near-black, so
+the same absolute edge difference is a larger fraction of a small mean — and they roughly
+doubled when the glow colour moved from `Toy_glass_Glow` to the much lighter
+`Toy_glassl_Glow` (see ../REPORT.md 6), for the same reason.
 
 ## Gates
 
@@ -135,7 +140,7 @@ so the same absolute edge difference is a larger fraction of a small mean.
 | G1 Contract | **PASS** | Material set identical (11); `_Glow` pair kept separate by `-km`; no `Toy_body` (landmark); no manifest-named nodes to preserve |
 | G2 Geometry | **PASS** | bbox Δ 0.0000 m; origin Δ 0.0000 m; all 12 closed solids positive volume, `inverted_solids: []`; ray flipped fraction **0.000058** vs 0.0015 tolerance |
 | G3 Round-trip | **PASS** | Re-imports in Blender (12 objects, 11 materials, bbox exact); `g3check` with pinned three → `G3-OK {"ok":true,"meshes":14,"tris":9262}` |
-| G4 Appearance | **PASS** | Max mean delta 0.0797% (night far) vs 2% far / 4% near |
+| G4 Appearance | **PASS** | Max mean delta 0.1684% (night far) vs 2% far / 4% near |
 | G5 Draw submeshes | **PASS** | 14 ≤ 167 |
 | G6 Size | **PASS** | −59.2% raw, comfortably past the 60%-aspiration band and in line with `106-south-park` (−58.1%) |
 | G7 GPU budget | n/a | bake mode not used |

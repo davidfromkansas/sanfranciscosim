@@ -6,8 +6,8 @@
   "primitives": 167,
   "materials": [
    "Toy_glass",
-   "Toy_glass_Glow",
    "Toy_glassl",
+   "Toy_glassl_Glow",
    "Toy_ink",
    "Toy_navy",
    "Toy_red",
@@ -39,8 +39,8 @@
   "primitives": 14,
   "materials": [
    "Toy_glass",
-   "Toy_glass_Glow",
    "Toy_glassl",
+   "Toy_glassl_Glow",
    "Toy_ink",
    "Toy_navy",
    "Toy_red",
@@ -68,8 +68,8 @@
  "output_signed_volumes": {
   "body": 2454.065226,
   "grp_Toy_glass": 9.424068,
-  "grp_Toy_glass_Glow": 120.847698,
   "grp_Toy_glassl": 2.175531,
+  "grp_Toy_glassl_Glow": 120.847698,
   "grp_Toy_ink": 4.474607,
   "grp_Toy_navy": 0.023846,
   "grp_Toy_roofd": 332.720798,

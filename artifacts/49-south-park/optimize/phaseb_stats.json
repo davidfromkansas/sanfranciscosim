@@ -1,8 +1,8 @@
 {
  "input_materials": [
   "Toy_glass",
-  "Toy_glass_Glow",
   "Toy_glassl",
+  "Toy_glassl_Glow",
   "Toy_ink",
   "Toy_navy",
   "Toy_red",
@@ -47,7 +47,7 @@
   "grp_Toy_trim_Glow": 2,
   "grp_Toy_sage": 8,
   "grp_Toy_glass": 24,
-  "grp_Toy_glass_Glow": 8,
+  "grp_Toy_glassl_Glow": 8,
   "grp_Toy_navy": 4,
   "grp_Toy_glassl": 2
  },
@@ -56,8 +56,8 @@
   "objects": 12,
   "materials": [
    "Toy_glass",
-   "Toy_glass_Glow",
    "Toy_glassl",
+   "Toy_glassl_Glow",
    "Toy_ink",
    "Toy_navy",
    "Toy_red",

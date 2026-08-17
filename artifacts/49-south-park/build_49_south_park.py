@@ -206,7 +206,18 @@ PALETTE_HEX = {
                              # taupe / warm mid-grey membrane, clearly darker
                              # than the near-white roofs across the alley.
     "Toy_glassl": "6f95b8",  # the roof skylight bank
-    "Toy_glass_Glow": "2a4d73",
+    "Toy_glassl_Glow": "6f95b8",  # the lit bay windows at night.
+                             # NOT Toy_glass_Glow (2a4d73). The app draws _Glow
+                             # in a separate UNLIT layer at opacity
+                             # 0.12 + 0.95*uNight, so at night the surface shows
+                             # its raw base colour - and 2a4d73 is the dark navy
+                             # of unlit glass, which renders as a dark window
+                             # pretending to be a lit one. The Blender night
+                             # render hid it, because emission strength 4.2 made
+                             # even a dark colour bright; the app does not
+                             # multiply by anything. Caught in local QA at 22:30
+                             # against neighbours whose windows were plainly
+                             # brighter. See REPORT.md 6.
     "Toy_trim_Glow": "f3efe6",
 }
 
@@ -798,7 +809,7 @@ def bay(name, poly, arc, mats):
                  mats["Toy_trim"])
         if lit[k]:
             glow_band(f"{name}_glow{k}", run, z0 + 0.10, z1 - 0.10,
-                      mats["Toy_glass_Glow"], GLASS_PROUD + 0.03)
+                      mats["Toy_glassl_Glow"], GLASS_PROUD + 0.03)
 
 
 def cornice(poly, mats):

@@ -29,8 +29,8 @@
   ],
   "materials": [
     "Toy_glass",
-    "Toy_glass_Glow",
     "Toy_glassl",
+    "Toy_glassl_Glow",
     "Toy_ink",
     "Toy_navy",
     "Toy_red",
@@ -49,18 +49,18 @@
       "glow": false
     },
     {
-      "name": "Toy_glass_Glow",
-      "image_texture_nodes": [],
-      "alpha": 1.0,
-      "roughness": 0.85,
-      "glow": true
-    },
-    {
       "name": "Toy_glassl",
       "image_texture_nodes": [],
       "alpha": 1.0,
       "roughness": 0.85,
       "glow": false
+    },
+    {
+      "name": "Toy_glassl_Glow",
+      "image_texture_nodes": [],
+      "alpha": 1.0,
+      "roughness": 0.85,
+      "glow": true
     },
     {
       "name": "Toy_ink",
@@ -139,7 +139,7 @@
   "unexpected_geometry_or_objects": [],
   "material_contract_violations": [],
   "glow_materials": [
-    "Toy_glass_Glow",
+    "Toy_glassl_Glow",
     "Toy_trim_Glow"
   ],
   "anchor_lonlat": [
@@ -194,8 +194,8 @@
       ]
     },
     {
-      "name": "grp_Toy_glass_Glow",
-      "triangles": 86,
+      "name": "grp_Toy_glassl",
+      "triangles": 216,
       "location": [
         0.0,
         0.0,
@@ -213,8 +213,8 @@
       ]
     },
     {
-      "name": "grp_Toy_glassl",
-      "triangles": 216,
+      "name": "grp_Toy_glassl_Glow",
+      "triangles": 86,
       "location": [
         0.0,
         0.0,
