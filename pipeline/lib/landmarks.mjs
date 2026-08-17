@@ -1589,6 +1589,43 @@ export const LANDMARKS = [
     // onto the South Park front, the only elevation with any ornament on it.
     camera: { distance: 150, yaw: 45, pitch: 26 },
   },
+  {
+    // 126 South Park: a 6.90 x 29.79 m sliver on the oval's west arc, 1907,
+    // two storeys, party walls down BOTH long flanks at a 0.6 m gap. Same
+    // radius rule as its neighbours — excluded() drops a footprint when its
+    // centroid OR ANY ring vertex falls inside the circle — but the geometry
+    // here is unusually forgiving, and for a reason worth recording: on a
+    // 29.79 m long building the area centroid sits ~15 m from either end, so
+    // the party-wall neighbours' VERTICES stay 4.67 m away even though their
+    // walls are 0.6 m away. A squarer building wedged between the same two
+    // neighbours would have had no valid window at all.
+    //
+    // Measured from this anchor against the actual bake input:
+    //   0.01 m  this footprint's centroid (OSM way/124884348) — always caught
+    //   2.19 m  this footprint's centroid (DataSF SF3775061) — the real floor
+    //   2.32 m  this footprint's nearest vertex (DataSF)
+    //   2.78 m  this footprint's nearest vertex (OSM)
+    //   4.67 m  112 South Park (OSM way/124884354), nearest vertex — the ceiling
+    //   4.85 m  112 South Park (DataSF SF3775060), nearest vertex
+    //   4.97 m  130/134 South Park (DataSF SF3775062), nearest vertex
+    //   5.53 m  130/134 South Park (OSM way/124884351), nearest vertex
+    //
+    // The bake reads DataSF first and gap-fills from Overture (OSM geometry),
+    // so both rows bind. Safe window (2.19, 4.67); 3.5 sits in the middle with
+    // 1.31 m of floor and 1.17 m of ceiling. Do not raise past 4.5 without
+    // re-running audit.mjs check 1.6 — at 4.7 it starts eating 112 South Park.
+    id: '126SouthPark',
+    name: '126 South Park',
+    lon: -122.3945863,
+    lat: 37.7816006,
+    height: 7.6,
+    exclude: 3.5,
+    // camera.js puts the eye at target + distance*(sin yaw, ., cos yaw) with
+    // +x east and +z south, so yaw 45 stands south-east of the building —
+    // square onto the South Park front. 130 m rather than the ~100 m its 7.6 m
+    // height suggests, because the building is 29.79 m long and needs the room.
+    camera: { distance: 130, yaw: 45, pitch: 26 },
+  },
 ];
 
 // Parks/green spaces the landcover bake must match at least one source polygon
