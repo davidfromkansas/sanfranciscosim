@@ -30,6 +30,7 @@ Francisco office**.
 | Arcade heading | outward **315.9° (NW)**; party wall 225.5°, flank 45.5°, rear 135.8° | **measured** |
 | Party wall | 41–43 South Park, gap **0.00 m**, south-west | **measured** (OSM way/112759867) |
 | Side gap | 27 South Park, **7.34 m**, north-east | **measured** (OSM way/112759868) |
+| Parcel address range | **35 to 35** — one address on block/lot 3775/102, so no sibling-scope conflict | **verified** — DataSF parcels `acdm-wktn`; Google's "33 S Park St" is its own geocoding, not a second address |
 | Historic status | **none** — not a contributor to the NR South End Historic District (that district reaches South Park only at 1 South Park / 570 Second Street) | **verified negative**, 2008 nomination searched in full |
 | Architect (1920) | not recorded in any source consulted | — |
 

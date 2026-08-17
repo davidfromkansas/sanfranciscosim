@@ -793,11 +793,13 @@ oval the tenant is what people recognise. `loadRadius` is the default rule,
    stone or brick. **If photography of the flanks turns up brick, use `Toy_rust` there
    and keep `Toy_stone` on the front** — that contrast is real and is worth having.
 
-5. **The address is ambiguous in one direction.** OSM, every building permit and Accel
-   all say **35**; Google Maps labels the frontage **33 S Park St**. The lot is a merged
-   one (lot 102 on an 8,197 sq ft parcel behind a 22.7 m frontage), so 33 and 35 are
-   almost certainly two historic numbers on one building. The manifest id, the plan and
-   the registry use **35**, which is what the data sources and the occupant use.
+5. **The address is ambiguous in one direction, and the parcel settles it.** OSM, every
+   building permit and Accel all say **35**; Google Maps labels the frontage **33 S Park
+   St**. The DataSF parcel layer (`acdm-wktn`) gives block/lot 3775/102 an address range
+   of **35 to 35** — one address, one parcel, one building. Google's 33 is its own
+   geocoding, not a second address on this lot, and there is no sibling-scope conflict of
+   the kind that caught 21/27 South Park (one APN, three OSM ways, range 21–29). The
+   manifest id, the plan and the registry use **35**.
 
 6. **The frieze inscription is unread.** The raised letters have been removed and only
    their shadows survive; the Jan 2025 capture resolves "C … O … O" and nothing more.
