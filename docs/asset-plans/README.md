@@ -105,6 +105,7 @@ route, and the park plans depend on it (§E8 of the parks README).
 | [188 South Park (South Park Lofts)](./188-south-park.md) | `188-south-park` | 15.93 m (LiDAR-derived) | new landmark |
 | [150 South Park](./150-south-park.md) | `150-south-park` | 8.0 m | new landmark |
 | [160 South Park](./160-south-park.md) | `160-south-park` | 9.4 m (LiDAR-derived) | new landmark |
+| [132 South Park (130–134 South Park)](./132-south-park.md) | `132-south-park` | 12.07 m (LiDAR-derived) | new landmark |
 
 ## Shared contract (all 61)
 
