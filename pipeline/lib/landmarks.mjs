@@ -1779,6 +1779,38 @@ export const LANDMARKS = [
     // Verified by render, not derived on paper (the 592Third lesson).
     camera: { distance: 400, yaw: 315, pitch: 24 },
   },
+  {
+    // 522-524 Second Street, the 1923 brick warehouse on the Taber Place corner.
+    // Third bespoke landmark on block 3775, with 358 and 370-400 Brannan.
+    //
+    // Exclusion sized against the REAL bake input (pipeline/data/
+    // overture_buildings.geojsonseq), by nearest ring VERTEX, not centroid —
+    // excluded() in buildings.mjs fires on either:
+    //
+    //    2.84 m  this building's own footprint (h=9, 7 verts), via CENTROID.
+    //            Its own nearest vertex is 14.79 m out, so the centroid test is
+    //            what does the work here — any radius over ~3 m drops it.
+    //   14.78 m  nearest neighbour vertex (h=12.9) — a shared party-wall point
+    //   18.12 m  two more neighbours (h=12, h=13) sharing this footprint's corners
+    //   19.69 m  512 Second St (h=20) and its neighbour, across Taber Place
+    //
+    // Safe window is therefore (2.9, 14.78) m and no other footprint has a
+    // centroid inside 21 m. 11 sits in that window with 8 m of margin below and
+    // 3.8 m above. Do NOT raise past 14 — at 14.78 this starts deleting the
+    // party-wall neighbour at 544 Second and leaving a hole in the street wall.
+    // Taber Place gives free clearance on the northwest side; all the risk is
+    // southeast and southwest, where the walls actually touch.
+    id: '524Second',
+    name: '524 Second Street',
+    lon: -122.393433,
+    lat: 37.7825731,
+    height: 9.9,
+    exclude: 11,
+    // Camera offset is (sin yaw, ., cos yaw) with +z south, so yaw 180 stands
+    // the camera due NORTH — the one bearing that shows the Second Street front
+    // (45.6 deg) and the Taber Place flank (315.4 deg) together.
+    camera: { distance: 200, yaw: 180, pitch: 26 },
+  },
 ];
 
 // Parks/green spaces the landcover bake must match at least one source polygon
