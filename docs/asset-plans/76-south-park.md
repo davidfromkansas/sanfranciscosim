@@ -91,8 +91,10 @@ not settle.
   the proportion.
 - The **large industrial multi-pane grid window** on the south-west half of the upper
   street front, in dark frames — the counterweight to the bay
-- The **garage roll-up door** at the south-west end of the ground floor, with the
-  storefront glazing and the entry to the north-east of it
+- The ground floor's three-part rhythm: a **plain dark service bay** at the south-west
+  end, the **recessed entry** under the stone pier, and the **storefront glazing** to
+  the north-east — plus the slim first-floor **balcony railing** over the entry. (The
+  documented two-car garage is *not* confidently locatable on this elevation; see 2.4.)
 - The **roof deck**: real, documented, furnished, with a barbecue, and the stair
   penthouse that serves it — from the app's camera this roof is the building
 - The **step down to 84 South Park**: the south-west party wall is exposed for a band
@@ -323,13 +325,30 @@ to one of them. Two things point at this building:
   roofline** toward the north-east (70-facing) side of this building, plus a smaller
   vent at the south-west edge.
 
-A rough photogrammetric check supports it. In that photograph, taken from inside the
-park about 45 m out, the penthouse top sits roughly 25 px above the main roofline while
-the facade from pavement to roofline spans about 330 px. Naively that reads as 1.0 m —
-but the penthouse is set back roughly 10 m, and once the extra distance is taken into
-account a 16.28 m crest projects to about 14 px of apparent lift, of the same order as
-the 25 px measured. The check is consistent with 16.28 m and flatly inconsistent with
-the naive 1.0 m reading. It is not proof. **This remains risk 1.**
+A photogrammetric check on that photograph supports it. Working in the 1067 × 800
+original: the horizon sits at about y = 660, the building's roofline at y = 318, and the
+roofline is 13.08 m above grade — so the 342 px from horizon to roofline subtend
+`atan(11.58 / D)` and calibrate the image at about 23.8 px per degree for a camera
+roughly 45 m out in the park. The dark rooftop box tops out at y = 290, i.e. 370 px
+above the horizon, i.e. 15.55°. Solving for height at various setbacks:
+
+| Setback behind the facade | Camera distance | Implied crest |
+|---|---|---|
+| 0 m (on the facade plane) | 45 m | 14.0 m |
+| 6 m | 51 m | 15.7 m |
+| 10 m | 55 m | **16.8 m** |
+
+A rooftop bulkhead standing on the facade plane would be very unusual; one set back
+8–11 m on a 29.7 m deep roof is exactly normal, and that band brackets 16.28 m. The
+naive same-plane reading (14.0 m) is the only one that contradicts the LiDAR, and it is
+the one geometrically implausible case.
+
+Two caveats remain, and they are why this is still risk 1. The box in the photograph is
+centred **on or just past the party wall** with 70 — it spans roughly x = 570–668 where
+this building's right edge is near x = 610 — so it may be a shared or mirrored structure
+serving both buildings, or 70's alone. And the photograph is undated. **Model the
+penthouse as a separate, cleanly deletable object** so that if better imagery kills it,
+the fix is one deletion plus a renormalization rather than a rebuild.
 
 ### 2.2 Sources
 
@@ -446,11 +465,20 @@ Read from the January 2025 pano, north-east to south-west:
 - On the south-west half, set slightly back, a **large industrial multi-pane grid
   window** in dark frames — roughly four lights wide by three high — with a
   cantilevered soffit or shallow balcony over it.
-- At ground level: dark storefront glazing and a recessed entry to the north-east, and
-  a **roll-up garage door** at the south-west end. The 2007 DBI complaint about
-  "blocked access to the garage and the street" places the garage on this elevation.
+- At ground level: dark storefront glazing to the north-east of the pier, and a
+  recessed entry immediately under it. A **balcony with a slim metal railing** crosses
+  the front at the first-floor line, just above the entry.
 - A small blank plaque sits at the foot of the stone pier; the address numerals were
   not legible in any available image.
+
+**Where the two-car garage is, is unresolved.** Both listings document one. The 2007
+DBI complaint ("blocked access to the garage and the street") reads like a street
+frontage, but the 311 record separately describes parking in the **rear yard**, and no
+roll-up door is legible within this building's 6.9 m of frontage in either available
+image — the roll-up shutter visible in the Hawthorne photograph is on a neighbour, well
+to the south-west. Model the south-west end of the ground floor as a **wide plain dark
+service bay** that can become a roll-up door or a plain wall once the research settles
+it, and do not commit `Toy_steel` door grooves to the street front on present evidence.
 
 **The mural.** The Hawthorne Group photograph shows a tall painted figure in warm ochre
 and gold running down the stone pier, from the first level to the ground — a strong,
@@ -525,10 +553,13 @@ call out any cheating.
 7. Grid window: on the south-west half, z = 7.4 to 10.2 m, 2.6 m wide, a 4 × 3 mullion
    grid in `Toy_trim`, glazing `Toy_glass`, recessed 0.15 m.
 8. Soffit / shallow balcony over the grid window at z = 10.6 m, 0.5 m deep.
-9. Ground floor: storefront band z = 0.4 to 3.2 m on the north-east two-thirds,
-   `Toy_glass` behind `Toy_trim` mullions; recessed entry 1.1 m wide, 0.5 m deep, at
-   the centre; garage roll-up door 2.6 m wide, z = 0 to 3.0 m, at the south-west end,
-   in `Toy_steel` with horizontal grooves.
+9. Ground floor: storefront band z = 0.4 to 3.2 m on the north-east third, `Toy_glass`
+   behind `Toy_trim` mullions; recessed entry 1.1 m wide, 0.5 m deep, under the pier;
+   a plain dark service bay 2.6 m wide, z = 0 to 3.0 m, at the south-west end, in
+   `Toy_ink` — **not** a detailed roll-up door until the garage question in 2.4 is
+   settled.
+9a. Balcony: a 0.25 m deep ledge with a slim `Toy_steel` railing across the front at
+   z = 6.9 m, over the entry.
 10. South-west flank band: a value change over the whole 29.7 m face, above
     **z = 11.36 m** only, in `Toy_sand`.
 11. Rear elevation: plain `Toy_roofd` face, a 2 × 3 window grid, one service door, and
@@ -550,7 +581,7 @@ Flat colors only, from the `sf-asset-check` palette (hexes quoted from
 | `Toy_stone` | `#d9d2c2` | the rusticated cast-stone base, the pier and the bay corbel |
 | `Toy_trim` | `#f3efe6` | window sashes, bay trim, grid-window mullions, storefront mullions, parapet cap |
 | `Toy_glass` | `#2a4d73` | all windows, the storefront band |
-| `Toy_steel` | `#9aa0a6` | garage roll-up door, roof railing, rooftop mechanical plant |
+| `Toy_steel` | `#9aa0a6` | roof-deck railing, the first-floor balcony railing, rooftop mechanical plant |
 | `Toy_roofd` | `#45454a` | the roof deck membrane and the north-west rear elevation |
 | `Toy_sand` | `#ece4d4` | the exposed south-west flank band above 84 South Park |
 | `Toy_brick` | `#c96f4a` | the roof-deck timber decking — the one warm note, and it is genuinely there |
@@ -737,7 +768,9 @@ the answer is fewer window subdivisions and a coarser arch, not a raised cap.
 - [ ] The canted bay is on the **north-east** half of the frontage and the grid window
       on the south-west (not mirrored), or the research says otherwise and `REPORT.md`
       records it
-- [ ] The garage door is at the **south-west** end of the ground floor
+- [ ] The south-west end of the ground floor is a plain dark service bay, **not** a
+      detailed roll-up door (see 2.4 — the garage position is unresolved)
+- [ ] The stair penthouse is a **separate, deletable object** (see 2.15 risk 1)
 - [ ] The south-west flank band exists, in `Toy_sand`, only above 11.36 m
 - [ ] The north-east flank has **no** step — 70 is only 0.21 m lower
 - [ ] Roof deck present, on the street third unless research moves it; railing and
@@ -776,6 +809,9 @@ the answer is fewer window subdivisions and a coarser arch, not a raised cap.
 7. **The mural.** Present and dominant in one undated photograph, effectively absent in
    the January 2025 pano. Treated as gone. If it is in fact current, the building's
    single most memorable feature is missing from the asset.
+7a. **The two-car garage.** Documented by two listings, but not locatable on the street
+   front in either available image, and the 311 record points at the rear yard instead.
+   Modelled as a neutral service bay so that either answer is a small edit.
 8. **The body colour hue.** Dark and warm is solid; the exact hue is not.
 9. **Every visual statement in 2.4 comes from two images.** There is no second
    photographer, no elevation drawing, and no survey. The confidence gap between this
