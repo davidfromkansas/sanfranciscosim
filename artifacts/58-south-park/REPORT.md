@@ -146,22 +146,105 @@ swap, so the numbers below describe the **packed file that ships**. All 16 check
 | no degenerate geometry | PASS (0) |
 | no unexpected objects | PASS |
 
-## 6. Integration notes carried forward
+## 6. Stage 5 — integration (Case B, batch mode)
 
-- **Case B, new landmark.** Needs a `pipeline/lib/landmarks.mjs` entry and a tile re-bake.
-- **Both flanks are exact party walls**, so the exclusion radius is the delicate part, and it
-  must be measured against the two files the bake actually reads
-  (`pipeline/data/buildings_datasf.geojson` and `overture_buildings.geojsonseq`) — not
-  against the parcel polygon this asset is built on. `excluded()` drops a footprint when its
-  centroid **or any ring vertex** is inside the radius, and both neighbours share vertices
-  with this building's rings. Expect a radius of order 2 m, like 106 (`2.1`) and 132 (`2`)
-  South Park, not the 16 m a free-standing building would take. Check *which* rings drop.
-- **The procedural stand-in is the right height here** (OSM `height=14` against a 13.6 m
-  parapet), so an unbaked local check will not reveal an exclusion mistake — the two will
-  simply z-fight. Bake before judging.
-- `loadRadius` = 2500 m (the default formula's floor).
-- Batch mode: bake, QA the bake, then `git checkout -- app/public/tiles api/_data` and commit
-  source only.
+Run 17 August 2026. `docs/asset-plans/INTEGRATION-PROMPT.md` Part 1, Steps 1-6; Step 7 is
+replaced by a stop, per `ADDRESS-TO-ASSET.md`.
+
+### 6.1 The exclusion radius — 5 m
+
+Measured against **both** files the bake actually reads, not against the parcel this asset is
+built on, and remembering that `excluded()` in `pipeline/buildings.mjs` fires on a
+footprint's centroid **or any ring vertex**, whichever is closer:
+
+| ring | vertex | centroid | trigger |
+|---|---|---|---|
+| **this building, Overture `9c9ab1d7`** | 13.31 m | 1.31 m | **1.31 m** |
+| **this building, DataSF `SF3775219`** | 14.13 m | 2.26 m | **2.26 m** ← the floor |
+| 70 South Park, Overture `7c04d454` | 13.36 m | 7.75 m | 7.75 m ← the ceiling |
+| 44-46 South Park, DataSF `SF3775217` | 14.03 m | 9.33 m | 9.33 m |
+| 70 South Park, DataSF `SF3775053` | 13.68 m | 10.37 m | 10.37 m |
+| 44-46 South Park, Overture `71b35ab5` | 13.31 m | 11.57 m | 11.57 m |
+
+**Two rings are this building** — DataSF and Overture both trace it — and both have to drop,
+or the survivor bakes a procedural block straight through the asset. Each ring was checked in
+the building's own frame before trusting the distance: the two "ours" rings span the frontage
+(v −4.8…+5.1 and −4.2…+4.6) and the four neighbour rings sit clear on either side
+(−14.2…−4.5 and +4.5…+12.7). So the safe window is **(2.26, 7.75)** and **5** sits dead
+centre with 2.74 m below and 2.75 m above.
+
+Why the window is so much wider than 106 South Park's 2.1 despite the same party-wall
+geometry: every ring here triggers on its **centroid**, not a vertex. The shared party-wall
+edges are 30 m long, so their endpoints sit 13-14 m from this anchor and the vertex test
+never fires inside the useful range.
+
+### 6.2 Re-bake
+
+Full chain — `terrain → bridges → buildings → streets → landcover → validate → lore → toy →
+notables → context → muni-shapes`. `lore` before `toy`, and the chain run to the end, because
+`context.mjs` imports `LANDMARKS` and the publish step drops `app/public/tiles/ctx/` and
+`context/`.
+
+Getting the raw data needed a workaround worth recording: **`npm run download` and
+`npm run loredata` both abort at the Overture step**, because `overturemaps` 0.18.0 resolves
+every release through `https://stac.overturemaps.org/catalog.json`, which now returns 404 —
+and `--release=` does not help, since the same lookup backs the validation callback. The data
+is fine (`s3://overturemaps-us-west-2/release/` still lists `2026-07-22.0`); only the index is
+gone. Both files were fetched with a scratch wrapper that stubs
+`overturemaps.core._get_stac_catalog` from the still-live `labs.overturemaps.org/data/releases.json`
+and then calls the CLI unchanged. **This bake used the real 2026-07-22.0 Overture release**,
+which matters: without it `buildings.mjs` skips the height gap-fill and the downtown skyline
+bakes flat, and an exclusion radius judged against that bake would be judged against the
+wrong city. The repo-side fix is filed separately; nothing about it is committed here.
+
+| Check | Result |
+|---|---|
+| `pipeline/audit.mjs` check **1.6** — no procedural footprint inside a bespoke exclusion zone | **PASS** — 83 zones over 80 landmarks clear |
+| `pipeline/verify-rebake.mjs` | **PASS** — 584 of 585 cells unchanged; `23_13` 201 → 200; nearest surviving footprint 13.7 m against the 5 m radius |
+| audit overall | 29 pass, 3 fail, 1 informational. The three failures (1.2b p95 height, 1.3c Telegraph Hill terrain, 1.7b one sampled tree offshore) are city-wide source characteristics that pre-date this change and are untouched by a 5 m circle at South Park. |
+
+### 6.3 Local QA
+
+Driven by `qa_local.mjs` — the built app in headless Chrome over CDP, adapted from
+`artifacts/340-brannan/qa_local.mjs` (constants only). Screenshots in `qa/`.
+
+| Item | Result |
+|---|---|
+| Re-validation of the shipped GLB | **PASS** 16/16 (§5) |
+| Manifest entry loads | **PASS** — `sf-assets: 58-south-park merged 13 objects / 10 materials -> batched (3610 tris body); uniform x1.0000 at 3838, -1340` |
+| id mapping | **PASS** — `camelId('58-south-park')` → `58SouthPark`, matching the registry |
+| Uniform scale | **PASS** — **x1.0000**: the authored crest and `targetHeightM` agree exactly |
+| Placement | **PASS** — at (3838, −1340), the projected anchor |
+| Single building | **PASS** — `qa/day.png`: one building on the site, no procedural twin, no z-fighting |
+| Orientation | **PASS** — the front faces the park; the flanks are hard against both neighbours |
+| Terrain seating | **PASS** — no float, no sink |
+| Night glow | **PASS** — `qa/night.png` at 22:30: only the glazed bay, two middle-storey lights, one cap-band light and the roof-office window |
+| Draw calls | **PASS** — 96/frame average at the landmark, against a 300 budget |
+| Asset warnings | **PASS** — none; `failed: 0` across all 74 entries |
+| Fallback drill | **PASS** — GLB served as 404: app boots, 67 landmarks still live, **exactly one** warning, and the site is empty ground inside the exclusion zone (`qa/drill-day.png`) — the expected Case B outcome |
+| `npm run lint` | **PASS** |
+| `npm test` | **PASS** — 26/26 |
+| `npm run build` | **PASS** |
+
+Two QA-harness corrections were needed and are recorded in `qa_local.mjs`:
+
+1. The inherited harness waited for `stats().live > 0`, which is satisfied instantly by the
+   resident/`alwaysLoaded` set and says nothing about a *streamed* landmark. `assets.js`
+   scans on a cooldown driven by the **simulation** dt (`SCAN_EVERY_S = 0.4` against a
+   clamped dt), so with several parallel headless sessions on this machine the pump advances
+   ~0.05 s per frame at ~1 fps and this landmark took minutes of wall time to appear. The
+   first run reported a **false FAIL**. It now waits for `assets.placed.has('58SouthPark')`.
+2. `SF.setTime(t)` is deprecated and only maps `t` onto 19:00-21:30, so the "day" screenshot
+   came out at 9:18 PM. `SF.setClock(msOrIso)` is the real override; day and night frames are
+   now taken at a fixed 14:00 and 22:30.
+
+### 6.4 Batch mode
+
+The bake was run and QA'd, then discarded: `git checkout -- app/public/tiles api/_data`.
+`git diff --name-only origin/main` lists **nothing** under `app/public/tiles/` or
+`api/_data/`. The branch carries source only — the GLB, the manifest entry, the registry
+entry, the plan and `artifacts/58-south-park/` — all of which merge mechanically. The city
+gets baked once for the whole batch by `docs/asset-pipeline/BATCH-INTEGRATE.md`.
 
 ## 7. Manifest entry (shipped numbers)
 

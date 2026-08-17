@@ -1843,6 +1843,60 @@ export const LANDMARKS = [
     // (225.4 deg) and the Bryant Street elevation (315.4 deg).
     camera: { distance: 420, yaw: 270, pitch: 26 },
   },
+  {
+    // 54-58 South Park: a 2009 four-storey mixed-use infill on the north-west
+    // rim of the oval, holding three condominium lots (3775/219 = 58, the
+    // ground-floor commercial condo; /220 = 56; /221 = 54, the penthouse). It
+    // replaced a two-storey office demolished in 2005 and was built as one half
+    // of a pair with 44-46 South Park next door under the same permit set.
+    // Nine and a half metres of frontage, thirty metres deep, party walls on
+    // BOTH flanks. Height 16.9 m is the roof-office crest; the main parapet is
+    // 13.6 m (see docs/asset-plans/58-south-park.md 2.1 and the height caveat
+    // in artifacts/58-south-park/REFERENCE.md).
+    //
+    // Exclusion sized against BOTH files the bake actually reads
+    // (pipeline/data/buildings_datasf.geojson and overture_buildings.geojsonseq,
+    // 17 Aug 2026), remembering that excluded() fires on a footprint's CENTROID
+    // or ANY ring vertex, whichever is closer:
+    //
+    //   ring                                    vertex   centroid   trigger
+    //   this building, Overture 9c9ab1d7        13.31 m    1.31 m     1.31 m
+    //   this building, DataSF SF3775219         14.13 m    2.26 m     2.26 m  <- the floor
+    //   70 South Park, Overture 7c04d454        13.36 m    7.75 m     7.75 m  <- the ceiling
+    //   44-46 South Park, DataSF SF3775217      14.03 m    9.33 m     9.33 m
+    //   70 South Park, DataSF SF3775053         13.68 m   10.37 m    10.37 m
+    //   44-46 South Park, Overture 71b35ab5     13.31 m   11.57 m    11.57 m
+    //
+    // TWO rings are this building — DataSF and Overture both trace it — and both
+    // have to go, or the survivor bakes a procedural block straight through the
+    // asset. So the safe window is (2.26, 7.75) and 5 sits dead centre with
+    // 2.74 m below and 2.75 m above. Do NOT raise past 7.7: at 7.75 this starts
+    // deleting 70 South Park and leaving a hole in a continuous street wall
+    // (AGENTS rule 5).
+    //
+    // Note why the window is so much wider than 106 South Park's (2.1) despite
+    // the same party-wall geometry: every ring here is caught by its CENTROID,
+    // not by a vertex. The shared party-wall edges are 30 m long, so their
+    // endpoints sit ~13-14 m from this anchor and the vertex test never fires
+    // inside the useful range. Both flanks are exact party walls all the same —
+    // the neighbours' parcels share these edges vertex-for-vertex.
+    //
+    // No clearTrees: the two mature street trees in front of this building are
+    // real, they are what makes the January 2025 pano useless above the ground
+    // floor, and at 5 m this radius clears no street furniture anyway.
+    id: '58SouthPark',
+    name: '54-58 South Park',
+    lon: -122.3938881,
+    lat: 37.7821223,
+    height: 16.9,
+    exclude: 5,
+    // app/src/camera.js places the rig at (sin(yaw), sin(pitch), cos(yaw)) x
+    // distance from the pivot, and this project's +z is SOUTH, so yaw 45 puts
+    // the camera south-east of the building — over the oval, looking north-west
+    // at the South Park front (135.2 deg), which is the only elevation of it
+    // worth flying to. Same value as 106 South Park on the same rim.
+    camera: { distance: 150, yaw: 45, pitch: 26 },
+  },
 ];
 
 // Parks/green spaces the landcover bake must match at least one source polygon
