@@ -102,8 +102,9 @@ route, and the park plans depend on it (§E8 of the parks README).
 | [592 Third Street](./592-third.md) | `592-third` | 8.2 m (estimated) | new landmark |
 | [400 Brannan Street](./400-brannan.md) | `400-brannan` | 8.8 m | new landmark |
 | [188 South Park (South Park Lofts)](./188-south-park.md) | `188-south-park` | 15.93 m (LiDAR-derived) | new landmark |
+| [132 South Park (130–134 South Park)](./132-south-park.md) | `132-south-park` | 12.07 m (LiDAR-derived) | new landmark |
 
-## Shared contract (all 60)
+## Shared contract (all 61)
 
 - Style: `docs/styles/miniature-toy.md` (authoritative for artistic decisions)
 - Technical contract: `.agents/skills/sf-asset-check/SKILL.md` (authoritative for the GLB)
@@ -194,6 +195,17 @@ and overlaps its neighbour. That plan's geometry comes from the surveyed DataSF 
 (`acdm-wktn`), with the DataSF LiDAR footprint (`ynuv-fyni`) supplying only the built depth
 — and even those two disagree by 3.7 m, which its 2.3 reconciles. On dense narrow-lot
 blocks, prefer the parcel layer and treat OSM as a cross-check.
+
+[132 South Park](./132-south-park.md) takes that one step further: OSM carries **no
+building on the lot at all** — no way, no address node, no height tag — and Nominatim
+answers the address with the *street*. Its geometry is reconstructed entirely from the
+surveyed parcel plus two DataSF LiDAR footprints, after correcting a uniform 1.1 m
+registration offset that the plan detects by noticing the rear footprint falling past the
+surveyed rear lot line. It is also the set's second two-structure lot after 551 Third —
+front flats, an 8.7 m open courtyard, a rear cottage — and the first where the asset's
+bounding-box centre, and therefore the manifest anchor, lands on empty ground. Read its
+2.13 before touching the exclusion registry: a lot like this needs one zone per structure
+plus a guard zone, and a single radius deletes the neighbours.
 
 358 Brannan Street breaks the pattern: there the bad number is not a height but the
 **footprint**. Its OSM way (`source=Bing`) traces a 115 m2 stub, wide and shallow,
