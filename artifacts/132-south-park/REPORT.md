@@ -3,13 +3,18 @@
 Asset: `132-south-park.glb` — the 1913 flats at 130-134 South Park Street, block
 3775 lot 062, plus the rear cottage on the same lot.
 
-**Status: stage 2 gate PASS.** `validation.json` is all-PASS on a fresh-scene
-re-import of the exported GLB.
+**Status: stage 2 gate PASS, stage 4 gate PASS.** `validation.json` is all-PASS on
+a fresh-scene re-import of the **shipped** GLB — i.e. the optimized file, re-validated
+after the stage-4 shipping swap. The optimize pass is reported separately in
+[`optimize/REPORT.md`](./optimize/REPORT.md); the pre-optimize original is archived
+at `optimize/input/132-south-park.glb`.
 
 | | |
 |---|---|
 | Triangles | **3,928** (cap 9,000) |
-| Objects | 108 |
+| Objects | 11 shipped (108 as authored; joined per material at stage 4) |
+| File size | **126,760 bytes** raw shipped (276,436 pre-optimize, −54.1%) |
+| Draw submeshes | 13 shipped (112 pre-optimize) |
 | Dimensions | 26.684 × 26.706 × **12.07** m |
 | min Z | 0.0000 |
 | XY centre offset | 0.0000, 0.0000 |
@@ -22,6 +27,9 @@ Build: `blender -b --python build_132_south_park.py --` (Blender 5.2.0 LTS).
 Renders: `render_132_south_park.py` (EEVEE, 128 samples), `--night` for the dusk
 pass, then `make_contact_sheet.py`.
 Validation: `blender -b --python validate_132_south_park.py --`.
+Optimize (stage 4): `optimize/` — Phase B geometry cleanup, then
+`npx gltfpack@0.24 -c -km -kn -noq`. 108 objects / 112 draw submeshes / 276 KB
+became 11 / 13 / 127 KB with the triangle count and the bounding box untouched.
 
 ---
 
@@ -153,6 +161,11 @@ transforms_applied                       no_negative_scales
 normals_outward_signed_volume            normals_outward_ray_residual_within_tolerance
 no_degenerate_geometry                   no_unexpected_objects
 ```
+
+Re-run against the shipped (optimized) GLB after the stage-4 swap, it still reports
+`overall: PASS` with `invalid_or_nonunit_loop_normal_count: 0` — the check that
+catches dissolve slivers, and the reason `optimize.py` skips the limited dissolve on
+this asset's two coplanar ring bands.
 
 Normals: 0 inverted objects by per-object signed volume — the authority here,
 because the asset is a union of solids **and two disjoint shells**; the ray test
