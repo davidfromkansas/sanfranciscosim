@@ -3,13 +3,13 @@
 Miniature GLB for the SF-SIM toy diorama city, built from
 `docs/asset-plans/84-south-park.md` (stage 2 of `docs/asset-pipeline/ADDRESS-TO-ASSET.md`).
 
-**Status: validation all-PASS, pre-approval.**
+**Status: validation all-PASS on the shipped, stage-4-optimized asset.**
 
 | | |
 |---|---|
 | Asset | `artifacts/84-south-park/84-south-park.glb` |
 | Build | `build_84_south_park.py` (deterministic, Blender 5.2.0 LTS, headless) |
-| Objects / triangles | 65 / **6,900** (cap 7,000) |
+| Objects / triangles | **11** / **6,900** (cap 7,000) — 65 objects before stage 4 joined them per material |
 | Dimensions | **26.086 × 26.292 × 13.200 m** — the XY box is the exact 45° rotation of a 6.99 × 30.07 m sliver, not a 26 m building |
 | Min Z / XY centre | 0.000 m / (0.000, 0.000) |
 | Bounding-box top | **13.200 m** — the pergola beams; loader scale = 1.0 |
@@ -18,12 +18,15 @@ Miniature GLB for the SF-SIM toy diorama city, built from
 | Manifest anchor | **-122.3940683, 37.7819794** (design anchor -122.3940683, 37.7819798; recentring shift −0.003 m E, −0.013 m N) |
 | Materials | 12, all `Toy_*`, flat, no textures, no alpha, no `Toy_body` |
 | Glow | `Toy_glassl_Glow` (2 windows), `Toy_trim_Glow` (entrance spill) |
-| File | 383,108 bytes raw / 62,546 gzip (pre-optimize; stage 4 replaces this) |
+| File | **185,352 bytes raw / 126,473 gzip** (shipped, meshopt-packed). Pre-optimize: 383,108 / 62,116, archived at `optimize/input/` |
+| Draw submeshes | **12** (67 before stage 4) |
 
 ## Validation (fresh-scene re-import of the exported GLB)
 
-`validate_84_south_park.py` → `validation.json`, **overall PASS**. Every one of the
-16 gates passes:
+`validate_84_south_park.py` → `validation.json`, **overall PASS**. Re-run against
+the **shipped, stage-4-packed** file after the optimize swap — that re-run is what
+catches dissolve slivers, which are invisible until gltfpack re-emits stored
+normals. Every one of the 16 gates passes:
 
 meters and plausible dimensions · crest normalized to target · base at z=0 ·
 centred XY · under triangle budget · no image textures · no transparency ·
@@ -31,10 +34,11 @@ materials follow contract · no cameras or lights · no animation/skin/constrain
 transforms applied · no negative scales · normals outward (signed volume) ·
 normals outward (ray residual) · no degenerate geometry · no unexpected objects.
 
-Normals: per-object signed volume positive for **all 65** objects (authoritative
+Normals: per-object signed volume positive for **all 11** objects (authoritative
 for a union of interpenetrating solids); the secondary 31,500-ray visibility test
-returns a flipped fraction of **0.000159** against a 0.0015 tolerance. Degenerate
-triangles: 0. Image textures: 0. Cameras/lights: 0.
+returns a flipped fraction of **0.000159** against a 0.0015 tolerance;
+`invalid_or_nonunit_loop_normal_count` **0**. Degenerate triangles: 0. Image
+textures: 0. Cameras/lights: 0.
 
 ## Dossier corrections
 
@@ -162,9 +166,20 @@ Not applied here — stage 5 owns the manifest.
 is the DataSF LiDAR maximum read as the pergola crest and 11.50 m is the LiDAR
 majority read as the parapet; both are derived, neither is a source.
 
-`dims` and `tris` are the pre-optimize values and will be restated after stage 4.
+`dims` and `tris` are the **shipped** post-stage-4 values. Stage 4 joined 65
+objects into 11 and 67 draw submeshes into 12 without touching a triangle, so
+`tris` is unchanged and `dims` is identical to 5 decimal places. Full metrics and
+gate results: `optimize/REPORT.md`.
 
 ## Approval
 
-Awaiting the user's stage-3 decision. To be quoted verbatim here with its date
-before stage 4 begins.
+**16 August 2026 — standing session authorisation, quoted verbatim:**
+
+> APPROVE EVERYTHING DONT ASK ME FOR PERMISSION
+
+Recorded honestly for the audit trail: this is a **blanket up-front
+authorisation given at the start of the session**, before any render existed. It
+is not a review of these specific images. The stage-3 evidence (contact sheet,
+aerial day and night, and the numbers above) was presented to the user at this
+point and the pipeline advanced under that authorisation rather than pausing.
+A later "change X" from the user re-opens stage 2 in the normal way.
