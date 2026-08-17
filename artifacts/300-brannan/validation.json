@@ -1,0 +1,7407 @@
+{
+  "asset": "300-brannan.glb",
+  "validator": "Blender 5.2.0 LTS",
+  "fresh_isolated_scene": true,
+  "reimported_final_glb": true,
+  "object_count": 362,
+  "mesh_object_count": 362,
+  "triangle_count": 12964,
+  "triangle_budget": 15000,
+  "dimensions_m": [
+    47.531,
+    49.2868,
+    25.2
+  ],
+  "bbox_min_m": [
+    -23.8885,
+    -24.6423,
+    0.0
+  ],
+  "bbox_max_m": [
+    23.6425,
+    24.6445,
+    25.2
+  ],
+  "min_z_m": 0.0,
+  "max_z_m": 25.2,
+  "loader_scale_factor": 1.0,
+  "xy_center_offset_m": [
+    -0.123,
+    0.0011
+  ],
+  "materials": [
+    "Toy_glass",
+    "Toy_glassl",
+    "Toy_glassl_Glow",
+    "Toy_ink",
+    "Toy_roofd",
+    "Toy_slate",
+    "Toy_steel",
+    "Toy_stone",
+    "Toy_trim",
+    "Toy_trim_Glow"
+  ],
+  "material_details": [
+    {
+      "name": "Toy_glass",
+      "image_texture_nodes": [],
+      "alpha": 1.0,
+      "roughness": 0.85,
+      "glow": false
+    },
+    {
+      "name": "Toy_glassl",
+      "image_texture_nodes": [],
+      "alpha": 1.0,
+      "roughness": 0.85,
+      "glow": false
+    },
+    {
+      "name": "Toy_glassl_Glow",
+      "image_texture_nodes": [],
+      "alpha": 1.0,
+      "roughness": 0.85,
+      "glow": true
+    },
+    {
+      "name": "Toy_ink",
+      "image_texture_nodes": [],
+      "alpha": 1.0,
+      "roughness": 0.85,
+      "glow": false
+    },
+    {
+      "name": "Toy_roofd",
+      "image_texture_nodes": [],
+      "alpha": 1.0,
+      "roughness": 0.85,
+      "glow": false
+    },
+    {
+      "name": "Toy_slate",
+      "image_texture_nodes": [],
+      "alpha": 1.0,
+      "roughness": 0.85,
+      "glow": false
+    },
+    {
+      "name": "Toy_steel",
+      "image_texture_nodes": [],
+      "alpha": 1.0,
+      "roughness": 0.85,
+      "glow": false
+    },
+    {
+      "name": "Toy_stone",
+      "image_texture_nodes": [],
+      "alpha": 1.0,
+      "roughness": 0.85,
+      "glow": false
+    },
+    {
+      "name": "Toy_trim",
+      "image_texture_nodes": [],
+      "alpha": 1.0,
+      "roughness": 0.85,
+      "glow": false
+    },
+    {
+      "name": "Toy_trim_Glow",
+      "image_texture_nodes": [],
+      "alpha": 1.0,
+      "roughness": 0.85,
+      "glow": true
+    }
+  ],
+  "image_texture_count": 0,
+  "textured_materials": [],
+  "transparent_materials": [],
+  "camera_count": 0,
+  "light_count": 0,
+  "animation_fcurve_count": 0,
+  "armature_count": 0,
+  "constraint_count": 0,
+  "transforms_applied": true,
+  "negative_scales": false,
+  "degenerate_triangle_count": 0,
+  "invalid_or_nonunit_loop_normal_count": 0,
+  "inverted_signed_volume_objects": [],
+  "normal_ray_cast_first_hits": 31500,
+  "normal_ray_cast_flipped_visible_faces": 0,
+  "normal_ray_cast_residual": 0.0,
+  "normal_ray_cast_residual_gate": 0.0015,
+  "normal_orientation_status": "PASS",
+  "normal_orientation_method": "All source meshes run bmesh.ops.recalc_face_normals before export. Per-object signed volume is authoritative for this union of closed solids and must be positive for every object; 31,500 deterministic visibility rays from nine interior targets must leave a residual of at most 0.15%, which is the share of first hits that legitimately land on a face buried inside a neighbouring solid.",
+  "unexpected_geometry_or_objects": [],
+  "material_contract_violations": [],
+  "glow_materials": [
+    "Toy_glassl_Glow",
+    "Toy_trim_Glow"
+  ],
+  "anchor_lonlat": [
+    -122.3925543,
+    37.7818313
+  ],
+  "long_axis_heading_deg_true": 135.5,
+  "front_normal_heading_deg_true": 45.2,
+  "object_details": [
+    {
+      "name": "belt",
+      "triangles": 504,
+      "signed_volume_m3": 77.93544,
+      "location": [
+        0.0,
+        0.0,
+        0.0
+      ],
+      "rotation_euler": [
+        0.0,
+        0.0,
+        0.0
+      ],
+      "scale": [
+        1.0,
+        1.0,
+        1.0
+      ]
+    },
+    {
+      "name": "belt_cap",
+      "triangles": 504,
+      "signed_volume_m3": 18.05016,
+      "location": [
+        0.0,
+        0.0,
+        0.0
+      ],
+      "rotation_euler": [
+        0.0,
+        0.0,
+        0.0
+      ],
+      "scale": [
+        1.0,
+        1.0,
+        1.0
+      ]
+    },
+    {
+      "name": "body",
+      "triangles": 192,
+      "signed_volume_m3": 23682.2526,
+      "location": [
+        0.0,
+        0.0,
+        0.0
+      ],
+      "rotation_euler": [
+        0.0,
+        0.0,
+        0.0
+      ],
+      "scale": [
+        1.0,
+        1.0,
+        1.0
+      ]
+    },
+    {
+      "name": "bran_bay0",
+      "triangles": 28,
+      "signed_volume_m3": 5.26667,
+      "location": [
+        0.0,
+        0.0,
+        0.0
+      ],
+      "rotation_euler": [
+        0.0,
+        0.0,
+        0.0
+      ],
+      "scale": [
+        1.0,
+        1.0,
+        1.0
+      ]
+    },
+    {
+      "name": "bran_bay1",
+      "triangles": 28,
+      "signed_volume_m3": 5.26656,
+      "location": [
+        0.0,
+        0.0,
+        0.0
+      ],
+      "rotation_euler": [
+        0.0,
+        0.0,
+        0.0
+      ],
+      "scale": [
+        1.0,
+        1.0,
+        1.0
+      ]
+    },
+    {
+      "name": "bran_bay2",
+      "triangles": 28,
+      "signed_volume_m3": 5.26656,
+      "location": [
+        0.0,
+        0.0,
+        0.0
+      ],
+      "rotation_euler": [
+        0.0,
+        0.0,
+        0.0
+      ],
+      "scale": [
+        1.0,
+        1.0,
+        1.0
+      ]
+    },
+    {
+      "name": "bran_bay3",
+      "triangles": 28,
+      "signed_volume_m3": 5.26662,
+      "location": [
+        0.0,
+        0.0,
+        0.0
+      ],
+      "rotation_euler": [
+        0.0,
+        0.0,
+        0.0
+      ],
+      "scale": [
+        1.0,
+        1.0,
+        1.0
+      ]
+    },
+    {
+      "name": "bran_bay4",
+      "triangles": 28,
+      "signed_volume_m3": 5.26668,
+      "location": [
+        0.0,
+        0.0,
+        0.0
+      ],
+      "rotation_euler": [
+        0.0,
+        0.0,
+        0.0
+      ],
+      "scale": [
+        1.0,
+        1.0,
+        1.0
+      ]
+    },
+    {
+      "name": "bran_bay5",
+      "triangles": 28,
+      "signed_volume_m3": 5.26667,
+      "location": [
+        0.0,
+        0.0,
+        0.0
+      ],
+      "rotation_euler": [
+        0.0,
+        0.0,
+        0.0
+      ],
+      "scale": [
+        1.0,
+        1.0,
+        1.0
+      ]
+    },
+    {
+      "name": "bran_cap0",
+      "triangles": 108,
+      "signed_volume_m3": 0.25928,
+      "location": [
+        0.0,
+        0.0,
+        0.0
+      ],
+      "rotation_euler": [
+        0.0,
+        0.0,
+        0.0
+      ],
+      "scale": [
+        1.0,
+        1.0,
+        1.0
+      ]
+    },
+    {
+      "name": "bran_cap1",
+      "triangles": 108,
+      "signed_volume_m3": 0.25944,
+      "location": [
+        0.0,
+        0.0,
+        0.0
+      ],
+      "rotation_euler": [
+        0.0,
+        0.0,
+        0.0
+      ],
+      "scale": [
+        1.0,
+        1.0,
+        1.0
+      ]
+    },
+    {
+      "name": "bran_cap2",
+      "triangles": 108,
+      "signed_volume_m3": 0.25904,
+      "location": [
+        0.0,
+        0.0,
+        0.0
+      ],
+      "rotation_euler": [
+        0.0,
+        0.0,
+        0.0
+      ],
+      "scale": [
+        1.0,
+        1.0,
+        1.0
+      ]
+    },
+    {
+      "name": "bran_cap3",
+      "triangles": 108,
+      "signed_volume_m3": 0.25925,
+      "location": [
+        0.0,
+        0.0,
+        0.0
+      ],
+      "rotation_euler": [
+        0.0,
+        0.0,
+        0.0
+      ],
+      "scale": [
+        1.0,
+        1.0,
+        1.0
+      ]
+    },
+    {
+      "name": "bran_cap4",
+      "triangles": 108,
+      "signed_volume_m3": 0.25921,
+      "location": [
+        0.0,
+        0.0,
+        0.0
+      ],
+      "rotation_euler": [
+        0.0,
+        0.0,
+        0.0
+      ],
+      "scale": [
+        1.0,
+        1.0,
+        1.0
+      ]
+    },
+    {
+      "name": "bran_cap5",
+      "triangles": 108,
+      "signed_volume_m3": 0.25932,
+      "location": [
+        0.0,
+        0.0,
+        0.0
+      ],
+      "rotation_euler": [
+        0.0,
+        0.0,
+        0.0
+      ],
+      "scale": [
+        1.0,
+        1.0,
+        1.0
+      ]
+    },
+    {
+      "name": "bran_cap6",
+      "triangles": 108,
+      "signed_volume_m3": 0.25922,
+      "location": [
+        0.0,
+        0.0,
+        0.0
+      ],
+      "rotation_euler": [
+        0.0,
+        0.0,
+        0.0
+      ],
+      "scale": [
+        1.0,
+        1.0,
+        1.0
+      ]
+    },
+    {
+      "name": "bran_g0_0",
+      "triangles": 12,
+      "signed_volume_m3": 0.55312,
+      "location": [
+        0.0,
+        0.0,
+        0.0
+      ],
+      "rotation_euler": [
+        0.0,
+        0.0,
+        0.0
+      ],
+      "scale": [
+        1.0,
+        1.0,
+        1.0
+      ]
+    },
+    {
+      "name": "bran_g0_1",
+      "triangles": 12,
+      "signed_volume_m3": 0.55314,
+      "location": [
+        0.0,
+        0.0,
+        0.0
+      ],
+      "rotation_euler": [
+        0.0,
+        0.0,
+        0.0
+      ],
+      "scale": [
+        1.0,
+        1.0,
+        1.0
+      ]
+    },
+    {
+      "name": "bran_g0_2",
+      "triangles": 12,
+      "signed_volume_m3": 0.55314,
+      "location": [
+        0.0,
+        0.0,
+        0.0
+      ],
+      "rotation_euler": [
+        0.0,
+        0.0,
+        0.0
+      ],
+      "scale": [
+        1.0,
+        1.0,
+        1.0
+      ]
+    },
+    {
+      "name": "bran_g0_3",
+      "triangles": 12,
+      "signed_volume_m3": 0.55312,
+      "location": [
+        0.0,
+        0.0,
+        0.0
+      ],
+      "rotation_euler": [
+        0.0,
+        0.0,
+        0.0
+      ],
+      "scale": [
+        1.0,
+        1.0,
+        1.0
+      ]
+    },
+    {
+      "name": "bran_g0_4",
+      "triangles": 12,
+      "signed_volume_m3": 0.55311,
+      "location": [
+        0.0,
+        0.0,
+        0.0
+      ],
+      "rotation_euler": [
+        0.0,
+        0.0,
+        0.0
+      ],
+      "scale": [
+        1.0,
+        1.0,
+        1.0
+      ]
+    },
+    {
+      "name": "bran_g0_5",
+      "triangles": 12,
+      "signed_volume_m3": 0.5531,
+      "location": [
+        0.0,
+        0.0,
+        0.0
+      ],
+      "rotation_euler": [
+        0.0,
+        0.0,
+        0.0
+      ],
+      "scale": [
+        1.0,
+        1.0,
+        1.0
+      ]
+    },
+    {
+      "name": "bran_g1_0",
+      "triangles": 12,
+      "signed_volume_m3": 0.55311,
+      "location": [
+        0.0,
+        0.0,
+        0.0
+      ],
+      "rotation_euler": [
+        0.0,
+        0.0,
+        0.0
+      ],
+      "scale": [
+        1.0,
+        1.0,
+        1.0
+      ]
+    },
+    {
+      "name": "bran_g1_1",
+      "triangles": 12,
+      "signed_volume_m3": 0.55316,
+      "location": [
+        0.0,
+        0.0,
+        0.0
+      ],
+      "rotation_euler": [
+        0.0,
+        0.0,
+        0.0
+      ],
+      "scale": [
+        1.0,
+        1.0,
+        1.0
+      ]
+    },
+    {
+      "name": "bran_g1_2",
+      "triangles": 12,
+      "signed_volume_m3": 0.55311,
+      "location": [
+        0.0,
+        0.0,
+        0.0
+      ],
+      "rotation_euler": [
+        0.0,
+        0.0,
+        0.0
+      ],
+      "scale": [
+        1.0,
+        1.0,
+        1.0
+      ]
+    },
+    {
+      "name": "bran_g1_3",
+      "triangles": 12,
+      "signed_volume_m3": 0.55309,
+      "location": [
+        0.0,
+        0.0,
+        0.0
+      ],
+      "rotation_euler": [
+        0.0,
+        0.0,
+        0.0
+      ],
+      "scale": [
+        1.0,
+        1.0,
+        1.0
+      ]
+    },
+    {
+      "name": "bran_g1_4",
+      "triangles": 12,
+      "signed_volume_m3": 0.5531,
+      "location": [
+        0.0,
+        0.0,
+        0.0
+      ],
+      "rotation_euler": [
+        0.0,
+        0.0,
+        0.0
+      ],
+      "scale": [
+        1.0,
+        1.0,
+        1.0
+      ]
+    },
+    {
+      "name": "bran_g1_5",
+      "triangles": 12,
+      "signed_volume_m3": 0.55312,
+      "location": [
+        0.0,
+        0.0,
+        0.0
+      ],
+      "rotation_euler": [
+        0.0,
+        0.0,
+        0.0
+      ],
+      "scale": [
+        1.0,
+        1.0,
+        1.0
+      ]
+    },
+    {
+      "name": "bran_g2_0",
+      "triangles": 12,
+      "signed_volume_m3": 0.55309,
+      "location": [
+        0.0,
+        0.0,
+        0.0
+      ],
+      "rotation_euler": [
+        0.0,
+        0.0,
+        0.0
+      ],
+      "scale": [
+        1.0,
+        1.0,
+        1.0
+      ]
+    },
+    {
+      "name": "bran_g2_1",
+      "triangles": 12,
+      "signed_volume_m3": 0.55317,
+      "location": [
+        0.0,
+        0.0,
+        0.0
+      ],
+      "rotation_euler": [
+        0.0,
+        0.0,
+        0.0
+      ],
+      "scale": [
+        1.0,
+        1.0,
+        1.0
+      ]
+    },
+    {
+      "name": "bran_g2_2",
+      "triangles": 12,
+      "signed_volume_m3": 0.55314,
+      "location": [
+        0.0,
+        0.0,
+        0.0
+      ],
+      "rotation_euler": [
+        0.0,
+        0.0,
+        0.0
+      ],
+      "scale": [
+        1.0,
+        1.0,
+        1.0
+      ]
+    },
+    {
+      "name": "bran_g2_3",
+      "triangles": 12,
+      "signed_volume_m3": 0.55305,
+      "location": [
+        0.0,
+        0.0,
+        0.0
+      ],
+      "rotation_euler": [
+        0.0,
+        0.0,
+        0.0
+      ],
+      "scale": [
+        1.0,
+        1.0,
+        1.0
+      ]
+    },
+    {
+      "name": "bran_g2_4",
+      "triangles": 12,
+      "signed_volume_m3": 0.5531,
+      "location": [
+        0.0,
+        0.0,
+        0.0
+      ],
+      "rotation_euler": [
+        0.0,
+        0.0,
+        0.0
+      ],
+      "scale": [
+        1.0,
+        1.0,
+        1.0
+      ]
+    },
+    {
+      "name": "bran_g2_5",
+      "triangles": 12,
+      "signed_volume_m3": 0.55313,
+      "location": [
+        0.0,
+        0.0,
+        0.0
+      ],
+      "rotation_euler": [
+        0.0,
+        0.0,
+        0.0
+      ],
+      "scale": [
+        1.0,
+        1.0,
+        1.0
+      ]
+    },
+    {
+      "name": "bran_g3_0",
+      "triangles": 12,
+      "signed_volume_m3": 0.55315,
+      "location": [
+        0.0,
+        0.0,
+        0.0
+      ],
+      "rotation_euler": [
+        0.0,
+        0.0,
+        0.0
+      ],
+      "scale": [
+        1.0,
+        1.0,
+        1.0
+      ]
+    },
+    {
+      "name": "bran_g3_1",
+      "triangles": 12,
+      "signed_volume_m3": 0.55313,
+      "location": [
+        0.0,
+        0.0,
+        0.0
+      ],
+      "rotation_euler": [
+        0.0,
+        0.0,
+        0.0
+      ],
+      "scale": [
+        1.0,
+        1.0,
+        1.0
+      ]
+    },
+    {
+      "name": "bran_g3_2",
+      "triangles": 12,
+      "signed_volume_m3": 0.55304,
+      "location": [
+        0.0,
+        0.0,
+        0.0
+      ],
+      "rotation_euler": [
+        0.0,
+        0.0,
+        0.0
+      ],
+      "scale": [
+        1.0,
+        1.0,
+        1.0
+      ]
+    },
+    {
+      "name": "bran_g3_3",
+      "triangles": 12,
+      "signed_volume_m3": 0.55303,
+      "location": [
+        0.0,
+        0.0,
+        0.0
+      ],
+      "rotation_euler": [
+        0.0,
+        0.0,
+        0.0
+      ],
+      "scale": [
+        1.0,
+        1.0,
+        1.0
+      ]
+    },
+    {
+      "name": "bran_g3_4",
+      "triangles": 12,
+      "signed_volume_m3": 0.55301,
+      "location": [
+        0.0,
+        0.0,
+        0.0
+      ],
+      "rotation_euler": [
+        0.0,
+        0.0,
+        0.0
+      ],
+      "scale": [
+        1.0,
+        1.0,
+        1.0
+      ]
+    },
+    {
+      "name": "bran_g3_5",
+      "triangles": 12,
+      "signed_volume_m3": 0.55319,
+      "location": [
+        0.0,
+        0.0,
+        0.0
+      ],
+      "rotation_euler": [
+        0.0,
+        0.0,
+        0.0
+      ],
+      "scale": [
+        1.0,
+        1.0,
+        1.0
+      ]
+    },
+    {
+      "name": "bran_g4_0",
+      "triangles": 12,
+      "signed_volume_m3": 0.55304,
+      "location": [
+        0.0,
+        0.0,
+        0.0
+      ],
+      "rotation_euler": [
+        0.0,
+        0.0,
+        0.0
+      ],
+      "scale": [
+        1.0,
+        1.0,
+        1.0
+      ]
+    },
+    {
+      "name": "bran_g4_1",
+      "triangles": 12,
+      "signed_volume_m3": 0.55325,
+      "location": [
+        0.0,
+        0.0,
+        0.0
+      ],
+      "rotation_euler": [
+        0.0,
+        0.0,
+        0.0
+      ],
+      "scale": [
+        1.0,
+        1.0,
+        1.0
+      ]
+    },
+    {
+      "name": "bran_g4_2",
+      "triangles": 12,
+      "signed_volume_m3": 0.55312,
+      "location": [
+        0.0,
+        0.0,
+        0.0
+      ],
+      "rotation_euler": [
+        0.0,
+        0.0,
+        0.0
+      ],
+      "scale": [
+        1.0,
+        1.0,
+        1.0
+      ]
+    },
+    {
+      "name": "bran_g4_3",
+      "triangles": 12,
+      "signed_volume_m3": 0.55306,
+      "location": [
+        0.0,
+        0.0,
+        0.0
+      ],
+      "rotation_euler": [
+        0.0,
+        0.0,
+        0.0
+      ],
+      "scale": [
+        1.0,
+        1.0,
+        1.0
+      ]
+    },
+    {
+      "name": "bran_g4_4",
+      "triangles": 12,
+      "signed_volume_m3": 0.55308,
+      "location": [
+        0.0,
+        0.0,
+        0.0
+      ],
+      "rotation_euler": [
+        0.0,
+        0.0,
+        0.0
+      ],
+      "scale": [
+        1.0,
+        1.0,
+        1.0
+      ]
+    },
+    {
+      "name": "bran_g4_5",
+      "triangles": 12,
+      "signed_volume_m3": 0.55313,
+      "location": [
+        0.0,
+        0.0,
+        0.0
+      ],
+      "rotation_euler": [
+        0.0,
+        0.0,
+        0.0
+      ],
+      "scale": [
+        1.0,
+        1.0,
+        1.0
+      ]
+    },
+    {
+      "name": "bran_lit0_2",
+      "triangles": 12,
+      "signed_volume_m3": 0.14781,
+      "location": [
+        0.0,
+        0.0,
+        0.0
+      ],
+      "rotation_euler": [
+        0.0,
+        0.0,
+        0.0
+      ],
+      "scale": [
+        1.0,
+        1.0,
+        1.0
+      ]
+    },
+    {
+      "name": "bran_lit1_4",
+      "triangles": 12,
+      "signed_volume_m3": 0.14786,
+      "location": [
+        0.0,
+        0.0,
+        0.0
+      ],
+      "rotation_euler": [
+        0.0,
+        0.0,
+        0.0
+      ],
+      "scale": [
+        1.0,
+        1.0,
+        1.0
+      ]
+    },
+    {
+      "name": "bran_lit2_0",
+      "triangles": 12,
+      "signed_volume_m3": 0.14776,
+      "location": [
+        0.0,
+        0.0,
+        0.0
+      ],
+      "rotation_euler": [
+        0.0,
+        0.0,
+        0.0
+      ],
+      "scale": [
+        1.0,
+        1.0,
+        1.0
+      ]
+    },
+    {
+      "name": "bran_lit3_5",
+      "triangles": 12,
+      "signed_volume_m3": 0.14782,
+      "location": [
+        0.0,
+        0.0,
+        0.0
+      ],
+      "rotation_euler": [
+        0.0,
+        0.0,
+        0.0
+      ],
+      "scale": [
+        1.0,
+        1.0,
+        1.0
+      ]
+    },
+    {
+      "name": "bran_lit4_1",
+      "triangles": 12,
+      "signed_volume_m3": 0.14795,
+      "location": [
+        0.0,
+        0.0,
+        0.0
+      ],
+      "rotation_euler": [
+        0.0,
+        0.0,
+        0.0
+      ],
+      "scale": [
+        1.0,
+        1.0,
+        1.0
+      ]
+    },
+    {
+      "name": "bran_lit4_4",
+      "triangles": 12,
+      "signed_volume_m3": 0.14786,
+      "location": [
+        0.0,
+        0.0,
+        0.0
+      ],
+      "rotation_euler": [
+        0.0,
+        0.0,
+        0.0
+      ],
+      "scale": [
+        1.0,
+        1.0,
+        1.0
+      ]
+    },
+    {
+      "name": "bran_pil0",
+      "triangles": 108,
+      "signed_volume_m3": 4.81635,
+      "location": [
+        0.0,
+        0.0,
+        0.0
+      ],
+      "rotation_euler": [
+        0.0,
+        0.0,
+        0.0
+      ],
+      "scale": [
+        1.0,
+        1.0,
+        1.0
+      ]
+    },
+    {
+      "name": "bran_pil1",
+      "triangles": 108,
+      "signed_volume_m3": 4.81633,
+      "location": [
+        0.0,
+        0.0,
+        0.0
+      ],
+      "rotation_euler": [
+        0.0,
+        0.0,
+        0.0
+      ],
+      "scale": [
+        1.0,
+        1.0,
+        1.0
+      ]
+    },
+    {
+      "name": "bran_pil2",
+      "triangles": 108,
+      "signed_volume_m3": 4.81658,
+      "location": [
+        0.0,
+        0.0,
+        0.0
+      ],
+      "rotation_euler": [
+        0.0,
+        0.0,
+        0.0
+      ],
+      "scale": [
+        1.0,
+        1.0,
+        1.0
+      ]
+    },
+    {
+      "name": "bran_pil3",
+      "triangles": 108,
+      "signed_volume_m3": 4.81654,
+      "location": [
+        0.0,
+        0.0,
+        0.0
+      ],
+      "rotation_euler": [
+        0.0,
+        0.0,
+        0.0
+      ],
+      "scale": [
+        1.0,
+        1.0,
+        1.0
+      ]
+    },
+    {
+      "name": "bran_pil4",
+      "triangles": 108,
+      "signed_volume_m3": 4.81657,
+      "location": [
+        0.0,
+        0.0,
+        0.0
+      ],
+      "rotation_euler": [
+        0.0,
+        0.0,
+        0.0
+      ],
+      "scale": [
+        1.0,
+        1.0,
+        1.0
+      ]
+    },
+    {
+      "name": "bran_pil5",
+      "triangles": 108,
+      "signed_volume_m3": 4.81633,
+      "location": [
+        0.0,
+        0.0,
+        0.0
+      ],
+      "rotation_euler": [
+        0.0,
+        0.0,
+        0.0
+      ],
+      "scale": [
+        1.0,
+        1.0,
+        1.0
+      ]
+    },
+    {
+      "name": "bran_pil6",
+      "triangles": 108,
+      "signed_volume_m3": 4.81622,
+      "location": [
+        0.0,
+        0.0,
+        0.0
+      ],
+      "rotation_euler": [
+        0.0,
+        0.0,
+        0.0
+      ],
+      "scale": [
+        1.0,
+        1.0,
+        1.0
+      ]
+    },
+    {
+      "name": "bran_sill0_0",
+      "triangles": 12,
+      "signed_volume_m3": 0.07471,
+      "location": [
+        0.0,
+        0.0,
+        0.0
+      ],
+      "rotation_euler": [
+        0.0,
+        0.0,
+        0.0
+      ],
+      "scale": [
+        1.0,
+        1.0,
+        1.0
+      ]
+    },
+    {
+      "name": "bran_sill0_1",
+      "triangles": 12,
+      "signed_volume_m3": 0.07472,
+      "location": [
+        0.0,
+        0.0,
+        0.0
+      ],
+      "rotation_euler": [
+        0.0,
+        0.0,
+        0.0
+      ],
+      "scale": [
+        1.0,
+        1.0,
+        1.0
+      ]
+    },
+    {
+      "name": "bran_sill0_2",
+      "triangles": 12,
+      "signed_volume_m3": 0.07472,
+      "location": [
+        0.0,
+        0.0,
+        0.0
+      ],
+      "rotation_euler": [
+        0.0,
+        0.0,
+        0.0
+      ],
+      "scale": [
+        1.0,
+        1.0,
+        1.0
+      ]
+    },
+    {
+      "name": "bran_sill0_3",
+      "triangles": 12,
+      "signed_volume_m3": 0.07472,
+      "location": [
+        0.0,
+        0.0,
+        0.0
+      ],
+      "rotation_euler": [
+        0.0,
+        0.0,
+        0.0
+      ],
+      "scale": [
+        1.0,
+        1.0,
+        1.0
+      ]
+    },
+    {
+      "name": "bran_sill0_4",
+      "triangles": 12,
+      "signed_volume_m3": 0.07469,
+      "location": [
+        0.0,
+        0.0,
+        0.0
+      ],
+      "rotation_euler": [
+        0.0,
+        0.0,
+        0.0
+      ],
+      "scale": [
+        1.0,
+        1.0,
+        1.0
+      ]
+    },
+    {
+      "name": "bran_sill0_5",
+      "triangles": 12,
+      "signed_volume_m3": 0.0747,
+      "location": [
+        0.0,
+        0.0,
+        0.0
+      ],
+      "rotation_euler": [
+        0.0,
+        0.0,
+        0.0
+      ],
+      "scale": [
+        1.0,
+        1.0,
+        1.0
+      ]
+    },
+    {
+      "name": "bran_sill1_0",
+      "triangles": 12,
+      "signed_volume_m3": 0.0747,
+      "location": [
+        0.0,
+        0.0,
+        0.0
+      ],
+      "rotation_euler": [
+        0.0,
+        0.0,
+        0.0
+      ],
+      "scale": [
+        1.0,
+        1.0,
+        1.0
+      ]
+    },
+    {
+      "name": "bran_sill1_1",
+      "triangles": 12,
+      "signed_volume_m3": 0.07468,
+      "location": [
+        0.0,
+        0.0,
+        0.0
+      ],
+      "rotation_euler": [
+        0.0,
+        0.0,
+        0.0
+      ],
+      "scale": [
+        1.0,
+        1.0,
+        1.0
+      ]
+    },
+    {
+      "name": "bran_sill1_2",
+      "triangles": 12,
+      "signed_volume_m3": 0.07469,
+      "location": [
+        0.0,
+        0.0,
+        0.0
+      ],
+      "rotation_euler": [
+        0.0,
+        0.0,
+        0.0
+      ],
+      "scale": [
+        1.0,
+        1.0,
+        1.0
+      ]
+    },
+    {
+      "name": "bran_sill1_3",
+      "triangles": 12,
+      "signed_volume_m3": 0.07472,
+      "location": [
+        0.0,
+        0.0,
+        0.0
+      ],
+      "rotation_euler": [
+        0.0,
+        0.0,
+        0.0
+      ],
+      "scale": [
+        1.0,
+        1.0,
+        1.0
+      ]
+    },
+    {
+      "name": "bran_sill1_4",
+      "triangles": 12,
+      "signed_volume_m3": 0.0747,
+      "location": [
+        0.0,
+        0.0,
+        0.0
+      ],
+      "rotation_euler": [
+        0.0,
+        0.0,
+        0.0
+      ],
+      "scale": [
+        1.0,
+        1.0,
+        1.0
+      ]
+    },
+    {
+      "name": "bran_sill1_5",
+      "triangles": 12,
+      "signed_volume_m3": 0.07471,
+      "location": [
+        0.0,
+        0.0,
+        0.0
+      ],
+      "rotation_euler": [
+        0.0,
+        0.0,
+        0.0
+      ],
+      "scale": [
+        1.0,
+        1.0,
+        1.0
+      ]
+    },
+    {
+      "name": "bran_sill2_0",
+      "triangles": 12,
+      "signed_volume_m3": 0.07468,
+      "location": [
+        0.0,
+        0.0,
+        0.0
+      ],
+      "rotation_euler": [
+        0.0,
+        0.0,
+        0.0
+      ],
+      "scale": [
+        1.0,
+        1.0,
+        1.0
+      ]
+    },
+    {
+      "name": "bran_sill2_1",
+      "triangles": 12,
+      "signed_volume_m3": 0.07472,
+      "location": [
+        0.0,
+        0.0,
+        0.0
+      ],
+      "rotation_euler": [
+        0.0,
+        0.0,
+        0.0
+      ],
+      "scale": [
+        1.0,
+        1.0,
+        1.0
+      ]
+    },
+    {
+      "name": "bran_sill2_2",
+      "triangles": 12,
+      "signed_volume_m3": 0.07469,
+      "location": [
+        0.0,
+        0.0,
+        0.0
+      ],
+      "rotation_euler": [
+        0.0,
+        0.0,
+        0.0
+      ],
+      "scale": [
+        1.0,
+        1.0,
+        1.0
+      ]
+    },
+    {
+      "name": "bran_sill2_3",
+      "triangles": 12,
+      "signed_volume_m3": 0.07463,
+      "location": [
+        0.0,
+        0.0,
+        0.0
+      ],
+      "rotation_euler": [
+        0.0,
+        0.0,
+        0.0
+      ],
+      "scale": [
+        1.0,
+        1.0,
+        1.0
+      ]
+    },
+    {
+      "name": "bran_sill2_4",
+      "triangles": 12,
+      "signed_volume_m3": 0.07468,
+      "location": [
+        0.0,
+        0.0,
+        0.0
+      ],
+      "rotation_euler": [
+        0.0,
+        0.0,
+        0.0
+      ],
+      "scale": [
+        1.0,
+        1.0,
+        1.0
+      ]
+    },
+    {
+      "name": "bran_sill2_5",
+      "triangles": 12,
+      "signed_volume_m3": 0.07475,
+      "location": [
+        0.0,
+        0.0,
+        0.0
+      ],
+      "rotation_euler": [
+        0.0,
+        0.0,
+        0.0
+      ],
+      "scale": [
+        1.0,
+        1.0,
+        1.0
+      ]
+    },
+    {
+      "name": "bran_sill3_0",
+      "triangles": 12,
+      "signed_volume_m3": 0.07473,
+      "location": [
+        0.0,
+        0.0,
+        0.0
+      ],
+      "rotation_euler": [
+        0.0,
+        0.0,
+        0.0
+      ],
+      "scale": [
+        1.0,
+        1.0,
+        1.0
+      ]
+    },
+    {
+      "name": "bran_sill3_1",
+      "triangles": 12,
+      "signed_volume_m3": 0.07471,
+      "location": [
+        0.0,
+        0.0,
+        0.0
+      ],
+      "rotation_euler": [
+        0.0,
+        0.0,
+        0.0
+      ],
+      "scale": [
+        1.0,
+        1.0,
+        1.0
+      ]
+    },
+    {
+      "name": "bran_sill3_2",
+      "triangles": 12,
+      "signed_volume_m3": 0.07472,
+      "location": [
+        0.0,
+        0.0,
+        0.0
+      ],
+      "rotation_euler": [
+        0.0,
+        0.0,
+        0.0
+      ],
+      "scale": [
+        1.0,
+        1.0,
+        1.0
+      ]
+    },
+    {
+      "name": "bran_sill3_3",
+      "triangles": 12,
+      "signed_volume_m3": 0.07473,
+      "location": [
+        0.0,
+        0.0,
+        0.0
+      ],
+      "rotation_euler": [
+        0.0,
+        0.0,
+        0.0
+      ],
+      "scale": [
+        1.0,
+        1.0,
+        1.0
+      ]
+    },
+    {
+      "name": "bran_sill3_4",
+      "triangles": 12,
+      "signed_volume_m3": 0.07468,
+      "location": [
+        0.0,
+        0.0,
+        0.0
+      ],
+      "rotation_euler": [
+        0.0,
+        0.0,
+        0.0
+      ],
+      "scale": [
+        1.0,
+        1.0,
+        1.0
+      ]
+    },
+    {
+      "name": "bran_sill3_5",
+      "triangles": 12,
+      "signed_volume_m3": 0.07475,
+      "location": [
+        0.0,
+        0.0,
+        0.0
+      ],
+      "rotation_euler": [
+        0.0,
+        0.0,
+        0.0
+      ],
+      "scale": [
+        1.0,
+        1.0,
+        1.0
+      ]
+    },
+    {
+      "name": "bran_sill4_0",
+      "triangles": 12,
+      "signed_volume_m3": 0.07473,
+      "location": [
+        0.0,
+        0.0,
+        0.0
+      ],
+      "rotation_euler": [
+        0.0,
+        0.0,
+        0.0
+      ],
+      "scale": [
+        1.0,
+        1.0,
+        1.0
+      ]
+    },
+    {
+      "name": "bran_sill4_1",
+      "triangles": 12,
+      "signed_volume_m3": 0.07488,
+      "location": [
+        0.0,
+        0.0,
+        0.0
+      ],
+      "rotation_euler": [
+        0.0,
+        0.0,
+        0.0
+      ],
+      "scale": [
+        1.0,
+        1.0,
+        1.0
+      ]
+    },
+    {
+      "name": "bran_sill4_2",
+      "triangles": 12,
+      "signed_volume_m3": 0.07479,
+      "location": [
+        0.0,
+        0.0,
+        0.0
+      ],
+      "rotation_euler": [
+        0.0,
+        0.0,
+        0.0
+      ],
+      "scale": [
+        1.0,
+        1.0,
+        1.0
+      ]
+    },
+    {
+      "name": "bran_sill4_3",
+      "triangles": 12,
+      "signed_volume_m3": 0.07478,
+      "location": [
+        0.0,
+        0.0,
+        0.0
+      ],
+      "rotation_euler": [
+        0.0,
+        0.0,
+        0.0
+      ],
+      "scale": [
+        1.0,
+        1.0,
+        1.0
+      ]
+    },
+    {
+      "name": "bran_sill4_4",
+      "triangles": 12,
+      "signed_volume_m3": 0.07467,
+      "location": [
+        0.0,
+        0.0,
+        0.0
+      ],
+      "rotation_euler": [
+        0.0,
+        0.0,
+        0.0
+      ],
+      "scale": [
+        1.0,
+        1.0,
+        1.0
+      ]
+    },
+    {
+      "name": "bran_sill4_5",
+      "triangles": 12,
+      "signed_volume_m3": 0.07476,
+      "location": [
+        0.0,
+        0.0,
+        0.0
+      ],
+      "rotation_euler": [
+        0.0,
+        0.0,
+        0.0
+      ],
+      "scale": [
+        1.0,
+        1.0,
+        1.0
+      ]
+    },
+    {
+      "name": "bulk",
+      "triangles": 108,
+      "signed_volume_m3": 51.00887,
+      "location": [
+        0.0,
+        0.0,
+        0.0
+      ],
+      "rotation_euler": [
+        0.0,
+        0.0,
+        0.0
+      ],
+      "scale": [
+        1.0,
+        1.0,
+        1.0
+      ]
+    },
+    {
+      "name": "bulk_cap",
+      "triangles": 108,
+      "signed_volume_m3": 4.97295,
+      "location": [
+        0.0,
+        0.0,
+        0.0
+      ],
+      "rotation_euler": [
+        0.0,
+        0.0,
+        0.0
+      ],
+      "scale": [
+        1.0,
+        1.0,
+        1.0
+      ]
+    },
+    {
+      "name": "cant_bay0",
+      "triangles": 28,
+      "signed_volume_m3": 4.7101,
+      "location": [
+        0.0,
+        0.0,
+        0.0
+      ],
+      "rotation_euler": [
+        0.0,
+        0.0,
+        0.0
+      ],
+      "scale": [
+        1.0,
+        1.0,
+        1.0
+      ]
+    },
+    {
+      "name": "cant_cap0",
+      "triangles": 108,
+      "signed_volume_m3": 0.25927,
+      "location": [
+        0.0,
+        0.0,
+        0.0
+      ],
+      "rotation_euler": [
+        0.0,
+        0.0,
+        0.0
+      ],
+      "scale": [
+        1.0,
+        1.0,
+        1.0
+      ]
+    },
+    {
+      "name": "cant_cap1",
+      "triangles": 108,
+      "signed_volume_m3": 0.25906,
+      "location": [
+        0.0,
+        0.0,
+        0.0
+      ],
+      "rotation_euler": [
+        0.0,
+        0.0,
+        0.0
+      ],
+      "scale": [
+        1.0,
+        1.0,
+        1.0
+      ]
+    },
+    {
+      "name": "cant_g0_0",
+      "triangles": 12,
+      "signed_volume_m3": 0.48362,
+      "location": [
+        0.0,
+        0.0,
+        0.0
+      ],
+      "rotation_euler": [
+        0.0,
+        0.0,
+        0.0
+      ],
+      "scale": [
+        1.0,
+        1.0,
+        1.0
+      ]
+    },
+    {
+      "name": "cant_g1_0",
+      "triangles": 12,
+      "signed_volume_m3": 0.48361,
+      "location": [
+        0.0,
+        0.0,
+        0.0
+      ],
+      "rotation_euler": [
+        0.0,
+        0.0,
+        0.0
+      ],
+      "scale": [
+        1.0,
+        1.0,
+        1.0
+      ]
+    },
+    {
+      "name": "cant_g2_0",
+      "triangles": 12,
+      "signed_volume_m3": 0.48359,
+      "location": [
+        0.0,
+        0.0,
+        0.0
+      ],
+      "rotation_euler": [
+        0.0,
+        0.0,
+        0.0
+      ],
+      "scale": [
+        1.0,
+        1.0,
+        1.0
+      ]
+    },
+    {
+      "name": "cant_g3_0",
+      "triangles": 12,
+      "signed_volume_m3": 0.48364,
+      "location": [
+        0.0,
+        0.0,
+        0.0
+      ],
+      "rotation_euler": [
+        0.0,
+        0.0,
+        0.0
+      ],
+      "scale": [
+        1.0,
+        1.0,
+        1.0
+      ]
+    },
+    {
+      "name": "cant_g4_0",
+      "triangles": 12,
+      "signed_volume_m3": 0.48359,
+      "location": [
+        0.0,
+        0.0,
+        0.0
+      ],
+      "rotation_euler": [
+        0.0,
+        0.0,
+        0.0
+      ],
+      "scale": [
+        1.0,
+        1.0,
+        1.0
+      ]
+    },
+    {
+      "name": "cant_lit0_0",
+      "triangles": 12,
+      "signed_volume_m3": 0.12819,
+      "location": [
+        0.0,
+        0.0,
+        0.0
+      ],
+      "rotation_euler": [
+        0.0,
+        0.0,
+        0.0
+      ],
+      "scale": [
+        1.0,
+        1.0,
+        1.0
+      ]
+    },
+    {
+      "name": "cant_lit1_0",
+      "triangles": 12,
+      "signed_volume_m3": 0.12818,
+      "location": [
+        0.0,
+        0.0,
+        0.0
+      ],
+      "rotation_euler": [
+        0.0,
+        0.0,
+        0.0
+      ],
+      "scale": [
+        1.0,
+        1.0,
+        1.0
+      ]
+    },
+    {
+      "name": "cant_lit2_0",
+      "triangles": 12,
+      "signed_volume_m3": 0.12818,
+      "location": [
+        0.0,
+        0.0,
+        0.0
+      ],
+      "rotation_euler": [
+        0.0,
+        0.0,
+        0.0
+      ],
+      "scale": [
+        1.0,
+        1.0,
+        1.0
+      ]
+    },
+    {
+      "name": "cant_lit3_0",
+      "triangles": 12,
+      "signed_volume_m3": 0.12816,
+      "location": [
+        0.0,
+        0.0,
+        0.0
+      ],
+      "rotation_euler": [
+        0.0,
+        0.0,
+        0.0
+      ],
+      "scale": [
+        1.0,
+        1.0,
+        1.0
+      ]
+    },
+    {
+      "name": "cant_lit4_0",
+      "triangles": 12,
+      "signed_volume_m3": 0.12819,
+      "location": [
+        0.0,
+        0.0,
+        0.0
+      ],
+      "rotation_euler": [
+        0.0,
+        0.0,
+        0.0
+      ],
+      "scale": [
+        1.0,
+        1.0,
+        1.0
+      ]
+    },
+    {
+      "name": "cant_pil0",
+      "triangles": 108,
+      "signed_volume_m3": 4.81631,
+      "location": [
+        0.0,
+        0.0,
+        0.0
+      ],
+      "rotation_euler": [
+        0.0,
+        0.0,
+        0.0
+      ],
+      "scale": [
+        1.0,
+        1.0,
+        1.0
+      ]
+    },
+    {
+      "name": "cant_pil1",
+      "triangles": 108,
+      "signed_volume_m3": 4.81645,
+      "location": [
+        0.0,
+        0.0,
+        0.0
+      ],
+      "rotation_euler": [
+        0.0,
+        0.0,
+        0.0
+      ],
+      "scale": [
+        1.0,
+        1.0,
+        1.0
+      ]
+    },
+    {
+      "name": "cant_sill0_0",
+      "triangles": 12,
+      "signed_volume_m3": 0.06614,
+      "location": [
+        0.0,
+        0.0,
+        0.0
+      ],
+      "rotation_euler": [
+        0.0,
+        0.0,
+        0.0
+      ],
+      "scale": [
+        1.0,
+        1.0,
+        1.0
+      ]
+    },
+    {
+      "name": "cant_sill1_0",
+      "triangles": 12,
+      "signed_volume_m3": 0.06613,
+      "location": [
+        0.0,
+        0.0,
+        0.0
+      ],
+      "rotation_euler": [
+        0.0,
+        0.0,
+        0.0
+      ],
+      "scale": [
+        1.0,
+        1.0,
+        1.0
+      ]
+    },
+    {
+      "name": "cant_sill2_0",
+      "triangles": 12,
+      "signed_volume_m3": 0.06615,
+      "location": [
+        0.0,
+        0.0,
+        0.0
+      ],
+      "rotation_euler": [
+        0.0,
+        0.0,
+        0.0
+      ],
+      "scale": [
+        1.0,
+        1.0,
+        1.0
+      ]
+    },
+    {
+      "name": "cant_sill3_0",
+      "triangles": 12,
+      "signed_volume_m3": 0.06612,
+      "location": [
+        0.0,
+        0.0,
+        0.0
+      ],
+      "rotation_euler": [
+        0.0,
+        0.0,
+        0.0
+      ],
+      "scale": [
+        1.0,
+        1.0,
+        1.0
+      ]
+    },
+    {
+      "name": "cant_sill4_0",
+      "triangles": 12,
+      "signed_volume_m3": 0.06613,
+      "location": [
+        0.0,
+        0.0,
+        0.0
+      ],
+      "rotation_euler": [
+        0.0,
+        0.0,
+        0.0
+      ],
+      "scale": [
+        1.0,
+        1.0,
+        1.0
+      ]
+    },
+    {
+      "name": "duct0",
+      "triangles": 108,
+      "signed_volume_m3": 3.68278,
+      "location": [
+        0.0,
+        0.0,
+        0.0
+      ],
+      "rotation_euler": [
+        0.0,
+        0.0,
+        0.0
+      ],
+      "scale": [
+        1.0,
+        1.0,
+        1.0
+      ]
+    },
+    {
+      "name": "duct1",
+      "triangles": 108,
+      "signed_volume_m3": 4.5017,
+      "location": [
+        0.0,
+        0.0,
+        0.0
+      ],
+      "rotation_euler": [
+        0.0,
+        0.0,
+        0.0
+      ],
+      "scale": [
+        1.0,
+        1.0,
+        1.0
+      ]
+    },
+    {
+      "name": "entry_canopy",
+      "triangles": 108,
+      "signed_volume_m3": 1.21801,
+      "location": [
+        0.0,
+        0.0,
+        0.0
+      ],
+      "rotation_euler": [
+        0.0,
+        0.0,
+        0.0
+      ],
+      "scale": [
+        1.0,
+        1.0,
+        1.0
+      ]
+    },
+    {
+      "name": "fe_land0",
+      "triangles": 44,
+      "signed_volume_m3": 0.4695,
+      "location": [
+        0.0,
+        0.0,
+        0.0
+      ],
+      "rotation_euler": [
+        0.0,
+        0.0,
+        0.0
+      ],
+      "scale": [
+        1.0,
+        1.0,
+        1.0
+      ]
+    },
+    {
+      "name": "fe_land1",
+      "triangles": 44,
+      "signed_volume_m3": 0.46942,
+      "location": [
+        0.0,
+        0.0,
+        0.0
+      ],
+      "rotation_euler": [
+        0.0,
+        0.0,
+        0.0
+      ],
+      "scale": [
+        1.0,
+        1.0,
+        1.0
+      ]
+    },
+    {
+      "name": "fe_land2",
+      "triangles": 44,
+      "signed_volume_m3": 0.46955,
+      "location": [
+        0.0,
+        0.0,
+        0.0
+      ],
+      "rotation_euler": [
+        0.0,
+        0.0,
+        0.0
+      ],
+      "scale": [
+        1.0,
+        1.0,
+        1.0
+      ]
+    },
+    {
+      "name": "fe_land3",
+      "triangles": 44,
+      "signed_volume_m3": 0.46948,
+      "location": [
+        0.0,
+        0.0,
+        0.0
+      ],
+      "rotation_euler": [
+        0.0,
+        0.0,
+        0.0
+      ],
+      "scale": [
+        1.0,
+        1.0,
+        1.0
+      ]
+    },
+    {
+      "name": "fe_land4",
+      "triangles": 44,
+      "signed_volume_m3": 0.46944,
+      "location": [
+        0.0,
+        0.0,
+        0.0
+      ],
+      "rotation_euler": [
+        0.0,
+        0.0,
+        0.0
+      ],
+      "scale": [
+        1.0,
+        1.0,
+        1.0
+      ]
+    },
+    {
+      "name": "fe_post0",
+      "triangles": 12,
+      "signed_volume_m3": 0.36329,
+      "location": [
+        0.0,
+        0.0,
+        0.0
+      ],
+      "rotation_euler": [
+        0.0,
+        0.0,
+        0.0
+      ],
+      "scale": [
+        1.0,
+        1.0,
+        1.0
+      ]
+    },
+    {
+      "name": "fe_post1",
+      "triangles": 12,
+      "signed_volume_m3": 0.36336,
+      "location": [
+        0.0,
+        0.0,
+        0.0
+      ],
+      "rotation_euler": [
+        0.0,
+        0.0,
+        0.0
+      ],
+      "scale": [
+        1.0,
+        1.0,
+        1.0
+      ]
+    },
+    {
+      "name": "fe_railA0",
+      "triangles": 12,
+      "signed_volume_m3": 0.17468,
+      "location": [
+        0.0,
+        0.0,
+        0.0
+      ],
+      "rotation_euler": [
+        0.0,
+        0.0,
+        0.0
+      ],
+      "scale": [
+        1.0,
+        1.0,
+        1.0
+      ]
+    },
+    {
+      "name": "fe_railA1",
+      "triangles": 12,
+      "signed_volume_m3": 0.17469,
+      "location": [
+        0.0,
+        0.0,
+        0.0
+      ],
+      "rotation_euler": [
+        0.0,
+        0.0,
+        0.0
+      ],
+      "scale": [
+        1.0,
+        1.0,
+        1.0
+      ]
+    },
+    {
+      "name": "fe_railA2",
+      "triangles": 12,
+      "signed_volume_m3": 0.17468,
+      "location": [
+        0.0,
+        0.0,
+        0.0
+      ],
+      "rotation_euler": [
+        0.0,
+        0.0,
+        0.0
+      ],
+      "scale": [
+        1.0,
+        1.0,
+        1.0
+      ]
+    },
+    {
+      "name": "fe_railA3",
+      "triangles": 12,
+      "signed_volume_m3": 0.17472,
+      "location": [
+        0.0,
+        0.0,
+        0.0
+      ],
+      "rotation_euler": [
+        0.0,
+        0.0,
+        0.0
+      ],
+      "scale": [
+        1.0,
+        1.0,
+        1.0
+      ]
+    },
+    {
+      "name": "fe_railA4",
+      "triangles": 12,
+      "signed_volume_m3": 0.17478,
+      "location": [
+        0.0,
+        0.0,
+        0.0
+      ],
+      "rotation_euler": [
+        0.0,
+        0.0,
+        0.0
+      ],
+      "scale": [
+        1.0,
+        1.0,
+        1.0
+      ]
+    },
+    {
+      "name": "fe_stair1",
+      "triangles": 12,
+      "signed_volume_m3": 0.27573,
+      "location": [
+        0.0,
+        0.0,
+        0.0
+      ],
+      "rotation_euler": [
+        0.0,
+        0.0,
+        0.0
+      ],
+      "scale": [
+        1.0,
+        1.0,
+        1.0
+      ]
+    },
+    {
+      "name": "fe_stair2",
+      "triangles": 12,
+      "signed_volume_m3": 0.2757,
+      "location": [
+        0.0,
+        0.0,
+        0.0
+      ],
+      "rotation_euler": [
+        0.0,
+        0.0,
+        0.0
+      ],
+      "scale": [
+        1.0,
+        1.0,
+        1.0
+      ]
+    },
+    {
+      "name": "fe_stair3",
+      "triangles": 12,
+      "signed_volume_m3": 0.27578,
+      "location": [
+        0.0,
+        0.0,
+        0.0
+      ],
+      "rotation_euler": [
+        0.0,
+        0.0,
+        0.0
+      ],
+      "scale": [
+        1.0,
+        1.0,
+        1.0
+      ]
+    },
+    {
+      "name": "fe_stair4",
+      "triangles": 12,
+      "signed_volume_m3": 0.27565,
+      "location": [
+        0.0,
+        0.0,
+        0.0
+      ],
+      "rotation_euler": [
+        0.0,
+        0.0,
+        0.0
+      ],
+      "scale": [
+        1.0,
+        1.0,
+        1.0
+      ]
+    },
+    {
+      "name": "gf_bran",
+      "triangles": 108,
+      "signed_volume_m3": 21.3096,
+      "location": [
+        0.0,
+        0.0,
+        0.0
+      ],
+      "rotation_euler": [
+        0.0,
+        0.0,
+        0.0
+      ],
+      "scale": [
+        1.0,
+        1.0,
+        1.0
+      ]
+    },
+    {
+      "name": "gf_bran_g0",
+      "triangles": 12,
+      "signed_volume_m3": 0.63266,
+      "location": [
+        0.0,
+        0.0,
+        0.0
+      ],
+      "rotation_euler": [
+        0.0,
+        0.0,
+        0.0
+      ],
+      "scale": [
+        1.0,
+        1.0,
+        1.0
+      ]
+    },
+    {
+      "name": "gf_bran_g1",
+      "triangles": 12,
+      "signed_volume_m3": 0.63264,
+      "location": [
+        0.0,
+        0.0,
+        0.0
+      ],
+      "rotation_euler": [
+        0.0,
+        0.0,
+        0.0
+      ],
+      "scale": [
+        1.0,
+        1.0,
+        1.0
+      ]
+    },
+    {
+      "name": "gf_bran_g2",
+      "triangles": 12,
+      "signed_volume_m3": 0.63266,
+      "location": [
+        0.0,
+        0.0,
+        0.0
+      ],
+      "rotation_euler": [
+        0.0,
+        0.0,
+        0.0
+      ],
+      "scale": [
+        1.0,
+        1.0,
+        1.0
+      ]
+    },
+    {
+      "name": "gf_bran_g3",
+      "triangles": 12,
+      "signed_volume_m3": 0.63266,
+      "location": [
+        0.0,
+        0.0,
+        0.0
+      ],
+      "rotation_euler": [
+        0.0,
+        0.0,
+        0.0
+      ],
+      "scale": [
+        1.0,
+        1.0,
+        1.0
+      ]
+    },
+    {
+      "name": "gf_bran_g4",
+      "triangles": 12,
+      "signed_volume_m3": 0.63265,
+      "location": [
+        0.0,
+        0.0,
+        0.0
+      ],
+      "rotation_euler": [
+        0.0,
+        0.0,
+        0.0
+      ],
+      "scale": [
+        1.0,
+        1.0,
+        1.0
+      ]
+    },
+    {
+      "name": "gf_bran_g5",
+      "triangles": 12,
+      "signed_volume_m3": 0.63266,
+      "location": [
+        0.0,
+        0.0,
+        0.0
+      ],
+      "rotation_euler": [
+        0.0,
+        0.0,
+        0.0
+      ],
+      "scale": [
+        1.0,
+        1.0,
+        1.0
+      ]
+    },
+    {
+      "name": "gf_cant",
+      "triangles": 108,
+      "signed_volume_m3": 3.86299,
+      "location": [
+        0.0,
+        0.0,
+        0.0
+      ],
+      "rotation_euler": [
+        0.0,
+        0.0,
+        0.0
+      ],
+      "scale": [
+        1.0,
+        1.0,
+        1.0
+      ]
+    },
+    {
+      "name": "gf_cant_g",
+      "triangles": 12,
+      "signed_volume_m3": 0.61882,
+      "location": [
+        0.0,
+        0.0,
+        0.0
+      ],
+      "rotation_euler": [
+        0.0,
+        0.0,
+        0.0
+      ],
+      "scale": [
+        1.0,
+        1.0,
+        1.0
+      ]
+    },
+    {
+      "name": "gf_glow_branband",
+      "triangles": 12,
+      "signed_volume_m3": 0.22728,
+      "location": [
+        0.0,
+        0.0,
+        0.0
+      ],
+      "rotation_euler": [
+        0.0,
+        0.0,
+        0.0
+      ],
+      "scale": [
+        1.0,
+        1.0,
+        1.0
+      ]
+    },
+    {
+      "name": "gf_glow_cantband",
+      "triangles": 12,
+      "signed_volume_m3": 0.23027,
+      "location": [
+        0.0,
+        0.0,
+        0.0
+      ],
+      "rotation_euler": [
+        0.0,
+        0.0,
+        0.0
+      ],
+      "scale": [
+        1.0,
+        1.0,
+        1.0
+      ]
+    },
+    {
+      "name": "gf_glow_secondband",
+      "triangles": 12,
+      "signed_volume_m3": 0.23389,
+      "location": [
+        0.0,
+        0.0,
+        0.0
+      ],
+      "rotation_euler": [
+        0.0,
+        0.0,
+        0.0
+      ],
+      "scale": [
+        1.0,
+        1.0,
+        1.0
+      ]
+    },
+    {
+      "name": "gf_na",
+      "triangles": 108,
+      "signed_volume_m3": 3.93813,
+      "location": [
+        0.0,
+        0.0,
+        0.0
+      ],
+      "rotation_euler": [
+        0.0,
+        0.0,
+        0.0
+      ],
+      "scale": [
+        1.0,
+        1.0,
+        1.0
+      ]
+    },
+    {
+      "name": "gf_nb",
+      "triangles": 108,
+      "signed_volume_m3": 0.85975,
+      "location": [
+        0.0,
+        0.0,
+        0.0
+      ],
+      "rotation_euler": [
+        0.0,
+        0.0,
+        0.0
+      ],
+      "scale": [
+        1.0,
+        1.0,
+        1.0
+      ]
+    },
+    {
+      "name": "gf_second",
+      "triangles": 108,
+      "signed_volume_m3": 21.65894,
+      "location": [
+        0.0,
+        0.0,
+        0.0
+      ],
+      "rotation_euler": [
+        0.0,
+        0.0,
+        0.0
+      ],
+      "scale": [
+        1.0,
+        1.0,
+        1.0
+      ]
+    },
+    {
+      "name": "gf_second_a0",
+      "triangles": 36,
+      "signed_volume_m3": 0.62223,
+      "location": [
+        0.0,
+        0.0,
+        0.0
+      ],
+      "rotation_euler": [
+        0.0,
+        0.0,
+        0.0
+      ],
+      "scale": [
+        1.0,
+        1.0,
+        1.0
+      ]
+    },
+    {
+      "name": "gf_second_a1",
+      "triangles": 36,
+      "signed_volume_m3": 0.6222,
+      "location": [
+        0.0,
+        0.0,
+        0.0
+      ],
+      "rotation_euler": [
+        0.0,
+        0.0,
+        0.0
+      ],
+      "scale": [
+        1.0,
+        1.0,
+        1.0
+      ]
+    },
+    {
+      "name": "gf_second_a2",
+      "triangles": 36,
+      "signed_volume_m3": 0.62226,
+      "location": [
+        0.0,
+        0.0,
+        0.0
+      ],
+      "rotation_euler": [
+        0.0,
+        0.0,
+        0.0
+      ],
+      "scale": [
+        1.0,
+        1.0,
+        1.0
+      ]
+    },
+    {
+      "name": "gf_second_a3",
+      "triangles": 36,
+      "signed_volume_m3": 0.62222,
+      "location": [
+        0.0,
+        0.0,
+        0.0
+      ],
+      "rotation_euler": [
+        0.0,
+        0.0,
+        0.0
+      ],
+      "scale": [
+        1.0,
+        1.0,
+        1.0
+      ]
+    },
+    {
+      "name": "gf_second_a4",
+      "triangles": 36,
+      "signed_volume_m3": 0.62222,
+      "location": [
+        0.0,
+        0.0,
+        0.0
+      ],
+      "rotation_euler": [
+        0.0,
+        0.0,
+        0.0
+      ],
+      "scale": [
+        1.0,
+        1.0,
+        1.0
+      ]
+    },
+    {
+      "name": "gf_second_roll5",
+      "triangles": 84,
+      "signed_volume_m3": 0.65011,
+      "location": [
+        0.0,
+        0.0,
+        0.0
+      ],
+      "rotation_euler": [
+        0.0,
+        0.0,
+        0.0
+      ],
+      "scale": [
+        1.0,
+        1.0,
+        1.0
+      ]
+    },
+    {
+      "name": "gf_stan",
+      "triangles": 108,
+      "signed_volume_m3": 23.0826,
+      "location": [
+        0.0,
+        0.0,
+        0.0
+      ],
+      "rotation_euler": [
+        0.0,
+        0.0,
+        0.0
+      ],
+      "scale": [
+        1.0,
+        1.0,
+        1.0
+      ]
+    },
+    {
+      "name": "gf_stan_g0",
+      "triangles": 12,
+      "signed_volume_m3": 0.60179,
+      "location": [
+        0.0,
+        0.0,
+        0.0
+      ],
+      "rotation_euler": [
+        0.0,
+        0.0,
+        0.0
+      ],
+      "scale": [
+        1.0,
+        1.0,
+        1.0
+      ]
+    },
+    {
+      "name": "gf_stan_g1",
+      "triangles": 12,
+      "signed_volume_m3": 0.60179,
+      "location": [
+        0.0,
+        0.0,
+        0.0
+      ],
+      "rotation_euler": [
+        0.0,
+        0.0,
+        0.0
+      ],
+      "scale": [
+        1.0,
+        1.0,
+        1.0
+      ]
+    },
+    {
+      "name": "gf_stan_g4",
+      "triangles": 12,
+      "signed_volume_m3": 0.60178,
+      "location": [
+        0.0,
+        0.0,
+        0.0
+      ],
+      "rotation_euler": [
+        0.0,
+        0.0,
+        0.0
+      ],
+      "scale": [
+        1.0,
+        1.0,
+        1.0
+      ]
+    },
+    {
+      "name": "gf_stan_g5",
+      "triangles": 12,
+      "signed_volume_m3": 0.60178,
+      "location": [
+        0.0,
+        0.0,
+        0.0
+      ],
+      "rotation_euler": [
+        0.0,
+        0.0,
+        0.0
+      ],
+      "scale": [
+        1.0,
+        1.0,
+        1.0
+      ]
+    },
+    {
+      "name": "hatch",
+      "triangles": 108,
+      "signed_volume_m3": 1.743,
+      "location": [
+        0.0,
+        0.0,
+        0.0
+      ],
+      "rotation_euler": [
+        0.0,
+        0.0,
+        0.0
+      ],
+      "scale": [
+        1.0,
+        1.0,
+        1.0
+      ]
+    },
+    {
+      "name": "mech0",
+      "triangles": 108,
+      "signed_volume_m3": 3.65091,
+      "location": [
+        0.0,
+        0.0,
+        0.0
+      ],
+      "rotation_euler": [
+        0.0,
+        0.0,
+        0.0
+      ],
+      "scale": [
+        1.0,
+        1.0,
+        1.0
+      ]
+    },
+    {
+      "name": "mech1",
+      "triangles": 108,
+      "signed_volume_m3": 3.65089,
+      "location": [
+        0.0,
+        0.0,
+        0.0
+      ],
+      "rotation_euler": [
+        0.0,
+        0.0,
+        0.0
+      ],
+      "scale": [
+        1.0,
+        1.0,
+        1.0
+      ]
+    },
+    {
+      "name": "mech2",
+      "triangles": 108,
+      "signed_volume_m3": 3.65092,
+      "location": [
+        0.0,
+        0.0,
+        0.0
+      ],
+      "rotation_euler": [
+        0.0,
+        0.0,
+        0.0
+      ],
+      "scale": [
+        1.0,
+        1.0,
+        1.0
+      ]
+    },
+    {
+      "name": "mech3",
+      "triangles": 108,
+      "signed_volume_m3": 3.6509,
+      "location": [
+        0.0,
+        0.0,
+        0.0
+      ],
+      "rotation_euler": [
+        0.0,
+        0.0,
+        0.0
+      ],
+      "scale": [
+        1.0,
+        1.0,
+        1.0
+      ]
+    },
+    {
+      "name": "mech_pad",
+      "triangles": 108,
+      "signed_volume_m3": 13.76985,
+      "location": [
+        0.0,
+        0.0,
+        0.0
+      ],
+      "rotation_euler": [
+        0.0,
+        0.0,
+        0.0
+      ],
+      "scale": [
+        1.0,
+        1.0,
+        1.0
+      ]
+    },
+    {
+      "name": "nota_bay0",
+      "triangles": 28,
+      "signed_volume_m3": 5.61931,
+      "location": [
+        0.0,
+        0.0,
+        0.0
+      ],
+      "rotation_euler": [
+        0.0,
+        0.0,
+        0.0
+      ],
+      "scale": [
+        1.0,
+        1.0,
+        1.0
+      ]
+    },
+    {
+      "name": "nota_g0_0",
+      "triangles": 12,
+      "signed_volume_m3": 0.59715,
+      "location": [
+        0.0,
+        0.0,
+        0.0
+      ],
+      "rotation_euler": [
+        0.0,
+        0.0,
+        0.0
+      ],
+      "scale": [
+        1.0,
+        1.0,
+        1.0
+      ]
+    },
+    {
+      "name": "nota_g1_0",
+      "triangles": 12,
+      "signed_volume_m3": 0.59716,
+      "location": [
+        0.0,
+        0.0,
+        0.0
+      ],
+      "rotation_euler": [
+        0.0,
+        0.0,
+        0.0
+      ],
+      "scale": [
+        1.0,
+        1.0,
+        1.0
+      ]
+    },
+    {
+      "name": "nota_g2_0",
+      "triangles": 12,
+      "signed_volume_m3": 0.59716,
+      "location": [
+        0.0,
+        0.0,
+        0.0
+      ],
+      "rotation_euler": [
+        0.0,
+        0.0,
+        0.0
+      ],
+      "scale": [
+        1.0,
+        1.0,
+        1.0
+      ]
+    },
+    {
+      "name": "nota_g3_0",
+      "triangles": 12,
+      "signed_volume_m3": 0.59716,
+      "location": [
+        0.0,
+        0.0,
+        0.0
+      ],
+      "rotation_euler": [
+        0.0,
+        0.0,
+        0.0
+      ],
+      "scale": [
+        1.0,
+        1.0,
+        1.0
+      ]
+    },
+    {
+      "name": "nota_g4_0",
+      "triangles": 12,
+      "signed_volume_m3": 0.59717,
+      "location": [
+        0.0,
+        0.0,
+        0.0
+      ],
+      "rotation_euler": [
+        0.0,
+        0.0,
+        0.0
+      ],
+      "scale": [
+        1.0,
+        1.0,
+        1.0
+      ]
+    },
+    {
+      "name": "nota_lit1_0",
+      "triangles": 12,
+      "signed_volume_m3": 0.16028,
+      "location": [
+        0.0,
+        0.0,
+        0.0
+      ],
+      "rotation_euler": [
+        0.0,
+        0.0,
+        0.0
+      ],
+      "scale": [
+        1.0,
+        1.0,
+        1.0
+      ]
+    },
+    {
+      "name": "nota_lit3_0",
+      "triangles": 12,
+      "signed_volume_m3": 0.16022,
+      "location": [
+        0.0,
+        0.0,
+        0.0
+      ],
+      "rotation_euler": [
+        0.0,
+        0.0,
+        0.0
+      ],
+      "scale": [
+        1.0,
+        1.0,
+        1.0
+      ]
+    },
+    {
+      "name": "nota_sill0_0",
+      "triangles": 12,
+      "signed_volume_m3": 0.08014,
+      "location": [
+        0.0,
+        0.0,
+        0.0
+      ],
+      "rotation_euler": [
+        0.0,
+        0.0,
+        0.0
+      ],
+      "scale": [
+        1.0,
+        1.0,
+        1.0
+      ]
+    },
+    {
+      "name": "nota_sill1_0",
+      "triangles": 12,
+      "signed_volume_m3": 0.08012,
+      "location": [
+        0.0,
+        0.0,
+        0.0
+      ],
+      "rotation_euler": [
+        0.0,
+        0.0,
+        0.0
+      ],
+      "scale": [
+        1.0,
+        1.0,
+        1.0
+      ]
+    },
+    {
+      "name": "nota_sill2_0",
+      "triangles": 12,
+      "signed_volume_m3": 0.08013,
+      "location": [
+        0.0,
+        0.0,
+        0.0
+      ],
+      "rotation_euler": [
+        0.0,
+        0.0,
+        0.0
+      ],
+      "scale": [
+        1.0,
+        1.0,
+        1.0
+      ]
+    },
+    {
+      "name": "nota_sill3_0",
+      "triangles": 12,
+      "signed_volume_m3": 0.08012,
+      "location": [
+        0.0,
+        0.0,
+        0.0
+      ],
+      "rotation_euler": [
+        0.0,
+        0.0,
+        0.0
+      ],
+      "scale": [
+        1.0,
+        1.0,
+        1.0
+      ]
+    },
+    {
+      "name": "nota_sill4_0",
+      "triangles": 12,
+      "signed_volume_m3": 0.08017,
+      "location": [
+        0.0,
+        0.0,
+        0.0
+      ],
+      "rotation_euler": [
+        0.0,
+        0.0,
+        0.0
+      ],
+      "scale": [
+        1.0,
+        1.0,
+        1.0
+      ]
+    },
+    {
+      "name": "parapet",
+      "triangles": 504,
+      "signed_volume_m3": 21.0909,
+      "location": [
+        0.0,
+        0.0,
+        0.0
+      ],
+      "rotation_euler": [
+        0.0,
+        0.0,
+        0.0
+      ],
+      "scale": [
+        1.0,
+        1.0,
+        1.0
+      ]
+    },
+    {
+      "name": "parapet_cap",
+      "triangles": 504,
+      "signed_volume_m3": 14.04436,
+      "location": [
+        0.0,
+        0.0,
+        0.0
+      ],
+      "rotation_euler": [
+        0.0,
+        0.0,
+        0.0
+      ],
+      "scale": [
+        1.0,
+        1.0,
+        1.0
+      ]
+    },
+    {
+      "name": "party_line",
+      "triangles": 12,
+      "signed_volume_m3": 0.88583,
+      "location": [
+        0.0,
+        0.0,
+        0.0
+      ],
+      "rotation_euler": [
+        0.0,
+        0.0,
+        0.0
+      ],
+      "scale": [
+        1.0,
+        1.0,
+        1.0
+      ]
+    },
+    {
+      "name": "party_line.001",
+      "triangles": 12,
+      "signed_volume_m3": 0.88551,
+      "location": [
+        0.0,
+        0.0,
+        0.0
+      ],
+      "rotation_euler": [
+        0.0,
+        0.0,
+        0.0
+      ],
+      "scale": [
+        1.0,
+        1.0,
+        1.0
+      ]
+    },
+    {
+      "name": "party_line.002",
+      "triangles": 12,
+      "signed_volume_m3": 0.88557,
+      "location": [
+        0.0,
+        0.0,
+        0.0
+      ],
+      "rotation_euler": [
+        0.0,
+        0.0,
+        0.0
+      ],
+      "scale": [
+        1.0,
+        1.0,
+        1.0
+      ]
+    },
+    {
+      "name": "party_line.003",
+      "triangles": 12,
+      "signed_volume_m3": 0.88597,
+      "location": [
+        0.0,
+        0.0,
+        0.0
+      ],
+      "rotation_euler": [
+        0.0,
+        0.0,
+        0.0
+      ],
+      "scale": [
+        1.0,
+        1.0,
+        1.0
+      ]
+    },
+    {
+      "name": "party_lis0",
+      "triangles": 44,
+      "signed_volume_m3": 3.78721,
+      "location": [
+        0.0,
+        0.0,
+        0.0
+      ],
+      "rotation_euler": [
+        0.0,
+        0.0,
+        0.0
+      ],
+      "scale": [
+        1.0,
+        1.0,
+        1.0
+      ]
+    },
+    {
+      "name": "party_lis1",
+      "triangles": 44,
+      "signed_volume_m3": 3.78721,
+      "location": [
+        0.0,
+        0.0,
+        0.0
+      ],
+      "rotation_euler": [
+        0.0,
+        0.0,
+        0.0
+      ],
+      "scale": [
+        1.0,
+        1.0,
+        1.0
+      ]
+    },
+    {
+      "name": "party_lis2",
+      "triangles": 44,
+      "signed_volume_m3": 3.78717,
+      "location": [
+        0.0,
+        0.0,
+        0.0
+      ],
+      "rotation_euler": [
+        0.0,
+        0.0,
+        0.0
+      ],
+      "scale": [
+        1.0,
+        1.0,
+        1.0
+      ]
+    },
+    {
+      "name": "party_lis3",
+      "triangles": 44,
+      "signed_volume_m3": 3.78719,
+      "location": [
+        0.0,
+        0.0,
+        0.0
+      ],
+      "rotation_euler": [
+        0.0,
+        0.0,
+        0.0
+      ],
+      "scale": [
+        1.0,
+        1.0,
+        1.0
+      ]
+    },
+    {
+      "name": "party_lis4",
+      "triangles": 44,
+      "signed_volume_m3": 3.78722,
+      "location": [
+        0.0,
+        0.0,
+        0.0
+      ],
+      "rotation_euler": [
+        0.0,
+        0.0,
+        0.0
+      ],
+      "scale": [
+        1.0,
+        1.0,
+        1.0
+      ]
+    },
+    {
+      "name": "party_w3_0",
+      "triangles": 12,
+      "signed_volume_m3": 0.16902,
+      "location": [
+        0.0,
+        0.0,
+        0.0
+      ],
+      "rotation_euler": [
+        0.0,
+        0.0,
+        0.0
+      ],
+      "scale": [
+        1.0,
+        1.0,
+        1.0
+      ]
+    },
+    {
+      "name": "party_w3_1",
+      "triangles": 12,
+      "signed_volume_m3": 0.16905,
+      "location": [
+        0.0,
+        0.0,
+        0.0
+      ],
+      "rotation_euler": [
+        0.0,
+        0.0,
+        0.0
+      ],
+      "scale": [
+        1.0,
+        1.0,
+        1.0
+      ]
+    },
+    {
+      "name": "party_w3_2",
+      "triangles": 12,
+      "signed_volume_m3": 0.16897,
+      "location": [
+        0.0,
+        0.0,
+        0.0
+      ],
+      "rotation_euler": [
+        0.0,
+        0.0,
+        0.0
+      ],
+      "scale": [
+        1.0,
+        1.0,
+        1.0
+      ]
+    },
+    {
+      "name": "party_w3_3",
+      "triangles": 12,
+      "signed_volume_m3": 0.16898,
+      "location": [
+        0.0,
+        0.0,
+        0.0
+      ],
+      "rotation_euler": [
+        0.0,
+        0.0,
+        0.0
+      ],
+      "scale": [
+        1.0,
+        1.0,
+        1.0
+      ]
+    },
+    {
+      "name": "party_w3_4",
+      "triangles": 12,
+      "signed_volume_m3": 0.16897,
+      "location": [
+        0.0,
+        0.0,
+        0.0
+      ],
+      "rotation_euler": [
+        0.0,
+        0.0,
+        0.0
+      ],
+      "scale": [
+        1.0,
+        1.0,
+        1.0
+      ]
+    },
+    {
+      "name": "party_w4_0",
+      "triangles": 12,
+      "signed_volume_m3": 0.169,
+      "location": [
+        0.0,
+        0.0,
+        0.0
+      ],
+      "rotation_euler": [
+        0.0,
+        0.0,
+        0.0
+      ],
+      "scale": [
+        1.0,
+        1.0,
+        1.0
+      ]
+    },
+    {
+      "name": "party_w4_1",
+      "triangles": 12,
+      "signed_volume_m3": 0.16908,
+      "location": [
+        0.0,
+        0.0,
+        0.0
+      ],
+      "rotation_euler": [
+        0.0,
+        0.0,
+        0.0
+      ],
+      "scale": [
+        1.0,
+        1.0,
+        1.0
+      ]
+    },
+    {
+      "name": "party_w4_2",
+      "triangles": 12,
+      "signed_volume_m3": 0.16903,
+      "location": [
+        0.0,
+        0.0,
+        0.0
+      ],
+      "rotation_euler": [
+        0.0,
+        0.0,
+        0.0
+      ],
+      "scale": [
+        1.0,
+        1.0,
+        1.0
+      ]
+    },
+    {
+      "name": "party_w4_3",
+      "triangles": 12,
+      "signed_volume_m3": 0.16909,
+      "location": [
+        0.0,
+        0.0,
+        0.0
+      ],
+      "rotation_euler": [
+        0.0,
+        0.0,
+        0.0
+      ],
+      "scale": [
+        1.0,
+        1.0,
+        1.0
+      ]
+    },
+    {
+      "name": "party_w4_4",
+      "triangles": 12,
+      "signed_volume_m3": 0.16898,
+      "location": [
+        0.0,
+        0.0,
+        0.0
+      ],
+      "rotation_euler": [
+        0.0,
+        0.0,
+        0.0
+      ],
+      "scale": [
+        1.0,
+        1.0,
+        1.0
+      ]
+    },
+    {
+      "name": "pent",
+      "triangles": 108,
+      "signed_volume_m3": 210.01323,
+      "location": [
+        0.0,
+        0.0,
+        0.0
+      ],
+      "rotation_euler": [
+        0.0,
+        0.0,
+        0.0
+      ],
+      "scale": [
+        1.0,
+        1.0,
+        1.0
+      ]
+    },
+    {
+      "name": "pent_cap",
+      "triangles": 108,
+      "signed_volume_m3": 14.16533,
+      "location": [
+        0.0,
+        0.0,
+        0.0
+      ],
+      "rotation_euler": [
+        0.0,
+        0.0,
+        0.0
+      ],
+      "scale": [
+        1.0,
+        1.0,
+        1.0
+      ]
+    },
+    {
+      "name": "second_bay0",
+      "triangles": 28,
+      "signed_volume_m3": 5.38177,
+      "location": [
+        0.0,
+        0.0,
+        0.0
+      ],
+      "rotation_euler": [
+        0.0,
+        0.0,
+        0.0
+      ],
+      "scale": [
+        1.0,
+        1.0,
+        1.0
+      ]
+    },
+    {
+      "name": "second_bay1",
+      "triangles": 28,
+      "signed_volume_m3": 5.38161,
+      "location": [
+        0.0,
+        0.0,
+        0.0
+      ],
+      "rotation_euler": [
+        0.0,
+        0.0,
+        0.0
+      ],
+      "scale": [
+        1.0,
+        1.0,
+        1.0
+      ]
+    },
+    {
+      "name": "second_bay2",
+      "triangles": 28,
+      "signed_volume_m3": 5.38169,
+      "location": [
+        0.0,
+        0.0,
+        0.0
+      ],
+      "rotation_euler": [
+        0.0,
+        0.0,
+        0.0
+      ],
+      "scale": [
+        1.0,
+        1.0,
+        1.0
+      ]
+    },
+    {
+      "name": "second_bay3",
+      "triangles": 28,
+      "signed_volume_m3": 5.38159,
+      "location": [
+        0.0,
+        0.0,
+        0.0
+      ],
+      "rotation_euler": [
+        0.0,
+        0.0,
+        0.0
+      ],
+      "scale": [
+        1.0,
+        1.0,
+        1.0
+      ]
+    },
+    {
+      "name": "second_bay4",
+      "triangles": 28,
+      "signed_volume_m3": 5.38177,
+      "location": [
+        0.0,
+        0.0,
+        0.0
+      ],
+      "rotation_euler": [
+        0.0,
+        0.0,
+        0.0
+      ],
+      "scale": [
+        1.0,
+        1.0,
+        1.0
+      ]
+    },
+    {
+      "name": "second_bay5",
+      "triangles": 28,
+      "signed_volume_m3": 5.38153,
+      "location": [
+        0.0,
+        0.0,
+        0.0
+      ],
+      "rotation_euler": [
+        0.0,
+        0.0,
+        0.0
+      ],
+      "scale": [
+        1.0,
+        1.0,
+        1.0
+      ]
+    },
+    {
+      "name": "second_cap0",
+      "triangles": 108,
+      "signed_volume_m3": 0.25921,
+      "location": [
+        0.0,
+        0.0,
+        0.0
+      ],
+      "rotation_euler": [
+        0.0,
+        0.0,
+        0.0
+      ],
+      "scale": [
+        1.0,
+        1.0,
+        1.0
+      ]
+    },
+    {
+      "name": "second_cap1",
+      "triangles": 108,
+      "signed_volume_m3": 0.25929,
+      "location": [
+        0.0,
+        0.0,
+        0.0
+      ],
+      "rotation_euler": [
+        0.0,
+        0.0,
+        0.0
+      ],
+      "scale": [
+        1.0,
+        1.0,
+        1.0
+      ]
+    },
+    {
+      "name": "second_cap2",
+      "triangles": 108,
+      "signed_volume_m3": 0.25922,
+      "location": [
+        0.0,
+        0.0,
+        0.0
+      ],
+      "rotation_euler": [
+        0.0,
+        0.0,
+        0.0
+      ],
+      "scale": [
+        1.0,
+        1.0,
+        1.0
+      ]
+    },
+    {
+      "name": "second_cap3",
+      "triangles": 108,
+      "signed_volume_m3": 0.25926,
+      "location": [
+        0.0,
+        0.0,
+        0.0
+      ],
+      "rotation_euler": [
+        0.0,
+        0.0,
+        0.0
+      ],
+      "scale": [
+        1.0,
+        1.0,
+        1.0
+      ]
+    },
+    {
+      "name": "second_cap4",
+      "triangles": 108,
+      "signed_volume_m3": 0.25933,
+      "location": [
+        0.0,
+        0.0,
+        0.0
+      ],
+      "rotation_euler": [
+        0.0,
+        0.0,
+        0.0
+      ],
+      "scale": [
+        1.0,
+        1.0,
+        1.0
+      ]
+    },
+    {
+      "name": "second_cap5",
+      "triangles": 108,
+      "signed_volume_m3": 0.25917,
+      "location": [
+        0.0,
+        0.0,
+        0.0
+      ],
+      "rotation_euler": [
+        0.0,
+        0.0,
+        0.0
+      ],
+      "scale": [
+        1.0,
+        1.0,
+        1.0
+      ]
+    },
+    {
+      "name": "second_cap6",
+      "triangles": 108,
+      "signed_volume_m3": 0.25927,
+      "location": [
+        0.0,
+        0.0,
+        0.0
+      ],
+      "rotation_euler": [
+        0.0,
+        0.0,
+        0.0
+      ],
+      "scale": [
+        1.0,
+        1.0,
+        1.0
+      ]
+    },
+    {
+      "name": "second_g0_0",
+      "triangles": 12,
+      "signed_volume_m3": 0.5675,
+      "location": [
+        0.0,
+        0.0,
+        0.0
+      ],
+      "rotation_euler": [
+        0.0,
+        0.0,
+        0.0
+      ],
+      "scale": [
+        1.0,
+        1.0,
+        1.0
+      ]
+    },
+    {
+      "name": "second_g0_1",
+      "triangles": 12,
+      "signed_volume_m3": 0.56749,
+      "location": [
+        0.0,
+        0.0,
+        0.0
+      ],
+      "rotation_euler": [
+        0.0,
+        0.0,
+        0.0
+      ],
+      "scale": [
+        1.0,
+        1.0,
+        1.0
+      ]
+    },
+    {
+      "name": "second_g0_2",
+      "triangles": 12,
+      "signed_volume_m3": 0.56747,
+      "location": [
+        0.0,
+        0.0,
+        0.0
+      ],
+      "rotation_euler": [
+        0.0,
+        0.0,
+        0.0
+      ],
+      "scale": [
+        1.0,
+        1.0,
+        1.0
+      ]
+    },
+    {
+      "name": "second_g0_3",
+      "triangles": 12,
+      "signed_volume_m3": 0.56745,
+      "location": [
+        0.0,
+        0.0,
+        0.0
+      ],
+      "rotation_euler": [
+        0.0,
+        0.0,
+        0.0
+      ],
+      "scale": [
+        1.0,
+        1.0,
+        1.0
+      ]
+    },
+    {
+      "name": "second_g0_4",
+      "triangles": 12,
+      "signed_volume_m3": 0.56747,
+      "location": [
+        0.0,
+        0.0,
+        0.0
+      ],
+      "rotation_euler": [
+        0.0,
+        0.0,
+        0.0
+      ],
+      "scale": [
+        1.0,
+        1.0,
+        1.0
+      ]
+    },
+    {
+      "name": "second_g0_5",
+      "triangles": 12,
+      "signed_volume_m3": 0.56751,
+      "location": [
+        0.0,
+        0.0,
+        0.0
+      ],
+      "rotation_euler": [
+        0.0,
+        0.0,
+        0.0
+      ],
+      "scale": [
+        1.0,
+        1.0,
+        1.0
+      ]
+    },
+    {
+      "name": "second_g1_0",
+      "triangles": 12,
+      "signed_volume_m3": 0.56753,
+      "location": [
+        0.0,
+        0.0,
+        0.0
+      ],
+      "rotation_euler": [
+        0.0,
+        0.0,
+        0.0
+      ],
+      "scale": [
+        1.0,
+        1.0,
+        1.0
+      ]
+    },
+    {
+      "name": "second_g1_1",
+      "triangles": 12,
+      "signed_volume_m3": 0.56751,
+      "location": [
+        0.0,
+        0.0,
+        0.0
+      ],
+      "rotation_euler": [
+        0.0,
+        0.0,
+        0.0
+      ],
+      "scale": [
+        1.0,
+        1.0,
+        1.0
+      ]
+    },
+    {
+      "name": "second_g1_2",
+      "triangles": 12,
+      "signed_volume_m3": 0.56749,
+      "location": [
+        0.0,
+        0.0,
+        0.0
+      ],
+      "rotation_euler": [
+        0.0,
+        0.0,
+        0.0
+      ],
+      "scale": [
+        1.0,
+        1.0,
+        1.0
+      ]
+    },
+    {
+      "name": "second_g1_3",
+      "triangles": 12,
+      "signed_volume_m3": 0.56748,
+      "location": [
+        0.0,
+        0.0,
+        0.0
+      ],
+      "rotation_euler": [
+        0.0,
+        0.0,
+        0.0
+      ],
+      "scale": [
+        1.0,
+        1.0,
+        1.0
+      ]
+    },
+    {
+      "name": "second_g1_4",
+      "triangles": 12,
+      "signed_volume_m3": 0.56745,
+      "location": [
+        0.0,
+        0.0,
+        0.0
+      ],
+      "rotation_euler": [
+        0.0,
+        0.0,
+        0.0
+      ],
+      "scale": [
+        1.0,
+        1.0,
+        1.0
+      ]
+    },
+    {
+      "name": "second_g1_5",
+      "triangles": 12,
+      "signed_volume_m3": 0.56749,
+      "location": [
+        0.0,
+        0.0,
+        0.0
+      ],
+      "rotation_euler": [
+        0.0,
+        0.0,
+        0.0
+      ],
+      "scale": [
+        1.0,
+        1.0,
+        1.0
+      ]
+    },
+    {
+      "name": "second_g2_0",
+      "triangles": 12,
+      "signed_volume_m3": 0.56756,
+      "location": [
+        0.0,
+        0.0,
+        0.0
+      ],
+      "rotation_euler": [
+        0.0,
+        0.0,
+        0.0
+      ],
+      "scale": [
+        1.0,
+        1.0,
+        1.0
+      ]
+    },
+    {
+      "name": "second_g2_1",
+      "triangles": 12,
+      "signed_volume_m3": 0.56747,
+      "location": [
+        0.0,
+        0.0,
+        0.0
+      ],
+      "rotation_euler": [
+        0.0,
+        0.0,
+        0.0
+      ],
+      "scale": [
+        1.0,
+        1.0,
+        1.0
+      ]
+    },
+    {
+      "name": "second_g2_2",
+      "triangles": 12,
+      "signed_volume_m3": 0.5674,
+      "location": [
+        0.0,
+        0.0,
+        0.0
+      ],
+      "rotation_euler": [
+        0.0,
+        0.0,
+        0.0
+      ],
+      "scale": [
+        1.0,
+        1.0,
+        1.0
+      ]
+    },
+    {
+      "name": "second_g2_3",
+      "triangles": 12,
+      "signed_volume_m3": 0.56748,
+      "location": [
+        0.0,
+        0.0,
+        0.0
+      ],
+      "rotation_euler": [
+        0.0,
+        0.0,
+        0.0
+      ],
+      "scale": [
+        1.0,
+        1.0,
+        1.0
+      ]
+    },
+    {
+      "name": "second_g2_4",
+      "triangles": 12,
+      "signed_volume_m3": 0.56752,
+      "location": [
+        0.0,
+        0.0,
+        0.0
+      ],
+      "rotation_euler": [
+        0.0,
+        0.0,
+        0.0
+      ],
+      "scale": [
+        1.0,
+        1.0,
+        1.0
+      ]
+    },
+    {
+      "name": "second_g2_5",
+      "triangles": 12,
+      "signed_volume_m3": 0.56749,
+      "location": [
+        0.0,
+        0.0,
+        0.0
+      ],
+      "rotation_euler": [
+        0.0,
+        0.0,
+        0.0
+      ],
+      "scale": [
+        1.0,
+        1.0,
+        1.0
+      ]
+    },
+    {
+      "name": "second_g3_0",
+      "triangles": 12,
+      "signed_volume_m3": 0.56744,
+      "location": [
+        0.0,
+        0.0,
+        0.0
+      ],
+      "rotation_euler": [
+        0.0,
+        0.0,
+        0.0
+      ],
+      "scale": [
+        1.0,
+        1.0,
+        1.0
+      ]
+    },
+    {
+      "name": "second_g3_1",
+      "triangles": 12,
+      "signed_volume_m3": 0.56743,
+      "location": [
+        0.0,
+        0.0,
+        0.0
+      ],
+      "rotation_euler": [
+        0.0,
+        0.0,
+        0.0
+      ],
+      "scale": [
+        1.0,
+        1.0,
+        1.0
+      ]
+    },
+    {
+      "name": "second_g3_2",
+      "triangles": 12,
+      "signed_volume_m3": 0.56748,
+      "location": [
+        0.0,
+        0.0,
+        0.0
+      ],
+      "rotation_euler": [
+        0.0,
+        0.0,
+        0.0
+      ],
+      "scale": [
+        1.0,
+        1.0,
+        1.0
+      ]
+    },
+    {
+      "name": "second_g3_3",
+      "triangles": 12,
+      "signed_volume_m3": 0.56746,
+      "location": [
+        0.0,
+        0.0,
+        0.0
+      ],
+      "rotation_euler": [
+        0.0,
+        0.0,
+        0.0
+      ],
+      "scale": [
+        1.0,
+        1.0,
+        1.0
+      ]
+    },
+    {
+      "name": "second_g3_4",
+      "triangles": 12,
+      "signed_volume_m3": 0.5675,
+      "location": [
+        0.0,
+        0.0,
+        0.0
+      ],
+      "rotation_euler": [
+        0.0,
+        0.0,
+        0.0
+      ],
+      "scale": [
+        1.0,
+        1.0,
+        1.0
+      ]
+    },
+    {
+      "name": "second_g3_5",
+      "triangles": 12,
+      "signed_volume_m3": 0.56747,
+      "location": [
+        0.0,
+        0.0,
+        0.0
+      ],
+      "rotation_euler": [
+        0.0,
+        0.0,
+        0.0
+      ],
+      "scale": [
+        1.0,
+        1.0,
+        1.0
+      ]
+    },
+    {
+      "name": "second_g4_0",
+      "triangles": 12,
+      "signed_volume_m3": 0.5676,
+      "location": [
+        0.0,
+        0.0,
+        0.0
+      ],
+      "rotation_euler": [
+        0.0,
+        0.0,
+        0.0
+      ],
+      "scale": [
+        1.0,
+        1.0,
+        1.0
+      ]
+    },
+    {
+      "name": "second_g4_1",
+      "triangles": 12,
+      "signed_volume_m3": 0.56756,
+      "location": [
+        0.0,
+        0.0,
+        0.0
+      ],
+      "rotation_euler": [
+        0.0,
+        0.0,
+        0.0
+      ],
+      "scale": [
+        1.0,
+        1.0,
+        1.0
+      ]
+    },
+    {
+      "name": "second_g4_2",
+      "triangles": 12,
+      "signed_volume_m3": 0.56739,
+      "location": [
+        0.0,
+        0.0,
+        0.0
+      ],
+      "rotation_euler": [
+        0.0,
+        0.0,
+        0.0
+      ],
+      "scale": [
+        1.0,
+        1.0,
+        1.0
+      ]
+    },
+    {
+      "name": "second_g4_3",
+      "triangles": 12,
+      "signed_volume_m3": 0.56741,
+      "location": [
+        0.0,
+        0.0,
+        0.0
+      ],
+      "rotation_euler": [
+        0.0,
+        0.0,
+        0.0
+      ],
+      "scale": [
+        1.0,
+        1.0,
+        1.0
+      ]
+    },
+    {
+      "name": "second_g4_4",
+      "triangles": 12,
+      "signed_volume_m3": 0.56759,
+      "location": [
+        0.0,
+        0.0,
+        0.0
+      ],
+      "rotation_euler": [
+        0.0,
+        0.0,
+        0.0
+      ],
+      "scale": [
+        1.0,
+        1.0,
+        1.0
+      ]
+    },
+    {
+      "name": "second_g4_5",
+      "triangles": 12,
+      "signed_volume_m3": 0.56758,
+      "location": [
+        0.0,
+        0.0,
+        0.0
+      ],
+      "rotation_euler": [
+        0.0,
+        0.0,
+        0.0
+      ],
+      "scale": [
+        1.0,
+        1.0,
+        1.0
+      ]
+    },
+    {
+      "name": "second_lit0_4",
+      "triangles": 12,
+      "signed_volume_m3": 0.15187,
+      "location": [
+        0.0,
+        0.0,
+        0.0
+      ],
+      "rotation_euler": [
+        0.0,
+        0.0,
+        0.0
+      ],
+      "scale": [
+        1.0,
+        1.0,
+        1.0
+      ]
+    },
+    {
+      "name": "second_lit1_0",
+      "triangles": 12,
+      "signed_volume_m3": 0.15189,
+      "location": [
+        0.0,
+        0.0,
+        0.0
+      ],
+      "rotation_euler": [
+        0.0,
+        0.0,
+        0.0
+      ],
+      "scale": [
+        1.0,
+        1.0,
+        1.0
+      ]
+    },
+    {
+      "name": "second_lit2_2",
+      "triangles": 12,
+      "signed_volume_m3": 0.15191,
+      "location": [
+        0.0,
+        0.0,
+        0.0
+      ],
+      "rotation_euler": [
+        0.0,
+        0.0,
+        0.0
+      ],
+      "scale": [
+        1.0,
+        1.0,
+        1.0
+      ]
+    },
+    {
+      "name": "second_lit2_5",
+      "triangles": 12,
+      "signed_volume_m3": 0.15185,
+      "location": [
+        0.0,
+        0.0,
+        0.0
+      ],
+      "rotation_euler": [
+        0.0,
+        0.0,
+        0.0
+      ],
+      "scale": [
+        1.0,
+        1.0,
+        1.0
+      ]
+    },
+    {
+      "name": "second_lit3_1",
+      "triangles": 12,
+      "signed_volume_m3": 0.1519,
+      "location": [
+        0.0,
+        0.0,
+        0.0
+      ],
+      "rotation_euler": [
+        0.0,
+        0.0,
+        0.0
+      ],
+      "scale": [
+        1.0,
+        1.0,
+        1.0
+      ]
+    },
+    {
+      "name": "second_lit4_3",
+      "triangles": 12,
+      "signed_volume_m3": 0.15183,
+      "location": [
+        0.0,
+        0.0,
+        0.0
+      ],
+      "rotation_euler": [
+        0.0,
+        0.0,
+        0.0
+      ],
+      "scale": [
+        1.0,
+        1.0,
+        1.0
+      ]
+    },
+    {
+      "name": "second_pil0",
+      "triangles": 108,
+      "signed_volume_m3": 4.81628,
+      "location": [
+        0.0,
+        0.0,
+        0.0
+      ],
+      "rotation_euler": [
+        0.0,
+        0.0,
+        0.0
+      ],
+      "scale": [
+        1.0,
+        1.0,
+        1.0
+      ]
+    },
+    {
+      "name": "second_pil1",
+      "triangles": 108,
+      "signed_volume_m3": 4.81646,
+      "location": [
+        0.0,
+        0.0,
+        0.0
+      ],
+      "rotation_euler": [
+        0.0,
+        0.0,
+        0.0
+      ],
+      "scale": [
+        1.0,
+        1.0,
+        1.0
+      ]
+    },
+    {
+      "name": "second_pil2",
+      "triangles": 108,
+      "signed_volume_m3": 4.81599,
+      "location": [
+        0.0,
+        0.0,
+        0.0
+      ],
+      "rotation_euler": [
+        0.0,
+        0.0,
+        0.0
+      ],
+      "scale": [
+        1.0,
+        1.0,
+        1.0
+      ]
+    },
+    {
+      "name": "second_pil3",
+      "triangles": 108,
+      "signed_volume_m3": 4.816,
+      "location": [
+        0.0,
+        0.0,
+        0.0
+      ],
+      "rotation_euler": [
+        0.0,
+        0.0,
+        0.0
+      ],
+      "scale": [
+        1.0,
+        1.0,
+        1.0
+      ]
+    },
+    {
+      "name": "second_pil4",
+      "triangles": 108,
+      "signed_volume_m3": 4.81653,
+      "location": [
+        0.0,
+        0.0,
+        0.0
+      ],
+      "rotation_euler": [
+        0.0,
+        0.0,
+        0.0
+      ],
+      "scale": [
+        1.0,
+        1.0,
+        1.0
+      ]
+    },
+    {
+      "name": "second_pil5",
+      "triangles": 108,
+      "signed_volume_m3": 4.81629,
+      "location": [
+        0.0,
+        0.0,
+        0.0
+      ],
+      "rotation_euler": [
+        0.0,
+        0.0,
+        0.0
+      ],
+      "scale": [
+        1.0,
+        1.0,
+        1.0
+      ]
+    },
+    {
+      "name": "second_pil6",
+      "triangles": 108,
+      "signed_volume_m3": 4.81646,
+      "location": [
+        0.0,
+        0.0,
+        0.0
+      ],
+      "rotation_euler": [
+        0.0,
+        0.0,
+        0.0
+      ],
+      "scale": [
+        1.0,
+        1.0,
+        1.0
+      ]
+    },
+    {
+      "name": "second_sill0_0",
+      "triangles": 12,
+      "signed_volume_m3": 0.0765,
+      "location": [
+        0.0,
+        0.0,
+        0.0
+      ],
+      "rotation_euler": [
+        0.0,
+        0.0,
+        0.0
+      ],
+      "scale": [
+        1.0,
+        1.0,
+        1.0
+      ]
+    },
+    {
+      "name": "second_sill0_1",
+      "triangles": 12,
+      "signed_volume_m3": 0.07647,
+      "location": [
+        0.0,
+        0.0,
+        0.0
+      ],
+      "rotation_euler": [
+        0.0,
+        0.0,
+        0.0
+      ],
+      "scale": [
+        1.0,
+        1.0,
+        1.0
+      ]
+    },
+    {
+      "name": "second_sill0_2",
+      "triangles": 12,
+      "signed_volume_m3": 0.07645,
+      "location": [
+        0.0,
+        0.0,
+        0.0
+      ],
+      "rotation_euler": [
+        0.0,
+        0.0,
+        0.0
+      ],
+      "scale": [
+        1.0,
+        1.0,
+        1.0
+      ]
+    },
+    {
+      "name": "second_sill0_3",
+      "triangles": 12,
+      "signed_volume_m3": 0.0765,
+      "location": [
+        0.0,
+        0.0,
+        0.0
+      ],
+      "rotation_euler": [
+        0.0,
+        0.0,
+        0.0
+      ],
+      "scale": [
+        1.0,
+        1.0,
+        1.0
+      ]
+    },
+    {
+      "name": "second_sill0_4",
+      "triangles": 12,
+      "signed_volume_m3": 0.07649,
+      "location": [
+        0.0,
+        0.0,
+        0.0
+      ],
+      "rotation_euler": [
+        0.0,
+        0.0,
+        0.0
+      ],
+      "scale": [
+        1.0,
+        1.0,
+        1.0
+      ]
+    },
+    {
+      "name": "second_sill0_5",
+      "triangles": 12,
+      "signed_volume_m3": 0.07649,
+      "location": [
+        0.0,
+        0.0,
+        0.0
+      ],
+      "rotation_euler": [
+        0.0,
+        0.0,
+        0.0
+      ],
+      "scale": [
+        1.0,
+        1.0,
+        1.0
+      ]
+    },
+    {
+      "name": "second_sill1_0",
+      "triangles": 12,
+      "signed_volume_m3": 0.07649,
+      "location": [
+        0.0,
+        0.0,
+        0.0
+      ],
+      "rotation_euler": [
+        0.0,
+        0.0,
+        0.0
+      ],
+      "scale": [
+        1.0,
+        1.0,
+        1.0
+      ]
+    },
+    {
+      "name": "second_sill1_1",
+      "triangles": 12,
+      "signed_volume_m3": 0.07645,
+      "location": [
+        0.0,
+        0.0,
+        0.0
+      ],
+      "rotation_euler": [
+        0.0,
+        0.0,
+        0.0
+      ],
+      "scale": [
+        1.0,
+        1.0,
+        1.0
+      ]
+    },
+    {
+      "name": "second_sill1_2",
+      "triangles": 12,
+      "signed_volume_m3": 0.07644,
+      "location": [
+        0.0,
+        0.0,
+        0.0
+      ],
+      "rotation_euler": [
+        0.0,
+        0.0,
+        0.0
+      ],
+      "scale": [
+        1.0,
+        1.0,
+        1.0
+      ]
+    },
+    {
+      "name": "second_sill1_3",
+      "triangles": 12,
+      "signed_volume_m3": 0.07648,
+      "location": [
+        0.0,
+        0.0,
+        0.0
+      ],
+      "rotation_euler": [
+        0.0,
+        0.0,
+        0.0
+      ],
+      "scale": [
+        1.0,
+        1.0,
+        1.0
+      ]
+    },
+    {
+      "name": "second_sill1_4",
+      "triangles": 12,
+      "signed_volume_m3": 0.07646,
+      "location": [
+        0.0,
+        0.0,
+        0.0
+      ],
+      "rotation_euler": [
+        0.0,
+        0.0,
+        0.0
+      ],
+      "scale": [
+        1.0,
+        1.0,
+        1.0
+      ]
+    },
+    {
+      "name": "second_sill1_5",
+      "triangles": 12,
+      "signed_volume_m3": 0.07649,
+      "location": [
+        0.0,
+        0.0,
+        0.0
+      ],
+      "rotation_euler": [
+        0.0,
+        0.0,
+        0.0
+      ],
+      "scale": [
+        1.0,
+        1.0,
+        1.0
+      ]
+    },
+    {
+      "name": "second_sill2_0",
+      "triangles": 12,
+      "signed_volume_m3": 0.07646,
+      "location": [
+        0.0,
+        0.0,
+        0.0
+      ],
+      "rotation_euler": [
+        0.0,
+        0.0,
+        0.0
+      ],
+      "scale": [
+        1.0,
+        1.0,
+        1.0
+      ]
+    },
+    {
+      "name": "second_sill2_1",
+      "triangles": 12,
+      "signed_volume_m3": 0.07644,
+      "location": [
+        0.0,
+        0.0,
+        0.0
+      ],
+      "rotation_euler": [
+        0.0,
+        0.0,
+        0.0
+      ],
+      "scale": [
+        1.0,
+        1.0,
+        1.0
+      ]
+    },
+    {
+      "name": "second_sill2_2",
+      "triangles": 12,
+      "signed_volume_m3": 0.07637,
+      "location": [
+        0.0,
+        0.0,
+        0.0
+      ],
+      "rotation_euler": [
+        0.0,
+        0.0,
+        0.0
+      ],
+      "scale": [
+        1.0,
+        1.0,
+        1.0
+      ]
+    },
+    {
+      "name": "second_sill2_3",
+      "triangles": 12,
+      "signed_volume_m3": 0.07645,
+      "location": [
+        0.0,
+        0.0,
+        0.0
+      ],
+      "rotation_euler": [
+        0.0,
+        0.0,
+        0.0
+      ],
+      "scale": [
+        1.0,
+        1.0,
+        1.0
+      ]
+    },
+    {
+      "name": "second_sill2_4",
+      "triangles": 12,
+      "signed_volume_m3": 0.0765,
+      "location": [
+        0.0,
+        0.0,
+        0.0
+      ],
+      "rotation_euler": [
+        0.0,
+        0.0,
+        0.0
+      ],
+      "scale": [
+        1.0,
+        1.0,
+        1.0
+      ]
+    },
+    {
+      "name": "second_sill2_5",
+      "triangles": 12,
+      "signed_volume_m3": 0.07651,
+      "location": [
+        0.0,
+        0.0,
+        0.0
+      ],
+      "rotation_euler": [
+        0.0,
+        0.0,
+        0.0
+      ],
+      "scale": [
+        1.0,
+        1.0,
+        1.0
+      ]
+    },
+    {
+      "name": "second_sill3_0",
+      "triangles": 12,
+      "signed_volume_m3": 0.07649,
+      "location": [
+        0.0,
+        0.0,
+        0.0
+      ],
+      "rotation_euler": [
+        0.0,
+        0.0,
+        0.0
+      ],
+      "scale": [
+        1.0,
+        1.0,
+        1.0
+      ]
+    },
+    {
+      "name": "second_sill3_1",
+      "triangles": 12,
+      "signed_volume_m3": 0.07641,
+      "location": [
+        0.0,
+        0.0,
+        0.0
+      ],
+      "rotation_euler": [
+        0.0,
+        0.0,
+        0.0
+      ],
+      "scale": [
+        1.0,
+        1.0,
+        1.0
+      ]
+    },
+    {
+      "name": "second_sill3_2",
+      "triangles": 12,
+      "signed_volume_m3": 0.07636,
+      "location": [
+        0.0,
+        0.0,
+        0.0
+      ],
+      "rotation_euler": [
+        0.0,
+        0.0,
+        0.0
+      ],
+      "scale": [
+        1.0,
+        1.0,
+        1.0
+      ]
+    },
+    {
+      "name": "second_sill3_3",
+      "triangles": 12,
+      "signed_volume_m3": 0.07649,
+      "location": [
+        0.0,
+        0.0,
+        0.0
+      ],
+      "rotation_euler": [
+        0.0,
+        0.0,
+        0.0
+      ],
+      "scale": [
+        1.0,
+        1.0,
+        1.0
+      ]
+    },
+    {
+      "name": "second_sill3_4",
+      "triangles": 12,
+      "signed_volume_m3": 0.07648,
+      "location": [
+        0.0,
+        0.0,
+        0.0
+      ],
+      "rotation_euler": [
+        0.0,
+        0.0,
+        0.0
+      ],
+      "scale": [
+        1.0,
+        1.0,
+        1.0
+      ]
+    },
+    {
+      "name": "second_sill3_5",
+      "triangles": 12,
+      "signed_volume_m3": 0.07653,
+      "location": [
+        0.0,
+        0.0,
+        0.0
+      ],
+      "rotation_euler": [
+        0.0,
+        0.0,
+        0.0
+      ],
+      "scale": [
+        1.0,
+        1.0,
+        1.0
+      ]
+    },
+    {
+      "name": "second_sill4_0",
+      "triangles": 12,
+      "signed_volume_m3": 0.07652,
+      "location": [
+        0.0,
+        0.0,
+        0.0
+      ],
+      "rotation_euler": [
+        0.0,
+        0.0,
+        0.0
+      ],
+      "scale": [
+        1.0,
+        1.0,
+        1.0
+      ]
+    },
+    {
+      "name": "second_sill4_1",
+      "triangles": 12,
+      "signed_volume_m3": 0.07638,
+      "location": [
+        0.0,
+        0.0,
+        0.0
+      ],
+      "rotation_euler": [
+        0.0,
+        0.0,
+        0.0
+      ],
+      "scale": [
+        1.0,
+        1.0,
+        1.0
+      ]
+    },
+    {
+      "name": "second_sill4_2",
+      "triangles": 12,
+      "signed_volume_m3": 0.07638,
+      "location": [
+        0.0,
+        0.0,
+        0.0
+      ],
+      "rotation_euler": [
+        0.0,
+        0.0,
+        0.0
+      ],
+      "scale": [
+        1.0,
+        1.0,
+        1.0
+      ]
+    },
+    {
+      "name": "second_sill4_3",
+      "triangles": 12,
+      "signed_volume_m3": 0.07641,
+      "location": [
+        0.0,
+        0.0,
+        0.0
+      ],
+      "rotation_euler": [
+        0.0,
+        0.0,
+        0.0
+      ],
+      "scale": [
+        1.0,
+        1.0,
+        1.0
+      ]
+    },
+    {
+      "name": "second_sill4_4",
+      "triangles": 12,
+      "signed_volume_m3": 0.07653,
+      "location": [
+        0.0,
+        0.0,
+        0.0
+      ],
+      "rotation_euler": [
+        0.0,
+        0.0,
+        0.0
+      ],
+      "scale": [
+        1.0,
+        1.0,
+        1.0
+      ]
+    },
+    {
+      "name": "second_sill4_5",
+      "triangles": 12,
+      "signed_volume_m3": 0.07647,
+      "location": [
+        0.0,
+        0.0,
+        0.0
+      ],
+      "rotation_euler": [
+        0.0,
+        0.0,
+        0.0
+      ],
+      "scale": [
+        1.0,
+        1.0,
+        1.0
+      ]
+    },
+    {
+      "name": "stan_bay0",
+      "triangles": 28,
+      "signed_volume_m3": 6.29444,
+      "location": [
+        0.0,
+        0.0,
+        0.0
+      ],
+      "rotation_euler": [
+        0.0,
+        0.0,
+        0.0
+      ],
+      "scale": [
+        1.0,
+        1.0,
+        1.0
+      ]
+    },
+    {
+      "name": "stan_bay1",
+      "triangles": 28,
+      "signed_volume_m3": 6.29458,
+      "location": [
+        0.0,
+        0.0,
+        0.0
+      ],
+      "rotation_euler": [
+        0.0,
+        0.0,
+        0.0
+      ],
+      "scale": [
+        1.0,
+        1.0,
+        1.0
+      ]
+    },
+    {
+      "name": "stan_bay2",
+      "triangles": 28,
+      "signed_volume_m3": 6.29485,
+      "location": [
+        0.0,
+        0.0,
+        0.0
+      ],
+      "rotation_euler": [
+        0.0,
+        0.0,
+        0.0
+      ],
+      "scale": [
+        1.0,
+        1.0,
+        1.0
+      ]
+    },
+    {
+      "name": "stan_bay3",
+      "triangles": 28,
+      "signed_volume_m3": 6.29479,
+      "location": [
+        0.0,
+        0.0,
+        0.0
+      ],
+      "rotation_euler": [
+        0.0,
+        0.0,
+        0.0
+      ],
+      "scale": [
+        1.0,
+        1.0,
+        1.0
+      ]
+    },
+    {
+      "name": "stan_bay4",
+      "triangles": 28,
+      "signed_volume_m3": 6.29434,
+      "location": [
+        0.0,
+        0.0,
+        0.0
+      ],
+      "rotation_euler": [
+        0.0,
+        0.0,
+        0.0
+      ],
+      "scale": [
+        1.0,
+        1.0,
+        1.0
+      ]
+    },
+    {
+      "name": "stan_bay5",
+      "triangles": 28,
+      "signed_volume_m3": 6.29443,
+      "location": [
+        0.0,
+        0.0,
+        0.0
+      ],
+      "rotation_euler": [
+        0.0,
+        0.0,
+        0.0
+      ],
+      "scale": [
+        1.0,
+        1.0,
+        1.0
+      ]
+    },
+    {
+      "name": "stan_door",
+      "triangles": 108,
+      "signed_volume_m3": 1.6635,
+      "location": [
+        0.0,
+        0.0,
+        0.0
+      ],
+      "rotation_euler": [
+        0.0,
+        0.0,
+        0.0
+      ],
+      "scale": [
+        1.0,
+        1.0,
+        1.0
+      ]
+    },
+    {
+      "name": "stan_g0_0",
+      "triangles": 12,
+      "signed_volume_m3": 0.68147,
+      "location": [
+        0.0,
+        0.0,
+        0.0
+      ],
+      "rotation_euler": [
+        0.0,
+        0.0,
+        0.0
+      ],
+      "scale": [
+        1.0,
+        1.0,
+        1.0
+      ]
+    },
+    {
+      "name": "stan_g0_1",
+      "triangles": 12,
+      "signed_volume_m3": 0.68143,
+      "location": [
+        0.0,
+        0.0,
+        0.0
+      ],
+      "rotation_euler": [
+        0.0,
+        0.0,
+        0.0
+      ],
+      "scale": [
+        1.0,
+        1.0,
+        1.0
+      ]
+    },
+    {
+      "name": "stan_g0_2",
+      "triangles": 12,
+      "signed_volume_m3": 0.68138,
+      "location": [
+        0.0,
+        0.0,
+        0.0
+      ],
+      "rotation_euler": [
+        0.0,
+        0.0,
+        0.0
+      ],
+      "scale": [
+        1.0,
+        1.0,
+        1.0
+      ]
+    },
+    {
+      "name": "stan_g0_3",
+      "triangles": 12,
+      "signed_volume_m3": 0.68147,
+      "location": [
+        0.0,
+        0.0,
+        0.0
+      ],
+      "rotation_euler": [
+        0.0,
+        0.0,
+        0.0
+      ],
+      "scale": [
+        1.0,
+        1.0,
+        1.0
+      ]
+    },
+    {
+      "name": "stan_g0_4",
+      "triangles": 12,
+      "signed_volume_m3": 0.6814,
+      "location": [
+        0.0,
+        0.0,
+        0.0
+      ],
+      "rotation_euler": [
+        0.0,
+        0.0,
+        0.0
+      ],
+      "scale": [
+        1.0,
+        1.0,
+        1.0
+      ]
+    },
+    {
+      "name": "stan_g0_5",
+      "triangles": 12,
+      "signed_volume_m3": 0.68144,
+      "location": [
+        0.0,
+        0.0,
+        0.0
+      ],
+      "rotation_euler": [
+        0.0,
+        0.0,
+        0.0
+      ],
+      "scale": [
+        1.0,
+        1.0,
+        1.0
+      ]
+    },
+    {
+      "name": "stan_g1_0",
+      "triangles": 12,
+      "signed_volume_m3": 0.6815,
+      "location": [
+        0.0,
+        0.0,
+        0.0
+      ],
+      "rotation_euler": [
+        0.0,
+        0.0,
+        0.0
+      ],
+      "scale": [
+        1.0,
+        1.0,
+        1.0
+      ]
+    },
+    {
+      "name": "stan_g1_1",
+      "triangles": 12,
+      "signed_volume_m3": 0.68145,
+      "location": [
+        0.0,
+        0.0,
+        0.0
+      ],
+      "rotation_euler": [
+        0.0,
+        0.0,
+        0.0
+      ],
+      "scale": [
+        1.0,
+        1.0,
+        1.0
+      ]
+    },
+    {
+      "name": "stan_g1_2",
+      "triangles": 12,
+      "signed_volume_m3": 0.68136,
+      "location": [
+        0.0,
+        0.0,
+        0.0
+      ],
+      "rotation_euler": [
+        0.0,
+        0.0,
+        0.0
+      ],
+      "scale": [
+        1.0,
+        1.0,
+        1.0
+      ]
+    },
+    {
+      "name": "stan_g1_3",
+      "triangles": 12,
+      "signed_volume_m3": 0.68148,
+      "location": [
+        0.0,
+        0.0,
+        0.0
+      ],
+      "rotation_euler": [
+        0.0,
+        0.0,
+        0.0
+      ],
+      "scale": [
+        1.0,
+        1.0,
+        1.0
+      ]
+    },
+    {
+      "name": "stan_g1_4",
+      "triangles": 12,
+      "signed_volume_m3": 0.68152,
+      "location": [
+        0.0,
+        0.0,
+        0.0
+      ],
+      "rotation_euler": [
+        0.0,
+        0.0,
+        0.0
+      ],
+      "scale": [
+        1.0,
+        1.0,
+        1.0
+      ]
+    },
+    {
+      "name": "stan_g1_5",
+      "triangles": 12,
+      "signed_volume_m3": 0.68145,
+      "location": [
+        0.0,
+        0.0,
+        0.0
+      ],
+      "rotation_euler": [
+        0.0,
+        0.0,
+        0.0
+      ],
+      "scale": [
+        1.0,
+        1.0,
+        1.0
+      ]
+    },
+    {
+      "name": "stan_g2_0",
+      "triangles": 12,
+      "signed_volume_m3": 0.68152,
+      "location": [
+        0.0,
+        0.0,
+        0.0
+      ],
+      "rotation_euler": [
+        0.0,
+        0.0,
+        0.0
+      ],
+      "scale": [
+        1.0,
+        1.0,
+        1.0
+      ]
+    },
+    {
+      "name": "stan_g2_1",
+      "triangles": 12,
+      "signed_volume_m3": 0.68145,
+      "location": [
+        0.0,
+        0.0,
+        0.0
+      ],
+      "rotation_euler": [
+        0.0,
+        0.0,
+        0.0
+      ],
+      "scale": [
+        1.0,
+        1.0,
+        1.0
+      ]
+    },
+    {
+      "name": "stan_g2_2",
+      "triangles": 12,
+      "signed_volume_m3": 0.68137,
+      "location": [
+        0.0,
+        0.0,
+        0.0
+      ],
+      "rotation_euler": [
+        0.0,
+        0.0,
+        0.0
+      ],
+      "scale": [
+        1.0,
+        1.0,
+        1.0
+      ]
+    },
+    {
+      "name": "stan_g2_3",
+      "triangles": 12,
+      "signed_volume_m3": 0.68139,
+      "location": [
+        0.0,
+        0.0,
+        0.0
+      ],
+      "rotation_euler": [
+        0.0,
+        0.0,
+        0.0
+      ],
+      "scale": [
+        1.0,
+        1.0,
+        1.0
+      ]
+    },
+    {
+      "name": "stan_g2_4",
+      "triangles": 12,
+      "signed_volume_m3": 0.68136,
+      "location": [
+        0.0,
+        0.0,
+        0.0
+      ],
+      "rotation_euler": [
+        0.0,
+        0.0,
+        0.0
+      ],
+      "scale": [
+        1.0,
+        1.0,
+        1.0
+      ]
+    },
+    {
+      "name": "stan_g2_5",
+      "triangles": 12,
+      "signed_volume_m3": 0.68144,
+      "location": [
+        0.0,
+        0.0,
+        0.0
+      ],
+      "rotation_euler": [
+        0.0,
+        0.0,
+        0.0
+      ],
+      "scale": [
+        1.0,
+        1.0,
+        1.0
+      ]
+    },
+    {
+      "name": "stan_g3_0",
+      "triangles": 12,
+      "signed_volume_m3": 0.68151,
+      "location": [
+        0.0,
+        0.0,
+        0.0
+      ],
+      "rotation_euler": [
+        0.0,
+        0.0,
+        0.0
+      ],
+      "scale": [
+        1.0,
+        1.0,
+        1.0
+      ]
+    },
+    {
+      "name": "stan_g3_1",
+      "triangles": 12,
+      "signed_volume_m3": 0.68142,
+      "location": [
+        0.0,
+        0.0,
+        0.0
+      ],
+      "rotation_euler": [
+        0.0,
+        0.0,
+        0.0
+      ],
+      "scale": [
+        1.0,
+        1.0,
+        1.0
+      ]
+    },
+    {
+      "name": "stan_g3_2",
+      "triangles": 12,
+      "signed_volume_m3": 0.68134,
+      "location": [
+        0.0,
+        0.0,
+        0.0
+      ],
+      "rotation_euler": [
+        0.0,
+        0.0,
+        0.0
+      ],
+      "scale": [
+        1.0,
+        1.0,
+        1.0
+      ]
+    },
+    {
+      "name": "stan_g3_3",
+      "triangles": 12,
+      "signed_volume_m3": 0.68135,
+      "location": [
+        0.0,
+        0.0,
+        0.0
+      ],
+      "rotation_euler": [
+        0.0,
+        0.0,
+        0.0
+      ],
+      "scale": [
+        1.0,
+        1.0,
+        1.0
+      ]
+    },
+    {
+      "name": "stan_g3_4",
+      "triangles": 12,
+      "signed_volume_m3": 0.68141,
+      "location": [
+        0.0,
+        0.0,
+        0.0
+      ],
+      "rotation_euler": [
+        0.0,
+        0.0,
+        0.0
+      ],
+      "scale": [
+        1.0,
+        1.0,
+        1.0
+      ]
+    },
+    {
+      "name": "stan_g3_5",
+      "triangles": 12,
+      "signed_volume_m3": 0.68151,
+      "location": [
+        0.0,
+        0.0,
+        0.0
+      ],
+      "rotation_euler": [
+        0.0,
+        0.0,
+        0.0
+      ],
+      "scale": [
+        1.0,
+        1.0,
+        1.0
+      ]
+    },
+    {
+      "name": "stan_g4_0",
+      "triangles": 12,
+      "signed_volume_m3": 0.68154,
+      "location": [
+        0.0,
+        0.0,
+        0.0
+      ],
+      "rotation_euler": [
+        0.0,
+        0.0,
+        0.0
+      ],
+      "scale": [
+        1.0,
+        1.0,
+        1.0
+      ]
+    },
+    {
+      "name": "stan_g4_1",
+      "triangles": 12,
+      "signed_volume_m3": 0.68152,
+      "location": [
+        0.0,
+        0.0,
+        0.0
+      ],
+      "rotation_euler": [
+        0.0,
+        0.0,
+        0.0
+      ],
+      "scale": [
+        1.0,
+        1.0,
+        1.0
+      ]
+    },
+    {
+      "name": "stan_g4_2",
+      "triangles": 12,
+      "signed_volume_m3": 0.68135,
+      "location": [
+        0.0,
+        0.0,
+        0.0
+      ],
+      "rotation_euler": [
+        0.0,
+        0.0,
+        0.0
+      ],
+      "scale": [
+        1.0,
+        1.0,
+        1.0
+      ]
+    },
+    {
+      "name": "stan_g4_3",
+      "triangles": 12,
+      "signed_volume_m3": 0.68136,
+      "location": [
+        0.0,
+        0.0,
+        0.0
+      ],
+      "rotation_euler": [
+        0.0,
+        0.0,
+        0.0
+      ],
+      "scale": [
+        1.0,
+        1.0,
+        1.0
+      ]
+    },
+    {
+      "name": "stan_g4_4",
+      "triangles": 12,
+      "signed_volume_m3": 0.68134,
+      "location": [
+        0.0,
+        0.0,
+        0.0
+      ],
+      "rotation_euler": [
+        0.0,
+        0.0,
+        0.0
+      ],
+      "scale": [
+        1.0,
+        1.0,
+        1.0
+      ]
+    },
+    {
+      "name": "stan_g4_5",
+      "triangles": 12,
+      "signed_volume_m3": 0.68146,
+      "location": [
+        0.0,
+        0.0,
+        0.0
+      ],
+      "rotation_euler": [
+        0.0,
+        0.0,
+        0.0
+      ],
+      "scale": [
+        1.0,
+        1.0,
+        1.0
+      ]
+    },
+    {
+      "name": "stan_line0",
+      "triangles": 12,
+      "signed_volume_m3": 0.63122,
+      "location": [
+        0.0,
+        0.0,
+        0.0
+      ],
+      "rotation_euler": [
+        0.0,
+        0.0,
+        0.0
+      ],
+      "scale": [
+        1.0,
+        1.0,
+        1.0
+      ]
+    },
+    {
+      "name": "stan_line1",
+      "triangles": 12,
+      "signed_volume_m3": 0.63128,
+      "location": [
+        0.0,
+        0.0,
+        0.0
+      ],
+      "rotation_euler": [
+        0.0,
+        0.0,
+        0.0
+      ],
+      "scale": [
+        1.0,
+        1.0,
+        1.0
+      ]
+    },
+    {
+      "name": "stan_line2",
+      "triangles": 12,
+      "signed_volume_m3": 0.63145,
+      "location": [
+        0.0,
+        0.0,
+        0.0
+      ],
+      "rotation_euler": [
+        0.0,
+        0.0,
+        0.0
+      ],
+      "scale": [
+        1.0,
+        1.0,
+        1.0
+      ]
+    },
+    {
+      "name": "stan_line3",
+      "triangles": 12,
+      "signed_volume_m3": 0.63126,
+      "location": [
+        0.0,
+        0.0,
+        0.0
+      ],
+      "rotation_euler": [
+        0.0,
+        0.0,
+        0.0
+      ],
+      "scale": [
+        1.0,
+        1.0,
+        1.0
+      ]
+    },
+    {
+      "name": "stan_line4",
+      "triangles": 12,
+      "signed_volume_m3": 0.63127,
+      "location": [
+        0.0,
+        0.0,
+        0.0
+      ],
+      "rotation_euler": [
+        0.0,
+        0.0,
+        0.0
+      ],
+      "scale": [
+        1.0,
+        1.0,
+        1.0
+      ]
+    },
+    {
+      "name": "stan_sill0_0",
+      "triangles": 12,
+      "signed_volume_m3": 0.09052,
+      "location": [
+        0.0,
+        0.0,
+        0.0
+      ],
+      "rotation_euler": [
+        0.0,
+        0.0,
+        0.0
+      ],
+      "scale": [
+        1.0,
+        1.0,
+        1.0
+      ]
+    },
+    {
+      "name": "stan_sill0_1",
+      "triangles": 12,
+      "signed_volume_m3": 0.09051,
+      "location": [
+        0.0,
+        0.0,
+        0.0
+      ],
+      "rotation_euler": [
+        0.0,
+        0.0,
+        0.0
+      ],
+      "scale": [
+        1.0,
+        1.0,
+        1.0
+      ]
+    },
+    {
+      "name": "stan_sill0_2",
+      "triangles": 12,
+      "signed_volume_m3": 0.09057,
+      "location": [
+        0.0,
+        0.0,
+        0.0
+      ],
+      "rotation_euler": [
+        0.0,
+        0.0,
+        0.0
+      ],
+      "scale": [
+        1.0,
+        1.0,
+        1.0
+      ]
+    },
+    {
+      "name": "stan_sill0_3",
+      "triangles": 12,
+      "signed_volume_m3": 0.09049,
+      "location": [
+        0.0,
+        0.0,
+        0.0
+      ],
+      "rotation_euler": [
+        0.0,
+        0.0,
+        0.0
+      ],
+      "scale": [
+        1.0,
+        1.0,
+        1.0
+      ]
+    },
+    {
+      "name": "stan_sill0_4",
+      "triangles": 12,
+      "signed_volume_m3": 0.09054,
+      "location": [
+        0.0,
+        0.0,
+        0.0
+      ],
+      "rotation_euler": [
+        0.0,
+        0.0,
+        0.0
+      ],
+      "scale": [
+        1.0,
+        1.0,
+        1.0
+      ]
+    },
+    {
+      "name": "stan_sill0_5",
+      "triangles": 12,
+      "signed_volume_m3": 0.09053,
+      "location": [
+        0.0,
+        0.0,
+        0.0
+      ],
+      "rotation_euler": [
+        0.0,
+        0.0,
+        0.0
+      ],
+      "scale": [
+        1.0,
+        1.0,
+        1.0
+      ]
+    },
+    {
+      "name": "stan_sill1_0",
+      "triangles": 12,
+      "signed_volume_m3": 0.0905,
+      "location": [
+        0.0,
+        0.0,
+        0.0
+      ],
+      "rotation_euler": [
+        0.0,
+        0.0,
+        0.0
+      ],
+      "scale": [
+        1.0,
+        1.0,
+        1.0
+      ]
+    },
+    {
+      "name": "stan_sill1_1",
+      "triangles": 12,
+      "signed_volume_m3": 0.09047,
+      "location": [
+        0.0,
+        0.0,
+        0.0
+      ],
+      "rotation_euler": [
+        0.0,
+        0.0,
+        0.0
+      ],
+      "scale": [
+        1.0,
+        1.0,
+        1.0
+      ]
+    },
+    {
+      "name": "stan_sill1_2",
+      "triangles": 12,
+      "signed_volume_m3": 0.0906,
+      "location": [
+        0.0,
+        0.0,
+        0.0
+      ],
+      "rotation_euler": [
+        0.0,
+        0.0,
+        0.0
+      ],
+      "scale": [
+        1.0,
+        1.0,
+        1.0
+      ]
+    },
+    {
+      "name": "stan_sill1_3",
+      "triangles": 12,
+      "signed_volume_m3": 0.09054,
+      "location": [
+        0.0,
+        0.0,
+        0.0
+      ],
+      "rotation_euler": [
+        0.0,
+        0.0,
+        0.0
+      ],
+      "scale": [
+        1.0,
+        1.0,
+        1.0
+      ]
+    },
+    {
+      "name": "stan_sill1_4",
+      "triangles": 12,
+      "signed_volume_m3": 0.09054,
+      "location": [
+        0.0,
+        0.0,
+        0.0
+      ],
+      "rotation_euler": [
+        0.0,
+        0.0,
+        0.0
+      ],
+      "scale": [
+        1.0,
+        1.0,
+        1.0
+      ]
+    },
+    {
+      "name": "stan_sill1_5",
+      "triangles": 12,
+      "signed_volume_m3": 0.09051,
+      "location": [
+        0.0,
+        0.0,
+        0.0
+      ],
+      "rotation_euler": [
+        0.0,
+        0.0,
+        0.0
+      ],
+      "scale": [
+        1.0,
+        1.0,
+        1.0
+      ]
+    },
+    {
+      "name": "stan_sill2_0",
+      "triangles": 12,
+      "signed_volume_m3": 0.09047,
+      "location": [
+        0.0,
+        0.0,
+        0.0
+      ],
+      "rotation_euler": [
+        0.0,
+        0.0,
+        0.0
+      ],
+      "scale": [
+        1.0,
+        1.0,
+        1.0
+      ]
+    },
+    {
+      "name": "stan_sill2_1",
+      "triangles": 12,
+      "signed_volume_m3": 0.09049,
+      "location": [
+        0.0,
+        0.0,
+        0.0
+      ],
+      "rotation_euler": [
+        0.0,
+        0.0,
+        0.0
+      ],
+      "scale": [
+        1.0,
+        1.0,
+        1.0
+      ]
+    },
+    {
+      "name": "stan_sill2_2",
+      "triangles": 12,
+      "signed_volume_m3": 0.09053,
+      "location": [
+        0.0,
+        0.0,
+        0.0
+      ],
+      "rotation_euler": [
+        0.0,
+        0.0,
+        0.0
+      ],
+      "scale": [
+        1.0,
+        1.0,
+        1.0
+      ]
+    },
+    {
+      "name": "stan_sill2_3",
+      "triangles": 12,
+      "signed_volume_m3": 0.09045,
+      "location": [
+        0.0,
+        0.0,
+        0.0
+      ],
+      "rotation_euler": [
+        0.0,
+        0.0,
+        0.0
+      ],
+      "scale": [
+        1.0,
+        1.0,
+        1.0
+      ]
+    },
+    {
+      "name": "stan_sill2_4",
+      "triangles": 12,
+      "signed_volume_m3": 0.09052,
+      "location": [
+        0.0,
+        0.0,
+        0.0
+      ],
+      "rotation_euler": [
+        0.0,
+        0.0,
+        0.0
+      ],
+      "scale": [
+        1.0,
+        1.0,
+        1.0
+      ]
+    },
+    {
+      "name": "stan_sill2_5",
+      "triangles": 12,
+      "signed_volume_m3": 0.09051,
+      "location": [
+        0.0,
+        0.0,
+        0.0
+      ],
+      "rotation_euler": [
+        0.0,
+        0.0,
+        0.0
+      ],
+      "scale": [
+        1.0,
+        1.0,
+        1.0
+      ]
+    },
+    {
+      "name": "stan_sill3_0",
+      "triangles": 12,
+      "signed_volume_m3": 0.0905,
+      "location": [
+        0.0,
+        0.0,
+        0.0
+      ],
+      "rotation_euler": [
+        0.0,
+        0.0,
+        0.0
+      ],
+      "scale": [
+        1.0,
+        1.0,
+        1.0
+      ]
+    },
+    {
+      "name": "stan_sill3_1",
+      "triangles": 12,
+      "signed_volume_m3": 0.09048,
+      "location": [
+        0.0,
+        0.0,
+        0.0
+      ],
+      "rotation_euler": [
+        0.0,
+        0.0,
+        0.0
+      ],
+      "scale": [
+        1.0,
+        1.0,
+        1.0
+      ]
+    },
+    {
+      "name": "stan_sill3_2",
+      "triangles": 12,
+      "signed_volume_m3": 0.09052,
+      "location": [
+        0.0,
+        0.0,
+        0.0
+      ],
+      "rotation_euler": [
+        0.0,
+        0.0,
+        0.0
+      ],
+      "scale": [
+        1.0,
+        1.0,
+        1.0
+      ]
+    },
+    {
+      "name": "stan_sill3_3",
+      "triangles": 12,
+      "signed_volume_m3": 0.09043,
+      "location": [
+        0.0,
+        0.0,
+        0.0
+      ],
+      "rotation_euler": [
+        0.0,
+        0.0,
+        0.0
+      ],
+      "scale": [
+        1.0,
+        1.0,
+        1.0
+      ]
+    },
+    {
+      "name": "stan_sill3_4",
+      "triangles": 12,
+      "signed_volume_m3": 0.09065,
+      "location": [
+        0.0,
+        0.0,
+        0.0
+      ],
+      "rotation_euler": [
+        0.0,
+        0.0,
+        0.0
+      ],
+      "scale": [
+        1.0,
+        1.0,
+        1.0
+      ]
+    },
+    {
+      "name": "stan_sill3_5",
+      "triangles": 12,
+      "signed_volume_m3": 0.09052,
+      "location": [
+        0.0,
+        0.0,
+        0.0
+      ],
+      "rotation_euler": [
+        0.0,
+        0.0,
+        0.0
+      ],
+      "scale": [
+        1.0,
+        1.0,
+        1.0
+      ]
+    },
+    {
+      "name": "stan_sill4_0",
+      "triangles": 12,
+      "signed_volume_m3": 0.09052,
+      "location": [
+        0.0,
+        0.0,
+        0.0
+      ],
+      "rotation_euler": [
+        0.0,
+        0.0,
+        0.0
+      ],
+      "scale": [
+        1.0,
+        1.0,
+        1.0
+      ]
+    },
+    {
+      "name": "stan_sill4_1",
+      "triangles": 12,
+      "signed_volume_m3": 0.09055,
+      "location": [
+        0.0,
+        0.0,
+        0.0
+      ],
+      "rotation_euler": [
+        0.0,
+        0.0,
+        0.0
+      ],
+      "scale": [
+        1.0,
+        1.0,
+        1.0
+      ]
+    },
+    {
+      "name": "stan_sill4_2",
+      "triangles": 12,
+      "signed_volume_m3": 0.09063,
+      "location": [
+        0.0,
+        0.0,
+        0.0
+      ],
+      "rotation_euler": [
+        0.0,
+        0.0,
+        0.0
+      ],
+      "scale": [
+        1.0,
+        1.0,
+        1.0
+      ]
+    },
+    {
+      "name": "stan_sill4_3",
+      "triangles": 12,
+      "signed_volume_m3": 0.09039,
+      "location": [
+        0.0,
+        0.0,
+        0.0
+      ],
+      "rotation_euler": [
+        0.0,
+        0.0,
+        0.0
+      ],
+      "scale": [
+        1.0,
+        1.0,
+        1.0
+      ]
+    },
+    {
+      "name": "stan_sill4_4",
+      "triangles": 12,
+      "signed_volume_m3": 0.09055,
+      "location": [
+        0.0,
+        0.0,
+        0.0
+      ],
+      "rotation_euler": [
+        0.0,
+        0.0,
+        0.0
+      ],
+      "scale": [
+        1.0,
+        1.0,
+        1.0
+      ]
+    },
+    {
+      "name": "stan_sill4_5",
+      "triangles": 12,
+      "signed_volume_m3": 0.09057,
+      "location": [
+        0.0,
+        0.0,
+        0.0
+      ],
+      "rotation_euler": [
+        0.0,
+        0.0,
+        0.0
+      ],
+      "scale": [
+        1.0,
+        1.0,
+        1.0
+      ]
+    },
+    {
+      "name": "tank",
+      "triangles": 276,
+      "signed_volume_m3": 8.50599,
+      "location": [
+        0.0,
+        0.0,
+        0.0
+      ],
+      "rotation_euler": [
+        0.0,
+        0.0,
+        0.0
+      ],
+      "scale": [
+        1.0,
+        1.0,
+        1.0
+      ]
+    },
+    {
+      "name": "vent0",
+      "triangles": 108,
+      "signed_volume_m3": 0.47152,
+      "location": [
+        0.0,
+        0.0,
+        0.0
+      ],
+      "rotation_euler": [
+        0.0,
+        0.0,
+        0.0
+      ],
+      "scale": [
+        1.0,
+        1.0,
+        1.0
+      ]
+    },
+    {
+      "name": "vent1",
+      "triangles": 108,
+      "signed_volume_m3": 0.47139,
+      "location": [
+        0.0,
+        0.0,
+        0.0
+      ],
+      "rotation_euler": [
+        0.0,
+        0.0,
+        0.0
+      ],
+      "scale": [
+        1.0,
+        1.0,
+        1.0
+      ]
+    },
+    {
+      "name": "vent2",
+      "triangles": 108,
+      "signed_volume_m3": 0.47155,
+      "location": [
+        0.0,
+        0.0,
+        0.0
+      ],
+      "rotation_euler": [
+        0.0,
+        0.0,
+        0.0
+      ],
+      "scale": [
+        1.0,
+        1.0,
+        1.0
+      ]
+    },
+    {
+      "name": "vent3",
+      "triangles": 108,
+      "signed_volume_m3": 0.47153,
+      "location": [
+        0.0,
+        0.0,
+        0.0
+      ],
+      "rotation_euler": [
+        0.0,
+        0.0,
+        0.0
+      ],
+      "scale": [
+        1.0,
+        1.0,
+        1.0
+      ]
+    },
+    {
+      "name": "walk",
+      "triangles": 12,
+      "signed_volume_m3": 1.05599,
+      "location": [
+        0.0,
+        0.0,
+        0.0
+      ],
+      "rotation_euler": [
+        0.0,
+        0.0,
+        0.0
+      ],
+      "scale": [
+        1.0,
+        1.0,
+        1.0
+      ]
+    }
+  ],
+  "checks": {
+    "meters_and_plausible_dimensions": true,
+    "base_at_z_zero": true,
+    "crest_is_target_height": true,
+    "centered_xy": true,
+    "under_triangle_budget": true,
+    "no_image_textures": true,
+    "no_transparency": true,
+    "materials_follow_contract": true,
+    "no_cameras_or_lights": true,
+    "no_animation_skin_or_constraints": true,
+    "transforms_applied": true,
+    "no_negative_scales": true,
+    "normals_outward": true,
+    "no_degenerate_geometry": true,
+    "no_unexpected_objects": true
+  },
+  "overall": "PASS"
+}
