@@ -1,0 +1,84 @@
+{
+ "input_materials": [
+  "Toy_glass",
+  "Toy_glass_Glow",
+  "Toy_glassl",
+  "Toy_gold_Glow",
+  "Toy_ink",
+  "Toy_roofd",
+  "Toy_steel",
+  "Toy_stone",
+  "Toy_trim",
+  "Toy_verdigris"
+ ],
+ "steps": [
+  {
+   "step": "weld+degenerate",
+   "tris": 6980,
+   "verts": 3668
+  },
+  {
+   "step": "interior-faces",
+   "tris": 6980,
+   "verts": 3668
+  },
+  {
+   "step": "curve-retess",
+   "skipped": "10-segment arches / 14-segment roundels are already minimal and silhouette-defining on the hero elevation"
+  },
+  {
+   "step": "limited-dissolve",
+   "skipped": "six coplanar ring bands (water_table, architrave, frieze, cornice, parapet, coping) plus the body cap"
+  },
+  {
+   "step": "join-per-material",
+   "tris": 6980,
+   "verts": 3668
+  }
+ ],
+ "input": {
+  "tris": 6980,
+  "verts": 13440,
+  "objects": 95
+ },
+ "interior_faces_removed": 0,
+ "joins": {
+  "grp_Toy_trim": 13,
+  "grp_Toy_stone": 8,
+  "grp_Toy_glass": 5,
+  "grp_Toy_glass_Glow": 5,
+  "grp_Toy_verdigris": 3,
+  "grp_Toy_ink": 40,
+  "grp_Toy_roofd": 8,
+  "grp_Toy_glassl": 8,
+  "grp_Toy_gold_Glow": 4
+ },
+ "inverted_solids": [],
+ "reimport": {
+  "objects": 10,
+  "materials": [
+   "Toy_glass",
+   "Toy_glass_Glow",
+   "Toy_glassl",
+   "Toy_gold_Glow",
+   "Toy_ink",
+   "Toy_roofd",
+   "Toy_steel",
+   "Toy_stone",
+   "Toy_trim",
+   "Toy_verdigris"
+  ],
+  "bbox_dims": [
+   42.0586,
+   40.2991,
+   13.4
+  ],
+  "bbox_min": [
+   -21.0294,
+   -19.3205,
+   0.0
+  ]
+ },
+ "bbox_ok": true,
+ "material_set_ok": true
+}

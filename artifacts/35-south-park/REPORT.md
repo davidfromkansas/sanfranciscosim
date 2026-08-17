@@ -5,13 +5,19 @@ Plan: `docs/asset-plans/35-south-park.md`
 Dossier: `REFERENCE.md` (this asset's own research; it beats the plan where they differ)
 Built: 17 August 2026, Blender 5.2.0 LTS, `build_35_south_park.py`
 
-## 1. Numbers
+## 1. Shipped numbers
+
+These are the numbers of the **shipped** file, i.e. after stage 4
+(`optimize/REPORT.md`). The pre-optimize build is archived at
+`optimize/input/35-south-park.glb`; where the two differ the pre-optimize figure is
+given in brackets.
 
 | | |
 |---|---|
-| File size | 394,856 bytes raw (pre-optimize) |
-| Triangles | **6,980** (budget 9,000) |
-| Objects | 95 |
+| File size | **211,704 bytes raw** [394,856 pre-optimize, −46.4%] |
+| Triangles | **6,980** (budget 9,000) — unchanged by the optimize pass |
+| Objects | **10** [95 pre-optimize] |
+| Draw submeshes | **10** [95] |
 | Materials | 10 — `Toy_glass`, `Toy_glass_Glow`, `Toy_glassl`, `Toy_gold_Glow`, `Toy_ink`, `Toy_roofd`, `Toy_steel`, `Toy_stone`, `Toy_trim`, `Toy_verdigris` |
 | Glow groups | 2 — `Toy_glass_Glow` (the five lit arches), `Toy_gold_Glow` (four pier sconces) |
 | AABB dimensions | 42.059 × 40.299 × 13.400 m |
@@ -124,7 +130,8 @@ layer) is unaffected.
 }
 ```
 
-`dims`/`tris` are the pre-optimize figures and are updated by stage 4.
+`dims` and `tris` are the shipped figures: the optimize pass changed neither
+(6,980 triangles in and out, bbox identical to five decimal places).
 
 ## 8. Approval
 
