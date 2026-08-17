@@ -1578,5 +1578,24 @@
     ],
     "tris": 7736,
     "loadRadius": 2500
+  },
+  {
+    "id": "95-jack-london-alley",
+    "file": "95-jack-london-alley.glb",
+    "anchor": [
+      -122.393443,
+      37.781346
+    ],
+    "targetHeightM": 8.4,
+    "cat": 8,
+    "name": "Gran Oriente Filipino Masonic Temple (95 Jack London Alley)",
+    "estimated": true,
+    "dims": [
+      16.1965,
+      16.0932,
+      8.4
+    ],
+    "tris": 3888,
+    "loadRadius": 2500
   }
 ]

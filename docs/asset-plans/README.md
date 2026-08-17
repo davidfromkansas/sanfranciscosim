@@ -128,6 +128,7 @@ route, and the park plans depend on it (§E8 of the parks README).
 | [76–82 South Park](./76-south-park.md) | `76-south-park` | 16.28 m (LiDAR max, attributed to the roof-stair penthouse — see its 2.15 risk 1; roof deck 13.08 m measured) | new landmark |
 | [84 South Park](./84-south-park.md) | `84-south-park` | 13.2 m (LiDAR-derived, roof pergola crest; parapet 11.5 m) | new landmark |
 | [92 South Park (86–96 South Park)](./92-south-park.md) | `92-south-park` | 13.28 m (LiDAR-derived) | new landmark |
+| [95 Jack London Alley (Gran Oriente Filipino Masonic Temple)](./95-jack-london-alley.md) | `95-jack-london-alley` | 8.4 m (estimated — LiDAR roof deck 7.84 m plus a derived parapet) | new landmark |
 
 ## Shared contract (all 76)
 
