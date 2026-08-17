@@ -1843,6 +1843,48 @@ export const LANDMARKS = [
     // (225.4 deg) and the Bryant Street elevation (315.4 deg).
     camera: { distance: 420, yaw: 270, pitch: 26 },
   },
+  {
+    // 334 Brannan Street, the 1929 "Sherman and Clay" building — a three-storey
+    // reinforced-concrete loft on a 21.08 x 21.13 m square lot, four doors
+    // northeast of 350 Brannan and a contributor to the South End Historic
+    // District. Gold frieze, gilt pier caps, pink Deco panels on the entry tower.
+    //
+    // Exclusion sized against the REAL bake input (both passes:
+    // pipeline/data/buildings_datasf.geojson AND overture_buildings.geojsonseq),
+    // with the rule excluded() actually uses — centroid OR ANY ring vertex:
+    //
+    //   THIS BUILDING IS TRACED TWICE and both rings must go:
+    //     0.49 m  Overture 879ad29f (h=12), by CENTROID
+    //     2.04 m  DataSF SF3775101 (h=12.14), by CENTROID
+    //   the neighbours, all reached by VERTEX, never by centroid:
+    //    10.96 m  Overture b57e2786 (h=5.3) — the 326 Brannan garden structure,
+    //             which SHARES the 10.96 m vertex with our own Overture ring, so
+    //             this is a hard ceiling that no radius can climb past
+    //    11.82 m  Overture 4a643109 (h=3.1)
+    //    12.07 m  DataSF SF3775012 (326 Brannan, both of its volumes)
+    //    13.40 m  DataSF SF3775015 (340 Brannan, h=14.82) — the party wall
+    //
+    //   exclude  2 m    -> drops 1  (WRONG: misses the DataSF ring, leaving a
+    //                     12.14 m procedural block inside the GLB)
+    //   exclude 3-10 m  -> drops 2  (correct: both rings of this building only)
+    //   exclude 11 m    -> drops 3  (eats the 326 Brannan garden structure)
+    //   exclude 13 m    -> drops 7  (eats both neighbours and a fourth lot)
+    //
+    // 6 m sits in the middle of the (2.04, 10.96) window. Do NOT raise it past
+    // 10. Note that 6 m does not reach this footprint's own vertices at 12.07 m
+    // and does not need to — the centroid test does all the work here.
+    id: '334Brannan',
+    name: '334 Brannan Street',
+    lon: -122.3930344,
+    lat: 37.7814147,
+    height: 13.4,
+    exclude: 6,
+    // Camera offset is (sin yaw, ., cos yaw) with +z south, so yaw 90 stands the
+    // camera due EAST — the bisector of the Brannan Street front (135.1 deg) and
+    // the exposed northeast flank (46.1 deg), which is the pair the app's aerial
+    // camera sees. Square-on from the southeast would show the blind party wall.
+    camera: { distance: 210, yaw: 90, pitch: 26 },
+  },
 ];
 
 // Parks/green spaces the landcover bake must match at least one source polygon
