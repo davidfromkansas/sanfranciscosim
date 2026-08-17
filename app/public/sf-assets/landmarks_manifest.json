@@ -1540,5 +1540,24 @@
     ],
     "tris": 4376,
     "loadRadius": 2500
+  },
+  {
+    "id": "84-south-park",
+    "file": "84-south-park.glb",
+    "anchor": [
+      -122.3940683,
+      37.7819794
+    ],
+    "targetHeightM": 13.2,
+    "cat": 1,
+    "name": "84 South Park",
+    "estimated": true,
+    "dims": [
+      26.0856,
+      26.2918,
+      13.2
+    ],
+    "tris": 6900,
+    "loadRadius": 2500
   }
 ]

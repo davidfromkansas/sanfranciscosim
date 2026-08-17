@@ -1,0 +1,571 @@
+{
+ "file_bytes": {
+  "raw": 383108,
+  "gzip9": 62102
+ },
+ "objects": 65,
+ "total_tris": 6900,
+ "total_verts": 13714,
+ "primitives_est": 67,
+ "top20": [
+  {
+   "name": "parapet",
+   "tris": 288,
+   "verts": 528,
+   "dims": [
+    21.025,
+    21.096,
+    0.3
+   ],
+   "materials": [
+    "Toy_trim"
+   ]
+  },
+  {
+   "name": "rear_parapet",
+   "tris": 288,
+   "verts": 538,
+   "dims": [
+    9.95,
+    9.952,
+    0.25
+   ],
+   "materials": [
+    "Toy_trim"
+   ]
+  },
+  {
+   "name": "bay_box",
+   "tris": 108,
+   "verts": 216,
+   "dims": [
+    2.93,
+    2.915,
+    3.05
+   ],
+   "materials": [
+    "Toy_trim"
+   ]
+  },
+  {
+   "name": "body",
+   "tris": 108,
+   "verts": 216,
+   "dims": [
+    21.017,
+    21.088,
+    11.2
+   ],
+   "materials": [
+    "Toy_slate",
+    "Toy_stone"
+   ]
+  },
+  {
+   "name": "door_head",
+   "tris": 108,
+   "verts": 216,
+   "dims": [
+    1.163,
+    1.157,
+    0.14
+   ],
+   "materials": [
+    "Toy_trim"
+   ]
+  },
+  {
+   "name": "f3_head",
+   "tris": 108,
+   "verts": 216,
+   "dims": [
+    2.656,
+    2.64,
+    0.1
+   ],
+   "materials": [
+    "Toy_trim"
+   ]
+  },
+  {
+   "name": "f3_sill",
+   "tris": 108,
+   "verts": 216,
+   "dims": [
+    2.658,
+    2.642,
+    0.12
+   ],
+   "materials": [
+    "Toy_trim"
+   ]
+  },
+  {
+   "name": "gw_head",
+   "tris": 108,
+   "verts": 216,
+   "dims": [
+    1.975,
+    1.964,
+    0.1
+   ],
+   "materials": [
+    "Toy_trim"
+   ]
+  },
+  {
+   "name": "gw_sill",
+   "tris": 108,
+   "verts": 216,
+   "dims": [
+    1.991,
+    1.98,
+    0.09
+   ],
+   "materials": [
+    "Toy_trim"
+   ]
+  },
+  {
+   "name": "pergola_beam0",
+   "tris": 108,
+   "verts": 216,
+   "dims": [
+    3.043,
+    3.025,
+    0.14
+   ],
+   "materials": [
+    "Toy_ink"
+   ]
+  },
+  {
+   "name": "pergola_beam1",
+   "tris": 108,
+   "verts": 216,
+   "dims": [
+    3.043,
+    3.025,
+    0.14
+   ],
+   "materials": [
+    "Toy_ink"
+   ]
+  },
+  {
+   "name": "pergola_beam2",
+   "tris": 108,
+   "verts": 216,
+   "dims": [
+    3.043,
+    3.025,
+    0.14
+   ],
+   "materials": [
+    "Toy_ink"
+   ]
+  },
+  {
+   "name": "pergola_beam3",
+   "tris": 108,
+   "verts": 216,
+   "dims": [
+    3.043,
+    3.025,
+    0.14
+   ],
+   "materials": [
+    "Toy_ink"
+   ]
+  },
+  {
+   "name": "pergola_beam4",
+   "tris": 108,
+   "verts": 216,
+   "dims": [
+    3.043,
+    3.025,
+    0.14
+   ],
+   "materials": [
+    "Toy_ink"
+   ]
+  },
+  {
+   "name": "pergola_post0",
+   "tris": 108,
+   "verts": 216,
+   "dims": [
+    0.17,
+    0.17,
+    1.86
+   ],
+   "materials": [
+    "Toy_ink"
+   ]
+  },
+  {
+   "name": "pergola_post1",
+   "tris": 108,
+   "verts": 216,
+   "dims": [
+    0.17,
+    0.17,
+    1.86
+   ],
+   "materials": [
+    "Toy_ink"
+   ]
+  },
+  {
+   "name": "pergola_post2",
+   "tris": 108,
+   "verts": 216,
+   "dims": [
+    0.17,
+    0.17,
+    1.86
+   ],
+   "materials": [
+    "Toy_ink"
+   ]
+  },
+  {
+   "name": "pergola_post3",
+   "tris": 108,
+   "verts": 216,
+   "dims": [
+    0.17,
+    0.17,
+    1.86
+   ],
+   "materials": [
+    "Toy_ink"
+   ]
+  },
+  {
+   "name": "pergola_rail0",
+   "tris": 108,
+   "verts": 216,
+   "dims": [
+    2.188,
+    2.201,
+    0.16
+   ],
+   "materials": [
+    "Toy_ink"
+   ]
+  },
+  {
+   "name": "pergola_rail1",
+   "tris": 108,
+   "verts": 216,
+   "dims": [
+    2.188,
+    2.201,
+    0.16
+   ],
+   "materials": [
+    "Toy_ink"
+   ]
+  }
+ ],
+ "vertex_attrs": [
+  "NORMAL"
+ ],
+ "materials": [
+  {
+   "name": "Toy_glass",
+   "glow": false,
+   "user_objects": 17
+  },
+  {
+   "name": "Toy_glassl_Glow",
+   "glow": true,
+   "user_objects": 2
+  },
+  {
+   "name": "Toy_ink",
+   "glow": false,
+   "user_objects": 14
+  },
+  {
+   "name": "Toy_mint",
+   "glow": false,
+   "user_objects": 6
+  },
+  {
+   "name": "Toy_red",
+   "glow": false,
+   "user_objects": 1
+  },
+  {
+   "name": "Toy_roofd",
+   "glow": false,
+   "user_objects": 2
+  },
+  {
+   "name": "Toy_rust",
+   "glow": false,
+   "user_objects": 1
+  },
+  {
+   "name": "Toy_slate",
+   "glow": false,
+   "user_objects": 2
+  },
+  {
+   "name": "Toy_steel",
+   "glow": false,
+   "user_objects": 1
+  },
+  {
+   "name": "Toy_stone",
+   "glow": false,
+   "user_objects": 2
+  },
+  {
+   "name": "Toy_trim",
+   "glow": false,
+   "user_objects": 18
+  },
+  {
+   "name": "Toy_trim_Glow",
+   "glow": true,
+   "user_objects": 1
+  }
+ ],
+ "textures": [],
+ "bbox": {
+  "dims": [
+   26.0856,
+   26.2918,
+   13.2
+  ],
+  "min": [
+   -13.0428,
+   -13.1459,
+   0.0
+  ],
+  "origin_offset_xy": [
+   0.0,
+   0.0
+  ],
+  "base_z": 0.0
+ },
+ "duplicate_mesh_groups": [
+  {
+   "signature": {
+    "verts": 216,
+    "tris": 108,
+    "dims": [
+     3.0431,
+     3.025,
+     0.14
+    ]
+   },
+   "objects": [
+    "pergola_beam0",
+    "pergola_beam1",
+    "pergola_beam2",
+    "pergola_beam3",
+    "pergola_beam4"
+   ]
+  },
+  {
+   "signature": {
+    "verts": 168,
+    "tris": 84,
+    "dims": [
+     0.8,
+     0.7962,
+     1.45
+    ]
+   },
+   "objects": [
+    "rear_win0_1",
+    "rear_win0_4",
+    "rear_win1_1",
+    "rear_win1_4",
+    "rear_win2_1",
+    "rear_win2_4"
+   ]
+  },
+  {
+   "signature": {
+    "verts": 216,
+    "tris": 108,
+    "dims": [
+     0.17,
+     0.17,
+     1.86
+    ]
+   },
+   "objects": [
+    "pergola_post0",
+    "pergola_post1",
+    "pergola_post2",
+    "pergola_post3"
+   ]
+  },
+  {
+   "signature": {
+    "verts": 216,
+    "tris": 108,
+    "dims": [
+     1.5181,
+     1.5201,
+     0.09
+    ]
+   },
+   "objects": [
+    "sky_mid0_glass",
+    "sky_mid1_glass",
+    "sky_mid2_glass",
+    "sky_mid3_glass"
+   ]
+  },
+  {
+   "signature": {
+    "verts": 216,
+    "tris": 108,
+    "dims": [
+     1.8153,
+     1.8173,
+     0.26
+    ]
+   },
+   "objects": [
+    "sky_mid0_kerb",
+    "sky_mid1_kerb",
+    "sky_mid2_kerb",
+    "sky_mid3_kerb"
+   ]
+  },
+  {
+   "signature": {
+    "verts": 216,
+    "tris": 108,
+    "dims": [
+     1.2361,
+     1.2365,
+     0.09
+    ]
+   },
+   "objects": [
+    "sky_ne0_glass",
+    "sky_ne1_glass",
+    "sky_ne2_glass"
+   ]
+  },
+  {
+   "signature": {
+    "verts": 216,
+    "tris": 108,
+    "dims": [
+     1.5382,
+     1.5386,
+     0.24
+    ]
+   },
+   "objects": [
+    "sky_ne0_kerb",
+    "sky_ne1_kerb",
+    "sky_ne2_kerb"
+   ]
+  },
+  {
+   "signature": {
+    "verts": 216,
+    "tris": 108,
+    "dims": [
+     2.1884,
+     2.201,
+     0.16
+    ]
+   },
+   "objects": [
+    "pergola_rail0",
+    "pergola_rail1"
+   ]
+  },
+  {
+   "signature": {
+    "verts": 216,
+    "tris": 108,
+    "dims": [
+     1.4717,
+     1.4739,
+     0.52
+    ]
+   },
+   "objects": [
+    "roof_plant0",
+    "roof_plant1"
+   ]
+  },
+  {
+   "signature": {
+    "verts": 216,
+    "tris": 108,
+    "dims": [
+     1.5293,
+     1.5294,
+     0.48
+    ]
+   },
+   "objects": [
+    "terrace_plant0",
+    "terrace_plant1"
+   ]
+  },
+  {
+   "signature": {
+    "verts": 168,
+    "tris": 84,
+    "dims": [
+     0.1823,
+     0.1826,
+     2.36
+    ]
+   },
+   "objects": [
+    "gw_jamb_ne",
+    "gw_jamb_sw"
+   ]
+  },
+  {
+   "signature": {
+    "verts": 168,
+    "tris": 84,
+    "dims": [
+     1.509,
+     1.5004,
+     0.95
+    ]
+   },
+   "objects": [
+    "terrace_rail0",
+    "terrace_rail1"
+   ]
+  }
+ ],
+ "dup_redundant_tris": 2748,
+ "join_candidates": {
+  "Toy_glass": 17,
+  "Toy_glassl_Glow": 2,
+  "Toy_ink": 14,
+  "Toy_mint": 6,
+  "Toy_roofd": 2,
+  "Toy_slate": 2,
+  "Toy_stone": 2,
+  "Toy_trim": 18
+ },
+ "degenerate_tris": 0,
+ "coincident_vert_pairs": 10138,
+ "over_tess": {
+  "near_distance_m": 39.44,
+  "one_px_world_m": 0.0266,
+  "note": "cylinders whose chord error < one_px_world_m can halve segments"
+ }
+}
