@@ -21,6 +21,20 @@ import {
 } from 'three';
 import { createGLTFLoader } from './gltf.js';
 import { mergeGeometries } from 'three/addons/utils/BufferGeometryUtils.js';
+// Motion, freshness and scene-tenure rules live in one tested module — see its
+// header before changing anything about whether a vessel moves or stays.
+import {
+  MAX_SPEED,
+  bearingToYaw,
+  deadReckonRun,
+  deadReckonSeconds,
+  headingFor,
+  isFreshFix,
+  shouldDrop,
+  shouldRender,
+  targetSpeedFor,
+  usableBearing,
+} from './ferry-motion.js';
 
 const ASSET = `${import.meta.env.BASE_URL}sf-assets/vehicles/SF_Bay_Ferry.glb`;
 const MANIFEST = `${import.meta.env.BASE_URL}sf-assets/vehicles_manifest.json`;
@@ -29,18 +43,10 @@ const CAPACITY = 24;
 const POLL_MS = 60 * 1000;
 const POLL_JITTER_MS = 5 * 1000;
 const DEMO_POLL_MS = 20 * 1000;
-// Cap on how far a stale fix may be extrapolated forward.
-const DEAD_RECKON_MAX_S = 90;
-const STALE_MS = 10 * 60 * 1000;
-// Two misses in a row is enough to call a vessel gone without flickering it out
-// on a single truncated response.
-const MISSES_TO_DROP = 2;
-const MAX_SPEED = 13; // m/s — a Gemini-class boat tops out around 25 kn.
 const EASE_S = 2.5; // seconds to absorb a position correction
 const HEADING_EASE = 1.6; // rad/s cap on turn rate
-const MOVING_M = 100; // movement between polls that counts as "underway"
-const IDLE_SPEED = 0.4; // m/s below which heading is held instead of derived
 const FALLBACK_AFTER_MS = 5 * 60 * 1000; // empty-but-live grace before falling back
+// Dwell, speed, dead-reckon and staleness thresholds live in ferry-motion.js.
 
 // The Bay is modelled by a single 30 km x 30 km water plane centred on the
 // projection origin (app/src/water.js), i.e. x/z in [-15000, +15000]; the baked
@@ -48,30 +54,6 @@ const FALLBACK_AFTER_MS = 5 * 60 * 1000; // empty-but-live grace before falling 
 // it, so northbound boats sail off-scene and get culled instead of floating
 // over void. A 500 m inset keeps a hull from straddling the water edge.
 const SCENE_HALF_EXTENT = 15000 - 500;
-
-// Compass bearing (deg clockwise from true north) to scene yaw. The asset's
-// front is -Z and the scene has -z = north, +x = east, so a boat's yaw is just
-// the negated bearing:
-//   bearing   0 (north) -> yaw  0    -> front points -z  ✔
-//   bearing  90 (east)  -> yaw -pi/2 -> front points +x  ✔
-//   bearing 180 (south) -> yaw  pi   -> front points +z  ✔
-//   bearing 270 (west)  -> yaw  pi/2 -> front points -x  ✔
-function bearingToYaw(bearingDeg) {
-  return -(bearingDeg * Math.PI) / 180;
-}
-
-// The SB feed sends Bearing 0 for every vessel it has no heading for — docked
-// boats and, at times, boats under way — so an exact 0 is treated as unknown
-// and the heading is derived from movement instead. A genuinely north-bound
-// boat loses nothing: its motion vector points north too.
-function usableBearing(bearingDeg) {
-  return bearingDeg != null && bearingDeg !== 0;
-}
-
-// Heading from a movement vector in scene space, same convention as above.
-function motionToYaw(dx, dz) {
-  return Math.atan2(-dx, -dz);
-}
 
 function shortestAngle(from, to) {
   let d = (to - from) % (Math.PI * 2);
@@ -293,7 +275,10 @@ export function createLiveFerries(scene, data, agents) {
           targetYaw: usableBearing(vessel.bearingDeg) ? bearingToYaw(vessel.bearingDeg) : 0,
           speed: 0,
           bob: Math.random() * 6.28,
+          // Two clocks, deliberately (invariant 4): lastFixAt = "still exists",
+          // lastFreshFixAt = "was last actually located".
           lastFixAt: now,
+          lastFreshFixAt: now,
           fixGap: POLL_MS / 1000,
           moved: 0,
           inService: vessel.inService,
@@ -309,34 +294,41 @@ export function createLiveFerries(scene, data, agents) {
         continue;
       }
 
-      const dx = x - state.targetX;
-      const dz = z - state.targetZ;
-      const step = Math.hypot(dx, dz);
-      const gap = Math.max(1, (now - state.lastFixAt) / 1000);
-      state.prevX = state.targetX;
-      state.prevZ = state.targetZ;
-      state.targetX = x;
-      state.targetZ = z;
-      state.moved = step;
-      state.fixGap = gap;
-      state.speed = Math.min(MAX_SPEED, Math.max(0, step / gap));
+      // A repeated payload proves the vessel still exists but carries no new
+      // position (invariant 4). Bump liveness and refresh the card metadata,
+      // then leave position, speed, heading and the dead-reckon clock alone:
+      // reading a repeat as "it did not move" is what froze the fleet mid-Bay.
+      const fresh = isFreshFix(state.recordedAt, vessel.recordedAt);
       state.lastFixAt = now;
+      state.seen = true;
       state.inService = vessel.inService;
       state.label = vessel.label;
       state.routeName = vessel.routeName ?? null;
       state.destination = vessel.destination ?? null;
       state.origin = vessel.origin ?? null;
       state.next = vessel.next ?? null;
-      state.recordedAt = vessel.recordedAt ?? now;
-      state.seen = true;
+      if (!fresh) continue;
 
-      if (usableBearing(vessel.bearingDeg)) {
-        state.targetYaw = bearingToYaw(vessel.bearingDeg);
-      } else if (state.speed > IDLE_SPEED) {
-        state.targetYaw = motionToYaw(dx, dz);
-      }
-      // else: a docked boat with no bearing keeps the heading it had, so it
-      // never spins on the spot.
+      const dx = x - state.targetX;
+      const dz = z - state.targetZ;
+      const step = Math.hypot(dx, dz);
+      // Measured fresh-fix to fresh-fix (invariant 2): timing this from the
+      // last poll instead would shrink the gap on every repeat and inflate the
+      // speed of a boat that had simply been waiting for real data.
+      const gap = Math.max(1, (now - state.lastFreshFixAt) / 1000);
+      state.prevX = state.targetX;
+      state.prevZ = state.targetZ;
+      state.targetX = x;
+      state.targetZ = z;
+      state.moved = step;
+      state.fixGap = gap;
+      state.speed = targetSpeedFor({ fixStep: step, gapSeconds: gap });
+      state.lastFreshFixAt = now;
+      state.recordedAt = vessel.recordedAt ?? now;
+
+      // null = keep the heading it had, so a docked boat never spins on the spot.
+      const yaw = headingFor({ bearingDeg: vessel.bearingDeg, speed: state.speed, dx, dz });
+      if (yaw != null) state.targetYaw = yaw;
     }
 
     for (const [id, state] of vessels) {
@@ -345,17 +337,20 @@ export function createLiveFerries(scene, data, agents) {
         continue;
       }
       state.misses = (state.misses || 0) + 1;
-      if (state.misses >= MISSES_TO_DROP || now - state.lastFixAt > STALE_MS) {
-        vessels.delete(id);
-      }
+      if (shouldDrop(state, now)) vessels.delete(id);
     }
   }
 
   function renderable(state, now) {
-    if (now - state.lastFixAt > STALE_MS) return false;
-    if (!inScene(state.x, state.z) && !inScene(state.targetX, state.targetZ)) return false;
-    // Out-of-service boats only count if they are actually going somewhere.
-    return state.inService || state.moved > MOVING_M;
+    return shouldRender(
+      {
+        lastFixAt: state.lastFixAt,
+        inService: state.inService,
+        moved: state.moved,
+        inScene: inScene(state.x, state.z) || inScene(state.targetX, state.targetZ),
+      },
+      now
+    );
   }
 
   function demoFixes(now) {
@@ -478,8 +473,11 @@ export function createLiveFerries(scene, data, agents) {
       // Dead-reckon the last fix forward along its course, then ease the drawn
       // position towards that estimate: corrections are absorbed over a couple
       // of seconds, so a boat never teleports when a new fix lands.
-      const since = Math.min(DEAD_RECKON_MAX_S, (now - state.lastFixAt) / 1000);
-      const run = state.speed > IDLE_SPEED ? state.speed * since : 0;
+      // Extrapolate from the last FRESH fix, never the last poll: bumping this
+      // clock on a repeat made the boat under-run its own course, because a fix
+      // that was already 90 s old got treated as brand new.
+      const since = deadReckonSeconds({ now, lastFreshFixAt: state.lastFreshFixAt });
+      const run = deadReckonRun({ speed: state.speed, sinceFreshS: since });
       const predictedX = state.targetX - Math.sin(state.targetYaw) * run;
       const predictedZ = state.targetZ - Math.cos(state.targetYaw) * run;
       const catchUp = Math.min(1, dt / EASE_S);
