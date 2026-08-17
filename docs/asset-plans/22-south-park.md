@@ -25,8 +25,8 @@ task prompt, Part 2 is the research and design dossier behind it.
 | Existing procedural builder | none — new landmark (needs a `pipeline/lib/landmarks.mjs` entry and a re-bake, see 2.13) |
 | WGS84 anchor | `-122.3936498, 37.7822952` (DataSF surveyed parcel 3775-048 area centroid, measured — see 2.13) |
 | Target height | **14.22 m** to the cornice crest; roof deck 12.39 m (LiDAR-derived, see 2.1 and 2.15) |
-| Footprint | lot 36.28 m (NW–SE, Taber Place to South Park) × 13.68 m (NE–SW), 444.5 m²; building 372.3 m² — the difference is a light well on the north-east flank (2.4) |
-| Frontage | a **15.0 m concave arc**, sagitta 0.95 m, radius ≈ 30 m — the South Park oval |
+| Footprint | a **trapezoid**: party walls 36.28 m (north-east) and 30.13 m (south-west), Taber Place rear 13.68 m, South Park frontage a 14.99 m chord / 15.15 m arc; 444.5 m². Building 372.3 m² — the difference is a light well on the north-east flank (2.4) |
+| Frontage | a **15.15 m concave arc**, sagitta 0.93 m, radius ≈ 30.8 m, sweeping 28° — the South Park oval turning |
 | Triangle cap | 9,000 |
 | Category | `7` (hotel — matching `102-south-park`, the other SRO on this block) |
 
@@ -104,7 +104,7 @@ Three things are genuinely open and you must settle them (2.15):
 
 ## Must capture
 
-- The **curved frontage**: 15 m of street face bowed 0.95 m concave toward the
+- The **curved frontage**: 15.15 m of street face bowed 0.93 m concave toward the
   park. This is the cue that says "South Park oval" and nothing else on this
   asset does that job. Build it as three or four chamfered segments, not a
   many-segment arc.
@@ -339,9 +339,9 @@ crest**, discussed in 2.15.
 | Addresses | 22 South Park (business and tenant address) = 24 South Park (storefront number) | DataSF EAS addresses; Assessor `property_location = 0024 0022 SOUTH PARK` |
 | Lot area | 4,893.3 sq ft (454.6 m²) | SF Assessor `lot_area`; the parcel polygon measures 444.5 m² (4,785 sq ft) |
 | Building area | 12,729 sq ft (1,182 m²) | SF Assessor `property_area` — 372.3 m² × 3 storeys = 1,117 m², consistent |
-| Footprint (parcel, survey) | **36.28 m × 13.68 m**, 444.5 m², long axis at bearing 315.18°/135.18° | DataSF parcels `acdm-wktn`, blklot 3775048, reprojected — **measured** |
+| Footprint (parcel, survey) | a trapezoid, **444.5 m²**; party walls 36.28 / 30.13 m at bearing 315.18°, rear 13.68 m, frontage a 14.99 m chord. Bounding rectangle 36.28 × 13.68 m | DataSF parcels `acdm-wktn`, blklot 3775048, reprojected — **measured** |
 | Footprint (LiDAR, building) | 35.92 × 13.49 m bounding rectangle, **372.3 m² actual** | DataSF `ynuv-fyni` SF3775048 — **measured**; the 72 m² shortfall is the light well |
-| Frontage curvature | **concave arc, chord 14.99 m, sagitta 0.95 m, radius ≈ 30 m** | measured from the 25-vertex parcel arc — **measured**, and reproduced by the LiDAR ring at 0.5–0.6 m |
+| Frontage curvature | **concave arc, chord 14.99 m, arc 15.15 m, sagitta 0.93 m, radius ≈ 30.8 m, sweep 28°** | measured from the 25-vertex parcel arc — **measured**, and reproduced by the LiDAR ring at 0.5–0.6 m |
 | Roof crest | **14.22 m** above ground | DataSF LiDAR `hgt_maxcm = 1422` — **measured**, interpretation open (2.15) |
 | Roof deck | **12.39 m** (median), 12.35 m (mean), 12.52 m (majority) | DataSF LiDAR `hgt_mediancm/meancm/majoritycm` — **measured**; three statistics within 13 cm |
 | Height std dev | **0.63 m** | DataSF LiDAR `hgt_stdcm = 62.6` — a very flat roof |
@@ -379,13 +379,14 @@ South Park at the south-east to Taber Place at the north-west. Both long sides a
 party walls: 10 South Park to the north-east, 26–28 South Park to the south-west.
 The oval's rim runs at bearing 45.2°/225.2°, so the lot runs 315.2°/135.2°.
 
-Rectangle corners in Blender coordinates (metres, `+X` east, `+Y` north), centred on
-the anchor `-122.3936498, 37.7822952`, from the surveyed parcel:
+**The lot is a trapezoid, not a rectangle.** Corners in Blender coordinates
+(metres, `+X` east, `+Y` north), centred on the anchor `-122.3936498, 37.7822952`,
+read off the surveyed parcel's own vertices:
 
 ```
 (  18.78,  -9.51)   East corner    (South Park x the 10 South Park party wall)
-(   9.08, -19.15)   South corner   (South Park x the 26-28 party wall)
-( -16.50,   6.59)   West corner    (Taber Place x the 26-28 party wall)
+(   4.75, -14.79)   South corner   (South Park x the 26-28 party wall)
+( -16.49,   6.58)   West corner    (Taber Place x the 26-28 party wall)
 (  -6.79,  16.23)   North corner   (Taber Place x the 10 South Park party wall)
 ```
 
@@ -395,24 +396,39 @@ Edges, with outward normals:
 
 | Edge | Length | Faces | Elevation |
 |---|---|---|---|
-| E corner → S corner | 13.68 m (arc 15.0 m) | SE 135.2° | **South Park front** — curved |
-| S corner → W corner | 36.29 m | SW 225.2° | **party wall** with 26–28 (blind) |
+| E corner → S corner | 14.99 m chord, 15.15 m of arc | SE, chord bearing 249.4° | **South Park front** — curved |
+| S corner → W corner | 30.13 m | SW 225.2° | **party wall** with 26–28 (blind) |
 | W corner → N corner | 13.68 m | NW 315.2° | **Taber Place rear** |
 | N corner → E corner | 36.28 m | NE 45.2° | **party wall** with 10 South Park (blind) |
 
+The two party walls are parallel (315.18°/135.18°) and the Taber Place rear is
+square to them, but **the South Park frontage is not** — its chord runs at 249.4°,
+24° off square, because the oval turns through this lot. That is what makes the
+north-east party wall 36.28 m and the south-west one only 30.13 m, and it is why
+the frontage chord is 14.99 m against a 13.68 m rear. The 36.28 × 13.68 m
+oriented bounding rectangle quoted elsewhere is the *bounding box*, not the lot.
+
+Chord-quad area 454.2 m²; the concave arc removes a 9.7 m² segment, giving the
+measured 444.5 m². The Assessor's `lot_area` of 4,893.3 sq ft (454.6 m²) matches
+the chord quad, as lot areas from straight-line dimensions always will.
+
 **The front is an arc, not a chord.** The 25 measured vertices along the South Park
-edge fit a circle of radius ≈ 30 m concave toward the park; the mid-face sits
-0.95 m further from the park than the chord between the corners. Build it as
-four segments of ~3.75 m, which reproduces the sagitta to within 6 cm and costs
-almost nothing:
+edge fit a circle of radius ≈ 30.8 m concave toward the park, sweeping 28°; the
+mid-face sits 0.93 m further from the park than the chord between the corners.
+Build it as four segments, which reproduces the sagitta to within 6 cm, costs
+almost nothing, and conveniently gives **one segment per facade bay**:
 
 ```
-(  18.78,  -9.51)      E corner
-(  15.16, -10.17)
-(  11.63, -11.21)      mid-face, 0.95 m behind the chord
-(   8.22, -12.61)
-(   4.75, -14.79)  ->  S corner at (9.08, -19.15) via the corner return
+(  18.78,  -9.51)      E corner          segment 1 = 3.68 m
+(  15.16, -10.17)                        segment 2 = 3.68 m
+(  11.63, -11.21)      mid-face, 0.93 m behind the chord
+(   8.22, -12.61)                        segment 3 = 3.69 m
+(   4.75, -14.79)      S corner          segment 4 = 4.10 m
 ```
+
+Total arc 15.15 m. The tangent swings from ~263° at the East corner to ~225° at
+the South corner, where it meets 26–28 South Park's straight frontage square —
+the neighbour is on the part of the rim that has stopped turning.
 
 Because of the 315° heading the axis-aligned bounding box is ~35.3 × 35.3 m. That
 is correct.
@@ -484,7 +500,7 @@ bright edge along the South Park end.
    where the immediate neighbours are flat-topped.
 3. **The green fire escape on the street face** — most SF fire escapes are black;
    this one is painted out in the body colour and reads as part of the facade.
-4. **The curved frontage** following the oval, 0.95 m of bow over 15 m.
+4. **The curved frontage** following the oval, 0.93 m of bow over 15.15 m — and a lot that is 6 m deeper on one side than the other because of it.
 5. The dark slate-blue storefront with its round white fan and the curved barrel
    awning over the residential entrance.
 
@@ -492,7 +508,7 @@ bright edge along the South Park end.
 
 **Preserve**
 
-- The 36.3 × 13.7 m through-lot footprint and the real 315.2°/135.2° heading, exactly
+- The trapezoid footprint (36.28 / 30.13 m party walls) and the real 315.2° heading, exactly
 - The **curved front**, as four chamfered segments
 - The sage/clay colour pair, on both public elevations
 - The cornice as a real projecting volume, not a painted stripe
@@ -594,11 +610,14 @@ Two notes on colour:
   (`Toy_rust`) for the cornice, the belt course and the awning, where the larger
   areas can carry it.
 
-**Night state (required).** Glow surfaces must be thin shells proud of the opaque
-glazing — the app renders `_Glow` in a separate layer that is ~12% alpha by day,
-so a primary surface must never be authored as glow, and a closed shell counts
-twice (see the memory on glow-shell day alpha; keep every glow surface a single
-open face). Hero glow: the **taqueria storefront**, warm (`Toy_mustard_Glow`),
+**Night state (required).** Glow surfaces must be thin **closed** shells proud of
+the opaque glazing — the app renders `_Glow` in a separate layer that is ~12%
+alpha by day, so a primary surface must never be authored as glow. Author them
+closed, not as open faces: the normals contract runs a per-object signed-volume
+test and an open plane has none. A closed shell is two alpha layers, so it reads
+~23% by day rather than 12% — cover only part of each opening, in a desaturated
+colour, and keep the fill, glow and frame planes at distinct offsets so no two
+are coplanar. Hero glow: the **taqueria storefront**, warm (`Toy_mustard_Glow`),
 across the south-west half of the ground floor — this is the one genuinely lit and
 busy thing on this stretch of the rim at night. Supporting accent: **five** of the
 eight upper windows lit, unevenly and never a full row — this is 43 rooms of
@@ -739,12 +758,12 @@ dark rectangle at 60 m.
 - [ ] `min Z` within 0.5 m of 0, XY center offset within ~1 m
 - [ ] Bounding-box top exactly 14.22 m — the cornice crest, not a mechanical unit and not the PV (loader scale lands at 1.0)
 - [ ] Dimensions plausible in meters and consistent with 2.1 (XY bbox ~35.3 × 35.3 m is expected)
-- [ ] The footprint is still 36.3 × 13.7 m in plan — measure it, do not eyeball it
-- [ ] **The front face is curved**, sagitta 0.9–1.0 m over the 15.0 m arc — measure it
+- [ ] The footprint is still the measured trapezoid in plan (36.28 / 30.13 m party walls, 13.68 m rear) — measure it, do not eyeball it
+- [ ] **The front face is curved**, sagitta 0.90–0.96 m over the 15.15 m arc — measure it
 - [ ] The roof deck sits at 12.39 m and the light-well floor at 9.31 m
 - [ ] Triangles at or under 9,000
 - [ ] Materials all `Toy_*`, flat, no textures, no alpha, no `Toy_body`
-- [ ] `_Glow` only on the five lit windows and the taqueria; every glow surface a single open face proud of the opaque glazing
+- [ ] `_Glow` only on the five lit windows and the taqueria; each a thin closed shell proud of the opaque glazing, covering at most the lower half of its opening
 - [ ] Both party walls have no openings; the south-west flank is finished up to the cornice (4 m of it is exposed above 26–28)
 - [ ] No tenant signage, no address numeral, no banner in the export
 - [ ] No cameras, lights, animations, armatures, constraints
