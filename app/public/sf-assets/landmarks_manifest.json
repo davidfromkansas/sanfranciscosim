@@ -1293,5 +1293,24 @@
     ],
     "tris": 8100,
     "loadRadius": 2500
+  },
+  {
+    "id": "2-south-park",
+    "file": "2-south-park.glb",
+    "anchor": [
+      -122.3932364,
+      37.7824236
+    ],
+    "targetHeightM": 17.72,
+    "cat": 3,
+    "name": "2 South Park",
+    "estimated": false,
+    "dims": [
+      36.2984,
+      36.2984,
+      17.72
+    ],
+    "tris": 4716,
+    "loadRadius": 2500
   }
 ]
