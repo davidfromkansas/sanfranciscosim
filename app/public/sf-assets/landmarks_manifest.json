@@ -1369,5 +1369,24 @@
     ],
     "tris": 16008,
     "loadRadius": 2500
+  },
+  {
+    "id": "326-brannan",
+    "file": "326-brannan.glb",
+    "anchor": [
+      -122.3928965,
+      37.781508
+    ],
+    "targetHeightM": 5.9,
+    "cat": 6,
+    "name": "326 Brannan Street (JAX Vineyards)",
+    "estimated": false,
+    "dims": [
+      22.3069,
+      22.3614,
+      5.9
+    ],
+    "tris": 6148,
+    "loadRadius": 2500
   }
 ]

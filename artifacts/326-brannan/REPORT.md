@@ -44,11 +44,14 @@ the review renders:
 1. **The canopy is a slatted pergola with a partial panel, not a solid plate.**
    The plan specified a 6.6 × 5.0 m closed plate. Built that way it rendered as a
    **black rectangle over a third of the court** in the downward view — the one
-   view this asset exists for. It is now two beams, a cross beam, seven slats,
-   and a translucent-toned panel over the rear half only, stopping on the cross
-   beam so the split reads as a designed edge. The real structure is a panelled
-   metal canopy; this is a deliberate miniature simplification and the court plan
-   is what it buys.
+   view this asset exists for. It is now a 6.1 × 4.2 m frame: two side beams, a
+   cross beam, six slats, and a smoky panel under the slats over the **front**
+   half only (v 3.14–4.68, the Brannan side), stopping on the cross beam so the
+   split reads as a designed edge rather than a modelling accident. The front
+   half is where the May 2025 pano actually shows the dark canopy edge above the
+   fence, and it leaves the fire ring and the olive open to the camera. The real
+   structure is a panelled metal canopy; this is a deliberate miniature
+   simplification and the court plan is what it buys.
 2. **The court side walls are 2.70 m, not 3.20 m, and the vines crest above
    them.** At 3.20 m in `Toy_plaster` they were the loudest element in every
    elevation — a big blank cream slab competing with the gate. Lowered, warmed
@@ -104,9 +107,12 @@ the review renders:
   `Z_CREST − 0.16` are both exactly 5.74, which produced a flat box, eight
   degenerate triangles and a black sliver on the roof. The constant is now
   written against `Z_CREST − 0.06` with the coincidence noted in the source.
-- **The pergola panel out-shouted the gate** in bright `Toy_steel`. It moved to
-  a new `Toy_canopy` tone (`9a9c96`) sitting close to the court slab, and it now
-  sits *under* the slats rather than above them.
+- **The pergola panel out-shouted the gate**, twice. In bright `Toy_steel`
+  (`8f959b`) it was the loudest thing in the court; a first attempt at a new
+  `Toy_canopy` tone of `9a9c96` was still reading near-white under the key light.
+  It ended at `6f736e` — smoky, below the court slab in value — and it now sits
+  *under* the slats rather than above them. The gate is the only element on this
+  asset allowed to be loud.
 - **The string-light beads were authored entirely in `Toy_bulb_Glow`.** That
   makes them primary surfaces in the app's separate unlit `_Glow` layer, which
   renders at low alpha by day — see-through bulbs. Each bead is now an opaque
@@ -225,6 +231,53 @@ the pipeline advanced on that instruction rather than on feedback about the
 images. If the design is later judged wrong, §2 and §4 are the record of what
 was decided and why, and stage 2 is re-runnable from
 `build_326_brannan.py` alone.
+
+## 8b. Stage 5 — integration QA (local, Case B, batch mode)
+
+| Item | Result | Evidence |
+|---|---|---|
+| Asset re-validated before touching the app | **PASS** | fresh-scene re-import, all checks green (§6) |
+| GLB in `app/public/sf-assets/landmarks/` | **PASS** | byte-identical to the artifact; `EXT_meshopt_compression` present |
+| Manifest entry | **PASS** | appended as text — 19 insertions, zero reflow of the other 73 entries |
+| `camelId` round trip | **PASS** | `326-brannan` → `326Brannan`, matching the registry id |
+| Registry entry + exclusion | **PASS** | `exclude: 4`, re-measured against the pipeline's own cleaned rings |
+| `pipeline/audit.mjs` check 1.6 | **PASS** | "83 zones over 80 landmarks clear" |
+| `pipeline/verify-rebake.mjs` | **PASS** | only cell `23_13` moved, **201 → 199** footprints (exactly the two SF3775012 polygons); nearest survivor **4.6 m** vs the 4 m radius, and it is the 14.4 m-tall 334 Brannan — it stands |
+| Loader merge line | **PASS** | `sf-assets: 326-brannan merged 20 objects / 18 materials -> batched (4007 tris body); uniform x1.0000 at 3925, -1272` |
+| Scale factor | **PASS** | **x1.0000** — authored height and `targetHeightM` agree exactly |
+| Position | **PASS** | placed at local `3925, -1272`; the anchor projects to `3924.92, -1272.09` |
+| Orientation | **PASS** | isolated render shows the gate on the SE (Brannan) and the shed at the NW rear |
+| Terrain seating | **PASS** | no floating, no sinking; the lot is flat made ground (LiDAR range 0.36 m over 24 m) |
+| Procedural twin | **N/A → PASS** | `app/src/landmarks.js` has no `326Brannan` builder, so a twin is structurally impossible |
+| Night glow in-app | **PASS** | clock pinned to 22:00; all four groups light — the 12-pane door, both string-light catenaries, the fire table, the JAX disc |
+| Draw calls (peak **scene pass**) | **PASS** | **91 day / 103 night** against the < 300 hard gate |
+| Fallback drill | **PASS** | GLB renamed aside → `warning: sf-assets: 326-brannan failed to load (… 404 …)`, **zero uncaught exceptions**, city keeps rendering, neighbours intact, lot degrades to empty ground |
+
+Notes on how this was measured, because two of them are easy to get wrong:
+
+- **Draw calls were read by wrapping `renderer.render`** to capture the peak
+  *scene* pass. Reading `renderer.info.render.calls` directly after a frame
+  reports the post-processing quad instead — it gave a nonsense "1 call /
+  2 triangles" on the first attempt. The perf-harness section of
+  `.agents/skills/testing-sf-3d/SKILL.md` documents this.
+- **The QA ran in headless Chrome over CDP, not in the Browser pane.** The pane
+  was available but hidden, and a hidden pane suspends `requestAnimationFrame`,
+  so the renderer reported 0 frames drawn and 0 draw calls. Dev-server slots
+  were also exhausted by other sessions, so the app was built and its `dist`
+  served statically. `/api/*` 404s in the console are that static server, not
+  the asset.
+- **The fallback drill's warning appears twice**, once per streaming load
+  attempt. That is the loader retrying on re-approach, not a crash loop.
+
+**Batch mode** (`ADDRESS-TO-ASSET.md`): the re-bake was run in full for this QA
+and then discarded with `git checkout -- app/public/tiles api/_data`. The commit
+is source-only. `git diff --name-only origin/main` lists nothing under
+`app/public/tiles/` or `api/_data/` — verified. The city gets baked once for the
+whole batch by `docs/asset-pipeline/BATCH-INTEGRATE.md`.
+
+**Not done, and deliberately:** no push, no PR, no deploy, and no production QA.
+`ADDRESS-TO-ASSET.md` stage 5 replaces the integration prompt's Step 7 with a
+stop, and the pipeline ends at a locally verified branch.
 
 ## 9. Known limitations carried forward
 
