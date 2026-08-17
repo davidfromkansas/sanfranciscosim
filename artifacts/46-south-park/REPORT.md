@@ -11,8 +11,9 @@ wherever they disagree.
 | Manifest anchor | `-122.3938219, 37.7821864` |
 | Target height | **16.15 m** (front parapet / roof screen crest) |
 | Footprint | 9.47 m frontage x 29.43 m depth, front face bearing **135.2°** |
-| Triangles | 4,532 (cap 6,000) |
-| Objects | 71 |
+| Triangles | **4,505** shipped (4,532 as authored; cap 6,000) |
+| Objects | **10** shipped (71 as authored, joined per material at stage 4) |
+| File size | **124,584 B** raw (272,832 B pre-optimize, −55.4%) |
 | Validator | Blender 5.2.0 LTS, fresh-scene re-import — **16 / 16 PASS** |
 
 ---
@@ -190,7 +191,7 @@ checks PASS.**
 | crest normalized to target | PASS — bbox top 16.150 m exactly |
 | base at z = 0 | PASS — min Z 0.0000 |
 | centered XY | PASS — offset (0.0000, 0.0000) |
-| under triangle budget | PASS — 4,532 / 6,000 |
+| under triangle budget | PASS — 4,505 / 6,000 |
 | no image textures | PASS |
 | no transparency | PASS |
 | materials follow contract | PASS — all `Toy_*`, no `Toy_body` |
@@ -198,7 +199,7 @@ checks PASS.**
 | no animation, skin or constraints | PASS |
 | transforms applied | PASS |
 | no negative scales | PASS |
-| normals outward (signed volume) | PASS — all 71 solids positive |
+| normals outward (signed volume) | PASS — all 10 shipped solids positive |
 | normals outward (ray residual) | PASS |
 | no degenerate geometry | PASS |
 | no unexpected objects | PASS |
@@ -209,6 +210,13 @@ checks PASS.**
 
 Materials shipped: `Toy_glass`, `Toy_glassl_Glow`, `Toy_ink`, `Toy_navy`,
 `Toy_plum`, `Toy_roofd`, `Toy_steel`, `Toy_stone`, `Toy_trim`, `Toy_trim_Glow`.
+
+The table above is the **post-optimize** run: the same 16 checks were run and
+passed on the pre-optimize 71-object / 4,532-triangle build as well, and were
+re-run after the stage-4 shipping swap. That second run is the one that matters —
+it is the only place a dissolve-manufactured sliver ever shows up, because
+gltfpack re-emits stored normals (precedent: `350-brannan`). It reports
+`invalid_or_nonunit_loop_normal_count: 0`.
 
 ## 6. Manifest entry and integration notes
 
@@ -225,11 +233,11 @@ Materials shipped: `Toy_glass`, `Toy_glassl_Glow`, `Toy_ink`, `Toy_navy`,
   "name": "44-46 South Park",
   "estimated": false,
   "dims": [
-    27.93,
-    27.62,
+    27.9295,
+    27.6198,
     16.15
   ],
-  "tris": 4532,
+  "tris": 4505,
   "loadRadius": 2500
 }
 ```
@@ -271,8 +279,25 @@ planting.
 
 ## 7. Stage 4 — optimize
 
-See `optimize/REPORT.md`. Summary of the shipped numbers is in §1 and §5 above,
-which are updated to the post-optimize asset.
+Full report: `optimize/REPORT.md`. **All gates PASS.**
+
+| | Input | Shipped | Δ |
+|---|---|---|---|
+| raw bytes | 279,332 | **124,584** | −55.4% |
+| gzip -9 bytes | 45,963 | 87,807 | +91.0% (qualified — see optimize §G6) |
+| nodes | 71 | **10** | −85.9% |
+| draw submeshes | 73 | **11** | −84.9% |
+| triangles | 4,532 | 4,505 | −0.6% |
+| bbox / origin / materials | — | identical | 0 |
+| appearance, mean abs RGB Δ | — | 0.008–0.079% | gates 2% far / 4% near |
+
+Phase B welded 6,916 coincident vertex pairs and joined 71 objects into 10 per
+material. The limited dissolve was **run** here, not skipped: §3.3's warning is
+about closed annulus ring bands and this asset has none — every parapet and band
+is an independent four-sided prism. It returned zero triangles and manufactured
+no slivers. Curve retessellation was skipped: halving the five 10-segment
+cylinders would clear the one-pixel chord test by only 30% and they are the
+asset's only round forms.
 
 ## 8. Gate 3 — approval
 
