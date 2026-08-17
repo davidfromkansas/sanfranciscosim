@@ -172,4 +172,13 @@ python3 make_contact_sheet.py
 
 ## Approval
 
-_Stage 3 (APPROVE) — awaiting the user's verbatim decision._
+Stage 3 (APPROVE) satisfied by the session's standing instruction, quoted
+verbatim from the invoking message (16 August 2026):
+
+> BATCH: yes
+> APPROVE EVERYTHING DONT ASK ME FOR PERMISSION
+
+The contact sheet, the aerial day and night renders and the shipped numbers were
+presented to the user at this gate before stage 4 began. The standing approval
+covers the pipeline's internal gates only: stage 5 still ends at a local commit
+and asks before any push, PR or deploy.
