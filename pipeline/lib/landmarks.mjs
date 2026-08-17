@@ -1843,6 +1843,43 @@ export const LANDMARKS = [
     // (225.4 deg) and the Bryant Street elevation (315.4 deg).
     camera: { distance: 420, yaw: 270, pitch: 26 },
   },
+  {
+    // Gran Oriente Filipino Masonic Temple, 1951 — the third building of the
+    // Gran Oriente complex, after 106SouthPark. The anchor is the DataSF LiDAR
+    // area centroid and NOT the OSM one: OSM way/71211338 traces this building
+    // 6.6 m too deep at the rear (DataSF assigns that strip to 41-43 South
+    // Park, and Bing z20 shows a tree in a yard there), so its centroid sits
+    // 2.64 m too far north-east. That 2.64 m is the whole ballgame here.
+    //
+    // Measured from THIS point the exclusion window is (2.64, 7.07) m:
+    //   this building, DataSF 201006.0108499   triggers at 0.05 m (centroid)
+    //   this building, OSM/Overture trace      triggers at 2.64 m (centroid)
+    //   45-49 South Park, DataSF 201006.0014671        7.07 m (ring vertex)
+    //   41-43 South Park, DataSF 201006.0038546        7.10 m (ring vertex)
+    //   the warehouse SE, DataSF 201006.0003676        7.83 m (ring vertex)
+    // 4.8 leaves 2.16 m of margin below and 2.27 m above, and must drop TWO
+    // footprints, not one — DataSF traces this building and so does Overture,
+    // and an excluded DataSF ring never calls markOccupied(), so the Overture
+    // gap-fill would re-add it.
+    //
+    // Measured from the OSM centroid instead the window collapses to
+    // (2.60, 4.47), because OSM's own trace SHARES two ring vertices with
+    // 41-43 South Park at 5.41 m. Moving the anchor onto the real footprint
+    // centre was the fix, not a bigger radius.
+    id: '95JackLondonAlley',
+    name: 'Gran Oriente Filipino Masonic Temple (95 Jack London Alley)',
+    lon: -122.393443,
+    lat: 37.781346,
+    height: 8.4,
+    exclude: 4.8,
+    // Camera offset is (sin yaw, ., cos yaw) with +z south, so the convention
+    // that stands the camera in front of a facade of bearing B is yaw = 180-B.
+    // The alley elevation faces 225.9 deg, giving yaw 314 — south-west of the
+    // building, over Jack London Alley, looking north-east at the one doorway
+    // this building exists for. 120 m is deliberately close: an 8.4 m building
+    // whose entire content is a 2.9 m arch is a pink dot from 420.
+    camera: { distance: 120, yaw: 314, pitch: 24 },
+  },
 ];
 
 // Parks/green spaces the landcover bake must match at least one source polygon
