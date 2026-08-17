@@ -2120,6 +2120,55 @@ export const LANDMARKS = [
     // 160 South Park at 155 for 9.4 m, 135 South Park at 150 for 8.5 m).
     camera: { distance: 150, yaw: 225, pitch: 26 },
   },
+  {
+    // 44-46 South Park, the 2008 four-level glass-fronted infill house on the
+    // north-west rim of the oval. Twentieth South Park building in the manifest.
+    // 46 is the ground-floor commercial unit, 44 the flats above.
+    //
+    // Exclusion sized against the REAL bake input, by nearest ring VERTEX as
+    // well as centroid — excluded() in buildings.mjs fires on either, and the
+    // bake reads buildings_datasf.geojson FIRST and gap-fills from
+    // overture_buildings.geojsonseq. addBuilding() returns null on exclusion so
+    // markOccupied() never runs, which means the Overture twin of an excluded
+    // DataSF footprint is re-attempted and has to be caught by the same circle.
+    // Measured from this anchor:
+    //
+    //    0.26 m  this building's DataSF footprint SF3775217, via its centroid
+    //    1.42 m  this building's Overture/OSM way 124884347 (h=14), via its
+    //            centroid -> the FLOOR: below this the procedural twin survives
+    //    4.95 m  26-28 South Park, DataSF SF3775049 (h=8.35), nearest ring
+    //            VERTEX -> the CEILING, and a vertex it SHARES with this
+    //            building's ring (party wall)
+    //    8.79 m  22-24 South Park rear wing, Overture (h=7.7), centroid
+    //    9.26 m  54-58 South Park, DataSF SF3775219 (h=13.5), centroid
+    //    9.36 m  54-58 South Park, Overture (h=14), centroid
+    //   13.53 m  22-24 South Park, Overture (h=12), nearest vertex
+    //   14.50 m  22-24 South Park, DataSF SF3775048, nearest vertex
+    //
+    // Safe window (1.42, 4.95) m. 3 sits with 1.58 m of margin below and 1.95 m
+    // above. excluded() fires on BOTH rings, but the observable cell-count delta
+    // is -1, not -2: before this entry existed the DataSF ring was added and
+    // markOccupied() ran, so the Overture twin was already being rejected as a
+    // duplicate. Now the DataSF ring is excluded, markOccupied() never runs, and
+    // the twin is re-attempted — and caught by the same circle. Measured:
+    // verify-rebake.mjs reports cell 23_13 moving 201 -> 200 and nothing else in
+    // the city; anything other than -1 there means something is wrong.
+    // Do NOT raise past 4.5: at 4.95 this starts deleting 26-28 South Park and
+    // leaves a hole two doors up the street wall. No clearTrees — at 3 m it
+    // clears nothing, which is right, because the street tree in front of the
+    // south-west end belongs to the park's rim planting.
+    id: '46SouthPark',
+    name: '44-46 South Park',
+    lon: -122.3938219,
+    lat: 37.7821864,
+    height: 16.15,
+    exclude: 3,
+    // Camera offset is (sin yaw, ., cos yaw) with +z south, so app yaw =
+    // 180 - true bearing. This building's one public face looks 135.2 deg, so
+    // yaw 45 stands the camera south-east over the park, looking north-west at
+    // the glazed front. It is the only view of this building worth flying to.
+    camera: { distance: 130, yaw: 45, pitch: 24 },
+  },
 ];
 
 // Parks/green spaces the landcover bake must match at least one source polygon

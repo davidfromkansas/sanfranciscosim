@@ -123,6 +123,7 @@ route, and the park plans depend on it (§E8 of the parks README).
 | [Hotel Madrid (22–24 South Park)](./22-south-park.md) | `22-south-park` | 14.22 m (LiDAR-derived) | new landmark |
 | [26–28 South Park (51 Taber Place)](./26-south-park.md) | `26-south-park` | 9.05 m (LiDAR-derived) | new landmark |
 | [41–43 South Park](./41-south-park.md) | `41-south-park` | 10.6 m (estimated, photogrammetric) | new landmark |
+| [44–46 South Park](./46-south-park.md) | `46-south-park` | 16.15 m (LiDAR-derived) | new landmark |
 
 ## Shared contract (all 76)
 
