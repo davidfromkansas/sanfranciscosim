@@ -240,3 +240,183 @@ explicit instruction.
 `"estimated": true` because the 10.60 m crest is photogrammetric, not published
 (`REFERENCE.md` §9.1). `cat: 1` is House. `loadRadius` is the default rule,
 `max(2500, 10.6 × 30) = 2500`.
+
+## 8. Integration (stage 5, batch mode)
+
+**Case B** — new landmark, so a registry entry and a tile re-bake were both
+required. `BATCH: yes`, so the bake was run, verified, and then **discarded**;
+this branch commits source only.
+
+### 8.1 What was committed
+
+| File | Change |
+|---|---|
+| `app/public/sf-assets/landmarks/41-south-park.glb` | new, 173,108 B, byte-identical to `artifacts/41-south-park/41-south-park.glb` |
+| `app/public/sf-assets/landmarks_manifest.json` | +19 lines, one entry appended **as text** (a JSON round-trip rewrites `11.0` → `11` across six unrelated landmarks) |
+| `pipeline/lib/landmarks.mjs` | +43 lines, one `LANDMARKS` entry with its measurement rationale |
+| `docs/asset-plans/41-south-park.md`, `docs/asset-plans/README.md` | the plan and its README row |
+| `artifacts/41-south-park/**` | the asset, scripts, renders, dossier and reports |
+
+`git diff --stat origin/main` over the three shared append-only files is
+**insertions only** (19 + 43 + 1), and lists nothing under `app/public/tiles/`
+or `api/_data/` — the batch-mode sanity check in `ADDRESS-TO-ASSET.md`.
+
+### 8.2 The registry entry, and how the radius was sized
+
+```js
+{
+  id: '41SouthPark',
+  name: '41-43 South Park',
+  lon: -122.3934867,
+  lat: 37.7815158,
+  height: 10.6,
+  exclude: 2.8,
+  camera: { distance: 150, yaw: 225, pitch: 26 },
+}
+```
+
+`camelId('41-south-park')` → `41SouthPark`, verified against the registry id, so
+the loader hides the procedural version.
+
+**The plan's exclusion numbers were replaced.** The plan sized `exclude` against
+OSM standing in for Overture, because `pipeline/data/` is gitignored and was not
+available when it was written. With the real bake input on disk the picture
+changed materially, and the entry now carries the measured table. From the
+registry point above:
+
+| Ring | Triggers at | Verdict |
+|---|---|---|
+| DataSF `SF3775040` — ours | **0.57 m** (centroid) | must drop |
+| Overture 177 m² — ours | **1.83 m** (centroid) | must drop |
+| DataSF `SF3775039` — 45–49 South Park | **3.73 m** (nearest vertex) | must survive |
+| Overture 272 m² — 45–49 South Park | 8.71 m | must survive |
+| Overture 791 m² — 35 South Park | 11.08 m | must survive |
+| DataSF `SF3775102` — 35 South Park | 12.12 m | must survive |
+
+Safe window **(1.83, 3.73) m**; `2.8` sits in it with 0.97 m of margin below and
+0.93 m above. The same measurement taken at the manifest anchor gives a window
+of only (2.74, 3.16) — 0.42 m wide, the same knife-edge `165-south-park` had —
+which is why the registry `lon`/`lat` is offset **1.50 m** from the manifest
+anchor. These are independent fields: `placeGeneric` in `app/src/assets.js`
+positions the GLB from the **manifest** anchor alone, and the registry point is
+only the centre of the bake-time exclusion circle (plus the search and camera
+target, where 1.5 m on a 7 m building flown to from 150 m is not visible).
+
+**No `clearTrees`.** The street tree in front of this house is real, and South
+Park's furniture sits inside the oval, outside the lot.
+
+**The plan predicted two rings would disappear; one did.** Both datasets trace
+this building, so a correct radius *offers* to drop two — but the bake's
+`occupiedFraction(bbox) > 0.25` test blocks the Overture gap-fill here, because
+the two party-wall neighbours' bounding boxes already cover this lot's box. The
+radius still has to clear the Overture ring in case that changes; it does.
+
+### 8.3 The re-bake
+
+Full chain per `INTEGRATION-PROMPT.md` Step 4.2, nothing skipped:
+`terrain → bridges → buildings → streets → landcover → validate → lore → toy →
+notables → context → muni-shapes`. `pipeline/data/` was cloned (APFS
+copy-on-write) from a sibling worktree rather than re-downloaded;
+`pipeline/out/` was generated fresh, never seeded.
+
+| Check | Result |
+|---|---|
+| `validate.mjs` | all checks ok, including `landmark in extent: 41-43 South Park — cell 23_13` |
+| `verify-rebake.mjs` | **PASS** — 584 of 585 cells unchanged; `23_13  201 → 200`; nearest surviving footprint 3.7 m vs the 2.8 m radius |
+| `audit.mjs` check **1.6** | **PASS** — no procedural footprint inside a bespoke landmark exclusion zone, 83 zones over 80 landmarks clear |
+| `audit.mjs` overall | 29 passed, 3 failed, 1 informational. The three failures (`1.2b` p95 height, `1.3c` Telegraph Hill DEM, `1.7b` one offshore tree in 792 sampled) are **pre-existing and citywide** — identical on the `358-brannan`, `524-second` and `84-south-park` worktrees. Not caused by this landmark. |
+| `app` lint + tests | `eslint src test` clean; `node --test` 6/6 pass |
+
+The `pipeline/data/` snapshot reproduced `main`'s tiles exactly — only the one
+cell this landmark touches changed its building count, so there is no
+data-vintage drift to explain.
+
+### 8.4 Local verification
+
+| Item | Result | Evidence |
+|---|---|---|
+| Manifest served from this worktree | **PASS** | `curl localhost:5400/sf-assets/landmarks_manifest.json` → 74 entries, last is `41-south-park` |
+| GLB served | **PASS** | `HTTP/1.1 200`, `Content-Length: 173108` |
+| id mapping | **PASS** | `camelId('41-south-park')` → `41SouthPark` = the registry id |
+| Scale factor | **PASS, exactly 1.0000** | `targetHeightM` 10.6 ÷ measured bbox height 10.600 |
+| Camera preset lands on the building | **PASS** | `SF.rig.state.pivot` = (3873.64, 11.58, −1271.61) — the manifest anchor's projected position; `yawDeg` 225.0, `pitchDeg` 26.0 |
+| Terrain seating | **PASS** | pivot ground 11.58 m against a LiDAR ground median of 11.76 m NAVD88 over the footprint with a 0.67 m range — a flat site, which is the case `placeGeneric`'s single terrain sample is right for |
+| Orientation | **PASS** | authored in world space at 315.22°; the loader applies no rotation and the manifest carries no `yawDeg` override |
+| **Exactly one building on the site** | **PASS** | settled from the baked tile rather than the screen: `app/public/tiles/buildings/23_13.bin` decoded and every one of its 200 surviving rings clipped against the asset's 175.1 m² design footprint. **True interior overlap: 0.000 m².** Two rings *touch* the footprint — 45–49 South Park and its rear building — but only along shared party-wall vertices, which is what a row of party-wall houses is. |
+| Day/night appearance, draw calls | see 8.5 | |
+| Fallback drill | see 8.5 | |
+
+### 8.5 In-app verification, and what the machine would not allow
+
+The loader-side evidence is complete and unambiguous. The **console merge line**,
+captured from a real headless-Chrome run against the dev server:
+
+```
+sf-assets: 41-south-park merged 16 objects / 11 materials -> batched (3458 tris body); uniform x1.0000 at 3874, -1272
+```
+
+| Item | Result |
+|---|---|
+| Loader picks the asset up | **PASS** — 16 objects / 11 materials, the exact counts the optimize pass produced |
+| Merged into the shared batch | **PASS** — `-> batched`, so it joins the one `BatchedMesh` pair and adds **zero** draw calls (`AGENTS.md`, streaming & batching) |
+| Scale factor | **PASS, `uniform x1.0000`** — the authored crest and `targetHeightM` agree exactly |
+| Placement | **PASS** — `at 3874, -1272`, the manifest anchor's projected position |
+| Streaming | **PASS** — `{entries: 74, far: 6, loading: 0, live: 68, fading: 0, failed: 0}` with the camera at the preset; the entry moves out of `far` on approach as `loadRadius: 2500` intends |
+| Load failures | **PASS** — `failed: 0`, and no 404 or parse error for this asset in the console |
+
+#### The fallback drill (Step 6) — PASS
+
+Run as its own pass, with no `renderer.render()` anywhere in it: the drill needs
+no pixels, only that the app survives and the entry fails cleanly.
+
+| Item | Result |
+|---|---|
+| App still boots with the GLB moved aside | **PASS** — `SF.boot.cleared === true` |
+| The entry fails, and only that entry | **PASS** — `{entries: 74, far: 6, loading: 0, live: 67, fading: 0, failed: 1}` |
+| Exactly one console line for this landmark | **PASS** — `sf-assets: 41-south-park failed to load (Unexpected token '<', "<!doctype "... is not valid JSON)` |
+| Every other landmark unaffected | **PASS** — 66 other `merged … -> batched` lines in the same session |
+| The city still renders | **PASS** — 1,144 / 1,656 cells, 18,897 trees, 11,344 kit instances, 4,109 street-furniture pieces |
+| Case B site behaviour | empty ground inside the exclusion zone — expected, and noted per the prompt |
+| GLB restored afterwards | **PASS** — byte-identical to `artifacts/41-south-park/41-south-park.glb` |
+
+The failure is a *parse* error rather than a 404 because Vite's dev server
+answers a missing `public/` path with the SPA `index.html` and HTTP 200
+(measured: 2,340 B). That is a dev-server artifact, not a loader bug, and the
+drill still proves what it exists to prove — rule 3 holds: one warning, no crash,
+no hole anywhere else.
+
+**Two items could not be completed on this machine and are honestly outstanding**
+— in-app day/night screenshots and a measured draw-call count. The cause is
+machine contention, not the asset: this landmark was built
+alongside ~20 sibling `ADDRESS-TO-ASSET` sessions and the Mac sat at a load
+average of **150–340** throughout. Concretely:
+
+- Headless Chrome reports `document.hidden === false`, yet a hand-installed rAF
+  counter measured **1 frame in 2 seconds**. The app's own render loop is
+  therefore effectively stopped, which is why the streaming scan had to be pumped
+  by hand (`SF.assets.update(SF.camera.position, 0.25)` on a 250 ms interval) to
+  produce the numbers above at all.
+- A **single** synchronous `renderer.render(scene, camera)` — the standard way to
+  read a true draw-call count, since the stats overlay measures the post-process
+  quad instead — did not return inside 180 s and blocked the renderer thread for
+  every later CDP call. `Page.captureScreenshot` behaved the same way.
+
+What the draw-call budget rests on instead: the merge line proves this asset went
+into the **shared batch**, which is 2 draw calls for every generic landmark in
+the city, however many there are. It cannot move the count. The measured figure
+for a comparable state on an idle machine is 120 calls at a landmark and 113 at
+street level downtown, against the 300 budget.
+
+**Deferred to `BATCH-INTEGRATE.md`, explicitly:**
+
+1. Day and night screenshots at the camera preset, and the wide shot.
+2. A hooked draw-call measurement (`renderer.render` wrapped, max per frame).
+3. `node pipeline/landmark-streaming-check.mjs` against a build — `AGENTS.md`
+   asks for this "after a batch of integrations", and this asset makes
+   twenty-one landmarks sharing one `loadRadius` centre, the densest cluster in
+   the manifest.
+
+None of these can hide an asset defect that the stage-2 validator, the stage-4
+gates, the tile clipping test in 8.4 and the merge line above have not already
+ruled out — but they are not done, and this branch should not be treated as
+production-verified until the batch run does them.

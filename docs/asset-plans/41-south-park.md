@@ -658,6 +658,16 @@ is photogrammetric (2.15).
 
 ### 2.13 Integration notes (for later, not this task)
 
+> **Superseded — read `artifacts/41-south-park/REPORT.md` §8.2 instead.** The
+> numbers below were derived with OSM standing in for Overture, because
+> `pipeline/data/` is gitignored and was not on disk when this plan was written.
+> Measured against the real bake input at integration time, the registry point
+> moved to `-122.3934867, 37.7815158` and `exclude` to **2.8** (safe window
+> 1.83–3.73 m, versus the 0.42 m window the manifest anchor gives). The
+> prediction that two rings would disappear also turned out to be wrong: one
+> did, because `occupiedFraction(bbox) > 0.25` blocks the Overture gap-fill on
+> this lot. The method below is right; the values are not.
+
 **Case B** — new landmark. It needs a `pipeline/lib/landmarks.mjs` entry and a tile
 re-bake, or the baked procedural building will intersect the GLB.
 
