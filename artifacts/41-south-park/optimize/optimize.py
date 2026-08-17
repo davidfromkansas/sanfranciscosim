@@ -121,7 +121,20 @@ stats["interior_faces_removed"] = interior_removed
 snap("interior-faces")
 
 # --- 3. limited dissolve, coplanar only ---
+# ASSET ADAPTATION (41-south-park): five objects are closed ring bands whose top
+# and bottom faces are coplanar annuli — the roof parapet, the spa's shell ring,
+# and the three cornice bands, which run the whole frontage and return over both
+# bay projections. This is exactly the case GLB-OPTIMIZE-PROMPT s.3 step 3 warns
+# about: a strictly-coplanar dissolve merges each into one annulus ngon, and
+# re-triangulating an annulus emits sub-millimetre slivers that only the stage-2
+# contract validator sees, two steps later and after the shipping swap. They are
+# skipped by name; everything else still dissolves.
+RING_BANDS = {"parapet", "spa_shell", "cornice_bed", "cornice_dentil",
+              "cornice_crown"}
+stats["dissolve_skipped_ring_bands"] = sorted(RING_BANDS)
 for o in mesh_objs():
+    if o.name in RING_BANDS:
+        continue
     bpy.context.view_layer.objects.active = o
     for oo in mesh_objs():
         oo.select_set(oo is o)

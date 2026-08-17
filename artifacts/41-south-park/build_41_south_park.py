@@ -776,7 +776,11 @@ def build():
     # shadows it into the same grey the solid-cylinder version rendered.
     cylinder("spa_water", scx, scy, SPA_R - SPA_RIM + 0.02, Z_SPA - 0.30, Z_SPA - 0.04,
              mats["Toy_glassl"])
-    cylinder("spa_glow", scx, scy, SPA_R - SPA_RIM - 0.05, Z_SPA - 0.04, Z_SPA - 0.015,
+    # The glow disc BITES INTO the water rather than sitting on it: butted at
+    # Z_SPA - 0.04 the two caps were coincident and the water surface speckled
+    # with z-fighting in the near A/B render. (Phase B's weld happened to fix it
+    # downstream, which is not a reason to ship it broken upstream.)
+    cylinder("spa_glow", scx, scy, SPA_R - SPA_RIM - 0.05, Z_SPA - 0.04 - LAP, Z_SPA - 0.015,
              mats["Toy_glassl_Glow"])
 
     for i, u in enumerate(SKYLIGHT_U):

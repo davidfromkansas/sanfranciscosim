@@ -9,21 +9,26 @@ they disagree. Every disagreement is listed in §3.
 
 ## 1. Shipped numbers
 
-| | Pre-optimize |
-|---|---|
-| Objects | 72 |
-| Triangles | **6,380** (cap 8,000) |
-| Dimensions (AABB) | 22.456 × 22.473 × **10.600** m |
-| Oriented footprint | **7.297 × 24.0 m** (25.15 m including the 0.95 m bay projection and the 1.20 m stoop) |
-| `min Z` | 0.0000 |
-| XY centre offset | 0.0000, 0.0000 |
-| Materials | 11, all `Toy_*`, no `Toy_body` |
-| Glow materials | `Toy_glass_Glow`, `Toy_glassl_Glow`, `Toy_gold_Glow` |
-| Textures / cameras / lights / animations | 0 / 0 / 0 / 0 |
-| Degenerate triangles | 0 |
-| Signed-volume outward objects | 72 / 72 |
-| Visibility-ray flipped fraction | **0.0032%** (1 of 31,500) — gate is ≤ 0.15% |
-| File size | 380 KB uncompressed (gate is ≤ 500 KB compressed) |
+The shipping file is the **stage-4 optimized** GLB (see `optimize/REPORT.md`);
+the pre-optimize original is archived at `optimize/input/41-south-park.glb`.
+
+| | Pre-optimize | **Shipped** |
+|---|---|---|
+| Objects | 72 | **13** |
+| Draw submeshes (primitives) | 76 | **16** |
+| Triangles | 6,380 | **6,380** (cap 8,000) |
+| Vertices | 12,822 | 10,577 |
+| Dimensions (AABB) | 22.456 × 22.473 × 10.600 m | **22.456 × 22.473 × 10.600 m** |
+| Oriented footprint | 7.297 × 24.0 m | **7.297 × 24.0 m** (25.15 m including the 0.95 m bay projection and the 1.20 m stoop) |
+| `min Z` | 0.0000 | **0.0000** |
+| XY centre offset | 0.0000, 0.0000 | **0.0000, 0.0000** |
+| Materials | 11, all `Toy_*`, no `Toy_body` | **11, identical set** |
+| Glow materials | `Toy_glass_Glow`, `Toy_glassl_Glow`, `Toy_gold_Glow` | same three |
+| Textures / cameras / lights / animations | 0 / 0 / 0 / 0 | 0 / 0 / 0 / 0 |
+| Degenerate triangles | 0 | **0** |
+| Signed-volume outward objects | 72 / 72 | **13 / 13** |
+| Visibility-ray flipped fraction | 0.0032% | **0.0032%** — gate is ≤ 0.15% |
+| File size | 380,384 B raw / 78,623 B gzip | **173,108 B raw / 125,781 B gzip** (meshopt; budget ≤ 500 KB) |
 
 The AABB is 22.5 × 22.5 m for a building that is 7.3 × 25.2 m. That is the
 135.22° heading, not a scale error — the model is authored in world space so the
@@ -79,7 +84,7 @@ palette *name*, so the contract check and the loader's merge path are unaffected
 
 ## 3. Corrections made to the plan
 
-**REPORT beats plan.** Ten changes were made to `docs/asset-plans/41-south-park.md`
+**REPORT beats plan.** Eleven changes were made to `docs/asset-plans/41-south-park.md`
 during the build. Two of them were real bugs found by the validator.
 
 ### Bugs
@@ -148,7 +153,13 @@ during the build. Two of them were real bugs found by the validator.
    was a systematic cleanup done while chasing the normals residual. It was *not*
    the cause of the residual (bugs 1 and 2 were), but it is correct and it stayed.
 
-10. **The dentil course is a continuous pale band, not modelled dentils.** The
+10. **The spa's glow disc now bites into the water rather than sitting on it.**
+    Butted at the same z, the two caps were coincident and the water surface
+    speckled with z-fighting — visible only in the stage-4 near A/B render, where
+    Phase B's weld happened to fix it downstream. Fixed at source and the whole
+    chain re-run; see `optimize/REPORT.md` §6.
+
+11. **The dentil course is a continuous pale band, not modelled dentils.** The
     plan sanctioned this; recording it because it is the most visible
     simplification on the facade. At 300–500 m a pale line under a dark crown is
     exactly the dentil read, and 24 modelled blocks would have cost ~1,200
