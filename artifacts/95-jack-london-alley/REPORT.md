@@ -9,22 +9,23 @@ plan, this file is the one that shipped.
 | | |
 |---|---|
 | File | `95-jack-london-alley.glb` |
-| Objects | 48 mesh, 0 other |
+| Objects | **13** mesh, 0 other (48 before the stage-4 optimize pass) |
 | Triangles | **3,888** (budget 6,000) |
 | Dimensions | 16.196 × 16.093 × **8.400** m |
 | bbox min / max | `[-7.997, -7.943, 0.000]` / `[8.199, 8.151, 8.400]` |
 | min Z | 0.000 |
 | XY centre offset | `[0.101, 0.104]` m |
-| File size | 230.6 KB raw, 48.8 KB gzip (pre-optimize) |
+| File size | **110.3 KB raw** as shipped (230.6 KB before the stage-4 optimize pass, −52.2%) |
 | Materials | 13, all `Toy_*`, flat, no textures, no alpha, no `Toy_body` |
 | Glow materials | `Toy_gold_Glow`, `Toy_trim_Glow` |
 | Anchor | `-122.3934430, 37.7813460` (DataSF LiDAR area centroid) |
 | Facade heading | 225.9° true (SW, onto Jack London Alley) |
 | Target height | 8.40 m — bbox top lands on it exactly, loader scale 1.0 |
 
-`validation.json` — **overall PASS**, all 16 checks. 48/48 objects enclose
-positive signed volume; 31,500 deterministic visibility rays, **0** flipped
-first-hit faces; 0 degenerate triangles.
+`validation.json` — **overall PASS**, all 16 checks, re-run against the shipped
+(meshopt-packed) file. 13/13 objects enclose positive signed volume; 31,500
+deterministic visibility rays, **0** flipped first-hit faces; 0 degenerate
+triangles; 0 invalid or non-unit loop normals.
 
 The 16.2 × 16.1 m axis-aligned bounding box is correct for an 8.60 × 13.70 m box
 standing at 45.9°, and is not a scale error. The validator's plausibility window
@@ -174,6 +175,14 @@ public face square-on:
 
 `validation.json` overall **PASS**. Committed pre-approval as
 `assets: build 95-jack-london-alley (pre-approval)`.
+
+## Gate 4 — optimize
+
+All gates G1–G6 and G8 PASS; see `optimize/REPORT.md`. 236,120 → 112,904 bytes
+(−52.2%), 49 → 14 draw primitives, triangles unchanged, mean pixel delta
+0.0009–0.0130% across day/night × near/far and four elevations. The optimized
+file is now the shipping file; the pre-optimize original is archived at
+`optimize/input/`.
 
 ## Gate 3 — approval
 
