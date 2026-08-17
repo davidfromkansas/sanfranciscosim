@@ -117,8 +117,9 @@ route, and the park plans depend on it (§E8 of the parks README).
 | [South Park (64 South Park)](./64-south-park.md) | `64-south-park` | 21.04 m (vertical extent — the asset is terrain-draped; the 15.0 m elm crest is estimated) | new landmark |
 | [524 Second Street (522–524)](./524-second.md) | `524-second` | 9.9 m (estimated) | new landmark |
 | [501 Second Street](./501-second.md) | `501-second` | 37.7 m | new landmark |
+| [326 Brannan Street (JAX Vineyards Wine Court)](./326-brannan.md) | `326-brannan` | 5.9 m (shed parapet; LiDAR deck 5.66 m) | new landmark |
 
-## Shared contract (all 75)
+## Shared contract (all 76)
 
 - Style: `docs/styles/miniature-toy.md` (authoritative for artistic decisions)
 - Technical contract: `.agents/skills/sf-asset-check/SKILL.md` (authoritative for the GLB)
@@ -235,6 +236,16 @@ building — a service-station forecourt whose asset is a canopy, two pump islan
 a kiosk and the asphalt they stand on. Its `targetHeightM` is a thin crest above
 a measured canopy deck, and its exclusion zone cannot be solved with one circle;
 see that plan's 2.13 and 2.15 before treating it as routine.
+
+326 Brannan Street is the second site-not-a-building and a different lesson again:
+there the survey is fine and the *statistics* are the trap. Its parcel carries two
+DataSF footprints, and on both of them the LiDAR maxima (9.42 m on the shed,
+38.74 m on the open court) are 0.5 m cells sitting on party walls with taller
+neighbours, while the court's own mode is 0.14 m because in 2010 it was a parking
+apron. Every element that gives that lot its identity — the walled garden, the
+olive tree, the gate — post-dates the survey by three to ten years. It also holds
+the set's narrowest exclusion window, 1.04 m, on a vertex it physically shares
+with the 12.1 m building next door; see its 2.13.
 
 599 Third Street is the reassuring counter-example: its OSM `height=16` and the LiDAR
 median (15.62 m) agree on the parapet and both are right — the tag is only untrustworthy
