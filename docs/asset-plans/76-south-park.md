@@ -700,29 +700,35 @@ the answer is fewer window subdivisions and a coarser arch, not a raised cap.
   re-bake the affected tiles, or the baked procedural building will intersect the GLB.
   This is the Case B path in `docs/asset-plans/INTEGRATION-PROMPT.md`.
 
-- **The exclusion window is tight — 1.7 m wide.** `excluded()` in
+- **The exclusion window is tight — 2.1 m wide.** `excluded()` in
   `pipeline/buildings.mjs` drops a footprint when its centroid **or any ring vertex**
-  falls inside the circle. Measured from the manifest anchor (the DataSF LiDAR area
-  centroid) against the DataSF footprints:
+  falls inside the circle.
+
+  **Measure on the SIMPLIFIED ring, not the raw one.** `addBuilding()` runs
+  `simplifyRing(ring, 0.6)` *before* it calls `excluded()`, so the ring the gate sees is
+  not the ring in the geojson. On this site that moves the window in both directions —
+  84 South Park's nearest vertex goes out from 3.64 m to 3.97 m and this footprint's own
+  OSM centroid comes in from 1.92 m to 1.83 m. Distances from the manifest anchor
+  against the simplified rings:
 
   | Polygon | Triggers at | Via |
   |---|---|---|
-  | this building (`SF3775054`) | **0.00 m** | its own centroid |
-  | this building, OSM `way/124884340` as an Overture proxy | **1.92 m** | its centroid |
-  | 84 South Park (`SF3775055`) | **3.64 m** | nearest ring vertex |
-  | 70 South Park (`SF3775053`) | 7.08 m | centroid |
-  | 84 South Park, second (rear) polygon | 13.62 m | nearest ring vertex |
+  | this building (`SF3775054`) | **0.18 m** | its own centroid |
+  | this building, OSM `way/124884340` as an Overture proxy | **1.83 m** | its centroid |
+  | 84 South Park (`SF3775055`) | **3.97 m** | nearest ring vertex |
+  | 84 South Park, OSM `way/113545687` | 5.52 m | nearest ring vertex |
+  | 70 South Park (`SF3775053`) | 7.20 m | centroid |
+  | 70 South Park, OSM `way/124884345` | 7.34 m | centroid |
 
-  The safe window is therefore **(1.92, 3.64) m** — it has to exceed 1.92 so the
+  The safe window is therefore **(1.83, 3.97) m** — it has to exceed 1.83 so the
   Overture gap-fill version is dropped too (`addBuilding()` returns null on exclusion,
   so `markOccupied()` never runs and `occupiedFraction()` cannot be relied on to block
-  a re-add), and stay under 3.64 so 84 South Park survives. **Use `exclude: 2.75`** —
-  0.83 m of margin below and 0.89 m above, near-perfectly centred, but only half the
-  room 104–106 had. Confirm against the real
-  `pipeline/data/overture_buildings.geojsonseq` at integration time and prove the
-  outcome with `pipeline/verify-rebake.mjs`: check **which** rings were dropped, not how
-  many — DataSF and Overture both trace some buildings on this oval, so two rings
-  disappearing can be correct and one disappearing can be wrong.
+  a re-add), and stay under 3.97 so 84 South Park survives. **Use `exclude: 2.9`** —
+  1.07 m either side, dead centre, but still only half the room 104–106 had. Confirm
+  against the real `pipeline/data/overture_buildings.geojsonseq` at integration time and
+  prove the outcome with `pipeline/verify-rebake.mjs`: check **which** rings were
+  dropped, not how many — DataSF and Overture both trace some buildings on this oval, so
+  two rings disappearing can be correct and one disappearing can be wrong.
 
 - **84 South Park is the one to watch.** Its nearest ring vertex is 3.64 m out because
   the two buildings share a party wall and the raster traces run right up to it. If the
@@ -736,15 +742,23 @@ the answer is fewer window subdivisions and a coarser arch, not a raised cap.
   are in every photograph of it, and they should stay. Do **not** set `clearTrees: true`.
 
 - `loadRadius`: the default formula gives `max(2500, 16.28 × 30) = 2500` m. Take the
-  default. Nothing about a 205 m² flats building justifies `alwaysLoaded`.
+  default. Nothing about a 205 m² flats building justifies `alwaysLoaded`. Note what the
+  fallback past that radius is: this is Case B with **no procedural builder**, so beyond
+  2500 m the site is empty ground rather than a stand-in block. At 2.5 km, on a 6.9 m
+  frontage, that absence is illegible.
 
 - **Camera preset.** In `app/src/camera.js` the rig places the camera at
   `(sin(yaw), sin(pitch), cos(yaw)) × distance` from the pivot, and the project's `+z`
   is **south**, so `yaw: 45` puts the camera south-east of the building, looking
   north-west at its street elevation — the only view of this building worth flying to.
-  Start from `camera: { distance: 120, yaw: 45, pitch: 26 }` and tune against the live
-  scene. Note that the `165SouthPark` preset reads as the opposite convention; 104–106's
-  plan flagged the same thing and it is still unsettled.
+  **Settled against `app/src/camera.js:119-127` rather than against a neighbour's
+  comment:** `apply()` sets `position = pivot + distance × (sin yaw, sin pitch, cos yaw)`,
+  and the project's `+z` is south, so `yaw: 45` puts the camera south-east — square onto
+  the 135° front. Shipped `camera: { distance: 130, yaw: 45, pitch: 26 }`; 130 m rather
+  than the ~90 m the height suggests, because the building is 29.70 m long. This also
+  resolves the disagreement 104–106's plan flagged: `126SouthPark`'s comment is right and
+  `64SouthPark`'s "app yaw = 180 − true bearing" is wrong. Neither was edited here — the
+  integration prompt forbids touching another landmark — but it is worth a follow-up.
 
 - **This one has no case for the bespoke route, and that should be said plainly.**
   104–106 earned it — a named, NR-nominated, architect-attributed building with a

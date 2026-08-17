@@ -134,7 +134,29 @@ Street View frame mistook a grey building further down the row for the subject. 
 and the check to repeat if anyone doubts the identification — is the January 2025 frame
 that has both neighbours' street numbers in shot (REFERENCE.md §1).
 
-## 6. What is still open
+## 6. Integration decisions taken at stage 5
+
+- **`exclude: 2.9`**, re-measured on the **simplified** rings the gate actually sees
+  (`addBuilding()` runs `simplifyRing(ring, 0.6)` before `excluded()`). That moved the
+  window from the plan's raw-ring (1.92, 3.64) to (1.83, 3.97), and 2.9 sits dead centre
+  with 1.07 m either side. The plan's §2.13 was corrected to match.
+- **Registry `height: 13.08`**, not the manifest's `targetHeightM: 16.28`. The registry
+  number only feeds `context/landmarks.json` and from there the search and concierge
+  cards, so it should be the measured roof deck, not the penthouse normalization target.
+  Same deliberate split as `64SouthPark` (15.0 against 21.0415).
+- **`camera: { distance: 130, yaw: 45, pitch: 26 }`**, settled from
+  `app/src/camera.js:119-127` rather than from a neighbour's comment: `position = pivot +
+  distance × (sin yaw, sin pitch, cos yaw)` with `+z` south, so yaw 45 stands the camera
+  south-east, square onto the 135° front. This resolves a disagreement 104–106's plan
+  flagged — `126SouthPark`'s comment is right, `64SouthPark`'s is wrong. Neither was
+  edited; the integration prompt forbids touching another landmark.
+- **No `clearTrees`.** The street trees in front of this building are real and are in
+  every photograph of it.
+- **`loadRadius: 2500`** (the default formula's floor). Case B with no procedural
+  builder, so past that radius the site is empty ground rather than a stand-in block; at
+  2.5 km on a 6.9 m frontage that is illegible.
+
+## 7. What is still open
 
 Carried forward from the plan's 2.15, unchanged by the build:
 
@@ -153,7 +175,7 @@ Carried forward from the plan's 2.15, unchanged by the build:
 6. **The width** (6.90 m, chosen from three sources spanning 6.71–7.22 m) will propagate
    into the row when 70 and 84 are eventually built.
 
-## 7. Approval — gate 3
+## 8. Approval — gate 3
 
 The pipeline's stage 3 requires an explicit human approval quoted verbatim. The
 invocation for this run carried a standing instruction:
@@ -169,3 +191,54 @@ intends** — no one has looked at these renders but the agent that made them �
 recorded as such. The reviewable evidence is `76-south-park-contact-sheet.png`,
 `76-south-park-aerial.png`, `76-south-park-aerial-night.png` and
 `76-south-park-facade.png`; if any of it is wrong, stage 2 is a rebuild, not a patch.
+
+---
+
+## 9. Stage 5 — local integration QA (batch mode)
+
+Executed `docs/asset-plans/INTEGRATION-PROMPT.md` Part 1, Case B, with the
+`ADDRESS-TO-ASSET.md` batch-mode amendment: the bake was **run** for this QA and then
+**discarded**, and only source is committed.
+
+`preview_start` refused with *"Maximum 5 dev servers per folder reached; 5 belong to
+other chats"*, so the QA ran through the documented escape hatch — Vite on port 5076
+driven by real headless Chrome over CDP, where rAF runs normally. The dev server was
+confirmed to be serving **this** worktree before anything was trusted
+(`lsof -a -p … -d cwd` → `sf-worktrees/76-south-park/app`; served manifest 74 entries,
+last id `76-south-park`; GLB 200 at 116,636 B).
+
+| Check | Result | Evidence |
+|---|---|---|
+| Re-validation of the shipping GLB | **PASS** | contract validator all-16 on the packed file: 4,376 tris, 11 objects, 26.6145 × 26.0241 × 16.28 m, min Z 0.0, XY centre (0,0), 11/11 signed volumes outward, ray-flip 0.1016 % |
+| Manifest entry | **PASS** | appended as **text**, not via `json.dump` — 19 insertions, 0 deletions, no churn on the other 73 entries |
+| id mapping | **PASS** | `76-south-park` → `camelId()` → `76SouthPark`, matching the registry entry |
+| Case B registry entry | **PASS** | `pipeline/lib/landmarks.mjs`, `exclude: 2.9`, `height: 13.08`, `camera { 130, 45, 26 }` |
+| Re-bake | **PASS** | full chain `terrain → bridges → buildings → streets → landcover → validate → lore → toy → notables → context → muni-shapes`; `validate` reported `ok landmark in extent: 76-82 South Park — cell 23_13` |
+| `verify-rebake.mjs` | **PASS** | *"only the new landmarks' cells moved"* — 584 of 585 cells unchanged; cell 23_13 **201 → 200**, i.e. exactly one footprint dropped; nearest surviving footprint **4.0 m** vs the 2.9 m radius |
+| `audit.mjs` check 1.6 | **PASS** | *"no procedural footprint inside a bespoke landmark exclusion zone — 83 zones over 80 landmarks clear"* |
+| Merge line / scale | **PASS** | `sf-assets: 76-south-park merged 12 objects / 10 materials -> batched (2547 tris body); uniform x1.0000 at 3826, -1329` — scale exactly **1.0000**, and 3826/−1329 is the anchor's local position to the metre |
+| Exactly one building on the site | **PASS** | settled from the tile, not the screen: `verify-rebake` puts the nearest surviving footprint 4.0 m from the anchor, outside the asset's 3.45 m half-width |
+| Footprint size | **PASS** | reads as the narrowest thing in the row in the day frame, flush with both party-wall neighbours |
+| Orientation | **PASS** | authored at true-world heading, no `yawDeg` override; the bay and arch face the oval in the day frame |
+| Terrain seating | **PASS** | no floating or sinking at the base in the day frame; site falls only 0.84 m across the footprint |
+| Night glow | **PASS** | only the intended `_Glow` surfaces light: a small number of lit windows plus the entry lintel and the roof-deck festoon line. Restrained against the procedurally-lit neighbours, which is the intent |
+| Draw calls | **PASS** | **87–101** max-per-frame across four passes, against the 300 budget. Measured by hooking `renderer.render` and taking the max, because the stats overlay reads the post-process quad (1 call), not the scene |
+| Fallback drill | **PASS** | GLB moved aside → exactly one console warning (`sf-assets: 76-south-park failed to load`), `failed: 1`, app boots, city renders, draw calls still 94, and the site is **empty ground** — expected for Case B with no procedural builder. Restored byte-identical. Note: Vite answers the missing path with `index.html` and HTTP **200**, so this surfaces as a parse failure rather than a 404 |
+| `npm run lint` | **PASS** | eslint clean |
+| `npm run build` | **PASS** | 57 modules, `dist/assets/index-*.js` 950.78 kB / 269.28 kB gzip; `compress-tiles` 3,315 tiles 56.8 → 31.8 MB |
+| Batch sanity check | **PASS** | `git diff --name-only origin/main` lists **nothing** under `app/public/tiles/` or `api/_data/` |
+
+Screenshots in `integration/`: `qa-local-day.png`, `qa-local-night.png`,
+`qa-local-fallback.png` and the three `-detail` crops.
+
+**Two honest caveats on the visual QA.** (1) The diorama camera clamps to
+`minDistance = 150 m` and locks pitch at 42°, so a 6.9 m frontage is small in frame; the
+detail crops are enlargements of the frame centre, not closer renders. (2) Frames must
+be caught with `SF.assets.stats().fading === 0` — a mid-cross-fade frame is a stack of
+half-alpha shells and reads as broken geometry that is not broken. Two frames were
+discarded for that reason before the ones committed here.
+
+**Not done, deliberately:** the bake was discarded (batch mode), so no tiles or
+`api/_data` are committed, and the city gets baked once for the whole batch by
+`docs/asset-pipeline/BATCH-INTEGRATE.md`. Step 7 (push, PR, deploy, production QA) is
+replaced by a stop per `ADDRESS-TO-ASSET.md` stage 5 — nothing has been pushed.

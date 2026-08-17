@@ -1843,6 +1843,54 @@ export const LANDMARKS = [
     // (225.4 deg) and the Bryant Street elevation (315.4 deg).
     camera: { distance: 420, yaw: 270, pitch: 26 },
   },
+  {
+    // A 1906 post-earthquake flats building on the NORTH-WEST rim of the South
+    // Park oval, party-walled to 70 South Park on the north-east and 84 on the
+    // south-west. 6.90 x 29.70 m — more than four times deeper than it is wide.
+    //
+    // `height` is the MEASURED ROOF DECK (DataSF LiDAR median over 763 cells),
+    // not the manifest's `targetHeightM` of 16.28. The manifest number
+    // normalizes the asset's tallest geometry, which is the roof-stair
+    // penthouse; this number is what a search or concierge card should say the
+    // building is. Same deliberate split as `64SouthPark` (15.0 here against
+    // 21.0415 in the manifest).
+    //
+    // MEASURED ON THE SIMPLIFIED RING. `addBuilding()` in buildings.mjs runs
+    // `simplifyRing(ring, 0.6)` BEFORE it calls `excluded()`, and on this site
+    // that matters in both directions: it pushes 84 South Park's nearest vertex
+    // out from 3.64 m to 3.97 m and pulls this footprint's own OSM centroid in
+    // from 1.92 m to 1.83 m. Distances from the anchor below, against the
+    // simplified rings the gate actually sees:
+    //
+    //   0.18 m  this footprint's centroid (DataSF SF3775054) — always caught
+    //   1.83 m  this footprint's centroid (OSM way/124884340) — the real FLOOR,
+    //           because the Overture gap-fill re-adds it if the radius misses
+    //   3.97 m  84 South Park nearest vertex (DataSF SF3775055) — the CEILING
+    //   5.52 m  84 South Park nearest vertex (OSM way/113545687)
+    //   7.20 m  70 South Park centroid (DataSF SF3775053)
+    //   7.34 m  70 South Park centroid (OSM way/124884345)
+    //
+    // The bake reads DataSF first and gap-fills from Overture (OSM geometry),
+    // so both rows bind. Safe window (1.83, 3.97); 2.9 sits dead centre with
+    // 1.07 m either side. Do not raise past 3.5 without re-running audit.mjs
+    // check 1.6 — beyond 3.97 it starts eating 84 South Park, which is a real
+    // standing building.
+    //
+    // No `clearTrees`: the street trees in front of this building are real and
+    // are in every photograph of it.
+    id: '76SouthPark',
+    name: '76-82 South Park',
+    lon: -122.3940170,
+    lat: 37.7820261,
+    height: 13.08,
+    exclude: 2.9,
+    // camera.js sets position = pivot + distance * (sin yaw, sin pitch, cos yaw)
+    // with +x east and +z SOUTH, so yaw 45 stands the camera south-east —
+    // square onto the 135 deg South Park front, which is the only elevation of
+    // this building worth flying to. 130 m rather than the ~90 m its height
+    // suggests, because the building is 29.70 m long and needs the room.
+    camera: { distance: 130, yaw: 45, pitch: 26 },
+  },
 ];
 
 // Parks/green spaces the landcover bake must match at least one source polygon
