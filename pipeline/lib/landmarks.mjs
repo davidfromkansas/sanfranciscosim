@@ -2444,68 +2444,6 @@ export const LANDMARKS = [
     camera: { distance: 120, yaw: 314, pitch: 24 },
   },
   {
-    // 86-96 South Park — Toby Levy's own 1996 live/work loft building, four
-    // residential units over two commercial spaces, on the CORNER of South Park
-    // and Jack London Alley. The only piece of authored modern architecture in
-    // the South Park set, and the only landmark in the manifest with a
-    // cylindrical rooftop drum.
-    //
-    // This site is the worst case in the row for source duplication: BOTH bake
-    // inputs split the building in half, and differently. DataSF carries two
-    // LiDAR rings for lot SF3775116 (208.7 m2 over the front and northeast,
-    // 81.0 m2 over the rear southwest); the Overture/OSM gap-fill carries two
-    // more (way/113545685, untagged, and way/113545691, misaddressed
-    // "92 Jack London Alley"). All four are copies of THIS building and all four
-    // must go.
-    //
-    // Sized against the REAL bake input, on the SIMPLIFIED rings the bake
-    // actually builds (simplifyRing(ring, 0.6) — measure on those, not the raw
-    // ones, or this entry looks impossible). excluded() in buildings.mjs fires
-    // on ring centroid OR any ring vertex; distances from this anchor:
-    //
-    //    2.54 m  DataSF SF3775116 / 201006.0022147  (h 11.15, front+NE)  vertex
-    //    3.31 m  Overture 9de15a80bf == OSM way/113545685 (h 10.8)       vertex
-    //    3.71 m  DataSF SF3775116 / 201006.0149656  (h 12.32, rear SW)   vertex
-    //    4.99 m  Overture aaf221991f == OSM way/113545691 (h 4)          centroid
-    //            -> the FLOOR: under 5.00 m at least one copy survives and the
-    //               asset sits inside a procedural building
-    //   12.30 m  DataSF SF3775055 (84 South Park, h 11.36)               centroid
-    //            -> the CEILING, and the binding constraint
-    //   12.41 m  Overture 3df1e9b461 (84 South Park, h 11)               centroid
-    //   16.03 m  DataSF SF3775054 (76-82 South Park)                     vertex
-    //   19.10 m  Overture 5128010cd5 (76-82 South Park)                  vertex
-    //
-    // Safe window (5.00, 12.30) m. 8 sits near the middle with 3.00 m of margin
-    // below and 4.30 m above, and drops exactly four footprints — all four
-    // copies of this building, nothing else.
-    //
-    // Note that 84 South Park's DataSF ring SHARES two party-wall vertices with
-    // our front footprint, 7.5 m and 15.3 m from this anchor. The 7.5 m one is
-    // nearly collinear with its neighbours and simplifyRing(0.6) removes it,
-    // which is the only reason the ceiling is 12.30 m and not 7.5 m. Raw-ring
-    // measurement would have made this entry impossible.
-    //
-    // The anchor is the modelled footprint's axis-aligned BBOX centre, not the
-    // lot centroid: the L-shaped plan (a 6.42 x 8.73 m open yard at the Taber
-    // Place / 84 South Park inside corner) pushes the bbox 2.26 m northwest of
-    // the lot centre, and anchoring on the bbox centre is what lets the asset
-    // contract's "centred in x/y" hold exactly. The lot's own area centroid is
-    // -122.3941704, 37.7819114 and DataSF's EAS point for "96 SOUTH PARK" is
-    // -122.3941549, 37.7819114 — 1.4 m apart, which cross-checks the projection.
-    id: '96SouthPark',
-    name: '86–96 South Park',
-    lon: -122.3941704,
-    lat: 37.7818909,
-    height: 13.7,
-    exclude: 8,
-    // Camera offset is (sin yaw, ., cos yaw) with +z south, so bearing =
-    // 180 - yaw. The South Park front faces 135.1 deg and the exposed Jack
-    // London Alley flank 225.2 deg, so bearing 180 — due south — is the
-    // bisector: both street elevations sit at 45 deg to the lens and the drum
-    // silhouettes against the sky. yaw 0.
-    camera: { distance: 160, yaw: 0, pitch: 26 },
-  },
-  {
     id: '318Brannan',
     name: '318 Brannan Street',
     lon: -122.3927890,
@@ -2564,6 +2502,48 @@ export const LANDMARKS = [
     height: 17.79,
     exclude: 8,
     camera: { distance: 240, yaw: 10, pitch: 26 },
+  },
+  {
+    // Measured against the real bake input (DataSF ynuv-fyni footprints, plus
+    // the Overture/OSM ring for the same building), by nearest ring VERTEX and
+    // by centroid — excluded() in buildings.mjs fires on either:
+    //
+    //    0.62 m  this building's own DataSF footprint (SF3775039, 278.6 m2),
+    //            via CENTROID. Its own nearest vertex is 4.76 m out.
+    //    1.36 m  the SAME building's Overture/OSM ring (way/71211339), also via
+    //            centroid — the two traces disagree by 1.4 m. In the event only
+    //            ONE ring drops: Overture is gap-fill only, and DataSF already
+    //            covers this footprint, so the second trace never reaches the
+    //            bake. Measured, not assumed — verify-rebake reports cell 23_13
+    //            going 201 -> 200 and no other cell moving at all.
+    //    7.18 m  41-43 South Park (SF3775040) — a PARTY-WALL neighbour, and the
+    //            first thing at risk
+    //   15.67 m  the Gran Oriente Filipino Masonic Temple, 95 Jack London Alley
+    //            (SF3775039's second footprint, same lot). It must SURVIVE: it
+    //            is a separate 1951 building this asset does not contain, and
+    //            there is no extraExclusions entry for it on purpose.
+    //   21.48 m  101 South Park
+    //
+    // Safe window (1.4, 7.18) m. 3 sits in it with 1.6 m of margin below and
+    // 4.2 m above, and matches the rest of this block — 165SouthPark uses 1.3,
+    // 160SouthPark 1.2, 132SouthPark 2, 106SouthPark 2.1, 101SouthPark 4. On a
+    // party-wall site the radius must NOT reach this footprint's own far
+    // corners (up to 15.4 m); reaching them would delete both neighbours.
+    id: '49SouthPark',
+    name: 'Gran Oriente Filipino Residence (45-49 South Park)',
+    lon: -122.3935929,
+    lat: 37.7814646,
+    height: 13.0,
+    exclude: 3,
+    // Camera offset is (sin yaw, ., cos yaw) with +z south, so camera bearing =
+    // 180 - yaw and yaw 270 stands the eye due WEST — the bisector of the South
+    // Park front (315.8 deg) and the Jack London Alley flank (225.8 deg). Both
+    // elevations are hero elevations here and the rounded corner turret joins
+    // them, so the corner is the only view worth flying to. 165 m suits a 13 m
+    // building (cf. 106SouthPark at 150 for 11.58 m, 181SouthPark at 190 for
+    // 16.5 m). No `key`: at 13 m this is texture in the block, not a
+    // destination.
+    camera: { distance: 165, yaw: 270, pitch: 26 },
   },
 ];
 

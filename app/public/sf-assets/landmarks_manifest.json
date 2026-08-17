@@ -1580,25 +1580,6 @@
     "loadRadius": 2500
   },
   {
-    "id": "96-south-park",
-    "file": "96-south-park.glb",
-    "anchor": [
-      -122.3941704,
-      37.7818909
-    ],
-    "targetHeightM": 13.7,
-    "cat": 2,
-    "name": "86\u201396 South Park",
-    "estimated": true,
-    "dims": [
-      31.8092,
-      27.6214,
-      13.7
-    ],
-    "tris": 6312,
-    "loadRadius": 2500
-  },
-  {
     "id": "300-brannan",
     "file": "300-brannan.glb",
     "anchor": [
@@ -1691,6 +1672,25 @@
       17.79
     ],
     "tris": 8871,
+    "loadRadius": 2500
+  },
+  {
+    "id": "49-south-park",
+    "file": "49-south-park.glb",
+    "anchor": [
+      -122.3935929,
+      37.7814646
+    ],
+    "targetHeightM": 13.0,
+    "cat": 2,
+    "name": "Gran Oriente Filipino Residence (45\u201349 South Park)",
+    "estimated": false,
+    "dims": [
+      23.6255,
+      22.5585,
+      13.0
+    ],
+    "tris": 9262,
     "loadRadius": 2500
   }
 ]
