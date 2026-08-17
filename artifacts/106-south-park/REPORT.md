@@ -11,14 +11,21 @@ disagree, this file is what was built and why.
 | Renders | `blender -b --python render_106_south_park.py` and `-- --night`; `python3 make_contact_sheet.py` |
 | Validation | `blender -b --python validate_106_south_park.py` → `validation.json` |
 | Triangles | **3,920** against a 7,000 cap |
-| Objects | 73 |
+| Objects | **11** after the stage-4 optimize pass (73 as authored) |
+| File | **105,336 B raw** (60.0 KB gzipped), meshopt-compressed — see `optimize/REPORT.md` |
 | Dimensions | 26.373 × 26.368 × **11.580** m (the XY box is the exact 45° rotation of a 7.32 × 29.72 m sliver) |
 | min Z / XY centre | 0.000 m / (0.000, 0.000) |
 | Materials | 10, all `Toy_*`, flat, no textures, no alpha, no `Toy_body` |
 | Glow | `Toy_glassl_Glow` (four upper street windows), `Toy_trim_Glow` (entry soffit) |
 | Manifest anchor | `-122.3944099, 37.7817221` |
 | Street facade heading | 135.00° true; long axis 315.00°; south-west flank 225.00° |
-| Overall | **PASS** — every contract check in `validation.json` |
+| Overall | **PASS** — every contract check in `validation.json`, re-run against the packed shipping file |
+
+The numbers above are the **shipped** ones: the stage-4 optimize pass
+(`optimize/REPORT.md`) welded 7,936 vertices down to 2,104, joined 73 objects
+into 11 per material, and meshopt-packed the result from 251,324 B to
+105,336 B with every gate G1–G8 passing and a worst-case appearance delta of
+0.0072%. Triangle count and geometry are unchanged.
 
 ## Dossier corrections and design reversals
 
