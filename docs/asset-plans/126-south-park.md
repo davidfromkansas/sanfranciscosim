@@ -535,10 +535,20 @@ a straitjacket — adjust after the first aerial review render.
    sets the bounding-box top and must land exactly on 7.6.**
 9. Roof deck at z=7.32, `Toy_roofd`, with a 0.25 m `Toy_steel` upstand around the whole
    ring except where the eave meets it.
-10. Roof furniture: two skylights 1.6 × 1.2 × 0.35 m, `Toy_glassl` sides and cap,
-    `Toy_trim` 0.1 m kerb, placed over the deep plan at roughly d = 17 m and d = 24 m;
-    two HVAC blocks (1.4 × 1.0 × 0.7 m and 1.0 × 0.8 × 0.5 m) `Toy_steel` grouped near
-    the rear; one roof hatch 1.0 × 0.9 × 0.45 m `Toy_roofd` at d ≈ 21 m.
+10. Roof furniture, **all of it below 7.6 m** — the eave crest is the bounding-box top
+    and nothing on the deck may exceed it: two skylights over the deep plan at roughly
+    d = 17 m and d = 24 m (1.6 × 1.2 m, `Toy_trim` kerb z 7.32–7.40, `Toy_glassl`
+    glazing z 7.40–7.54); one roof hatch 1.0 × 0.9 m `Toy_roofd` to z 7.52 at d ≈ 21 m;
+    one vent cowl r 0.3 m `Toy_steel` to z 7.54 at d ≈ 14 m.
+
+    **No rooftop mechanical plant.** The 0.7 m HVAC blocks this recipe carried in its
+    first draft would have stood at 8.02 m, above the crest — and more to the point,
+    nothing in the evidence supports them. The LiDAR argues the other way: σ 0.64 m
+    over 715 cells with the mode and median both pinned at 7.32 m is what a *clean*
+    roof measures, and a pair of 0.7 m units on a 6.9 m wide deck would have widened
+    that distribution visibly. Inventing plant here would be inventing detail on the
+    one elevation the dossier admits it cannot see (2.15). The roof composition is
+    carried by the two light wells biting in at the waist, which is where it belongs.
 11. Rear elevation: one 1.0 × 2.2 m door (`Toy_roofd`, recessed 0.15 m) and two small
     0.8 × 1.0 m `Toy_glass` openings on the upper floor. Nothing else.
 12. Bevel 0.12 m, 2 segments.
@@ -588,10 +598,14 @@ A flat roof 7.3 m up in a district the camera flies over constantly, and one of 
 asset's two primary elevations. Composition, front to rear: the eave's darker slab
 oversailing the street edge; the deck running back as a long clean dark plane inside its
 light upstand ring; the two wells biting in from opposite sides at the waist, their
-`Toy_stone` linings catching light where the deck does not; the first skylight; the
-hatch; the second skylight; the mechanical pair grouped at the rear. Keep the deck value
-clearly darker than the upstand, the well linings and the skylights, so all four read
-separately from above.
+`Toy_stone` linings catching light where the deck does not; the vent cowl; the first
+skylight; the hatch; the second skylight; and the shallower third well taking its bite
+from the south-west near the rear. Keep the deck value clearly darker than the upstand,
+the well linings and the skylights, so all four read separately from above.
+
+The roof is deliberately **sparse** — see 2.7 step 10. On a plan this narrow the two
+wells are the composition, and adding plant to fill the deck would both break the 7.6 m
+crest and invent detail the evidence does not support.
 
 ### 2.10 Scope
 
