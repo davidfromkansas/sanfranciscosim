@@ -11,12 +11,13 @@ in `REFERENCE.md`. Where the plan and this report disagree, **this report wins**
 | Front heading | **117.3°** true (ESE), onto South Park Street |
 | Target height | **8.70 m** to the front parapet crest (normalised exactly) |
 | Triangles | **4,020** of a 6,000 cap |
-| Objects | 77 |
+| Objects | **8** after stage 4 (77 as authored) |
 | Dimensions | 29.94 × 23.72 × 8.70 m (axis-aligned; the building is a 32.3 m strip at ~45° to the world axes) |
 | Min Z | 0.000 m |
 | Materials | `Toy_slate`, `Toy_roofd`, `Toy_trim`, `Toy_ink`, `Toy_glass`, `Toy_warm_Glow`, `Toy_glass_Glow` |
-| File | 259 KB uncompressed (pre stage-4 optimize) |
-| Validation | `validation.json` — **overall PASS**, 16 of 16 checks |
+| File | **120,132 B** shipped (meshopt); 248,120 B as authored — see `optimize/REPORT.md` |
+| Draw submeshes | **9** shipped (79 as authored) |
+| Validation | `validation.json` — **overall PASS**, 16 of 16 checks, re-run on the *shipped* packed file |
 
 Build: `blender -b --python build_156_south_park.py`
 Renders: `blender -b --python render_156_south_park.py [-- --night]`
@@ -145,11 +146,22 @@ property of the plan shape, not a placement error.
 }
 ```
 
-`dims` and `tris` are the pre-optimize figures and must be refreshed after stage 4.
+`dims` and `tris` are the **shipped** figures: stage 4 changed neither (it removed node
+overhead, not geometry).
 `cat: 3` is Office (`CATEGORY_LABELS` in `app/src/context.js`) — the building's use since
 the 2019 change of use.
 
-## 8. Approval
+## 8. Stage 4 — optimize
+
+Run per `docs/asset-pipeline/GLB-OPTIMIZE-PROMPT.md`; full detail in
+`optimize/REPORT.md`. Headline: **248,120 → 120,132 raw bytes (−51.6%)**, **79 → 9 draw
+submeshes**, triangles and bbox unchanged, all applicable gates G1–G6 and G8 PASS, worst
+A/B pixel delta 0.027% against a 2%/4% gate. The limited-dissolve step was deliberately
+skipped because this asset has three coplanar parapet ring bands — the 350-brannan sliver
+trap. The packed file was then re-run through the stage-2 contract validator: PASS, 16 of
+16.
+
+## 9. Approval
 
 Standing approval given by the user at the start of the session, quoted verbatim,
 16 August 2026:
