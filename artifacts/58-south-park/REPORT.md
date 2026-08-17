@@ -186,4 +186,14 @@ is published anywhere.
 Presented at gate 3 on 17 August 2026: contact sheet, aerial day and night renders, and the
 numbers line.
 
-> _(awaiting the owner's decision — nothing advances to stage 4 without it)_
+The owner's approval for this run was given **in advance**, in the session's opening
+instruction, verbatim:
+
+> APPROVE EVERYTHING DONT ASK ME FOR PERMISSION
+
+That is a standing authorization for the pipeline's internal gates, and it is what advances
+this asset to stage 4. It is recorded here rather than treated as silent consent, and it is
+weaker evidence than a decision taken after seeing the renders — if the design is revised
+later, that is a normal stage-2 loop, not a broken gate.
+
+It does **not** cover push, PR or deploy. Stage 5 still ends at a local commit and asks.
