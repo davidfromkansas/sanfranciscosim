@@ -187,3 +187,51 @@ Recorded as a standing pre-approval covering stages 3 through 5 of
 `docs/asset-pipeline/ADDRESS-TO-ASSET.md` for this building. No per-iteration
 approval was sought; the review iterations in §6 were self-directed against the
 style bible.
+
+## 9. Stage 5 — local integration QA (batch mode)
+
+Run 17 August 2026 against this worktree's own Vite dev server, driven in real
+headless Chrome over CDP. The served manifest was checked first — 74 entries,
+`26-south-park` present — because a dev server pointed at the wrong tree is the
+failure mode that wastes the most time here.
+
+| Check | Result |
+|---|---|
+| Placement | `uniform x1.0000 at 3850, -1353` — the loader's `targetHeightM / measuredHeight` lands on **exactly 1.0** |
+| Orientation | camera preset yaw 45°; the slot runs South Park → Taber Place with the open deck at the near end |
+| Terrain seating | seats on the rim with no gap or sink at either party wall |
+| **The step** | reads exactly as designed — the roof sits clearly below both neighbours and the building is the dark notch in the row |
+| Streaming | `entries 74, live 18, failed 0` at `loadRadius: 2500` |
+| Draw calls | **125** max per frame at the landmark, against a 300 budget |
+| Night glow | the quietest in the set, on purpose: one lit second-floor window and the entry spill, while every neighbour lights up in yellow |
+| `pipeline/audit.mjs` 1.6 | **PASS** — 83 zones over 80 landmarks clear |
+| Cell 23_13 | `origin/main` 201 buildings → re-baked **200**; the two rings left within 12 m of the anchor are the Hotel Madrid at 8.6 m and 44–46 South Park at 10.3 m — **both neighbours standing**, which is what the 1.2 m margin above the 4.60 m ceiling was for |
+
+Draw calls were measured by hooking `renderer.render` and keeping the per-frame
+maximum; the in-app stats overlay reads `1` because `toypost.js` renders a
+fullscreen quad after the scene and three resets `renderer.info` on every
+`render()`.
+
+Note that the landmark must be **polled for**, not waited on: the rig eases to the
+target and the streaming scan only fetches once the camera is genuinely inside
+`loadRadius`, so a fixed sleep after `SF.goTo` reports `placed: false` perhaps half
+the time and looks exactly like a broken radius.
+
+### Fallback drill
+
+With `app/public/sf-assets/landmarks/26-south-park.glb` moved aside: the app boots,
+all 74 manifest entries load, the entry goes to **`failed: 1`**, 18 other landmarks
+go live and nothing crashes.
+
+As with its neighbour, the site is then an **empty lot** rather than a procedural
+block — for a Case B landmark the exclusion has already removed that footprint from
+the baked tiles. This is inherent to Case B, not a defect in this asset.
+
+### Batch-mode handoff
+
+The re-bake was run in full and QA'd on, then discarded with
+`git checkout -- app/public/tiles api/_data`. `git diff --name-only origin/main`
+lists nothing under `app/public/tiles/` or `api/_data/`. The branch carries source
+only. `node pipeline/compress-assets.mjs` again re-compressed the unrelated
+`vehicles/passenger-airplane.glb`; it was reverted. This asset was correctly
+skipped as already carrying `EXT_meshopt_compression` from stage 4.

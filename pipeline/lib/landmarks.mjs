@@ -1843,6 +1843,33 @@ export const LANDMARKS = [
     // (225.4 deg) and the Bryant Street elevation (315.4 deg).
     camera: { distance: 420, yaw: 270, pitch: 26 },
   },
+  {
+    // 26-28 South Park (51 Taber Place): a 1907 two-storey through-lot sliver,
+    // 6.69 m of frontage against 30.13 m of depth, and the low notch between the
+    // Hotel Madrid and 44-46 South Park.
+    //
+    // height 9.05 is the LiDAR MEDIAN deck (8.35 m) plus a conventional parapet,
+    // NOT the 13.59 m LiDAR maximum: that maximum matches 44-46 South Park's own
+    // roof-plane median (13.52 m) to 7 cm on a 7.65 m-wide raster footprint
+    // dilated into both taller party walls. See artifacts/26-south-park/REPORT.md.
+    //
+    // exclude: 3.4 is the middle of a (2.20, 4.60) m band — the tightest in the
+    // South Park set — measured against both bake inputs. Floor = this building's
+    // own Overture ring; ceiling = 44-46 South Park's nearest DataSF vertex, with
+    // only 1.2 m of margin, so re-check the drop list against origin/main's
+    // registry after any merge that lands 46SouthPark.
+    id: '26SouthPark',
+    name: '26-28 South Park',
+    lon: -122.3937438,
+    lat: 37.7822369,
+    height: 9.05,
+    exclude: 3.4,
+    // Front faces 135.2 deg, so yaw 45 stands the camera south-east, over the
+    // oval. Closer and flatter than its neighbour: the recognition here is the
+    // 4.5:1 slot proportion and the step against both neighbours, which a high
+    // pitch flattens away.
+    camera: { distance: 165, yaw: 45, pitch: 24 },
+  },
 ];
 
 // Parks/green spaces the landcover bake must match at least one source polygon
