@@ -201,11 +201,34 @@ const ROUTE_GLOW_DAY_COLORS = {
   streetcar: [0.8, 0.0, 0.4], // magenta
   cable: [0.9, 0.5, 0.0], // amber
 };
-// Alpha of a daylight wall (NormalBlending). High enough to read as a solid
-// coloured curtain from the hero view without hiding the city behind it.
-const ROUTE_GLOW_DAY_OPACITY = 0.45;
+// Overall alpha of the ribbon, per palette. These multiply the shader's own
+// profile (see ROUTE_GLOW_PROFILE), which already spends most of its alpha on
+// the two edges, so they are far higher than the flat-curtain values they
+// replaced — at the old night 0.125 the white core simply wasn't white.
+const ROUTE_GLOW_DAY_OPACITY = 0.62;
+const ROUTE_GLOW_NIGHT_OPACITY = 0.62;
 // uNight below this counts as day: the palette and blend mode swap here.
 const ROUTE_GLOW_NIGHT_AT = 0.5;
+
+// How the ribbon is shaped across its height. A Tron light trail is not a
+// tinted pane: it is a blown-out WHITE core with the colour living in the
+// falloff around it, bounded by a hard clean edge. So the wall spends its
+// alpha at the two edges — a crisp lit rim along the top and a contact flare
+// where it meets the street — and stays nearly clear through the middle,
+// which is also what lets you see the city through it.
+//   coreWhite: how far the edges wash out to white (the "hot" core)
+//   body:      alpha of the transparent interior
+//   topEdge:   width of the top rim, as a fraction of wall height
+//   baseEdge:  width of the ground flare
+const ROUTE_GLOW_PROFILE = {
+  // After dark the core goes properly white-hot and the interior nearly
+  // vanishes, so the route reads as a drawn line of light over the city.
+  night: { coreWhite: 0.92, body: 0.42, topEdge: 0.075, baseEdge: 0.16 },
+  // By day the same ribbon has to survive sunlight (this is what PR #141/#143
+  // were about), so the interior keeps real paint in it and the core whitens
+  // less — a white edge on a pale street is an invisible edge.
+  day: { coreWhite: 0.4, body: 1.0, topEdge: 0.055, baseEdge: 0.13 },
+};
 
 // Module-scope scratch: the update loop and the picker must not allocate.
 const dummy = new Object3D();
@@ -531,6 +554,7 @@ export function createLiveMuni(scene, data) {
   // bound right now (starts on the day palette — setRouteGlowDay corrects it
   // on the first frame if the city boots after dark).
   let routeGlowPalettes = null;
+  let routeGlowUniforms = null;
   let routeGlowIsDay = true;
 
   // ------------------------------------------------------------- subway
@@ -679,13 +703,7 @@ export function createLiveMuni(scene, data) {
     // mode starts where routeGlowIsDay does and setRouteGlowDay flips it.
     routeGlowMesh = new Mesh(
       new BufferGeometry(),
-      new MeshBasicMaterial({
-        vertexColors: true,
-        transparent: true,
-        blending: 1, // NormalBlending (day); AdditiveBlending after dark
-        depthWrite: false,
-        side: 2, // DoubleSide — visible from both sides of the wall
-      }),
+      routeGlowMaterial(),
     );
     routeGlowMesh.name = 'live-muni-route-glow';
     routeGlowMesh.frustumCulled = false;
@@ -1073,6 +1091,59 @@ export function createLiveMuni(scene, data) {
 
   // ------------------------------------------------------- route glow walls
 
+  // The ribbon shader. MeshBasicMaterial carries the vertex colours, the
+  // blend mode and the day/night opacity exactly as before; onBeforeCompile
+  // only reshapes the alpha across the wall's height (aRibbon: 0 at the
+  // street, 1 at the top) and burns the edges toward white.
+  function routeGlowMaterial() {
+    const material = new MeshBasicMaterial({
+      vertexColors: true,
+      transparent: true,
+      blending: 1, // NormalBlending (day); AdditiveBlending after dark
+      depthWrite: false,
+      side: 2, // DoubleSide — visible from both sides of the wall
+      toneMapped: false, // a light trail is emitted light, not a lit surface
+    });
+    const profile = ROUTE_GLOW_PROFILE[routeGlowIsDay ? 'day' : 'night'];
+    routeGlowUniforms = {
+      uCoreWhite: { value: profile.coreWhite },
+      uBody: { value: profile.body },
+      uTopEdge: { value: profile.topEdge },
+      uBaseEdge: { value: profile.baseEdge },
+    };
+    material.onBeforeCompile = (shader) => {
+      Object.assign(shader.uniforms, routeGlowUniforms);
+      shader.vertexShader = shader.vertexShader
+        .replace('#include <common>', '#include <common>\n        attribute float aRibbon;\n        varying float vRibbon;')
+        .replace('#include <begin_vertex>', '#include <begin_vertex>\n        vRibbon = aRibbon;');
+      shader.fragmentShader = shader.fragmentShader
+        .replace(
+          '#include <common>',
+          `#include <common>
+          uniform float uCoreWhite;
+          uniform float uBody;
+          uniform float uTopEdge;
+          uniform float uBaseEdge;
+          varying float vRibbon;`
+        )
+        .replace(
+          '#include <dithering_fragment>',
+          `#include <dithering_fragment>
+          // Two hot edges and a near-clear interior.
+          float top = exp(-pow((1.0 - vRibbon) / uTopEdge, 2.0));
+          float base = exp(-pow(vRibbon / uBaseEdge, 2.0));
+          // The interior is brightest where the light spills off the street
+          // and thins upward, so the wall has a direction: it is lit FROM the
+          // route, not uniformly filled.
+          float body = uBody * pow(1.0 - vRibbon, 2.2);
+          float edge = clamp(top + base * 0.85, 0.0, 1.0);
+          gl_FragColor.rgb = mix(gl_FragColor.rgb, vec3(1.0), edge * uCoreWhite);
+          gl_FragColor.a = clamp(body * 0.35 + top + base * 0.8, 0.0, 1.0) * opacity;`
+        );
+    };
+    return material;
+  }
+
   function rebuildRouteGlow() {
     if (!shapes || !routeGlowMesh) return;
     const F = shapes.floats;
@@ -1084,6 +1155,10 @@ export function createLiveMuni(scene, data) {
     const positions = [];
     const colors = [];
     const dayColors = [];
+    // Height of each vertex within the ribbon, 0 at the street and 1 at the
+    // top. The shader shapes the trail along this, so it is not derivable
+    // from world y: the wall follows the terrain up and down the hills.
+    const ribbon = [];
     const indices = [];
 
     for (const [shapeIdx, { mode, route }] of activeRouteShapes) {
@@ -1128,6 +1203,8 @@ export function createLiveMuni(scene, data) {
           colors.push(color[0], color[1], color[2]);
           dayColors.push(dayColor[0], dayColor[1], dayColor[2]);
         }
+        // Matches the corner order pushed above: bottom, top, bottom, top.
+        ribbon.push(0, 1, 0, 1);
 
         // Two triangles: (v, v+1, v+2) and (v+1, v+3, v+2)
         indices.push(v, v + 1, v + 2, v + 1, v + 3, v + 2);
@@ -1143,6 +1220,7 @@ export function createLiveMuni(scene, data) {
       day: new BufferAttribute(new Float32Array(dayColors), 3),
     };
     geo.setAttribute('color', routeGlowPalettes[routeGlowIsDay ? 'day' : 'night']);
+    geo.setAttribute('aRibbon', new BufferAttribute(new Float32Array(ribbon), 1));
     geo.setIndex(indices);
     geo.computeVertexNormals();
     routeGlowMesh.visible = positions.length > 0;
@@ -1160,6 +1238,14 @@ export function createLiveMuni(scene, data) {
     mat.needsUpdate = true;
     if (routeGlowPalettes) {
       routeGlowMesh.geometry.setAttribute('color', routeGlowPalettes[isDay ? 'day' : 'night']);
+    }
+    // Same ribbon, different fire: see ROUTE_GLOW_PROFILE.
+    if (routeGlowUniforms) {
+      const profile = ROUTE_GLOW_PROFILE[isDay ? 'day' : 'night'];
+      routeGlowUniforms.uCoreWhite.value = profile.coreWhite;
+      routeGlowUniforms.uBody.value = profile.body;
+      routeGlowUniforms.uTopEdge.value = profile.topEdge;
+      routeGlowUniforms.uBaseEdge.value = profile.baseEdge;
     }
   }
 
@@ -1190,7 +1276,7 @@ export function createLiveMuni(scene, data) {
       const pulse = 0.75 + 0.25 * Math.sin(now * 0.0015);
       const night = shared.uNight.value ?? 0;
       setRouteGlowDay(night < ROUTE_GLOW_NIGHT_AT);
-      const baseOpacity = routeGlowIsDay ? ROUTE_GLOW_DAY_OPACITY : nightOpacity * 0.125;
+      const baseOpacity = routeGlowIsDay ? ROUTE_GLOW_DAY_OPACITY : nightOpacity * ROUTE_GLOW_NIGHT_OPACITY;
       routeGlowMesh.material.opacity = baseOpacity * pulse;
     }
 
