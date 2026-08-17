@@ -67,6 +67,7 @@ route, and the park plans depend on it (§E8 of the parks README).
 | [370 Brannan Street](./370-brannan.md) | `370-brannan` | 7.63 m | new landmark |
 | [358 Brannan Street](./358-brannan.md) | `358-brannan` | 9.6 m (estimated) | new landmark |
 | [380 Brannan Street](./380-brannan.md) | `380-brannan` | 12.6 m | new landmark |
+| [318 Brannan Street](./318-brannan.md) | `318-brannan` | 8.6 m (estimated) | new landmark |
 | [550 Third Street](./550-third.md) | `550-third` | 11 m | new landmark |
 | [551 Third Street (Shell Service Station)](./551-third.md) | `551-third` | 6.6 m | new landmark |
 | [375 Alabama Street (Ames Harris Neville Co.)](./375-alabama.md) | `375-alabama` | 22.5 m | new landmark |
