@@ -952,6 +952,50 @@ export const LANDMARKS = [
     camera: { distance: 190, yaw: 315, pitch: 26 },
   },
   {
+    // A 1959 two-storey commercial building at the WEST TIP of the South Park
+    // oval, on a wedge lot: 5.5 m of frontage widening to 9.7 m over an 18.7 m
+    // depth, because South Park Street curves around the end of the ellipse
+    // while the party walls stay on the old rectilinear lot lines.
+    //
+    // The tightest window in this file, and the clearest demonstration of why
+    // the half-diagonal rule is wrong rather than merely risky. excluded() drops
+    // a footprint when its centroid OR ANY ring vertex falls inside, and here
+    // those two tests point in opposite directions. Measured from this anchor
+    // against the actual bake input:
+    //
+    //                                     nearest vertex   centroid
+    //   own footprint (DataSF SF3775065)       6.10 m       3.24 m
+    //   own footprint (Overture)               6.56 m       1.37 m
+    //   156 South Park (DataSF SF3775066)      6.10 m       8.50 m
+    //   156 South Park (Overture)              6.56 m       9.52 m
+    //   140 South Park (DataSF SF3775064)     11.34 m      13.18 m
+    //   140 South Park (Overture)              9.83 m       9.73 m
+    //
+    // This building has to be cleared by its CENTROID at 3.24 m, because its
+    // own nearest vertex, 6.10 m, is a party-wall node it SHARES with 156 South
+    // Park - which is why both report exactly 6.10 m in DataSF and exactly
+    // 6.56 m in Overture. That is not a coincidence, it is the same point, so
+    // no radius reaches our corner without reaching the neighbour's.
+    //
+    // Safe window: 3.24 < r < 6.10. 4.5 sits mid-window with 1.3 m of headroom
+    // over our own centroid and 1.6 m below 156's vertex. Do NOT raise it: the
+    // half-diagonal here would be ~9.5 m and would delete 156 AND 140, punching
+    // a two-lot hole in the row at the head of the park, which is far more
+    // visible than the building itself.
+    //
+    // camera.js puts the eye at target + distance*(sin yaw, ., cos yaw) with +x
+    // east and +z south, so yaw 46 stands south-east of the building - square
+    // onto the South Park front, looking back over the head of the oval. 140 m
+    // suits an 8 m building (cf. 135 South Park at 150 for 8.5 m).
+    id: '150SouthPark',
+    name: '150 South Park',
+    lon: -122.3947673,
+    lat: 37.781381,
+    height: 8.0,
+    exclude: 4.5,
+    camera: { distance: 140, yaw: 46, pitch: 26 },
+  },
+  {
     // The new Main Library, one block south of the Old Main across Fulton, on a
     // near-identical 106 x 57 m block. Same radius rule as its neighbour and for
     // the same reason: excluded() drops a footprint when its centroid OR ANY ring

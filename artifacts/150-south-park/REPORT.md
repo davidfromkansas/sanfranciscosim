@@ -117,10 +117,16 @@ proportional guesses.
 Regenerated from the final export (the rig re-imports the GLB, so every image depicts
 exactly the geometry that ships):
 
-Renders predate the stage-4 swap only in file mtime; the geometry is byte-identical within the G4 gate (worst pixel delta 0.037%). `150-south-park-north.png`, `-east.png`, `-south.png`, `-west.png` (four elevations, one
+`150-south-park-north.png`, `-east.png`, `-south.png`, `-west.png` (four elevations, one
 orthographic rig, identical scale/framing/lighting/exposure, differing only in azimuth);
-`-top.png`; `-aerial.png` (high three-quarter, 105 mm, 30° down, from the SE); 
+`-top.png`; `-aerial.png` (high three-quarter, 105 mm, 30° down, from the SE);
 `-aerial-night.png`; `-contact-sheet.png`.
+
+These were rendered from the pre-optimize build, minutes before the stage-4 shipping swap.
+They were not re-rendered afterwards because stage 4 changed no geometry: 3,084 triangles
+in and out, bbox identical to five decimal places, and the A/B pass measured a worst-case
+0.037% mean pixel delta against a 2%/4% gate (`optimize/REPORT.md` §5, with its own
+`renders/contact_sheet.png` showing the optimized build directly).
 
 Because the real front faces SE 133.1°, the labelled `south` and `east` elevations each
 catch the frontage at ~45°. That is a property of a true-compass rig on a 43°-rotated
