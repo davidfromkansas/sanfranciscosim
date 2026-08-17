@@ -10,17 +10,17 @@ document and the plan disagree, this document is what shipped.
 | | |
 |---|---|
 | File | `340-brannan.glb` |
-| Objects | 176 |
-| Triangles | **8,880** (cap 11,000) |
+| Objects | 13 shipped (176 authored) |
+| Triangles | **8,871** shipped (8,880 pre-optimize; cap 11,000) |
 | Dimensions (AABB) | 41.05 x 40.68 x **17.79** m |
 | Min Z | 0.000 m |
 | XY centre offset | (-0.015, -0.119) m |
-| File size | 557 KB raw / 99 KB gzip (pre-optimize) |
+| File size | **251 KB** raw shipped (557 KB pre-optimize, −55.0%); draw submeshes 177 → 14 |
 | Materials | 13, all `Toy_*`, flat, no textures, no alpha, no `Toy_body` |
 | Glow materials | `Toy_glass_Glow`, `Toy_white_Glow` |
 | Anchor (WGS84) | -122.3932324, 37.7812786 |
 | Brannan front heading | 135.4° true (SE) |
-| Contract validation | **PASS** — all 16 checks, fresh re-import (`validation.json`) |
+| Contract validation | **PASS** — all 16 checks, fresh re-import of the SHIPPED (meshopt-packed) file (`validation.json`) |
 
 The 41 x 41 m axis-aligned bounding box on a 29.25 x 28.22 m building is the
 expected consequence of the ~45° SoMa heading, not a scale error.
@@ -163,12 +163,12 @@ python3 make_contact_sheet.py
     40.68,
     17.79
   ],
-  "tris": 8880,
+  "tris": 8871,
   "loadRadius": 2500
 }
 ```
 
-`dims` and `tris` are the pre-optimize figures and are updated by stage 4.
+`tris` is the shipped, post-optimize figure (stage 4). See `optimize/REPORT.md`.
 
 ## Approval
 
