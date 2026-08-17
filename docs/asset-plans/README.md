@@ -102,6 +102,7 @@ route, and the park plans depend on it (§E8 of the parks README).
 | [592 Third Street](./592-third.md) | `592-third` | 8.2 m (estimated) | new landmark |
 | [400 Brannan Street](./400-brannan.md) | `400-brannan` | 8.8 m | new landmark |
 | [188 South Park (South Park Lofts)](./188-south-park.md) | `188-south-park` | 15.93 m (LiDAR-derived) | new landmark |
+| [160 South Park](./160-south-park.md) | `160-south-park` | 9.4 m (LiDAR-derived) | new landmark |
 
 ## Shared contract (all 60)
 
@@ -194,6 +195,19 @@ and overlaps its neighbour. That plan's geometry comes from the surveyed DataSF 
 (`acdm-wktn`), with the DataSF LiDAR footprint (`ynuv-fyni`) supplying only the built depth
 — and even those two disagree by 3.7 m, which its 2.3 reconciles. On dense narrow-lot
 blocks, prefer the parcel layer and treat OSM as a cross-check.
+
+160 South Park is the next variety along from 165–167, and the one that shows how the DataSF
+LiDAR layer fails *quietly*. There the "building footprint" `SF3775067` is 220.0 m² against a
+216.8 m² parcel — it is the **lot**, rear yard included, not the roof. Nothing in the record
+says so; the tell is in the statistics, where `hgt_min` is 0.56 m and the height standard
+deviation is 2.56 m on a footprint whose five block neighbours all sit between 0.75 and
+1.14 m. The consequence is that `hgt_median` (7.79 m) is a roof-and-yard blend and describes
+no surface on the building, while `hgt_majority` — the mode, 8.81 m — is the roof deck and
+`hgt_max` (9.41 m) is the crest. **On a footprint with an anomalous standard deviation,
+prefer the mode to the median.** The same mixture is what makes the built depth solvable:
+the mean height pins the built fraction at 0.74–0.76, and SF Planning's floor-area record
+independently agrees. It is also why that plan's manifest anchor and registry point sit
+4.89 m apart rather than 165–167's 1.34 m.
 
 358 Brannan Street breaks the pattern: there the bad number is not a height but the
 **footprint**. Its OSM way (`source=Bing`) traces a 115 m2 stub, wide and shallow,
