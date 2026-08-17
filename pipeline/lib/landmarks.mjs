@@ -1780,6 +1780,53 @@ export const LANDMARKS = [
     camera: { distance: 400, yaw: 315, pitch: 24 },
   },
   {
+    // 35 South Park — Accel's San Francisco office. A 1920 industrial building
+    // on the NE arc of the oval (block/lot 3775/102), wearing the grandest street
+    // elevation on the park: five giant round-arched bays in pale ashlar under a
+    // rope-enriched architrave, a lettered frieze and a tall blank parapet. A
+    // 2020-23 ground-up renovation (permits 202008222419 and its 2023 roof-trellis
+    // submittal) added a set-back penthouse and a clipped hedge running the whole
+    // front parapet — the two things the app's downward camera reads first.
+    //
+    // height is the PENTHOUSE crest, and it is estimated: the DataSF LiDAR is a
+    // 2010 product and predates the penthouse entirely (its max is 12.44 m). 13.4 m
+    // is photogrammetric from two Jan 2025 Street View captures, +-0.7 m, the
+    // largest error term being the penthouse's setback. The front parapet is
+    // 10.4 m. See artifacts/35-south-park/REFERENCE.md section 2.
+    //
+    // excluded() drops a footprint when its centroid OR any ring vertex falls
+    // inside the radius. Measured from this anchor against the actual bake input
+    // (DataSF footprints primary, Overture/OSM gap-fill):
+    //
+    //    0.42 m  this building's own OSM ring (way 112759864), via CENTROID
+    //    1.36 m  this building's own DataSF footprint (SF3775102), via centroid
+    //   10.68 m  nearest neighbour VERTEX — 41-43 South Park (SF3775040), the
+    //            party-wall Victorian on the SW. This is the binding constraint.
+    //   12.87 m  the same neighbour via OSM (way 112759867)
+    //   15.51 m  the rear neighbour (SF3775015)
+    //   24.73 m  27 South Park (way 112759868), across the 7.34 m NE gap
+    //
+    // Safe window is therefore (1.4, 10.68) m and 6 sits in the middle of it with
+    // 4.6 m of margin on each side — the most comfortable window in the South Park
+    // set, unlike 135SouthPark's 1.5 m one. Do NOT raise past 10: at 10.68 this
+    // starts deleting the party-wall Victorian, which has no GLB to replace it.
+    //
+    // No clearTrees: this is a building, and the oval's scatter is already handled
+    // by 64SouthPark's 80 m zone.
+    id: '35SouthPark',
+    name: 'Accel (35 South Park)',
+    lon: -122.3933378,
+    lat: 37.7815714,
+    height: 13.4,
+    exclude: 6,
+    // App yaw = 180 - the true bearing the camera stands at. The arcade faces
+    // 315.9 deg (NW) across the street into the park, so the camera has to stand
+    // to the NW: bearing 315 -> yaw 225, square onto the one elevation that
+    // carries the design. Verified against the -aerial render, not derived on
+    // paper (the 592Third lesson).
+    camera: { distance: 130, yaw: 225, pitch: 24 },
+  },
+  {
     // 522-524 Second Street, the 1923 brick warehouse on the Taber Place corner.
     // Third bespoke landmark on block 3775, with 358 and 370-400 Brannan.
     //
