@@ -14,24 +14,30 @@ model existed.
 | | |
 |---|---|
 | Triangles | **9,262** (cap 11,000) |
-| Objects | 165 mesh, 0 anything else |
-| Dimensions | 23.63 × 22.61 × **13.000** m |
+| Objects | **12** mesh after the stage-4 join (165 as authored), 0 anything else |
+| Dimensions | 23.6255 × 22.5585 × **13.0000** m |
 | Wall box | 12.90 m (South Park front) × 17.70 m deep |
 | min Z / XY centre offset | 0.000 m / (0.000, 0.000) |
-| File | 535,704 B raw, 96,630 B gzip (pre-stage-4) |
+| File (shipped, post-stage-4) | **219,356 B** raw, 141,289 B gzip — from 537,592 B raw |
 | Materials | 11, all `Toy_*`, flat, opaque, no textures |
 | Glow | `Toy_glass_Glow`, `Toy_trim_Glow` — 90 faces, all open single-layer strips |
 | Front heading | 315.8° (NW) · flank 225.8° (SW) · party 45.8° · rear 135.8° |
-| Manifest anchor | `-122.3935926, 37.7814648` |
+| Manifest anchor | `-122.3935929, 37.7814646` |
 | Target height | 13.00 m → loader scale exactly **1.0** |
-| Validation | **PASS**, all 17 checks — `validation.json` |
+| Validation | **PASS**, all 17 checks — `validation.json` (re-run against the shipped, optimized file) |
+| Stage 4 | −59.2% raw, 167 → 14 draw submeshes, all 8 gates PASS — `optimize/REPORT.md` |
 
-The 23.63 × 22.61 m XY box is the 45.8° rotation of a 12.90 × 17.70 m building plus its
+The 23.63 × 22.56 m XY box is the 45.8° rotation of a 12.90 × 17.70 m building plus its
 bays. It is not a 23 m building.
+
+Every review render, the contact sheet and `validation.json` were regenerated from the
+**shipped** file after the stage-4 swap, so nothing in this directory depicts a build
+that is not the one being integrated. The pre-optimize asset is archived byte-for-byte
+at `optimize/input/49-south-park.glb`.
 
 ## Corrections to the dossier, made during the build
 
-Four, all documented in the build script at the point of change.
+Five, all documented in the build script at the point of change.
 
 **1. The body colour is off-palette, and that was a deliberate reversal.** The plan
 specified `Toy_stone` (`#d9d2c2`) for the body against `Toy_trim` (`#f3efe6`) for the
@@ -88,6 +94,29 @@ the 2017 corner photograph, the alley elevation reads as turret / canted / cante
 rounded over 17.70 m, with real flat wall between — so two it is. The *rounded* count,
 three, one per exposed corner, is from the designation report and was never in doubt.
 
+**5. The offset helpers were deciding "outward" the wrong way, and stage 4 caught it.**
+Not a visual defect — a contract one. `inset_polygon()` and the polyline offset used by
+the bay glazing bands worked out which side of each edge was outward by comparing it to
+the *building centroid*. That is fine for a rectangle. It is wrong for a corner turret
+that sweeps 242°, and wrong for a rounded bay sitting near a far corner, because some of
+their segments genuinely face back past the centroid — so those segments offset inward,
+their bands folded through themselves, and the folded faces read as flipped to a ray
+test. The stage-4 gate measured 0.202% flipped first hits against a 0.15% tolerance and
+refused the pass.
+
+Both helpers now decide handedness once and geometrically: `inset_polygon()` from the
+polygon's own **winding**, and the open-polyline offset from its **middle segment**,
+which on a convex arc always faces squarely out. The glow strips use the same rule. The
+input then measured 2 flipped hits in 17,325 (0.012%), and the shipped file 1.
+
+Two things were fixed alongside it. Every applied band — bay glazing, bay frames,
+cornice steps, water table, window sills, roof furniture — is now sunk 30 mm into the
+surface it sits on (`EMBED`), because a face exactly coincident with another solid's
+face makes a ray's first hit ambiguous; overlapping solids are the supported model here.
+And this file's own `glow_strips_face_outward` check was rewritten: it used to dot each
+glow face against the model centre, which is the *same* mistake, and it now casts a ray
+inward along each face's own normal and requires that face to be the first thing hit.
+
 ## Design decisions worth recording
 
 - **The corner turret is modelled as wrapping the corner**, centred on the West corner
@@ -140,9 +169,9 @@ meters and plausible dimensions · crest normalized to target (13.000) · base a
 centred in XY · under triangle budget (9,262 / 11,000) · no image textures · no
 transparency · materials follow contract · no cameras or lights · no animation, skin or
 constraints · transforms applied · no negative scales · normals outward by signed volume
-(155 / 155 closed solids positive, 0 inverted) · glow strips face outward (90 / 90) ·
-normals outward by ray test (31,500 rays, 5 flipped first hits = 0.0159%, tolerance
-0.15%) · no degenerate geometry · no unexpected objects.
+(0 inverted) · glow strips face outward (90 / 90, each one the first thing a ray fired
+back along its own normal hits) · normals outward by ray test (31,500 rays, 4 flipped
+first hits = 0.0127%, tolerance 0.15%) · no degenerate geometry · no unexpected objects.
 
 ## Files
 
@@ -160,7 +189,9 @@ validate_49_south_park.py     fresh-scene contract validation -> validation.json
 49-south-park-aerial-night.png
 49-south-park-contact-sheet.png
 REFERENCE.md                  research dossier
-validation.json               machine-readable validation
+validation.json               machine-readable validation (of the SHIPPED file)
+optimize/                     stage-4 shrink pass: byte-identical input archive,
+                              adapted scripts, gate results, A/B renders, REPORT.md
 ```
 
 ## Draft manifest entry
@@ -170,8 +201,8 @@ validation.json               machine-readable validation
   "id": "49-south-park",
   "file": "49-south-park.glb",
   "anchor": [
-    -122.3935926,
-    37.7814648
+    -122.3935929,
+    37.7814646
   ],
   "targetHeightM": 13.0,
   "cat": 2,
@@ -179,7 +210,7 @@ validation.json               machine-readable validation
   "estimated": false,
   "dims": [
     23.6255,
-    22.6089,
+    22.5585,
     13.0
   ],
   "tris": 9262,

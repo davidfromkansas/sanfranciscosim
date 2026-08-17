@@ -1,0 +1,952 @@
+{
+ "file_bytes": {
+  "raw": 537592,
+  "gzip9": 98267
+ },
+ "objects": 165,
+ "total_tris": 9262,
+ "total_verts": 17008,
+ "primitives_est": 167,
+ "top20": [
+  {
+   "name": "cornice_bed",
+   "tris": 432,
+   "verts": 648,
+   "dims": [
+    23.018,
+    22.032,
+    0.24
+   ],
+   "materials": [
+    "Toy_trim"
+   ]
+  },
+  {
+   "name": "cornice_crown",
+   "tris": 432,
+   "verts": 664,
+   "dims": [
+    23.625,
+    22.558,
+    0.6
+   ],
+   "materials": [
+    "Toy_trim"
+   ]
+  },
+  {
+   "name": "cornice_mid",
+   "tris": 432,
+   "verts": 648,
+   "dims": [
+    23.298,
+    22.275,
+    0.26
+   ],
+   "materials": [
+    "Toy_trim"
+   ]
+  },
+  {
+   "name": "crown_step",
+   "tris": 276,
+   "verts": 540,
+   "dims": [
+    3.262,
+    4.209,
+    0.39
+   ],
+   "materials": [
+    "Toy_trim"
+   ]
+  },
+  {
+   "name": "turret_body",
+   "tris": 276,
+   "verts": 540,
+   "dims": [
+    2.596,
+    3.44,
+    7.28
+   ],
+   "materials": [
+    "Toy_sage"
+   ]
+  },
+  {
+   "name": "turret_shelf",
+   "tris": 276,
+   "verts": 540,
+   "dims": [
+    2.835,
+    3.651,
+    0.28
+   ],
+   "materials": [
+    "Toy_trim"
+   ]
+  },
+  {
+   "name": "flank_round_0_body",
+   "tris": 192,
+   "verts": 378,
+   "dims": [
+    2.177,
+    2.223,
+    7.28
+   ],
+   "materials": [
+    "Toy_sage"
+   ]
+  },
+  {
+   "name": "flank_round_0_shelf",
+   "tris": 192,
+   "verts": 378,
+   "dims": [
+    2.405,
+    2.45,
+    0.28
+   ],
+   "materials": [
+    "Toy_trim"
+   ]
+  },
+  {
+   "name": "front_round_0_body",
+   "tris": 192,
+   "verts": 378,
+   "dims": [
+    2.223,
+    2.177,
+    7.28
+   ],
+   "materials": [
+    "Toy_sage"
+   ]
+  },
+  {
+   "name": "front_round_0_shelf",
+   "tris": 192,
+   "verts": 378,
+   "dims": [
+    2.45,
+    2.405,
+    0.28
+   ],
+   "materials": [
+    "Toy_trim"
+   ]
+  },
+  {
+   "name": "basement",
+   "tris": 108,
+   "verts": 216,
+   "dims": [
+    21.661,
+    21.756,
+    1.43
+   ],
+   "materials": [
+    "Toy_roofd"
+   ]
+  },
+  {
+   "name": "body",
+   "tris": 108,
+   "verts": 216,
+   "dims": [
+    21.505,
+    21.6,
+    10.75
+   ],
+   "materials": [
+    "Toy_sage",
+    "Toy_steel"
+   ]
+  },
+  {
+   "name": "ent_0_recess",
+   "tris": 108,
+   "verts": 216,
+   "dims": [
+    1.322,
+    1.298,
+    2.9
+   ],
+   "materials": [
+    "Toy_ink"
+   ]
+  },
+  {
+   "name": "ent_1_recess",
+   "tris": 108,
+   "verts": 216,
+   "dims": [
+    1.322,
+    1.298,
+    2.9
+   ],
+   "materials": [
+    "Toy_ink"
+   ]
+  },
+  {
+   "name": "flank_cant_0_body",
+   "tris": 108,
+   "verts": 216,
+   "dims": [
+    2.072,
+    2.097,
+    7.28
+   ],
+   "materials": [
+    "Toy_sage"
+   ]
+  },
+  {
+   "name": "flank_cant_0_shelf",
+   "tris": 108,
+   "verts": 216,
+   "dims": [
+    2.324,
+    2.348,
+    0.28
+   ],
+   "materials": [
+    "Toy_trim"
+   ]
+  },
+  {
+   "name": "flank_cant_1_body",
+   "tris": 108,
+   "verts": 216,
+   "dims": [
+    2.072,
+    2.097,
+    7.28
+   ],
+   "materials": [
+    "Toy_sage"
+   ]
+  },
+  {
+   "name": "flank_cant_1_shelf",
+   "tris": 108,
+   "verts": 216,
+   "dims": [
+    2.324,
+    2.348,
+    0.28
+   ],
+   "materials": [
+    "Toy_trim"
+   ]
+  },
+  {
+   "name": "front_cant_0_body",
+   "tris": 108,
+   "verts": 216,
+   "dims": [
+    2.097,
+    2.072,
+    7.28
+   ],
+   "materials": [
+    "Toy_sage"
+   ]
+  },
+  {
+   "name": "front_cant_0_shelf",
+   "tris": 108,
+   "verts": 216,
+   "dims": [
+    2.348,
+    2.324,
+    0.28
+   ],
+   "materials": [
+    "Toy_trim"
+   ]
+  }
+ ],
+ "vertex_attrs": [
+  "NORMAL"
+ ],
+ "materials": [
+  {
+   "name": "Toy_glass",
+   "glow": false,
+   "user_objects": 24
+  },
+  {
+   "name": "Toy_glass_Glow",
+   "glow": true,
+   "user_objects": 8
+  },
+  {
+   "name": "Toy_glassl",
+   "glow": false,
+   "user_objects": 2
+  },
+  {
+   "name": "Toy_ink",
+   "glow": false,
+   "user_objects": 15
+  },
+  {
+   "name": "Toy_navy",
+   "glow": false,
+   "user_objects": 4
+  },
+  {
+   "name": "Toy_red",
+   "glow": false,
+   "user_objects": 1
+  },
+  {
+   "name": "Toy_roofd",
+   "glow": false,
+   "user_objects": 4
+  },
+  {
+   "name": "Toy_sage",
+   "glow": false,
+   "user_objects": 10
+  },
+  {
+   "name": "Toy_steel",
+   "glow": false,
+   "user_objects": 1
+  },
+  {
+   "name": "Toy_trim",
+   "glow": false,
+   "user_objects": 96
+  },
+  {
+   "name": "Toy_trim_Glow",
+   "glow": true,
+   "user_objects": 2
+  }
+ ],
+ "textures": [],
+ "bbox": {
+  "dims": [
+   23.6255,
+   22.5585,
+   13.0
+  ],
+  "min": [
+   -11.8127,
+   -11.2792,
+   0.0
+  ],
+  "origin_offset_xy": [
+   0.0,
+   0.0
+  ],
+  "base_z": 0.0
+ },
+ "duplicate_mesh_groups": [
+  {
+   "signature": {
+    "verts": 168,
+    "tris": 84,
+    "dims": [
+     0.8093,
+     0.8282,
+     2.1
+    ]
+   },
+   "objects": [
+    "kwin_0_fill",
+    "kwin_1_fill",
+    "kwin_2_fill",
+    "kwin_3_fill",
+    "kwin_4_fill",
+    "kwin_5_fill",
+    "kwin_6_fill",
+    "kwin_7_fill"
+   ]
+  },
+  {
+   "signature": {
+    "verts": 48,
+    "tris": 28,
+    "dims": [
+     0.4611,
+     0.4523,
+     0.546
+    ]
+   },
+   "objects": [
+    "quat_1_lobe0",
+    "quat_1_lobe1",
+    "quat_1_lobe2",
+    "quat_1_lobe3",
+    "quat_2_lobe0",
+    "quat_2_lobe1",
+    "quat_2_lobe2",
+    "quat_2_lobe3",
+    "quat_3_lobe0",
+    "quat_3_lobe1",
+    "quat_3_lobe2",
+    "quat_3_lobe3"
+   ]
+  },
+  {
+   "signature": {
+    "verts": 108,
+    "tris": 68,
+    "dims": [
+     2.4817,
+     3.6782,
+     0.15
+    ]
+   },
+   "objects": [
+    "turret_frame0a",
+    "turret_frame0b",
+    "turret_frame1a",
+    "turret_frame1b"
+   ]
+  },
+  {
+   "signature": {
+    "verts": 48,
+    "tris": 28,
+    "dims": [
+     1.9842,
+     2.0136,
+     0.15
+    ]
+   },
+   "objects": [
+    "flank_cant_0_frame0a",
+    "flank_cant_0_frame0b",
+    "flank_cant_0_frame1a",
+    "flank_cant_0_frame1b",
+    "flank_cant_1_frame0a",
+    "flank_cant_1_frame0b",
+    "flank_cant_1_frame1a",
+    "flank_cant_1_frame1b"
+   ]
+  },
+  {
+   "signature": {
+    "verts": 48,
+    "tris": 28,
+    "dims": [
+     2.0136,
+     1.9842,
+     0.15
+    ]
+   },
+   "objects": [
+    "front_cant_0_frame0a",
+    "front_cant_0_frame0b",
+    "front_cant_0_frame1a",
+    "front_cant_0_frame1b",
+    "front_cant_1_frame0a",
+    "front_cant_1_frame0b",
+    "front_cant_1_frame1a",
+    "front_cant_1_frame1b"
+   ]
+  },
+  {
+   "signature": {
+    "verts": 216,
+    "tris": 108,
+    "dims": [
+     1.3222,
+     1.2979,
+     2.9
+    ]
+   },
+   "objects": [
+    "ent_0_recess",
+    "ent_1_recess"
+   ]
+  },
+  {
+   "signature": {
+    "verts": 216,
+    "tris": 108,
+    "dims": [
+     2.0723,
+     2.0968,
+     7.28
+    ]
+   },
+   "objects": [
+    "flank_cant_0_body",
+    "flank_cant_1_body"
+   ]
+  },
+  {
+   "signature": {
+    "verts": 216,
+    "tris": 108,
+    "dims": [
+     2.3236,
+     2.3483,
+     0.28
+    ]
+   },
+   "objects": [
+    "flank_cant_0_shelf",
+    "flank_cant_1_shelf"
+   ]
+  },
+  {
+   "signature": {
+    "verts": 216,
+    "tris": 108,
+    "dims": [
+     2.0968,
+     2.0723,
+     7.28
+    ]
+   },
+   "objects": [
+    "front_cant_0_body",
+    "front_cant_1_body"
+   ]
+  },
+  {
+   "signature": {
+    "verts": 216,
+    "tris": 108,
+    "dims": [
+     2.3483,
+     2.3236,
+     0.28
+    ]
+   },
+   "objects": [
+    "front_cant_0_shelf",
+    "front_cant_1_shelf"
+   ]
+  },
+  {
+   "signature": {
+    "verts": 84,
+    "tris": 52,
+    "dims": [
+     2.0167,
+     2.0639,
+     0.15
+    ]
+   },
+   "objects": [
+    "flank_round_0_frame0a",
+    "flank_round_0_frame0b",
+    "flank_round_0_frame1a",
+    "flank_round_0_frame1b"
+   ]
+  },
+  {
+   "signature": {
+    "verts": 84,
+    "tris": 52,
+    "dims": [
+     2.0639,
+     2.0167,
+     0.15
+    ]
+   },
+   "objects": [
+    "front_round_0_frame0a",
+    "front_round_0_frame0b",
+    "front_round_0_frame1a",
+    "front_round_0_frame1b"
+   ]
+  },
+  {
+   "signature": {
+    "verts": 168,
+    "tris": 84,
+    "dims": [
+     0.8282,
+     0.8093,
+     2.1
+    ]
+   },
+   "objects": [
+    "fwin_0_fill",
+    "fwin_1_fill"
+   ]
+  },
+  {
+   "signature": {
+    "verts": 60,
+    "tris": 36,
+    "dims": [
+     0.3937,
+     0.384,
+     0.4945
+    ]
+   },
+   "objects": [
+    "quat_0_glass",
+    "quat_1_glass",
+    "quat_2_glass",
+    "quat_3_glass"
+   ]
+  },
+  {
+   "signature": {
+    "verts": 108,
+    "tris": 68,
+    "dims": [
+     2.3955,
+     3.5435,
+     1.95
+    ]
+   },
+   "objects": [
+    "turret_glass0",
+    "turret_glass1"
+   ]
+  },
+  {
+   "signature": {
+    "verts": 48,
+    "tris": 28,
+    "dims": [
+     0.3,
+     0.3,
+     2.76
+    ]
+   },
+   "objects": [
+    "ent_0_col0",
+    "ent_0_col1",
+    "ent_1_col0",
+    "ent_1_col1"
+   ]
+  },
+  {
+   "signature": {
+    "verts": 48,
+    "tris": 28,
+    "dims": [
+     1.8899,
+     1.9181,
+     1.95
+    ]
+   },
+   "objects": [
+    "flank_cant_0_glass0",
+    "flank_cant_0_glass1",
+    "flank_cant_1_glass0",
+    "flank_cant_1_glass1"
+   ]
+  },
+  {
+   "signature": {
+    "verts": 48,
+    "tris": 28,
+    "dims": [
+     1.9181,
+     1.8899,
+     1.95
+    ]
+   },
+   "objects": [
+    "front_cant_0_glass0",
+    "front_cant_0_glass1",
+    "front_cant_1_glass0",
+    "front_cant_1_glass1"
+   ]
+  },
+  {
+   "signature": {
+    "verts": 48,
+    "tris": 28,
+    "dims": [
+     0.4612,
+     0.4523,
+     0.546
+    ]
+   },
+   "objects": [
+    "quat_0_lobe0",
+    "quat_0_lobe1",
+    "quat_0_lobe2",
+    "quat_0_lobe3"
+   ]
+  },
+  {
+   "signature": {
+    "verts": 84,
+    "tris": 52,
+    "dims": [
+     1.9458,
+     1.9914,
+     1.95
+    ]
+   },
+   "objects": [
+    "flank_round_0_glass0",
+    "flank_round_0_glass1"
+   ]
+  },
+  {
+   "signature": {
+    "verts": 84,
+    "tris": 52,
+    "dims": [
+     1.9914,
+     1.9458,
+     1.95
+    ]
+   },
+   "objects": [
+    "front_round_0_glass0",
+    "front_round_0_glass1"
+   ]
+  },
+  {
+   "signature": {
+    "verts": 36,
+    "tris": 20,
+    "dims": [
+     0.26,
+     0.2252,
+     0.73
+    ]
+   },
+   "objects": [
+    "roof_vent0",
+    "roof_vent1",
+    "roof_vent2",
+    "roof_vent3",
+    "roof_vent4"
+   ]
+  },
+  {
+   "signature": {
+    "verts": 24,
+    "tris": 12,
+    "dims": [
+     0.3684,
+     0.3669,
+     0.26
+    ]
+   },
+   "objects": [
+    "bracket_226_2.61",
+    "bracket_226_4.04",
+    "bracket_226_7.62",
+    "bracket_226_8.35",
+    "bracket_226_9.08",
+    "bracket_226_12.62",
+    "bracket_226_13.35",
+    "bracket_226_14.08"
+   ]
+  },
+  {
+   "signature": {
+    "verts": 24,
+    "tris": 12,
+    "dims": [
+     0.9995,
+     1.0226,
+     0.12
+    ]
+   },
+   "objects": [
+    "kwin_0_sill",
+    "kwin_1_sill",
+    "kwin_2_sill",
+    "kwin_3_sill",
+    "kwin_4_sill",
+    "kwin_5_sill",
+    "kwin_6_sill",
+    "kwin_7_sill"
+   ]
+  },
+  {
+   "signature": {
+    "verts": 96,
+    "tris": 44,
+    "dims": [
+     1.5252,
+     1.4883,
+     0.26
+    ]
+   },
+   "objects": [
+    "ent_0_head",
+    "ent_1_head"
+   ]
+  },
+  {
+   "signature": {
+    "verts": 24,
+    "tris": 12,
+    "dims": [
+     0.5669,
+     0.5785,
+     0.45
+    ]
+   },
+   "objects": [
+    "bwin_k_2.50",
+    "bwin_k_5.00",
+    "bwin_k_7.50",
+    "bwin_k_10.00",
+    "bwin_k_12.50",
+    "bwin_k_15.00"
+   ]
+  },
+  {
+   "signature": {
+    "verts": 24,
+    "tris": 12,
+    "dims": [
+     0.5785,
+     0.5669,
+     0.45
+    ]
+   },
+   "objects": [
+    "bwin_f_2.00",
+    "bwin_f_4.10",
+    "bwin_f_6.40",
+    "bwin_f_8.80",
+    "bwin_f_11.00"
+   ]
+  },
+  {
+   "signature": {
+    "verts": 24,
+    "tris": 12,
+    "dims": [
+     0.58,
+     0.5796,
+     0.14
+    ]
+   },
+   "objects": [
+    "ent_0_base0",
+    "ent_0_base1",
+    "ent_1_base0",
+    "ent_1_base1"
+   ]
+  },
+  {
+   "signature": {
+    "verts": 24,
+    "tris": 12,
+    "dims": [
+     0.58,
+     0.5796,
+     0.18
+    ]
+   },
+   "objects": [
+    "ent_0_cap0",
+    "ent_0_cap1",
+    "ent_1_cap0",
+    "ent_1_cap1"
+   ]
+  },
+  {
+   "signature": {
+    "verts": 32,
+    "tris": 16,
+    "dims": [
+     2.4309,
+     3.597,
+     1.75
+    ]
+   },
+   "objects": [
+    "turret_glow0",
+    "turret_glow1"
+   ]
+  },
+  {
+   "signature": {
+    "verts": 24,
+    "tris": 12,
+    "dims": [
+     1.9773,
+     2.024,
+     1.75
+    ]
+   },
+   "objects": [
+    "flank_round_0_glow0",
+    "flank_round_0_glow1"
+   ]
+  },
+  {
+   "signature": {
+    "verts": 24,
+    "tris": 12,
+    "dims": [
+     1.0226,
+     0.9995,
+     0.12
+    ]
+   },
+   "objects": [
+    "fwin_0_sill",
+    "fwin_1_sill"
+   ]
+  },
+  {
+   "signature": {
+    "verts": 12,
+    "tris": 6,
+    "dims": [
+     1.9202,
+     1.95,
+     1.75
+    ]
+   },
+   "objects": [
+    "flank_cant_0_glow1",
+    "flank_cant_1_glow0"
+   ]
+  },
+  {
+   "signature": {
+    "verts": 4,
+    "tris": 2,
+    "dims": [
+     0.975,
+     0.9481,
+     2.4
+    ]
+   },
+   "objects": [
+    "ent_0_glow",
+    "ent_1_glow"
+   ]
+  }
+ ],
+ "dup_redundant_tris": 3564,
+ "join_candidates": {
+  "Toy_glass": 24,
+  "Toy_glass_Glow": 8,
+  "Toy_glassl": 2,
+  "Toy_ink": 15,
+  "Toy_navy": 4,
+  "Toy_roofd": 4,
+  "Toy_sage": 10,
+  "Toy_trim": 96,
+  "Toy_trim_Glow": 2
+ },
+ "degenerate_tris": 0,
+ "coincident_vert_pairs": 11940,
+ "over_tess": {
+  "near_distance_m": 35.44,
+  "one_px_world_m": 0.0239,
+  "note": "cylinders whose chord error < one_px_world_m can halve segments"
+ }
+}

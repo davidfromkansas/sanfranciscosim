@@ -117,6 +117,18 @@ GLASS2_Z = (5.50, 7.45)    # second-storey bay glazing band
 GLASS3_Z = (8.70, 10.65)   # third-storey bay glazing band
 GLASS_PROUD = 0.035
 FRAME_PROUD = 0.10
+EMBED = 0.03               # how far every applied band is sunk INTO the surface
+                           # it sits on. Nothing in this model is allowed to have
+                           # a face exactly coincident with another solid's face:
+                           # coincident faces make the first-hit direction of a
+                           # ray ambiguous, and the contract's normals ray test
+                           # counts the ambiguity as a flipped face. Measured at
+                           # stage 4: 21 of 17,312 first hits (0.12%) before this
+                           # constant existed, all of them on bay glazing bands,
+                           # bay frames and cornice steps whose inner face lay
+                           # exactly on the wall. Overlapping solids are the
+                           # supported model here - the validator's authoritative
+                           # normals test is per-object signed volume.
 FRAME_H = 0.15
 GLASS_INSET = 0.32         # how far the glazing band stops short of the wall at
                            # each end of a bay, so the body colour shows at every
@@ -396,6 +408,7 @@ def glow_band(name, pts, z0, z1, mat, proud):
     the winding is set explicitly (never recalculated) so the single face points
     out of the building."""
     verts, faces = [], []
+    side = _polyline_side(pts)
     for i in range(len(pts) - 1):
         a, b = pts[i], pts[i + 1]
         dx, dy = b[0] - a[0], b[1] - a[1]
@@ -403,10 +416,10 @@ def glow_band(name, pts, z0, z1, mat, proud):
         if m < 1e-6:
             continue
         nx, ny = dy / m, -dx / m
-        mid = ((a[0] + b[0]) / 2.0, (a[1] + b[1]) / 2.0)
-        if nx * (mid[0] - CX) + ny * (mid[1] - CY) < 0.0:
-            # The quad's own normal follows (dy, -dx), so flipping the segment
-            # flips the face too - do not just negate the offset.
+        if side > 0.0:
+            # The quad's own normal follows (dy, -dx), so flipping the SEGMENT
+            # flips the face too - do not just negate the offset. Handedness is
+            # taken once for the whole run by _polyline_side().
             a, b = b, a
             nx, ny = -nx, -ny
         a2 = (a[0] + nx * proud, a[1] + ny * proud)
@@ -464,10 +477,29 @@ def prism(name, poly_xy, z0, z1, mat, mat_top=None):
     return new_mesh(name, verts, faces, mats, face_mats)
 
 
+def _winding(poly):
+    """+1 for a counter-clockwise polygon, -1 for clockwise."""
+    s2 = 0.0
+    for i in range(len(poly)):
+        a, b = poly[i], poly[(i + 1) % len(poly)]
+        s2 += a[0] * b[1] - b[0] * a[1]
+    return 1.0 if s2 > 0.0 else -1.0
+
+
 def inset_polygon(poly, dist):
     """Offset every edge of a simple polygon inward by `dist` and re-intersect
-    adjacent edges. Negative dist offsets outward (a proud band)."""
+    adjacent edges. Negative dist offsets outward (a proud band).
+
+    Which side is "inward" is decided by the polygon's own WINDING, not by which
+    side the building centroid happens to be on. The centroid test that stood
+    here was wrong for exactly the shapes this asset is made of: on the corner
+    turret, which sweeps 242 degrees, and on a rounded bay near a far corner,
+    some segments' outward normals point back past the centroid, so those
+    segments offset the wrong way and the band folded. It cost 36 of 17,316
+    first-hit rays at stage 4 - over the 0.15% contract tolerance - before the
+    cause was found. See REPORT.md 5."""
     n = len(poly)
+    side = _winding(poly)          # interior is left of each edge when CCW
     lines = []
     for i in range(n):
         a, b = poly[i], poly[(i + 1) % n]
@@ -476,11 +508,7 @@ def inset_polygon(poly, dist):
         if m < 1e-9:
             m = 1e-9
         d = (dx / m, dy / m)
-        nrm = (-d[1], d[0])
-        if (a[0] + nrm[0] - CX) ** 2 + (a[1] + nrm[1] - CY) ** 2 > (a[0] - CX) ** 2 + (
-            a[1] - CY
-        ) ** 2:
-            nrm = (-nrm[0], -nrm[1])
+        nrm = (-d[1] * side, d[0] * side)
         lines.append(((a[0] + nrm[0] * dist, a[1] + nrm[1] * dist), d))
     out = []
     for i in range(n):
@@ -556,21 +584,35 @@ def rim(name, poly, inset, z0, z1, mat):
     return new_mesh(name, verts, faces, [mat])
 
 
+def _polyline_side(pts):
+    """Decide, ONCE for a whole open polyline, which side is outward.
+
+    Every polyline here is a convex bay arc traced in one direction, so the
+    outward side is constant along it - but it cannot be found per segment from
+    the building centroid, because the turret sweeps 242 degrees and its end
+    segments face sideways or backwards. The MIDDLE segment always faces
+    squarely out, so the handedness is taken from that one and applied to the
+    rest."""
+    i = max(0, (len(pts) - 1) // 2)
+    a, b = pts[i], pts[i + 1]
+    dx, dy = b[0] - a[0], b[1] - a[1]
+    mid = ((a[0] + b[0]) / 2.0, (a[1] + b[1]) / 2.0)
+    return 1.0 if (-dy) * (mid[0] - CX) + dx * (mid[1] - CY) > 0.0 else -1.0
+
+
 def polyline_offset(pts, d):
     """Offset an OPEN polyline by `d` metres along each segment's outward normal
     (outward = away from the footprint centroid), re-intersecting neighbouring
     segments. The endpoints just move perpendicular to their own segment."""
     n = len(pts)
+    side = _polyline_side(pts)
     lines = []
     for i in range(n - 1):
         a, b = pts[i], pts[i + 1]
         dx, dy = b[0] - a[0], b[1] - a[1]
         m = math.hypot(dx, dy) or 1e-9
         u = (dx / m, dy / m)
-        nrm = (-u[1], u[0])
-        mid = ((a[0] + b[0]) / 2.0, (a[1] + b[1]) / 2.0)
-        if nrm[0] * (mid[0] - CX) + nrm[1] * (mid[1] - CY) < 0.0:
-            nrm = (-nrm[0], -nrm[1])
+        nrm = (-u[1] * side, u[0] * side)
         lines.append(((a[0] + nrm[0] * d, a[1] + nrm[1] * d), u))
     out = [lines[0][0]]
     for i in range(1, n - 1):
@@ -664,7 +706,7 @@ def window(name, face, t_c, z_sill, mats, w=WIN_W, h=WIN_H):
     t0, t1 = t_c - w / 2.0, t_c + w / 2.0
     prism(f"{name}_fill", face.rect(t0, t1, -WIN_RECESS, 0.02), z_sill, z_sill + h,
           mats["Toy_glass"])
-    prism(f"{name}_sill", face.rect(t0 - 0.10, t1 + 0.10, 0.0, 0.10),
+    prism(f"{name}_sill", face.rect(t0 - 0.10, t1 + 0.10, -EMBED, 0.10),
           z_sill - 0.12, z_sill, mats["Toy_trim"])
 
 
@@ -713,7 +755,7 @@ def entrance(name, face, t_c, mats):
     t0, t1 = t_c - ENT_W / 2.0, t_c + ENT_W / 2.0
     prism(f"{name}_recess", face.rect(t0, t1, -ENT_D, 0.02), Z_BASE, Z_BASE + ENT_H,
           mats["Toy_ink"])
-    prism(f"{name}_head", face.rect(t0 - 0.22, t1 + 0.22, 0.0, 0.14),
+    prism(f"{name}_head", face.rect(t0 - 0.22, t1 + 0.22, -EMBED, 0.14),
           Z_BASE + ENT_H, Z_BASE + ENT_H + 0.26, mats["Toy_trim"])
     for s, dt in ((0, -1), (1, 1)):
         cx, cy = face.xy(t_c + dt * (ENT_W / 2.0 + 0.20), 0.16)
@@ -721,11 +763,11 @@ def entrance(name, face, t_c, mats):
              mats["Toy_trim"])
         prism(f"{name}_cap{s}",
               face.rect(t_c + dt * (ENT_W / 2.0 + 0.20) - 0.21,
-                        t_c + dt * (ENT_W / 2.0 + 0.20) + 0.21, 0.0, 0.37),
+                        t_c + dt * (ENT_W / 2.0 + 0.20) + 0.21, -EMBED, 0.37),
               Z_BASE + COL_H, Z_BASE + COL_H + 0.18, mats["Toy_trim"])
         prism(f"{name}_base{s}",
               face.rect(t_c + dt * (ENT_W / 2.0 + 0.20) - 0.21,
-                        t_c + dt * (ENT_W / 2.0 + 0.20) + 0.21, 0.0, 0.37),
+                        t_c + dt * (ENT_W / 2.0 + 0.20) + 0.21, -EMBED, 0.37),
               Z_BASE, Z_BASE + 0.14, mats["Toy_trim"])
     glow_band(f"{name}_glow",
               [face.xy(t0 + 0.12, -ENT_D + 0.04), face.xy(t1 - 0.12, -ENT_D + 0.04)],
@@ -742,17 +784,17 @@ def bay(name, poly, arc, mats):
     # Up to the DECK, not to Z_ST3. Stopping at the third-storey ceiling left an
     # open well between the bay and the cornice that read from directly above as
     # a dark hole punched in every bulge - see REPORT.md 3.
-    prism(f"{name}_body", poly, SHELF_Z1, Z_DECK, mats["Toy_sage"])
-    prism(f"{name}_shelf", inset_polygon(poly, -SHELF_PROUD), SHELF_Z0, SHELF_Z1,
-          mats["Toy_trim"])
+    prism(f"{name}_body", poly, SHELF_Z1 - EMBED, Z_DECK, mats["Toy_sage"])
+    prism(f"{name}_shelf", inset_polygon(poly, -SHELF_PROUD), SHELF_Z0,
+          SHELF_Z1 + EMBED, mats["Toy_trim"])
     lit = LIT_BAYS.get(name, (False, False))
     run = trim_polyline(arc, GLASS_INSET)
     for k, (z0, z1) in enumerate((GLASS2_Z, GLASS3_Z)):
-        arc_band(f"{name}_glass{k}", run, z0, z1, 0.0, GLASS_PROUD,
+        arc_band(f"{name}_glass{k}", run, z0, z1, -EMBED, GLASS_PROUD,
                  mats["Toy_glass"])
-        arc_band(f"{name}_frame{k}a", run, z0 - FRAME_H, z0, 0.0, FRAME_PROUD,
+        arc_band(f"{name}_frame{k}a", run, z0 - FRAME_H, z0, -EMBED, FRAME_PROUD,
                  mats["Toy_trim"])
-        arc_band(f"{name}_frame{k}b", run, z1, z1 + FRAME_H, 0.0, FRAME_PROUD,
+        arc_band(f"{name}_frame{k}b", run, z1, z1 + FRAME_H, -EMBED, FRAME_PROUD,
                  mats["Toy_trim"])
         if lit[k]:
             glow_band(f"{name}_glow{k}", run, z0 + 0.10, z1 - 0.10,
@@ -765,10 +807,16 @@ def cornice(poly, mats):
     blocks are placed only along the straight wall runs - on the arcs the
     corbelling alone carries the reading, and thirty-four modelled brackets would
     cost more than the whole roof."""
+    # Each step is built from a base polygon sunk EMBED into the wall, so the
+    # ring's inner surface is buried rather than coincident with the body.
     poly = relax_polygon(poly, CORN_OUT[2] + 0.20)
-    rim("cornice_bed", poly, -CORN_OUT[0], CORN_Z[0], CORN_Z[1], mats["Toy_trim"])
-    rim("cornice_mid", poly, -CORN_OUT[1], CORN_Z[1], CORN_Z[2], mats["Toy_trim"])
-    rim("cornice_crown", poly, -CORN_OUT[2], CORN_Z[2], CORN_Z[3], mats["Toy_trim"])
+    base = inset_polygon(poly, EMBED)
+    rim("cornice_bed", base, -(CORN_OUT[0] + EMBED), CORN_Z[0], CORN_Z[1],
+        mats["Toy_trim"])
+    rim("cornice_mid", base, -(CORN_OUT[1] + EMBED), CORN_Z[1], CORN_Z[2],
+        mats["Toy_trim"])
+    rim("cornice_crown", base, -(CORN_OUT[2] + EMBED), CORN_Z[2], CORN_Z[3],
+        mats["Toy_trim"])
     # Bracket blocks go only on the flat runs of the two HERO elevations. The
     # party wall is blind and the rear faces a 6 m gap, so a bracket run there
     # buys nothing and costs ~1,000 triangles; both keep the plain corbelled
@@ -796,12 +844,15 @@ def build():
 
     # 1. body: raised basement -> roof deck, in one solid. The top face is the
     #    flat roof membrane, which the cornice ring then stands proud of.
-    prism("body", FOOTPRINT, Z_BASE, Z_DECK, mats["Toy_sage"], mats["Toy_steel"])
+    prism("body", FOOTPRINT, Z_BASE - 0.20, Z_DECK, mats["Toy_sage"],
+          mats["Toy_steel"])
 
     # 2. raised basement, standing slightly proud, with its red water table
     base_poly = inset_polygon(FOOTPRINT, -BASE_PROUD)
-    prism("basement", base_poly, 0.0, Z_BASE - STRIPE_H, mats["Toy_roofd"])
-    rim("water_table", base_poly, -0.03, Z_BASE - STRIPE_H, Z_BASE, mats["Toy_red"])
+    prism("basement", base_poly, 0.0, Z_BASE - STRIPE_H + EMBED,
+          mats["Toy_roofd"])
+    rim("water_table", inset_polygon(base_poly, EMBED), -(0.03 + EMBED),
+        Z_BASE - STRIPE_H, Z_BASE, mats["Toy_red"])
     for t in FRONT_BWIN_T:
         prism(f"bwin_f_{t:.2f}",
               FRONT.rect(t - BWIN_W / 2, t + BWIN_W / 2, BASE_PROUD - 0.10,
@@ -839,10 +890,10 @@ def build():
     # to turret_arc() are cheaper than any repair.
     prism("crown_step",
           turret_arc(attach=TURRET_ATTACH + 0.40, reach=TURRET_REACH + 0.38)
-          + [W_COR], CORN_Z[3], 12.66, mats["Toy_trim"])
+          + [W_COR], CORN_Z[3] - EMBED, 12.66, mats["Toy_trim"])
     prism("crown_cap",
           turret_arc(attach=TURRET_ATTACH - 0.10, reach=TURRET_REACH + 0.02)
-          + [W_COR], 12.66, Z_CROWN, mats["Toy_trim"])
+          + [W_COR], 12.66 - EMBED, Z_CROWN, mats["Toy_trim"])
 
     # 7. roof furniture (2026 satellite imagery: a hatch near the centre, a
     #    skylight bank toward the rear third, vent stacks, one small unit).
@@ -861,24 +912,24 @@ def build():
     # aerial camera is the one thing the style bible will not forgive. Nothing
     # here goes above 12.90 m: the turret crown at 13.00 has to stay the tallest
     # geometry or the loader's height normalization picks a chimney.
-    prism("roof_chimney_a", rrect(6.4, 7.5, 1.35, 2.35), Z_DECK, 12.88,
+    prism("roof_chimney_a", rrect(6.4, 7.5, 1.35, 2.35), Z_DECK - EMBED, 12.88,
           mats["Toy_roofd"])
-    prism("roof_chimney_b", rrect(13.2, 14.3, 9.2, 10.2), Z_DECK, 12.80,
+    prism("roof_chimney_b", rrect(13.2, 14.3, 9.2, 10.2), Z_DECK - EMBED, 12.80,
           mats["Toy_roofd"])
-    prism("roof_bulkhead", rrect(9.4, 11.6, 4.4, 6.6), Z_DECK, 12.72,
+    prism("roof_bulkhead", rrect(9.4, 11.6, 4.4, 6.6), Z_DECK - EMBED, 12.72,
           mats["Toy_sage"], mats["Toy_roofd"])
-    prism("roof_hatch", rrect(4.6, 5.7, 6.4, 7.5), Z_DECK, Z_DECK + 0.30,
+    prism("roof_hatch", rrect(4.6, 5.7, 6.4, 7.5), Z_DECK - EMBED, Z_DECK + 0.30,
           mats["Toy_ink"])
-    prism("roof_skylight_a", rrect(13.0, 14.6, 3.2, 6.4), Z_DECK, Z_DECK + 0.26,
+    prism("roof_skylight_a", rrect(13.0, 14.6, 3.2, 6.4), Z_DECK - EMBED, Z_DECK + 0.26,
           mats["Toy_glassl"])
-    prism("roof_skylight_b", rrect(15.2, 16.4, 6.9, 9.1), Z_DECK, Z_DECK + 0.26,
+    prism("roof_skylight_b", rrect(15.2, 16.4, 6.9, 9.1), Z_DECK - EMBED, Z_DECK + 0.26,
           mats["Toy_glassl"])
-    prism("roof_curb", rrect(2.4, 3.6, 8.6, 11.2), Z_DECK, Z_DECK + 0.18,
+    prism("roof_curb", rrect(2.4, 3.6, 8.6, 11.2), Z_DECK - EMBED, Z_DECK + 0.18,
           mats["Toy_trim"])
     for k, (sv, u) in enumerate(((2.6, 2.2), (3.3, 3.1), (4.1, 2.4),
                                  (11.4, 10.6), (16.2, 2.6))):
         p = rxy(sv, u)
-        disc(f"roof_vent{k}", p[0], p[1], Z_DECK, Z_DECK + 0.70, 0.13, 6,
+        disc(f"roof_vent{k}", p[0], p[1], Z_DECK - EMBED, Z_DECK + 0.70, 0.13, 6,
              mats["Toy_trim"])
 
     # 8. rear: one simplified stair box, the only thing the permits record out

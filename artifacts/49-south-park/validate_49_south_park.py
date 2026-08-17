@@ -161,21 +161,31 @@ def main():
         # closed shells: the app draws _Glow in a separate translucent layer, and
         # a closed box shows its front and its back face and reads at roughly
         # twice the intended day alpha. An open strip has no signed volume, so it
-        # gets the check that actually applies to it - every face must point away
-        # from the model centre - instead of the volume test.
-        if "_glow" in obj.name:
+        # gets the check that actually applies to it - is this face visible from
+        # the side it claims to face? - instead of the volume test.
+        #
+        # NOT a dot product against the model centre. That test is wrong on this
+        # asset for the same reason the build script's offset handedness was: the
+        # corner turret sweeps 242 degrees, so a correctly outward-facing strip on
+        # its flanks points back past the model centre. Casting a ray in along
+        # each face's own normal and requiring that face to be the first thing hit
+        # is both stricter and correct.
+        if "_glow" in obj.name.lower():
             ev = obj.evaluated_get(dg)
             me = ev.to_mesh()
             for poly in me.polygons:
                 glow_strip_faces += 1
                 c = obj.matrix_world @ poly.center
                 nrm = (obj.matrix_world.to_3x3() @ poly.normal).normalized()
-                if nrm.dot(Vector((c.x - center.x, c.y - center.y, 0.0))) > 0.0:
+                hit, _, hn, _, _, _ = bpy.context.scene.ray_cast(
+                    dg, c + nrm * 60.0, -nrm, distance=120.0
+                )
+                if hit and hn.dot(nrm) > 0.9:
                     glow_strip_outward += 1
             ev.to_mesh_clear()
             continue
     for obj in meshes:
-        if "_glow" in obj.name:
+        if "_glow" in obj.name.lower():
             continue
         ev = obj.evaluated_get(dg)
         me = ev.to_mesh()
