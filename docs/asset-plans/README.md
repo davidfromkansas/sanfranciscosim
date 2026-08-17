@@ -102,6 +102,7 @@ route, and the park plans depend on it (§E8 of the parks README).
 | [592 Third Street](./592-third.md) | `592-third` | 8.2 m (estimated) | new landmark |
 | [400 Brannan Street](./400-brannan.md) | `400-brannan` | 8.8 m | new landmark |
 | [188 South Park (South Park Lofts)](./188-south-park.md) | `188-south-park` | 15.93 m (LiDAR-derived) | new landmark |
+| [104–106 South Park (Gran Oriente Filipino Hotel)](./106-south-park.md) | `106-south-park` | 11.58 m | new landmark |
 
 ## Shared contract (all 60)
 
@@ -245,6 +246,18 @@ footprint shares a party wall with the 54 m Hiram W. Johnson slab and a 0.5 m ce
 that boundary samples the tower. Treat a single-cell `hgt_max` on a party wall as
 unusable. That plan's 2.14 is also the set's clearest exclusion-radius trap: the usual
 half-diagonal would have deleted the neighbour.
+
+104–106 South Park (the Gran Oriente Filipino Hotel) is the set's one case of the
+*opposite* problem: not a missing or wrong source but an excellent one that has gone
+stale. Its 2019 National Register nomination describes all four elevations, the roof,
+the lot and the 38 ft height in survey-grade prose — and the painted Corinthian
+columns and trompe-l'œil pediment lintels it describes were removed in the 2020–21
+rehabilitation, along with the entrance gates. Every clear photograph of the street
+front predates that work. Where a plan cites a designation report, check its date
+against the permit and alteration record before believing its *surfaces*; its *form*
+is still the best number you will get. That plan is also a clean second instance of
+the Earl Warren party-wall trap: its LiDAR `hgt_max` sits 2.5 m above its own roof
+plane because a 0.5 m cell on the shared wall samples the taller building next door.
 
 The executing agent is expected to re-verify height, anchor, footprint and
 orientation before modelling — the dossier is a head start, not a citation.
