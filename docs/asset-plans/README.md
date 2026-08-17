@@ -119,6 +119,7 @@ route, and the park plans depend on it (§E8 of the parks README).
 | [501 Second Street](./501-second.md) | `501-second` | 37.7 m | new landmark |
 | [21–29 South Park](./21-south-park.md) | `21-south-park` | 11.73 m (LiDAR maximum, read as the roof bulkhead; the 10.20 m cornice crest is estimated) | new landmark |
 | [Hotel Madrid (22–24 South Park)](./22-south-park.md) | `22-south-park` | 14.22 m (LiDAR-derived) | new landmark |
+| [26–28 South Park (51 Taber Place)](./26-south-park.md) | `26-south-park` | 9.05 m (LiDAR-derived) | new landmark |
 
 ## Shared contract (all 75)
 
