@@ -116,7 +116,7 @@ route, and the park plans depend on it (§E8 of the parks README).
 | [140 South Park](./140-south-park.md) | `140-south-park` | 10.68 m (LiDAR-derived) | new landmark |
 | [126 South Park](./126-south-park.md) | `126-south-park` | 7.6 m (LiDAR-derived) | new landmark |
 | [102 South Park (The Park View)](./102-south-park.md) | `102-south-park` | 14.0 m (estimated) | new landmark |
-| [86–96 South Park (Levy Design Partners, 1996)](./96-south-park.md) | `96-south-park` | 13.7 m (LiDAR-derived maximum) | new landmark |
+| [86–96 South Park (Levy Design Partners, 1996)](./96-south-park.md) | `96-south-park` | 13.7 m (LiDAR-derived maximum) | not shipped — superseded by `92-south-park` |
 | [2 South Park (544 Second Street, Kohler warehouse)](./2-south-park.md) | `2-south-park` | 17.72 m (LiDAR-derived) | new landmark |
 | [27 South Park (centre of the 21–29 warehouse)](./27-south-park.md) | `27-south-park` | 10.2 m (LiDAR-derived) | not shipped — superseded by `21-south-park` |
 | [South Park (64 South Park)](./64-south-park.md) | `64-south-park` | 21.04 m (vertical extent — the asset is terrain-draped; the 15.0 m elm crest is estimated) | new landmark |
