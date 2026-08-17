@@ -3,9 +3,13 @@
 Stage 2 of `docs/asset-pipeline/ADDRESS-TO-ASSET.md`, run 16–17 August 2026 in
 `sf-worktrees/76-south-park` on branch `pipeline/76-south-park`.
 
-**Shipped:** `76-south-park.glb` — 4,376 triangles, 118 objects, 299 KB raw / 48.8 KB
-gzipped, bbox 26.61 × 26.02 × 16.28 m, min Z 0.000, XY centre offset (0.000, 0.000),
-ten `Toy_*` materials, validator **all-PASS**.
+**Shipped (post stage-4 optimize):** `76-south-park.glb` — 4,376 triangles,
+**11 objects / 12 draw submeshes**, **116,636 B raw / 67,228 B gzipped**, bbox
+26.61 × 26.02 × 16.28 m, min Z 0.000, XY centre offset (0.000, 0.000), ten `Toy_*`
+materials, contract validator **all-PASS on the packed file**.
+
+The pre-optimize build was 118 objects / 120 submeshes at 299,404 B raw; it is archived
+at `optimize/input/76-south-park.glb`. See `optimize/REPORT.md` for the full pass.
 
 ---
 
@@ -13,9 +17,9 @@ ten `Toy_*` materials, validator **all-PASS**.
 
 | | |
 |---|---|
-| Triangles | **4,376** (cap 9,000) |
-| Objects | 118 |
-| File | 299,404 B raw / 48,764 B gzipped (budget ≤ 500 KB compressed) |
+| Triangles | **4,376** (cap 9,000) — unchanged by the optimize pass |
+| Objects / draw submeshes | **11 / 12** shipped (118 / 120 pre-optimize) |
+| File | **116,636 B raw / 67,228 B gzipped** shipped (299,404 B / 47,983 B pre-optimize; budget ≤ 500 KB compressed) |
 | Dimensions | 26.6145 × 26.0241 × 16.28 m |
 | Footprint | 6.90 × 29.70 m = 204.9 m² |
 | Crest | 16.28 m exactly ⇒ loader scale `targetHeightM / measuredHeight` = 1.000 |
@@ -45,8 +49,9 @@ equal because the bay projects on one end only.
 authoring scene). All 16 checks PASS. The two normals tests both passed on the
 authoritative reading:
 
-- **Signed volume**: 118 of 118 objects outward, 0 inverted. This is the authoritative
-  test for a union-of-solids asset like this one.
+- **Signed volume**: 118 of 118 objects outward, 0 inverted (11 of 11 after the
+  optimize pass's join-per-material). This is the authoritative test for a
+  union-of-solids asset like this one.
 - **Ray cast**: 32 flipped first hits out of 31,500 = **0.1016 %** residual, inside the
   ≤ 0.15 % tolerance. The residual is the expected artefact of coincident faces where the
   proud skins (stone base, flank band, rear face) sit against the body wall.
