@@ -17,7 +17,7 @@
 // broken, the banks simply do not exist and the shader fog carries the scene.
 
 import { Color, DynamicDrawUsage, InstancedBufferAttribute, InstancedMesh, Matrix4, Quaternion, Vector3 } from 'three';
-import { GLTFLoader } from 'three/addons/loaders/GLTFLoader.js';
+import { createGLTFLoader } from './gltf.js';
 import { shared } from './env.js';
 
 const URL = `${import.meta.env.BASE_URL}sf-assets/fog-cube.glb`;
@@ -114,7 +114,10 @@ export function createFogBanks(scene, { sampleAt }) {
     });
   }
 
-  new GLTFLoader().load(
+  // createGLTFLoader, never a bare GLTFLoader: everything under sf-assets is
+  // meshopt-compressed at intake, and a decoder-less loader fails the file
+  // rather than the app — the fog just quietly stops existing.
+  createGLTFLoader().load(
     URL,
     (gltf) => {
       let source = null;
