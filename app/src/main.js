@@ -29,6 +29,7 @@ import { createLiveMuni } from './muni.js';
 import { createMuniStopLayer } from './munistoplayer.js';
 import { createFerryTerminals } from './ferryterminals.js';
 import { createFerryRoutes } from './ferryroutes.js';
+import { createFerryBadges } from './ferrybadges.js';
 import { createLiveAircraft } from './aircraft.js';
 import { createCameraRig } from './camera.js';
 import { createSigns } from './signs.js';
@@ -173,6 +174,8 @@ async function boot() {
   // Unlike the bus walls these are always on: a crossing is not a street, and
   // nothing else in the Bay marks where the boats actually go.
   const ferryRoutes = createFerryRoutes(scene);
+  // Route pills over the live hulls, in the same livery as the walls below them.
+  const ferryBadges = createFerryBadges(scene, ferries);
   // Real aircraft from /api/flights. Like the Muni layer this one simply stays
   // empty when the feed is away — nothing else in the city depends on it.
   const aircraft = createLiveAircraft(scene, data);
@@ -237,6 +240,7 @@ async function boot() {
     fogBanks.setQuality(key);
     ferryTerminals.setQuality(key);
     ferryRoutes.setQuality(key);
+    ferryBadges.setQuality(key);
     post.setSamples(quality.samples);
     renderer.setSize(window.innerWidth, window.innerHeight, false);
     post.setSize();
@@ -785,6 +789,7 @@ async function boot() {
     muniStops,
     ferryTerminals,
     ferryRoutes,
+    ferryBadges,
     aircraft,
     // Which aircraft the camera is locked to, or null. Exposed because the
     // follow is otherwise unobservable from outside and QA has to be able to
@@ -955,6 +960,7 @@ async function boot() {
     muniStops.update(dt, camera, pivotWorld);
     ferryTerminals.update(dt, camera, pivotWorld);
     ferryRoutes.update();
+    ferryBadges.update(dt, camera);
     aircraft.update(dt, camera);
     trackVessel(dt);
     landmarks.update();

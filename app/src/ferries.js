@@ -546,6 +546,9 @@ export function createLiveFerries(scene, data, agents) {
       speedKn: state.speed * 1.94384,
       inService: state.inService,
       recordedAt: state.recordedAt ?? state.lastFixAt,
+      // Whether this vessel has an instance on screen right now, so the badge
+      // layer labels only hulls that are actually drawn.
+      drawn: state.index >= 0,
       demo,
       source: demo ? 'demo' : '511',
       confidence: 3,
