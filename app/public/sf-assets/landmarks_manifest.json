@@ -1350,5 +1350,24 @@
     ],
     "tris": 5620,
     "loadRadius": 2500
+  },
+  {
+    "id": "501-second",
+    "file": "501-second.glb",
+    "anchor": [
+      -122.3929683,
+      37.7831785
+    ],
+    "targetHeightM": 37.7,
+    "cat": 3,
+    "name": "501 Second Street",
+    "estimated": false,
+    "dims": [
+      83.1067,
+      82.8064,
+      37.7
+    ],
+    "tris": 16008,
+    "loadRadius": 2500
   }
 ]
