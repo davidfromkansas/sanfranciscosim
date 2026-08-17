@@ -1,17 +1,19 @@
 # 300 Brannan Street — build report
 
-**Status:** built, validated, all contract checks PASS. Pre-optimize.
+**Status:** built, approved, optimized and re-validated. The shipping file is the
+stage-4 output; the pre-optimize original is archived at `optimize/input/`.
 
 | | |
 |---|---|
 | Asset | `artifacts/300-brannan/300-brannan.glb` |
 | Triangles | **12,964** (cap 15,000) |
-| Objects | 362 |
+| Objects / nodes | 11 shipped (362 as authored, joined per material in stage 4) |
 | Dimensions | 47.531 × 49.287 × **25.200** m |
 | min Z | 0.000 m — sits on the ground plane |
 | XY centre offset | (−0.123, +0.001) m |
 | Loader scale | `targetHeightM / measuredHeight` = 25.2 / 25.2 = **1.000** |
-| File | 808.8 KB raw, 123.6 KB gzip (pre-optimize) |
+| File | **332.0 KB** shipped (808.8 KB pre-optimize, −59.0%) |
+| Draw submeshes | **12** (363 pre-optimize) |
 | Materials | 10, all `Toy_*`, flat, no textures, no alpha, no `Toy_body` |
 | Glow materials | `Toy_glassl_Glow`, `Toy_trim_Glow` |
 | Normals | every object positive signed volume; ray-cast residual **0.000%** |
@@ -129,8 +131,9 @@ only in azimuth.
 }
 ```
 
-`dims` and `tris` are the pre-optimize numbers and must be refreshed from the
-stage-4 output before the manifest entry ships.
+These are the **shipped** numbers, re-measured from the stage-4 output: the optimize
+pass changed no triangles and no bounding box, only vertex count, node count and
+encoding. See `optimize/REPORT.md`.
 
 ## Approval
 
