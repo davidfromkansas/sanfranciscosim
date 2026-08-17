@@ -2110,66 +2110,6 @@ export const LANDMARKS = [
     camera: { distance: 165, yaw: 45, pitch: 24 },
   },
   {
-    // 27 South Park: the CENTRE THIRD of the 1919 warehouse at 21-29 South Park
-    // Street (APN 3775-042), a contributor to the potential South Park Historic
-    // District. One 1919 building in three sections - additions by Fred
-    // Koldenstadt (1920) and Caspar Zwierlein (1921), "connected with fire
-    // doors" per the DPR 523D, cut apart by two party walls in the 1993 UMB
-    // retrofit. A 12.19 x 33.55 m stick with one public elevation, an arcade of
-    // six segmental-arched second-floor windows, and blind flanks. Crest
-    // 10.20 m to the parapet coping over a 9.60 m roof deck.
-    //
-    // THE EXCLUSION HERE REMOVES THREE BUILDINGS, AND CANNOT DO OTHERWISE.
-    // DataSF traces 21, 27 and 29 as ONE 1,115 m2 polygon (SF3775042), so the
-    // bake has no polygon for 27 alone. excluded() drops a footprint when its
-    // area centroid OR any ring vertex falls inside the circle, and the bake
-    // reads DataSF first then gap-fills from Overture (which carries the OSM
-    // geometry), so both sources bind. Measured from this anchor against the
-    // two files the bake actually reads (pipeline/data/buildings_datasf.geojson
-    // and overture_buildings.geojsonseq, 16 Aug 2026 vintage), and confirmed by
-    // replaying the DataSF -> Overture handoff at 3.4 / 3.5 / 15 / 19.5 / 20.5 m:
-    //
-    //       polygon                                trigger    via
-    //       Overture w112759868 (this building)      0.00 m   own centroid
-    //       DataSF SF3775042 (21 + 27 + 29)          3.45 m   its centroid  <- floor
-    //       Overture w112759865 (29 South Park)      9.86 m   its centroid
-    //       Overture w112759863 (21 South Park)     12.60 m   its centroid
-    //       Overture w112759869 (318 Brannan)       19.13 m   nearest vertex
-    //       DataSF SF3775102 (33-35 South Park)     20.07 m   nearest vertex <- ceiling
-    //
-    // Safe window (3.45, 20.07); exactly one footprint drops anywhere inside it.
-    // BELOW 3.45 nothing is excluded at all and the 10.67 m procedural block
-    // (datasfHeight = (9.60 + 11.73)/2) buries this 10.20 m asset entirely - an
-    // invisible landmark, which is worse than a hole. So the collateral is not a
-    // choice: 21 (455 m2) and 29 (253 m2) lose their procedural mass with it.
-    // Both party walls on the GLB are finished blind faces for exactly that
-    // reason. 21 South Park is a sibling in the same batch; 29 has no GLB yet.
-    //
-    // 15 rather than something nearer the floor because dropping SF3775042
-    // means addBuilding() returns null, so markOccupied() never runs for it and
-    // the Overture gap-fill is free to re-add all three rings straight through
-    // the asset. Today occupiedFraction still reads 0.86-0.93 for them from the
-    // NEIGHBOURS' bounding boxes and blocks it, but that is a side effect of
-    // other buildings' geometry, not a guarantee. At 15 all three are excluded
-    // outright and the outcome stops depending on it. Same failure mode as
-    // 106SouthPark; here the guard is cheap because the DataSF polygon that
-    // would otherwise protect the neighbours is already gone. 5.07 m of margin
-    // to 33-35 South Park's nearest vertex.
-    // See docs/asset-plans/27-south-park.md 2.13.
-    id: '27SouthPark',
-    name: '27 South Park',
-    lon: -122.3931439,
-    lat: 37.7817369,
-    height: 10.2,
-    exclude: 15,
-    // camera.js puts the eye at target + distance*(sin yaw, ., cos yaw) with +x
-    // east and +z south, so camera bearing = 180 - yaw. The one public
-    // elevation faces north-west (314.8 deg), so yaw 225 stands the camera over
-    // the oval looking south-east, square onto the arcade. No `key`: at 10 m
-    // this is texture in the row, not a destination.
-    camera: { distance: 170, yaw: 225, pitch: 26 },
-  },
-  {
     // 35 South Park — Accel's San Francisco office. A 1920 industrial building
     // on the NE arc of the oval (block/lot 3775/102), wearing the grandest street
     // elevation on the park: five giant round-arched bays in pale ashlar under a
