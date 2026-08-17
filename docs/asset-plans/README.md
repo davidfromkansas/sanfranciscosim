@@ -117,6 +117,7 @@ route, and the park plans depend on it (§E8 of the parks README).
 | [South Park (64 South Park)](./64-south-park.md) | `64-south-park` | 21.04 m (vertical extent — the asset is terrain-draped; the 15.0 m elm crest is estimated) | new landmark |
 | [524 Second Street (522–524)](./524-second.md) | `524-second` | 9.9 m (estimated) | new landmark |
 | [501 Second Street](./501-second.md) | `501-second` | 37.7 m | new landmark |
+| [21–29 South Park](./21-south-park.md) | `21-south-park` | 11.73 m (LiDAR maximum, read as the roof bulkhead; the 10.20 m cornice crest is estimated) | new landmark |
 
 ## Shared contract (all 75)
 
