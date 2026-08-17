@@ -1206,6 +1206,55 @@ export const LANDMARKS = [
     exclude: 28,
     camera: { distance: 320, yaw: 232, pitch: 24 },
   },
+  {
+    // The Gran Oriente Filipino Hotel, 104-106 South Park: a 1907 three-storey
+    // rooming house by W. L. Schmolle on the north-west rim of the oval,
+    // occupying the whole of a 24 x 97.5 ft lot (7.32 x 29.72 m) with frontages
+    // on South Park Street and Taber Place. NR-nominated 2019 for Filipino
+    // ethnic heritage; 24 units of affordable housing since the 2020-21
+    // Mission Housing rehabilitation. Crest 11.58 m (38 ft, published) against
+    // a LiDAR roof deck of 11.02 m.
+    //
+    // The exclusion band here is 0.88 m wide and BOTH ends are set by different
+    // sources, so it is measured, not guessed. excluded() drops a footprint when
+    // its centroid OR any ring vertex falls inside the radius; measured from
+    // this anchor against the two files the bake actually reads
+    // (pipeline/data/buildings_datasf.geojson and
+    // overture_buildings.geojsonseq, 16 Aug 2026):
+    //
+    //       polygon                        DataSF    Overture
+    //       104-106 (this)                   0.09 m    1.65 m
+    //       102 South Park (Caffe Centro)    3.89 m    2.53 m
+    //       108-110 South Park               3.83 m    8.07 m
+    //       112 South Park                  14.37 m   14.18 m
+    //
+    // So r must EXCEED 1.65 — below that the Overture gap-fill re-adds this
+    // building on top of the asset, because addBuilding() returns null on
+    // exclusion so markOccupied() never runs and occupiedFraction() cannot
+    // block it — and stay UNDER 3.83, or 108-110 disappears and leaves a hole
+    // where a real building stands (AGENTS rule 5). 2.1 sits in the middle with
+    // 0.45 m below and 0.43 m of margin to 102's Overture vertex at 2.53.
+    //
+    // Staying under 2.53 is belt-and-braces rather than load-bearing: 102's
+    // DataSF footprint survives at 3.89 m and marks its bbox occupied, so its
+    // Overture twin would never be added anyway. Keeping the radius below it
+    // means the re-bake diff says so without anyone having to re-derive that.
+    //
+    // No clearTrees: the large street tree in front of this building is real,
+    // is the single most photographed thing about it, and at 2.1 m this radius
+    // clears no street furniture in any case.
+    id: '106SouthPark',
+    name: 'Gran Oriente Filipino Hotel (104-106 South Park)',
+    lon: -122.3944099,
+    lat: 37.7817221,
+    height: 11.58,
+    exclude: 2.1,
+    // app/src/camera.js places the rig at (sin(yaw), sin(pitch), cos(yaw)) x
+    // distance from the pivot, and this project's +z is SOUTH, so yaw 45 puts
+    // the camera south-east of the building — over the oval, looking north-west
+    // at the street elevation, which is the only view of it worth flying to.
+    camera: { distance: 150, yaw: 45, pitch: 26 },
+  },
 ];
 
 // Parks/green spaces the landcover bake must match at least one source polygon
