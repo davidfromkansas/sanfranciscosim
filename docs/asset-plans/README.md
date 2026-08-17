@@ -97,6 +97,7 @@ route, and the park plans depend on it (§E8 of the parks README).
 | [Civic Center Plaza](./civic-center-plaza.md) | `civic-center-plaza` | 30.48 m (flagpole crest) | new landmark |
 | [250 Van Ness Avenue (171–195 Grove Street)](./250-van-ness.md) | `250-van-ness` | 10.0 m (estimated) | new landmark |
 | [Earl Warren Building](./earl-warren-building.md) | `earl-warren-building` | 27.0 m | new landmark |
+| [560 Third Street](./560-third.md) | `560-third` | 7.2 m (LiDAR-derived) | new landmark |
 | [574 Third Street (566–586 Third)](./574-third.md) | `574-third` | 15.4 m | new landmark |
 | [590 Third Street](./590-third.md) | `590-third` | 9.5 m (estimated) | new landmark |
 | [592 Third Street](./592-third.md) | `592-third` | 8.2 m (estimated) | new landmark |
