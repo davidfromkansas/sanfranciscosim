@@ -1843,6 +1843,62 @@ export const LANDMARKS = [
     // (225.4 deg) and the Bryant Street elevation (315.4 deg).
     camera: { distance: 420, yaw: 270, pitch: 26 },
   },
+  {
+    // A 6.99 x 30.07 m sliver on the north-west rim of the South Park oval —
+    // the thinnest lot in this set, thinner than 106SouthPark four doors along.
+    // 1907, raised 2 -> 3 storeys by a 1992-94 vertical addition; the
+    // bounding-box top is the roof-deck pergola at 13.20 m, not the 11.50 m
+    // parapet. See docs/asset-plans/84-south-park.md 2.13.
+    //
+    // THE lon/lat BELOW IS NOT THE MANIFEST ANCHOR, deliberately. Placement uses
+    // the DataSF parcel centroid (-122.3940683, 37.7819798); this circle is
+    // centred 0.84 m away, on bearing 344 deg. The reason is that TWO rings have
+    // to be dropped here — the DataSF footprint and the Overture/OSM trace of the
+    // same building sit 2.7 m apart, because OSM traces the whole lot depth while
+    // the LiDAR footprint stops at the rear wing's open terrace — while both party
+    // walls have neighbour vertices under 4 m out. Measured with the metric
+    // excluded() uses (centroid OR any ring vertex inside the circle):
+    //
+    //   registry point                own rings gone by   nearest neighbour   window
+    //   manifest anchor (parcel)              2.00 m            3.43 m        1.43 m
+    //   DataSF LiDAR area centroid            2.66 m            3.70 m        1.04 m
+    //   OSM OBB centre                        2.67 m            3.27 m        0.60 m
+    //   THIS POINT                            1.48 m            3.73 m        2.25 m
+    //
+    // Full trigger table from this point:
+    //   1.47 m  this building, OSM way/113545687 (Overture proxy)  <- must go
+    //   1.48 m  this building, DataSF SF3775055                    <- must go
+    //   3.73 m  86-96 South Park  (SF3775116 / 201006.0022147)     <- must survive
+    //   3.86 m  76-82 South Park  (SF3775054 / 201006.0026693)     <- must survive
+    //   4.36 m  OSM way/113545685, untagged, on the 86-96 lot      <- must survive
+    //   4.89 m  76-82 South Park, OSM way/124884340                <- must survive
+    //
+    // exclude: 2.6 sits in the middle of (1.48, 3.73) with 1.12 m of margin below
+    // and 1.13 m above — the widest band available anywhere near this building and
+    // more than double what the manifest anchor would give.
+    //
+    // The lot's own 16 m2 rear structure (201006.0168103) triggers at ~14 m and
+    // therefore SURVIVES the bake, which is correct: it is a real outbuilding and
+    // the asset models its own version of it. If QA shows a doubled rear volume,
+    // the fix is to model it OUT of the GLB, not to widen this radius past 3.73
+    // and delete a neighbour (AGENTS rule 5).
+    //
+    // No clearTrees: the large street tree in front of this building is real and
+    // is in every photograph of it; at 2.6 m the radius clears no street furniture
+    // in any case.
+    id: '84SouthPark',
+    name: '84 South Park',
+    lon: -122.3940709,
+    lat: 37.7819871,
+    height: 13.2,
+    exclude: 2.6,
+    // app/src/camera.js places the rig at (sin(yaw), sin(pitch), cos(yaw)) x
+    // distance from the pivot, and this project's +z is SOUTH, so yaw 45 puts the
+    // camera south-east of the building — over the oval, looking north-west at the
+    // street elevation, which is the only view of it worth flying to. Same
+    // convention as 106SouthPark.
+    camera: { distance: 150, yaw: 45, pitch: 26 },
+  },
 ];
 
 // Parks/green spaces the landcover bake must match at least one source polygon

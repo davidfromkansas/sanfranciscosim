@@ -1,7 +1,11 @@
 # 84 South Park — GLB optimize pass (stage 4)
 
 Run of `docs/asset-pipeline/GLB-OPTIMIZE-PROMPT.md` against
-`artifacts/84-south-park/`, 17 August 2026.
+`artifacts/84-south-park/`, 17 August 2026. **Run twice**: once on the first
+shipped build, and again from scratch after stage 5 sent the body colour back to
+stage 2 (see the parent `REPORT.md`, correction 1). The numbers below are the
+second run. They are identical to the first apart from gzip noise, because the
+change was a material colour and this pass never touches a triangle.
 `ASSET_CLASS: landmark`, `ALLOW_MESHOPT: yes`, `ALLOW_BAKE: no`.
 
 ## Metrics

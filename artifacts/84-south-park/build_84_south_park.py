@@ -103,16 +103,23 @@ ANCHOR_SHIFT = [0.0, 0.0]
 
 
 PALETTE_HEX = {
-    "Toy_slate": "6d8188",      # the whole body. OFF-PALETTE and deliberate:
+    "Toy_slate": "7b9298",      # the whole body. OFF-PALETTE and deliberate:
                                 # the nearest palette entry, Toy_verdigris
                                 # (#9fb8a8), was built first and the aerial
                                 # review killed it — it read as pale sage and
                                 # lost the one cue that makes this building
                                 # worth modelling, which is being the only
                                 # tinted facade in a row of cream and taupe.
-                                # #6d8188 is the mid-dark slate blue-green the
-                                # January 2025 Street View shows. The style
-                                # bible's SF exception covers painted
+                                # #6d8188 was the next attempt — the mid-dark
+                                # slate blue-green the January 2025 Street View
+                                # shows — and it was right in the Blender rig and
+                                # too dark IN THE APP, which is the only judge
+                                # that counts: the app's flatter lighting crushed
+                                # it toward near-black on a facade that is in
+                                # shade for most of the afternoon. Shipped one
+                                # step lighter at #7b9298, measured against the
+                                # cream procedural neighbours in a local build.
+                                # The style bible's SF exception covers painted
                                 # residential facades and sf-asset-check scores
                                 # an off-palette colour as a WARN, not a FAIL.
                                 # See REPORT.md correction 1.

@@ -45,17 +45,32 @@ textures: 0. Cameras/lights: 0.
 The plan's Part 1 requires re-verifying the dossier before modelling and says
 REPORT beats plan. Four things changed.
 
-**1. The body colour went off-palette, exactly as the plan's §2.8 anticipated.**
+**1. The body colour went off-palette, exactly as the plan's §2.8 anticipated —
+and then had to be tuned a second time against the app, not against Blender.**
 The plan specified `Toy_verdigris` (`#9fb8a8`) as the palette's nearest hue while
 recording that the real facade is around `#6d8188` and that an off-palette move was
 allowed if the first aerial render read chalky. **It did.** Built in
 `Toy_verdigris`, the model read as pale sage against the warm tabletop and would
 have been near-indistinguishable from the cream and taupe neighbours in the baked
 city — which destroys the *only* recognition cue this building has at the app's
-viewing distance. The shipped body is **`Toy_slate` `#6d8188`**, off-palette and
-deliberate. `sf-asset-check` scores an off-palette colour as a WARN, not a FAIL,
-and the style bible's SF exception explicitly covers painted residential facades.
-`validation.json` reports it under `off_palette_materials` rather than gating it.
+viewing distance.
+
+`#6d8188` was the second attempt and it was right in the Blender rig and **too dark
+in the app**, which is the only judge that counts. Measured in a local build against
+the procedural neighbours, on the 9:30 morning pass when this south-east facade is
+actually lit: neighbour cream facade `#c8bda9`, this facade `#1a2d32`. The app's
+flatter lighting crushes a mid-dark value far harder than the studio rig does, and
+this facade is in shade for most of the afternoon on top of that.
+
+Shipped one step lighter at **`Toy_slate` `#7b9298`**, which measures `#243e42` on
+the same lit face — a ~38% lift, clearly a slate blue-green rather than a
+near-black, and still nowhere near the pale sage that failed. It remains **darker
+than the real building**; going further risks re-creating the chalky failure, and
+the cue that matters (being the one tinted facade in a row of cream, taupe and raw
+metal) is now unambiguous in the app. Off-palette is deliberate: `sf-asset-check`
+scores it a WARN, not a FAIL, and the style bible's SF exception explicitly covers
+painted residential facades. `validation.json` reports it under
+`off_palette_materials` rather than gating it.
 
 **2. The plan's roof design was wrong about the rear, and the aerial corrected it.**
 Plan §2.7 step 4 called for a **4.6 × 4.6 m light well cut into the roof plane**
@@ -120,6 +135,7 @@ disproved, the fix is: delete the pergola, set the bounding-box top and
 | 3 | body → `Toy_slate` `#6d8188`; slot re-authored proud; projecting box 0.35 → 0.45 m proud with a larger window; tree canopy lifted so the trunk reads; ground-floor window widened | first aerial review: pale-sage body, buried door and rails, box not reading as projecting |
 | 4 | slot outer face pushed from −0.02 to +0.03 m; door and rails pushed further proud | second facade review: the dark field was itself hidden behind the wall |
 | 5 | night emission 3.2 → 2.1 | both lit windows blown to flat white |
+| 6 | body `#6d8188` → `#7b9298`, after stage 5 put the asset in a local build | the Blender rig said the colour was right and the app said it was near-black; the app wins. Re-ran stage 2 renders, stage 4 optimize and all gates on the recoloured build |
 
 Every render in this folder was regenerated from the final export after change 5,
 and the contact sheet is composed from those files.
