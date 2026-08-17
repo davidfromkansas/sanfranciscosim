@@ -12,7 +12,7 @@ Miniature GLB for the SF-SIM toy-diorama city. Built from
 | Target height | **7.60 m** (front eave crest) |
 | Front heading | **135.3° true (SE)** |
 | Blender | 5.2.0 LTS |
-| Validation | **PASS** (all 20 checks) |
+| Validation | **PASS** (all 18 checks, re-run against the shipped meshopt file) |
 
 ## Shipped numbers
 
@@ -32,7 +32,7 @@ Miniature GLB for the SF-SIM toy-diorama city. Built from
 | Image textures / cameras / lights | 0 / 0 / 0 | 0 |
 | Animations / armatures / constraints | 0 / 0 / 0 | 0 |
 | Degenerate triangles | 0 | 0 |
-| Signed-volume outward objects | 82 / 82 | all |
+| Signed-volume outward objects | 9 / 9 | all |
 | Normal ray test | 0 flipped of 31,500 first hits (0.000%) | ≤ 0.15% |
 | File size (as built) | 286 KB raw | — |
 | **File size (shipped, meshopt)** | **124 KB raw**, 85 KB gzip | ≤ 500 KB compressed |
