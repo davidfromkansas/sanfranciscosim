@@ -475,11 +475,28 @@ async function addReply(people, thread) {
 const STATE_PATH = "simfrancisco/state.json";
 const STATE_VERSION = 1;
 
+// Connecting a store in the dashboard lets you choose an environment-variable
+// PREFIX, and this project's connection chose one — so the id arrives as
+// `sfsim_STORE_ID`, not the `BLOB_STORE_ID` the SDK looks for by default. Rather
+// than depend on whatever prefix some future connection picks, find the id under
+// any name ending in STORE_ID and hand it to the SDK explicitly.
+function storeId() {
+  if (process.env.BLOB_STORE_ID) return process.env.BLOB_STORE_ID;
+  const key = Object.keys(process.env).find(
+    (k) => k.endsWith("STORE_ID") && /^store_/.test(process.env[k] ?? ""),
+  );
+  return key ? process.env[key] : null;
+}
+
 const blobConfigured = () =>
   Boolean(
     process.env.BLOB_READ_WRITE_TOKEN ||
-    (process.env.VERCEL_OIDC_TOKEN && process.env.BLOB_STORE_ID),
+    (process.env.VERCEL_OIDC_TOKEN && storeId()),
   );
+
+// Credentials for every call in one place. An explicit storeId beats relying on
+// the SDK's env lookup, which only knows the unprefixed name.
+const blobAuth = () => (storeId() ? { storeId: storeId() } : {});
 
 let etag = null; // of the copy we last read or wrote
 let restored = false;
@@ -492,6 +509,7 @@ async function restore() {
     const found = await get(STATE_PATH, {
       access: "private",
       useCache: false,
+      ...blobAuth(),
     });
     if (!found || found.statusCode !== 200) return;
     const saved = JSON.parse(await new Response(found.stream).text());
@@ -527,6 +545,7 @@ async function persist() {
         contentType: "application/json",
         allowOverwrite: true,
         cacheControlMaxAge: 60,
+        ...blobAuth(),
         // Refuse the write if somebody saved after our read. First time round
         // there is nothing to match, so the option is simply absent.
         ...(etag ? { ifMatch: etag } : {}),
