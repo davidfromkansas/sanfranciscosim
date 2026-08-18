@@ -252,3 +252,31 @@ button:hover {
   line-height: 1.45;
   color: #6b5a48;
 }
+
+/* A resident's own headline over their post — the thing they decided was worth
+   other people's attention. Larger than the body, smaller than the panel title,
+   and only ever on the first post in a thread. */
+.feed-post-title {
+  margin: 6px 0 0 15px;
+  font: 700 14px/1.35 -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+  color: #2b2118;
+  text-wrap: balance;
+}
+
+/* The news story that prompted the thread, sitting under it as a citation
+   rather than over it as a headline. */
+.feed-thread .feed-event {
+  margin: 12px 16px 0;
+  padding: 8px 10px;
+  border: 1px solid rgba(43, 33, 24, 0.22);
+  border-radius: 8px;
+  background: #f5ead4;
+}
+
+.feed-thread .feed-event .feed-headline {
+  font-weight: 600;
+  font-size: 11.5px;
+  line-height: 1.4;
+  margin-top: 2px;
+  color: #4a3d30;
+}

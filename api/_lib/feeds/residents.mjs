@@ -37,7 +37,9 @@ const ENDPOINT = "https://ai-gateway.vercel.sh/v1/chat/completions";
 // would be ~$29. See the model note in the PR.
 const MODEL = "deepseek/deepseek-v3.2";
 const TEMPERATURE = 0.85;
-const MAX_CHARS = 180;
+const MAX_CHARS = 180; // a reply
+const TITLE_CHARS = 100; // the headline a resident writes over their own post
+const BODY_CHARS = 240; // what they write under it
 
 // The community, in Social Simulacra's terms (arXiv 2208.04024 §4). The paper
 // takes a GOAL and RULES from the designer and puts them in every prompt, and
@@ -125,27 +127,43 @@ async function write({ speaker, event, because, posts }) {
   // Order follows the paper: who you are, then how this place behaves, then
   // what it is for. The persona comes first because everything after it is
   // read as constraints on that voice rather than as a character brief.
-  const system =
+  // An opening post and a reply are different acts of writing. Opening one is
+  // deciding a thing is worth other people's attention and giving it a title;
+  // replying is answering what somebody said. The shared rules stay identical
+  // so the voice does not change between them.
+  const opening = posts.length === 0;
+  const common =
     `WHO YOU ARE\n${speaker.iss}\n\n` +
     `WHERE YOU ARE POSTING\n` +
     `${COMMUNITY.name} — ${COMMUNITY.goal}.\n` +
-    `People here avoid ${COMMUNITY.avoid.join("; ")}.\n\n` +
-    `HOW TO WRITE\n` +
-    `- Under ${MAX_CHARS} characters. One or two sentences.\n` +
-    `- Write only the message. No name, no quotation marks, no hashtags, no emoji.\n` +
+    `People here avoid ${COMMUNITY.avoid.join("; ")}.\n\n`;
+  const manners =
     `- Speak from your own life, in the first person.\n` +
     `- You are a neighbour, not a spokesperson. Be specific, partial and ordinary.\n` +
+    `- No quotation marks, no hashtags, no emoji, no name.\n` +
     `- Never mention being an AI, a persona, or the Census.`;
+  const system = opening
+    ? common +
+      `HOW TO WRITE\n` +
+      `You are starting a thread. Answer on exactly two lines:\n` +
+      `TITLE: what you would call this post — under ${TITLE_CHARS} characters. Say the thing, do not repeat the news headline back.\n` +
+      `BODY: what you actually want to say about it — under ${BODY_CHARS} characters, two or three sentences.\n` +
+      manners
+    : common +
+      `HOW TO WRITE\n` +
+      `- Under ${MAX_CHARS} characters. One or two sentences.\n` +
+      `- Write only the message.\n` +
+      manners;
 
   const thread = posts.length
-    ? `\n\nTHE CONVERSATION SO FAR\n${posts.map((p) => `${p.name}: ${p.text}`).join("\n")}`
+    ? `\n\nTHE CONVERSATION SO FAR\n${posts.map((p) => `${p.name}: ${p.title ? `${p.title} — ` : ""}${p.text}`).join("\n")}`
     : "";
   const why = grounding ? `\n\nWHY THIS REACHES YOU\n${grounding}` : "";
   const user =
     `WHAT HAPPENED (${event.source}, ${event.where})\n${event.headline}${event.detail ? `\n${event.detail}` : ""}` +
     why +
     thread +
-    `\n\n${posts.length ? "Reply to this conversation." : "Post about this."}`;
+    `\n\n${opening ? "Start the thread." : "Reply to this conversation."}`;
 
   const res = await fetch(ENDPOINT, {
     method: "POST",
@@ -156,7 +174,7 @@ async function write({ speaker, event, because, posts }) {
     body: JSON.stringify({
       model: MODEL,
       temperature: TEMPERATURE,
-      max_tokens: 120,
+      max_tokens: opening ? 220 : 120,
       messages: [
         { role: "system", content: system },
         { role: "user", content: user },
@@ -168,15 +186,70 @@ async function write({ speaker, event, because, posts }) {
       `gateway ${res.status}: ${(await res.text()).slice(0, 200)}`,
     );
   const body = await res.json();
-  const text = (body.choices?.[0]?.message?.content ?? "").trim();
-  if (!text) throw new Error("gateway returned an empty message");
+  const raw = (body.choices?.[0]?.message?.content ?? "").trim();
+  if (!raw) throw new Error("gateway returned an empty message");
+
   // Models like to open with the speaker's own name however firmly you ask them
   // not to. Cheaper to take it off here than to argue in the prompt.
-  return text
-    .replace(/^["'“]|["'”]$/g, "")
-    .replace(new RegExp(`^${speaker.name.split(" ")[0]}\\s*[:,-]\\s*`, "i"), "")
-    .slice(0, MAX_CHARS + 40)
-    .trim();
+  // Cut at a sentence, never mid-word. A hard character slice left posts
+  // ending "takes more than a stripe to slow down" — which reads as a bug, not
+  // as brevity. Prefer the last full sentence inside the limit; failing that,
+  // the last whole word.
+  const tidy = (t, limit) => {
+    const clean = t
+      .replace(/^\*\*|\*\*$/g, "")
+      .replace(/^["'“]|["'”]$/g, "")
+      .replace(
+        new RegExp(`^${speaker.name.split(" ")[0]}\\s*[:,-]\\s*`, "i"),
+        "",
+      )
+      .trim();
+    if (clean.length <= limit) return clean;
+    const window = clean.slice(0, limit);
+    const sentence = Math.max(
+      window.lastIndexOf(". "),
+      window.lastIndexOf("! "),
+      window.lastIndexOf("? "),
+    );
+    // Only honour a sentence break if it leaves a post worth reading; a title
+    // cut to four words because the first sentence was short is worse.
+    if (sentence > limit * 0.5) return window.slice(0, sentence + 1).trim();
+    if (/[.!?]$/.test(window)) return window.trim();
+    const word = window.lastIndexOf(" ");
+    return (
+      (word > 0 ? window.slice(0, word) : window)
+        .trim()
+        .replace(/[,;:—-]$/, "") + "…"
+    );
+  };
+
+  if (!opening) return { text: tidy(raw, MAX_CHARS) };
+
+  // TITLE:/BODY: rather than JSON — one fewer thing for a cheap model to get
+  // wrong, and a miss degrades to a post with no title rather than an error.
+  const title =
+    raw.match(/^\s*(?:\*\*)?TITLE(?:\*\*)?\s*:\s*(.+)$/im)?.[1] ?? "";
+  const rest =
+    raw.match(/(?:\*\*)?BODY(?:\*\*)?\s*:\s*([\s\S]+)$/im)?.[1] ?? "";
+  if (!title || !rest) {
+    // No labels came back. Treat the first line as the title only if it reads
+    // like one — short, and with a body behind it. Otherwise it is just a post.
+    const lines = raw
+      .split("\n")
+      .map((l) => l.trim())
+      .filter(Boolean);
+    if (lines.length > 1 && lines[0].length <= TITLE_CHARS) {
+      return {
+        title: tidy(lines[0], TITLE_CHARS),
+        text: tidy(lines.slice(1).join(" "), BODY_CHARS),
+      };
+    }
+    return { text: tidy(raw, BODY_CHARS) };
+  }
+  return {
+    title: tidy(title, TITLE_CHARS),
+    text: tidy(rest.replace(/\s+/g, " "), BODY_CHARS),
+  };
 }
 
 async function fetchResidents() {
@@ -203,18 +276,21 @@ async function fetchResidents() {
     const thread = { ...source, cursor: 0, posts: [], startedAt: now };
     const slot = thread.slots[0];
     const speaker = data.speakers[slot.speaker];
+    // The opening post carries a title of its own; the spread puts it on the
+    // post only when the writer produced one.
+    const written = await write({
+      speaker,
+      event: thread.event,
+      because: slot.because,
+      posts: [],
+    });
     thread.posts.push({
       id: slot.id,
       speakerId: speaker.id,
       name: speaker.name,
       occupation: speaker.occupation,
       puma: speaker.puma,
-      text: await write({
-        speaker,
-        event: thread.event,
-        because: slot.because,
-        posts: [],
-      }),
+      ...written,
       at: Date.now(),
     });
     thread.cursor = 1;
@@ -240,18 +316,19 @@ async function fetchResidents() {
         thread.cursor++;
         continue;
       }
+      const written = await write({
+        speaker,
+        event: thread.event,
+        because: slot.because,
+        posts: thread.posts,
+      });
       thread.posts.push({
         id: slot.id,
         speakerId: speaker.id,
         name: speaker.name,
         occupation: speaker.occupation,
         puma: speaker.puma,
-        text: await write({
-          speaker,
-          event: thread.event,
-          because: slot.because,
-          posts: thread.posts,
-        }),
+        ...written,
         at: Date.now(),
       });
       thread.cursor++;

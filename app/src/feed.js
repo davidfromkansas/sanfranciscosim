@@ -61,17 +61,25 @@ function renderPost(post, isReply) {
   dot.style.background = PUMA_COLORS[post.puma] ?? '#6b7280';
   head.append(dot, el('span', 'feed-name', post.name), el('span', 'feed-time', ago(post.at)));
   const meta = el('p', 'feed-meta', `${post.occupation} · ${PUMA_NAMES[post.puma] ?? 'San Francisco'}`);
-  wrap.append(head, meta, el('p', 'feed-text', post.text));
+  wrap.append(head, meta);
+  // Only an opening post has a title. A writer who did not produce one still
+  // gets a readable post — the body simply stands on its own.
+  if (post.title) wrap.append(el('h2', 'feed-post-title', post.title));
+  wrap.append(el('p', 'feed-text', post.text));
   return wrap;
 }
 
 function renderThread(thread) {
   const wrap = el('section', 'feed-thread');
-  const event = el('div', 'feed-event');
-  event.append(el('p', 'feed-headline', thread.event.headline));
-  event.append(el('p', 'feed-source', `${thread.event.source} · ${thread.event.where}`));
-  wrap.append(event);
+  // The resident's post is the top of the thread now; the news story that
+  // prompted it hangs underneath as attribution. The city event is why the
+  // conversation exists, but it is not what somebody posted — and reading the
+  // headline first made every thread look like a news feed with comments.
   thread.posts.forEach((post, i) => wrap.append(renderPost(post, i > 0)));
+  const src = el('div', 'feed-event');
+  src.append(el('p', 'feed-source', `${thread.event.source} · ${thread.event.where}`));
+  src.append(el('p', 'feed-headline', thread.event.headline));
+  wrap.append(src);
   return wrap;
 }
 
