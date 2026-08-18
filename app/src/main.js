@@ -25,6 +25,7 @@ import { createAssets } from './assets.js';
 import { createPiers } from './piers.js';
 import { createAgents } from './agents.js';
 import { createPopulation } from './population.js';
+import { createFeedPanel } from './feed.js';
 import { createLiveFerries } from './ferries.js';
 import { createLiveMuni } from './muni.js';
 import { createMuniStopLayer } from './munistoplayer.js';
@@ -125,6 +126,10 @@ async function boot() {
   // they walk, the anonymous pedestrians stand down.
   const population = createPopulation(scene, data, city);
   agents.setPedExclusion(population.containsResidents);
+  // The column on the right: the same residents, talking. Independent of the
+  // renderer — if the writer is offline the panel says so and the city is
+  // exactly as it was.
+  const feedPanel = createFeedPanel();
   // Real WETA vessels from /api/ferries; falls back to the procedural ferries.
   const ferries = createLiveFerries(scene, data, agents);
   // The live weather field. Created before the clock so the card can read it
@@ -769,6 +774,7 @@ async function boot() {
     city,
     agents,
     population,
+    feedPanel,
     ferries,
     clouds,
     rain,
