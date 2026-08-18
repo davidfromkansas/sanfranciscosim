@@ -160,27 +160,40 @@ function avatar(who, size) {
   return svg;
 }
 
+// Who is speaking, in two lines: the name and when, then what they do and
+// where they live. The occupation is the whole reason a post reads as coming
+// from a particular life rather than from nobody — "Cook, part time" over a
+// post about a bakery is most of the meaning — so it belongs on screen and not
+// in a tooltip nobody hovers.
+function identity(who, at, onOpen) {
+  const block = el("div", "rs-who");
+
+  const top = el("div", "rs-who-top");
+  const name = el("button", "rs-author", who.name);
+  name.addEventListener("click", () => onOpen(who));
+  top.append(name, el("span", "rs-sep", "·"), el("span", "rs-time", ago(at)));
+
+  // A resident with no job still has a place. Census wording like "Not in the
+  // labour force" is theirs and is printed as written; only a genuinely empty
+  // field falls back to the neighbourhood alone.
+  const where = PUMA_NAMES[who.puma] ?? "San Francisco";
+  const sub = who.occupation ? `${who.occupation} · ${where}` : where;
+
+  block.append(top, el("div", "rs-who-sub", sub));
+  return block;
+}
+
 function byline(who, at, onOpen) {
   const row = el("div", "rs-byline");
-  const face = avatar(who, 20);
-  const name = el("button", "rs-author", who.name);
-  name.title =
-    `${who.occupation || ""} · ${PUMA_NAMES[who.puma] ?? "San Francisco"}`.trim();
-  name.addEventListener("click", () => onOpen(who));
-  row.append(
-    face,
-    name,
-    el("span", "rs-sep", "·"),
-    el("span", "rs-time", ago(at)),
-  );
+  row.append(avatar(who, 22), identity(who, at, onOpen));
   return row;
 }
 
 function renderThread(thread, speakers, onOpen) {
-  const who = speakers[thread.authorId] ?? thread.author;
+  const who = { ...thread.author, ...(speakers[thread.authorId] ?? {}) };
   const card = el("article", "rs-post");
 
-  card.append(byline({ ...thread.author, ...who }, thread.at, onOpen));
+  card.append(byline(who, thread.at, onOpen));
   card.append(el("h2", "rs-title", thread.title));
   card.append(el("p", "rs-body", thread.body));
 
@@ -192,10 +205,16 @@ function renderThread(thread, speakers, onOpen) {
   if (count) {
     const comments = el("div", "rs-comments");
     for (const reply of thread.replies) {
+      const speaker = { ...reply, ...(speakers[reply.personaId] ?? {}) };
+      // A comment is a two-column row: the face in its own column, everything
+      // said in the other. The body then hangs under the name rather than under
+      // the picture, which is what makes a long thread scannable — the eye
+      // follows one straight edge of text down the whole discussion.
       const item = el("div", "rs-comment");
-      const speaker = speakers[reply.personaId] ?? reply;
-      item.append(byline({ ...reply, ...speaker }, reply.at, onOpen));
-      item.append(el("p", "rs-comment-body", reply.body));
+      const main = el("div", "rs-comment-main");
+      main.append(identity(speaker, reply.at, onOpen));
+      main.append(el("p", "rs-comment-body", reply.body));
+      item.append(avatar(speaker, 22), main);
       comments.append(item);
     }
     card.append(comments);

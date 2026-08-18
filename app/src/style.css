@@ -208,10 +208,29 @@ button:hover {
 
 .rs-byline {
   display: flex;
-  align-items: center;
-  gap: 5px;
+  align-items: flex-start;
+  gap: 7px;
   font-size: 11px;
   color: #6b5a48;
+}
+
+.rs-who {
+  min-width: 0; /* so a long occupation wraps instead of widening the row */
+}
+
+.rs-who-top {
+  display: flex;
+  align-items: baseline;
+  gap: 4px;
+}
+
+/* What they do and where they live. Quieter than the name, but present — an
+   occupation is most of why a post reads as coming from a particular life. */
+.rs-who-sub {
+  margin-top: 1px;
+  font-size: 10.5px;
+  line-height: 1.35;
+  color: #8a7860;
 }
 
 /* The profile picture. Drawn as SVG in feed.js — the ring carries the
@@ -285,8 +304,28 @@ button:hover {
   gap: 9px;
 }
 
+/* Two columns: the face in one, everything said in the other. The body then
+   hangs under the NAME rather than under the picture, so the eye follows a
+   single straight edge of text down a long thread. */
+.rs-comment {
+  display: flex;
+  align-items: flex-start;
+  gap: 7px;
+}
+
+.rs-comment-main {
+  min-width: 0;
+  flex: 1;
+}
+
+/* The identity block already sits in the right column, so the avatar inside it
+   would be a second face. Comments supply their own. */
+.rs-comment-main .rs-byline {
+  gap: 0;
+}
+
 .rs-comment-body {
-  margin: 3px 0 0 14px;
+  margin: 3px 0 0;
   color: #3a3028;
 }
 
