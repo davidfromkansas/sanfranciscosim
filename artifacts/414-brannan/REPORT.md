@@ -132,6 +132,11 @@ and the tympanum medallion.
 
 ## Approval
 
-Stage 3 of the pipeline. Recorded below when given.
+Stage 3 of the pipeline. Given in advance, as the session's opening instruction,
+18 August 2026:
 
-> _(pending)_
+> APPROVE EVERYTHING DONT ASK ME FOR PERMISSION
+
+Standing pre-approval for every gate in this run, quoted verbatim per the
+pipeline's Gate 3. No revision loop was requested; the five iterations logged
+above were the author's own, driven by the renders.
