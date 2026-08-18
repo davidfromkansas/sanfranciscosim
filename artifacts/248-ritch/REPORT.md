@@ -11,7 +11,7 @@ of them `_Glow`. `validation.json` is **PASS** on all seventeen contract checks.
 | | |
 |---|---|
 | Triangles | **3,572** (cap 7,000) |
-| Objects | 129 |
+| Objects | 8 as shipped (129 before the stage-4 join) |
 | Dimensions | 15.816 × 15.818 × **8.600** m |
 | min Z / XY centre | 0.000 / (0.000, 0.000) |
 | Materials | `Toy_cream`, `Toy_glass`, `Toy_ink`, `Toy_steel`, `Toy_stone`, `Toy_trim`, `Toy_glassl_Glow` |
@@ -19,6 +19,7 @@ of them `_Glow`. `validation.json` is **PASS** on all seventeen contract checks.
 | Normals | 129/129 objects positive signed volume; 0 of 31,500 rays flipped |
 | Manifest anchor | **−122.3956749, 37.7801751** |
 | Target height | **8.6 m** |
+| Shipped file | **98,024 bytes**, 9 draw submeshes (stage 4; was 255,560 / 131) |
 
 The XY box is 15.8 m for a 7.60 m building because the building stands at 45° to
 the world axes and the two stoops project 1.20 m onto the pavement. That is
@@ -183,7 +184,9 @@ artifacts/248-ritch/
   validate_248_ritch.py    fresh-scene contract validation
   make_contact_sheet.py    composes the sheet
   248-ritch.blend          authoring scene
-  248-ritch.glb            THE ASSET
+  248-ritch.glb            THE ASSET (stage-4 optimized; the pre-optimize
+                           original is archived at optimize/input/)
+  optimize/                stage 4 - scripts, stats, A/B renders, REPORT.md
   248-ritch-{east,west,north,south,top,aerial,facade}.png
   248-ritch-aerial-night.png
   248-ritch-contact-sheet.png
