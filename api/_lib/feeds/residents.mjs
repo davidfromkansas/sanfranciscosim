@@ -38,10 +38,7 @@ const TEMPERATURE = 0.9;
 const SUBREDDIT = {
   id: "simfrancisco",
   name: "r/simfrancisco",
-  goal:
-    "people who actually live in San Francisco talking about what they notice in " +
-    "their own neighbourhood — what they saw, what it costs them, what they think " +
-    "is going to happen, what they are glad about and what they are sick of",
+  goal: "Discuss news, events, politics, culture, and everyday life relevant to San Francisco",
   rules: [],
 };
 
