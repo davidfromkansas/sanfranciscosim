@@ -274,7 +274,10 @@ function renderThread(thread, speakers, onOpen) {
   return card;
 }
 
-export function createFeedPanel({ onVisit = () => false } = {}) {
+export function createFeedPanel({
+  onVisit = () => false,
+  onlineCount = () => 0,
+} = {}) {
   const root = document.getElementById("feed");
   if (!root) return { refresh() {} };
   root.classList.add("rs");
@@ -290,8 +293,22 @@ export function createFeedPanel({ onVisit = () => false } = {}) {
   const icon = el("div", "rs-icon");
   const titles = el("div", "rs-titles");
   const title = el("h1", "rs-name", "r/simfrancisco");
+  // Counted from the city itself, not from the feed: these are the residents
+  // currently walking the streets behind the panel. It climbs from zero as
+  // their neighbourhoods stream in, which is why it ticks on its own rather
+  // than being written once.
+  const online = el("p", "rs-online", "");
   const goal = el("p", "rs-goal", "");
-  titles.append(title, goal);
+  titles.append(title, online, goal);
+
+  function refreshOnline() {
+    const n = onlineCount();
+    const text = `${n.toLocaleString()} simfranciscan${n === 1 ? "" : "s"} ${n === 1 ? "is" : "are"} online`;
+    if (online.textContent !== text) online.textContent = text;
+  }
+  refreshOnline();
+  // Fast while the city is loading, when the number moves every second.
+  setInterval(refreshOnline, 2000);
   bar.append(icon, titles);
 
   const status = el("p", "rs-status", "Loading…");

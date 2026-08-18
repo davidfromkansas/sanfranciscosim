@@ -547,6 +547,17 @@ export function createPopulation(scene, data, city) {
       focused = id;
     },
 
+    // How many residents are actually out on the streets right now. This is the
+    // number the feed calls "online": not the size of the cast, but the people
+    // who have been seated on a real street and are walking. It climbs from
+    // zero as the city streams in, which is honest — before their neighbourhood
+    // loads, they are not anywhere.
+    get onlineCount() {
+      let n = 0;
+      for (const resident of residents) if (resident.placed) n++;
+      return n;
+    },
+
     get residentCount() {
       return bodyMesh ? bodyMesh.count : 0;
     },

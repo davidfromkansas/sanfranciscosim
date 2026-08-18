@@ -135,6 +135,10 @@ async function boot() {
   // streets may still be streaming — and the panel says so rather than the
   // camera flying somewhere arbitrary.
   const feedPanel = createFeedPanel({
+    // "X simfranciscans are online" counts the residents actually walking the
+    // city, not the size of the cast — the panel and the diorama report the
+    // same population or the number means nothing.
+    onlineCount: () => population.onlineCount,
     onVisit(person) {
       const at = population.locate(person.id);
       if (!at) return false;

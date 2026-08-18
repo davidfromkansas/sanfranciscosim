@@ -526,3 +526,41 @@ button:hover {
   font-size: 10.5px;
   font-weight: 700;
 }
+
+/* The live population, counted from the diorama rather than the feed. A dot
+   that pulses, because the number it sits beside is genuinely moving. */
+.rs-online {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  margin: 4px 0 0;
+  font-size: 12px;
+  font-weight: 700;
+  color: #3f8f6b;
+}
+
+.rs-online::before {
+  content: "";
+  width: 7px;
+  height: 7px;
+  border-radius: 50%;
+  background: #3f8f6b;
+  flex: none;
+  animation: rs-pulse 2.4s ease-in-out infinite;
+}
+
+@keyframes rs-pulse {
+  0%,
+  100% {
+    opacity: 1;
+  }
+  50% {
+    opacity: 0.25;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .rs-online::before {
+    animation: none;
+  }
+}
