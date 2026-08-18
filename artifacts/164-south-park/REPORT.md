@@ -177,3 +177,131 @@ unbroken flat roof, and both two-storey neighbours visibly overtop this building
 Standing approval was given for the whole run ("APPROVE EVERYTHING DONT ASK ME FOR
 PERMISSION", 2026-08-18). The contact sheet, the day and night aerials and the numbers above
 are presented as the gate-3 evidence rather than as a request.
+
+---
+
+## Stage 5 — integration (Case B, batch mode)
+
+Executed per `docs/asset-plans/INTEGRATION-PROMPT.md` with the batch-mode amendment from
+`docs/asset-pipeline/ADDRESS-TO-ASSET.md`. Filled in as each step completed; the QA table is
+below.
+
+**Source changes (the only things committed):**
+
+- `app/public/sf-assets/landmarks/164-south-park.glb` — the stage-4 file, copied byte-for-byte.
+  `node pipeline/compress-assets.mjs` reports `skip (already compressed)` for it, as expected
+  for a post-optimize asset. It also re-compressed `vehicles/passenger-airplane.glb`, which is
+  somebody else's file and unrelated to this landmark; reverted.
+- `app/public/sf-assets/landmarks_manifest.json` — one appended entry, written as **text**
+  so `JSON.stringify` could not renormalise other entries' float formatting. Diff: 19
+  insertions, 0 deletions.
+- `pipeline/lib/landmarks.mjs` — one appended `LANDMARKS` entry (verified it landed in
+  `LANDMARKS`, not in `VIEW_PRESETS`: 97 landmarks, 6 presets after the edit).
+- `docs/asset-plans/164-south-park.md` — §2.13 rewritten with the measured exclusion.
+
+**`camelId` round trip:** `164-south-park` → `164SouthPark`, which is the registry id. Checked
+against the actual `camelId()` in `app/src/assets.js` rather than by eye, because a digit-led
+slug is exactly where that mapping has bitten before.
+
+**The re-bake, and a false reassurance from `verify-rebake.mjs`.**
+
+The full chain ran green (`terrain → bridges → buildings → streets → landcover → validate →
+lore → toy → notables → context → muni-shapes`, exit 0). `node pipeline/audit.mjs` check
+**1.6 PASSES** — "no procedural footprint inside a bespoke landmark exclusion zone,
+100 zones over 97 landmarks clear". `node pipeline/verify-rebake.mjs` also passes, and reports
+the nearest surviving footprint at **3.8 m against the 2.6 m radius**.
+
+But it also prints this, and it is wrong:
+
+```
+23_13   unchanged  <- 164SouthPark: exclusion dropped nothing (no footprint in the source data?)
+```
+
+It is a *count* comparison, and cell 23_13 holds 182 footprints before and after. What
+actually happened is that this landmark dropped one footprint and the `pipeline/data` snapshot
+this bake ran against — cloned from a sibling worktree — differs slightly in vintage from the
+one `origin/main` was baked with, so one other footprint appeared in the same cell. Net zero.
+Counts cannot see that; identities can.
+
+Settled from the tiles instead, decoding `app/public/tiles/buildings/23_13.bin` and running
+point-in-polygon at the anchor:
+
+| | Rings covering the anchor | Nearest ring |
+|---|---|---|
+| `origin/main` | **1**, height **8.5 m** | 0 m (it covers the anchor) |
+| after this re-bake | **0** | 3.76 m, height 8.7 m — the 158 sliver, deliberately kept |
+
+The 8.5 m procedural block is the point. The asset is 5.4 m. Without the exclusion the
+landmark would have been *completely invisible* inside a taller baked box, and no amount of
+looking at the GLB would have shown it — which is exactly why `ADDRESS-TO-ASSET.md` insists
+the bake runs even in batch mode before the QA.
+
+The three `audit.mjs` failures (1.2b p95 height, 1.3c Telegraph Hill terrain, 1.7b one
+sampled tree offshore) are all pre-existing on `origin/main` and unrelated to this landmark.
+
+### Local QA (Step 5)
+
+Run in real headless Chrome over CDP against the Vite dev server for **this worktree**
+(manifest served: 91 entries, ours confirmed present before anything else was believed).
+Script kept at `artifacts/164-south-park/integration/qa-headless.mjs`. `requestAnimationFrame`
+measured at 200 frames in 3 s, so the app's own loop drove the streaming scan and nothing had
+to be pumped by hand.
+
+| Item | Result |
+|---|---|
+| Landmark streams in and merges | **PASS** — `sf-assets: 164-south-park merged 8 objects / 8 materials -> batched (1961 tris body); uniform x1.0000 at 3745, -1239` |
+| Loader scale | **1.0000** exactly — the authored crest and `targetHeightM` agree |
+| `SF.assets.stats()` | `entries: 91, live: 77, fading: 0, **failed: 0**` |
+| Exactly one building on the site | **PASS** — no procedural twin, no z-fighting; settled from the tile as well (see above) |
+| Footprint size against neighbours | **PASS** — reads as the 42 m wedge it is, against 160 to the north and 166 to the south-west |
+| Orientation | **PASS** — the red screen faces the oval; the entry and canopy sit at the north end of the frontage, as researched |
+| Terrain seating | **PASS** — no float, no sink; pivot ground at y = 7.11 m |
+| Night glow | **PASS** — the ribbon reads as one continuous lit band dropping at the entry, and **nothing else on the building lights** |
+| Draw calls | **85** against the 300 budget (hooked `renderer.render` and took the max over the app's own frames — the stats overlay's own line reads 1 because `toypost.js` renders a second fullscreen quad and three resets `renderer.info` each `render()`) |
+
+Screenshots: `integration/qa-in-city-day.png`, `integration/qa-in-city-night.png`.
+
+### Fallback drill (Step 6) — mandatory, and it passes
+
+GLB moved aside, page re-navigated with a cache-buster:
+
+- The app **boots and the area renders** — `SF.city.stats` still reports 1,277 cells loaded,
+  35,571 trees, 11,463 kit instances. Nothing else broke.
+- **`failed: 1`** and exactly one console warning:
+  `sf-assets: 164-south-park failed to load (Unexpected token '<', "<!doctype "... is not valid JSON)`.
+  That is Vite answering a missing `public/` path with the SPA `index.html` at HTTP 200 —
+  a dev-server artifact, not a real 404. The drill still proves what it is meant to prove.
+- **Case B behaviour confirmed:** the site is empty ground inside the exclusion zone, which is
+  the expected and documented outcome for a new landmark — there is no procedural version to
+  fall back to, because the exclusion removed it.
+- GLB restored; `git status` clean apart from the intended changes.
+
+### Batch mode — source-only branch
+
+`git checkout -- app/public/tiles api/_data` after the QA, per
+`docs/asset-pipeline/ADDRESS-TO-ASSET.md`. Sanity check passes:
+`git diff --name-only origin/main | grep -E '^app/public/tiles/|^api/_data/'` returns **0**
+lines. The bake rewrote 1,977 generated files and every one of them was discarded; the batch
+gets rebuilt once by `docs/asset-pipeline/BATCH-INTEGRATE.md`.
+
+`cd app && npm run lint && npm run build` — both clean.
+
+### Gate 5
+
+| Item | Result |
+|---|---|
+| Re-bake chain | **PASS** (exit 0) |
+| `audit.mjs` 1.6 | **PASS** — 100 zones over 97 landmarks clear |
+| `verify-rebake.mjs` | **PASS** — nearest surviving footprint 3.8 m vs 2.6 m radius (its "dropped nothing" line is a count artefact; see above) |
+| Tile point-in-polygon at the anchor | **PASS** — 1 ring (8.5 m) before, **0** after |
+| Streams, merges, scale 1.0000 | **PASS** |
+| Exactly one building on the site | **PASS** |
+| Orientation, footprint, terrain seating | **PASS** |
+| Night glow, intended surfaces only | **PASS** |
+| Draw calls 85 / 300 | **PASS** |
+| Fallback drill | **PASS** |
+| Source-only branch | **PASS** — 0 generated files staged |
+| lint + build | **PASS** |
+
+**Not pushed, no PR, not deployed** — the pipeline ends at a local verified integration and
+asks. Branch: `pipeline/164-south-park`.

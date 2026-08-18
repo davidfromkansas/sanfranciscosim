@@ -25,8 +25,7 @@ prompt, Part 2 is the research and design dossier behind it.
 |---|---|
 | Manifest id | `164-south-park` |
 | Existing procedural builder | none — new landmark (**Case B**: needs a `pipeline/lib/landmarks.mjs` entry and a re-bake, see 2.13) |
-| WGS84 anchor (manifest, placement) | `-122.3949238, 37.7812072` — surveyed parcel-union area centroid |
-| WGS84 anchor (registry, exclusion only) | `-122.3949502, 37.7812178` — **deliberately different, see 2.13** |
+| WGS84 anchor (manifest and registry) | `-122.3949366, 37.7812097` — the model's recentred origin; design anchor was the parcel-union area centroid `-122.3949238, 37.7812072` |
 | Target height | **5.4 m** to the rear parapet crest (*LiDAR median, measured*); street screen parapet **4.1 m** (*photogrammetric*) |
 | Footprint | 439.5 m², surveyed; 42.1 m deep on the SW party line, 19.4 m of exposed street elevation in five facets |
 | Axis | body runs 315.1°/135.1°; street facets face **86.0°, 91.1°, 95.8°, 100.6°** with a **135.2°** chamfer at the south end |
@@ -663,34 +662,47 @@ more. Streamed, not `alwaysLoaded`.
 `app/src/landmarks.js`, so the baked city still carries a procedural block on this footprint
 and the registry needs a new entry plus a re-bake.
 
-**The registry anchor should NOT be the manifest anchor.** `excluded()` in
-`pipeline/buildings.mjs` drops a footprint when its area centroid **or any ring vertex**
-falls inside the circle, and the bake reads DataSF first and gap-fills from Overture (which
-carries OSM geometry), so both sources bind. Measured from three candidate anchors against
-DataSF `ynuv-fyni` and OSM, with neighbours already covered by an existing landmark's
-exclusion discounted (they are dropped anyway and a GLB stands in their place):
+**MEASURED OUTCOME (stage 5) — the plan's recommendation was superseded.** The paragraphs
+below record what was actually measured against the bake's own input, which is what the
+registry now carries. The earlier draft recommended a separate registry anchor at the OSM way
+centroid with `exclude: 3`; measuring against the real input rather than the live APIs showed
+the **manifest anchor itself gives the widest window**, so there is only one anchor here and
+no second number to explain.
 
-| Candidate anchor | Floor (own centroid) | Ceiling (uncovered neighbour vertex) | Window |
+`excluded()` in `pipeline/buildings.mjs` drops a footprint when its area centroid **or any
+ring vertex** falls inside the circle, and the bake reads DataSF first and gap-fills from
+Overture, so both sources bind. Measured from the manifest anchor `-122.3949366, 37.7812097`
+against `pipeline/data/buildings_datasf.geojson` and
+`pipeline/data/overture_buildings.geojsonseq`, both simplified at the bake's own
+`SIMPLIFY_TOLERANCE = 0.6`, with neighbours already dropped by an existing landmark's
+exclusion discounted (a GLB stands in their place):
+
+| Ring | Nearest vertex | Centroid | Role |
 |---|---|---|---|
-| parcel-union area centroid `-122.3949238, 37.7812072` | 2.60 m (OSM way/124884357) | 3.45 m (OSM way/124884344) | 0.85 m |
-| DataSF LiDAR centroid `-122.3949327, 37.7812123` | 1.65 m (OSM way/124884357) | 3.32 m (OSM way/124884344) | 1.67 m |
-| **OSM way centroid `-122.3949502, 37.7812178`** | **1.66 m** (DataSF SF3775069) | **4.06 m** (OSM way/124884344) | **2.40 m** |
+| DataSF `SF3775069` (ours, 419 m²) | 3.06 m | **0.60 m** | own footprint |
+| Overture 469 m² (ours) | 3.76 m | **1.43 m** | own footprint — **the floor** |
+| DataSF `SF3775067` (160 South Park) | 3.06 m | 9.67 m | already dropped by `160SouthPark` |
+| Overture 76 m² (OSM "158 South Park" sliver) | **3.76 m** | 10.36 m | **the ceiling** — uncovered |
+| everything else | ≥ 8.57 m | | covered by 156 / 168 / 188 `SouthPark` |
 
-The binding ceiling in every case is **OSM `way/124884344`**, tagged `addr:housenumber = 158`,
-a 76 m² sliver that shares vertices with our own OSM way and is *not* covered by
-`160SouthPark`'s `exclude: 1.2`. Nothing fills it if we drop it, so it is a hard ceiling.
+Safe window **(1.43, 3.76)**, 2.33 m wide. **`exclude: 2.6`** sits in the middle with 1.17 m
+below and 1.16 m above, both comfortably over the 0.6 m simplify tolerance. Below 1.43 the
+Overture ring survives and the procedural block pokes through the model; above 3.76 the
+re-bake punches a hole where the 158 sliver stands and nothing fills it.
 
-Recommended: registry anchor **`-122.3949502, 37.7812178`**, **`exclude: 3`** — 1.34 m of
-margin below the floor and 1.06 m above it, both comfortably larger than the bake's 0.60 m
-`SIMPLIFY_TOLERANCE`. The manifest anchor stays at the parcel-union centroid because that is
-where the building actually is; the two differ by 2.6 m and that is deliberate, exactly as
-in `165-south-park`.
+The binding ceiling is worth naming: OSM `way/124884344`, tagged `addr:housenumber = 158`,
+a 76 m² fragment that **shares a party-wall vertex with our own Overture ring** and is not
+covered by `160SouthPark`'s `exclude: 1.2`. It is the same shared-vertex trap that made
+`181SouthPark`'s window 2.9 m wide.
 
-**Verify these numbers against the committed bake input, not against the live APIs, before
-committing the registry entry.** The bake consumes simplified geometry and the published
-sources drift; every number in the table above is a starting point for that measurement, not
-a substitute for it. Confirm on the re-bake that exactly the two 164 footprints are dropped
-and that `way/124884344` still stands.
+Candidate anchors compared, for the record (floor → ceiling, both measured the same way):
+
+| Anchor | Floor | Ceiling | Window |
+|---|---|---|---|
+| parcel-union area centroid | 2.54 m | 3.45 m | 0.92 m |
+| DataSF LiDAR centroid | 1.59 m | 3.32 m | 1.73 m |
+| OSM way centroid | 1.86 m | 4.06 m | 2.21 m |
+| **manifest anchor (chosen)** | **1.43 m** | **3.76 m** | **2.33 m** |
 
 No `clearTrees`: there are four real street trees on this frontage — they are in every
 photograph and they belong to the app's tree system.
@@ -701,8 +713,8 @@ over the oval. 120 m suits a 5.4 m building — the shortest landmark on this ri
 closer than the 150–170 m used for the 9–10 m neighbours.
 
 ```js
-{ id: '164SouthPark', name: '164 South Park', lon: -122.3949502, lat: 37.7812178,
-  height: 5.4, exclude: 3, camera: { distance: 120, yaw: 85, pitch: 26 } }
+{ id: '164SouthPark', name: '164 South Park', lon: -122.3949366, lat: 37.7812097,
+  height: 5.4, exclude: 2.6, camera: { distance: 120, yaw: 85, pitch: 26 } }
 ```
 
 **Batch mode applies.** Other South Park landmarks are in flight; run the bake and the full
