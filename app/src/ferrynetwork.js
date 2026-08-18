@@ -117,12 +117,6 @@ function parse(buf) {
         .sort()
         .map((id) => operators.get(id)?.name || id),
       routes: [...routes].sort(),
-      // A terminal the published timetable never calls at. Pier 48 (the Chase
-      // Center / Oracle Park event dock) and Pier 41 (where Blue & Gold sails
-      // from — a private operator 511 does not carry at all) are real berths
-      // with zero stop_times rows, so they get a pin and an explanation rather
-      // than being deleted or silently drawn as if boats went there.
-      scheduled: routes.size > 0,
       inScene: inScene(c.x, c.z),
     };
   });

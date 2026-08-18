@@ -1,5 +1,9 @@
-// Ferry terminal markers: the clickable layer over the berths WETA boats
-// actually tie up at, baked by pipeline/ferry-shapes.mjs.
+// Ferry terminal markers: the clickable layer over the berths boats actually
+// tie up at, baked by pipeline/ferry-shapes.mjs.
+//
+// "Actually" is the bake's job, not this layer's: a berth no scheduled trip
+// calls at is dropped there (owner decision, 2026-08-17), so everything that
+// arrives here has service.
 //
 // This is the bus-stop layer's problem two orders of magnitude smaller — fourteen
 // berths in the water plane against 2,976 bus stops — so almost none of
@@ -24,8 +28,6 @@ import {
   PlaneGeometry,
   SRGBColorSpace,
 } from 'three';
-
-import { Color } from 'three';
 
 import { loadFerryNetwork } from './ferrynetwork.js';
 
@@ -53,10 +55,6 @@ const QUALITY_CAP = { high: 16, medium: 16, low: 6 };
 
 const PIN_TEX = 256;
 const dummy = new Object3D();
-// Pin tints. The quiet one is a desaturated wash, not a fade to nothing: the
-// berth is still findable and clickable, it just does not read as in service.
-const LIVE_TINT = new Color(1, 1, 1);
-const QUIET_TINT = new Color(0.62, 0.6, 0.57);
 
 // The pin: a toy-theme cream card with a warm-ink border and a hard offset
 // shadow (no blur — the UI theme forbids gradients and soft shadows), carrying a
@@ -171,9 +169,6 @@ export function createFerryTerminals(scene, data, ferries) {
       QUALITY_CAP.high,
     );
     mesh.name = 'ferry-terminal-markers';
-    // Allocate the per-instance colour up front; setColorAt on a mesh that has
-    // never had one silently allocates a white buffer mid-frame.
-    for (let i = 0; i < QUALITY_CAP.high; i++) mesh.setColorAt(i, LIVE_TINT);
     mesh.instanceMatrix.setUsage(DynamicDrawUsage);
     // Every whole-city instanced object in this repo gets this: batch bounds
     // cover the reserved buffer and cull on-screen content otherwise. This bug
@@ -222,11 +217,6 @@ export function createFerryTerminals(scene, data, ferries) {
       dummy.scale.setScalar(scale);
       dummy.updateMatrix();
       mesh.setMatrixAt(count, dummy.matrix);
-      // A berth the timetable never calls at is drawn QUIETER rather than
-      // hidden: Pier 48 and Pier 41 are real terminals with no scheduled
-      // service, and a pin that looks identical to a working one would claim
-      // boats go there. Tinting through instanceColor keeps it to one draw call.
-      mesh.setColorAt(count, berth.scheduled ? LIVE_TINT : QUIET_TINT);
       // Where the pin was actually drawn and how big: the pick reads these so
       // the hit target is the art on screen and cannot drift from it.
       visible.push({ berth, y, markerY, scale });
@@ -234,7 +224,6 @@ export function createFerryTerminals(scene, data, ferries) {
     }
     mesh.count = count;
     mesh.instanceMatrix.needsUpdate = true;
-    if (mesh.instanceColor) mesh.instanceColor.needsUpdate = true;
   }
 
   // Boats currently working a route that calls at this berth. The live fleet is
@@ -276,7 +265,6 @@ export function createFerryTerminals(scene, data, ferries) {
       stops: berth.stops,
       operators: berth.operators,
       operatorNames: berth.operatorNames || [],
-      scheduled: berth.scheduled !== false,
       vessels: vesselsFor(berth),
       source: 'weta',
       confidence: 3,

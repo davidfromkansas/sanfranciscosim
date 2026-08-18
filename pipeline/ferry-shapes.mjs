@@ -276,10 +276,24 @@ async function main() {
     // entrances. Only location_type 0 is a place a boat ties up; the rest would
     // plant pins inland.
     let skipped = 0;
+    const unserved = [];
     await eachRow(op.id, 'stops.txt', (cols, h) => {
       const id = cols[h.stop_id];
       if ((cols[h.location_type] || '0').trim() !== '0') {
         skipped++;
+        return;
+      }
+      // OWNER DECISION (2026-08-17): a berth no scheduled trip calls at is not
+      // shipped. These are real docks — Pier 48 is the Chase Center / Oracle
+      // Park event berth, Pier 41 is Blue & Gold's, a private operator 511 does
+      // not publish — but with zero stop_times rows we cannot say a boat goes
+      // there, so they are dropped rather than pinned.
+      //
+      // NOTE FOR A FUTURE RE-BAKE: this is why the terminal count can move
+      // between bakes. A seasonal service pausing (Angel Island in winter) will
+      // silently remove its berth. The log line below is the audit trail.
+      if (!(stopRoutes.get(id) || new Set()).size) {
+        unserved.push(cols[h.stop_name] || id);
         return;
       }
       const [x, z] = project(Number(cols[h.stop_lon]), Number(cols[h.stop_lat]));
@@ -300,6 +314,11 @@ async function main() {
         `${skipped ? ` (skipped ${skipped} station/entrance rows)` : ''}` +
         `${op.live ? '' : ', no live positions'}`,
     );
+    if (unserved.length) {
+      console.log(
+        `[ferry-shapes] ${op.id}: dropped ${unserved.length} berth(s) with no scheduled trip — ${unserved.join(', ')}`,
+      );
+    }
   }
 
   terminals.sort((a, b) => a.name.localeCompare(b.name));
