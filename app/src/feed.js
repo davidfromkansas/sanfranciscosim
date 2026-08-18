@@ -349,8 +349,13 @@ export function createFeedPanel({
     if (key === lastKey) return;
     lastKey = key;
 
-    const posts = threads.reduce((n, t) => n + 1 + t.replies.length, 0);
-    status.textContent = `${threads.length} posts · ${posts} comments and posts today`;
+    // Posts and comments are separate counts. The old line added the posts into
+    // the second number and then called it "comments and posts", so it counted
+    // them twice and read as nonsense. "Last 24 hours" rather than "today"
+    // because retirement is a rolling twenty-four hours, not a calendar day.
+    const comments = threads.reduce((n, t) => n + t.replies.length, 0);
+    const plural = (n, word) => `${n} ${word}${n === 1 ? "" : "s"}`;
+    status.textContent = `${plural(threads.length, "post")} · ${plural(comments, "comment")} · last 24 hours`;
     const speakers = payload.speakers ?? {};
     list.replaceChildren(
       ...threads.map((t) => renderThread(t, speakers, profile.show)),
