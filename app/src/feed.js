@@ -80,9 +80,13 @@ export function createFeedPanel() {
   if (!root) return { update() {} };
 
   const head = el('header', 'feed-head');
-  head.append(el('h1', 'feed-title', 'The neighbours'));
+  head.append(el('h1', 'feed-title', 'r/simfrancisco'));
+  // The community's own description of itself, straight from the server, so
+  // the panel and the writers' prompt can never drift apart. Changing the goal
+  // changes the feed's character AND this line, together.
+  const goal = el('p', 'feed-goal', '');
   const status = el('p', 'feed-status', 'Listening…');
-  head.append(status);
+  head.append(goal, status);
   const list = el('div', 'feed-list');
   root.append(head, list);
 
@@ -110,6 +114,7 @@ export function createFeedPanel() {
     if (key === lastKey) return;
     lastKey = key;
 
+    if (payload.goal && goal.textContent !== payload.goal) goal.textContent = payload.goal;
     const posts = threads.reduce((n, t) => n + t.posts.length, 0);
     status.textContent = `${posts} posts · ${threads.length} conversations${payload.stale ? ' · catching up' : ''}`;
     list.replaceChildren(...threads.map(renderThread));

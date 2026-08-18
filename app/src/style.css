@@ -242,3 +242,13 @@ button:hover {
   font: 13px/1.5 -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
   color: #2b2118;
 }
+
+/* The community's stated purpose, in its own words. Small, quiet, and always
+   the text the writers were actually given — it comes from the same server
+   field the prompt is built from. */
+.feed-goal {
+  margin: 4px 0 0;
+  font-size: 11px;
+  line-height: 1.45;
+  color: #6b5a48;
+}

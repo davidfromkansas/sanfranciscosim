@@ -39,6 +39,34 @@ const MODEL = "deepseek/deepseek-v3.2";
 const TEMPERATURE = 0.85;
 const MAX_CHARS = 180;
 
+// The community, in Social Simulacra's terms (arXiv 2208.04024 §4). The paper
+// takes a GOAL and RULES from the designer and puts them in every prompt, and
+// is specific that a goal which is too broad produces off-topic writing — their
+// "UIST warriors" wandered until it became "a place for UIST warriors to
+// support each other as they finish writing their papers".
+//
+// So the goal here is written from a MEMBER's side. The design intent — making
+// Sim Francisco feel like a living city — is ours and stays out of the prompt:
+// nobody posts to a subreddit in order to make a city feel alive, and a
+// resident told that is being told they are a simulation.
+//
+// Rules are nudges, not enforcement, and the paper states them as things to
+// avoid. Change either of these and the whole feed changes character — that is
+// the point of them, and the cheapest experiment available here.
+const COMMUNITY = {
+  name: "r/simfrancisco",
+  goal:
+    "people who actually live in San Francisco talking about what they notice in " +
+    "their own neighbourhood — what they saw, what it costs them, what they think " +
+    "is going to happen, what they are glad about and what they are sick of",
+  avoid: [
+    "sounding like a news report or a press release",
+    "speaking for the city or for a group rather than yourself",
+    "advertising anything",
+    "attacking the person rather than what they said",
+  ],
+};
+
 const REPLY_CHANCE = 0.65;
 const MAX_REPLIES = 8;
 const LIVE_THREADS = 8; // how many conversations are on screen at once
@@ -94,14 +122,18 @@ async function write({ speaker, event, because, posts }) {
   // The transcript, in the paper's shape: who is writing, what happened, what
   // has been said. Nothing else — every extra instruction here is a nudge
   // toward a generic internet voice, which is the failure mode.
+  // Order follows the paper: who you are, then how this place behaves, then
+  // what it is for. The persona comes first because everything after it is
+  // read as constraints on that voice rather than as a character brief.
   const system =
-    `You write a single message for a neighbourhood social feed in San Francisco. ` +
-    `You are writing AS this person, in their own words.\n\n` +
     `WHO YOU ARE\n${speaker.iss}\n\n` +
-    `RULES\n` +
+    `WHERE YOU ARE POSTING\n` +
+    `${COMMUNITY.name} — ${COMMUNITY.goal}.\n` +
+    `People here avoid ${COMMUNITY.avoid.join("; ")}.\n\n` +
+    `HOW TO WRITE\n` +
     `- Under ${MAX_CHARS} characters. One or two sentences.\n` +
     `- Write only the message. No name, no quotation marks, no hashtags, no emoji.\n` +
-    `- Speak from your own life. Do not describe yourself in the third person.\n` +
+    `- Speak from your own life, in the first person.\n` +
     `- You are a neighbour, not a spokesperson. Be specific, partial and ordinary.\n` +
     `- Never mention being an AI, a persona, or the Census.`;
 
@@ -230,6 +262,8 @@ async function fetchResidents() {
   return {
     live: true,
     day: data.label,
+    community: COMMUNITY.name,
+    goal: COMMUNITY.goal,
     model: MODEL,
     written: (cold ? FIRST_BUILD_MESSAGES : MAX_MESSAGES_PER_REFRESH) - budget,
     threads: live.map((t) => ({ id: t.id, event: t.event, posts: t.posts })),
