@@ -91,7 +91,12 @@ async function main() {
       id: thread.id,
       event: {
         headline: thread.event.headline,
-        detail: thread.event.detail ?? '',
+        // A URL is not a description of what happened. Older event files stored
+        // the article link here, which reached the writer as a base64 Google
+        // News redirect under the words "WHAT HAPPENED" — noise it paid tokens
+        // to read. Real summaries pass through; links are dropped and the
+        // headline stands alone.
+        detail: /^https?:\/\//.test(thread.event.detail ?? '') ? '' : (thread.event.detail ?? ''),
         source: thread.event.source,
         where: thread.event.place?.neighbourhoods?.[0] ?? 'San Francisco',
         scope: thread.event.place?.scope ?? 'citywide',
