@@ -301,7 +301,13 @@ export async function generatePost({ persona, subreddit }) {
   };
 }
 
-export async function generateReply({ persona, subreddit, post, replies }) {
+export async function generateReply({
+  persona,
+  subreddit,
+  post,
+  replies,
+  stance,
+}) {
   const system =
     `You are simulating a person participating in a Reddit discussion.\n\n` +
     `PERSONA\n${persona.persona}\n` +
@@ -317,8 +323,19 @@ export async function generateReply({ persona, subreddit, post, replies }) {
   // readers: the author of a thread about the 22 bus replied to it explaining
   // that he rides the 22, as though meeting a stranger.
   const own = post.authorId && post.authorId === persona.id;
+  // Deliberately light. The vote is a fact about them, not a brief: telling
+  // somebody "explain your downvote" produces a complaint with a thesis
+  // statement, which is not how anyone writes. Naming the reaction and getting
+  // out of the way gets the objection in their own voice.
+  const voted =
+    stance === "down"
+      ? `You downvoted this. You did not think it belonged here or did not like it. Say what you think, the way you would actually say it.\n\n`
+      : stance === "up"
+        ? `You upvoted this. You are glad somebody said it, and others in the thread disagree.\n\n`
+        : "";
   const user =
     `DISCUSSION\n\n` +
+    voted +
     `Original post by ${post.author ?? "someone"}:\n\nTitle:\n${post.title}\n\nBody:\n${post.body}\n\n` +
     `Replies so far:\n${formatted}\n\n` +
     (own
@@ -440,7 +457,67 @@ const pick = (list) => list[Math.floor(Math.random() * list.length)];
 // the time somebody already arguing comes back — that mix is what makes a
 // thread read as a conversation rather than a row of strangers. Nobody follows
 // themselves; the original poster may return later.
-function pickResponder(cast, thread) {
+// What the room made of a post, from the votes it actually got. This is what
+// decides whether a thread happens at all and who is in it — attention drives
+// conversation, which is the paper's point and, until now, something our votes
+// had no say in.
+//
+//   ignored    nobody voted either way. Nobody cared, so nobody replies. The
+//              post stands alone, which is most of what a real subreddit is.
+//   positive   more up than down. Anyone may reply, as before.
+//   negative   more down than up. The people who disliked it are the ones who
+//              speak, and they say why.
+//   contested  a genuine tie with votes on both sides. Not indifference — an
+//              argument. Both camps reply, alternating.
+function moodOf(thread) {
+  const { upvotes, downvotes } = tally(thread.votes);
+  if (upvotes === 0 && downvotes === 0) return "ignored";
+  if (upvotes > downvotes) return "positive";
+  if (downvotes > upvotes) return "negative";
+  return "contested";
+}
+
+// Everyone who voted a given way and has not spoken yet, never following
+// themselves. A thread can only be as long as it has voters to draw on.
+function votersOf(cast, thread, value) {
+  const lastSpoke = thread.replies.at(-1)?.personaId ?? thread.authorId;
+  const spoken = new Set(thread.replies.map((r) => r.personaId));
+  const ids = (thread.votes ?? [])
+    .filter((v) => v.value === value)
+    .map((v) => v.personaId)
+    .filter(
+      (id) => id !== lastSpoke && id !== thread.authorId && !spoken.has(id),
+    );
+  return cast.filter((p) => ids.includes(p.id));
+}
+
+// Who speaks next, and from which camp. On a positive thread it is anyone in
+// the city; on a negative or contested one it can only be someone who actually
+// voted, because their reply is an account of that vote.
+function pickResponder(cast, thread, mood) {
+  if (mood === "negative") {
+    const down = votersOf(cast, thread, -1);
+    return down.length ? { persona: pick(down), stance: "down" } : null;
+  }
+  if (mood === "contested") {
+    // Alternate, so it reads as an argument rather than two monologues: answer
+    // whichever side spoke last with the other one.
+    const lastStance = thread.replies.at(-1)?.stance;
+    const first = lastStance === "down" ? 1 : -1;
+    const primary = votersOf(cast, thread, first);
+    const other = votersOf(cast, thread, -first);
+    const chosen = primary.length ? primary : other;
+    if (!chosen.length) return null;
+    return {
+      persona: pick(chosen),
+      stance: (primary.length ? first : -first) === 1 ? "up" : "down",
+    };
+  }
+  const persona = pickAnyone(cast, thread);
+  return persona ? { persona, stance: null } : null;
+}
+
+function pickAnyone(cast, thread) {
   const lastSpoke = thread.replies.at(-1)?.personaId ?? thread.authorId;
   const spoken = new Set([
     thread.authorId,
@@ -551,21 +628,37 @@ async function openThread(people, spendVote) {
 // same thread up where it stopped, rather than a long thread being silently
 // truncated because it happened to be last in the loop.
 async function growThread(people, thread, spend, spendVote) {
+  const mood = moodOf(thread);
+  // Nobody voted, so nobody cared. The post stands on its own and the thread is
+  // finished before it starts — which is most of what a real subreddit is, and
+  // costs nothing to render.
+  if (mood === "ignored") {
+    thread.done = true;
+    return;
+  }
+  // Score decides WHETHER a thread happens and WHO is in it; the thread's own
+  // probability still decides HOW LONG it runs. The paper's continuation loop
+  // is untouched — it just no longer runs on posts nobody looked at.
   while (
     thread.replies.length < simulationConfig.maxReplies &&
     Math.random() < thread.replyProbability
   ) {
     if (!spend()) return;
-    if (!(await addReply(people, thread, spendVote))) break;
+    if (!(await addReply(people, thread, spendVote, mood))) break;
   }
   thread.done = true;
 }
 
-async function addReply(people, thread, spendVote) {
-  const responder = pickResponder(people, thread);
-  if (!responder) return false;
+async function addReply(people, thread, spendVote, mood) {
+  const chosen = pickResponder(people, thread, mood);
+  // On a negative or contested thread the pool is only the people who voted
+  // that way, so it runs dry long before maxReplies. That is the thread ending
+  // because everyone who objected has said so, which is the right reason.
+  if (!chosen) return false;
+  const { persona: responder, stance } = chosen;
   const { body } = await generateReply({
     persona: responder,
+    stance,
     subreddit: SUBREDDIT,
     post: {
       title: thread.title,
@@ -594,6 +687,7 @@ async function addReply(people, thread, spendVote) {
   });
   thread.replies.push({
     votes,
+    stance,
     personaId: responder.id,
     name: responder.name,
     occupation: responder.occupation,
