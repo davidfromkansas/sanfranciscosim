@@ -136,8 +136,9 @@ route, and the park plans depend on it (§E8 of the parks README).
 | [326 Brannan Street (JAX Vineyards Wine Court)](./326-brannan.md) | `326-brannan` | 5.9 m (shed parapet; LiDAR deck 5.66 m) | new landmark |
 | [340 Brannan Street](./340-brannan.md) | `340-brannan` | 17.79 m | new landmark |
 | [45–49 South Park (Gran Oriente Filipino Residence)](./49-south-park.md) | `49-south-park` | 13.0 m (LiDAR-derived) | new landmark |
+| [246 Ritch Street](./246-ritch.md) | `246-ritch` | 18.76 m (LiDAR max, read as the roof stair/elevator penthouse — see its 2.15 risk 1; parapet 15.87 m) | new landmark |
 
-## Shared contract (all 94)
+## Shared contract (all 95)
 
 - Style: `docs/styles/miniature-toy.md` (authoritative for artistic decisions)
 - Technical contract: `.agents/skills/sf-asset-check/SKILL.md` (authoritative for the GLB)
