@@ -330,6 +330,47 @@ function pickResponder(cast, thread) {
   return fresh.length ? pick(fresh) : returning.length ? pick(returning) : null;
 }
 
+// ------------------------------------------------------------- when to post
+//
+// Six posts an hour, but not on the clock. A post landing at exactly :00, :10,
+// :20 reads as a machine the moment anyone notices the pattern, and people
+// notice patterns quickly. So the hour is cut into six windows and each window
+// draws its OWN minute to fire on.
+//
+// The draw is deterministic from the window number rather than random, which is
+// what lets it work without any shared state: two servers handed the same
+// window compute the same minute, so the cron can fire every minute against any
+// instance and still produce exactly one post per window. Random would have
+// needed somewhere to write the decision down.
+const WINDOW_MS = 10 * 60_000;
+
+export function dueMinuteFor(window) {
+  // xorshift-multiply on the window index — cheap, and spreads adjacent windows
+  // apart instead of drifting one minute at a time the way `window % 10` would.
+  // Math.imul, not `*`: a plain multiply of two 32-bit values exceeds what a
+  // double holds exactly, and the bits that fall off the end took the sign with
+  // them — the first version handed out minute -8.
+  let h = Math.imul(window, 2654435761) >>> 0;
+  h ^= h >>> 15;
+  h = Math.imul(h, 2246822519) >>> 0;
+  h ^= h >>> 13;
+  return (h >>> 0) % 10;
+}
+
+let lastWindow = -1;
+
+// True at most once per ten-minute window. `>=` rather than `===` so a window
+// whose minute was missed — a cold start, a deploy, a slow generation running
+// long — still gets its post late rather than losing it entirely.
+export function postIsDue(now = Date.now()) {
+  const window = Math.floor(now / WINDOW_MS);
+  if (window === lastWindow) return false;
+  const minute = Math.floor((now % WINDOW_MS) / 60_000);
+  if (minute < dueMinuteFor(window)) return false;
+  lastWindow = window;
+  return true;
+}
+
 // ------------------------------------------------------------------- feed
 
 let cast = null;

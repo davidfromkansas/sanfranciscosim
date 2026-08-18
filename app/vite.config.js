@@ -138,6 +138,21 @@ function liveFeeds() {
           if (pathname === "/api/tick") {
             const feed = core.getFeed("feed");
             if (!feed) return next();
+            // Same jitter as production, so the cron path behaves identically
+            // locally: most minutes do nothing. `?force=1` skips the check.
+            const forced = new URL(
+              req.url,
+              "http://localhost",
+            ).searchParams.get("force");
+            const { postIsDue } = await import(
+              /* @vite-ignore */
+              `${new URL("../api/_lib/feeds/", import.meta.url).href}residents.mjs`
+            );
+            if (!forced && !postIsDue()) {
+              return void shim
+                .status(200)
+                .json({ ticked: false, reason: "not this minute" });
+            }
             const failed = await core.forceRefresh(feed);
             return void shim.status(failed ? 503 : 200).json({
               ticked: !failed,

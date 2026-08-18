@@ -34,6 +34,14 @@ async function serveTick(req, res) {
     res.status(404).json({ error: "no feed to tick" });
     return;
   }
+  // The cron fires every minute; the feed decides which minute is its own. Most
+  // invocations do nothing and return immediately — that is the mechanism, not
+  // a fault. `?force=1` skips the check for testing.
+  const forced = new URL(req.url, "http://localhost").searchParams.get("force");
+  if (!forced && !postIsDue()) {
+    res.status(200).json({ ticked: false, reason: "not this minute" });
+    return;
+  }
   const started = Date.now();
   const failed = await forceRefresh(entry);
   const data = entry.data ?? {};
