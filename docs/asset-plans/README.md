@@ -113,6 +113,7 @@ route, and the park plans depend on it (§E8 of the parks README).
 | [108–110 South Park (South Park Cafe)](./108-south-park.md) | `108-south-park` | 8.45 m (estimated) | new landmark |
 | [156 South Park Street (Anchor Packing Co.)](./156-south-park.md) | `156-south-park` | 8.7 m (LiDAR-derived) | new landmark |
 | [166–168 South Park](./168-south-park.md) | `168-south-park` | 10.44 m (LiDAR-derived) | new landmark |
+| [164 South Park (Saitowitz facade; Twitter/Instagram birthplace)](./164-south-park.md) | `164-south-park` | 5.4 m (LiDAR median — the maximum is rejected, see its §2.15) | new landmark |
 | [140 South Park](./140-south-park.md) | `140-south-park` | 10.68 m (LiDAR-derived) | new landmark |
 | [126 South Park](./126-south-park.md) | `126-south-park` | 7.6 m (LiDAR-derived) | new landmark |
 | [102 South Park (The Park View)](./102-south-park.md) | `102-south-park` | 14.0 m (estimated) | new landmark |
