@@ -66,12 +66,12 @@ function createProfileCard({ onVisit }) {
   const close = el("button", "rs-modal-close", "×");
   close.setAttribute("aria-label", "Close");
   const head = el("div", "rs-modal-head");
-  const avatar = el("div", "rs-modal-avatar");
+  const face = el("div", "rs-modal-avatar");
   const names = el("div", "rs-modal-names");
   const name = el("h2", "rs-modal-name", "");
   const job = el("p", "rs-modal-job", "");
   names.append(name, job);
-  head.append(avatar, names);
+  head.append(face, names);
   const hood = el("p", "rs-modal-hood", "");
   const persona = el("p", "rs-modal-persona", "");
   const visit = el("button", "rs-modal-visit", "Find them in the city");
@@ -107,7 +107,7 @@ function createProfileCard({ onVisit }) {
     show(person) {
       current = person;
       note.textContent = "";
-      avatar.style.background = PUMA_COLORS[person.puma] ?? "#6b7280";
+      face.replaceChildren(avatar(person, 52));
       name.textContent = person.name;
       job.textContent = person.occupation || "No occupation recorded";
       hood.textContent = PUMA_NAMES[person.puma] ?? "San Francisco";
@@ -121,16 +121,54 @@ function createProfileCard({ onVisit }) {
 
 // ----------------------------------------------------------------- rendering
 
+// The stock profile silhouette, drawn rather than fetched: it stays sharp at any
+// size, costs no request, and needs no asset in the repo. The ring keeps the
+// neighbourhood colour that used to be the whole dot — that colour is the link
+// between a name here and their sphere out in the city, and losing it would cut
+// the two halves of the product apart.
+const SVG_NS = "http://www.w3.org/2000/svg";
+
+function avatar(who, size) {
+  const svg = document.createElementNS(SVG_NS, "svg");
+  svg.setAttribute("viewBox", "0 0 100 100");
+  svg.setAttribute("width", size);
+  svg.setAttribute("height", size);
+  svg.setAttribute("aria-hidden", "true");
+  svg.classList.add("rs-avatar");
+
+  const ring = document.createElementNS(SVG_NS, "circle");
+  ring.setAttribute("cx", "50");
+  ring.setAttribute("cy", "50");
+  ring.setAttribute("r", "47");
+  ring.setAttribute("fill", "#eceae4");
+  ring.setAttribute("stroke", PUMA_COLORS[who.puma] ?? "#6b7280");
+  ring.setAttribute("stroke-width", "6");
+
+  const head = document.createElementNS(SVG_NS, "circle");
+  head.setAttribute("cx", "50");
+  head.setAttribute("cy", "38");
+  head.setAttribute("r", "17");
+  head.setAttribute("fill", "#3c4450");
+
+  // Shoulders: a dome whose flat base sits inside the ring, so nothing needs
+  // clipping and the shape holds at 20 px as well as at 52.
+  const body = document.createElementNS(SVG_NS, "path");
+  body.setAttribute("d", "M23 86 a27 27 0 0 1 54 0 Z");
+  body.setAttribute("fill", "#3c4450");
+
+  svg.append(ring, head, body);
+  return svg;
+}
+
 function byline(who, at, onOpen) {
   const row = el("div", "rs-byline");
-  const dot = el("span", "rs-dot");
-  dot.style.background = PUMA_COLORS[who.puma] ?? "#6b7280";
+  const face = avatar(who, 20);
   const name = el("button", "rs-author", who.name);
   name.title =
     `${who.occupation || ""} · ${PUMA_NAMES[who.puma] ?? "San Francisco"}`.trim();
   name.addEventListener("click", () => onOpen(who));
   row.append(
-    dot,
+    face,
     name,
     el("span", "rs-sep", "·"),
     el("span", "rs-time", ago(at)),

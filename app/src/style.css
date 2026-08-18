@@ -214,12 +214,13 @@ button:hover {
   color: #6b5a48;
 }
 
-.rs-dot {
-  width: 9px;
-  height: 9px;
-  border-radius: 50%;
-  border: 1.5px solid #2b2118;
+/* The profile picture. Drawn as SVG in feed.js — the ring carries the
+   neighbourhood colour, which is the same colour as that person's sphere out
+   in the city. */
+.rs-avatar {
   flex: none;
+  display: block;
+  border-radius: 50%;
 }
 
 /* The author is a button because it does something. It has to look like text
@@ -345,11 +346,9 @@ button:hover {
 }
 
 .rs-modal-avatar {
-  width: 42px;
-  height: 42px;
-  border-radius: 50%;
-  border: 2px solid #2b2118;
   flex: none;
+  display: flex;
+  line-height: 0;
 }
 
 .rs-modal-name {
