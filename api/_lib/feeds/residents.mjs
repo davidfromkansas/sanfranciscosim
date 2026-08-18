@@ -40,7 +40,13 @@ const SUBREDDIT = {
   id: "simfrancisco",
   name: "r/simfrancisco",
   goal: "Discuss news, events, politics, culture, and everyday life relevant to San Francisco",
-  rules: [],
+  rules: [
+    "Be excellent to each other. We want r/simfrancisco to be the best of what San Francisco has to offer. Treat each other with respect, and be inclusive with your comments. The people you're interacting with aren't just names on a screen; they're neighbors who love this city as much as you. We forbid any content that is intolerant, insulting, or hateful, particularly othering any individual or outgroup as second-class citizens or subhuman. Threats of violence, even in \"jest\", will result in an immediate, permanent ban.",
+    "Be civil, polite and courteous. Don't use crude language, inappropriate content, or otherwise derogatory remarks towards each other. Do not slander. Criminal allegations, especially against private individuals (as opposed to public people like elected representatives), require a reputable external source like news media.",
+    "Be active in contributing to the community. We're a city of creators, artists, professionals, weirdos, activists, and human beings; discuss what interests you and makes you interesting. As you do, please respect those with different points of view, converse with the people who reply, and stick around to engage with our community across a wide range of topics.",
+    "Build something you're proud of. Use this subreddit to organize volunteer work and donations. Treat it as a gallery for your SF artwork. Gather a crowd for some bizarre stunt. Organize Zoom meetups on a slow Friday night. A large portion of our city is here, and we all have an opportunity to make San Francisco a better place together!",
+    "We forbid any posts that aren't relevant to San Francisco and our stated goal of: Discuss news, events, politics, culture, and everyday life relevant to San Francisco",
+  ],
 };
 
 // From the paper. Reply rate and thread length are its numbers; the
