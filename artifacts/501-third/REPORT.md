@@ -66,6 +66,16 @@ All 15 contract checks PASS. Full details in `validation.json`.
 | No degenerate geometry | PASS |
 | No unexpected objects | PASS |
 
+## Approval (gate 3)
+
+David, 18 August 2026, given up front for the whole run:
+
+> "APPROVE EVERYTHING DONT ASK ME FOR PERMISSION"
+
+Presented at approval: the contact sheet (aerial, top, night, four elevations),
+2,636 triangles, 34.70 x 34.54 x 16.40 m, 7 materials, 1 glow group
+(`Toy_white_Glow`).
+
 ## Numbers
 
 | Metric | Value |
