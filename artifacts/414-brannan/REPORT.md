@@ -10,16 +10,17 @@ document and the plan disagree, this document is what shipped.
 |---|---|
 | File | `414-brannan.glb` |
 | Triangles | **8,312** (cap 10,000) |
-| Objects | 155 (pre-optimize; stage 4 merges these) |
+| Objects | **15** shipped (155 pre-optimize; stage 4 joined them per material) |
 | Dimensions | 33.163 x 33.073 x **14.000** m |
 | bbox min / max | `[-16.310, -16.810, 0.000]` / `[16.853, 16.263, 14.000]` |
 | XY centre offset | `[0.272, -0.274]` m |
-| Raw / gzipped | 512,896 B / 96,845 B (pre-optimize) |
+| Raw / gzipped | **228,016 B** shipped (512,896 B pre-optimize, −55.5%) |
 | Materials | 14, all `Toy_*`, flat, opaque |
 | Glow materials | `Toy_glass_Glow`, `Toy_trim_Glow` (+ `Toy_gold_Glow` authored but folded into the medallion set) |
 | Anchor | `-122.3948685, 37.7799308` |
 | Brannan front heading | 135.2° true |
-| `validation.json` | **PASS** on all 16 checks |
+| Draw primitives | **16** shipped (158 pre-optimize) |
+| `validation.json` | **PASS** on all 16 checks, re-run against the shipped optimized file |
 
 The 33 x 33 m footprint bbox is correct: a 24.90 x 21.28 m parallelogram sitting
 45.2° off the world axes, plus the 0.68 m tile pent on two faces.
@@ -115,6 +116,16 @@ and the tympanum medallion.
 
 `fade_glow()` in `render_414_brannan.py` zeroes `Emission Strength` as well as
 `Alpha`, so the day renders show what the app shows. Night emission is 2.0.
+
+## Stage 4 — optimize
+
+Run 18 August 2026; full metrics, census and gate table in `optimize/REPORT.md`.
+Headline: 512,896 → **228,016 bytes** (−55.5%), 155 → **15 objects**,
+158 → **16 draw primitives**, triangles and bbox unchanged, all eight gates PASS.
+The limited-dissolve step was skipped on purpose — this asset has three large
+coplanar ring bands (parapet + two copings) and dissolving them manufactures
+sub-millimetre slivers that only surface in the packed file. The pre-optimize
+file is archived byte-for-byte at `optimize/input/414-brannan.glb`.
 
 ## Known risks carried into integration
 
