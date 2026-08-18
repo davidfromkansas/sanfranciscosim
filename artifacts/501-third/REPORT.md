@@ -31,6 +31,19 @@ front faces NE, 45.2° true).
   are buried in the neighbour and invisible from the street, and the 3rd Street
   face (the only one the camera sees clearly) carries the identity.
 
+## Revision log
+
+**2026-08-18 — roof field moved from `Toy_roofd` to `Toy_steel` (pre-approval).**
+The roof membrane was built in `Toy_roofd` (`45454a`), which contradicted this
+asset's own dossier ("a pale grey membrane field") and is a known trap: measured
+on 92 South Park (2026-08-17), an up-facing `Toy_roofd` plane reads **rgb(9,9,12)**
+in the running app at 1 PM while the same asset's `Toy_steel` reads rgb(94,103,112)
+in the same frame — the diorama's ambient cannot lift `45454a`, and the landmark
+would have read as a black hole from the aerial camera. `Toy_roofd` is retained
+for the small dark rooftop props (bulkhead, accessories box) only. Geometry,
+triangle count and dimensions are unchanged (2,636 tris); all renders and the
+contact sheet were regenerated and the validator re-run — still all-PASS.
+
 ## Validation summary
 
 All 15 contract checks PASS. Full details in `validation.json`.

@@ -352,7 +352,12 @@ def build():
     bevel(prism("body", FOOTPRINT, 0.0, H_WALL, sand), width=0.12)
 
     # ---- 2. roof field ----------------------------------------------------- #
-    prism("roof_field", offset_polygon(FOOTPRINT, -0.30), H_WALL, H_ROOF, roofd)
+    # Toy_steel (9aa0a6), NOT Toy_roofd (45454a): an up-facing Toy_roofd plane
+    # measures rgb(9,9,12) in the running app at 1 PM -- black -- while the same
+    # asset's Toy_steel reads rgb(94,103,112) in the same frame (measured on
+    # 92 South Park, 2026-08-17). The dossier calls this roof a PALE grey
+    # membrane; Toy_roofd stays on the small dark rooftop props only.
+    prism("roof_field", offset_polygon(FOOTPRINT, -0.30), H_WALL, H_ROOF, steel)
 
     # ---- 3. parapet -------------------------------------------------------- #
     bevel(ring_band("parapet", H_WALL, H_PAR, -0.30, 0.0, sand), width=0.05)

@@ -79,6 +79,10 @@ mechanical unit (2019 VRF).
 - Ornament becomes two horizontal bands: a base cap and a parapet cap
 - The stair/elevator shaft bump becomes one small projection on the rear
 - The roof becomes a membrane field, one bulkhead, one accessories box, a deck guardrail, one mechanical unit
+- The membrane is `Toy_steel` (`9aa0a6`), not `Toy_roofd` (`45454a`): the dark
+  value measures rgb(9,9,12) on an up-facing plane in the running app and would
+  read as a black hole from the aerial camera. `Toy_roofd` stays on the small
+  dark rooftop props.
 
 ## Uncertainties and conflicting evidence
 
