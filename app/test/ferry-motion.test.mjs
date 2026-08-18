@@ -16,6 +16,7 @@ import { describe, it } from 'node:test';
 
 import {
   DEAD_RECKON_MAX_S,
+  WORST_FRESH_FIX_GAP_S,
   DWELL_STEP_M,
   IDLE_SPEED,
   MAX_SPEED,
@@ -69,6 +70,21 @@ describe('invariant 4 — liveness and freshness are different clocks', () => {
     const fromPoll = deadReckonSeconds({ now, lastFreshFixAt: now - 1 * SEC });
     const fromFresh = deadReckonSeconds({ now, lastFreshFixAt: now - 80 * SEC });
     assert.ok(fromFresh > fromPoll, 'the fresh-fix clock must be the older one');
+  });
+
+  it('extrapolates far enough to cover the worst wait for a new fix', () => {
+    // The regression this pins: a cap SHORTER than the gap between fresh fixes
+    // stalls every moving boat once per cycle, which looks exactly like the
+    // freeze bug this module exists to prevent.
+    assert.ok(
+      DEAD_RECKON_MAX_S >= WORST_FRESH_FIX_GAP_S,
+      `cap ${DEAD_RECKON_MAX_S}s must cover the ${WORST_FRESH_FIX_GAP_S}s worst-case fix gap`
+    );
+    const now = 1_000_000;
+    // A boat two minutes past its last fresh fix is still running.
+    const since = deadReckonSeconds({ now, lastFreshFixAt: now - 120 * SEC });
+    assert.equal(since, 120);
+    assert.ok(deadReckonRun({ speed: 9, sinceFreshS: since }) > 0);
   });
 
   it('stops extrapolating once the fix is beyond the cap', () => {

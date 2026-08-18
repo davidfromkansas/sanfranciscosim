@@ -47,10 +47,26 @@ export const MAX_SPEED = 13;
 // Below this a vessel is not under way: heading is held rather than derived
 // from motion, so a docked boat never spins on the spot.
 export const IDLE_SPEED = 0.4;
-// Cap on how far past the last FRESH fix a vessel may be extrapolated. Fresh
-// fixes arrive up to ~120 s apart (60 s poll against a 90 s server TTL), so
-// this bridges the gap; beyond it the boat eases to a stop and waits.
-export const DEAD_RECKON_MAX_S = 90;
+// The worst realistic wait for a genuinely new position. The browser polls
+// every 60 s and the server holds each answer for 90 s, so a client can poll
+// just before a refresh and again just after the next one: 60 + 90 = 150 s in
+// the worst alignment, ~120 s typically. muni-motion.js sizes its cap off the
+// same arithmetic, because it is the same poll and the same TTL.
+export const WORST_FRESH_FIX_GAP_S = 150;
+// Cap on how far past the last FRESH fix a vessel may be extrapolated.
+//
+// THIS MUST COVER THE GAP ABOVE, or the boats stall. It was 90 - inherited from
+// the version of this file that had one clock, where it never bound because
+// every poll reset the timer. Once the clock started running from the last
+// FRESH fix (invariant 4), 90 became the binding constraint and left a boat
+// sitting still for up to a minute in every two-minute cycle: the exact
+// symptom the freshness fix was written to remove, moved one layer down.
+//
+// Extrapolating further is safe here BECAUSE of invariant 1: a vessel whose
+// displacement is under DWELL_STEP_M has speed 0, and deadReckonRun refuses to
+// move anything at or below IDLE_SPEED. So a longer cap only ever extends a
+// boat that the data says is genuinely under way; a berthed one never creeps.
+export const DEAD_RECKON_MAX_S = 150;
 // No fix at all for this long -> the vessel leaves the scene. Matches the
 // server's own stale horizon.
 export const STALE_MS = 10 * 60 * 1000;
