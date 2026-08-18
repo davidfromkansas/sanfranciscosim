@@ -68,8 +68,12 @@ function pick(list) {
 }
 
 async function write({ speaker, event, because, posts }) {
-  const apiKey = process.env.AI_GATEWAY_API_KEY;
-  if (!apiKey) throw new Error('no AI_GATEWAY_API_KEY — feed offline');
+  // The gateway takes either a key or the project's OIDC token. The token is
+  // what `vercel env pull` writes for local development, so a linked checkout
+  // runs the real writer without a production secret ever landing on a laptop.
+  // It is short-lived; re-run the pull when it expires.
+  const credential = process.env.AI_GATEWAY_API_KEY || process.env.VERCEL_OIDC_TOKEN;
+  if (!credential) throw new Error('no AI_GATEWAY_API_KEY or VERCEL_OIDC_TOKEN — feed offline');
 
   const grounding = because
     .filter((b) => b.fact)
@@ -102,7 +106,7 @@ async function write({ speaker, event, because, posts }) {
 
   const res = await fetch(ENDPOINT, {
     method: 'POST',
-    headers: { Authorization: `Bearer ${apiKey}`, 'Content-Type': 'application/json' },
+    headers: { Authorization: `Bearer ${credential}`, 'Content-Type': 'application/json' },
     body: JSON.stringify({
       model: MODEL,
       temperature: TEMPERATURE,
