@@ -21,9 +21,9 @@ COLS = 3
 BG = (219, 205, 176)
 INK = (58, 53, 48)
 TILES = [
-    ("aerial", "AERIAL 3/4 — from due NE, 40° down (hero)"),
+    ("aerial", "AERIAL 3/4 — the 3rd/Bryant corner, from due W, 40° down (hero)"),
     ("top", "TOP — rhombus roof, bulkhead, deck, mechanical"),
-    ("night", "NIGHT — storefront uplight + lit upper windows"),
+    ("night", "NIGHT — gallery front lit, Bryant tails off"),
     ("north", "NORTH elevation"),
     ("east", "EAST elevation"),
     ("south", "SOUTH elevation"),

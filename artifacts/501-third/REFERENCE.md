@@ -29,13 +29,51 @@ recognition cues; features to preserve and simplify; uncertainties.
 | Ground | 5.84 m NAVD88 mean | LiDAR |
 | Anchor | -122.3954601, 37.7813246 | footprint vertex centroid (measured) |
 | Grid heading | 3rd Street axis 45.7°/225.6° true; cross axis 315.3°/135.4° true | OSM geometry (measured) |
+| 3rd Street side | SW face, outward normal 225.4° true | DataSF street centrelines (measured, stage 5) |
+| Bryant Street side | NW face, outward normal 315.6° true | DataSF street centrelines (measured, stage 5) |
+| Taber Place side | SE face, outward normal 135.7° true | DataSF street centrelines (measured, stage 5) |
+| Party wall | NE face, against SF3775075 (h 14.90 m) | DataSF footprints (measured, stage 5) |
 
-## Orientation
+## Orientation — CORRECTED 18 August 2026
 
-Authored with Blender `+Y` = true north, `+X` = east. The 3rd Street front faces
-north-east (outward normal 45.2° true). The contract's "front faces −Y" cannot be
-met — real-world orientation wins per AGENTS rule 5 and the README orientation
-note.
+Authored with Blender `+Y` = true north, `+X` = east. The contract's "front faces
+−Y" cannot be met — real-world orientation wins per AGENTS rule 5 and the README
+orientation note.
+
+**The plan, and the first build, had this 180° out.** They placed the 3rd Street
+elevation on the NE face. The NE face is the mid-block party wall. Measured at
+stage 5 against the bake's own street centrelines
+(`pipeline/data/streets_datasf.geojson`, perpendicular offset of each centreline
+from this anchor) and the neighbouring DataSF footprints:
+
+| Face | Length | Outward normal | What is actually there |
+|---|---|---|---|
+| SW | 25.05 m | 225.4° | **3rd Street** — centreline 24.1 m out, bearing 225.2° |
+| NW | 23.59 m | 315.6° | **Bryant Street** — centreline 23.5 m out, bearing 315.2° |
+| SE | 23.64 m | 135.7° | **Taber Place** (alley) — centreline 17.0 m out, bearing 135.1° |
+| NE | 25.09 m | 45.3° | **party wall** — DataSF SF3775075 (h 14.90 m) abuts, centroid bearing 42° at 21.8 m, nearest vertex 16.3 m |
+
+The method was checked against a control before it was trusted: run on shipped
+`500-third`'s anchor it returns 3rd Street at 45.2°, Bryant at 315.3°, Ritch at
+225.1°, exactly what that asset's own build script documents. 500 Third and 501
+Third face each other across 3rd Street, so their 3rd Street elevations point in
+opposite directions — which is what makes the two results consistent rather than
+contradictory.
+
+**Consequence for the design.** 501 Third is a CORNER building on 3rd and Bryant
+with an alley flank, not a one-street building with three party walls. It has
+three exposed elevations, not one. The asset was rebuilt accordingly: the
+shopfront and the steel-sash window grid run the 3rd Street front and turn the
+corner onto Bryant; Taber Place gets punched windows and the re-surfaced
+stair/elevator shaft bump (an alley is where a shaft is re-surfaced from the
+outside, a party wall is not); the NE face is blind painted masonry, because
+anything modelled there would be buried inside a 14.9 m neighbour.
+
+*The four "observations from each side" below were written against the WRONG face
+assignment and are kept only as the record of what was believed. Read them as:
+"north-east" = the 3rd Street front, now built on the SOUTH-WEST face;
+"south-east" = now Taber Place; "north-west" = now Bryant Street; "south-west" =
+now the blind NE party wall.*
 
 ## Observations from each side
 
@@ -95,11 +133,13 @@ mechanical unit (2019 VRF).
 - **LiDAR `peak_1st_m` of 22.38 m** is almost certainly a neighbour bleed (8.6 m
   above the median, sigma 0.92 m — a 9σ outlier). Not used; the credible crest
   is the `hgt_max` of 16.42 m.
-- **Rear faces may be party walls.** The LiDAR footprint (568 m2) matches the
-  parcel (567 m2), suggesting the building fills its lot. Modelled with punched
-  windows on all three rear faces (conservative — if they are blind party walls,
-  the windows are buried in the neighbour and invisible from the street; the
-  3rd Street face is the only one the camera sees clearly).
+- **RESOLVED — which faces are party walls.** The LiDAR footprint (568 m2)
+  matches the parcel (567 m2), so the building does fill its lot; the open
+  question was which faces that leaves blind. Measured at stage 5 (see
+  Orientation): exactly ONE face is a party wall, the NE, against DataSF
+  SF3775075 (h 14.90 m). The other three are exposed — two to streets (3rd,
+  Bryant) and one to the Taber Place alley. The asset is modelled that way: NE
+  blind, everything else glazed.
 - **No published architectural height was found.** The 14 m parapet and 16.4 m
   crest are LiDAR-derived (corroborated by the OSM `height=14` tag and the DBI
   rooftop-structure permits).

@@ -5,7 +5,7 @@
   "reimported_final_glb": true,
   "object_count": 7,
   "mesh_object_count": 7,
-  "triangle_count": 2588,
+  "triangle_count": 2732,
   "triangle_budget": 12000,
   "dimensions_m": [
     34.6966,
@@ -103,8 +103,8 @@
   "invalid_or_nonunit_loop_normal_count": 0,
   "inverted_signed_volume_objects": [],
   "normal_ray_cast_first_hits": 31500,
-  "normal_ray_cast_flipped_visible_faces": 1,
-  "normal_ray_cast_residual": 3.2e-05,
+  "normal_ray_cast_flipped_visible_faces": 0,
+  "normal_ray_cast_residual": 0.0,
   "normal_ray_cast_residual_gate": 0.0015,
   "normal_orientation_status": "PASS",
   "normal_orientation_method": "All source meshes run bmesh.ops.recalc_face_normals before export. Per-object signed volume is authoritative for this union of closed solids and must be positive for every object; 31,500 deterministic visibility rays from nine interior targets must leave a residual of at most 0.15%, which is the share of first hits that legitimately land on a face buried inside a neighbouring solid.",
@@ -117,12 +117,15 @@
     -122.3954601,
     37.7813246
   ],
-  "third_street_front_normal_deg_true": 45.2,
+  "third_street_front_normal_deg_true": 225.4,
+  "bryant_street_front_normal_deg_true": 315.6,
+  "taber_place_flank_normal_deg_true": 135.7,
+  "party_wall_normal_deg_true": 45.3,
   "object_details": [
     {
       "name": "grp_Toy_glass",
-      "triangles": 360,
-      "signed_volume_m3": 21.71851,
+      "triangles": 348,
+      "signed_volume_m3": 28.73334,
       "location": [
         0.0,
         0.0,
@@ -141,8 +144,8 @@
     },
     {
       "name": "grp_Toy_ink",
-      "triangles": 1104,
-      "signed_volume_m3": 12.30005,
+      "triangles": 1260,
+      "signed_volume_m3": 19.3805,
       "location": [
         0.0,
         0.0,
@@ -162,7 +165,7 @@
     {
       "name": "grp_Toy_roofd",
       "triangles": 216,
-      "signed_volume_m3": 37.10329,
+      "signed_volume_m3": 37.10374,
       "location": [
         0.0,
         0.0,
@@ -182,7 +185,7 @@
     {
       "name": "grp_Toy_sand",
       "triangles": 360,
-      "signed_volume_m3": 8198.92974,
+      "signed_volume_m3": 8198.92973,
       "location": [
         0.0,
         0.0,
@@ -202,7 +205,7 @@
     {
       "name": "grp_Toy_steel",
       "triangles": 128,
-      "signed_volume_m3": 410.18818,
+      "signed_volume_m3": 410.18817,
       "location": [
         0.0,
         0.0,
@@ -221,8 +224,8 @@
     },
     {
       "name": "grp_Toy_trim",
-      "triangles": 336,
-      "signed_volume_m3": 23.58404,
+      "triangles": 312,
+      "signed_volume_m3": 25.19205,
       "location": [
         0.0,
         0.0,
@@ -241,8 +244,8 @@
     },
     {
       "name": "grp_Toy_white_Glow",
-      "triangles": 84,
-      "signed_volume_m3": 1.2035,
+      "triangles": 108,
+      "signed_volume_m3": 1.62382,
       "location": [
         0.0,
         0.0,

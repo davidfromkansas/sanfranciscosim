@@ -227,7 +227,10 @@ def main():
         "material_contract_violations": sorted(off_contract),
         "glow_materials": sorted(m["name"] for m in mat_rows if m["glow"]),
         "anchor_lonlat": [-122.3954601, 37.7813246],
-        "third_street_front_normal_deg_true": 45.2,
+        "third_street_front_normal_deg_true": 225.4,
+        "bryant_street_front_normal_deg_true": 315.6,
+        "taber_place_flank_normal_deg_true": 135.7,
+        "party_wall_normal_deg_true": 45.3,
         "object_details": sorted(object_rows, key=lambda x: x["name"]),
     }
     results["checks"] = {

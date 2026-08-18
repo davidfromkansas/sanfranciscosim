@@ -33,9 +33,11 @@ VIEWS = [
     ("south", 180.0),
     ("west", 270.0),
 ]
-# Due north-east: the 3rd Street front (normal 45.2 deg) reads in this frame,
-# along with the rhombus footprint and the rooftop bulkhead.
-AERIAL_AZ = 45.0
+# Due south-west: the hero frame is the 3rd Street / Bryant Street corner, so
+# the camera stands on the bisector of the 3rd Street front (normal 225.4 deg)
+# and the Bryant elevation (315.6 deg) -- due west, 270 deg -- which shows both
+# street elevations, the rhombus footprint and the rooftop bulkhead at once.
+AERIAL_AZ = 270.0
 
 
 def clear():

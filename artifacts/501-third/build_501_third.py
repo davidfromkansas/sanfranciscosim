@@ -51,15 +51,30 @@ FOOTPRINT = [
     (-0.385, +17.170),   # 2  N  north corner  (3rd St front / NW party)
     (-17.236, +0.666),   # 3  W  west corner   (NW party / SW party)
 ]
-E_SE = (0, 1)    # SE face, 23.64 m, outward normal 135.7 deg — party/rear wall
-E_THIRD = (1, 2)  # NE face, 25.09 m, outward normal 45.2 deg — 3rd STREET front
-E_NW = (2, 3)    # NW face, 23.59 m, outward normal 315.6 deg — party/rear wall
-E_SW = (3, 0)    # SW face, 25.05 m, outward normal 225.4 deg — party/rear wall
+# Edge roles CORRECTED 18 August 2026 against the bake's own street centrelines
+# (pipeline/data/streets_datasf.geojson) and the neighbouring DataSF footprints.
+# The plan and the first build had this 180 deg out: they put the 3rd Street
+# elevation on the NE face, which is the mid-block PARTY wall. Measured
+# perpendicular offsets from this anchor, and the method reproduces shipped
+# 500 Third's documented orientation exactly as a control:
+#
+#     3rd Street     bearing 225.2 deg, 24.1 m   -> the SW face
+#     Bryant Street  bearing 315.2 deg, 23.5 m   -> the NW face
+#     Taber Place    bearing 135.1 deg, 17.0 m   -> the SE face (alley)
+#     NE face        no street; DataSF SF3775075 (h 14.90 m) abuts, centroid
+#                    bearing 42 deg at 21.8 m    -> the party wall
+#
+# So this is a CORNER building on 3rd and Bryant with an alley flank, not a
+# one-street building with three party walls. See REFERENCE.md "Orientation".
+E_THIRD = (3, 0)   # SW face, 25.05 m, outward normal 225.4 deg — 3rd STREET front
+E_BRYANT = (2, 3)  # NW face, 23.59 m, outward normal 315.6 deg — BRYANT STREET
+E_TABER = (0, 1)   # SE face, 23.64 m, outward normal 135.7 deg — TABER PLACE alley
+E_PARTY = (1, 2)   # NE face, 25.09 m, outward normal 45.3 deg — blind party wall
 
-L_THIRD = 25.09
-L_SE = 23.64
-L_NW = 23.59
-L_SW = 25.05
+L_THIRD = 25.05
+L_BRYANT = 23.59
+L_TABER = 23.64
+L_PARTY = 25.09
 
 H_WALL = 13.80   # top of the wall shell / underside of the parapet
 H_ROOF = 13.90   # roof membrane surface (LiDAR median 13.73 m)
@@ -137,13 +152,13 @@ def offset_polygon(poly, d):
     return out
 
 
-# The building's own axes: U runs along the 3rd Street face from the east corner
-# toward the north corner, W runs along the SE face from the south corner toward
-# the east corner. Roof objects are laid out in this frame.
+# The building's own axes: U runs along the 3rd Street face from the west corner
+# toward the south corner, W runs along the Taber Place face from the south
+# corner toward the east corner. Roof objects are laid out in this frame.
 def _axes():
     _, _, _, t_third, _ = poly_edge(E_THIRD)
-    _, _, _, t_se, _ = poly_edge(E_SE)
-    return t_third, t_se
+    _, _, _, t_taber, _ = poly_edge(E_TABER)
+    return t_third, t_taber
 
 
 U, W = _axes()
@@ -311,9 +326,10 @@ def punched_window(tag, edge, s0, s1, z0, z1, mats, lit=False):
                  0.145, 0.165, mats["Toy_white_Glow"])
 
 
-def shopfront(tag, edge, s0, s1, mats, bays):
+def shopfront(tag, edge, s0, s1, mats, bays, lit_bays=None):
     """A run of the dark storefront base: recessed glazing under a proud Toy_ink
-    fascia, with night glow per bay."""
+    fascia. `lit_bays` is the set of bay indices that carry night glow; the rest
+    stay dark glass. Default: every bay."""
     wall_box(f"{tag}_back", edge, s0, s1, 0.0, Z_FASCIA_TOP, 0.0, 0.04, mats["Toy_ink"])
     bevel(wall_box(f"{tag}_fascia", edge, s0, s1, Z_SHOP_HEAD + 0.14, Z_FASCIA_TOP,
                    0.0, 0.20, mats["Toy_ink"]), width=0.04)
@@ -324,7 +340,8 @@ def shopfront(tag, edge, s0, s1, mats, bays):
         s = s0 + span * k / bays
         wall_box(f"{tag}_mull{k}", edge, s - 0.07, s + 0.07, Z_SHOP_SILL, Z_SHOP_HEAD,
                  0.10, 0.17, mats["Toy_ink"])
-    for k in range(bays):
+    lit = range(bays) if lit_bays is None else lit_bays
+    for k in lit:
         g0 = s0 + span * k / bays + 0.45
         g1 = s0 + span * (k + 1) / bays - 0.45
         wall_box(f"{tag}_glow{k}", edge, g0, g1, Z_SHOP_SILL + 0.55,
@@ -363,11 +380,21 @@ def build():
     bevel(ring_band("parapet", H_WALL, H_PAR, -0.30, 0.0, sand), width=0.05)
     bevel(ring_band("parapet_cap", H_PAR, H_PAR_CAP, -0.38, 0.08, ink), width=0.04)
 
-    # ---- 4. storefront base on the 3rd Street face (NE, 25.09 m) ----------- #
-    # The dark ground-floor band wrapping the address face. 5 bays of glazing
-    # under a proud fascia — the SoMa loft storefront.
+    # ---- 4. storefront base, wrapping the 3rd/Bryant corner --------------- #
+    # The dark ground-floor band. A 1920 corner loft carries its shopfront round
+    # the corner onto the secondary street, so the band runs the full 3rd Street
+    # face (5 bays, the gallery front) and continues along Bryant (4 bays), with
+    # the pier between them left solid so the corner reads as masonry.
+    # Night restraint (style bible: hero glow + supporting accents, not a
+    # beacon). The gallery front on 3rd Street is the hero and lights all five
+    # bays; Bryant keeps the same shopfront band but lights only the two bays
+    # nearest the corner, so the corner reads lit and the secondary street
+    # tails off into dark glass. E_BRYANT runs north corner -> west corner, so
+    # bays 2 and 3 are the ones at the 3rd Street corner.
     shopfront("shop_t", E_THIRD, 1.20, L_THIRD - 1.20, mats, bays=5)
-    # a recessed entry door near the centre of the 3rd Street front
+    shopfront("shop_b", E_BRYANT, 1.20, L_BRYANT - 1.20, mats, bays=4,
+              lit_bays=(2, 3))
+    # the recessed entry door, on 3rd Street (the address face) only
     ent_s = L_THIRD * 0.45
     wall_box("ent_door", E_THIRD, ent_s, ent_s + 1.30, 0.0, 2.60, 0.02, 0.09, glass)
     bevel(wall_box("ent_jamb0", E_THIRD, ent_s - 0.16, ent_s, 0.0, 2.80, 0.02, 0.18, ink),
@@ -375,38 +402,41 @@ def build():
     bevel(wall_box("ent_jamb1", E_THIRD, ent_s + 1.30, ent_s + 1.46, 0.0, 2.80, 0.02, 0.18, ink),
           width=0.04)
 
-    # ---- 5. upper window grid on the 3rd Street face ----------------------- #
-    # Two bands of large industrial windows: 5 bays per band on the 25.09 m face.
-    # The 3rd Street front is the only designed elevation; the other three faces
-    # get punched windows only (see step 6).
-    bay_pitch = (L_THIRD - 2.40) / 5  # 5 bays across the face with 1.2 m end margins
-    bay_w = 3.20
-    for k in range(5):
-        s0 = 1.20 + k * bay_pitch + (bay_pitch - bay_w) / 2
-        # 2nd floor
-        punched_window(f"t_f2_{k}", E_THIRD, s0, s0 + bay_w, Z_F2_SILL, Z_F2_HEAD,
-                       mats, lit=(k == 2))
-        # 3rd floor
-        punched_window(f"t_f3_{k}", E_THIRD, s0, s0 + bay_w, Z_F3_SILL, Z_F3_HEAD,
-                       mats, lit=(k == 3))
+    # ---- 5. upper window grid on the two street elevations ---------------- #
+    # The identity: two bands of large steel-sash industrial windows. 5 bays on
+    # 3rd Street (25.05 m) and 4 on Bryant (23.59 m), at a near-identical bay
+    # pitch, so the grid turns the corner instead of stopping at it. One lit
+    # window per street at night.
+    for tag, edge, length, nbays, lit2, lit3 in (
+        ("t", E_THIRD, L_THIRD, 5, 2, None),
+        ("b", E_BRYANT, L_BRYANT, 4, None, 3),
+    ):
+        pitch = (length - 2.40) / nbays
+        bay_w = min(3.20, pitch - 1.30)
+        for k in range(nbays):
+            s0 = 1.20 + k * pitch + (pitch - bay_w) / 2
+            punched_window(f"{tag}_f2_{k}", edge, s0, s0 + bay_w, Z_F2_SILL, Z_F2_HEAD,
+                           mats, lit=(k == lit2))
+            punched_window(f"{tag}_f3_{k}", edge, s0, s0 + bay_w, Z_F3_SILL, Z_F3_HEAD,
+                           mats, lit=(k == lit3))
 
-    # ---- 6. plainer rear faces: punched windows, no storefront ------------- #
-    # SE face (23.64 m): a few punched windows per floor
-    for k, s0 in enumerate((3.0, 9.0, 15.0)):
-        punched_window(f"se_f2_{k}", E_SE, s0, s0 + 2.20, Z_F2_SILL, Z_F2_HEAD, mats)
-        punched_window(f"se_f3_{k}", E_SE, s0, s0 + 2.20, Z_F3_SILL, Z_F3_HEAD, mats)
-    # NW face (23.59 m): a few punched windows
-    for k, s0 in enumerate((3.0, 9.0, 15.0)):
-        punched_window(f"nw_f2_{k}", E_NW, s0, s0 + 2.20, Z_F2_SILL, Z_F2_HEAD, mats)
-        punched_window(f"nw_f3_{k}", E_NW, s0, s0 + 2.20, Z_F3_SILL, Z_F3_HEAD, mats)
-    # SW face (25.05 m): fewer windows, plainer — the service rear
-    for k, s0 in enumerate((5.0, 12.0, 19.0)):
-        punched_window(f"sw_f2_{k}", E_SW, s0, s0 + 2.00, Z_F2_SILL, Z_F2_HEAD, mats)
-        punched_window(f"sw_f3_{k}", E_SW, s0, s0 + 2.00, Z_F3_SILL, Z_F3_HEAD, mats)
+    # ---- 6. Taber Place: the alley flank ---------------------------------- #
+    # Exposed to a 12 m alley, not to a street: no shopfront, punched windows
+    # only, and this is where the stair/elevator shaft shows (the 2011 permit
+    # re-surfaced it from outside, which an alley allows and a party wall does
+    # not).
+    for k, s0 in enumerate((3.0, 9.0, 15.0, 20.2)):
+        punched_window(f"tb_f2_{k}", E_TABER, s0, s0 + 2.20, Z_F2_SILL, Z_F2_HEAD, mats)
+        punched_window(f"tb_f3_{k}", E_TABER, s0, s0 + 2.20, Z_F3_SILL, Z_F3_HEAD, mats)
 
-    # ---- 7. stair/elevator shaft bump on the SW rear face ------------------ #
-    # A slight projection (resurfaced 2011) — one small box proud of the wall
-    wall_box("shaft_bump", E_SW, 8.0, 12.0, 0.0, H_WALL, 0.0, 0.50, sand)
+    # ---- 7. stair/elevator shaft bump on the Taber Place flank ------------- #
+    # A slight projection (re-surfaced 2011) — one small box proud of the wall
+    wall_box("shaft_bump", E_TABER, 12.6, 16.6, 0.0, H_WALL, 0.0, 0.50, sand)
+
+    # ---- 7b. the NE party wall stays blind -------------------------------- #
+    # DataSF SF3775075 (14.90 m) abuts this face and the building fills its lot,
+    # so anything modelled here would be buried inside the neighbour up to 14.9 m
+    # of a 13.8 m wall. Blind painted masonry is both the truth and free.
 
     # ---- 8. the working roof ----------------------------------------------- #
     # The bulkhead: the crest at 16.4 m. Its coping is four thin bars around the
@@ -463,7 +493,8 @@ def report():
     print(f"[build] dims={[round(mx[i] - mn[i], 3) for i in range(3)]}")
     print(f"[build] footprint area={abs(signed_area(FOOTPRINT)):.1f} m2")
     print("[build] anchor lon/lat: -122.3954601 37.7813246 (vertex centroid)")
-    print("[build] 3rd Street front normal 45.2 deg true (NE face)")
+    print("[build] 3rd Street front normal 225.4 deg true (SW face);"
+          " Bryant 315.6, Taber Place 135.7, party wall 45.3")
     return tris
 
 
