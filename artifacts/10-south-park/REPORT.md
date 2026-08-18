@@ -305,8 +305,8 @@ is committed. `git diff --name-only origin/main` lists nothing under
 | orientation | **PASS** — the bowed front and the loggia face the oval; the blind flanks face the two party walls |
 | terrain seating | **PASS** — no float, no sink at the anchor |
 | night glow | **PASS** — only the front window bands, the Taber Place windows and the entry accent light up |
-| draw calls | **PASS** — **129** max at the landmark (300 budget), measured by hooking `renderer.render` and taking the per-frame max |
-| streaming | **PASS** — `entries 91, live 83, loading 0, fading 0, failed 0` after settling |
+| draw calls | **PASS** — **112–129** max at the landmark (300 budget), measured by hooking `renderer.render` and taking the per-frame max |
+| streaming | **PASS** — `entries 91, live 83, loading 0, fading 0, failed 0` after settling; shared batch 1,168,245 / 1,200,000 verts (97.4 %) — see the note below |
 | **fallback drill** | **PASS** — with the GLB moved aside: `failed: 1`, `live: 82`, the app boots, the city renders (613 cells, 15,263 trees), the landmark is absent and, as expected for Case B, its site is empty ground inside the exclusion zone. File restored. |
 | `npm run lint` / `npm test` / `npm run build` | **PASS** — clean lint, 26/26 tests, build 1.53 s |
 | batch sanity check | **PASS** — no `app/public/tiles/` or `api/_data/` in the diff |
@@ -320,6 +320,23 @@ with `SF.setClock(...)` for the day and night frames rather than left on live
 time. The served manifest was checked for this entry before anything else was
 believed, because `preview_start` resolves names from `~/.claude/launch.json` and
 can silently serve a different tree.
+
+**One thing the batch owner needs to know before adding the next SoMa landmark.**
+The shared landmark `BatchedMesh` vertex reserve (`BODY_VERTS = 1_200_000` in
+`app/src/assets.js`) is the binding limit on how many bespoke landmarks can be
+*simultaneously resident*, and the South Park cluster is close to it. Measured
+with this asset placed, camera at its own anchor:
+
+    landmark-bodies  1,168,245 / 1,200,000 verts (97.4 %) across 82 geometries
+    landmark-glow       66,007 /   250,000 verts (26.4 %)
+
+`failed: 0` — nothing was dropped on this run, and this asset's 6,488 vertices
+fit inside the ~31,755 remaining. But that is room for only about four more
+assets of this size, and the failure mode when it runs out is a **load-order
+race**: the losing landmark throws "Reserved space request exceeds the maximum
+buffer size", is marked `failed`, and stays absent for the whole session. For a
+Case B landmark like this one the fallback is empty ground, not a procedural
+building. Nothing to do in this branch; flagged for the batch.
 
 **One honest observation from the deployed look, not a defect:** the app renders
 `Toy_apricot` noticeably more saturated than the Blender review rig does — closer
