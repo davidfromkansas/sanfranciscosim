@@ -1,5 +1,18 @@
 # 501 Third Street — SF-SIM asset plan
 
+> **CORRECTION, 18 August 2026 — this plan's street orientation is wrong, and
+> the shipped asset does not follow it.** The plan puts the 3rd Street elevation
+> on the NE face. The NE face is the mid-block party wall. Measured against the
+> bake's own street centrelines (`pipeline/data/streets_datasf.geojson`) and the
+> neighbouring DataSF footprints, and cross-checked by running the same method
+> on shipped `500-third` as a control: **3rd Street is the SW face (normal
+> 225.4°), Bryant Street the NW face (315.6°), Taber Place the SE face (135.7°),
+> and the NE face (45.3°) is the party wall against SF3775075.** 501 Third is a
+> corner building on 3rd and Bryant with an alley flank and exactly ONE blind
+> face, not a one-street building with three party walls. §2.3, §2.4 and §2.13
+> below are superseded; `artifacts/501-third/REFERENCE.md` and `REPORT.md` carry
+> the corrected orientation and the measurements behind it. REPORT beats plan.
+
 A 1920 unreinforced-masonry industrial loft holding the **west corner of 3rd
 and the cross street**, a three-storey rhombus on the 45° SoMa grid with big
 steel-sash factory windows on every elevation, a painted masonry parapet, and a
@@ -329,15 +342,19 @@ on the vertex centroid (x east, y north, metres, CCW):
 10874867135  (-17.236, +0.666)   west corner   (rear / party wall side)
 ```
 
-| Edge | Length | Outward normal (true) | What it is |
+| Edge | Length | Outward normal (true) | What it is — CORRECTED, see the banner |
 |---|---|---|---|
-| 485 → 488 | 23.64 m | 45.7 deg (NE) | **3rd Street** front (the address side) |
-| 488 → 505 | 25.09 m | 315.3 deg (NW) | **Cross street** front |
-| 505 → 7135 | 23.59 m | 225.6 deg (SW) | rear / party wall |
-| 7135 → 485 | 25.05 m | 135.4 deg (SE) | rear / party wall |
+| 485 → 488 | 23.64 m | 135.7 deg (SE) | **Taber Place** — the alley flank |
+| 488 → 505 | 25.09 m | 45.3 deg (NE) | **party wall** vs SF3775075 (h 14.90 m) |
+| 505 → 7135 | 23.59 m | 315.6 deg (NW) | **Bryant Street** front |
+| 7135 → 485 | 25.05 m | 225.4 deg (SW) | **3rd Street** front (the address side) |
+
+(The edge lengths and normals were always right; only the street assignment was
+wrong. The version of this table shipped before 18 August 2026 read the same
+four edges as NE-front / NW-cross-street / two party walls.)
 
 Author `+Y` = north and place the polygon exactly as measured. The contract's
-"front faces −Y" cannot be met — the real front faces north-east — so real-world
+"front faces −Y" cannot be met — the real front faces south-west — so real-world
 orientation wins per the README orientation note and AGENTS rule 5.
 
 ### 2.4 What each side shows
@@ -491,18 +508,43 @@ and the roof, not on ornament.
 
 ### 2.13 Integration notes (for later, not this task)
 
-- **New landmark.** Add a `pipeline/lib/landmarks.mjs` entry (`id: '501-third'`,
-  `exclude: ~20` — the half-diagonal is ~17 m, so 20 m clears the footprint
-  without eating the neighbours across the street) and re-bake the affected
-  tiles.
+- **New landmark.** Add a `pipeline/lib/landmarks.mjs` entry (`id: '501Third'`,
+  camelCase per `camelId()`) and re-bake the affected tiles.
+  **`exclude: 11`, NOT the ~20 this plan originally suggested.** That estimate
+  reasoned from the half-diagonal instead of measuring, and `excluded()` in
+  `pipeline/buildings.mjs` fires on a footprint's centroid *or any of its ring
+  vertices* — so 20 m reaches three neighbours. Measured against the real bake
+  inputs (`pipeline/data/buildings_datasf.geojson` and
+  `overture_buildings.geojsonseq`), by `min(nearest vertex, centroid)` from this
+  anchor:
+
+  ```
+    3.43 m  own Overture ring (1355349a)      <- floor
+    5.70 m  own DataSF ring (SF3775073)       <- floor: both must go
+   16.23 m  own footprint's nearest vertex
+   16.31 m  DataSF SF3775075 (h 14.90)        <- ceiling: the party neighbour
+   17.17 m  Overture 0f2baf8a (h 11)
+   19.55 m  DataSF SF3775072 (h 13.53)
+  ```
+
+  Band that drops exactly this building's two rings and nothing else:
+  **(5.70, 16.23) m**, 10.5 m wide. Shipped **11**, the middle of it, so the
+  registry centre needs no offset. Note 11 does not reach this footprint's own
+  corners at 17.3 m; it does not need to, and reaching them would delete
+  SF3775075.
 - Manifest id `501-third` maps directly (no camel conversion needed).
 - `loadRadius: 2500` per the default rule `max(2500, 16.4 × 30)` = max(2500, 492)
   = 2500. This is a small landmark, not a skyline piece — stream it, do not make
   it `alwaysLoaded`.
-- The nearest neighbour already in the scene is 500 Third (26.5 m, 63 m north).
-  The two will share frames on the 3rd Street corridor; the exclusion zone must
-  not eat 500 Third's footprint (its half-diagonal is ~37 m, so 20 m + 37 m <
-  63 m — safe).
+- The nearest neighbour already in the scene is 500 Third (26.5 m), which is
+  ~55 m SSW across 3rd Street, not 63 m north as this plan said. At
+  `exclude: 11` it is nowhere near the exclusion; the binding neighbour is the
+  party-wall building SF3775075 at 16.31 m, which is not a bespoke landmark.
+- **Residual, and why it is acceptable:** with `exclude: 11`, SF3775075 survives
+  and one of its vertices sits 0.147 m inside this asset's footprint — a shared
+  party-wall survey vertex, inside a wall thickness. Clearing it would need
+  `exclude` ≥ 16.31, which deletes the whole 14.9 m neighbour for 15 cm of
+  overlap. Prove the result from the baked tile rather than from the radius.
 
 ### 2.14 Validation checklist
 
