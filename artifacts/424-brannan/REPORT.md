@@ -18,7 +18,7 @@ Deliverables in `artifacts/424-brannan/`:
 
 | File | What it is |
 |---|---|
-| `424-brannan.glb` | the shipping asset, 726,280 bytes raw |
+| `424-brannan.glb` | the shipping asset — **356,972 bytes**, meshopt-packed at stage 4 |
 | `424-brannan.blend` | the authoring scene |
 | `build_424_brannan.py` | deterministic rebuild (`blender -b --python …`) |
 | `extract_site.mjs` | DataSF parcel → `data/site_uv.json` (the measured ring) |
@@ -33,10 +33,10 @@ Deliverables in `artifacts/424-brannan/`:
 
 | | |
 |---|---|
-| Triangles | **12,632** / 18,000 cap |
-| Objects | 37 |
-| Dimensions | 88.8150 x 59.9199 x **8.5649** m |
-| Raw GLB | 726,280 bytes (compression is stage 4's job) |
+| Triangles | **8,940** / 18,000 cap (12,632 before the stage-4 census; see §10) |
+| Objects | 37 authored, 21 after the per-material join |
+| Dimensions | 88.8432 x 59.9340 x **8.5649** m |
+| Shipped GLB | **356,972 bytes** meshopt-packed (514,628 unpacked) |
 | `min_z` | **−1.0844 m** — negative by design, see §4 |
 | XY centre offset | −0.0002, 0.1181 m |
 | `targetHeightM` | **8.5649 m** = the measured bbox height, so loader scale = 1.0000 |
@@ -48,12 +48,13 @@ Deliverables in `artifacts/424-brannan/`:
 | Cars | 18 |
 | Fence posts | 93 |
 | Wheel stops | 44 |
+| Draw primitives | 22 (from 38) |
 | Materials | 20, all `Toy_*`, all on-palette, no textures, no alpha, no `Toy_body` |
 | Glow | 4 — `Toy_red_Glow`, `Toy_white_Glow` (the sign), `Toy_trim_Glow` (booth window), `Toy_gold_Glow` (three lamp heads) |
 
-Triangle split: fence posts 3,652 · car cabins 1,944 · plate 1,236 · striping
-876 · wheel stops 528 · cars (7 colours) 1,728 · crowns 384 · everything else
-under 200 each.
+Triangle split (shipped): plate 1,236 · fence posts 1,116 · striping 1,056 ·
+car cabins 792 · wheel stops 528 · cars (7 colours) 1,728 · crowns 384 · fence
+rail 288 · everything else under 200 each.
 
 ## 3. Where this build departs from the plan
 
@@ -88,6 +89,19 @@ reasoning.
 
 Two plan values were confirmed rather than corrected: the sign at 6.80 m (still
 *inferred*, see `REFERENCE.md` §7.2) and the 18-car count.
+
+## 3a. What stage 4 sent back into the build
+
+The optimize pass's waste census (`optimize/REPORT.md`) found no geometry to
+remove — no duplicate meshes, no buried faces, no over-tessellation — and
+pointed instead at two bevels: 93 fence posts carrying 3,652 triangles of
+chamfer on a 90 mm section, and 18 car cabins at two bevel segments. Both are
+sub-pixel at every distance the app renders this from, and together they were a
+fifth of the file. `build_424_brannan.py` was changed to drop the post bevel and
+halve the cabin segments and the asset was rebuilt — 12,632 → 8,944 triangles,
+726,280 → 514,628 bytes — before packing. Without that the packed file would
+have been 519 KB, over the 500 KB per-landmark budget in `AGENTS.md`; it ships
+at 357 KB.
 
 ## 4. The two deliberate contract deviations
 

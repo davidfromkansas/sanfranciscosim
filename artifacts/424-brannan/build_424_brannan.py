@@ -723,8 +723,11 @@ def build(site, mats):
                 box_uv(posts_v, posts_f, pu - FENCE_POST / 2, pu + FENCE_POST / 2,
                        pv - FENCE_POST / 2, pv + FENCE_POST / 2, Z_BURY, FENCE_H)
                 nposts += 1
-    objs.append(bevel(new_mesh("fence_posts", posts_v, posts_f, [mats["Toy_steel"]]),
-                      width=0.02, segments=1, thin=FENCE_POST))
+    # No bevel on the posts: 93 boxes x 27 triangles of chamfer on a 90 mm
+    # section is 2,500 triangles and ~5,000 flat-shaded vertices spent on an
+    # edge that is sub-pixel at every distance the app renders this from. That
+    # is a fifth of the whole asset's file size for nothing (see optimize/).
+    objs.append(new_mesh("fence_posts", posts_v, posts_f, [mats["Toy_steel"]]))
     objs.append(new_mesh("fence_mesh", band_v, band_f, [mats["Toy_steel"]]))
     objs.append(new_mesh("fence_rail", rail_v, rail_f, [mats["Toy_steel"]]))
     objs.append(new_mesh("fence_barb", barb_v, barb_f, [mats["Toy_ink"]]))
@@ -865,7 +868,7 @@ def build(site, mats):
         objs.append(bevel(new_mesh(f"cars_{colour[4:].lower()}", vb, fb, [mats[colour]]),
                           width=0.11, segments=2, thin=1.6))
     objs.append(bevel(new_mesh("car_cabins", cabin_v, cabin_f, [mats["Toy_glass"]]),
-                      width=0.08, segments=2, thin=1.4))
+                      width=0.08, segments=1, thin=1.4))
     counts["cars"] = len(CARS)
 
     # 13 ------------------------------------------------------------- greenery
