@@ -9,7 +9,9 @@ Built 18 August 2026 with Blender 5.2.0 LTS from `build_226_ritch.py`, rendered 
 | | |
 |---|---|
 | Triangles | **5,144** (cap 9,000) |
-| Objects | 149 |
+| Objects | 13 as shipped (149 before the stage-4 join-per-material pass) |
+| File size | **163,016 B** shipped, meshopt-compressed (364,412 B before stage 4 — see `optimize/REPORT.md`) |
+| Draw submeshes | 17 shipped (153 before stage 4) |
 | Dimensions (axis-aligned) | 25.082 x 24.924 x **18.100** m |
 | Min Z | 0.000 |
 | XY centre offset | 0.000, 0.000 |
