@@ -2545,6 +2545,45 @@ export const LANDMARKS = [
     // destination.
     camera: { distance: 165, yaw: 270, pitch: 26 },
   },
+  {
+    // 501 Third Street, the 1920 unreinforced-masonry industrial loft on the
+    // EAST corner of 3rd and Bryant. 23.6 x 25.05 m rhombus on the 45 deg SoMa
+    // grid, 592 m2, parapet 14.0 m and a rooftop bulkhead crest at 16.4 m (OSM
+    // height=14 and LiDAR hgt_median 13.73 / hgt_max 16.42 agreeing).
+    //
+    // Exclusion sized against the REAL bake inputs (pipeline/data/
+    // buildings_datasf.geojson AND overture_buildings.geojsonseq), by
+    // min(nearest ring VERTEX, centroid) -- excluded() in buildings.mjs fires
+    // on either:
+    //
+    //    3.43 m  this building's own Overture ring (h=14)   <- floor
+    //    5.70 m  this building's own DataSF ring (SF3775073) <- floor, both go
+    //   16.23 m  this footprint's own nearest vertex
+    //   16.31 m  DataSF SF3775075 (h=14.90), the NE party neighbour <- ceiling
+    //   17.17 m  Overture 0f2baf8a (h=11), that neighbour's twin
+    //   19.55 m  DataSF SF3775072 (h=13.53), across Taber Place
+    //
+    // Safe window (5.70, 16.23) m, 10.5 m wide; 11 is its middle, so the centre
+    // needs no offset from the manifest anchor. The asset plan's original
+    // suggestion of ~20 was reasoned from the half-diagonal rather than
+    // measured and would delete three neighbours. Note 11 does NOT reach this
+    // footprint's own corners at 17.3 m; it does not need to, and reaching them
+    // would delete SF3775075, which shares a party-wall survey vertex sitting
+    // 0.147 m inside this footprint -- inside a wall thickness.
+    id: '501Third',
+    name: '501 Third Street',
+    lon: -122.3954601,
+    lat: 37.7813246,
+    height: 16.4,
+    exclude: 11,
+    // Camera offset is (sin yaw, ., cos yaw) with +z south, so yaw 270 stands
+    // the camera due WEST -- the bisector of the 3rd Street front (225.4 deg)
+    // and the Bryant Street elevation (315.6 deg). Both are hero elevations on
+    // this corner. 190 m suits a 16.4 m building (cf. 49SouthPark at 165 for
+    // 13.0 m, 106SouthPark at 150 for 11.58 m). No `key`: at 16 m this is
+    // texture in the block, not a destination.
+    camera: { distance: 190, yaw: 270, pitch: 26 },
+  },
 ];
 
 // Parks/green spaces the landcover bake must match at least one source polygon

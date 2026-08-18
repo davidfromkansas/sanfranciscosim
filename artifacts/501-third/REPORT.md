@@ -200,3 +200,61 @@ file is archived at `optimize/input/501-third.glb`.
   "loadRadius": 2500
 }
 ```
+
+## Stage 5 — integration and local QA (Case B, batch mode)
+
+Integrated per `docs/asset-plans/INTEGRATION-PROMPT.md` Part 1 with the
+pipeline's batch amendment: the bake was run and fully QA'd, then discarded, and
+only source is committed (`docs/asset-pipeline/ADDRESS-TO-ASSET.md`, "Batch
+mode"). Verified locally in a real foregrounded headless Chrome over CDP — the
+in-app preview pane runs its tab hidden, which throttles rAF and stops the
+streamed-asset scan from ever firing.
+
+| # | Check | Result | Evidence |
+|---|---|---|---|
+| 1 | Re-validation of the shipped GLB | **PASS** | fresh-scene re-import, all 15 contract checks, `overall: PASS`, 7 objects / 2,732 tris / 34.6966 × 34.5376 × 16.4 m |
+| 2 | Asset dropped in, not re-exported | **PASS** | `app/public/sf-assets/landmarks/501-third.glb` byte-identical to the artifact; `compress-assets.mjs` reports "skip (already compressed)" |
+| 3 | Manifest entry | **PASS** | appended as text, `git diff --stat` = +19 lines / 0 deletions, JSON still valid at 91 entries |
+| 4 | id mapping (`camelId`) | **PASS** | `501-third` → `501Third`, which is the `pipeline/lib/landmarks.mjs` id; the asset appears in `SF.assets.placed` under `501Third` |
+| 5 | Case B registry entry | **PASS** | `501Third`, `exclude: 11`, camera `{190, 270, 26}`, landed in `LANDMARKS` (97 entries) and not in `VIEW_PRESETS` (still 6) |
+| 6 | Re-bake scope | **PASS** | only `buildings/23_13.bin` and `toy/23_13.bin` changed geometrically; 575 `ctx/*.json` re-numbered (expected — dropping a footprint renumbers global building ids); nothing deleted; `muni-shapes.bin` untouched |
+| 7 | `verify-rebake.mjs` | **PASS** | "584 of 585 cells unchanged; 23_13 182 → 181 ← 501Third"; nearest surviving footprint 16.3 m vs the 11 m radius |
+| 8 | `audit.mjs` check 1.6 | **PASS** | "no procedural footprint inside a bespoke landmark exclusion zone — 100 zones over 97 landmarks clear". (1.2b, 1.3c and 1.7b fail; they fail on main too and are not ours — `BATCH-INTEGRATE.md` §3.) |
+| 9 | Nothing standing under the asset — proved from the TILE, not the radius | **PASS** | decoded `buildings/23_13.bin`: 13 rings survive within 60 m; exactly one touches the footprint — SF3775075, **one vertex 0.14 m inside**, a shared party-wall survey vertex within a wall thickness. Clearing it would need `exclude` ≥ 16.31, which deletes a whole 13.6 m neighbour. |
+| 10 | Exactly one building on the site | **PASS** | `501-third-qa-day_hero.png`; no procedural twin, no block poking through, no z-fighting |
+| 11 | Scale ≈ 1.0 | **PASS** | console: `sf-assets: 501-third merged 7 objects / 7 materials -> batched (1560 tris body); uniform x1.0000 at 3699, -1252` |
+| 12 | Orientation — the real front faces the real street | **PASS** | both glazed elevations face 3rd and Bryant in `501-third-qa-day_hero.png`; this is the check the stage-5 pass caught the plan's 180° error with |
+| 13 | Terrain seating | **PASS** | sits flush at the intersection, no float, no sink (flat site) |
+| 14 | Night glow | **PASS** | `501-third-qa-night_hero.png` — shopfront lit on 3rd, tailing off along Bryant, one upper window per street; alley and party wall dark; nothing else lights |
+| 15 | Roof reads as a pale membrane in the APP, not just the rig | **PASS** | measured rgb(89, 98, 106) on the roof field at 1 PM — the healthy `Toy_steel` band (cf. `Toy_roofd`'s rgb(9,9,12) on 92 South Park) |
+| 16 | Draw calls < 300 | **PASS** | 81 at the landmark (direct `renderer.render` + `info.render.calls`, since the post pass resets `renderer.info` and the overlay reads its own quad) |
+| 17 | `landmark-streaming-check.mjs` | **PASS (3 of 4), 4th pre-existing** | boot keeps streamed entries unloaded; hero draw calls avg 155 < 300; streamed landmark loads on approach. The `stream-out` step times out — **and does so identically with this landmark removed from the manifest** (live 70 vs 71), so it is the harness wanting its 100 synthetic scattered `dummy-*` entries injected, not a regression. |
+| 18 | Fallback drill (mandatory) | **PASS** | GLB renamed away, clean browser: app boots, the whole neighbourhood renders, 84 other landmarks stay live, `failed: 1`, **exactly one** console line for it (`sf-assets: 501-third failed to load (…)`), zero uncaught errors, and the site is empty ground inside the exclusion zone — the documented Case B outcome. `501-third-qa-fallback_hole.png` |
+| 19 | Build | **PASS** | `npm run build` clean; `compress-tiles` 3,315 tiles 56.8 → 31.8 MB |
+
+Screenshots: `501-third-qa-day_hero.png`, `501-third-qa-night_hero.png`,
+`501-third-qa-day_wide.png`, `501-third-qa-fallback_hole.png`.
+
+**One thing to know about the drill's warning text.** The spec expects
+"— keeping the code-built landmark". A *streamed* entry fails through
+`app/src/assets.js:560`, a plain `console.warn` without that suffix; the suffixed
+`warn()` at :434 is the boot-time path. Either way it is one warning and a
+graceful degrade. That is existing loader behaviour and not something this
+integration changes.
+
+### Streaming decision
+
+`loadRadius: 2500` — the default rule `max(2500, targetHeightM × 30)` =
+max(2500, 492) = 2500. Explicitly NOT `alwaysLoaded`: at 16.4 m this is a block
+neighbour, not a skyline piece, and the `alwaysLoaded` list is the only one that
+still costs boot time. Beyond the radius the site is empty ground rather than a
+procedural stand-in (Case B carved the footprint out), which at 2.5 km is
+illegible.
+
+### Batch-mode handoff
+
+The bake was run in full and used for every check above, then discarded with
+`git checkout -- app/public/tiles api/_data`. This branch commits source only:
+the GLB, the manifest entry, the `pipeline/lib/landmarks.mjs` entry, the asset
+plan and `artifacts/501-third/`. The city is re-baked once for the whole batch by
+`docs/asset-pipeline/BATCH-INTEGRATE.md`.
