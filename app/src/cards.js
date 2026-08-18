@@ -32,6 +32,7 @@ const KIND_GLYPH = {
   vessel: 'vessel',
   transit: 'transit',
   'transit-stop': 'transit',
+  'ferry-terminal': 'vessel',
   aircraft: 'aircraft',
 };
 
@@ -244,6 +245,36 @@ export function createContextCard({ onFly, onAsk, onSelectHistory, onClose }) {
         }
       } else {
         fact('Coming soon', 'Nothing predicted in the next few minutes');
+      }
+    } else if (entity.kind === 'ferry-terminal') {
+      subtitle.textContent = entity.operatorNames?.length
+        ? entity.operatorNames.join(' \u00b7 ')
+        : 'Ferry terminal';
+      chips.append(chip('Ferry terminal', 'teal', 'vessel'));
+      for (const route of entity.routes.slice(0, 6)) chips.append(chip(route.name, 'coral'));
+      if (entity.routes.length > 6) chips.append(chip(`+${entity.routes.length - 6}`, 'navy'));
+      if (entity.routes.length) {
+        fact('Routes calling here', entity.routes.map((r) => r.name).join(' \u00b7 '));
+      } else {
+        // Pier 48 is the Chase Center / Oracle Park event dock and Pier 41 is
+        // Blue & Gold's berth — a private operator 511 does not publish at all.
+        // Both are real terminals with zero trips in the timetable, so the card
+        // says so rather than leaving a pin that seems to have lost its routes.
+        fact('Scheduled service', 'None in the published timetable');
+        fact('Why', 'A real berth used for charters or event sailings, or served by an operator that does not publish a schedule to 511.');
+      }
+      if (entity.stops > 1) fact('Berths', `${entity.stops} gates or docks grouped here`);
+      // Only WETA publishes live positions, so only its terminals can ever show
+      // an inbound boat. Saying nothing would read as "no boats due".
+      if (entity.vessels?.length) {
+        for (const vessel of entity.vessels.slice(0, 4)) {
+          const eta = vessel.arrivingAt
+            ? `${Math.max(0, Math.round((vessel.arrivingAt - Date.now()) / 60000))} min`
+            : 'departed from here';
+          fact(vessel.routeName || vessel.label, eta);
+        }
+      } else if (entity.routes.length) {
+        fact('Live vessels', 'None reporting on these routes right now');
       }
     } else if (entity.kind === 'aircraft') {
       // Every number here is the TRUE reading from the transponder. Only the

@@ -313,6 +313,7 @@ async function main() {
   const jsonRaw = Buffer.from(
     JSON.stringify({
       generated: new Date().toISOString(),
+      operators: Object.fromEntries(OPERATORS.map((op) => [op.id, { name: op.name, live: op.live }])),
       routes: routesOut,
       shapes: shapeMeta,
       terminals,
@@ -344,6 +345,7 @@ async function main() {
     OUT_STOPS,
     JSON.stringify({
       generated: new Date().toISOString(),
+      operators: Object.fromEntries(OPERATORS.map((op) => [op.id, { name: op.name, live: op.live }])),
       routes: Object.fromEntries(
         Object.entries(routesOut).map(([id, r]) => [id, { name: r.name, color: r.color }]),
       ),

@@ -40,6 +40,7 @@ function parse(buf) {
   // [x, z, s] triplets for every shape back to back; s = cumulative metres.
   const verts = new Float32Array(buf, 16 + jsonLen, floatCount);
 
+  const operators = new Map(Object.entries(meta.operators || {}));
   const entries = Object.entries(meta.routes || {});
   // Golden Gate publishes ONE red for all five of its routes, so the liveries
   // alone cannot tell the crossings apart. ferry-palette.js keeps every colour
@@ -98,10 +99,10 @@ function parse(buf) {
   const berths = clusters.map((c) => {
     c.title = berthName(c.members);
     const routes = new Set();
-    const operators = new Set();
+    const berthOperators = new Set();
     for (const m of c.members) {
       for (const r of m.routes) routes.add(r);
-      operators.add(m.operator);
+      if (m.operator) berthOperators.add(m.operator);
     }
     return {
       // Named for the stop the cluster is titled after, so an id is stable
@@ -111,14 +112,23 @@ function parse(buf) {
       x: c.x,
       z: c.z,
       stops: c.members.length,
-      operators: [...operators].sort(),
+      operators: [...berthOperators].sort(),
+      operatorNames: [...berthOperators]
+        .sort()
+        .map((id) => operators.get(id)?.name || id),
       routes: [...routes].sort(),
+      // A terminal the published timetable never calls at. Pier 48 (the Chase
+      // Center / Oracle Park event dock) and Pier 41 (where Blue & Gold sails
+      // from — a private operator 511 does not carry at all) are real berths
+      // with zero stop_times rows, so they get a pin and an explanation rather
+      // than being deleted or silently drawn as if boats went there.
+      scheduled: routes.size > 0,
       inScene: inScene(c.x, c.z),
     };
   });
   berths.sort((a, b) => a.name.localeCompare(b.name));
 
-  return { routes, shapes, verts, terminals, berths };
+  return { routes, shapes, verts, terminals, berths, operators };
 }
 
 // What to call a cluster of stops, and which stop lends it its id.
