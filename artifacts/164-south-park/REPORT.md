@@ -9,12 +9,12 @@ disagree**; `REFERENCE.md` carries the sources and the photogrammetric working.
 | | |
 |---|---|
 | File | `artifacts/164-south-park/164-south-park.glb` |
-| Triangles | **3,366** (cap 8,000) |
-| Mesh objects | 56 |
+| Triangles | **3,366** (cap 8,000) — unchanged by stage 4 |
+| Mesh objects | **8** (shipped; 56 before the stage-4 join-per-material) |
 | Dimensions | **37.2385 × 36.4711 × 5.4000 m** |
 | Crest | **5.4000 m** exactly — loader scale `targetHeightM / measuredHeight` = 1.0000 |
 | Min Z / XY centre offset | 0.0000 m / (0.0000, 0.0000) |
-| Raw / gzipped | 206,060 B / 46,999 B (pre-optimize) |
+| Raw / gzipped | **92,552 B** / 64,988 B (shipped, post stage 4; pre-optimize was 206,060 / 46,999) |
 | Materials | 8: `Toy_red`, `Toy_brick`, `Toy_ink`, `Toy_glass`, `Toy_steel`, `Toy_trim`, `Toy_glass_Glow`, `Toy_trim_Glow` |
 | Glow groups | 2 (`Toy_glass_Glow` on the ribbon + entry band, `Toy_trim_Glow` on the canopy soffit) |
 | Manifest anchor | **-122.3949366, 37.7812097** (after recentring on the model's XY bbox) |
@@ -170,7 +170,7 @@ the LiDAR **maximum of 9.25 m is deliberately rejected**. The reasoning is in th
 contain a 4 m step, the assessor records one storey on both parcels, the aerial shows an
 unbroken flat roof, and both two-storey neighbours visibly overtop this building.
 
-`dims` and `tris` are pre-optimize. Stage 4 rewrites them.
+`dims` and `tris` above are the **shipped** figures — stage 4 changed neither. What it changed is the file (206,060 → 92,552 raw bytes, −55.1%) and the draw submesh count (56 → 8). Full metrics, gates and the deliberate skip of the limited-dissolve step are in `optimize/REPORT.md`. The stage-2 contract validator was re-run on the shipped file and still reports `overall: PASS`.
 
 ## Stage 3 — approval
 

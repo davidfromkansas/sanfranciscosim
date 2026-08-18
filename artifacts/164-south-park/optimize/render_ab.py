@@ -28,8 +28,12 @@ long_axis = max(maxs - mins)
 NEAR, FAR = 1.5 * long_axis, 6.0 * long_axis
 
 scene = bpy.context.scene
-scene.render.engine = "CYCLES"
-scene.cycles.samples = 64
+# EEVEE, not Cycles: this machine was carrying four parallel landmark sessions
+# at load average 200+ while this asset was optimized. The A/B gate compares two
+# renders of the SAME rig against each other, so the engine only has to be
+# identical between them, and EEVEE is ~25x faster here.
+scene.render.engine = "BLENDER_EEVEE"
+scene.eevee.taa_render_samples = 64
 scene.cycles.use_denoising = False
 scene.render.resolution_x, scene.render.resolution_y = RES
 scene.render.film_transparent = True
