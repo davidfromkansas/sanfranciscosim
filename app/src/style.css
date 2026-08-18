@@ -158,9 +158,11 @@ button:hover {
   color: #2b2118;
 }
 
-/* Sticky, so the community you are reading is always named. Kept deliberately
-   short — this column is for reading, and a tall banner pinned to the top would
-   spend a quarter of it on decoration. */
+/* Sticky, so the community you are reading is always named. The banner is
+   deliberately a band rather than the whole illustration: every pixel of it is
+   permanently gone from a column whose job is reading text. The source art was
+   pre-cropped to roughly this shape (pipeline note: 4.5:1, horizon band) so
+   `cover` barely has to crop anything at render time. */
 .rs-head {
   position: sticky;
   top: 0;
@@ -174,11 +176,11 @@ button:hover {
    is missing, so an absent file reads as a plain painted header rather than a
    broken picture. */
 .rs-banner {
-  height: 64px;
+  height: 86px;
   margin: 0 -16px;
   border-bottom: 2px solid #2b2118;
   background:
-    image-set(url("/feed/banner.png") 1x) center / cover no-repeat,
+    url("/feed/banner.webp") center / cover no-repeat,
     linear-gradient(160deg, #7fc4e8 0%, #bfe0f2 55%, #e8d9bd 100%);
 }
 
@@ -202,7 +204,7 @@ button:hover {
   border: 2px solid #2b2118;
   box-shadow: 0 0 0 3px #fffdf8;
   background:
-    image-set(url("/feed/icon.png") 1x) center / cover no-repeat,
+    url("/feed/icon.webp") center / cover no-repeat,
     #cfe8f5;
 }
 
