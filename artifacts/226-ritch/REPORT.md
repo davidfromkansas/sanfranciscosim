@@ -153,3 +153,84 @@ and the pipeline advanced to stage 4 on that standing instruction.
   "loadRadius": 2500
 }
 ```
+
+---
+
+## 9. Stage 5 — integration (batch mode)
+
+Case **B**: no `226Ritch` existed in `pipeline/lib/landmarks.mjs`, so this needed a
+registry entry, an exclusion and a tile re-bake. `BATCH: yes`, so the bake was run
+for the QA below and then **discarded**; the branch carries source only.
+
+Evidence and scripts are archived under `qa/`.
+
+### Local QA
+
+| Check | Result |
+|---|---|
+| Re-validation of the shipping GLB | **PASS** — `validation.json` all-PASS on the stage-4 output |
+| Manifest entry served | **PASS** — 91 entries, `226-ritch` present with the drafted values |
+| id mapping (`camelId`) | **PASS** — `226-ritch` → `226Ritch`, matching the registry |
+| Landmark placed | **PASS** — `SF.assets.placed.has('226Ritch')` true |
+| Loader scale | **PASS** — `uniform x1.0000 at 3644, -1154` (the anchor is 3643.9, −1153.8) |
+| Exactly one building on the site | **PASS** — proved from the tile, not the radius: see below |
+| Orientation | **PASS** — preset `yaw 134` (= 180 − 45.6) puts the camera NE over Ritch Street and the green front faces it |
+| Terrain seating | **PASS** — flat site, `pivot.y` 5.38 m, no float or sink |
+| Night glow | **PASS** — the lit loft windows and the entry light; the loggias and roof stay dark |
+| Draw calls | **PASS** — max **124** over the app's own frames (budget 300) |
+| Streaming | **PASS** — settled at `entries 91, far 6, loading 0, live 85, fading 0, failed 0` |
+| `npm run lint` | **PASS** |
+| `npm test` | **PASS** — 26/26 |
+| Fallback drill | **PASS** — see below |
+
+### The exclusion, proved from the tile
+
+`qa/tilecheck.mjs` decodes `app/public/tiles/buildings/23_13.bin` and measures the
+*penetration depth* of every surviving footprint into the asset's real 12.13 × 22.80 m
+rectangle, rather than asking a boolean question a shared party-wall vertex would fail.
+
+| | footprints in 23_13 | nearest surviving vertex to the anchor | deepest penetration |
+|---|---|---|---|
+| `origin/main` | 182 | 9.44 m | **+1.86 m** — a procedural block 17.6 m tall standing inside the asset |
+| after the re-bake | 181 | 10.23 m | **−0.00 m** — nothing inside |
+
+Exactly one footprint dropped, which is what `exclude: 5` was sized for. The −0.00 m
+figure is the party wall to 218 Ritch sitting exactly on the boundary — correct, and
+the reason a penetration depth was measured instead of a containment test.
+
+`node pipeline/verify-rebake.mjs`: **PASS** — 584 of 585 cells unchanged, 23_13
+182 → 181, `226Ritch` 10.2 m of clear ground against a 5 m radius.
+`node pipeline/audit.mjs` check **1.6 PASS** — 100 zones over 97 landmarks clear.
+(1.2b, 1.3c and 1.7b fail on `origin/main` too and are unrelated.)
+
+### Fallback drill
+
+GLB moved aside, page reloaded with a cache-buster: the app booted, the city stayed
+alive, 84 other landmarks merged normally, and the manifest entry went to
+`failed: 1` with `placed: false` and no merge line. **Case B, so the site is empty
+ground inside the exclusion zone — that is by design, not a hole to debug.** File
+restored.
+
+### The bake, and why it is not in this commit
+
+The re-bake changed 595 generated files. That is the documented consequence of
+dropping one footprint: `ctx/*.json` keys buildings by *global* index, so removing
+one renumbers every later index. Spot-checked 25 random `ctx` sidecars by content
+rather than by id — **25 of 25 identical**, i.e. a pure renumber. The only real
+content changes are `api/_data/stats.json` (buildings 174,696 → 174,695, apartments
+14,009 → 14,008, land-use source −1) and `search-index.json` (+1 for the new
+searchable landmark).
+
+Per `ADDRESS-TO-ASSET.md` "Batch mode", the bake was discarded with
+`git checkout -- app/public/tiles api/_data`. `git diff --name-only origin/main`
+lists nothing under `app/public/tiles/` or `api/_data/`. The city gets baked once
+for the whole batch by `docs/asset-pipeline/BATCH-INTEGRATE.md`.
+
+### One observation for the batch reviewer
+
+At city scale the roof reads noticeably darker than its baked neighbours —
+`Toy_roofd` (`45454a`) against the toy palette's cream and tan roofs. That is the
+same material every sibling landmark uses for a flat membrane roof and it is
+correct for the real building, but 226 Ritch is small enough that the roof is most
+of what the aerial camera sees of it, so it is the one thing worth a second opinion
+when the batch is reviewed together.

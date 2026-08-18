@@ -2545,6 +2545,53 @@ export const LANDMARKS = [
     // destination.
     camera: { distance: 165, yaw: 270, pitch: 26 },
   },
+  {
+    // 226 Ritch Street (1994-96) — eight live/work lofts on the south-west side
+    // of Ritch, the alley between Bryant and Brannan. Sage-green stucco over a
+    // sand-tiled garage band, a galvanised fire escape up the front, and a roof
+    // deck. Three storeys, but the lofts have 15-foot ceilings, which is why the
+    // parapet is 16.0 m — as tall as a five-storey building on the same block.
+    //
+    // `height` is the CREST (the stair bulkhead), not the parapet, because the
+    // manifest scales the GLB by targetHeightM / measuredHeight and the model's
+    // bbox top is the bulkhead. The parapet itself lands at 16.0 m, which is
+    // where OSM's height=16 and the DataSF LiDAR median (15.90 m) both put it.
+    // The 18.1 m crest is the LiDAR hgt_max (18.14 m) and is corroborated by
+    // hgt_majority 17.63 m — a REPEATED value 1.7 m above a roof plane whose
+    // mean and median agree to 0.1 m, which a single spurious return cannot
+    // produce. See artifacts/226-ritch/REPORT.md §2 for what is still unproven.
+    //
+    // exclude: 5 is MEASURED, not guessed, against both bake inputs from this
+    // anchor. `excluded()` in pipeline/buildings.mjs drops a footprint whose
+    // ring centroid OR any ring vertex is inside the radius:
+    //
+    //   0.85 m  this footprint's centroid, DataSF SF3776120
+    //   0.68 m  this footprint's centroid, OSM 148217483 (Overture proxy)
+    //   9.75 m  the CENTROID of 218 Ritch (OSM 148217499) — the binding limit
+    //  10.23 m  the nearest vertex of 218 Ritch, DataSF SF3776144
+    //
+    // So the window that drops exactly this footprint is 0.9 < r < 9.75 and it
+    // is unusually wide for a party-wall row: 218 Ritch is a small 144 m2
+    // building whose centroid, not a shared party-wall vertex, sets the ceiling.
+    // 5 sits in the middle with ~4.1 m of margin below and ~4.75 m above. The
+    // exclusion fires on this footprint's CENTROID — its own nearest vertex is
+    // 6.1 m out — so do not shrink r below 1 expecting the vertices to catch it.
+    //
+    // App yaw = 180 - true bearing (camera.js `apply()`: the offset is
+    // (sin yaw, ., cos yaw) with +z south). The Ritch Street front faces 45.6
+    // deg, so yaw 134 stands the camera north-east, out over the alley, looking
+    // back at the one designed elevation — the other three faces are two party
+    // walls and a rear that the 1998 permits clad in vinyl siding. 180 m suits
+    // an 18.1 m building (cf. 188SouthPark 190 at 15.93 m, 181SouthPark 190 at
+    // 16.5 m). No `key`: this is texture in the block, not a destination.
+    id: '226Ritch',
+    name: '226 Ritch Street',
+    lon: -122.3960899,
+    lat: 37.7804376,
+    height: 18.1,
+    exclude: 5,
+    camera: { distance: 180, yaw: 134, pitch: 28 },
+  },
 ];
 
 // Parks/green spaces the landcover bake must match at least one source polygon
