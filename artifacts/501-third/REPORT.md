@@ -80,13 +80,13 @@ Presented at approval: the contact sheet (aerial, top, night, four elevations),
 
 | Metric | Value |
 |---|---|
-| Triangles | 2,636 |
+| Triangles | 2,588 (shipped, post-optimize; 2,636 as built) |
 | Dimensions (bbox) | 34.70 × 34.54 × 16.40 m (rhombus diagonal span) |
 | Footprint | 23.6 × 25.05 m rhombus, 592 m2 |
 | Min Z | 0.0 m |
 | Max Z (crest) | 16.4 m (rooftop bulkhead) |
 | Loader scale factor | 1.0 (targetHeightM / measuredHeight = 16.4 / 16.4) |
-| Object count | 86 |
+| Object count | 7 (shipped, joined per material; 86 as built) |
 | Materials | Toy_sand, Toy_ink, Toy_glass, Toy_trim, Toy_roofd, Toy_steel, Toy_white_Glow |
 | Glow materials | Toy_white_Glow (storefront uplight + 2 lit upper windows) |
 | Normal ray residual | 0.000032 (gate 0.0015) |
@@ -108,6 +108,26 @@ quietly lit at night, not as a beacon. Glow surfaces are thin shells proud of
 opaque glazing — the app renders `_Glow` in a separate layer at ~12% alpha by
 day.
 
+## Optimize pass (stage 4)
+
+The approved GLB was run through `docs/asset-pipeline/GLB-OPTIMIZE-PROMPT.md`
+(`ASSET_CLASS: landmark`, `ALLOW_MESHOPT: yes`, `ALLOW_BAKE: no`). Full metrics,
+census and gate table in `optimize/REPORT.md`.
+
+| Metric | Approved | Shipped |
+|---|---:|---:|
+| File, raw bytes | 177,568 | **75,696** (−57.4%) |
+| Draw submeshes | 86 | **7** (−91.9%) |
+| Triangles | 2,636 | 2,588 |
+| Bbox | 34.6966 x 34.5376 x 16.4 m | identical |
+| Materials | 7 (1 glow) | 7 (1 glow) |
+
+All gates G1-G6, G8 PASS (G7 n/a, no bake). Worst appearance delta 0.049% mean
+absolute RGB, night far, against a 2% gate. The limited dissolve was skipped
+(this asset has two full-footprint parapet annuli); the 1 mm weld was kept after
+measuring it four ways -- worth 6,776 bytes here because the asset is beveled
+throughout. The pre-optimize file is archived at `optimize/input/501-third.glb`.
+
 ## Manifest draft
 
 ```json
@@ -125,7 +145,7 @@ day.
   "dims": [
     34.70, 34.54, 16.40
   ],
-  "tris": 2636,
+  "tris": 2588,
   "loadRadius": 2500
 }
 ```
