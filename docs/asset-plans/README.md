@@ -136,8 +136,9 @@ route, and the park plans depend on it (§E8 of the parks README).
 | [326 Brannan Street (JAX Vineyards Wine Court)](./326-brannan.md) | `326-brannan` | 5.9 m (shed parapet; LiDAR deck 5.66 m) | new landmark |
 | [340 Brannan Street](./340-brannan.md) | `340-brannan` | 17.79 m | new landmark |
 | [45–49 South Park (Gran Oriente Filipino Residence)](./49-south-park.md) | `49-south-park` | 13.0 m (LiDAR-derived) | new landmark |
+| [10 South Park (South Park Lofts)](./10-south-park.md) | `10-south-park` | 14.67 m (roof bulkhead, LiDAR maximum; parapet crest 13.10 m photogrammetric) | new landmark |
 
-## Shared contract (all 94)
+## Shared contract (all 95)
 
 - Style: `docs/styles/miniature-toy.md` (authoritative for artistic decisions)
 - Technical contract: `.agents/skills/sf-asset-check/SKILL.md` (authoritative for the GLB)
@@ -237,6 +238,17 @@ Where a plan cites a DataSF `mblr`/`sf16_bldgid` footprint, that is the survey; 
 geometry on small SoMa lots is a Bing trace and should be treated as a cross-check
 only. Getting from an address to the right DataSF polygon goes through the parcels
 dataset (`acdm-wktn`, `blklot` -> address range), not through a spatial guess.
+
+10 South Park is the set's hardest *resolution* case, and it fails in two ways at once.
+First, no OSM way carries its address at all, so Nominatim TIGER-interpolates onto the
+South Park roadway and returns `osm_type: way` — the 350 Brannan failure mode, and it
+looks like a building hit. Second, it is a **condominium**: the address exists ten
+times over, on lots 3775/106 through 3775/115, all sharing one parcel polygon. Only the
+address -> DataSF address table -> APN -> parcel -> footprint route survives both. It
+is also the set's clearest case of a lot with **two** baked buildings and an open
+courtyard between them, so like 132 South Park it needs one exclusion zone per
+structure plus a guard zone at the anchor; the difference is that here both buildings
+are traced twice, by DataSF and by Overture, so a correct exclusion drops four rings.
 that could plausibly be a sea-level datum. 181 South Park is a fifth: its `height=14`
 matches the LiDAR median to within 0.2 m, which makes it look corroborated rather than
 merely repeated, and the crest is still 2.3 m above it.
