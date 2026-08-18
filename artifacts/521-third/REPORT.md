@@ -86,12 +86,13 @@ honest, which is the view the app spends most of its time in. The davits are
 modelled from the deck to exactly 11.40 m, so they read as a frame against the
 membrane from the aerial camera and do not change the bbox.
 
-## Geometry
+## Geometry (shipped numbers, after the stage-4 optimize pass)
 
 | | |
 |---|---|
 | Footprint | surveyed parcel `3775072`: 14.64 × 23.10 m rhombus, 338.8 m², 90° corners on the 45° SoMa grid |
-| Objects | 255 |
+| File size | **248,552 B** raw (588,992 B before optimize, −57.8 %); 148,989 B gzip −9 |
+| Objects / draw primitives | **15 / 16** (255 / 256 before optimize) |
 | Triangles | **8,848** (plan cap 10,000; AGENTS landmark cap 30,000) |
 | Bounding box | X −13.968 … 13.393, Y −13.659 … 13.442, Z 0 … **11.400** |
 | Dimensions | 27.361 × 27.101 × 11.400 m |
@@ -155,11 +156,28 @@ axes, the west orthographic camera looks straight at the 3rd Street / Taber Plac
 corner and carries both designed elevations in one frame. The aerial uses the
 same azimuth, which is also the manifest camera preset's `yaw: 270`.
 
+## Optimize (stage 4)
+
+`optimize/REPORT.md` has the full account. Summary: meshopt via
+`gltfpack@0.24 -c -km -kn -noq`, **588,992 → 248,552 B (−57.8 %)**, 255 → 15
+objects, 256 → 16 draw primitives, triangles and bounding box unchanged to the
+byte, material set identical, both `_Glow` pairs preserved. Gates G1–G5, G7 and
+G8 PASS; G6 passes on raw bytes and records the documented gzip crossover
+(gzipped bytes rise 51 %, because meshopt is already entropy-coded — the same
+crossover `592-third` and `370-brannan` recorded). The limited dissolve was
+skipped per GLB-OPTIMIZE-PROMPT §3.3: this asset has two footprint-following ring
+bands. A/B pixel deltas: worst view 0.0090 % mean absolute RGB against a 2–4 %
+gate.
+
+The optimized file **is** the shipping asset. The pre-optimize original is
+archived at `optimize/input/521-third.glb`.
+
 ## Validation
 
-See `validation.json` — re-import into a fresh, isolated Blender scene, then the
-full `sf-asset-check` contract, per-object signed-volume normals test, and a
-31,500-ray visibility residual test.
+See `validation.json` — the *shipped* (meshopt-packed) file re-imported into a
+fresh, isolated Blender scene, then the full `sf-asset-check` contract,
+per-object signed-volume normals test, and a 31,500-ray visibility residual test.
+**All 16 checks PASS**, 8,848 triangles, crest exactly 11.400 m.
 
 ## Known limitations
 

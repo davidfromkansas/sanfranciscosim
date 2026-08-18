@@ -6,8 +6,10 @@
 #      objects, so a per-object weld can never fuse glow onto base surfaces)
 #   2. delete degenerate faces; delete interior faces strictly buried inside
 #      another box-like solid (AABB-fill >= 95%) — provable-invisible only
-#   3. limited dissolve, 0.05 deg (strictly coplanar), delimit material+sharp
-#   4. (skipped) curve retess — the cupola is a silhouette-defining hypar shell
+#   3. (SKIPPED) limited dissolve — see the block below; this asset has TWO
+#      footprint-following ring bands, the exact case GLB-OPTIMIZE-PROMPT §3.3
+#      says to skip
+#   4. (skipped) curve retess — this asset has no curved geometry at all
 #   5. join objects per material (no manifest node names, no Toy_body here)
 #   7. signed-volume normals audit
 import bpy, bmesh, sys, json, contextlib, io
@@ -120,21 +122,21 @@ for o in mesh_objs():
 stats["interior_faces_removed"] = interior_removed
 snap("interior-faces")
 
-# --- 3. limited dissolve, coplanar only ---
-for o in mesh_objs():
-    bpy.context.view_layer.objects.active = o
-    for oo in mesh_objs():
-        oo.select_set(oo is o)
-    bpy.ops.object.mode_set(mode="EDIT")
-    bpy.ops.mesh.select_all(action="SELECT")
-    # 0.05 deg, not 0.5: dissolve merges transitively, and on the gently
-    # curved hypar shell a 0.5-deg chain accumulates into twisted ngons whose
-    # triangulation flips windings (caught by the 22.5k-ray test). Strictly
-    # coplanar runs only.
-    bpy.ops.mesh.dissolve_limited(angle_limit=0.000872665,
-                                  delimit={"MATERIAL", "SHARP"})
-    bpy.ops.object.mode_set(mode="OBJECT")
-snap("limited-dissolve")
+# --- 3. limited dissolve: SKIPPED ON THIS ASSET ---
+# GLB-OPTIMIZE-PROMPT §3.3: skip the dissolve entirely on assets with large
+# coplanar ring bands. This building has TWO — `parapet`, a 0.30 m band
+# following all four footprint edges from 10.90 to 11.40 m, and `coping`, the
+# dark cap ring over it. Their top and bottom faces are perfectly coplanar
+# annuli, so even a strictly-coplanar 0.05 deg dissolve merges each into a
+# single ngon, and re-triangulating an annulus emits slivers tens of metres long
+# and a fraction of a millimetre wide. Those pass an area-based degeneracy test
+# and survive Phase B and E, then fail the stage-2 contract validator AFTER the
+# shipping swap, as `invalid_or_nonunit_loop_normal_count` in the packed file
+# (measured on 350-brannan, 13 Aug 2026). At 8,848 triangles the dissolve would
+# have been worth a fraction of a percent; it is not worth manufacturing that
+# failure.
+stats["limited_dissolve"] = "skipped: parapet + coping ring bands (prompt 3.3)"
+snap("limited-dissolve-skipped")
 
 # --- 5. join per material (multi-material objects keep their own mesh) ---
 groups = defaultdict(list)

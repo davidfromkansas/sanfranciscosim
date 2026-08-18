@@ -38,7 +38,7 @@ cw, ch = cell.size
 cw2, ch2 = cw // 2, ch // 2
 sheet = Image.new("RGB", (cw2 * 4, ch2 * 3 + 24), (24, 24, 28))
 d = ImageDraw.Draw(sheet)
-d.text((8, 4), "St Marys Cathedral A/B — rows: input / optimized / diff x8 — cols: N E S W",
+d.text((8, 4), "521 Third St A/B — rows: input / optimized / diff x8 — cols: N E S W",
        fill=(220, 220, 220))
 for r, pref in enumerate(["renders/in_", "renders/out_", "renders/diff_"]):
     for c, tag in enumerate(cols):
