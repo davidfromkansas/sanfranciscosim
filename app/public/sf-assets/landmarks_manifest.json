@@ -1692,5 +1692,24 @@
     ],
     "tris": 9262,
     "loadRadius": 2500
+  },
+  {
+    "id": "10-south-park",
+    "file": "10-south-park.glb",
+    "anchor": [
+      -122.3935162,
+      37.7823704
+    ],
+    "targetHeightM": 14.67,
+    "cat": 2,
+    "name": "10 South Park (South Park Lofts)",
+    "estimated": false,
+    "dims": [
+      39.9401,
+      35.9952,
+      14.67
+    ],
+    "tris": 11976,
+    "loadRadius": 2500
   }
 ]

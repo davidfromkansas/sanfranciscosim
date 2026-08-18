@@ -280,3 +280,56 @@ Two judgment calls worth carrying forward: the limited-dissolve step was
 is the one that manufactures slivers; and the A/B rig was moved from Cycles to
 EEVEE because the machine was at load 142 and the gate compares two renders of
 one rig, so only the match matters.
+
+## 9. Stage 5 — integration (Case B, batch mode)
+
+Executed `docs/asset-plans/INTEGRATION-PROMPT.md` Part 1 with `<slug>` =
+`10-south-park`, `<Name>` = `10 South Park (South Park Lofts)`, **Case B**, in
+**batch mode**: the bake was run and fully QA'd, then discarded, and only source
+is committed. `git diff --name-only origin/main` lists nothing under
+`app/public/tiles/` or `api/_data/`.
+
+| step | result |
+|---|---|
+| re-validation of the shipped GLB, fresh scene | **PASS** — `validation.json` overall PASS on the meshopt-packed file |
+| GLB copied to `app/public/sf-assets/landmarks/` | **PASS** — byte-identical to `artifacts/` |
+| manifest entry appended | **PASS** — +19 lines, 0 deletions (text splice, no JSON round-trip) |
+| id mapping | **PASS** — `camelId('10-south-park')` = `10SouthPark`, matching the registry |
+| registry entry in `pipeline/lib/landmarks.mjs` | **PASS** — landed in `LANDMARKS`, `exclusionZones()` returns its three zones |
+| re-bake | **PASS** — full chain `terrain → bridges → buildings → streets → landcover → validate → lore → toy → notables → context → muni-shapes` |
+| `audit.mjs` check 1.6 | **PASS** — "102 zones over 97 landmarks clear" |
+| `verify-rebake.mjs` | **PASS** — 584 of 585 cells unchanged; cell **23_13 182 → 180**; nearest surviving footprint 25.5 m / 34.6 m / 11.5 m against the 2 / 5 / 4.5 m radii |
+| nothing procedural under the asset | **PASS** — decoded `buildings/23_13.bin` and measured penetration into the real lot polygon: deepest is **−5.68 m**, i.e. the nearest survivor is 5.7 m *outside* the lot |
+| single building at the site | **PASS** — one asset, no procedural twin, no z-fighting (screenshot) |
+| **loader scale** | **PASS** — `SF.assets.placed.get('10SouthPark').log` = **`uniform x1.0000 at 3870, -1367`** |
+| orientation | **PASS** — the bowed front and the loggia face the oval; the blind flanks face the two party walls |
+| terrain seating | **PASS** — no float, no sink at the anchor |
+| night glow | **PASS** — only the front window bands, the Taber Place windows and the entry accent light up |
+| draw calls | **PASS** — **129** max at the landmark (300 budget), measured by hooking `renderer.render` and taking the per-frame max |
+| streaming | **PASS** — `entries 91, live 83, loading 0, fading 0, failed 0` after settling |
+| **fallback drill** | **PASS** — with the GLB moved aside: `failed: 1`, `live: 82`, the app boots, the city renders (613 cells, 15,263 trees), the landmark is absent and, as expected for Case B, its site is empty ground inside the exclusion zone. File restored. |
+| `npm run lint` / `npm test` / `npm run build` | **PASS** — clean lint, 26/26 tests, build 1.53 s |
+| batch sanity check | **PASS** — no `app/public/tiles/` or `api/_data/` in the diff |
+
+QA method: headless Chrome over CDP against this worktree's own Vite dev server,
+with the flag set from `pipeline/landmark-streaming-check.mjs`
+(`--disable-background-timer-throttling --disable-renderer-backgrounding
+--enable-unsafe-swiftshader`), which is what makes `requestAnimationFrame` run —
+measured 30 frames in 3 s, so nothing had to be hand-pumped. The clock was pinned
+with `SF.setClock(...)` for the day and night frames rather than left on live
+time. The served manifest was checked for this entry before anything else was
+believed, because `preview_start` resolves names from `~/.claude/launch.json` and
+can silently serve a different tree.
+
+**One honest observation from the deployed look, not a defect:** the app renders
+`Toy_apricot` noticeably more saturated than the Blender review rig does — closer
+to a terracotta orange than the authored `#dda87b`. That is the toy post-process,
+and every neighbour gets the same treatment (2 South Park's brick and 22–24's
+sage both read hotter in the app too). The building still does what the colour is
+there to do: it is the one warm-orange lot on a rim of sage clapboard, cream
+ashlar and red brick.
+
+Not run, deliberately: push, PR and deployed QA. Stage 5 of
+`docs/asset-pipeline/ADDRESS-TO-ASSET.md` replaces the integration prompt's Step 7
+with a stop, and the batch is opened as one PR by
+`docs/asset-pipeline/BATCH-INTEGRATE.md`.
