@@ -40,12 +40,49 @@ const PUMA_NAMES = {
   "07514": "Marina & Western Addition",
 };
 
+// Elapsed time FLOORS. Rounding made everything older than it was: something
+// written ninety minutes ago read "2h ago", and thirty seconds ago read "1m
+// ago". Nobody says "two hours" about an hour and a half.
 function ago(at) {
-  const mins = Math.max(0, Math.round((Date.now() - at) / 60000));
-  if (mins < 1) return "just now";
+  const secs = Math.max(0, (Date.now() - at) / 1000);
+  if (secs < 60) return "just now";
+  const mins = Math.floor(secs / 60);
   if (mins < 60) return `${mins}m ago`;
-  const hours = Math.round(mins / 60);
-  return hours < 24 ? `${hours}h ago` : `${Math.round(hours / 24)}d ago`;
+  const hours = Math.floor(mins / 60);
+  if (hours < 24) return `${hours}h ago`;
+  const days = Math.floor(hours / 24);
+  if (days === 1) return "yesterday";
+  if (days < 7) return `${days} days ago`;
+  // Past a week, a count stops meaning anything — say the date.
+  return new Date(at).toLocaleDateString(undefined, {
+    month: "short",
+    day: "numeric",
+  });
+}
+
+// Every rendered time label, so they can be refreshed in place. Rebuilding the
+// feed to age a timestamp would yank a post out from under whoever is reading
+// it; the panel only rebuilds when something is actually said.
+const stamps = new Set();
+
+function timeLabel(at) {
+  const node = el("span", "rs-time", ago(at));
+  // The exact moment, for anyone who wants it, without spending screen on it.
+  node.title = new Date(at).toLocaleString();
+  node.dataset.at = String(at);
+  stamps.add(node);
+  return node;
+}
+
+function refreshStamps() {
+  for (const node of stamps) {
+    if (!node.isConnected) {
+      stamps.delete(node); // re-rendered away; stop holding a reference
+      continue;
+    }
+    const text = ago(Number(node.dataset.at));
+    if (node.textContent !== text) node.textContent = text;
+  }
 }
 
 function el(tag, className, text) {
@@ -171,7 +208,7 @@ function identity(who, at, onOpen) {
   const top = el("div", "rs-who-top");
   const name = el("button", "rs-author", who.name);
   name.addEventListener("click", () => onOpen(who));
-  top.append(name, el("span", "rs-sep", "·"), el("span", "rs-time", ago(at)));
+  top.append(name, el("span", "rs-sep", "·"), timeLabel(at));
 
   // A resident with no job still has a place. Census wording like "Not in the
   // labour force" is theirs and is printed as written; only a genuinely empty
@@ -278,5 +315,9 @@ export function createFeedPanel({ onVisit = () => false } = {}) {
 
   refresh();
   setInterval(refresh, POLL_MS);
+  // Ages tick on their own clock. The feed only rebuilds when something is
+  // actually said, so without this a post written five minutes ago still reads
+  // "5m ago" an hour later. One pass over a few dozen spans, once a minute.
+  setInterval(refreshStamps, 60 * 1000);
   return { refresh };
 }
