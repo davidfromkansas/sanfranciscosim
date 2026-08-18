@@ -136,8 +136,9 @@ route, and the park plans depend on it (§E8 of the parks README).
 | [326 Brannan Street (JAX Vineyards Wine Court)](./326-brannan.md) | `326-brannan` | 5.9 m (shed parapet; LiDAR deck 5.66 m) | new landmark |
 | [340 Brannan Street](./340-brannan.md) | `340-brannan` | 17.79 m | new landmark |
 | [45–49 South Park (Gran Oriente Filipino Residence)](./49-south-park.md) | `49-south-park` | 13.0 m (LiDAR-derived) | new landmark |
+| [434 Brannan Street (Art Deco loft, 1929)](./434-brannan.md) | `434-brannan` | 13.79 m (LiDAR maximum, read as the rooftop mechanical penthouse; roof deck 11.46 m measured, parapet crest ~12.4 m estimated) | new landmark |
 
-## Shared contract (all 94)
+## Shared contract (all 95)
 
 - Style: `docs/styles/miniature-toy.md` (authoritative for artistic decisions)
 - Technical contract: `.agents/skills/sf-asset-check/SKILL.md` (authoritative for the GLB)
@@ -288,6 +289,19 @@ a party-wall node it **shares with 156 South Park**, whose nearest vertex is the
 3.24 < r < 6.10 and the half-diagonal (~9.5 m) would have taken out both neighbours. Size
 the radius from `excluded()`'s actual test — centroid **or** any vertex — against both bake
 sources, not from the building's own dimensions.
+
+434 Brannan Street is the set's clearest case of a measurement that simply refused to
+close. Its roof deck is one of the best-pinned numbers in the whole collection (LiDAR mode
+11.43, median 11.46, mean 11.36, sd 0.92 m over 3,086 cells, with OSM's `height=11`
+agreeing), and its LiDAR maximum of 13.79 m is a believable +2.5σ with no canopy over the
+footprint. What could not be settled is the parapet in between: an equirect
+elevation-angle solve off the Street View pano returned a wall crest *below* the measured
+deck, and a rectilinear width-and-pitch solve off the same pano returned answers 20% apart
+depending on which row was measured. That plan's 2.15 leads with the failure rather than
+quoting the more flattering of the two. It also records why the failure is survivable —
+the body is normalised to the measured deck and `targetHeightM` is by definition the
+export's own top — which is the general reason to prefer "deck measured, crest inferred"
+over "crest measured badly".
 
 The executing agent is expected to re-verify height, anchor, footprint and
 orientation before modelling — the dossier is a head start, not a citation.
