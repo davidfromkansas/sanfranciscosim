@@ -11,15 +11,15 @@ report wins**; §5 lists every disagreement.
 
 | | |
 |---|---|
-| File | `10-south-park.glb` — 751.3 KB raw, 124.9 KB gzip (pre-optimize) |
-| Objects | 258 |
+| File | `10-south-park.glb` — **361.6 KB raw, 213.8 KB gzip** (shipped, meshopt-packed; the 751.3 KB pre-optimize original is archived at `optimize/input/`) |
+| Objects | **13** shipped (258 before the stage-4 join) |
 | Triangles | **11,976** (plan cap 12,000; contract cap 27,000) |
 | Dimensions | 39.94 × 36.00 × **14.67** m |
 | Min Z | 0.000 |
 | XY centre offset | 0.000, 0.000 |
 | Materials | 12, all `Toy_*`, two `_Glow` |
 | Textures / transparency / cameras / lights / animation | none |
-| Validation | `validation.json` — **overall PASS**, every check true |
+| Validation | `validation.json` — **overall PASS** on the shipped packed file, every check true |
 | Build | `build_10_south_park.py` (deterministic), `10-south-park.blend` |
 | Renders | four elevations, facade, top, aerial, aerial-night, contact sheet |
 
@@ -188,10 +188,25 @@ Logged in the order they happened.
    `surround()` with a sill band under a doorway at z = 0 put the entry casing
    0.20 m below the pavement; `min_z` caught it.
 
+## 5b. Approval (stage 3 gate)
+
+Given in the pipeline session on **18 August 2026**, as a standing instruction
+covering every gate in this run, quoted verbatim:
+
+> APPROVE EVERYTHING DONT ASK ME FOR PERMISSION
+
+Presented at the gate: the contact sheet, the day and night aerials, and the
+numbers in §1 and §6 (11,976 triangles, 39.94 x 36.00 x 14.67 m, 12 materials,
+2 glow groups, validation overall PASS). No revision was requested.
+
 ## 6. Validation
 
 `validation.json`, written by `validate_10_south_park.py` from a **fresh
-factory-reset scene importing the shipped GLB** — not the build scene.
+factory-reset scene importing the shipped GLB** — not the build scene. It was run
+twice: once on the pre-optimize build, and again on the stage-4 meshopt-packed
+file that actually ships, because the sliver failure mode the optimize prompt
+warns about appears only in the packed file. Both pass; the numbers below are the
+shipped ones.
 
 | check | result |
 |---|---|
@@ -207,7 +222,7 @@ factory-reset scene importing the shipped GLB** — not the build scene.
 | no animation, skin or constraints | PASS |
 | transforms applied | PASS |
 | no negative scales | PASS |
-| normals outward — per-object signed volume | PASS — 258 / 258 positive |
+| normals outward — per-object signed volume | PASS — 13 / 13 positive (258 / 258 pre-optimize) |
 | normals outward — ray residual | PASS — **0 flipped of 30,823 first hits** |
 | no degenerate geometry | PASS |
 | no unexpected objects | PASS |
@@ -249,3 +264,19 @@ of the plan's parcel-AABB estimate (`-122.3934999, 37.7823712`) because the buil
 outline includes bevels and the courtyard slab. `name` leads with the address
 rather than "South Park Lofts" because `188-south-park` already ships under that
 marketing name.
+
+## 8. Stage 4 — optimize
+
+Run with the pipeline defaults (`ASSET_CLASS: landmark`, `ALLOW_MESHOPT: yes`,
+`ALLOW_BAKE: no`). Full metrics, census, per-phase savings and gate results are
+in `optimize/REPORT.md`. Headline: **769,304 → 361,604 raw bytes (−53.0 %)**,
+258 → 13 objects, 261 → 14 draw submeshes, 24,806 → 6,488 vertices, triangles and
+bounding box unchanged, worst A/B pixel delta 0.017 % against gates of 2 % and
+4 %. All of G1–G6 and G8 pass. The optimized file is now the shipping file and
+the pre-optimize original is archived at `optimize/input/10-south-park.glb`.
+
+Two judgment calls worth carrying forward: the limited-dissolve step was
+**skipped** because this asset has four coplanar parapet ring bands and that step
+is the one that manufactures slivers; and the A/B rig was moved from Cycles to
+EEVEE because the machine was at load 142 and the gate compares two renders of
+one rig, so only the match matters.
