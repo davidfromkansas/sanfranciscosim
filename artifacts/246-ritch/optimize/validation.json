@@ -1,0 +1,137 @@
+{
+ "input": {
+  "tris": 8496,
+  "verts": 18076,
+  "objects": 11,
+  "primitives": 12,
+  "materials": [
+   "Toy_glass",
+   "Toy_glass_Glow",
+   "Toy_ink",
+   "Toy_roofd",
+   "Toy_sand",
+   "Toy_slate",
+   "Toy_steel",
+   "Toy_trim",
+   "Toy_trim_Glow",
+   "Toy_white"
+  ],
+  "bbox_dims": [
+   28.3678,
+   28.15563,
+   18.76
+  ],
+  "bbox_min": [
+   -14.08899,
+   -13.97829,
+   0.0
+  ],
+  "center_xy": [
+   0.09491,
+   0.09953
+  ]
+ },
+ "output": {
+  "tris": 8492,
+  "verts": 18035,
+  "objects": 11,
+  "primitives": 12,
+  "materials": [
+   "Toy_glass",
+   "Toy_glass_Glow",
+   "Toy_ink",
+   "Toy_roofd",
+   "Toy_sand",
+   "Toy_slate",
+   "Toy_steel",
+   "Toy_trim",
+   "Toy_trim_Glow",
+   "Toy_white"
+  ],
+  "bbox_dims": [
+   28.3678,
+   28.15563,
+   18.76
+  ],
+  "bbox_min": [
+   -14.08899,
+   -13.97829,
+   0.0
+  ],
+  "center_xy": [
+   0.09491,
+   0.09953
+  ]
+ },
+ "output_signed_volumes": {
+  "part_Toy_glass": {
+   "volume": 23.523101,
+   "closed": true
+  },
+  "part_Toy_glass_Glow": {
+   "volume": 0.439765,
+   "closed": true
+  },
+  "part_Toy_ink": {
+   "volume": 16.233346,
+   "closed": false
+  },
+  "part_Toy_roofd": {
+   "volume": 11.883439,
+   "closed": true
+  },
+  "part_Toy_sand": {
+   "volume": 79.54135,
+   "closed": true
+  },
+  "part_Toy_sand_Toy_steel": {
+   "volume": 5723.827909,
+   "closed": true
+  },
+  "part_Toy_slate": {
+   "volume": 9.090497,
+   "closed": true
+  },
+  "part_Toy_steel": {
+   "volume": 5.359646,
+   "closed": true
+  },
+  "part_Toy_trim": {
+   "volume": 25.77504,
+   "closed": true
+  },
+  "part_Toy_trim_Glow": {
+   "volume": 0.411015,
+   "closed": true
+  },
+  "part_Toy_white": {
+   "volume": 0.014281,
+   "closed": true
+  }
+ },
+ "inverted_solids": [],
+ "open_shells": [
+  "part_Toy_ink"
+ ],
+ "ray_test_output": {
+  "rays": 22500,
+  "hits": 16849,
+  "flipped": 0,
+  "flipped_fraction": 0.0
+ },
+ "ray_test_input": {
+  "rays": 22500,
+  "hits": 16849,
+  "flipped": 0,
+  "flipped_fraction": 0.0
+ },
+ "ray_flip_delta": 0.0,
+ "gates": {
+  "G1_materials_identical": true,
+  "G2_bbox_ok": true,
+  "G2_origin_ok": true,
+  "G2_volumes_positive": true,
+  "G2_ray_flip_ok": true,
+  "G5_primitives_ok": true
+ }
+}

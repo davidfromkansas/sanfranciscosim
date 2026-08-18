@@ -5,7 +5,7 @@
   "reimported_final_glb": true,
   "object_count": 11,
   "mesh_object_count": 11,
-  "triangle_count": 8496,
+  "triangle_count": 8492,
   "triangle_budget": 9000,
   "dimensions_m": [
     28.3678,
@@ -183,7 +183,7 @@
     },
     {
       "name": "part_Toy_ink",
-      "triangles": 1364,
+      "triangles": 1360,
       "location": [
         0.0,
         0.0,

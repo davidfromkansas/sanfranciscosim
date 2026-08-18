@@ -11,8 +11,9 @@ Built: 18 August 2026, Blender 5.2.0 LTS, headless.
 
 | | Measured (fresh re-import of the shipped GLB) | Contract |
 |---|---|---|
-| Triangles | **8,496** | cap 9,000 (plan §2.11); landmark limit 27,000 |
+| Triangles | **8,492** shipped (8,496 pre-optimize) | cap 9,000 (plan §2.11); landmark limit 27,000 |
 | Objects | 11 (joined by material) | — |
+| File | **248,928 bytes** meshopt-packed (509,272 authored, −51.1%) | ≤ 500 KB |
 | Dimensions | **28.368 x 28.156 x 18.760 m** | XY bbox ~27.9 expected from the 45° heading |
 | Building | 16.68 m frontage x 22.70 m deep | measured, OSM way/1174904714 |
 | min Z | 0.0000 | ≤ 0.5 m |
@@ -150,7 +151,7 @@ fire-department connection, vehicles, people, plinths, cameras or lights.
     28.1556,
     18.76
   ],
-  "tris": 8496,
+  "tris": 8492,
   "loadRadius": 2500
 }
 ```
@@ -158,6 +159,15 @@ fire-department connection, vehicles, people, plinths, cameras or lights.
 `camelId()` maps `246-ritch` → `246Ritch`; digits do not start a segment. The
 `pipeline/lib/landmarks.mjs` entry must use exactly that id or the procedural block is never
 hidden and there is no warning.
+
+## 6a. Stage 4 — optimize
+
+`gltfpack@0.24 -c -km -kn -noq` applied directly to the authored GLB: **509,272 → 248,928 bytes,
+−51.1%**, 8,496 → 8,492 triangles (four degenerates dropped), identical bbox, identical material
+set, worst A/B pixel delta 0.0019%. Phase B measured as a net regression and reverted in full —
+the build script already joins per material, so the pass had nothing left to do and every
+Blender round-trip cost ~9 KB. Full four-variant table, census and gate results in
+`optimize/REPORT.md`. The pre-optimize original is archived at `optimize/input/246-ritch.glb`.
 
 ## 7. Reproducing
 
@@ -173,4 +183,12 @@ Add `--workbench` to the render script for a seconds-per-frame iteration pass.
 
 ## 8. Approval
 
-Pending — presented at stage 3 of `docs/asset-pipeline/ADDRESS-TO-ASSET.md`.
+Presented at stage 3 on 18 August 2026 (contact sheet, hero aerial from the north-east, night
+aerial, and the numbers above). The session's standing instruction, given verbatim in the
+invocation, was:
+
+> "APPROVE EVERYTHING DONT ASK ME FOR PERMISSION"
+
+Taken as the gate-3 approval and recorded here as such. It is a standing pre-authorisation
+rather than a judgement on these particular renders, so it is quoted as what it is; the
+evidence was presented in full before advancing.
