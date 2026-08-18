@@ -9,7 +9,8 @@ Built 18 August 2026, Blender 5.2.0 LTS, headless.
 |---|---|
 | `build_434_brannan.py` | deterministic build; re-run to reproduce the GLB exactly |
 | `434-brannan.blend` | the authoring scene the export came from |
-| `434-brannan.glb` | **the shipping asset** — 407 KB raw, 65 KB gzipped |
+| `434-brannan.glb` | **the shipping asset** — the stage-4 optimized, meshopt-packed file: 166 KB raw, 93 KB gzipped |
+| `optimize/` | stage-4 pass: scripts, stats, A/B renders, `input/434-brannan.glb` (the pre-optimize archive), `REPORT.md` |
 | `render_434_brannan.py` | the review rig (re-imports the exported GLB, never the .blend) |
 | `validate_434_brannan.py` | fresh-scene contract validation |
 | `make_contact_sheet.py` | composes the seven review frames |
@@ -23,13 +24,14 @@ Built 18 August 2026, Blender 5.2.0 LTS, headless.
 | | |
 |---|---|
 | Triangles | **5,872** (cap 9,000) |
-| Mesh objects | 202 |
+| Mesh objects | 12 as shipped (202 as authored; stage 4 joins per material) |
+| Draw submeshes | 13 |
 | Dimensions | 40.196 x 40.668 x **13.79** m |
 | Min Z | 0.0000 |
 | XY centre offset | (0.206, −0.205) m |
 | Materials | 11 — `Toy_coral`, `Toy_glass`, `Toy_ink`, `Toy_roofd`, `Toy_rust`, `Toy_steel`, `Toy_stone`, `Toy_trim`, plus `Toy_coral_Glow`, `Toy_glass_Glow`, `Toy_trim_Glow` |
 | Glow groups | 3 (frieze crown, sash scatter, entry) |
-| File | 416,948 B raw / 66,437 B gzip |
+| File | **170,356 B raw / 94,960 B gzip** as shipped (416,948 / 65,450 as authored) |
 | Anchor | −122.3954103, 37.7796003 |
 | Brannan front heading | 134.8° true (SE) |
 
@@ -130,6 +132,21 @@ judges — silhouette, massing, the toothed roofline, which surfaces glow — ne
 path tracing. `--engine cycles` forces path tracing; the night frame here was
 rendered in Cycles at 40 samples because EEVEE's glow read is less trustworthy.
 In Blender 5.2 the enum is `BLENDER_EEVEE`, not `BLENDER_EEVEE_NEXT`.
+
+## Gate 4 — optimize
+
+Run 18 August 2026 per `docs/asset-pipeline/GLB-OPTIMIZE-PROMPT.md`; full write-up
+in `optimize/REPORT.md`. 416,948 → **170,356** raw bytes (−59.1%), 202 → 12 mesh
+objects, 203 → 13 draw submeshes, triangles unchanged at 5,872, material set
+identical. All gates G1–G6 and G8 PASS (G7 n/a, no bake); worst A/B pixel delta
+0.055% against a 2%/4% gate; ray-flip fraction 0.0000. The stage-2 contract
+validator was re-run against the shipped file and still returns `overall: PASS`.
+
+Two judgment calls worth carrying forward: the limited dissolve was **skipped**
+because this asset has two footprint-following coplanar ring bands (parapet and
+coping), which is the documented sliver hazard; and the 1 mm weld was **kept**
+after a four-variant measurement, because this asset is beveled and the weld cut
+vertices by 72% and raw bytes by a further 4.3 KB on top of the join.
 
 ## Gate 3 — approval
 
