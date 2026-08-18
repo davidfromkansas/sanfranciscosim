@@ -500,9 +500,10 @@ things must read from directly above: the **toothed parapet** (six caps on Brann
 coping down Zoe) and the **penthouse-plus-duct** composition in the rear half. Keep the
 deck clearly lighter than the roof units so the furniture reads as objects on a surface,
 keep the Brannan third of the deck comparatively clean — the real roof is empty there
-apart from the skylight cluster — and do not centre the penthouse: it sits toward the
-rear and slightly southwest, which is what makes the roof look observed rather than
-decorated.
+apart from the skylight cluster — and do not centre the penthouse: it sits about two
+thirds of the way back and only ~6.6 m in from the **northeast** parapet (measured off
+the nadir imagery against the footprint ring), which is what makes the roof look
+observed rather than decorated.
 
 ### 2.10 Scope
 
