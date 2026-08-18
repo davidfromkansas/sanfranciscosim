@@ -15,7 +15,7 @@
       "maxDuration": 60
     },
     "api/[...path].mjs": {
-      "includeFiles": "api/_data/feed-seed.json",
+      "includeFiles": "api/_data/personas.json",
       "maxDuration": 60
     }
   },

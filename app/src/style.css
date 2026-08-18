@@ -13,7 +13,12 @@ body {
   height: 100%;
   overflow: hidden;
   background: #10151c;
-  font: 12px/1.45 -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+  font:
+    12px/1.45 -apple-system,
+    BlinkMacSystemFont,
+    "Segoe UI",
+    Roboto,
+    sans-serif;
   color: #f2ece2;
 }
 
@@ -88,7 +93,7 @@ body {
 }
 
 select,
-input[type='range'],
+input[type="range"],
 button {
   font: inherit;
   color: inherit;
@@ -98,7 +103,7 @@ button {
   padding: 3px 6px;
 }
 
-input[type='checkbox'] {
+input[type="checkbox"] {
   accent-color: #ffcf8a;
 }
 
@@ -152,7 +157,12 @@ button:hover {
 
 .feed-title {
   margin: 0;
-  font: 800 17px/1.2 -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+  font:
+    800 17px/1.2 -apple-system,
+    BlinkMacSystemFont,
+    "Segoe UI",
+    Roboto,
+    sans-serif;
   color: #2b2118;
   letter-spacing: -0.2px;
 }
@@ -171,26 +181,6 @@ button:hover {
 .feed-thread {
   border-bottom: 2px solid #2b2118;
   padding: 0 0 10px;
-}
-
-.feed-event {
-  padding: 12px 16px 10px;
-  background: #f5ead4;
-  border-bottom: 1px solid rgba(43, 33, 24, 0.18);
-}
-
-.feed-headline {
-  margin: 0;
-  font: 700 13px/1.4 -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
-  color: #2b2118;
-}
-
-.feed-source {
-  margin: 3px 0 0;
-  font-size: 10.5px;
-  letter-spacing: 0.2px;
-  text-transform: uppercase;
-  color: #6b5a48;
 }
 
 .feed-post {
@@ -220,7 +210,12 @@ button:hover {
 }
 
 .feed-name {
-  font: 700 13px/1.3 -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+  font:
+    700 13px/1.3 -apple-system,
+    BlinkMacSystemFont,
+    "Segoe UI",
+    Roboto,
+    sans-serif;
   color: #2b2118;
 }
 
@@ -239,7 +234,12 @@ button:hover {
 
 .feed-text {
   margin: 5px 0 0 15px;
-  font: 13px/1.5 -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+  font:
+    13px/1.5 -apple-system,
+    BlinkMacSystemFont,
+    "Segoe UI",
+    Roboto,
+    sans-serif;
   color: #2b2118;
 }
 
@@ -258,25 +258,12 @@ button:hover {
    and only ever on the first post in a thread. */
 .feed-post-title {
   margin: 6px 0 0 15px;
-  font: 700 14px/1.35 -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+  font:
+    700 14px/1.35 -apple-system,
+    BlinkMacSystemFont,
+    "Segoe UI",
+    Roboto,
+    sans-serif;
   color: #2b2118;
   text-wrap: balance;
-}
-
-/* The news story that prompted the thread, sitting under it as a citation
-   rather than over it as a headline. */
-.feed-thread .feed-event {
-  margin: 12px 16px 0;
-  padding: 8px 10px;
-  border: 1px solid rgba(43, 33, 24, 0.22);
-  border-radius: 8px;
-  background: #f5ead4;
-}
-
-.feed-thread .feed-event .feed-headline {
-  font-weight: 600;
-  font-size: 11.5px;
-  line-height: 1.4;
-  margin-top: 2px;
-  color: #4a3d30;
 }
