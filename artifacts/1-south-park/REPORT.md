@@ -10,15 +10,17 @@ records what shipped.
 
 | | |
 |---|---|
-| Triangles | **18,938** (cap 20,000) |
-| Objects | 402 |
+| Triangles | **18,932** (cap 20,000) |
+| Objects | 13 as shipped (399 as authored — joined per material at stage 4) |
 | Dimensions | **58.92 × 54.91 × 20.20 m** |
 | min Z | 0.000 |
 | XY centre offset | 0.000, 0.000 |
 | Crest | **20.200 m** — `targetHeightM / measuredHeight` = **1.000** |
 | Anchor (shipped) | `-122.3928634, 37.7820480` |
 | Materials | 11, all `Toy_*`; 2 `_Glow` |
-| Validation | `validation.json` — **all checks PASS** |
+| Shipping file | **469,824 B (458.8 KB)** meshopt-packed — stage 4, see `optimize/REPORT.md` |
+| Draw submeshes | **16** (408 as authored) |
+| Validation | `validation.json` — **all checks PASS**, re-run on the packed shipping file |
 
 The axis-aligned XY box is 58.9 × 54.9 m even though the longest side of the building
 is 43.2 m. That is the ~45° real-world heading, not a scale error.
@@ -64,7 +66,10 @@ moved:
    softening nobody can see at a 4 m bay pitch. Restricting the bevel to the massing,
    and dropping `ARCH_SEGS` from 7 to 5 and `MED_SEGS` from 12 to 10, brought it to
    15,522 before the roof was finished, 18,938 shipped.
-4. **The lawn moved inboard** from d 1.8–8.4 m to 2.6–7.4 m on the north-west terrace:
+4. **The two roof terraces both claimed the west corner.** Two coincident 0.14 m deck
+   slabs z-fought there into a black patch on the top view. The north-west band now
+   wins the corner and the south-west one is clipped out of it.
+5. **The lawn moved inboard** from d 1.8–8.4 m to 2.6–7.4 m on the north-west terrace:
    at the planned position it interpenetrated the hedge row and the coplanar faces
    z-fought into a black patch on the aerial render.
 
@@ -153,8 +158,16 @@ gives night a continuous ribbon.
 
 Every glow surface is an **open single-layer plate** standing proud of the opaque
 glazing, never a closed shell — a shell is two alpha layers deep and reads at roughly
-twice the intended day alpha. `validation.json` confirms 116 of 116 glow faces are the
-first surface hit from outside along their own normal.
+twice the intended day alpha. `validation.json` confirms every glow face is the
+first surface hit from outside along its own normal.
+
+**The penthouse band was cut back after the first night render.** An unbroken glow
+ribbon round the whole penthouse perimeter, 1.55 m tall, out-shouted the arcade
+completely — it read as the hero and the building's actual night identity became a
+footnote. It now lights only the two street-facing sides (within 25° of 45° or 315°)
+and only 1.1 m of the 2.15 m band. The Blender night render flatters this more than the
+app will: emission strength 3.2 makes `6f95b8` glare, where the app shows the raw base
+colour in an unlit layer.
 
 ## 7. Orientation
 
@@ -184,11 +197,35 @@ SW party (17-19 South Park) 43.24 m   224.61°
   "name": "One South Park (1 South Park)",
   "estimated": false,
   "dims": [58.92, 54.91, 20.2],
-  "tris": 18938,
+  "tris": 18932,
   "loadRadius": 2500
 }
 ```
 
-## 9. Approval
+## 9. Stage 4 — optimize
 
-_Pending — stage 3._
+Run in full; `optimize/REPORT.md` carries the metrics, the four-variant weld
+measurement, the waste census, the judgment calls and the gate table. Headline:
+**1,114,312 → 469,824 bytes (−57.8%; −28.2% against the gltfpack-alone baseline)** and
+**408 → 16 draw submeshes**, with the bbox, the origin, the material set, the triangle
+count and the ray-flip fraction all unchanged. The optimized file is now the shipping
+`1-south-park.glb`; the pre-optimize original is archived at
+`optimize/input/1-south-park.glb`. The stage-2 contract validator was re-run on the
+packed file and still passes every check, including `transforms_applied` and
+`no_unexpected_objects`.
+
+## 10. Approval
+
+Approved in advance by David for the whole batch, quoted verbatim from the session
+instruction of **18 August 2026**:
+
+> APPROVE EVERYTHING DONT ASK ME FOR PERMISSION
+
+Presented at stage 3: contact sheet, aerial day and night, the four elevations and the
+top view, against 18,932 tris / 58.92 × 54.91 × 20.20 m / 11 materials / 2 glow groups.
+No revision round was requested; the standing approval carried the asset to stage 4.
+
+Note that this standing approval covers the pipeline's own gates. It does **not** cover
+pushing, opening a PR or deploying: this landmark runs in **batch mode**, whose stage 5
+ends deliberately at a local source-only branch, and the batch is baked and shipped once
+by `docs/asset-pipeline/BATCH-INTEGRATE.md`.

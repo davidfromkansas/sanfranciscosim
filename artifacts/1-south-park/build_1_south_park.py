@@ -387,7 +387,7 @@ def glow_seg(name, a, b, z0, z1, proud, mat, blockers=()):
     penthouse band, whose plan is a clipped hexagon with no Face frame."""
     dx, dy = b[0] - a[0], b[1] - a[1]
     m = math.hypot(dx, dy)
-    if m < 2.0:
+    if m < 1.6:
         return None
     nx, ny = dy / m, -dx / m
     mx, my = (a[0] + b[0]) / 2.0, (a[1] + b[1]) / 2.0
@@ -799,6 +799,12 @@ def build():
     for face, depth, key in ((NW, TERRACE_NW, "NW"), (SW, TERRACE_SW, "SW")):
         strip = clip_polygon(inner, face.xy(0.0, -depth),
                              (-face.n[0], -face.n[1]))
+        if face is SW:
+            # The two terrace bands both reach the WEST corner, and two
+            # coincident 0.14 m deck slabs there z-fought into a black patch on
+            # the top view. The north-west band wins the corner; the south-west
+            # one is clipped out of it.
+            strip = clip_polygon(strip, NW.xy(0.0, -TERRACE_NW), NW.n)
         if len(strip) >= 3:
             solids.append(prism(f"terrace_{key}", strip, Z_DECK - 0.02,
                                 Z_DECK + 0.12, mats["Toy_rust"]))
@@ -863,9 +869,32 @@ def build():
                            mats["Toy_glass"]))
         # night: one quiet cool band, an open plate proud of the glazing
         for a, b in zip(poly, poly[1:] + poly[:1]):
-            glow_seg(f"pent{k}_glow", a, b, Z_PENT - 2.55, Z_PENT - 1.00, 0.16,
-                     mats["Toy_glassl_Glow"],
-                     blockers=[q for q in pent_pieces if q is not poly])
+            # Only the two STREET sides light, and only for 1.1 m of the 2.15 m
+            # band. An unbroken glow ribbon round the whole penthouse perimeter
+            # out-shouted the arcade in the first night render, which inverts
+            # the composition the style bible asks for: one hero (the arcade at
+            # eye level, warm and continuous) plus quiet accents.
+            hd = (math.degrees(math.atan2(b[0] - a[0], b[1] - a[1])) + 90.0) % 360.0
+            if min(abs((hd - 45.0 + 180) % 360 - 180),
+                   abs((hd - 315.0 + 180) % 360 - 180)) > 25.0:
+                continue
+            # ...and broken into ~4 m chunks with about half of them lit, so
+            # the penthouse reads as a row of flats where some lights are on
+            # rather than as one continuous LED strip. A 55 m unbroken ribbon
+            # was still competing with the arcade after the first cutback.
+            seglen = math.hypot(b[0] - a[0], b[1] - a[1])
+            nch = max(1, int(round(seglen / 4.2)))
+            for c in range(nch):
+                rng[0] = (rng[0] * 1103515245 + 12345) & 0x7FFFFFFF
+                if (rng[0] >> 17) % 100 >= 55:
+                    continue
+                f0, f1 = (c + 0.12) / nch, (c + 0.88) / nch
+                p0 = (a[0] + (b[0] - a[0]) * f0, a[1] + (b[1] - a[1]) * f0)
+                p1 = (a[0] + (b[0] - a[0]) * f1, a[1] + (b[1] - a[1]) * f1)
+                glow_seg(f"pent{k}_{c}_glow", p0, p1,
+                         Z_PENT - 2.30, Z_PENT - 1.35, 0.16,
+                         mats["Toy_glassl_Glow"],
+                         blockers=[q for q in pent_pieces if q is not poly])
     print(f"[build] penthouse pieces={len(pent_pieces)} "
           f"areas={[round(poly_area(q), 1) for q in pent_pieces]}")
 
