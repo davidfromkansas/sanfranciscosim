@@ -59,11 +59,44 @@ function loadFeeds(server) {
   return feedsPromise;
 }
 
+// Dev-only: put the repo-root .env into process.env so keyed feeds actually
+// run locally. Vite loads .env for the CLIENT bundle; the feed fetchers are
+// server-side Node in this same process and read process.env, so without this
+// every keyed feed (ferries, Muni, the residents' writer) is permanently
+// offline in dev and you cannot see a live feature until it is deployed.
+// Existing variables win, so an env var on the command line still overrides
+// the file. .env* is gitignored — nothing here reaches the browser or a commit.
+function loadDotEnv() {
+  const file = new URL('../.env', import.meta.url);
+  let text;
+  try {
+    text = readFileSync(file, 'utf8');
+  } catch {
+    return [];
+  }
+  const loaded = [];
+  for (const line of text.split('\n')) {
+    const match = line.match(/^\s*(?:export\s+)?([A-Za-z_][A-Za-z0-9_]*)\s*=\s*(.*)$/);
+    if (!match || line.trimStart().startsWith('#')) continue;
+    const [, name, raw] = match;
+    if (process.env[name] !== undefined) continue;
+    process.env[name] = raw.trim().replace(/^["']|["']$/g, '');
+    loaded.push(name);
+  }
+  return loaded;
+}
+
 function liveFeeds() {
   return {
     name: 'sf-live-feeds',
     apply: 'serve',
     configureServer(server) {
+      const loaded = loadDotEnv();
+      console.log(
+        loaded.length
+          ? `sf-live-feeds: loaded ${loaded.join(', ')} from .env`
+          : 'sf-live-feeds: no .env at the repo root — keyed feeds will report themselves offline'
+      );
       server.middlewares.use(async (req, res, next) => {
         const pathname = new URL(req.url, 'http://localhost').pathname.replace(/\/+$/, '');
         if (!pathname.startsWith('/api/')) return next();
