@@ -545,19 +545,21 @@ and louvres ~2.0k, arch ~0.9k, balconies (3) ~0.6k, roof furniture ~0.8k.
   tests the centroid *and* every ring vertex):
 
   ```
-  exclude  6-7 m  -> drops 1  (the middle bay only)
-  exclude  8-9 m  -> drops 2  (middle + NE bay)
-  exclude 10-13 m -> drops 3  (correct: all three bays, zero collateral)
-  exclude 14 m    -> drops 4  (eats 566-586 Third, SF3776008, nearest vertex 13.73 m)
-  exclude 16 m    -> drops 5  (eats 400 Brannan / 590 Third, SF3776114, vertex 15.78 m)
+  exclude  6-8 m  -> drops 2  (the middle bay + one Overture ring)
+  exclude 10 m    -> drops 4  (two bays)
+  exclude 11-13 m -> drops 6  (correct: all three bays + all three Overture rings,
+                               zero collateral)
+  exclude 14 m    -> drops 8  (eats 566-586 Third, SF3776008, nearest vertex 13.73 m)
+  exclude 16 m    -> drops 10 (eats 400 Brannan / 590 Third, SF3776114, vertex 15.78 m)
   ```
 
-  The band is wide because all three of this building's own centroids sit within
-  9.26 m of the anchor while the nearest neighbour *vertex* is 13.73 m away — the
-  centroid test does the work and the radius never has to reach this building's own
-  ring (its corners are 16.4 m out). **12 m is the middle of the band.** Re-measure
-  against the real bake input at stage 5: the numbers above are the DataSF half
-  only, and the Overture gap-fill carries its own rings on this block.
+  Measured at stage 5 against the real bake input, both sources — the numbers
+  hold across DataSF and the Overture gap-fill, which carries three more rings
+  over the same lot. The band is wide because all three of this building's own
+  centroids sit within 10.71 m of the anchor while the nearest neighbour *vertex*
+  is 13.73 m away — the centroid test does the work and the radius never has to
+  reach this building's own ring (its corners are 16.4 m out). **12 m is the
+  middle of the band, and that is what shipped.**
 - 400 Brannan's shipped `exclude: 11` was sized in the knowledge that 16 m would eat
   this building (see its registry comment). Nothing there needs to change; check
   after the re-bake that neither exclusion has grown into the other's site.

@@ -540,6 +540,36 @@ export const LANDMARKS = [
     exclude: 11,
     camera: { distance: 170, yaw: 90, pitch: 26 },
   },
+  // 414 Brannan (Epic Church, 1924) — the next lot southwest, on the Ritch
+  // Street corner. ONE building, but the LiDAR footprint layer splits it into
+  // THREE ~180 m2 strips under `mblr = SF3776011`, one per structural bay, and
+  // all three have to go or the GLB shares its site with a procedural triplet.
+  // Overture carries three more rings over the same lot. Measured against the
+  // real bake input, both sources:
+  //
+  //   exclude  6-8 m  -> drops 2  (the middle bay + one Overture ring)
+  //   exclude 10 m    -> drops 4  (two bays)
+  //   exclude 11-13 m -> drops 6  (correct: all three bays + all three Overture
+  //                                rings, zero collateral)
+  //   exclude 14 m    -> drops 8  (eats 566-586 Third, SF3776008, vertex 13.73 m)
+  //   exclude 16 m    -> drops 10 (eats 400 Brannan above, SF3776114, vertex 15.78 m)
+  //
+  // 12 m is the middle of the band. Note the binding limit at the BOTTOM is the
+  // southwest bay's CENTROID at 10.71 m, not any vertex — this lot's own corners
+  // are 16.4 m out and the radius never has to reach them.
+  //
+  // camera.yaw = 180 - eye bearing. This is a corner site with two finished
+  // elevations, Brannan facing SE 135.2 deg and Ritch facing SW 225.2 deg; their
+  // bisector is 180.2, so the eye goes due south and yaw is 0.
+  {
+    id: '414Brannan',
+    name: '414 Brannan Street (Epic Church)',
+    lon: -122.3948685,
+    lat: 37.7799308,
+    height: 14,
+    exclude: 12,
+    camera: { distance: 200, yaw: 0, pitch: 28 },
+  },
   {
     // Shell service station, across 3rd Street from 550 Third. The asset is a
     // forecourt, not a building, and the lot carries TWO baked footprints — the

@@ -127,6 +127,103 @@ coplanar ring bands (parapet + two copings) and dissolving them manufactures
 sub-millimetre slivers that only surface in the packed file. The pre-optimize
 file is archived byte-for-byte at `optimize/input/414-brannan.glb`.
 
+## Stage 5 — integration and local QA (batch mode)
+
+Run 18 August 2026 in `sf-worktrees/414-brannan` on branch `pipeline/414-brannan`.
+Case **B** (new landmark). Headless Chrome + CDP against the worktree's own Vite
+dev server; the served manifest was asserted to contain this entry (91 entries)
+before anything was trusted.
+
+### Re-bake
+
+Full chain (`terrain → bridges → buildings → streets → landcover → validate →
+lore → toy → notables → context → muni-shapes`) against a `pipeline/data`
+snapshot shared read-only from a sibling worktree. 2 min 16 s.
+
+| check | result |
+|---|---|
+| `pipeline/audit.mjs` check **1.6** — no procedural footprint inside a bespoke exclusion zone | **PASS** — 100 zones over 97 landmarks clear |
+| `pipeline/verify-rebake.mjs` | **PASS** — 584 of 585 cells unchanged; only `23_13` moved, 182 → 179 |
+| nearest surviving footprint vs the 12 m radius | 34.8 m (nearest is 9.7 m tall) |
+| tile penetration test (decode `23_13.bin`, point-in-polygon every surviving ring against the real parcel) | **no ring reaches inside the footprint** — clean site, no party-wall intruder at any depth |
+
+Three DataSF footprints dropped, matching the measurement's DataSF half exactly;
+the three Overture rings over the same lot were never in the tile because
+`markOccupied` had already claimed that ground — the documented behaviour, not a
+miss. Audit failures 1.2b (p95 height), 1.3c (Telegraph Hill DEM) and 1.7b (one
+offshore tree) are pre-existing city-wide data-vintage items that adding a 14 m
+landmark cannot cause or cure.
+
+### Local verification
+
+| item | result |
+|---|---|
+| merge line | `sf-assets: 414-brannan merged 16 objects / 14 materials -> batched (4869 tris body); uniform x1.0000 at 3751, -1098` |
+| loader scale | **x1.0000** — authored height and `targetHeightM` agree exactly |
+| placement | 3751, −1098, matching the anchor projection (3751.39, −1097.75) |
+| exactly one building on the site | yes — no procedural twin, no z-fighting (settled from the tile as well as the frame) |
+| footprint size and orientation | Brannan front on Brannan, Ritch front on Ritch, arch at the northeast end against 400 Brannan |
+| terrain seating | sits flat, no float, no sink |
+| night | only the intended `_Glow` surfaces light: the frosted ground-floor bays, two upper windows on Brannan, one on Ritch, the monitor clerestory, the medallion |
+| body colour in the app | reads as a slate blue-gray against cream neighbours — the lift from `#6a798b` to `#8a97a8` was the right call and the 108-south-park black-slab failure did not recur |
+| draw calls | **117** at the landmark (hooked on `renderer.render`, max over the app's own frames), against the 300 budget |
+| `SF.assets.stats()` settled | `{entries: 91, far: 6, loading: 0, live: 85, fading: 0, failed: 0}` |
+
+### Fallback drill
+
+GLB moved aside, page reloaded with a cache-buster:
+
+- the app boots and the district renders (84 live landmarks),
+- exactly **one** console warning — `sf-assets: 414-brannan failed to load` (Vite
+  answers a missing `public/` path with the SPA `index.html` and HTTP 200, so the
+  message is a JSON parse error rather than a 404; that is a dev-server artifact),
+- `failed: 1`, nothing else affected,
+- Case B: the site is empty ground inside the exclusion zone — expected, and the
+  reason `loadRadius` was left at the 2500 m default rather than tightened.
+
+The file was restored automatically.
+
+### FAIL, and it is not this asset: the shared landmark batch is full
+
+**The first QA pass failed** with
+`sf-assets: 414-brannan failed to load (THREE.BatchedMesh: Reserved space request
+exceeds the maximum buffer size.)`. That is not a defect in this GLB. Measured
+from the running app at this camera position, on **`origin/main` geometry alone**:
+
+```
+landmark-bodies batch:  maxVerts 1,200,000   nextVert 1,187,405   geoms 83
+                        -> 12,595 vertices free (98.95% consumed)
+83 batched landmarks x 395,798 triangles = 1,187,394 de-indexed vertices
+```
+
+`BODY_VERTS = 1_200_000` in `app/src/assets.js` was sized when the manifest was
+much smaller. `AGENTS.md` quotes the ceiling as "~400k triangles of
+simultaneously loaded landmarks" — the district around Brannan and South Park now
+holds 83 of them inside one 2,500 m `loadRadius`, and 395,798 triangles **is** that
+ceiling. 414 Brannan needs 4,869 × 3 = 14,607 body vertices and only 12,595 remain,
+so it is simply the first integration to arrive after the wall.
+
+To prove the asset itself is sound, `BODY_VERTS` / `BODY_INDICES` were temporarily
+raised to 2,000,000 / 6,000,000 **as a local experiment**; everything in the two
+tables above was then measured, `failed` went to 0, and the change was reverted
+before committing. `app/src/assets.js` is **not** part of this branch.
+
+Raising the reserve is a repo-wide GPU-memory decision (the body batch reserves
+position + normal + colour float32, so 1.2M → 2.0M vertices is roughly 43 → 72 MB,
+plus indices 14 → 24 MB) that belongs to the owner and to its own PR, not to a
+landmark branch. Until it lands, **every** further landmark integration in this
+district will fail the same way — gracefully, per AGENTS rule 3, but invisibly to
+anyone who does not read the console.
+
+### Batch-mode hand-off
+
+The bake was thrown away (`git checkout -- app/public/tiles api/_data`) after the
+QA above, per `ADDRESS-TO-ASSET.md`. `git diff --name-only origin/main` lists
+**zero** files under `app/public/tiles/` or `api/_data/`. The branch carries source
+only: the GLB, its manifest entry, its `pipeline/lib/landmarks.mjs` entry, the
+asset plan and `artifacts/414-brannan/`. `npm run lint` and `npm run build` both
+pass.
+
 ## Known risks carried into integration
 
 - The **body colour** `#8a97a8` is lifted from the photographic value (`#6a798b` in
