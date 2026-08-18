@@ -23,37 +23,44 @@
 // Without AI_GATEWAY_API_KEY this throws and the registry serves `empty` — the
 // panel then says the neighbours are quiet. The city itself never needs a key.
 
-import { readFile } from 'node:fs/promises';
-import path from 'node:path';
-import { fileURLToPath } from 'node:url';
-import { registerFeed } from '../feedcore.mjs';
+import { readFile } from "node:fs/promises";
+import path from "node:path";
+import { fileURLToPath } from "node:url";
+import { registerFeed } from "../feedcore.mjs";
 
 const HERE = path.dirname(fileURLToPath(import.meta.url));
-const SEED = path.resolve(HERE, '../../_data/feed-seed.json');
+const SEED = path.resolve(HERE, "../../_data/feed-seed.json");
 
-const ENDPOINT = 'https://ai-gateway.vercel.sh/v1/chat/completions';
+const ENDPOINT = "https://ai-gateway.vercel.sh/v1/chat/completions";
 // Chosen for what it is NOT: the only large open-weight model in its price band
 // that is not a reasoning model. ~$3.50/month at this refresh rate; Sonnet
 // would be ~$29. See the model note in the PR.
-const MODEL = 'deepseek/deepseek-v3.2';
+const MODEL = "deepseek/deepseek-v3.2";
 const TEMPERATURE = 0.85;
 const MAX_CHARS = 180;
 
 const REPLY_CHANCE = 0.65;
 const MAX_REPLIES = 8;
-const LIVE_THREADS = 6; // how many conversations are on screen at once
+const LIVE_THREADS = 8; // how many conversations are on screen at once
 const RETIRE_AFTER = 6 * 60 * 60 * 1000;
 
 // The budget rail. Everything else in this file is taste; this is the line that
 // stops a bad day costing real money. At ~$0.0003 a message this caps one
 // refresh at under a cent, and a month of half-hourly refreshes near $4.
 const MAX_MESSAGES_PER_REFRESH = 10;
+// The first build is a different problem from the ones after it. Ten messages
+// spread over six new conversations is one opening post and a handful of
+// replies — technically a feed, but it reads as though the neighbourhood has
+// nothing to say. A cold start therefore gets a bigger allowance, once, to
+// arrive at something worth reading; every refresh after that is incremental.
+// ~1 cent, and only on a cold instance.
+const FIRST_BUILD_MESSAGES = 34;
 
 const REFRESH_MS = 30 * 60 * 1000;
 
 let seed = null;
 async function loadSeed() {
-  seed ??= JSON.parse(await readFile(SEED, 'utf8'));
+  seed ??= JSON.parse(await readFile(SEED, "utf8"));
   return seed;
 }
 
@@ -72,13 +79,17 @@ async function write({ speaker, event, because, posts }) {
   // what `vercel env pull` writes for local development, so a linked checkout
   // runs the real writer without a production secret ever landing on a laptop.
   // It is short-lived; re-run the pull when it expires.
-  const credential = process.env.AI_GATEWAY_API_KEY || process.env.VERCEL_OIDC_TOKEN;
-  if (!credential) throw new Error('no AI_GATEWAY_API_KEY or VERCEL_OIDC_TOKEN — feed offline');
+  const credential =
+    process.env.AI_GATEWAY_API_KEY || process.env.VERCEL_OIDC_TOKEN;
+  if (!credential)
+    throw new Error(
+      "no AI_GATEWAY_API_KEY or VERCEL_OIDC_TOKEN — feed offline",
+    );
 
   const grounding = because
     .filter((b) => b.fact)
     .map((b) => `- ${b.topic}: ${b.fact}`)
-    .join('\n');
+    .join("\n");
 
   // The transcript, in the paper's shape: who is writing, what happened, what
   // has been said. Nothing else — every extra instruction here is a nudge
@@ -95,54 +106,62 @@ async function write({ speaker, event, because, posts }) {
     `- Never mention being an AI, a persona, or the Census.`;
 
   const thread = posts.length
-    ? `\n\nTHE CONVERSATION SO FAR\n${posts.map((p) => `${p.name}: ${p.text}`).join('\n')}`
-    : '';
-  const why = grounding ? `\n\nWHY THIS REACHES YOU\n${grounding}` : '';
+    ? `\n\nTHE CONVERSATION SO FAR\n${posts.map((p) => `${p.name}: ${p.text}`).join("\n")}`
+    : "";
+  const why = grounding ? `\n\nWHY THIS REACHES YOU\n${grounding}` : "";
   const user =
-    `WHAT HAPPENED (${event.source}, ${event.where})\n${event.headline}${event.detail ? `\n${event.detail}` : ''}` +
+    `WHAT HAPPENED (${event.source}, ${event.where})\n${event.headline}${event.detail ? `\n${event.detail}` : ""}` +
     why +
     thread +
-    `\n\n${posts.length ? 'Reply to this conversation.' : 'Post about this.'}`;
+    `\n\n${posts.length ? "Reply to this conversation." : "Post about this."}`;
 
   const res = await fetch(ENDPOINT, {
-    method: 'POST',
-    headers: { Authorization: `Bearer ${credential}`, 'Content-Type': 'application/json' },
+    method: "POST",
+    headers: {
+      Authorization: `Bearer ${credential}`,
+      "Content-Type": "application/json",
+    },
     body: JSON.stringify({
       model: MODEL,
       temperature: TEMPERATURE,
       max_tokens: 120,
       messages: [
-        { role: 'system', content: system },
-        { role: 'user', content: user },
+        { role: "system", content: system },
+        { role: "user", content: user },
       ],
     }),
   });
-  if (!res.ok) throw new Error(`gateway ${res.status}: ${(await res.text()).slice(0, 200)}`);
+  if (!res.ok)
+    throw new Error(
+      `gateway ${res.status}: ${(await res.text()).slice(0, 200)}`,
+    );
   const body = await res.json();
-  const text = (body.choices?.[0]?.message?.content ?? '').trim();
-  if (!text) throw new Error('gateway returned an empty message');
+  const text = (body.choices?.[0]?.message?.content ?? "").trim();
+  if (!text) throw new Error("gateway returned an empty message");
   // Models like to open with the speaker's own name however firmly you ask them
   // not to. Cheaper to take it off here than to argue in the prompt.
   return text
-    .replace(/^["'“]|["'”]$/g, '')
-    .replace(new RegExp(`^${speaker.name.split(' ')[0]}\\s*[:,-]\\s*`, 'i'), '')
+    .replace(/^["'“]|["'”]$/g, "")
+    .replace(new RegExp(`^${speaker.name.split(" ")[0]}\\s*[:,-]\\s*`, "i"), "")
     .slice(0, MAX_CHARS + 40)
     .trim();
 }
 
 async function fetchResidents() {
   const data = await loadSeed();
-  if (!data.threads.length) throw new Error('feed-seed.json has no threads');
+  if (!data.threads.length) throw new Error("feed-seed.json has no threads");
 
   const now = Date.now();
-  let budget = MAX_MESSAGES_PER_REFRESH;
+  const cold = live.length === 0;
+  let budget = cold ? FIRST_BUILD_MESSAGES : MAX_MESSAGES_PER_REFRESH;
 
-  // Retire what has gone quiet, so the panel is a feed and not an archive.
+  // Threads leave on AGE ALONE. Evicting a finished conversation to make room
+  // for a new one seems tidy and is not: a seven-post argument is replaced by
+  // somebody's opening line, and the panel visibly loses posts between
+  // refreshes. The column scrolls, so it does not need the room — a finished
+  // conversation is still worth reading, and it goes when it is genuinely old.
   for (let i = live.length - 1; i >= 0; i--) {
-    const t = live[i];
-    if (now - t.startedAt > RETIRE_AFTER || t.cursor >= t.slots.length || t.posts.length > MAX_REPLIES) {
-      live.splice(i, 1);
-    }
+    if (now - live[i].startedAt > RETIRE_AFTER) live.splice(i, 1);
   }
 
   // Open new conversations up to the on-screen count.
@@ -158,7 +177,12 @@ async function fetchResidents() {
       name: speaker.name,
       occupation: speaker.occupation,
       puma: speaker.puma,
-      text: await write({ speaker, event: thread.event, because: slot.because, posts: [] }),
+      text: await write({
+        speaker,
+        event: thread.event,
+        because: slot.because,
+        posts: [],
+      }),
       at: Date.now(),
     });
     thread.cursor = 1;
@@ -167,45 +191,56 @@ async function fetchResidents() {
   }
 
   // Extend the ones already running. A coin flip per thread per refresh, which
-  // is what keeps some conversations busy and others one lonely post.
-  for (const thread of live) {
-    if (budget <= 0) break;
-    if (thread.cursor >= thread.slots.length) continue;
-    if (thread.posts.length > MAX_REPLIES) continue;
-    if (Math.random() > REPLY_CHANCE) continue;
-    const slot = thread.slots[thread.cursor];
-    const speaker = data.speakers[slot.speaker];
-    if (!speaker) {
+  // is what keeps some conversations busy and others one lonely post. A cold
+  // build goes round more than once: a single pass of coin flips over six
+  // threads cannot spend an opening allowance, and the flips still decide
+  // WHICH conversations get deep rather than levelling them all.
+  const passes = cold ? MAX_REPLIES : 1;
+  for (let pass = 0; pass < passes && budget > 0; pass++) {
+    for (const thread of live) {
+      if (budget <= 0) break;
+      if (thread.cursor >= thread.slots.length) continue;
+      if (thread.posts.length > MAX_REPLIES) continue;
+      if (Math.random() > REPLY_CHANCE) continue;
+      const slot = thread.slots[thread.cursor];
+      const speaker = data.speakers[slot.speaker];
+      if (!speaker) {
+        thread.cursor++;
+        continue;
+      }
+      thread.posts.push({
+        id: slot.id,
+        speakerId: speaker.id,
+        name: speaker.name,
+        occupation: speaker.occupation,
+        puma: speaker.puma,
+        text: await write({
+          speaker,
+          event: thread.event,
+          because: slot.because,
+          posts: thread.posts,
+        }),
+        at: Date.now(),
+      });
       thread.cursor++;
-      continue;
+      budget--;
     }
-    thread.posts.push({
-      id: slot.id,
-      speakerId: speaker.id,
-      name: speaker.name,
-      occupation: speaker.occupation,
-      puma: speaker.puma,
-      text: await write({ speaker, event: thread.event, because: slot.because, posts: thread.posts }),
-      at: Date.now(),
-    });
-    thread.cursor++;
-    budget--;
   }
 
   return {
     live: true,
     day: data.label,
     model: MODEL,
-    written: MAX_MESSAGES_PER_REFRESH - budget,
+    written: (cold ? FIRST_BUILD_MESSAGES : MAX_MESSAGES_PER_REFRESH) - budget,
     threads: live.map((t) => ({ id: t.id, event: t.event, posts: t.posts })),
   };
 }
 
-registerFeed('feed', {
+registerFeed("feed", {
   ttl: REFRESH_MS,
   fetcher: fetchResidents,
   empty: { live: false, threads: [] },
-  describe: 'what the residents are saying about today’s city events',
+  describe: "what the residents are saying about today’s city events",
   // A generation takes a while and costs money; do not retry a broken gateway
   // every thirty seconds, and keep serving the last conversation for an hour
   // rather than blanking the panel over one bad refresh.
