@@ -133,5 +133,12 @@ In Blender 5.2 the enum is `BLENDER_EEVEE`, not `BLENDER_EEVEE_NEXT`.
 
 ## Gate 3 — approval
 
-Pending. Present the contact sheet, the aerial day and night frames, and the
-numbers above; only an explicit approval advances the pipeline.
+**Approved 18 August 2026**, on the session's standing instruction, quoted
+verbatim: *"APPROVE EVERYTHING DONT ASK ME FOR PERMISSION"* (David, opening
+message of this session, given alongside `BUILDING: 434 Brannan St, San
+Francisco, CA 94107` and `BATCH: yes`). The contact sheet, the day aerial and the
+night aerial were presented with the numbers above at the moment of the gate.
+
+This is a standing pre-approval rather than a reaction to the renders. If the
+building is later judged wrong, the fix is a stage-2 revision loop logged in this
+section, not a retro-justification here.
