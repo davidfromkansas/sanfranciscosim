@@ -158,13 +158,57 @@ button:hover {
   color: #2b2118;
 }
 
+/* Sticky, so the community you are reading is always named. Kept deliberately
+   short — this column is for reading, and a tall banner pinned to the top would
+   spend a quarter of it on decoration. */
 .rs-head {
   position: sticky;
   top: 0;
   z-index: 2;
   background: #fffdf8;
   border-bottom: 2px solid #2b2118;
-  padding: 13px 16px 11px;
+  padding: 0 16px 10px;
+}
+
+/* The banner. The gradient is not a placeholder — it is what shows if the image
+   is missing, so an absent file reads as a plain painted header rather than a
+   broken picture. */
+.rs-banner {
+  height: 64px;
+  margin: 0 -16px;
+  border-bottom: 2px solid #2b2118;
+  background:
+    image-set(url("/feed/banner.png") 1x) center / cover no-repeat,
+    linear-gradient(160deg, #7fc4e8 0%, #bfe0f2 55%, #e8d9bd 100%);
+}
+
+/* Icon and name on one row, the icon lifted so it breaks the banner's edge the
+   way a subreddit avatar does. */
+.rs-bar {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  margin-top: 8px;
+}
+
+/* Only the ICON breaks the banner's edge. Lifting the whole row dragged the
+   name up with it and the banner cut through the type. */
+.rs-icon {
+  width: 46px;
+  height: 46px;
+  margin-top: -26px;
+  flex: none;
+  border-radius: 50%;
+  border: 2px solid #2b2118;
+  box-shadow: 0 0 0 3px #fffdf8;
+  background:
+    image-set(url("/feed/icon.png") 1x) center / cover no-repeat,
+    #cfe8f5;
+}
+
+.rs-titles {
+  min-width: 0;
+  padding-bottom: 1px;
 }
 
 .rs-name {
@@ -175,14 +219,14 @@ button:hover {
 }
 
 .rs-goal {
-  margin: 3px 0 0;
+  margin: 2px 0 0;
   font-size: 11px;
   line-height: 1.45;
   color: #6b5a48;
 }
 
 .rs-status {
-  margin: 6px 0 0;
+  margin: 8px 0 0;
   font-size: 10.5px;
   letter-spacing: 0.3px;
   text-transform: uppercase;

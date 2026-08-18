@@ -264,11 +264,23 @@ export function createFeedPanel({ onVisit = () => false } = {}) {
   if (!root) return { refresh() {} };
   root.classList.add("rs");
 
+  // The subreddit header, in Reddit's arrangement: a banner, then the icon
+  // overlapping its lower edge with the name beside it. Both images live in
+  // app/public/feed/ and are set as backgrounds rather than <img> so a missing
+  // file shows the painted fallback underneath instead of a broken-image icon.
   const head = el("header", "rs-head");
+  head.append(el("div", "rs-banner"));
+
+  const bar = el("div", "rs-bar");
+  const icon = el("div", "rs-icon");
+  const titles = el("div", "rs-titles");
   const title = el("h1", "rs-name", "r/simfrancisco");
   const goal = el("p", "rs-goal", "");
+  titles.append(title, goal);
+  bar.append(icon, titles);
+
   const status = el("p", "rs-status", "Loading…");
-  head.append(title, goal, status);
+  head.append(bar, status);
   const list = el("div", "rs-list");
   root.append(head, list);
 
