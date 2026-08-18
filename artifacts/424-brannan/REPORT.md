@@ -1,0 +1,202 @@
+# 424 Brannan Street (Tower Valet Parking lot) — build report
+
+Stage 2 of `docs/asset-pipeline/ADDRESS-TO-ASSET.md`, run 18 August 2026 against
+`docs/asset-plans/424-brannan.md`. **REPORT beats plan**: every place this build
+departs from the plan is listed in §3, and the plan was corrected first in
+`REFERENCE.md` rather than silently followed.
+
+## 1. What was built
+
+A terrain-draped miniature of the surface parking lot at 424 Brannan Street —
+block 3776 lot 455, run as Tower Valet Parking, 60 permitted stalls. **There is
+no building on this site and none was modelled.** DataSF returns zero building
+footprints on the parcel, the assessor carries it as class V vacant with $0 of
+improvements, and the entitled SOM office scheme (288 Ritch / 55 Zoe) has never
+broken ground — its two 2019 DBI permits are still at status `filed`.
+
+Deliverables in `artifacts/424-brannan/`:
+
+| File | What it is |
+|---|---|
+| `424-brannan.glb` | the shipping asset, 726,280 bytes raw |
+| `424-brannan.blend` | the authoring scene |
+| `build_424_brannan.py` | deterministic rebuild (`blender -b --python …`) |
+| `extract_site.mjs` | DataSF parcel → `data/site_uv.json` (the measured ring) |
+| `sample_terrain.mjs` | baked heightmap → `data/terrain_uv.json` (the drape grid) |
+| `render_424_brannan.py` | the review rig, day and `--night` |
+| `validate_424_brannan.py` | the contract gate → `validation.json` |
+| `make_contact_sheet.py` | assembles the contact sheet |
+| `REFERENCE.md` | the research dossier behind every number |
+| 8 PNG renders + contact sheet | top, aerial, grazing, night, four elevations |
+
+## 2. Numbers
+
+| | |
+|---|---|
+| Triangles | **12,632** / 18,000 cap |
+| Objects | 37 |
+| Dimensions | 88.8150 x 59.9199 x **8.5649** m |
+| Raw GLB | 726,280 bytes (compression is stage 4's job) |
+| `min_z` | **−1.0844 m** — negative by design, see §4 |
+| XY centre offset | −0.0002, 0.1181 m |
+| `targetHeightM` | **8.5649 m** = the measured bbox height, so loader scale = 1.0000 |
+| Anchor | −122.3954857, 37.7798744 |
+| Anchor ground | 5.8894 m |
+| Terrain fall | 1.4692 m, planar to 0.1022 m |
+| Plate clearance above terrain | 0.1200 m everywhere; spread **0.00000 m** over 1,236 top-cap vertices |
+| Stalls | **60** — matches SFPD permit 500106 exactly |
+| Cars | 18 |
+| Fence posts | 93 |
+| Wheel stops | 44 |
+| Materials | 20, all `Toy_*`, all on-palette, no textures, no alpha, no `Toy_body` |
+| Glow | 4 — `Toy_red_Glow`, `Toy_white_Glow` (the sign), `Toy_trim_Glow` (booth window), `Toy_gold_Glow` (three lamp heads) |
+
+Triangle split: fence posts 3,652 · car cabins 1,944 · plate 1,236 · striping
+876 · wheel stops 528 · cars (7 colours) 1,728 · crowns 384 · everything else
+under 200 each.
+
+## 3. Where this build departs from the plan
+
+Six departures, all deliberate, all found by looking at renders rather than by
+reasoning.
+
+1. **Row Z holds 7 bays, not 10, and the balance moved to a parallel row on
+   Brannan.** The plan allocated 10 stalls along the 25.62 m Zoe frontage; minus
+   a 7 m gate that frontage only holds 7 at a 2.65 m pitch. The five extra
+   stalls are **parallel** bays in the 4 m strip the Brannan neck's bay module
+   leaves over — which is what such strips carry in life. Final allocation:
+   R 23, M 11, C1 8, C2 6, Z 7, A 5 = **60**.
+2. **Row C2 lost a bay to the thicket** (7 → 6). The volunteer thicket measured
+   at (u −2.0, v −30.8) straddles the parcel line into the private lot next
+   door; pulling it wholly inside put its crowns over C2's last bay.
+3. **The fence has no full-height mesh panel.** The first build gave it a
+   1.05 m opaque band in a near-plate tone, and the Ritch elevation came back as
+   a continuous white wall with the cars hidden behind it — the exact "walling
+   in" failure the plan warned about. Replaced with posts (2.30 m) + top rail +
+   mid rail + a 0.87 m `Toy_steel` band, which reads as chain-link at street
+   level and as a line from the aerial, and hides nothing.
+4. **Aisle direction arrows were added** (7 of them). Not in the plan. Without
+   them the spine aisle and the belly cross-aisle are ~700 m2 of blank slab,
+   which style bible §13 forbids; with them the lot reads as a one-way loop —
+   in at Brannan, up the spine, round the belly, out at Zoe, with a return lane
+   against the south-west party wall.
+5. **The concrete patch is `Toy_sand`, not `Toy_trim`.** Against a `Toy_stone`
+   plate the trim white read as a hole punched in the slab.
+6. **No `Toy_mustard` car.** The plan's colour list included one; mustard is the
+   striping colour and a mustard car sitting on mustard stripes disappeared.
+   Replaced by a second `Toy_stone`.
+
+Two plan values were confirmed rather than corrected: the sign at 6.80 m (still
+*inferred*, see `REFERENCE.md` §7.2) and the 18-car count.
+
+## 4. The two deliberate contract deviations
+
+Both are asserted by `validate_424_brannan.py` as named checks, not tolerated as
+slips. The full argument is in `REFERENCE.md` §4.
+
+- **D1 — `min_z` is negative (−1.0844 m).** This asset IS the ground.
+  `placeGeneric()` seats a landmark from one terrain sample at the anchor, so
+  z = 0 must mean the anchor's ground, not the bottom of the model. The check
+  that replaces "min_z ≈ 0" is **D2**: the plate's top face stands a constant
+  0.1200 m above the sampled terrain across its whole area — measured spread
+  **0.00000 m** over 1,236 vertices.
+- **D3 — `targetHeightM` is the vertical extent (8.5649 m), not an architectural
+  height**, because the loader's scale is `targetHeightM / bbox height` and has
+  to land on 1.0.
+
+A third judgement worth recording: the drape interpolates the **sampled grid**,
+not the fitted plane. The terrain here is planar to 0.1022 m, and 0.1022 m of
+residual against 0.1200 m of plate clearance would have left the slab 18 mm off
+the ground at the worst point. The grid is what the runtime samples; using it
+put the spread at zero.
+
+## 5. The normals gate, and why the whole-model ray test reads 27%
+
+`validation.json` reports three numbers:
+
+| Probe | Value | Meaning |
+|---|---|---|
+| whole-model ray residual | 27.17% | meaningless here |
+| exposed-geometry ray residual | 25.48% | still meaningless |
+| **per-object self-ray residual** | **2.16%** | the diagnostic |
+| **per-object signed volume** | **all positive** | **the gate** |
+
+This asset is a union of 37 solids that deliberately abut and interpenetrate:
+the plate is 103 side-by-side prisms, every superstructure's bottom cap is
+buried inside it so nothing is coplanar with the paving, the fence band passes
+through every post, and each car's cabin sits in its body. A scene-wide outward
+probe therefore hits a neighbouring solid on a quarter of all faces by
+construction. `artifacts/64-south-park/validate_64_south_park.py` makes the same
+argument and lands in the same place: **per-object signed volume is the
+authoritative test for a union of closed solids**, and it passes for all 37.
+
+The self-ray probe (each face tested only against its own object) is the
+inversion tripwire beside it. Its offenders are listed and every one is an
+overlap by design: `fence_barb`/`fence_mesh`/`fence_rail` 12.5% (adjacent runs
+overlap by one end cap at each corner), `striping` 9.1% (each arrow's barbs on
+its shaft), `kerb` 4.5% (the Ritch/Brannan corner), `crowns` 1.3% (the three
+thicket crowns in each other). An inside-out solid would score near 100%, so the
+gate is set at 40% per object — comfortably clear of both.
+
+## 6. Validation
+
+`validation.json`, from a fresh-scene re-import of the shipped GLB:
+
+```
+PASS  single_glb                        PASS  no_negative_scale
+PASS  triangles_within_cap              PASS  transforms_applied
+PASS  no_textures                       PASS  normals_outward_signed_volume
+PASS  no_alpha                          PASS  no_object_self_ray_above_40pct
+PASS  all_materials_toy_prefixed        PASS  xy_centred_within_1m
+PASS  no_toy_body                       PASS  D1_min_z_is_negative_by_design
+PASS  has_glow                          PASS  D2_plate_clearance_constant
+PASS  no_cameras                        PASS  D3_targetHeight_is_bbox_extent
+PASS  no_lights                         PASS  D4_terrain_residual_recorded
+PASS  no_animations
+PASS  no_armatures                      OVERALL: PASS
+```
+
+## 7. Night state
+
+Three lit things in a dark field, which is what this lot is after dark: the
+**PUBLIC PARKING sign** (hero — a lit box sign in reality), the **booth window**,
+and **three lamp heads**. The plate, the striping, the fence and the cars all go
+dark. Glow surfaces are thin plates 20 mm proud of the sign board's Brannan face
+only, never closed shells around it — the app's day pass would otherwise show
+them at ~23% rather than 12% and tint the board. `fade_glow()` in the render rig
+zeroes emission as well as alpha, and `light_glow()` drives emission from Base
+Color rather than the re-imported material's default white.
+
+## 8. Draft manifest entry
+
+```json
+{
+  "id": "424-brannan",
+  "file": "424-brannan.glb",
+  "anchor": [
+    -122.3954857,
+    37.7798744
+  ],
+  "targetHeightM": 8.5649,
+  "cat": 23,
+  "name": "424 Brannan Street Parking",
+  "estimated": false,
+  "dims": [
+    88.815,
+    59.9199,
+    8.5649
+  ],
+  "tris": 12632,
+  "loadRadius": 2500
+}
+```
+
+`cat 23` is `parking_garage` in `pipeline/taxonomy.mjs`'s `CATS`, the first
+landmark in the manifest to use it. `loadRadius` takes the default
+`max(2500, 8.5649 x 30) = 2500` m.
+
+## 9. Approval
+
+Awaiting the user's approval (stage 3). Nothing has been integrated: the
+production manifest, `pipeline/lib/landmarks.mjs` and the baked tiles are all
+untouched by this stage.
