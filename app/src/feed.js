@@ -94,6 +94,56 @@ function el(tag, className, text) {
 
 // ---------------------------------------------------------------- the modal
 
+// The community's rules, shown verbatim. These are not decoration: whatever is
+// in this list is handed to every resident in every prompt, so the panel and
+// the writers are reading the same document. Empty today, and the empty state
+// says so plainly rather than inventing house rules nobody agreed.
+function createRulesCard() {
+  const back = el("div", "rs-modal-back");
+  back.hidden = true;
+  const card = el("div", "rs-modal");
+  const close = el("button", "rs-modal-close", "×");
+  close.setAttribute("aria-label", "Close");
+  const heading = el("h2", "rs-rules-title", "Community rules");
+  const sub = el("p", "rs-rules-sub", "");
+  const body = el("div", "rs-rules-body");
+  card.append(close, heading, sub, body);
+  back.append(card);
+  document.body.append(back);
+
+  const hide = () => {
+    back.hidden = true;
+  };
+  close.addEventListener("click", hide);
+  back.addEventListener("click", (e) => {
+    if (e.target === back) hide();
+  });
+  document.addEventListener("keydown", (e) => {
+    if (e.key === "Escape" && !back.hidden) hide();
+  });
+
+  return {
+    show(name, rules) {
+      sub.textContent = `Every rule here is given to each resident of ${name} whenever they write.`;
+      if (!rules?.length) {
+        body.replaceChildren(
+          el(
+            "p",
+            "rs-rules-empty",
+            `No rules have been set for ${name} yet. Residents are writing to the community's stated purpose alone.`,
+          ),
+        );
+      } else {
+        const list = el("ol", "rs-rules-list");
+        for (const rule of rules) list.append(el("li", null, rule));
+        body.replaceChildren(list);
+      }
+      back.hidden = false;
+      close.focus();
+    },
+  };
+}
+
 // One modal, built once and reused. Rebuilding it per click would drop focus
 // and lose the escape handler.
 function createProfileCard({ onVisit }) {
@@ -299,7 +349,13 @@ export function createFeedPanel({
   // than being written once.
   const online = el("p", "rs-online", "");
   const goal = el("p", "rs-goal", "");
-  titles.append(title, online, goal);
+  const rulesButton = el("button", "rs-rules-open", "Community rules");
+  // The button rides the name's line, pushed to the far edge — it is a
+  // reference, not something the header is asking you to do, so it belongs out
+  // of the reading path rather than under the description.
+  const nameRow = el("div", "rs-name-row");
+  nameRow.append(title, rulesButton);
+  titles.append(nameRow, online, goal);
 
   function refreshOnline() {
     const n = onlineCount();
@@ -317,6 +373,11 @@ export function createFeedPanel({
   root.append(head, list);
 
   const profile = createProfileCard({ onVisit });
+  const rulesCard = createRulesCard();
+  let community = { name: "r/simfrancisco", rules: [] };
+  rulesButton.addEventListener("click", () =>
+    rulesCard.show(community.name, community.rules),
+  );
   let lastKey = "";
 
   async function refresh() {
@@ -332,6 +393,10 @@ export function createFeedPanel({
     // to be a community the writers were not told they were posting in.
     if (payload.community && title.textContent !== payload.community)
       title.textContent = payload.community;
+    community = {
+      name: payload.community ?? community.name,
+      rules: payload.rules ?? [],
+    };
     if (payload.goal && goal.textContent !== payload.goal)
       goal.textContent = payload.goal;
 

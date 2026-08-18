@@ -829,6 +829,10 @@ async function fetchSubreddit() {
     },
     community: SUBREDDIT.name,
     goal: SUBREDDIT.goal,
+    // The rules verbatim, so the panel shows exactly what every resident is
+    // told when they write. Empty today; populate the array and both the
+    // prompts and this list pick it up with no other change.
+    rules: SUBREDDIT.rules,
     model: MODEL,
     cast: people.length,
     written: allowance - budget,

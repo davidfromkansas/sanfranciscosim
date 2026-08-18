@@ -208,7 +208,11 @@ button:hover {
     #cfe8f5;
 }
 
+/* flex: 1 is what makes the name row's space-between mean anything — without
+   it the column sized to its content and the button pushed 7 px past the
+   panel's edge instead of sitting inside its padding. */
 .rs-titles {
+  flex: 1;
   min-width: 0;
   padding-bottom: 1px;
 }
@@ -377,11 +381,16 @@ button:hover {
 
 /* -------------------------------------------------------------- the profile */
 
+/* Both modals share this. The blur is what makes a dialogue read as ON the
+   city rather than beside it — and with a 3D scene behind, a flat scrim alone
+   left the diorama competing with the text for attention. */
 .rs-modal-back {
   position: fixed;
   inset: 0;
   z-index: 20;
-  background: rgba(20, 16, 12, 0.55);
+  background: rgba(20, 16, 12, 0.45);
+  backdrop-filter: blur(10px) saturate(0.85);
+  -webkit-backdrop-filter: blur(10px) saturate(0.85);
   display: flex;
   align-items: center;
   justify-content: center;
@@ -563,4 +572,90 @@ button:hover {
   .rs-online::before {
     animation: none;
   }
+}
+
+/* -------------------------------------------------------- community rules */
+
+/* Quieter than the concierge button: this is a reference people open once,
+   not an action the header is asking for. */
+/* Name on the left, rules on the right, sharing a baseline. `.rs-titles`
+   already stops at the header's 16 px padding, so the button lands there and
+   never touches the panel edge. */
+/* Name left, rules right, sharing a baseline — and wrapping rather than
+   overflowing. The panel is 25vw, so on a 1280 px window there is not room for
+   both on one line; the button then drops beneath the name and stays hard
+   right instead of running off the edge. */
+.rs-name-row {
+  display: flex;
+  align-items: baseline;
+  flex-wrap: wrap;
+  justify-content: flex-end;
+  gap: 6px 12px;
+}
+
+.rs-name-row .rs-name {
+  margin-right: auto;
+}
+
+.rs-rules-open {
+  appearance: none;
+  flex: none;
+  padding: 5px 9px;
+  font:
+    700 10.5px/1 -apple-system,
+    BlinkMacSystemFont,
+    "Segoe UI",
+    Roboto,
+    sans-serif;
+  color: #2b2118;
+  background: #f5ead4;
+  border: 2px solid #2b2118;
+  border-radius: 999px;
+  box-shadow: 2px 2px 0 #2b2118;
+  cursor: pointer;
+}
+
+.rs-rules-open:hover {
+  background: #fff6e2;
+}
+
+.rs-rules-open:active {
+  transform: translate(2px, 2px);
+  box-shadow: none;
+}
+
+.rs-rules-title {
+  margin: 0;
+  font-size: 20px;
+  font-weight: 800;
+  letter-spacing: -0.2px;
+}
+
+.rs-rules-sub {
+  margin: 6px 0 0;
+  font-size: 11.5px;
+  color: #6b5a48;
+}
+
+.rs-rules-list {
+  margin: 16px 0 0;
+  padding-left: 22px;
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+
+.rs-rules-list li {
+  padding-left: 4px;
+}
+
+/* No rules yet is a real state, not a failure — say what that means for the
+   residents rather than showing an apologetic blank. */
+.rs-rules-empty {
+  margin: 16px 0 0;
+  padding: 14px;
+  border: 2px dashed rgba(43, 33, 24, 0.3);
+  border-radius: 12px;
+  color: #6b5a48;
+  background: #f7f2e6;
 }
