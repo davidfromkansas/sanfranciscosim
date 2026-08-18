@@ -70,15 +70,23 @@ function sampleReplyProbability() {
   return Math.min(max, Math.max(min, mean + stdev * z));
 }
 
-const OPENING_THREADS = 8; // how many posts a cold start puts up
-// A thread is finished the moment its roll fails, so nothing new would ever
-// appear without new posts. Every refresh starts a couple.
-const NEW_THREADS_PER_REFRESH = 2;
+const OPENING_THREADS = 8; // how many posts a cold start puts up, so a fresh
+// deploy is a subreddit rather than one lonely thread
+// Then ONE post every tick, with whatever replies its own probability earns it.
+// A thread is finished the moment its roll fails, so new posts are the only
+// thing that keeps the feed moving.
+const NEW_THREADS_PER_REFRESH = 1;
 const RETIRE_AFTER = 24 * 60 * 60 * 1000;
-const MAX_THREADS = 50; // backstop, not a design limit
-const REFRESH_MS = 30 * 60 * 1000;
+// A day at one post every ten minutes is 144 threads, so a 50-thread cap would
+// have filled in eight hours and then silently stopped the subreddit — new
+// posts blocked, nothing retiring for another sixteen. The cap has to be a
+// backstop against runaway generation, not a limit the normal rate walks into.
+const MAX_THREADS = 200;
+const REFRESH_MS = 10 * 60 * 1000;
 // The budget rail. Everything else here is taste; this is the line that stops a
-// bad day costing real money.
+// bad day costing real money. Ten covers the worst case for one tick — a post
+// whose probability earns it the full eight replies, plus a spare for resuming
+// a thread the previous tick cut short. The average tick spends about three.
 const MAX_MESSAGES_PER_REFRESH = 10;
 const FIRST_BUILD_MESSAGES = 34;
 
