@@ -10,7 +10,8 @@ this file records what was built, what changed from the plan, and the numbers.
 |---|---|
 | File | `254-ritch.glb` |
 | Triangles | **3,140** (cap 7,000) |
-| Objects | 91 mesh objects |
+| File | 85,808 B shipped (206,832 B pre-optimize, −58.5%) |
+| Objects | 8 mesh objects shipped (91 before the stage-4 join-per-material) |
 | Dimensions | 16.14 × 16.20 × **8.80** m |
 | bbox min / max | `[-8.071, -8.101, 0.000]` / `[8.071, 8.101, 8.800]` |
 | min Z / XY centre offset | 0.000 m / `[0.000, 0.000]` |
@@ -18,16 +19,20 @@ this file records what was built, what changed from the plan, and the numbers.
 | Front heading | 45.05° true (north-east, onto Ritch Street) |
 | Manifest anchor | `-122.3956322, 37.7801278` |
 | Registry anchor (exclusion) | `-122.3956361, 37.7801244` |
-| Validation | **PASS**, all 17 checks |
+| Validation | **PASS**, all 17 checks — re-run against the shipped optimized file |
 
 The 16.14 × 16.20 m XY box is the 45.05° rotation of a 7.60 × 14.20 m building
 plus its bay, cornice and stoop — not a 16 m building.
 
-**Normals.** Per-object signed volume positive on all 87 closed solids; the
-8 open glow faces each pass the visibility ray test in the direction they claim
-to face. 31,500 deterministic rays from nine interior targets, **0 flipped first
-hits (0.0000%)** against a 0.15% tolerance. 0 degenerate triangles, 0 non-unit
-loop normals.
+**Normals** (measured on the stage-2 build, 91 objects). Per-object signed
+volume positive on all 87 closed solids; the 8 open glow faces each pass the
+visibility ray test in the direction they claim to face. 31,500 deterministic
+rays from nine interior targets, **0 flipped first hits (0.0000%)** against a
+0.15% tolerance. 0 degenerate triangles, 0 non-unit loop normals. The optimize
+pass re-ran the same tests on the shipped file: still PASS.
+
+**Stage 4.** See `optimize/REPORT.md`. 206,832 → 85,808 B (−58.5%), 92 → 9 draw
+submeshes, appearance identical within 0.034% mean RGB. All gates G1–G8 pass.
 
 ## Dossier corrections made during the build
 
@@ -118,7 +123,7 @@ Two render-rig notes, both caught here:
 | `render_254_ritch.py` | review renders from the re-imported GLB; `-- --night` for the dusk pass |
 | `validate_254_ritch.py` | fresh-scene contract validation → `validation.json` |
 | `make_contact_sheet.py` | composes the eight renders |
-| `254-ritch.glb` | the asset — 202 KB raw, 34 KB gzipped |
+| `254-ritch.glb` | the **shipping** asset — the stage-4 optimized file, 84 KB raw (the pre-optimize build is archived at `optimize/input/254-ritch.glb`, 202 KB) |
 | `254-ritch.blend` | authoring scene |
 | `254-ritch-{north,east,south,west}.png` | the four building-aligned elevations, one rig |
 | `254-ritch-facade.png` | square-on look down the 45.05° facade normal |
