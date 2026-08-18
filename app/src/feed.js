@@ -97,7 +97,8 @@ export function createFeedPanel() {
   if (!root) return { update() {} };
 
   const head = el("header", "feed-head");
-  head.append(el("h1", "feed-title", "r/simfrancisco"));
+  const title = el("h1", "feed-title", "r/simfrancisco");
+  head.append(title);
   // The community's own description of itself, straight from the server, so
   // the panel and the writers' prompt can never drift apart. Changing the goal
   // changes the feed's character AND this line, together.
@@ -110,6 +111,17 @@ export function createFeedPanel() {
   let lastKey = "";
 
   async function poll() {
+    try {
+      await refresh();
+    } catch (error) {
+      // A throw anywhere in here used to leave the panel reading "Listening…"
+      // for ever, which looks identical to a slow server. Say so instead.
+      status.textContent = "Something went wrong rendering the feed.";
+      console.error("feed panel:", error);
+    }
+  }
+
+  async function refresh() {
     let payload;
     try {
       const res = await fetch(ENDPOINT);
