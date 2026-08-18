@@ -24,8 +24,14 @@ import "./_lib/feeds/index.mjs";
 // generate early, which is exactly what it does on its own schedule anyway —
 // but it should be set in production so nobody can spend the budget for you.
 async function serveTick(req, res) {
+  // Vercel sends `Authorization: Bearer <CRON_SECRET>` automatically whenever
+  // that variable is set on the project. Refusing when the secret is MISSING
+  // too — not just when it mismatches — means deleting the variable turns the
+  // endpoint off rather than throwing it open. Cron runs against production
+  // only, and local dev goes through the vite plugin, so nothing legitimate
+  // depends on the unauthenticated path.
   const secret = process.env.CRON_SECRET;
-  if (secret && req.headers.authorization !== `Bearer ${secret}`) {
+  if (!secret || req.headers.authorization !== `Bearer ${secret}`) {
     res.status(401).json({ error: "unauthorized" });
     return;
   }
