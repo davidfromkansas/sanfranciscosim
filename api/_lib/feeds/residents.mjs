@@ -49,12 +49,30 @@ const SUBREDDIT = {
 // new-participant rate is what keeps a thread a conversation rather than a
 // queue of strangers each speaking once.
 const simulationConfig = {
-  replyProbability: 0.65,
+  // Sampled ONCE per thread, then reused for every continuation decision in it.
+  // The paper draws from a normal around .65, and the spread is the whole point:
+  // a fixed rate gives every post the same expected length, and a subreddit
+  // where every thread runs the same depth reads as machinery. Drawn per thread,
+  // one post limps to a single reply and the one next to it argues for eight.
+  replyProbability: { mean: 0.65, stdev: 0.18, min: 0.05, max: 0.95 },
   maxReplies: 8,
   newParticipantProbability: 0.5,
 };
 
-const LIVE_THREADS = 8;
+// Box–Muller. Clamped, because the tail of a normal goes past both ends of a
+// probability and a thread with p > 1 would only ever stop at maxReplies.
+function sampleReplyProbability() {
+  const { mean, stdev, min, max } = simulationConfig.replyProbability;
+  const u = 1 - Math.random();
+  const v = Math.random();
+  const z = Math.sqrt(-2 * Math.log(u)) * Math.cos(2 * Math.PI * v);
+  return Math.min(max, Math.max(min, mean + stdev * z));
+}
+
+const OPENING_THREADS = 8; // how many posts a cold start puts up
+// A thread is finished the moment its roll fails, so nothing new would ever
+// appear without new posts. Every refresh starts a couple.
+const NEW_THREADS_PER_REFRESH = 2;
 const RETIRE_AFTER = 24 * 60 * 60 * 1000;
 const MAX_THREADS = 50; // backstop, not a design limit
 const REFRESH_MS = 30 * 60 * 1000;
@@ -263,9 +281,32 @@ async function openThread(people) {
     title: post.title,
     body: post.body,
     replies: [],
+    // Sampled here and never resampled: this thread's own appetite for
+    // discussion, fixed at birth like a real post's.
+    replyProbability: sampleReplyProbability(),
+    done: false,
     startedAt: Date.now(),
     at: Date.now(),
   };
+}
+
+// Roll, generate, append, roll again — the paper's continuation loop. A failed
+// roll ends the thread permanently; `done` is what stops a later refresh from
+// quietly reviving a conversation that already finished.
+//
+// The budget is the one thing allowed to interrupt without ending it: running
+// out of allowance mid-thread leaves `done` false so the next refresh picks the
+// same thread up where it stopped, rather than a long thread being silently
+// truncated because it happened to be last in the loop.
+async function growThread(people, thread, spend) {
+  while (
+    thread.replies.length < simulationConfig.maxReplies &&
+    Math.random() < thread.replyProbability
+  ) {
+    if (!spend()) return;
+    if (!(await addReply(people, thread))) break;
+  }
+  thread.done = true;
 }
 
 async function addReply(people, thread) {
@@ -300,7 +341,13 @@ async function fetchSubreddit() {
 
   const now = Date.now();
   const cold = live.length === 0;
-  let budget = cold ? FIRST_BUILD_MESSAGES : MAX_MESSAGES_PER_REFRESH;
+  const allowance = cold ? FIRST_BUILD_MESSAGES : MAX_MESSAGES_PER_REFRESH;
+  let budget = allowance;
+  let failures = 0;
+  // One accountant for the whole refresh. Returns false when the allowance is
+  // gone, which is how a thread's continuation loop learns to stop without
+  // knowing anything about budgets.
+  const spend = () => (budget > 0 ? (budget--, true) : false);
 
   // Threads leave on age alone. Evicting a finished conversation to make room
   // seems tidy and is not — a long argument gets replaced by somebody's opening
@@ -309,43 +356,40 @@ async function fetchSubreddit() {
     if (now - live[i].startedAt > RETIRE_AFTER) live.splice(i, 1);
   }
 
-  // A single failed generation used to take the whole refresh with it: 34 calls
-  // on a cold start, and any one of them blanking the panel. A failure now costs
-  // that one post and the rest of the subreddit carries on. The counters stop a
-  // genuinely broken gateway from burning the entire budget on retries.
-  let failures = 0;
-  while (
-    live.length < LIVE_THREADS &&
-    live.length < MAX_THREADS &&
-    budget > 0
-  ) {
-    budget--;
+  // Any thread the budget cut short last time resumes before anything new is
+  // started: finishing a conversation beats beginning one.
+  for (const thread of live.filter((t) => !t.done)) {
+    if (budget <= 0) break;
     try {
-      live.push(await openThread(people));
+      await growThread(people, thread, spend);
+    } catch (error) {
+      failures++;
+      console.warn(`${SUBREDDIT.name}: reply failed — ${error.message}`);
+      if (failures > 6) break;
+    }
+  }
+
+  const wanted = cold ? OPENING_THREADS : NEW_THREADS_PER_REFRESH;
+  for (let i = 0; i < wanted && budget > 0 && live.length < MAX_THREADS; i++) {
+    if (!spend()) break;
+    let thread;
+    try {
+      thread = await openThread(people);
     } catch (error) {
       failures++;
       console.warn(`${SUBREDDIT.name}: post failed — ${error.message}`);
       if (failures > 3) break;
+      continue;
     }
-  }
-
-  // A cold build goes round more than once: a single pass of coin flips over
-  // eight threads cannot spend an opening allowance, and the flips still decide
-  // WHICH conversations get deep rather than levelling them all.
-  const passes = cold ? simulationConfig.maxReplies : 1;
-  for (let pass = 0; pass < passes && budget > 0; pass++) {
-    for (const thread of live) {
-      if (budget <= 0) break;
-      if (thread.replies.length >= simulationConfig.maxReplies) continue;
-      if (Math.random() > simulationConfig.replyProbability) continue;
-      try {
-        if (await addReply(people, thread)) budget--;
-      } catch (error) {
-        budget--;
-        failures++;
-        console.warn(`${SUBREDDIT.name}: reply failed — ${error.message}`);
-        if (failures > 6) break;
-      }
+    live.push(thread);
+    // Straight into its own continuation loop, so a post and its discussion
+    // arrive together rather than the post sitting alone until the next tick.
+    try {
+      await growThread(people, thread, spend);
+    } catch (error) {
+      failures++;
+      console.warn(`${SUBREDDIT.name}: reply failed — ${error.message}`);
+      if (failures > 6) break;
     }
   }
 
@@ -361,7 +405,7 @@ async function fetchSubreddit() {
     goal: SUBREDDIT.goal,
     model: MODEL,
     cast: people.length,
-    written: (cold ? FIRST_BUILD_MESSAGES : MAX_MESSAGES_PER_REFRESH) - budget,
+    written: allowance - budget,
     threads: live,
   };
 }
