@@ -21,6 +21,7 @@ import { readFile } from "node:fs/promises";
 import path from "node:path";
 import { fileURLToPath } from "node:url";
 import { registerFeed } from "../feedcore.mjs";
+import { get, put, BlobPreconditionFailedError } from "@vercel/blob";
 
 const HERE = path.dirname(fileURLToPath(import.meta.url));
 const CAST = path.resolve(HERE, "../../_data/personas.json");
@@ -451,7 +452,103 @@ async function addReply(people, thread) {
   return true;
 }
 
+// --------------------------------------------------------------- persistence
+//
+// Until now the subreddit lived in one server's memory: a deploy wiped it, a
+// cold start wiped it, and two instances each accumulated a different feed —
+// so the scheduled tick could be writing to a server nobody was reading. The
+// whole point of generating on a timer is that the posts are there when you
+// arrive, which means they have to outlive the process that wrote them.
+//
+// One JSON blob holds the lot. Reads are uncached (`useCache: false`) because a
+// stale read here means regenerating posts that already exist, and writes are
+// CONDITIONAL on the etag we read — if another instance saved in between, ours
+// is refused and dropped rather than clobbering theirs. That is the fix for the
+// race the traffic-driven design would otherwise have: any warm instance can
+// answer the cron, and only one of them can win a given write.
+//
+// Auth is OIDC (VERCEL_OIDC_TOKEN + BLOB_STORE_ID), automatic on Vercel and
+// pulled by `vercel env pull` locally, so no long-lived secret is involved.
+// With neither credential the whole layer sits out and the feed behaves exactly
+// as it did before — in memory, forgetful, working.
+
+const STATE_PATH = "simfrancisco/state.json";
+const STATE_VERSION = 1;
+
+const blobConfigured = () =>
+  Boolean(
+    process.env.BLOB_READ_WRITE_TOKEN ||
+    (process.env.VERCEL_OIDC_TOKEN && process.env.BLOB_STORE_ID),
+  );
+
+let etag = null; // of the copy we last read or wrote
+let restored = false;
+
+async function restore() {
+  if (restored) return;
+  restored = true;
+  if (!blobConfigured()) return;
+  try {
+    const found = await get(STATE_PATH, {
+      access: "private",
+      useCache: false,
+    });
+    if (!found || found.statusCode !== 200) return;
+    const saved = JSON.parse(await new Response(found.stream).text());
+    if (saved.version !== STATE_VERSION) return; // shape changed; start fresh
+    etag = found.blob.etag;
+    // Drop anything already past its life rather than reviving a stale feed.
+    const now = Date.now();
+    const kept = (saved.threads ?? []).filter(
+      (t) => now - t.startedAt <= RETIRE_AFTER,
+    );
+    live.length = 0;
+    live.push(...kept);
+    if (Number.isInteger(saved.lastWindow)) lastWindow = saved.lastWindow;
+    console.log(
+      `${SUBREDDIT.name}: restored ${kept.length} threads from blob storage`,
+    );
+  } catch (error) {
+    // A store that is unreachable must not take the subreddit down with it.
+    console.warn(
+      `${SUBREDDIT.name}: could not restore state — ${error.message}`,
+    );
+  }
+}
+
+async function persist() {
+  if (!blobConfigured()) return;
+  try {
+    const saved = await put(
+      STATE_PATH,
+      JSON.stringify({ version: STATE_VERSION, lastWindow, threads: live }),
+      {
+        access: "private",
+        contentType: "application/json",
+        allowOverwrite: true,
+        cacheControlMaxAge: 60,
+        // Refuse the write if somebody saved after our read. First time round
+        // there is nothing to match, so the option is simply absent.
+        ...(etag ? { ifMatch: etag } : {}),
+      },
+    );
+    etag = saved.etag;
+  } catch (error) {
+    if (error instanceof BlobPreconditionFailedError) {
+      // Another instance got there first. Theirs stands; ours is dropped, and
+      // the next cold start will read whatever won.
+      console.warn(
+        `${SUBREDDIT.name}: another instance saved first — skipping`,
+      );
+      etag = null;
+      return;
+    }
+    console.warn(`${SUBREDDIT.name}: could not save state — ${error.message}`);
+  }
+}
+
 async function fetchSubreddit() {
+  await restore();
   const people = await loadCast();
   if (!people.length)
     throw new Error("personas.json has no people with a paragraph");
@@ -516,6 +613,7 @@ async function fetchSubreddit() {
     throw new Error("every generation failed — nothing to serve");
 
   live.sort((a, b) => b.startedAt - a.startedAt);
+  await persist();
   return {
     live: true,
     community: SUBREDDIT.name,
