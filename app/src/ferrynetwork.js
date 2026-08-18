@@ -14,6 +14,8 @@
 // One parse, shared by the terminal markers, the route walls and the badges:
 // the browser cache makes the fetch free but a second parse of the chunk is not.
 
+import { resolveRouteColors } from './ferry-palette.js';
+
 const URL = `${import.meta.env.BASE_URL}tiles/ferry-shapes.bin`;
 const MAGIC = 0x46525931; // 'FRY1'
 
@@ -38,15 +40,26 @@ function parse(buf) {
   // [x, z, s] triplets for every shape back to back; s = cumulative metres.
   const verts = new Float32Array(buf, 16 + jsonLen, floatCount);
 
+  const entries = Object.entries(meta.routes || {});
+  // Golden Gate publishes ONE red for all five of its routes, so the liveries
+  // alone cannot tell the crossings apart. ferry-palette.js keeps every colour
+  // that is already unique and spreads only the ones that collide.
+  const drawn = resolveRouteColors(
+    entries.map(([id, r]) => ({ id, color: r.color || '#7f8c94' }))
+  );
   const routes = new Map();
-  for (const [id, r] of Object.entries(meta.routes || {})) {
+  for (const [id, r] of entries) {
     routes.set(id, {
       id,
       name: r.name || id,
-      // Never null downstream: an unpainted route still has to draw as
-      // something, and the toy palette's neutral is the honest choice.
-      color: r.color || '#7f8c94',
+      // What to draw with: unique liveries survive this untouched.
+      color: drawn.get(id) || r.color || '#7f8c94',
+      // What the operator actually publishes, for anything stating the truth.
+      publishedColor: r.color || null,
       textColor: r.textColor || '#ffffff',
+      operator: r.operator || null,
+      operatorName: r.operatorName || null,
+      live: Boolean(r.live),
       shapes: r.shapes || [],
     });
   }

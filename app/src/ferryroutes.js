@@ -64,13 +64,15 @@ const OFF_SCENE_ROUTES = new Set(['SB:VJO', 'SB:RCH', 'SB:HB', 'GF:LSSF']);
 function neon(hex) {
   const c = new Color(hex);
   const peak = Math.max(c.r, c.g, c.b) || 1;
-  // Normalise the brightest channel to 1 so every livery reads as lit, then
-  // lift the darker channels slightly so a navy does not go black.
-  return [
-    Math.min(1, (c.r / peak) * 0.92 + 0.08),
-    Math.min(1, (c.g / peak) * 0.92 + 0.08),
-    Math.min(1, (c.b / peak) * 0.92 + 0.08),
-  ];
+  // Lift toward emitted light WITHOUT flattening the palette. Normalising every
+  // colour to peak 1 — which this did at first — threw away exactly the
+  // distinction ferry-palette.js works to create: Golden Gate's five reds are
+  // separated mostly by LIGHTNESS, and after dark all five normalised to the
+  // same bright red. Brightening toward a target that still rises with the
+  // original keeps a dark route darker than a pale one.
+  const target = 0.55 + 0.45 * peak;
+  const k = target / peak;
+  return [Math.min(1, c.r * k), Math.min(1, c.g * k), Math.min(1, c.b * k)];
 }
 
 function paint(hex) {
