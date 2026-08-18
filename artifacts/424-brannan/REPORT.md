@@ -197,6 +197,12 @@ landmark in the manifest to use it. `loadRadius` takes the default
 
 ## 9. Approval
 
-Awaiting the user's approval (stage 3). Nothing has been integrated: the
-production manifest, `pipeline/lib/landmarks.mjs` and the baked tiles are all
-untouched by this stage.
+**Approved 18 August 2026**, in advance and for the whole run, by David:
+
+> "APPROVE EVERYTHING DONT ASK ME FOR PERMISSION"
+
+Recorded verbatim per stage 3 of `docs/asset-pipeline/ADDRESS-TO-ASSET.md`. The
+contact sheet, the aerial day and night renders and the numbers in §2 were
+presented at the same time so the approval has something behind it; no
+iteration was requested. Nothing was integrated by this stage — the production
+manifest, `pipeline/lib/landmarks.mjs` and the baked tiles are untouched.
