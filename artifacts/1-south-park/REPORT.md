@@ -229,3 +229,74 @@ Note that this standing approval covers the pipeline's own gates. It does **not*
 pushing, opening a PR or deploying: this landmark runs in **batch mode**, whose stage 5
 ends deliberately at a local source-only branch, and the batch is baked and shipped once
 by `docs/asset-pipeline/BATCH-INTEGRATE.md`.
+
+## 11. Stage 5 — integration (batch mode)
+
+Case **B**. `1SouthPark` is new to `pipeline/lib/landmarks.mjs`, so the entry, the
+exclusion radius and a tile re-bake were all required.
+
+**Exclusion sizing.** Measured from the shipped anchor against the real bake inputs
+after `simplifyRing(0.6)`, by the rule `excluded()` actually uses (centroid **or** any
+ring vertex inside the radius):
+
+| distance | polygon | via |
+|---|---|---|
+| 0.69 m | own Overture footprint (h 18) | centroid |
+| 3.90 m | own DataSF footprint `SF3775181` | centroid — **the floor** |
+| 18.20 m | 17–19 South Park, `SF3775046` (h_med 6.60) | centroid — **the ceiling** |
+| 20.44 m | the same neighbour in Overture (h 6.7) | centroid |
+| 26.52 m | 300 Brannan, `SF3775008` | nearest vertex |
+| 27.84 m | 21–29 South Park, `SF3775042` (already dropped by `21SouthPark`) | nearest vertex |
+
+Safe window **(3.90, 18.20) m**; shipped **`exclude: 11`**, 7.10 m clear below and
+7.20 m above. This is the opposite shape to every other entry on this oval: those are
+party-wall teeth whose radius must stay small enough not to reach their *own* far
+corners, and this is a whole corner block whose own footprints go by their centroids
+long before any radius could reach its 28 m-distant vertices. Note also that reading
+17–19 South Park off vertices alone would have put the ceiling at 22.58 m and
+overstated the window by 4.4 m.
+
+**Re-bake evidence.**
+
+- `1 of 585` building tiles changed bytes. The `pipeline/data` snapshot symlinked in
+  reproduces `origin/main`'s tiles exactly, so there is no drift churn to explain.
+- Cell `23_13`: **182 → 181**. Decoding the tile shows exactly one footprint dropped —
+  8 vertices, centroid 4.30 m from the anchor, nearest vertex 12.37 m, procedural top
+  32.2 m absolute (≈ 18.9 m tall, i.e. it would have stood *inside* the 20.2 m asset).
+- Nearest **surviving** footprint after the re-bake: centroid 18.31 m / vertex 22.58 m —
+  17–19 South Park, intact, with 7.3 m of real margin above the radius.
+- Nothing was gap-filled back in: the count moved by exactly −1.
+- `node pipeline/audit.mjs` → **1.6 PASS** ("100 zones over 97 landmarks clear").
+  1.2b, 1.3c and 1.7b fail on `main` too and are pre-existing.
+- `node pipeline/verify-rebake.mjs` → **PASS**, "only the new landmarks' cells moved,
+  and every asset has clear ground under it", `1SouthPark 22.6 m vs 11 m radius`.
+
+**Streaming decision.** `loadRadius: 2500` by the default rule
+`max(2500, targetHeightM × 30)` = `max(2500, 606)`. Not `alwaysLoaded`: at 20 m this is
+not a skyline piece, and beyond the radius the site is empty rather than wrong (the
+procedural block is gone), which is illegible at 2.5 km.
+
+**Local QA** (headless Chrome + CDP against the Vite dev server, clock pinned):
+
+| Check | Result |
+|---|---|
+| manifest served with the entry | PASS — 91 entries, mine present |
+| loader merge line | `sf-assets: 1-south-park merged 16 objects / 11 materials -> batched (10421 tris body); **uniform x1.0000** at 3928, -1332` |
+| scale | **1.0000** — the model's crest is normalised to `targetHeightM` |
+| position | 3928, −1332 local metres, on the anchor |
+| streaming | `{entries: 91, far: 10, loading: 0, live: 81, fading: 0, **failed: 0**}` |
+| draw calls | **108** worst observed, against the 300 budget (hooked on `renderer.render`, max over the app's own frames — the overlay's own line reads 1 and is not the scene) |
+| day | screenshot at 13:30 — arcade, medallions, cornice, dark penthouse and terraces all read; clear ground under the asset, neighbours intact |
+| night | screenshot at 21:30 — the arcade is a continuous warm ribbon at street level, the flats scatter cool, the penthouse shows two quiet bands |
+| fallback drill | PASS — with the GLB moved aside: `{entries: 91, far: 10, loading: 0, live: 80, fading: 0, **failed: 1**}`, one console line `sf-assets: 1-south-park failed to load (…)`, the app boots and every other landmark merges and renders. Note the error is a *parse* failure, not a 404: Vite answers a missing `public/` path with the SPA `index.html` and HTTP 200. The GLB was restored afterwards (469,824 B, byte-identical) |
+
+**`node pipeline/compress-assets.mjs`** reports the shipping GLB as already carrying
+`EXT_meshopt_compression` and skips it, as expected after stage 4. It re-compressed
+`vehicles/passenger-airplane.glb` as collateral — a known recurrence, reverted.
+
+**Batch mode.** The bake was run and QA'd in full, then discarded
+(`git checkout -- app/public/tiles api/_data`) and only source committed: the GLB, the
+manifest entry, the `pipeline/lib/landmarks.mjs` entry, the plan and `artifacts/`.
+`git diff --name-only origin/main` lists nothing under `app/public/tiles/` or
+`api/_data/`. The city is baked once for the whole batch by
+`docs/asset-pipeline/BATCH-INTEGRATE.md`.

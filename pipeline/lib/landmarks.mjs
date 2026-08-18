@@ -2545,6 +2545,66 @@ export const LANDMARKS = [
     // destination.
     camera: { distance: 165, yaw: 270, pitch: 26 },
   },
+  {
+    // One South Park: the 1919-20 concrete tobacco warehouse that closes the
+    // EAST end of the oval, converted 2004-07 by LDP Architecture into 35 lofts
+    // with two set-back storeys added on the roof. At 1,570 m2 it is the
+    // largest building on the oval by a factor of two, which is what makes its
+    // exclusion different from every other entry on this block: those are
+    // party-wall teeth whose radius must stay small enough not to reach their
+    // own far corners, and this one is a whole corner block whose own footprints
+    // are dropped by their CENTROIDS long before any radius could reach its
+    // 28 m-distant vertices.
+    //
+    // excluded() in buildings.mjs drops a footprint when its centroid OR any
+    // ring vertex falls inside the radius. Measured from THIS anchor against the
+    // real committed bake inputs (pipeline/data/buildings_datasf.geojson and
+    // overture_buildings.geojsonseq), after projection and simplifyRing(0.6):
+    //
+    //    0.69 m  own Overture footprint (h 18), via CENTROID
+    //    3.90 m  own DataSF footprint SF3775181 (h_med 17.77), via CENTROID
+    //            -> the FLOOR. Above 3.90 both of this building's own
+    //               footprints are gone; their nearest VERTICES are 16.98 m and
+    //               12.37 m out and are irrelevant here.
+    //   18.20 m  17-19 South Park, DataSF SF3775046 (h_med 6.60), via CENTROID
+    //            -> the CEILING, and the binding constraint. A real standing
+    //               1934 building with no GLB; it must survive (AGENTS rules 3
+    //               and 5). Its nearest vertex is 22.58 m out, so reading this
+    //               neighbour off vertices alone would overstate the window by
+    //               4.4 m.
+    //   20.44 m  the same neighbour in Overture (h 6.7), via centroid
+    //   26.52 m  300 Brannan, DataSF SF3775008 (h_med 20.84), nearest vertex
+    //   27.84 m  21-29 South Park, DataSF SF3775042, nearest vertex - already
+    //            dropped by 21SouthPark's own exclude: 16
+    //
+    // Safe window (3.90, 18.20) m. 11 sits almost exactly in the middle with
+    // 7.10 m of margin below and 7.20 m above, both an order of magnitude
+    // larger than the bake's 0.6 m SIMPLIFY_TOLERANCE. No Overture polygon
+    // other than this building's own overlaps the footprint, so there is
+    // nothing for the gap-fill to re-add into the area markOccupied() no longer
+    // covers.
+    //
+    // No clearTrees: the street trees on both frontages are real, they are in
+    // every photograph of this building, and they stand in the road reserve
+    // outside the building line - at 11 m the radius does not reach the kerb.
+    // See docs/asset-plans/1-south-park.md 2.13 and
+    // artifacts/1-south-park/REPORT.md.
+    id: '1SouthPark',
+    name: 'One South Park (1 South Park)',
+    lon: -122.3928634,
+    lat: 37.782048,
+    height: 20.2,
+    exclude: 11,
+    // Camera offset is (sin yaw, ., cos yaw) with +z south, so camera bearing =
+    // 180 - yaw and yaw 180 stands the eye due NORTH - the bisector of the
+    // Second Street elevation (45.3 deg) and the South Park elevation
+    // (315.0 deg). Both are hero elevations, the re-entrant step is on the
+    // Second Street run, and the roof - which is half this building's design -
+    // only reads from above the corner they meet at. 240 m suits a 59 m-wide
+    // 20 m block (cf. 300Brannan at 240 for 25.2 m, 49SouthPark at 165 for
+    // 13 m). No `key`: keys 0-9 are taken.
+    camera: { distance: 240, yaw: 180, pitch: 28 },
+  },
 ];
 
 // Parks/green spaces the landcover bake must match at least one source polygon
