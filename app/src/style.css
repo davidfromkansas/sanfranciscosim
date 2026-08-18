@@ -17,11 +17,49 @@ body {
   color: #f2ece2;
 }
 
+/* The width the residents' feed covers on the right of the window. ONE source
+   of truth: the panel claims it and the right-anchored chrome steps out of it.
+   The canvas keeps the full window and simply renders behind the panel — the
+   city carries on under there. Zero below the desktop breakpoint, the same
+   900 px the quality heuristic uses: a quarter of a phone screen is a gutter,
+   not a column. */
+:root {
+  --feed-w: 0px;
+}
+
+@media (min-width: 900px) {
+  :root {
+    --feed-w: 25vw;
+  }
+}
+
 #view {
   display: block;
   width: 100vw;
   height: 100vh;
   cursor: default;
+}
+
+/* The feed of residents talking. White for now, but wearing the city's ink
+   border so its edge reads as a panel and not a torn canvas. */
+#feed {
+  display: none;
+  position: fixed;
+  top: 0;
+  right: 0;
+  bottom: 0;
+  width: var(--feed-w);
+  background: #ffffff;
+  border-left: 2px solid #2b2118;
+  overflow-y: auto;
+  overscroll-behavior: contain;
+  z-index: 8;
+}
+
+@media (min-width: 900px) {
+  #feed {
+    display: block;
+  }
 }
 
 #attribution {

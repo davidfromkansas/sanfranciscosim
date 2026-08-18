@@ -224,6 +224,7 @@ export function createPopulation(scene, data, city) {
   let cap = MAX_RESIDENTS;
   let badgeCap = MAX_BADGES;
   let badgeRadius = BADGE_RADIUS_MAX;
+  let eligibleLast = 0;
   let bodyScale = 1;
   // Reused each frame: everyone inside the badge radius, before the nearest are
   // picked off it. Allocating this per frame would be 432 objects of garbage
@@ -415,11 +416,10 @@ export function createPopulation(scene, data, city) {
     const camZ = cameraPos.z;
     // Radius from the camera's HEIGHT, so what is labelled tracks what is on
     // screen instead of a distance that only reads right at one altitude.
-    const zoomRadius = Math.max(
+    badgeRadius = Math.max(
       BADGE_RADIUS_MIN,
       Math.min(BADGE_RADIUS_MAX, Math.max(0, cameraPos.y) * BADGE_RADIUS_PER_M)
     );
-    badgeRadius = Math.min(badgeRadius, zoomRadius);
 
     let bodies = 0;
     let badges = 0;
@@ -466,16 +466,19 @@ export function createPopulation(scene, data, city) {
       resident.dist = dist;
     }
 
-    // Nearest first, then hand out the slots. Iteration order would otherwise
-    // spend all of them on whoever happens to sit early in the file — with 432
-    // residents and 140 badges that reliably meant the person under the camera
-    // went untagged while somebody across town got the bubble.
-    if (shortlist.length > badgeCap) {
-      shortlist.sort((a, b) => a.dist - b.dist);
-      shortlist.length = badgeCap;
-    }
+    // Sort by distance, then take an evenly-strided sample of that order. Two
+    // failure modes this is threading between: handing slots out in FILE order
+    // leaves the person under the camera untagged while somebody across town
+    // gets the bubble, and handing them all to the NEAREST collapses the whole
+    // set into one corner of a city view — which is exactly what a low tier
+    // did, 45 bubbles in a knot instead of scattered over San Francisco.
+    // Striding the sorted list keeps index 0 (the nearest) and spreads the rest
+    // across the full distance range, at every altitude.
+    shortlist.sort((a, b) => a.dist - b.dist);
+    const stride = Math.max(1, Math.ceil(shortlist.length / badgeCap));
     const near = badgeRadius * 0.72; // fade over the outer quarter of the ring
-    for (const resident of shortlist) {
+    for (let i = 0; i < shortlist.length; i += stride) {
+      const resident = shortlist[i];
       if (badges >= badgeMesh.instanceMatrix.count) break;
       const dist = resident.dist;
       const fade = dist < near ? 1 : Math.max(0, 1 - (dist - near) / Math.max(1, badgeRadius - near));
@@ -495,11 +498,7 @@ export function createPopulation(scene, data, city) {
     if (bodyMesh.instanceColor) bodyMesh.instanceColor.needsUpdate = true;
     badgeMesh.count = badges;
     badgeMesh.instanceMatrix.needsUpdate = true;
-
-    // Breathe the radius toward whatever keeps roughly badgeCap on screen,
-    // bounded by what the current zoom allows.
-    const target = eligible > badgeCap ? badgeRadius * 0.94 : badgeRadius * 1.06;
-    badgeRadius = Math.max(120, Math.min(zoomRadius, badgeRadius + (target - badgeRadius) * Math.min(1, dt * 1.5)));
+    eligibleLast = eligible;
   }
 
   load();
@@ -534,7 +533,9 @@ export function createPopulation(scene, data, city) {
         owned: [...ownedPumas],
         shared: [...livePumas].filter((puma) => !ownedPumas.has(puma)),
         streets,
-        badgeRadius,
+        badgeRadius: Math.round(badgeRadius),
+        inBadgeRange: eligibleLast,
+        badgesDrawn: badgeMesh ? badgeMesh.count : 0,
       };
     },
   };
