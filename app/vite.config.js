@@ -67,13 +67,18 @@ function loadFeeds(server) {
 // Existing variables win, so an env var on the command line still overrides
 // the file. .env* is gitignored — nothing here reaches the browser or a commit.
 function loadDotEnv() {
-  const file = new URL('../.env', import.meta.url);
-  let text;
-  try {
-    text = readFileSync(file, 'utf8');
-  } catch {
-    return [];
+  // .env.local first: that is what `vercel env pull` writes, so a linked
+  // project needs no copying of secrets by hand. .env is the manual fallback.
+  let text = null;
+  for (const name of ['../.env.local', '../.env']) {
+    try {
+      text = readFileSync(new URL(name, import.meta.url), 'utf8');
+      break;
+    } catch {
+      // try the next one
+    }
   }
+  if (text === null) return [];
   const loaded = [];
   for (const line of text.split('\n')) {
     const match = line.match(/^\s*(?:export\s+)?([A-Za-z_][A-Za-z0-9_]*)\s*=\s*(.*)$/);
@@ -95,7 +100,7 @@ function liveFeeds() {
       console.log(
         loaded.length
           ? `sf-live-feeds: loaded ${loaded.join(', ')} from .env`
-          : 'sf-live-feeds: no .env at the repo root — keyed feeds will report themselves offline'
+          : 'sf-live-feeds: no .env.local or .env at the repo root — keyed feeds will report themselves offline'
       );
       server.middlewares.use(async (req, res, next) => {
         const pathname = new URL(req.url, 'http://localhost').pathname.replace(/\/+$/, '');
