@@ -129,7 +129,20 @@ async function boot() {
   // The column on the right: the same residents, talking. Independent of the
   // renderer — if the writer is offline the panel says so and the city is
   // exactly as it was.
-  const feedPanel = createFeedPanel();
+  // Clicking a name in the feed flies the camera to that person standing on
+  // their own street and rings them, so the column and the diorama are one
+  // thing. Returns false when they have not been seated yet — their PUMA's
+  // streets may still be streaming — and the panel says so rather than the
+  // camera flying somewhere arbitrary.
+  const feedPanel = createFeedPanel({
+    onVisit(person) {
+      const at = population.locate(person.id);
+      if (!at) return false;
+      population.focus(person.id);
+      flyTo({ x: at.x, z: at.z, y: at.y, yaw: 210, pitch: 38, distance: 110 });
+      return true;
+    },
+  });
   // Real WETA vessels from /api/ferries; falls back to the procedural ferries.
   const ferries = createLiveFerries(scene, data, agents);
   // The live weather field. Created before the clock so the card can read it

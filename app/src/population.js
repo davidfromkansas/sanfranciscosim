@@ -30,6 +30,7 @@ import {
   SRGBColorSpace,
   Vector3,
 } from 'three';
+import { shared } from './env.js';
 
 const DATA = `${import.meta.env.BASE_URL}sf-people/`;
 
@@ -226,6 +227,7 @@ export function createPopulation(scene, data, city) {
   let badgeRadius = BADGE_RADIUS_MAX;
   let eligibleLast = 0;
   let bodyScale = 1;
+  let focused = null; // resident id the viewer was sent to
   // Reused each frame: everyone inside the badge radius, before the nearest are
   // picked off it. Allocating this per frame would be 432 objects of garbage
   // sixty times a second.
@@ -451,12 +453,19 @@ export function createPopulation(scene, data, city) {
       resident.heading = Math.atan2(tangent.x * resident.dir, tangent.z * resident.dir);
 
       const bob = Math.abs(Math.sin(resident.phase + resident.d * 1.6)) * 0.12;
+      const isFocused = focused === resident.id;
       dummy.position.set(resident.x, resident.y + BODY_RADIUS + bob, resident.z);
       dummy.rotation.set(0, resident.heading, 0);
-      dummy.scale.setScalar(bodyScale);
+      // The person you asked for stands a head above the crowd and pulses, so
+      // "take me to them" ends somewhere you can actually see them.
+      dummy.scale.setScalar(
+        isFocused ? bodyScale * (2.1 + Math.sin(shared.uTime.value * 3) * 0.25) : bodyScale
+      );
       dummy.updateMatrix();
       bodyMesh.setMatrixAt(bodies, dummy.matrix);
-      bodyMesh.setColorAt(bodies, tint.set(PUMA_COLORS[resident.puma] ?? DEFAULT_COLOR));
+      tint.set(PUMA_COLORS[resident.puma] ?? DEFAULT_COLOR);
+      if (isFocused) tint.offsetHSL(0, 0.15, 0.25);
+      bodyMesh.setColorAt(bodies, tint);
       bodies++;
 
       const dist = Math.hypot(resident.x - camX, resident.z - camZ);
@@ -515,6 +524,29 @@ export function createPopulation(scene, data, city) {
       cap = low ? LOW_CAP : MAX_RESIDENTS;
       badgeCap = low ? LOW_BADGES : MAX_BADGES;
     },
+    // Where a named resident is standing right now, for "take me to this
+    // person". Returns null when they have not been seated — their PUMA's
+    // streets may not have streamed in yet, or they may not be in the cast at
+    // all — and the caller is expected to say so rather than fly somewhere
+    // arbitrary.
+    locate(id) {
+      const resident = residents.find((r) => r.id === id);
+      if (!resident || !resident.placed) return null;
+      return {
+        x: resident.x,
+        y: resident.y,
+        z: resident.z,
+        name: resident.name,
+        puma: resident.puma,
+      };
+    },
+
+    // Ring the person you flew to, so they are findable among four hundred
+    // identical spheres. One id at a time; null clears it.
+    focus(id) {
+      focused = id;
+    },
+
     get residentCount() {
       return bodyMesh ? bodyMesh.count : 0;
     },

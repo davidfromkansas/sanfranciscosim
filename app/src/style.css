@@ -140,100 +140,15 @@ button:hover {
   white-space: nowrap;
 }
 
-/* ------------------------------------------------- the residents' feed --- */
-/* Reads as paper, like the rest of the UI, but plainer: this column is for
-   reading a lot of text, so it drops the hard shadows and candy accents the
-   cards wear and keeps only the ink rules that separate one voice from the
-   next. */
+/* ----------------------------------------------- r/simfrancisco (the feed) ---
+   Reddit's reading grammar — tinted ground, white post cards, a byline above a
+   bold title, comments on a rail — in this city's ink and paper rather than
+   Reddit's blue. It has to sit beside a warm paper UI without looking pasted in
+   from another product. */
 
-.feed-head {
-  position: sticky;
-  top: 0;
-  background: #ffffff;
-  border-bottom: 2px solid #2b2118;
-  padding: 14px 16px 10px;
-  z-index: 1;
-}
-
-.feed-title {
-  margin: 0;
-  font:
-    800 17px/1.2 -apple-system,
-    BlinkMacSystemFont,
-    "Segoe UI",
-    Roboto,
-    sans-serif;
-  color: #2b2118;
-  letter-spacing: -0.2px;
-}
-
-.feed-status {
-  margin: 3px 0 0;
-  font-size: 11px;
-  color: #6b5a48;
-}
-
-.feed-list {
-  display: flex;
-  flex-direction: column;
-}
-
-.feed-thread {
-  border-bottom: 2px solid #2b2118;
-  padding: 0 0 10px;
-}
-
-.feed-post {
-  padding: 11px 16px 0;
-}
-
-/* Replies step in and hang a rule down the left, so the shape of a thread is
-   readable without reading it. */
-.feed-reply {
-  margin-left: 16px;
-  padding-left: 12px;
-  border-left: 2px solid rgba(43, 33, 24, 0.16);
-}
-
-.feed-who {
-  display: flex;
-  align-items: center;
-  gap: 6px;
-}
-
-.feed-dot {
-  width: 9px;
-  height: 9px;
-  border-radius: 50%;
-  border: 1.5px solid #2b2118;
-  flex: none;
-}
-
-.feed-name {
-  font:
-    700 13px/1.3 -apple-system,
-    BlinkMacSystemFont,
-    "Segoe UI",
-    Roboto,
-    sans-serif;
-  color: #2b2118;
-}
-
-.feed-time {
-  margin-left: auto;
-  font-size: 11px;
-  color: #6b5a48;
-  font-variant-numeric: tabular-nums;
-}
-
-.feed-meta {
-  margin: 1px 0 0 15px;
-  font-size: 10.5px;
-  color: #6b5a48;
-}
-
-.feed-text {
-  margin: 5px 0 0 15px;
+#feed.rs {
+  background: #f2efe8;
+  border-left: 2px solid #2b2118;
   font:
     13px/1.5 -apple-system,
     BlinkMacSystemFont,
@@ -243,27 +158,253 @@ button:hover {
   color: #2b2118;
 }
 
-/* The community's stated purpose, in its own words. Small, quiet, and always
-   the text the writers were actually given — it comes from the same server
-   field the prompt is built from. */
-.feed-goal {
-  margin: 4px 0 0;
+.rs-head {
+  position: sticky;
+  top: 0;
+  z-index: 2;
+  background: #fffdf8;
+  border-bottom: 2px solid #2b2118;
+  padding: 13px 16px 11px;
+}
+
+.rs-name {
+  margin: 0;
+  font-size: 17px;
+  font-weight: 800;
+  letter-spacing: -0.2px;
+}
+
+.rs-goal {
+  margin: 3px 0 0;
   font-size: 11px;
   line-height: 1.45;
   color: #6b5a48;
 }
 
-/* A resident's own headline over their post — the thing they decided was worth
-   other people's attention. Larger than the body, smaller than the panel title,
-   and only ever on the first post in a thread. */
-.feed-post-title {
-  margin: 6px 0 0 15px;
+.rs-status {
+  margin: 6px 0 0;
+  font-size: 10.5px;
+  letter-spacing: 0.3px;
+  text-transform: uppercase;
+  color: #8a7860;
+}
+
+.rs-list {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+  padding: 10px;
+}
+
+/* The card. A 2 px ink border and a hard offset shadow are this project's
+   house style; Reddit's hairline-on-white would read as a foreign object. */
+.rs-post {
+  background: #fffdf8;
+  border: 2px solid #2b2118;
+  border-radius: 12px;
+  box-shadow: 3px 3px 0 rgba(43, 33, 24, 0.9);
+  padding: 11px 13px 10px;
+}
+
+.rs-byline {
+  display: flex;
+  align-items: center;
+  gap: 5px;
+  font-size: 11px;
+  color: #6b5a48;
+}
+
+.rs-dot {
+  width: 9px;
+  height: 9px;
+  border-radius: 50%;
+  border: 1.5px solid #2b2118;
+  flex: none;
+}
+
+/* The author is a button because it does something. It has to look like text
+   until you approach it, or every byline turns into a row of controls. */
+.rs-author {
+  appearance: none;
+  background: none;
+  border: 0;
+  padding: 0;
+  font: inherit;
+  font-weight: 700;
+  color: #2b2118;
+  cursor: pointer;
+  border-radius: 3px;
+}
+
+.rs-author:hover,
+.rs-author:focus-visible {
+  color: #c8442f;
+  text-decoration: underline;
+}
+
+.rs-sep {
+  color: #b8a894;
+}
+
+.rs-time {
+  color: #8a7860;
+  font-variant-numeric: tabular-nums;
+}
+
+.rs-title {
+  margin: 6px 0 0;
+  font-size: 15px;
+  font-weight: 800;
+  line-height: 1.3;
+  text-wrap: balance;
+}
+
+.rs-body {
+  margin: 5px 0 0;
+  color: #3a3028;
+}
+
+.rs-actions {
+  margin-top: 9px;
+  padding-top: 8px;
+  border-top: 1px solid rgba(43, 33, 24, 0.14);
+  font-size: 11px;
+  font-weight: 700;
+  color: #6b5a48;
+}
+
+/* Comments hang off a single rail, the way a collapsed Reddit thread reads:
+   the shape of the discussion is legible before you read a word of it. */
+.rs-comments {
+  margin: 8px 0 0 4px;
+  padding-left: 10px;
+  border-left: 2px solid rgba(43, 33, 24, 0.18);
+  display: flex;
+  flex-direction: column;
+  gap: 9px;
+}
+
+.rs-comment-body {
+  margin: 3px 0 0 14px;
+  color: #3a3028;
+}
+
+/* -------------------------------------------------------------- the profile */
+
+.rs-modal-back {
+  position: fixed;
+  inset: 0;
+  z-index: 20;
+  background: rgba(20, 16, 12, 0.55);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 24px;
+}
+
+.rs-modal-back[hidden] {
+  display: none;
+}
+
+.rs-modal {
+  position: relative;
+  width: min(460px, 100%);
+  max-height: 80vh;
+  overflow-y: auto;
+  background: #fffdf8;
+  color: #2b2118;
+  border: 2px solid #2b2118;
+  border-radius: 16px;
+  box-shadow: 5px 5px 0 #2b2118;
+  padding: 20px 22px 18px;
   font:
-    700 14px/1.35 -apple-system,
+    13px/1.55 -apple-system,
     BlinkMacSystemFont,
     "Segoe UI",
     Roboto,
     sans-serif;
-  color: #2b2118;
-  text-wrap: balance;
+}
+
+.rs-modal-close {
+  position: absolute;
+  top: 10px;
+  right: 12px;
+  appearance: none;
+  background: none;
+  border: 0;
+  font-size: 22px;
+  line-height: 1;
+  color: #6b5a48;
+  cursor: pointer;
+}
+
+.rs-modal-head {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+}
+
+.rs-modal-avatar {
+  width: 42px;
+  height: 42px;
+  border-radius: 50%;
+  border: 2px solid #2b2118;
+  flex: none;
+}
+
+.rs-modal-name {
+  margin: 0;
+  font-size: 19px;
+  font-weight: 800;
+  letter-spacing: -0.2px;
+}
+
+.rs-modal-job {
+  margin: 1px 0 0;
+  font-size: 12px;
+  color: #6b5a48;
+}
+
+.rs-modal-hood {
+  margin: 12px 0 0;
+  font-size: 10.5px;
+  letter-spacing: 0.4px;
+  text-transform: uppercase;
+  color: #8a7860;
+}
+
+/* The identity paragraph — the thing every post they write comes out of. */
+.rs-modal-persona {
+  margin: 8px 0 0;
+  color: #3a3028;
+}
+
+.rs-modal-visit {
+  margin-top: 16px;
+  appearance: none;
+  width: 100%;
+  padding: 9px 12px;
+  font:
+    700 13px/1 -apple-system,
+    BlinkMacSystemFont,
+    "Segoe UI",
+    Roboto,
+    sans-serif;
+  color: #fffdf8;
+  background: #2ba79b;
+  border: 2px solid #2b2118;
+  border-radius: 10px;
+  box-shadow: 3px 3px 0 #2b2118;
+  cursor: pointer;
+}
+
+.rs-modal-visit:active {
+  transform: translate(2px, 2px);
+  box-shadow: 1px 1px 0 #2b2118;
+}
+
+.rs-modal-note {
+  margin: 9px 0 0;
+  font-size: 11.5px;
+  color: #c8442f;
 }

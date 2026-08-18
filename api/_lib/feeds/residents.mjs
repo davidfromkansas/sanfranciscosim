@@ -633,8 +633,31 @@ async function fetchSubreddit() {
 
   live.sort((a, b) => b.startedAt - a.startedAt);
   await persist();
+
+  // Everyone who actually spoke, once, with the paragraph they were written
+  // from. The panel needs it to say who somebody is when you click their name,
+  // and sending it per-post would repeat ~900 characters for every reply.
+  // Bounded by how many people are on screen, not by the size of the cast.
+  const speaking = new Set();
+  for (const t of live) {
+    speaking.add(t.authorId);
+    for (const r of t.replies) speaking.add(r.personaId);
+  }
+  const speakers = {};
+  for (const person of people) {
+    if (!speaking.has(person.id)) continue;
+    speakers[person.id] = {
+      id: person.id,
+      name: person.name,
+      occupation: person.occupation,
+      puma: person.puma,
+      persona: person.persona,
+    };
+  }
+
   return {
     live: true,
+    speakers,
     community: SUBREDDIT.name,
     goal: SUBREDDIT.goal,
     model: MODEL,
