@@ -240,4 +240,17 @@ deliberately **not** the manifest anchor; see the plan's §2.13):
 
 ## 11. Approval
 
-_Stage 3 pending._
+Gate 3 was satisfied by a **blanket pre-authorisation given at the start of the
+session**, quoted verbatim:
+
+> APPROVE EVERYTHING DONT ASK ME FOR PERMISSION
+
+18 August 2026, David (repo owner), in the session's opening message.
+
+Recorded honestly: this instruction **predates the renders**, so it is a standing
+authorisation to run the pipeline without stopping, not a design review of these
+eight images. The contact sheet, both aerials and the night state were presented
+before advancing, and the reviewable concerns are named in `REFERENCE.md` §7 —
+the rear and both party walls are inferred, and nothing in the record observes
+them. If a later reader wants a real design review of this asset, that has not
+happened.
