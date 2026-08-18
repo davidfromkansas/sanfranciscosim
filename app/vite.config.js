@@ -1,5 +1,5 @@
-import { readFileSync } from 'node:fs';
-import { defineConfig } from 'vite';
+import { readFileSync } from "node:fs";
+import { defineConfig } from "vite";
 
 // Baked tiles live under stable, unhashed names, so every tile URL carries the
 // bake timestamp as a query key: a re-bake invalidates the browser cache even
@@ -8,13 +8,14 @@ import { defineConfig } from 'vite';
 // previous toy tiles from cache long after they were replaced.
 const stamp = (file) => {
   try {
-    return JSON.parse(readFileSync(new URL(`./public/tiles/${file}`, import.meta.url), 'utf8'))
-      .generated;
+    return JSON.parse(
+      readFileSync(new URL(`./public/tiles/${file}`, import.meta.url), "utf8"),
+    ).generated;
   } catch {
     return null;
   }
 };
-const tilesVersion = [stamp('manifest.json'), stamp('toy.json')]
+const tilesVersion = [stamp("manifest.json"), stamp("toy.json")]
   .filter(Boolean)
   .sort()
   .pop();
@@ -34,26 +35,30 @@ let feedsPromise = null;
 function loadFeeds(server) {
   if (feedsPromise) return feedsPromise;
   feedsPromise = (async () => {
-    const dir = new URL('../api/_lib/', import.meta.url).href;
+    const dir = new URL("../api/_lib/", import.meta.url).href;
     const core = await import(/* @vite-ignore */ `${dir}feedcore.mjs`);
     // Read the directory rather than keeping a list: a hardcoded one silently
     // omitted a newly added feed, which then 404'd locally while working fine
     // in production.
-    const { readdirSync } = await import('node:fs');
-    const dirPath = new URL('../api/_lib/feeds/', import.meta.url);
+    const { readdirSync } = await import("node:fs");
+    const dirPath = new URL("../api/_lib/feeds/", import.meta.url);
     const names = readdirSync(dirPath)
-      .filter((f) => f.endsWith('.mjs') && f !== 'index.mjs')
+      .filter((f) => f.endsWith(".mjs") && f !== "index.mjs")
       .sort();
     for (const name of names) {
       try {
         await import(/* @vite-ignore */ `${dir}feeds/${name}`);
       } catch (error) {
-        server.config.logger.warn(`[live-feeds] ${name} unavailable locally: ${error?.message || error}`);
+        server.config.logger.warn(
+          `[live-feeds] ${name} unavailable locally: ${error?.message || error}`,
+        );
       }
     }
     return core;
   })().catch((error) => {
-    server.config.logger.warn(`[live-feeds] disabled: ${error?.message || error}`);
+    server.config.logger.warn(
+      `[live-feeds] disabled: ${error?.message || error}`,
+    );
     return null;
   });
   return feedsPromise;
@@ -70,9 +75,9 @@ function loadDotEnv() {
   // .env.local first: that is what `vercel env pull` writes, so a linked
   // project needs no copying of secrets by hand. .env is the manual fallback.
   let text = null;
-  for (const name of ['../.env.local', '../.env']) {
+  for (const name of ["../.env.local", "../.env"]) {
     try {
-      text = readFileSync(new URL(name, import.meta.url), 'utf8');
+      text = readFileSync(new URL(name, import.meta.url), "utf8");
       break;
     } catch {
       // try the next one
@@ -80,12 +85,14 @@ function loadDotEnv() {
   }
   if (text === null) return [];
   const loaded = [];
-  for (const line of text.split('\n')) {
-    const match = line.match(/^\s*(?:export\s+)?([A-Za-z_][A-Za-z0-9_]*)\s*=\s*(.*)$/);
-    if (!match || line.trimStart().startsWith('#')) continue;
+  for (const line of text.split("\n")) {
+    const match = line.match(
+      /^\s*(?:export\s+)?([A-Za-z_][A-Za-z0-9_]*)\s*=\s*(.*)$/,
+    );
+    if (!match || line.trimStart().startsWith("#")) continue;
     const [, name, raw] = match;
     if (process.env[name] !== undefined) continue;
-    process.env[name] = raw.trim().replace(/^["']|["']$/g, '');
+    process.env[name] = raw.trim().replace(/^["']|["']$/g, "");
     loaded.push(name);
   }
   return loaded;
@@ -93,18 +100,21 @@ function loadDotEnv() {
 
 function liveFeeds() {
   return {
-    name: 'sf-live-feeds',
-    apply: 'serve',
+    name: "sf-live-feeds",
+    apply: "serve",
     configureServer(server) {
       const loaded = loadDotEnv();
       console.log(
         loaded.length
-          ? `sf-live-feeds: loaded ${loaded.join(', ')} from .env`
-          : 'sf-live-feeds: no .env.local or .env at the repo root — keyed feeds will report themselves offline'
+          ? `sf-live-feeds: loaded ${loaded.join(", ")} from .env`
+          : "sf-live-feeds: no .env.local or .env at the repo root — keyed feeds will report themselves offline",
       );
       server.middlewares.use(async (req, res, next) => {
-        const pathname = new URL(req.url, 'http://localhost').pathname.replace(/\/+$/, '');
-        if (!pathname.startsWith('/api/')) return next();
+        const pathname = new URL(req.url, "http://localhost").pathname.replace(
+          /\/+$/,
+          "",
+        );
+        if (!pathname.startsWith("/api/")) return next();
         try {
           const core = await loadFeeds(server);
           if (!core) return next();
@@ -116,16 +126,33 @@ function liveFeeds() {
               return this;
             },
             json(body) {
-              res.setHeader('content-type', 'application/json');
+              res.setHeader("content-type", "application/json");
               res.end(JSON.stringify(body));
             },
           };
-          if (pathname === '/api/live') return void (await core.serveLive(shim));
-          const entry = core.getFeed(pathname.replace(/^\/api\//, ''));
+          if (pathname === "/api/live")
+            return void (await core.serveLive(shim));
+          // The scheduled tick, so the cron path can be exercised locally
+          // instead of only ever running in production. CRON_SECRET is not
+          // checked here — dev is not reachable from outside.
+          if (pathname === "/api/tick") {
+            const feed = core.getFeed("feed");
+            if (!feed) return next();
+            const failed = await core.forceRefresh(feed);
+            return void shim.status(failed ? 503 : 200).json({
+              ticked: !failed,
+              error: failed ?? null,
+              threads: feed.data?.threads?.length ?? 0,
+              written: feed.data?.written ?? 0,
+            });
+          }
+          const entry = core.getFeed(pathname.replace(/^\/api\//, ""));
           if (!entry) return next();
           await core.serveFeed(shim, entry);
         } catch (error) {
-          server.config.logger.warn(`[live-feeds] ${pathname}: ${error?.message || error}`);
+          server.config.logger.warn(
+            `[live-feeds] ${pathname}: ${error?.message || error}`,
+          );
           next();
         }
       });
@@ -134,16 +161,16 @@ function liveFeeds() {
 }
 
 export default defineConfig({
-  base: '/',
+  base: "/",
   plugins: [liveFeeds()],
   define: { __TILES_VERSION__: JSON.stringify(tilesVersion) },
   build: {
-    target: 'es2022',
+    target: "es2022",
     assetsInlineLimit: 0,
     chunkSizeWarningLimit: 1200,
   },
   server: {
-    host: '0.0.0.0',
+    host: "0.0.0.0",
     port: 5173,
   },
 });
