@@ -733,6 +733,10 @@ export function createAgents(scene, data, city) {
   pedMesh.count = 0;
   group.add(pedMesh);
   const peds = [];
+  // The PUMS population layer claims the streets it has real residents for.
+  // Until it says otherwise the anonymous crowd walks the whole city, which is
+  // also what happens when the baked population is missing entirely.
+  let pedExclusion = () => false;
 
   // ------------------------------------------------------------------ birds ---
   const birdGeometry = new ConeGeometry(0.5, 2.2, 3);
@@ -1096,7 +1100,11 @@ export function createAgents(scene, data, city) {
       const candidates = [];
       for (const path of cityPaths) {
         if (!path.meta) path.meta = polylineLengths(path.points);
-        if (Math.hypot(path.points[0] - pivot.x, path.points[2] - pivot.z) < PED_RANGE * 2) candidates.push(path);
+        if (Math.hypot(path.points[0] - pivot.x, path.points[2] - pivot.z) >= PED_RANGE * 2) continue;
+        // Streets with named residents get their own walkers from the
+        // population layer; an anonymous body on the same kerb is a duplicate.
+        if (pedExclusion(path.points[0], path.points[2])) continue;
+        candidates.push(path);
       }
       let visible = 0;
       for (let i = 0; i < pedCap && candidates.length; i++) {
@@ -1197,6 +1205,11 @@ export function createAgents(scene, data, city) {
       birdCap = low ? LOW_CAPS.birds : BIRD_COUNT;
     },
     useBridgeDeckTop,
+    // `test(x, z) => true` means "real residents walk this street" — the
+    // anonymous pedestrian pool then stops seeding there.
+    setPedExclusion(test) {
+      pedExclusion = test || (() => false);
+    },
     // The live-ferry system hides the two looping procedural ferries when real
     // vessel positions are flowing, and shows them again on any fallback.
     // Container and sail traffic are untouched.

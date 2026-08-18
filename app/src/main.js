@@ -24,6 +24,7 @@ import { createLandmarks } from './landmarks.js';
 import { createAssets } from './assets.js';
 import { createPiers } from './piers.js';
 import { createAgents } from './agents.js';
+import { createPopulation } from './population.js';
 import { createLiveFerries } from './ferries.js';
 import { createLiveMuni } from './muni.js';
 import { createMuniStopLayer } from './munistoplayer.js';
@@ -119,6 +120,11 @@ async function boot() {
     },
   });
   const agents = createAgents(scene, data, city);
+  // The residents: one sphere per adult sampled from the 2024 ACS PUMS
+  // microdata, walking the PUMA the Census actually recorded them in. Where
+  // they walk, the anonymous pedestrians stand down.
+  const population = createPopulation(scene, data, city);
+  agents.setPedExclusion(population.containsResidents);
   // Real WETA vessels from /api/ferries; falls back to the procedural ferries.
   const ferries = createLiveFerries(scene, data, agents);
   // The live weather field. Created before the clock so the card can read it
@@ -221,6 +227,7 @@ async function boot() {
     water.setGlitter(key === 'low' ? 0.6 : 1);
     water.setQuality(key);
     agents.setQuality(key);
+    population.setQuality(key);
     terrain.setQuality(key);
     clouds.setQuality(key);
     rain.setQuality(key);
@@ -264,6 +271,7 @@ async function boot() {
     rig.setDiorama(toy);
     env.setToy(toy);
     agents.setToy(toy);
+    population.setToy(toy);
     signs.setVisible(toy);
     post.setEnabled(toy);
     await city.setTier(toy ? 'toy' : 'base');
@@ -760,6 +768,7 @@ async function boot() {
     rig,
     city,
     agents,
+    population,
     ferries,
     clouds,
     rain,
@@ -924,6 +933,7 @@ async function boot() {
     overlay.update(dt);
     city.update(dt, pivotWorld, camera.position, quality);
     agents.update(dt, pivotWorld, camera.position);
+    population.update(dt, camera.position, camera.quaternion);
     ferries.update(dt);
     // Weather eases on wall time for the same reason the clouds do: the
     // simulation clamp would stall the transition below 20 fps.
@@ -981,6 +991,7 @@ async function boot() {
           `far groups ${city.stats.farGroups}  near ${city.stats.nearChunks}`,
           `trees      ${city.stats.trees}  lamps ${city.stats.lamps}`,
           `cars       ${agents.carCount}`,
+          `residents  ${population.residentCount}`,
           `ferries    ${ferries.count}${ferries.live ? ' live' : ' procedural'}`,
           `muni       ${muni.count}${muni.live ? ` live (${muni.onShapeCount} on-route${muni.degraded ? ', degraded' : ''})` : ' off'}`,
           `stops      ${muniStops.count} shown / ${muniStops.total}`,
