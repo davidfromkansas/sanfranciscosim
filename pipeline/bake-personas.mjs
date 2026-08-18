@@ -23,6 +23,21 @@ import { fileURLToPath } from 'node:url';
 const HERE = path.dirname(fileURLToPath(import.meta.url));
 const OUT = path.resolve(HERE, '../api/_data/personas.json');
 
+// Where each PUMA is, in the words a resident would use. The writer is told
+// this because the paragraphs mostly do not say: 79% of them never name a
+// neighbourhood, so a model asked for a post that needs a place invented one,
+// and residents were writing "it's quiet here in the Sunset" from Bayview.
+const PUMA_NAMES = {
+  '07507': 'Bayview & Hunters Point',
+  '07508': 'the Richmond',
+  '07509': 'Chinatown & North Beach',
+  '07510': 'the Mission & SoMa',
+  '07511': 'Bernal Heights & the Castro',
+  '07512': 'the Sunset',
+  '07513': 'Ingleside',
+  '07514': 'the Marina & Western Addition',
+};
+
 function arg(name, fallback) {
   const i = process.argv.indexOf(`--${name}`);
   return i !== -1 && process.argv[i + 1] ? process.argv[i + 1] : fallback;
@@ -52,6 +67,10 @@ async function main() {
         id: person.id,
         // The paragraph. This is the ONLY thing the writer is given about them.
         persona: person.iss,
+        // Where they live. The ONE fact the writer gets beyond the paragraph,
+        // because the paragraph usually omits it and a resident who does not
+        // know their own neighbourhood makes one up.
+        neighbourhood: PUMA_NAMES[household.puma] ?? 'San Francisco',
         // Printed beside the name in the panel; never shown to the model.
         name: person.name,
         occupation: person.occupation ?? '',

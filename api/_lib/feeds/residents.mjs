@@ -221,10 +221,22 @@ function dropTrailingSentences(text, limit) {
   return out.trim() || text;
 }
 
+// Where this person lives. 79% of the paragraphs never say, and the PUMA was
+// known to every other part of the system but never reached the writer — so a
+// post that needed a place got an invented one, and a Bayview resident wrote
+// "it's quiet here in the Sunset" while the panel printed Bayview beside his
+// name. The line is deliberately part of WHO YOU ARE: where you live is not a
+// property of the subreddit.
+const livesIn = (persona) =>
+  persona.neighbourhood
+    ? `You live in ${persona.neighbourhood}, San Francisco. Write from there — do not place yourself in another neighbourhood.`
+    : "";
+
 export async function generatePost({ persona, subreddit }) {
   const system =
     `You are simulating a person posting in a subreddit.\n\n` +
-    `PERSONA\n${persona.persona}\n\n` +
+    `PERSONA\n${persona.persona}\n` +
+    `${livesIn(persona)}\n\n` +
     `SUBREDDIT GOAL\n${subreddit.goal}\n\n` +
     `SUBREDDIT RULES\n${rulesBlock()}`;
   const user =
@@ -261,7 +273,8 @@ export async function generatePost({ persona, subreddit }) {
 export async function generateReply({ persona, subreddit, post, replies }) {
   const system =
     `You are simulating a person participating in a Reddit discussion.\n\n` +
-    `PERSONA\n${persona.persona}\n\n` +
+    `PERSONA\n${persona.persona}\n` +
+    `${livesIn(persona)}\n\n` +
     `SUBREDDIT GOAL\n${subreddit.goal}\n\n` +
     `SUBREDDIT RULES\n${rulesBlock()}`;
   const formatted = replies.length
@@ -651,6 +664,7 @@ async function fetchSubreddit() {
       name: person.name,
       occupation: person.occupation,
       puma: person.puma,
+      neighbourhood: person.neighbourhood,
       persona: person.persona,
     };
   }
