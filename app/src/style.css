@@ -492,3 +492,37 @@ button:hover {
   font-size: 11.5px;
   color: #c8442f;
 }
+
+/* The score. Reddit puts it in a rail; this column is too narrow for one, so it
+   sits in the action row with the comment count. Direction is carried by the
+   arrow as well as the colour, so it survives being read in greyscale. */
+.rs-score {
+  font-variant-numeric: tabular-nums;
+  font-weight: 700;
+  margin-right: 10px;
+  cursor: default;
+}
+
+.rs-score.up {
+  color: #c8552f;
+}
+
+.rs-score.down {
+  color: #4a6bb5;
+}
+
+.rs-score.zero {
+  color: #8a7860;
+}
+
+.rs-count {
+  font-weight: 700;
+}
+
+/* On a comment the score is a footnote, not a headline. */
+.rs-comment-main .rs-score {
+  display: inline-block;
+  margin: 4px 0 0;
+  font-size: 10.5px;
+  font-weight: 700;
+}

@@ -71,6 +71,31 @@ function sampleReplyProbability() {
   return Math.min(max, Math.max(min, mean + stdev * z));
 }
 
+// Voting. Each sampled resident decides alone — that independence is the point:
+// a score has to be an aggregate of many small judgements, not a number a model
+// made up. Votes fire ONCE, when a post or reply is created, and never again;
+// re-sampling later would multiply the cost by however many passes.
+//
+// Sizes are small on purpose. At this refresh rate each extra post voter costs
+// about $0.74 a month and each extra reply voter about $1.69, because replies
+// outnumber posts 2.3 to 1. A score of +4 reads perfectly well — you do not
+// need twenty-five voters to make a number look real.
+const votingConfig = {
+  postVoterSampleSize: 5,
+  replyVoterSampleSize: 3,
+};
+
+// A separate rail from the generation budget: a vote call costs about a quarter
+// of a post, and counting them together would misprice both. A steady tick
+// needs about twelve — one post at five voters, two-ish replies at three — so
+// this is roughly double headroom.
+const MAX_VOTES_PER_REFRESH = 24;
+// A cold start writes eight posts and twenty-odd replies at once and needs
+// about a hundred votes to cover them. Rationing it to a normal tick left most
+// of the subreddit sitting at zero, which reads as broken rather than as quiet.
+// One-off, and about two cents.
+const FIRST_BUILD_VOTES = 130;
+
 const OPENING_THREADS = 8; // how many posts a cold start puts up, so a fresh
 // deploy is a subreddit rather than one lonely thread
 // Then ONE post every tick, with whatever replies its own probability earns it.
@@ -320,6 +345,87 @@ export async function generateReply({ persona, subreddit, post, replies }) {
   };
 }
 
+// ------------------------------------------------------------------- voting
+
+// One resident, one piece of content, one decision. No context beyond what they
+// need to judge it: who they are, what this place is for, and the thing itself.
+export async function generateVoteDecision({ persona, subreddit, content }) {
+  const system =
+    `You are simulating a person browsing a subreddit.\n\n` +
+    `PERSONA\n${persona.persona}\n` +
+    `${livesIn(persona)}\n\n` +
+    `SUBREDDIT GOAL\n${subreddit.goal}\n\n` +
+    `SUBREDDIT RULES\n${rulesBlock()}`;
+  const user =
+    `CONTENT\n${content}\n\n` +
+    `Decide how this person would react to this content.\n\n` +
+    `Choose exactly one:\n- "upvote"\n- "downvote"\n- "none"\n\n` +
+    `UPVOTE — this person thinks it contributes to the subreddit and fits its goal and rules.\n` +
+    `DOWNVOTE — this person thinks it detracts, does not belong, is misleading, low quality, or conflicts with the goal or rules.\n` +
+    `NONE — this person would move on without feeling strongly enough to vote.\n\n` +
+    `Consider both how well it fits the subreddit, and this person's own interests, opinions and values.\n\n` +
+    `Important:\n` +
+    `- It is normal to choose "none" — but vote when this person would actually feel something.\n` +
+    `- Do not assume every relevant post deserves an upvote.\n` +
+    `- Do not assume disagreement alone deserves a downvote.\n` +
+    `- Stay consistent with the persona.\n` +
+    `- Do not explain the decision.\n\n` +
+    `Return JSON:\n{ "action": "upvote" | "downvote" | "none" }`;
+
+  const { action } = parseJson(await complete(system, user, 40));
+  return action === "upvote" || action === "downvote" ? action : "none";
+}
+
+// Selection stays out of the model, and nobody votes on their own words.
+// Without replacement, so one resident cannot be asked twice about one thing.
+function sampleVoters(cast, authorId, size) {
+  const pool = cast.filter((p) => p.id !== authorId);
+  const picked = [];
+  const taken = new Set();
+  const wanted = Math.min(size, pool.length);
+  while (picked.length < wanted) {
+    const i = Math.floor(Math.random() * pool.length);
+    if (taken.has(i)) continue;
+    taken.add(i);
+    picked.push(pool[i]);
+  }
+  return picked;
+}
+
+// Every vote is stored individually — who, on what, which way, when. Totals are
+// derived from these and never stored as the truth, so a score can always be
+// explained by pointing at the residents who produced it.
+async function simulateVotes({ cast, authorId, content, size, spend }) {
+  const voters = sampleVoters(cast, authorId, size).filter(() => spend());
+  if (!voters.length) return [];
+  // Independent by definition, so they run at once. Replies cannot do this —
+  // each one has to read the last — but a vote reads nothing but the content.
+  const decisions = await Promise.all(
+    voters.map((persona) =>
+      generateVoteDecision({ persona, subreddit: SUBREDDIT, content })
+        .then((action) => ({ persona, action }))
+        .catch(() => ({ persona, action: "none" })),
+    ),
+  );
+  const at = Date.now();
+  return decisions
+    .filter((d) => d.action !== "none")
+    .map((d) => ({
+      personaId: d.persona.id,
+      value: d.action === "upvote" ? 1 : -1,
+      at,
+    }));
+}
+
+// Totals from the records, every time. Cheap at this size, and it means the
+// stored votes cannot drift out of step with the number on screen.
+function tally(votes = []) {
+  let up = 0;
+  let down = 0;
+  for (const v of votes) v.value === 1 ? up++ : down++;
+  return { upvotes: up, downvotes: down, score: up - down };
+}
+
 // --------------------------------------------------------------- who speaks
 
 const pick = (list) => list[Math.floor(Math.random() * list.length)];
@@ -398,9 +504,17 @@ async function loadCast() {
 // instance produces a real feed rather than a broken one.
 const live = [];
 
-async function openThread(people) {
+async function openThread(people, spendVote) {
   const author = pick(people);
   const post = await generatePost({ persona: author, subreddit: SUBREDDIT });
+  // Once, here, and never again for this post.
+  const votes = await simulateVotes({
+    cast: people,
+    authorId: author.id,
+    content: `${post.title}\n\n${post.body}`,
+    size: votingConfig.postVoterSampleSize,
+    spend: spendVote,
+  });
   return {
     id: `${author.id}-${live.length}-${post.title.slice(0, 24)}`,
     authorId: author.id,
@@ -411,6 +525,7 @@ async function openThread(people) {
     },
     title: post.title,
     body: post.body,
+    votes,
     replies: [],
     // Sampled here and never resampled: this thread's own appetite for
     // discussion, fixed at birth like a real post's.
@@ -429,18 +544,18 @@ async function openThread(people) {
 // out of allowance mid-thread leaves `done` false so the next refresh picks the
 // same thread up where it stopped, rather than a long thread being silently
 // truncated because it happened to be last in the loop.
-async function growThread(people, thread, spend) {
+async function growThread(people, thread, spend, spendVote) {
   while (
     thread.replies.length < simulationConfig.maxReplies &&
     Math.random() < thread.replyProbability
   ) {
     if (!spend()) return;
-    if (!(await addReply(people, thread))) break;
+    if (!(await addReply(people, thread, spendVote))) break;
   }
   thread.done = true;
 }
 
-async function addReply(people, thread) {
+async function addReply(people, thread, spendVote) {
   const responder = pickResponder(people, thread);
   if (!responder) return false;
   const { body } = await generateReply({
@@ -454,7 +569,25 @@ async function addReply(people, thread) {
     },
     replies: thread.replies,
   });
+  // The reply is judged in its thread: a comment read without the post it
+  // answers is a different comment.
+  const votes = await simulateVotes({
+    cast: people,
+    authorId: responder.id,
+    content:
+      `ORIGINAL POST\n${thread.title}\n${thread.body}\n\n` +
+      (thread.replies.length
+        ? `EARLIER IN THE THREAD\n${thread.replies
+            .slice(-2)
+            .map((r) => `${r.name}: ${r.body}`)
+            .join("\n")}\n\n`
+        : "") +
+      `REPLY BEING EVALUATED\n${body}`,
+    size: votingConfig.replyVoterSampleSize,
+    spend: spendVote,
+  });
   thread.replies.push({
+    votes,
     personaId: responder.id,
     name: responder.name,
     occupation: responder.occupation,
@@ -594,6 +727,10 @@ async function fetchSubreddit() {
   // gone, which is how a thread's continuation loop learns to stop without
   // knowing anything about budgets.
   const spend = () => (budget > 0 ? (budget--, true) : false);
+  // Voting gets its own allowance so a busy tick cannot quietly spend the
+  // generation budget on opinions about posts that were never written.
+  let voteBudget = cold ? FIRST_BUILD_VOTES : MAX_VOTES_PER_REFRESH;
+  const spendVote = () => (voteBudget > 0 ? (voteBudget--, true) : false);
 
   // Threads leave on age alone. Evicting a finished conversation to make room
   // seems tidy and is not — a long argument gets replaced by somebody's opening
@@ -607,7 +744,7 @@ async function fetchSubreddit() {
   for (const thread of live.filter((t) => !t.done)) {
     if (budget <= 0) break;
     try {
-      await growThread(people, thread, spend);
+      await growThread(people, thread, spend, spendVote);
     } catch (error) {
       failures++;
       console.warn(`${SUBREDDIT.name}: reply failed — ${error.message}`);
@@ -620,7 +757,7 @@ async function fetchSubreddit() {
     if (!spend()) break;
     let thread;
     try {
-      thread = await openThread(people);
+      thread = await openThread(people, spendVote);
     } catch (error) {
       failures++;
       console.warn(`${SUBREDDIT.name}: post failed — ${error.message}`);
@@ -631,7 +768,7 @@ async function fetchSubreddit() {
     // Straight into its own continuation loop, so a post and its discussion
     // arrive together rather than the post sitting alone until the next tick.
     try {
-      await growThread(people, thread, spend);
+      await growThread(people, thread, spend, spendVote);
     } catch (error) {
       failures++;
       console.warn(`${SUBREDDIT.name}: reply failed — ${error.message}`);
@@ -646,6 +783,15 @@ async function fetchSubreddit() {
 
   live.sort((a, b) => b.startedAt - a.startedAt);
   await persist();
+
+  // Totals are DERIVED on the way out, never stored. The individual votes stay
+  // canonical, so a score can always be explained by naming the residents who
+  // produced it — and the number on screen cannot drift from the records.
+  const scored = live.map((t) => ({
+    ...t,
+    ...tally(t.votes),
+    replies: t.replies.map((r) => ({ ...r, ...tally(r.votes) })),
+  }));
 
   // Everyone who actually spoke, once, with the paragraph they were written
   // from. The panel needs it to say who somebody is when you click their name,
@@ -672,12 +818,21 @@ async function fetchSubreddit() {
   return {
     live: true,
     speakers,
+    votes: {
+      cast: live.reduce(
+        (n, t) =>
+          n +
+          (t.votes?.length ?? 0) +
+          t.replies.reduce((m, r) => m + (r.votes?.length ?? 0), 0),
+        0,
+      ),
+    },
     community: SUBREDDIT.name,
     goal: SUBREDDIT.goal,
     model: MODEL,
     cast: people.length,
     written: allowance - budget,
-    threads: live,
+    threads: scored,
   };
 }
 

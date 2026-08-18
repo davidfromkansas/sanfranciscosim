@@ -226,6 +226,17 @@ function byline(who, at, onOpen) {
   return row;
 }
 
+// The score, with the residents behind it in the tooltip. A bare number invites
+// the question "who?", and unlike a real subreddit we can actually answer it.
+function score(item) {
+  const wrap = el("span", "rs-score");
+  const n = item.score ?? 0;
+  wrap.classList.add(n > 0 ? "up" : n < 0 ? "down" : "zero");
+  wrap.textContent = `${n > 0 ? "▲" : n < 0 ? "▼" : "•"} ${n}`;
+  wrap.title = `${item.upvotes ?? 0} up · ${item.downvotes ?? 0} down`;
+  return wrap;
+}
+
 function renderThread(thread, speakers, onOpen) {
   const who = { ...thread.author, ...(speakers[thread.authorId] ?? {}) };
   const card = el("article", "rs-post");
@@ -235,9 +246,12 @@ function renderThread(thread, speakers, onOpen) {
   card.append(el("p", "rs-body", thread.body));
 
   const count = thread.replies.length;
-  card.append(
-    el("div", "rs-actions", count === 1 ? "1 comment" : `${count} comments`),
+  const actions = el("div", "rs-actions");
+  actions.append(score(thread));
+  actions.append(
+    el("span", "rs-count", count === 1 ? "1 comment" : `${count} comments`),
   );
+  card.append(actions);
 
   if (count) {
     const comments = el("div", "rs-comments");
@@ -251,6 +265,7 @@ function renderThread(thread, speakers, onOpen) {
       const main = el("div", "rs-comment-main");
       main.append(identity(speaker, reply.at, onOpen));
       main.append(el("p", "rs-comment-body", reply.body));
+      main.append(score(reply));
       item.append(avatar(speaker, 22), main);
       comments.append(item);
     }
