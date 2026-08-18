@@ -57,6 +57,10 @@ const simulationConfig = {
   replyProbability: { mean: 0.65, stdev: 0.18, min: 0.05, max: 0.95 },
   maxReplies: 8,
   newParticipantProbability: 0.5,
+  // Asked for in the prompt AND enforced after, because a model told to stay
+  // under a limit treats it as a suggestion. The title is not something the
+  // spec set, so it gets a length a headline can actually be.
+  maxChars: { post: 240, reply: 240, title: 120 },
 };
 
 // Box–Muller. Clamped, because the tail of a normal goes past both ends of a
@@ -166,6 +170,51 @@ function parseJson(text) {
   return { title, body };
 }
 
+// Bringing an over-long answer down to the limit WITHOUT losing what it said.
+//
+// Slicing at a character count is the obvious move and the wrong one: it ends
+// posts mid-thought — "takes more than a stripe to slow down" — which reads as
+// broken software rather than as brevity, and it throws away the writer's
+// actual point. So the model is asked to say the same thing shorter, in its own
+// voice, and only if that fails twice do we fall back to dropping whole
+// sentences from the end. Nothing is ever cut mid-sentence.
+async function fitToLimit({ system, text, limit, maxTokens, attempts = 2 }) {
+  let current = String(text).replace(/\s+/g, " ").trim();
+  for (let i = 0; i < attempts && current.length > limit; i++) {
+    const user =
+      `You wrote this:\n\n${current}\n\n` +
+      `It is ${current.length} characters, which is too long. Rewrite it in under ${limit} characters.\n\n` +
+      `Keep the same point, the same voice, and every idea in it. Say it more briefly — do not add anything, ` +
+      `do not trail off, and finish the last sentence.\n\n` +
+      `Return JSON:\n{ "body": "..." }`;
+    try {
+      const { body } = parseJson(await complete(system, user, maxTokens));
+      if (!body) break;
+      const shorter = String(body).replace(/\s+/g, " ").trim();
+      // Only accept a rewrite that actually helped.
+      if (shorter.length < current.length) current = shorter;
+    } catch {
+      break; // a failed repair is not worth failing the whole generation over
+    }
+  }
+  return current.length > limit
+    ? dropTrailingSentences(current, limit)
+    : current;
+}
+
+// Last resort, and only whole sentences. Losing a sentence is a real loss, but
+// it is a loss the reader can see the shape of; a half-sentence is a bug.
+function dropTrailingSentences(text, limit) {
+  const parts = text.match(/[^.!?]+[.!?]+(\s|$)/g);
+  if (!parts) return text; // no sentence boundaries at all — leave it whole
+  let out = "";
+  for (const part of parts) {
+    if ((out + part).trim().length > limit) break;
+    out += part;
+  }
+  return out.trim() || text;
+}
+
 export async function generatePost({ persona, subreddit }) {
   const system =
     `You are simulating a person posting in a subreddit.\n\n` +
@@ -181,12 +230,26 @@ export async function generatePost({ persona, subreddit }) {
     `- Feel like a real Reddit post.\n` +
     `- Let the person decide naturally what is worth posting about.\n` +
     `- Not mention the persona, prompt, subreddit goal, rules, or simulation.\n\n` +
+    `The title must be under ${simulationConfig.maxChars.title} characters and the body under ${simulationConfig.maxChars.post} characters. Say one thing and stop.\n\n` +
     `Return JSON:\n{ "title": "...", "body": "..." }`;
 
-  const { title, body } = parseJson(await complete(system, user, 700));
+  const { title, body } = parseJson(await complete(system, user, 350));
   if (!title || !body)
     throw new Error("post came back without a title or body");
-  return { title: String(title).trim(), body: String(body).trim() };
+  return {
+    title: await fitToLimit({
+      system,
+      text: title,
+      limit: simulationConfig.maxChars.title,
+      maxTokens: 120,
+    }),
+    body: await fitToLimit({
+      system,
+      text: body,
+      limit: simulationConfig.maxChars.post,
+      maxTokens: 200,
+    }),
+  };
 }
 
 export async function generateReply({ persona, subreddit, post, replies }) {
@@ -223,11 +286,19 @@ export async function generateReply({ persona, subreddit, post, replies }) {
     `- Avoid unnecessarily repeating comments that have already been made.\n` +
     `- Not sound like an AI assistant.\n\n` +
     `It is okay for the reply to be short, casual, opinionated, uncertain, humorous, or disagree with another commenter.\n\n` +
+    `Keep it under ${simulationConfig.maxChars.reply} characters.\n\n` +
     `Return JSON:\n{ "body": "..." }`;
 
-  const { body } = parseJson(await complete(system, user, 400));
+  const { body } = parseJson(await complete(system, user, 200));
   if (!body) throw new Error("reply came back without a body");
-  return { body: String(body).trim() };
+  return {
+    body: await fitToLimit({
+      system,
+      text: body,
+      limit: simulationConfig.maxChars.reply,
+      maxTokens: 200,
+    }),
+  };
 }
 
 // --------------------------------------------------------------- who speaks
