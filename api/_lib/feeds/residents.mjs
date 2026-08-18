@@ -180,10 +180,19 @@ export async function generateReply({ persona, subreddit, post, replies }) {
   const formatted = replies.length
     ? replies.map((r) => `${r.name}: ${r.body}`).join("\n\n")
     : "(no replies yet)";
+  // Reddit shows you who wrote the post you are answering, and the responder
+  // may BE that person — the poster is allowed back into their own thread. Told
+  // neither of those things, they re-introduced themselves to their own
+  // readers: the author of a thread about the 22 bus replied to it explaining
+  // that he rides the 22, as though meeting a stranger.
+  const own = post.authorId && post.authorId === persona.id;
   const user =
     `DISCUSSION\n\n` +
-    `Original post:\n\nTitle:\n${post.title}\n\nBody:\n${post.body}\n\n` +
+    `Original post by ${post.author ?? "someone"}:\n\nTitle:\n${post.title}\n\nBody:\n${post.body}\n\n` +
     `Replies so far:\n${formatted}\n\n` +
+    (own
+      ? `You wrote that original post. You are coming back to your own thread — answer the people who replied to you. Do not re-introduce yourself or restate what you already said.\n\n`
+      : "") +
     `Write the next reply as this person.\n\n` +
     `Respond naturally to the discussion as it currently exists.\n` +
     `The reply can respond to the original post or to something another person has already said.\n\n` +
@@ -265,7 +274,12 @@ async function addReply(people, thread) {
   const { body } = await generateReply({
     persona: responder,
     subreddit: SUBREDDIT,
-    post: { title: thread.title, body: thread.body },
+    post: {
+      title: thread.title,
+      body: thread.body,
+      author: thread.author.name,
+      authorId: thread.authorId,
+    },
     replies: thread.replies,
   });
   thread.replies.push({
