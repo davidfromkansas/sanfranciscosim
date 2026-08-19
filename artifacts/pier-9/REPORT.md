@@ -14,8 +14,8 @@ Deterministic build: `build_pier_9.py` (Blender 5.2 LTS, headless). Renders:
 
 | | |
 |---|---|
-| Triangles | **11,820** (cap 24,000) |
-| Objects | 675 meshes |
+| Triangles | **11,788 shipped** (11,820 pre-optimize; cap 24,000) |
+| Objects | 16 meshes / 19 draw submeshes shipped (675 pre-optimize) |
 | Dimensions (axis-aligned) | 235.28 × 188.42 × **17.60** m |
 | min Z | **−2.60 m — deliberate, a PASS** (deck-top origin; see below) |
 | XY centre offset | 0.0, 0.0 |
@@ -82,13 +82,20 @@ Two expected results that are **not** failures (stated in `validation.json` too)
   "name": "Pier 9",
   "estimated": false,
   "dims": [235.28, 17.6, 188.42],
-  "tris": 11820,
+  "tris": 11788,
   "loadRadius": 2500
 }
 ```
 
 Integration: Case B — registry entry + solved three-zone exclusion in
 `docs/asset-plans/pier-9.md` §2.13 (do not re-derive by the half-diagonal rule).
+
+## Stage 4 (optimize)
+
+`optimize/REPORT.md`: 915.7 KB -> **283.2 KB raw (-69.1 %)**, 680 -> 19 draw
+submeshes, appearance identical within gates (worst 0.33 % night far). The shipped
+`pier-9.glb` re-passed the full stage-2 contract validator after the swap; the original
+is archived at `optimize/input/pier-9.glb`.
 
 ## Approval
 

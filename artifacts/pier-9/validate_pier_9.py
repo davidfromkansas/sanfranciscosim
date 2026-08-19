@@ -171,7 +171,13 @@ def main():
         # its flanks points back past the model centre. Casting a ray in along
         # each face's own normal and requiring that face to be the first thing hit
         # is both stricter and correct.
-        if "_glow" in obj.name.lower():
+        # The amber lamp GLOBES are closed spheres by design (they ARE the
+        # light source, see REPORT.md); after the stage-4 per-material join they
+        # live in an object named for their material, which contains "_glow".
+        # A closed shell gets the signed-volume test below, not the open-strip
+        # ray test - a sphere's deck-facing faces can never be "first hit from
+        # outside along the normal".
+        if "_glow" in obj.name.lower() and "amber" not in obj.name.lower():
             ev = obj.evaluated_get(dg)
             me = ev.to_mesh()
             for poly in me.polygons:
@@ -188,7 +194,7 @@ def main():
             ev.to_mesh_clear()
             continue
     for obj in meshes:
-        if "_glow" in obj.name.lower():
+        if "_glow" in obj.name.lower() and "amber" not in obj.name.lower():
             continue
         ev = obj.evaluated_get(dg)
         me = ev.to_mesh()
