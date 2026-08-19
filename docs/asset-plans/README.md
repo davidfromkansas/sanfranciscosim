@@ -143,6 +143,7 @@ route, and the park plans depend on it (§E8 of the parks README).
 | [246 Ritch Street](./246-ritch.md) | `246-ritch` | 18.76 m (LiDAR max, read as the roof stair/elevator penthouse — see its 2.15 risk 1; parapet 15.87 m) | new landmark |
 | [248–250 Ritch Street](./248-ritch.md) | `248-ritch` | 8.6 m (cornice crest; measured twice — LiDAR mixture 8.65 m, rectified panorama 8.50 m) | new landmark |
 | [1 South Park (One South Park)](./1-south-park.md) | `1-south-park` | 20.2 m (LiDAR `hgt_max`; penthouse roof 18.6 m, cornice crest 15.75 m) | new landmark |
+| [132 The Embarcadero (Jewish Community Federation Building)](./132-embarcadero.md) | `132-embarcadero` | 29.57 m (LiDAR bulkhead crest; parapet 27.4 m measured) | new landmark |
 
 ## Shared contract (all 107)
 | [252–254 Ritch Street](./254-ritch.md) | `254-ritch` | 8.8 m (LiDAR maximum, the roof flue; cornice crest 8.05 m estimated) | new landmark |
