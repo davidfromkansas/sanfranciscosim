@@ -333,7 +333,17 @@ function placeGeneric(box, entry, data) {
 // The meshopt pass reindexes every GLB, so merged landmark geometry arrives
 // indexed: the batch needs index space too (a zero maxIndexCount rejects the
 // very first indexed addGeometry).
-const BODY_VERTS = 1_200_000;
+// Body reserve sized against the WHOLE manifest resident at once, not against
+// the worst camera: streaming keeps the live set below that, but the ceiling
+// then does not move when a batch lands in one district. 103 landmarks total
+// 1,434,764 body vertices; the SoMa worst case (89 live) is 1,241,294, which
+// overflowed the previous 1,200,000 reserve — measured while integrating the
+// thirteen Ritch/Brannan/South Park landmarks. An overflow is not a crash: the
+// addGeometry throw drops that landmark to its procedural stand-in, so it reads
+// as one arbitrary landmark quietly missing on each reload.
+//   1,600,000 verts x 36 B (position+normal+color) = 58 MB, up 14 MB.
+// Indices are untouched: all-resident needs 2,409,606 of the 3,600,000.
+const BODY_VERTS = 1_600_000;
 const BODY_INDICES = 3_600_000;
 const GLOW_VERTS = 250_000;
 const GLOW_INDICES = 750_000;
