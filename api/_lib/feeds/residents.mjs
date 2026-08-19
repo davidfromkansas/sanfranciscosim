@@ -97,11 +97,12 @@ const votingConfig = {
 // this is roughly double headroom.
 const MAX_VOTES_PER_REFRESH = 24;
 
-const OPENING_THREADS = 8; // how many posts a cold start puts up, so a fresh
-// deploy is a subreddit rather than one lonely thread
-// Then ONE post every tick, with whatever replies its own probability earns it.
-// A thread is finished the moment its roll fails, so new posts are the only
-// thing that keeps the feed moving.
+// ONE post every tick, with whatever replies its own probability earns it, and
+// the same rate whether the feed holds nothing or a hundred and forty threads.
+// There is no opening burst and no catch-up mode: a subreddit that posts faster
+// because it is empty is a subreddit whose history is a lie about how busy the
+// city was that hour. A thread is finished the moment its roll fails, so new
+// posts are the only thing that keeps the feed moving.
 const NEW_THREADS_PER_REFRESH = 1;
 const RETIRE_AFTER = 24 * 60 * 60 * 1000;
 // A day at one post every ten minutes is 144 threads, so a 50-thread cap would
@@ -581,9 +582,11 @@ async function loadCast() {
   return cast;
 }
 
-// Threads live in memory. Per the registry's own accepted limits this dies on a
-// cold start and the subreddit begins again — acceptable, because a fresh
-// instance produces a real feed rather than a broken one.
+// Threads live in memory for the life of one instance and in blob storage for
+// the life of the subreddit: restore() fills this from the blob before any tick
+// reads it, and persist() writes it back after. A cold start therefore resumes
+// the feed rather than beginning it again — which is the whole reason posts
+// accumulate while nobody is looking.
 const live = [];
 
 async function openThread(people, spendVote) {
@@ -887,19 +890,6 @@ export async function readSubreddit() {
   return shape(people, 0);
 }
 
-// A fresh deploy starts with an empty blob and fills two threads a tick. Held
-// to one tick per ten minutes that is over an hour of near-empty panel, so
-// while the feed is below its opening count the tick runs every minute and
-// only then settles into the jittered cadence. One blob read to decide.
-export async function stillFilling() {
-  try {
-    await restore();
-    return live.length < OPENING_THREADS;
-  } catch {
-    return false;
-  }
-}
-
 export async function advanceSubreddit() {
   await restore();
   const people = await loadCast();
@@ -908,10 +898,11 @@ export async function advanceSubreddit() {
 
   const now = Date.now();
   // Every invocation gets the SAME small allowance, including the first. A
-  // serverless function has sixty seconds and each generation is a round trip;
-  // an eight-thread opening build cannot fit and must not be attempted. A cold
-  // deploy instead fills over successive ticks, which is slower to watch and
-  // the only version that completes.
+  // serverless function has a fixed budget of wall-clock and each generation is
+  // a round trip, so any opening build big enough to be worth watching cannot
+  // fit and must not be attempted. The feed accumulates one post a window from
+  // whatever it already holds — slower to watch on day one, and the only
+  // version that completes.
   const allowance = MAX_MESSAGES_PER_REFRESH;
   let budget = allowance;
   let failures = 0;
@@ -944,9 +935,7 @@ export async function advanceSubreddit() {
     }
   }
 
-  // Below the opening count the feed is still filling, so take two a tick; at
-  // steady state it is one, whatever the window allows.
-  const wanted = live.length < OPENING_THREADS ? 2 : NEW_THREADS_PER_REFRESH;
+  const wanted = NEW_THREADS_PER_REFRESH;
   for (let i = 0; i < wanted && budget > 0 && live.length < MAX_THREADS; i++) {
     if (!spend()) break;
     let thread;
