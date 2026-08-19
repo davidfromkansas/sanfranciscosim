@@ -22,10 +22,21 @@
 
 const feeds = new Map();
 
-export function registerFeed(name, { ttl, fetcher, empty = {}, backoffMs = 60_000, staleMs = 10 * 60_000, swrMs, describe }) {
+export function registerFeed(
+  name,
+  {
+    ttl,
+    fetcher,
+    empty = {},
+    backoffMs = 60_000,
+    staleMs = 10 * 60_000,
+    swrMs,
+    describe,
+  },
+) {
   feeds.set(name, {
     name,
-    describe: describe || 'live city data', // one line for the concierge's live_data tool
+    describe: describe || "live city data", // one line for the concierge's live_data tool
     ttl,
     fetcher,
     empty,
@@ -45,6 +56,17 @@ export const allFeeds = () => [...feeds.values()];
 
 // Refresh-if-stale, single-flight: concurrent requests share one upstream call.
 // Resolves even on upstream failure — callers then serve last-good via payload().
+// Force a refresh regardless of ttl, for the scheduled tick. Shares the same
+// single-flight promise as ensureFresh, so a cron firing while a visitor's
+// refresh is already running joins it rather than starting a second one — and
+// paying for the same generation twice.
+export async function forceRefresh(entry) {
+  entry.fetchedAt = 0;
+  entry.backoffUntil = 0;
+  await ensureFresh(entry);
+  return entry.lastError;
+}
+
 export async function ensureFresh(entry) {
   const now = Date.now();
   if (entry.data !== null && now - entry.fetchedAt < entry.ttl) return;
@@ -60,7 +82,9 @@ export async function ensureFresh(entry) {
       .catch((error) => {
         entry.backoffUntil = Date.now() + entry.backoffMs;
         entry.lastError = String(error?.message || error);
-        console.error(`[feed:${entry.name}] refresh failed: ${entry.lastError}`);
+        console.error(
+          `[feed:${entry.name}] refresh failed: ${entry.lastError}`,
+        );
       })
       .finally(() => {
         entry.refreshing = null;
@@ -96,9 +120,12 @@ export async function serveFeed(res, entry) {
   if (entry.data !== null) {
     const ttlS = Math.max(10, Math.round(entry.ttl / 1000));
     const swrS = Math.max(ttlS, Math.round(entry.swrMs / 1000));
-    res.setHeader('Cache-Control', `public, max-age=0, s-maxage=${ttlS}, stale-while-revalidate=${swrS}`);
+    res.setHeader(
+      "Cache-Control",
+      `public, max-age=0, s-maxage=${ttlS}, stale-while-revalidate=${swrS}`,
+    );
   } else {
-    res.setHeader('Cache-Control', 'no-store');
+    res.setHeader("Cache-Control", "no-store");
   }
   res.status(200).json(feedPayload(entry));
 }
@@ -108,11 +135,15 @@ export async function serveFeed(res, entry) {
 // must not stall the snapshot: each refresh gets a bounded wait, and a feed
 // that isn't ready ships its last-good (or empty) state with its own fetchedAt.
 export async function serveLive(res, { waitMs = 6000 } = {}) {
-  const bounded = (p) => Promise.race([p, new Promise((r) => setTimeout(r, waitMs))]);
+  const bounded = (p) =>
+    Promise.race([p, new Promise((r) => setTimeout(r, waitMs))]);
   const entries = allFeeds();
   await Promise.all(entries.map((entry) => bounded(ensureFresh(entry))));
   const out = {};
   for (const entry of entries) out[entry.name] = feedPayload(entry);
-  res.setHeader('Cache-Control', 'public, max-age=0, s-maxage=15, stale-while-revalidate=60');
+  res.setHeader(
+    "Cache-Control",
+    "public, max-age=0, s-maxage=15, stale-while-revalidate=60",
+  );
   res.status(200).json({ now: Date.now(), feeds: out });
 }

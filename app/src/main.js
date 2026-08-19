@@ -24,6 +24,8 @@ import { createLandmarks } from './landmarks.js';
 import { createAssets } from './assets.js';
 import { createPiers } from './piers.js';
 import { createAgents } from './agents.js';
+import { createPopulation } from './population.js';
+import { createFeedPanel } from './feed.js';
 import { createLiveFerries } from './ferries.js';
 import { createLiveMuni } from './muni.js';
 import { createMuniStopLayer } from './munistoplayer.js';
@@ -119,6 +121,32 @@ async function boot() {
     },
   });
   const agents = createAgents(scene, data, city);
+  // The residents: one sphere per adult sampled from the 2024 ACS PUMS
+  // microdata, walking the PUMA the Census actually recorded them in. Where
+  // they walk, the anonymous pedestrians stand down.
+  const population = createPopulation(scene, data, city);
+  agents.setPedExclusion(population.containsResidents);
+  // The column on the right: the same residents, talking. Independent of the
+  // renderer — if the writer is offline the panel says so and the city is
+  // exactly as it was.
+  // Clicking a name in the feed flies the camera to that person standing on
+  // their own street and rings them, so the column and the diorama are one
+  // thing. Returns false when they have not been seated yet — their PUMA's
+  // streets may still be streaming — and the panel says so rather than the
+  // camera flying somewhere arbitrary.
+  const feedPanel = createFeedPanel({
+    // "X simfranciscans are online" counts the residents actually walking the
+    // city, not the size of the cast — the panel and the diorama report the
+    // same population or the number means nothing.
+    onlineCount: () => population.onlineCount,
+    onVisit(person) {
+      const at = population.locate(person.id);
+      if (!at) return false;
+      population.focus(person.id);
+      flyTo({ x: at.x, z: at.z, y: at.y, yaw: 210, pitch: 38, distance: 110 });
+      return true;
+    },
+  });
   // Real WETA vessels from /api/ferries; falls back to the procedural ferries.
   const ferries = createLiveFerries(scene, data, agents);
   // The live weather field. Created before the clock so the card can read it
@@ -221,6 +249,7 @@ async function boot() {
     water.setGlitter(key === 'low' ? 0.6 : 1);
     water.setQuality(key);
     agents.setQuality(key, quality);
+    population.setQuality(key);
     terrain.setQuality(key);
     clouds.setQuality(key);
     rain.setQuality(key);
@@ -264,6 +293,7 @@ async function boot() {
     rig.setDiorama(toy);
     env.setToy(toy);
     agents.setToy(toy);
+    population.setToy(toy);
     signs.setVisible(toy);
     post.setEnabled(toy);
     await city.setTier(toy ? 'toy' : 'base');
@@ -760,6 +790,8 @@ async function boot() {
     rig,
     city,
     agents,
+    population,
+    feedPanel,
     ferries,
     clouds,
     rain,
@@ -924,6 +956,7 @@ async function boot() {
     overlay.update(dt);
     city.update(dt, pivotWorld, camera.position, quality);
     agents.update(dt, pivotWorld, camera.position);
+    population.update(dt, camera.position, camera.quaternion);
     ferries.update(dt);
     // Weather eases on wall time for the same reason the clouds do: the
     // simulation clamp would stall the transition below 20 fps.
@@ -981,6 +1014,7 @@ async function boot() {
           `far groups ${city.stats.farGroups}  near ${city.stats.nearChunks}`,
           `trees      ${city.stats.trees}  lamps ${city.stats.lamps}`,
           `cars       ${agents.carCount}`,
+          `residents  ${population.residentCount}`,
           `ferries    ${ferries.count}${ferries.live ? ' live' : ' procedural'}`,
           `muni       ${muni.count}${muni.live ? ` live (${muni.onShapeCount} on-route${muni.degraded ? ', degraded' : ''})` : ' off'}`,
           `stops      ${muniStops.count} shown / ${muniStops.total}`,

@@ -16,3 +16,6 @@ __pycache__/
 *.blend1
 render.log
 pipeline/bake.log
+
+# Local Claude Code tooling (dev-server config, worktrees)
+.claude/

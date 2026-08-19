@@ -279,7 +279,12 @@ export function createCity(scene, data) {
     furnitureDraws: 0,
   };
   const paths = [];
-  let onPathsReady = () => {};
+  // Two layers walk the street centrelines now — procedural traffic and the
+  // resident population — so this is a broadcast rather than a single slot.
+  const pathListeners = [];
+  const onPathsReady = (list) => {
+    for (const listener of pathListeners) listener(list);
+  };
 
   const groundMaterial = createGroundMaterial();
   const quality = { windows: 1, poolScale: 1, poolStrength: 1 };
@@ -1144,7 +1149,7 @@ export function createCity(scene, data) {
     stats,
     paths,
     onPaths(cb) {
-      onPathsReady = cb;
+      pathListeners.push(cb);
       if (paths.length) cb(paths);
     },
     get progress() {

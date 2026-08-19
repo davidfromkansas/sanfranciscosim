@@ -7,3 +7,4 @@ import './muni.mjs';
 import './weather.mjs';
 import './satfog.mjs';
 import './flights.mjs';
+import './residents.mjs';

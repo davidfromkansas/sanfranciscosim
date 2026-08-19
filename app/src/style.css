@@ -13,8 +13,29 @@ body {
   height: 100%;
   overflow: hidden;
   background: #10151c;
-  font: 12px/1.45 -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+  font:
+    12px/1.45 -apple-system,
+    BlinkMacSystemFont,
+    "Segoe UI",
+    Roboto,
+    sans-serif;
   color: #f2ece2;
+}
+
+/* The width the residents' feed covers on the right of the window. ONE source
+   of truth: the panel claims it and the right-anchored chrome steps out of it.
+   The canvas keeps the full window and simply renders behind the panel — the
+   city carries on under there. Zero below the desktop breakpoint, the same
+   900 px the quality heuristic uses: a quarter of a phone screen is a gutter,
+   not a column. */
+:root {
+  --feed-w: 0px;
+}
+
+@media (min-width: 900px) {
+  :root {
+    --feed-w: 25vw;
+  }
 }
 
 #view {
@@ -22,6 +43,28 @@ body {
   width: 100vw;
   height: 100vh;
   cursor: default;
+}
+
+/* The feed of residents talking. White for now, but wearing the city's ink
+   border so its edge reads as a panel and not a torn canvas. */
+#feed {
+  display: none;
+  position: fixed;
+  top: 0;
+  right: 0;
+  bottom: 0;
+  width: var(--feed-w);
+  background: #ffffff;
+  border-left: 2px solid #2b2118;
+  overflow-y: auto;
+  overscroll-behavior: contain;
+  z-index: 8;
+}
+
+@media (min-width: 900px) {
+  #feed {
+    display: block;
+  }
 }
 
 #attribution {
@@ -50,7 +93,7 @@ body {
 }
 
 select,
-input[type='range'],
+input[type="range"],
 button {
   font: inherit;
   color: inherit;
@@ -60,7 +103,7 @@ button {
   padding: 3px 6px;
 }
 
-input[type='checkbox'] {
+input[type="checkbox"] {
   accent-color: #ffcf8a;
 }
 
@@ -95,4 +138,524 @@ button:hover {
   pointer-events: none;
   transform: translate(-50%, -140%);
   white-space: nowrap;
+}
+
+/* ----------------------------------------------- r/simfrancisco (the feed) ---
+   Reddit's reading grammar — tinted ground, white post cards, a byline above a
+   bold title, comments on a rail — in this city's ink and paper rather than
+   Reddit's blue. It has to sit beside a warm paper UI without looking pasted in
+   from another product. */
+
+#feed.rs {
+  background: #f2efe8;
+  border-left: 2px solid #2b2118;
+  font:
+    13px/1.5 -apple-system,
+    BlinkMacSystemFont,
+    "Segoe UI",
+    Roboto,
+    sans-serif;
+  color: #2b2118;
+}
+
+/* Sticky, so the community you are reading is always named. The banner is
+   deliberately a band rather than the whole illustration: every pixel of it is
+   permanently gone from a column whose job is reading text. The source art was
+   pre-cropped to roughly this shape (pipeline note: 4.5:1, horizon band) so
+   `cover` barely has to crop anything at render time. */
+.rs-head {
+  position: sticky;
+  top: 0;
+  z-index: 2;
+  background: #fffdf8;
+  border-bottom: 2px solid #2b2118;
+  padding: 0 16px 10px;
+}
+
+/* The banner. The gradient is not a placeholder — it is what shows if the image
+   is missing, so an absent file reads as a plain painted header rather than a
+   broken picture. */
+.rs-banner {
+  height: 86px;
+  margin: 0 -16px;
+  border-bottom: 2px solid #2b2118;
+  background:
+    url("/feed/banner.webp") center / cover no-repeat,
+    linear-gradient(160deg, #7fc4e8 0%, #bfe0f2 55%, #e8d9bd 100%);
+}
+
+/* Icon and name on one row, the icon lifted so it breaks the banner's edge the
+   way a subreddit avatar does. */
+.rs-bar {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  margin-top: 8px;
+}
+
+/* Only the ICON breaks the banner's edge. Lifting the whole row dragged the
+   name up with it and the banner cut through the type. */
+.rs-icon {
+  width: 46px;
+  height: 46px;
+  margin-top: -26px;
+  flex: none;
+  border-radius: 50%;
+  border: 2px solid #2b2118;
+  box-shadow: 0 0 0 3px #fffdf8;
+  background:
+    url("/feed/icon.webp") center / cover no-repeat,
+    #cfe8f5;
+}
+
+/* flex: 1 is what makes the name row's space-between mean anything — without
+   it the column sized to its content and the button pushed 7 px past the
+   panel's edge instead of sitting inside its padding. */
+.rs-titles {
+  flex: 1;
+  min-width: 0;
+  padding-bottom: 1px;
+}
+
+.rs-name {
+  margin: 0;
+  font-size: 25.5px;
+  font-weight: 800;
+  letter-spacing: -0.2px;
+}
+
+.rs-goal {
+  margin: 3px 0 0;
+  font-size: 16.5px;
+  line-height: 1.45;
+  color: #6b5a48;
+}
+
+.rs-status {
+  margin: 8px 0 0;
+  font-size: 10.5px;
+  letter-spacing: 0.3px;
+  text-transform: uppercase;
+  color: #8a7860;
+}
+
+.rs-list {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+  padding: 10px;
+}
+
+/* The card. A 2 px ink border and a hard offset shadow are this project's
+   house style; Reddit's hairline-on-white would read as a foreign object. */
+.rs-post {
+  background: #fffdf8;
+  border: 2px solid #2b2118;
+  border-radius: 12px;
+  box-shadow: 3px 3px 0 rgba(43, 33, 24, 0.9);
+  padding: 11px 13px 10px;
+}
+
+.rs-byline {
+  display: flex;
+  align-items: flex-start;
+  gap: 7px;
+  font-size: 11px;
+  color: #6b5a48;
+}
+
+.rs-who {
+  min-width: 0; /* so a long occupation wraps instead of widening the row */
+}
+
+.rs-who-top {
+  display: flex;
+  align-items: baseline;
+  gap: 4px;
+}
+
+/* What they do and where they live. Quieter than the name, but present — an
+   occupation is most of why a post reads as coming from a particular life. */
+.rs-who-sub {
+  margin-top: 1px;
+  font-size: 10.5px;
+  line-height: 1.35;
+  color: #8a7860;
+}
+
+/* The profile picture. Drawn as SVG in feed.js — the ring carries the
+   neighbourhood colour, which is the same colour as that person's sphere out
+   in the city. */
+.rs-avatar {
+  flex: none;
+  display: block;
+  border-radius: 50%;
+}
+
+/* The author is a button because it does something. It has to look like text
+   until you approach it, or every byline turns into a row of controls. */
+.rs-author {
+  appearance: none;
+  background: none;
+  border: 0;
+  padding: 0;
+  font: inherit;
+  font-weight: 700;
+  color: #2b2118;
+  cursor: pointer;
+  border-radius: 3px;
+}
+
+.rs-author:hover,
+.rs-author:focus-visible {
+  color: #c8442f;
+  text-decoration: underline;
+}
+
+.rs-sep {
+  color: #b8a894;
+}
+
+.rs-time {
+  color: #8a7860;
+  font-variant-numeric: tabular-nums;
+}
+
+.rs-title {
+  margin: 6px 0 0;
+  font-size: 15px;
+  font-weight: 800;
+  line-height: 1.3;
+  text-wrap: balance;
+}
+
+.rs-body {
+  margin: 5px 0 0;
+  color: #3a3028;
+}
+
+.rs-actions {
+  margin-top: 9px;
+  padding-top: 8px;
+  border-top: 1px solid rgba(43, 33, 24, 0.14);
+  font-size: 11px;
+  font-weight: 700;
+  color: #6b5a48;
+}
+
+/* Comments hang off a single rail, the way a collapsed Reddit thread reads:
+   the shape of the discussion is legible before you read a word of it. */
+.rs-comments {
+  margin: 8px 0 0 4px;
+  padding-left: 10px;
+  border-left: 2px solid rgba(43, 33, 24, 0.18);
+  display: flex;
+  flex-direction: column;
+  gap: 9px;
+}
+
+/* Two columns: the face in one, everything said in the other. The body then
+   hangs under the NAME rather than under the picture, so the eye follows a
+   single straight edge of text down a long thread. */
+.rs-comment {
+  display: flex;
+  align-items: flex-start;
+  gap: 7px;
+}
+
+.rs-comment-main {
+  min-width: 0;
+  flex: 1;
+}
+
+/* The identity block already sits in the right column, so the avatar inside it
+   would be a second face. Comments supply their own. */
+.rs-comment-main .rs-byline {
+  gap: 0;
+}
+
+.rs-comment-body {
+  margin: 3px 0 0;
+  color: #3a3028;
+}
+
+/* -------------------------------------------------------------- the profile */
+
+/* Both modals share this. The blur is what makes a dialogue read as ON the
+   city rather than beside it — and with a 3D scene behind, a flat scrim alone
+   left the diorama competing with the text for attention. */
+.rs-modal-back {
+  position: fixed;
+  inset: 0;
+  z-index: 20;
+  background: rgba(20, 16, 12, 0.45);
+  backdrop-filter: blur(10px) saturate(0.85);
+  -webkit-backdrop-filter: blur(10px) saturate(0.85);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 24px;
+}
+
+.rs-modal-back[hidden] {
+  display: none;
+}
+
+.rs-modal {
+  position: relative;
+  width: min(460px, 100%);
+  max-height: 80vh;
+  overflow-y: auto;
+  background: #fffdf8;
+  color: #2b2118;
+  border: 2px solid #2b2118;
+  border-radius: 16px;
+  box-shadow: 5px 5px 0 #2b2118;
+  padding: 20px 22px 18px;
+  font:
+    13px/1.55 -apple-system,
+    BlinkMacSystemFont,
+    "Segoe UI",
+    Roboto,
+    sans-serif;
+}
+
+.rs-modal-close {
+  position: absolute;
+  top: 10px;
+  right: 12px;
+  appearance: none;
+  background: none;
+  border: 0;
+  font-size: 22px;
+  line-height: 1;
+  color: #6b5a48;
+  cursor: pointer;
+}
+
+.rs-modal-head {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+}
+
+.rs-modal-avatar {
+  flex: none;
+  display: flex;
+  line-height: 0;
+}
+
+.rs-modal-name {
+  margin: 0;
+  font-size: 19px;
+  font-weight: 800;
+  letter-spacing: -0.2px;
+}
+
+.rs-modal-job {
+  margin: 1px 0 0;
+  font-size: 12px;
+  color: #6b5a48;
+}
+
+.rs-modal-hood {
+  margin: 12px 0 0;
+  font-size: 10.5px;
+  letter-spacing: 0.4px;
+  text-transform: uppercase;
+  color: #8a7860;
+}
+
+/* The identity paragraph — the thing every post they write comes out of. */
+.rs-modal-persona {
+  margin: 8px 0 0;
+  color: #3a3028;
+}
+
+.rs-modal-visit {
+  margin-top: 16px;
+  appearance: none;
+  width: 100%;
+  padding: 9px 12px;
+  font:
+    700 13px/1 -apple-system,
+    BlinkMacSystemFont,
+    "Segoe UI",
+    Roboto,
+    sans-serif;
+  color: #fffdf8;
+  background: #2ba79b;
+  border: 2px solid #2b2118;
+  border-radius: 10px;
+  box-shadow: 3px 3px 0 #2b2118;
+  cursor: pointer;
+}
+
+.rs-modal-visit:active {
+  transform: translate(2px, 2px);
+  box-shadow: 1px 1px 0 #2b2118;
+}
+
+.rs-modal-note {
+  margin: 9px 0 0;
+  font-size: 11.5px;
+  color: #c8442f;
+}
+
+/* The score. Reddit puts it in a rail; this column is too narrow for one, so it
+   sits in the action row with the comment count. Direction is carried by the
+   arrow as well as the colour, so it survives being read in greyscale. */
+.rs-score {
+  font-variant-numeric: tabular-nums;
+  font-weight: 700;
+  margin-right: 10px;
+  cursor: default;
+}
+
+.rs-score.up {
+  color: #c8552f;
+}
+
+.rs-score.down {
+  color: #4a6bb5;
+}
+
+.rs-score.zero {
+  color: #8a7860;
+}
+
+.rs-count {
+  font-weight: 700;
+}
+
+/* On a comment the score is a footnote, not a headline. */
+.rs-comment-main .rs-score {
+  display: inline-block;
+  margin: 4px 0 0;
+  font-size: 10.5px;
+  font-weight: 700;
+}
+
+/* The live population, counted from the diorama rather than the feed. A dot
+   that pulses, because the number it sits beside is genuinely moving. */
+.rs-online {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  margin: 4px 0 0;
+  font-size: 12px;
+  font-weight: 700;
+  color: #3f8f6b;
+}
+
+.rs-online::before {
+  content: "";
+  width: 7px;
+  height: 7px;
+  border-radius: 50%;
+  background: #3f8f6b;
+  flex: none;
+  animation: rs-pulse 2.4s ease-in-out infinite;
+}
+
+@keyframes rs-pulse {
+  0%,
+  100% {
+    opacity: 1;
+  }
+  50% {
+    opacity: 0.25;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .rs-online::before {
+    animation: none;
+  }
+}
+
+/* -------------------------------------------------------- community rules */
+
+/* Quieter than the concierge button: this is a reference people open once,
+   not an action the header is asking for. */
+/* Name on the left, rules on the right, sharing a baseline. `.rs-titles`
+   already stops at the header's 16 px padding, so the button lands there and
+   never touches the panel edge. */
+/* Name left, rules right, sharing a baseline — and wrapping rather than
+   overflowing. The panel is 25vw, so on a 1280 px window there is not room for
+   both on one line; the button then drops beneath the name and stays hard
+   right instead of running off the edge. */
+.rs-name-row {
+  display: flex;
+  align-items: baseline;
+  flex-wrap: wrap;
+  justify-content: flex-end;
+  gap: 6px 12px;
+}
+
+.rs-name-row .rs-name {
+  margin-right: auto;
+}
+
+.rs-rules-open {
+  appearance: none;
+  flex: none;
+  padding: 5px 9px;
+  font:
+    700 10.5px/1 -apple-system,
+    BlinkMacSystemFont,
+    "Segoe UI",
+    Roboto,
+    sans-serif;
+  color: #2b2118;
+  background: #f5ead4;
+  border: 2px solid #2b2118;
+  border-radius: 999px;
+  box-shadow: 2px 2px 0 #2b2118;
+  cursor: pointer;
+}
+
+.rs-rules-open:hover {
+  background: #fff6e2;
+}
+
+.rs-rules-open:active {
+  transform: translate(2px, 2px);
+  box-shadow: none;
+}
+
+.rs-rules-title {
+  margin: 0;
+  font-size: 20px;
+  font-weight: 800;
+  letter-spacing: -0.2px;
+}
+
+.rs-rules-sub {
+  margin: 6px 0 0;
+  font-size: 11.5px;
+  color: #6b5a48;
+}
+
+.rs-rules-list {
+  margin: 16px 0 0;
+  padding-left: 22px;
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+
+.rs-rules-list li {
+  padding-left: 4px;
+}
+
+/* No rules yet is a real state, not a failure — say what that means for the
+   residents rather than showing an apologetic blank. */
+.rs-rules-empty {
+  margin: 16px 0 0;
+  padding: 14px;
+  border: 2px dashed rgba(43, 33, 24, 0.3);
+  border-radius: 12px;
+  color: #6b5a48;
+  background: #f7f2e6;
 }

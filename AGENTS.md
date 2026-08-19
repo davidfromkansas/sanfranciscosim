@@ -8,8 +8,8 @@ A data-accurate 3D San Francisco in Three.js, rendered as a **toy diorama** (min
 
 ## Repo layout
 
-- `app/` — Vite + three.js frontend. Static assets in `app/public/` (`tiles/` = baked city geometry, `sf-assets/` = hand-made GLB landmarks + manifest, `fonts/`).
-- `api/` — Vercel functions with exactly ONE dependency (`gtfs-realtime-bindings`, decoding the Muni feed's protobuf — owner-approved 2026-08-12; adding another needs an owner decision; protobuf never reaches the browser). `agent.mjs` = the "concierge" LLM endpoint via Vercel AI Gateway. All live data feeds (`/api/ferries`, `/api/live`, future feeds) share ONE function — `api/[...path].mjs` dispatching into the feed registry (`api/_lib/feedcore.mjs`); adding a feed = one fetcher module in `api/_lib/feeds/` + one import line (the full recipe is in feedcore's header). Feeds share a process on purpose: it is what lets `/api/live` compose a consolidated snapshot from memory.
+- `app/` — Vite + three.js frontend. Static assets in `app/public/` (`tiles/` = baked city geometry, `sf-assets/` = hand-made GLB landmarks + manifest, `sf-people/` = the baked PUMS population, `fonts/`).
+- `api/` — Vercel functions with exactly TWO dependencies (`gtfs-realtime-bindings`, decoding the Muni feed's protobuf — owner-approved 2026-08-12, protobuf never reaches the browser; and `@vercel/blob`, holding r/simfrancisco's threads so a deploy does not wipe the subreddit — owner-approved 2026-08-18. Adding another needs an owner decision). `agent.mjs` = the "concierge" LLM endpoint via Vercel AI Gateway. All live data feeds (`/api/ferries`, `/api/live`, future feeds) share ONE function — `api/[...path].mjs` dispatching into the feed registry (`api/_lib/feedcore.mjs`); adding a feed = one fetcher module in `api/_lib/feeds/` + one import line (the full recipe is in feedcore's header). Feeds share a process on purpose: it is what lets `/api/live` compose a consolidated snapshot from memory.
 - `pipeline/` — offline Node scripts that download open data and bake the binary tiles the app streams. Re-run only when data or formats change.
 - `docs/styles/` — the canonical style bibles (see `docs/styles/README.md`); `.agents/skills/` — agent procedures (asset intake, testing, style pointer).
 - `vercel.json` — build config (`cd app && npm install && npm run build`, output `app/dist`).
@@ -40,6 +40,7 @@ Rules for maintaining these: they are the single source of truth — update them
 - Local tangent projection centered lon −122.4375, lat 37.77: `x=(lon−LON0)·111320·cos(LAT0)`, `z=−(lat−LAT0)·110540`; +x east, −z north, y up, meters. ONE projection function — never re-derive elsewhere.
 - City is streamed in **500 m cells**; binary tile format: `uint32 count` + N×9 float32 (`x,y,z,nx,ny,nz,r,g,b`), non-indexed. Toy tiles ("TOY2" magic) carry a 10th `flag` float (band-suppression / night-profile / glow bits).
 - Terrain from AWS Terrarium tiles; heights sampled via `sampleElevation(x,z)`. Water level = y 0.
+- The population (`app/src/population.js`) is real people, not decoration: every sphere is one adult sampled from the 2024 ACS PUMS microdata and written up as a character, walking the PUMA the Census recorded them in. Baked by `pipeline/bake-population.mjs` out of the personas project; the output is committed like the tiles are. Names, ages and occupations come from the data — never invent a resident to fill a street. A PUMA keeps the anonymous pedestrians until it has 50+ written residents, so a half-written neighbourhood is never emptier than before.
 
 ## The asset pipeline (hand-made GLB landmarks & kit)
 
