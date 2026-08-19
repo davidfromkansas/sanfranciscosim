@@ -2987,6 +2987,75 @@ export const LANDMARKS = [
     // texture in the block, not a destination.
     camera: { distance: 190, yaw: 270, pitch: 26 },
   },
+  {
+    // The South Park Lofts, 1993, Ramon Zambrano: ten live/work loft
+    // condominiums on one 585 m2 through-lot running from South Park at the
+    // south-east to Taber Place at the north-west. The lot carries TWO baked
+    // footprints — the front block 262 m2 and the rear block 181 m2 — with a
+    // ~142 m2 courtyard between them, and the anchor sits at the courtyard's
+    // edge because that is where the GLB's bounding-box centre lands. This is
+    // the 132SouthPark case: no single radius works, so there is one zone per
+    // structure plus a guard at the anchor.
+    //
+    // height is the roof stair bulkhead (LiDAR max). The parapet crest is
+    // 13.10 m, photogrammetric from Street View pano aFRDCNG9w0lcHJ9ngJI8LQ and
+    // flat to +-0.06 m over a 41% range change; the roof deck is 12.27 m (LiDAR
+    // median). See artifacts/10-south-park/REFERENCE.md section 3 for why the
+    // maximum is believed here — briefly, both neighbours are TALLER, so
+    // party-wall bleed could only pull it down, and the rear block reports the
+    // same 2.4 m step against different neighbours.
+    //
+    // excluded() drops a footprint whose ring CENTROID or any vertex is inside
+    // a zone. Measured from each candidate centre against the rings the bake
+    // actually reads — DataSF ynuv-fyni AND the Overture gap-fill, both
+    // extracted from pipeline/data/:
+    //
+    //   from the anchor:        1.35 m  own front block, nearest vertex
+    //                           5.21 m  2 South Park (Overture) vertex  <- ceiling
+    //                           5.90 m  own rear block, nearest vertex
+    //   from the front zone:    1.24 m  own front block, DataSF ring CENTROID
+    //                           1.48 m  own front block, Overture ring CENTROID
+    //                           8.94 m  22-24 South Park (DataSF) vertex <- ceiling
+    //   from the rear zone:     2.38 m  own rear block, DataSF ring CENTROID
+    //                           2.43 m  own rear block, Overture ring CENTROID
+    //                           7.09 m  22-24 South Park (Overture) vertex <- ceiling
+    //
+    // So each block is dropped by its own ring CENTROID and no radius ever
+    // reaches this lot's far corners (14.7 m front, 7.3 m rear) — reaching them
+    // would delete 22-24 South Park (14.22 m) or 2 South Park (17.72 m), neither
+    // of which has a GLB to replace it, and both failures are silent. Margins
+    // 3.5/3.9 m on the front zone and 2.1/2.6 m on the rear.
+    //
+    // The 2 m guard at the anchor happens to drop the front block by vertex, but
+    // its real job is 132SouthPark's: stopping the Overture gap-fill re-filling a
+    // lot that markOccupied() no longer sees as occupied once the DataSF
+    // footprints are excluded. A whole-lot Overture polygon would centre within
+    // about a metre of the anchor and sail past both other zones. Do NOT raise
+    // it — 2 South Park's Overture vertex is 5.21 m out.
+    //
+    // Both blocks are traced twice, by DataSF and by Overture, so a correct
+    // exclusion drops FOUR rings here, not two. See
+    // docs/asset-plans/10-south-park.md 2.13.
+    id: '10SouthPark',
+    name: '10 South Park (South Park Lofts)',
+    lon: -122.3935162,
+    lat: 37.7823704,
+    height: 14.67,
+    exclude: 2,
+    extraExclusions: [
+      { lon: -122.3934359, lat: 37.7823083, r: 5 },   // front block, on South Park
+      { lon: -122.3936335, lat: 37.7824581, r: 4.5 }, // rear block, on Taber Place
+    ],
+    // Camera bearing = 180 - yaw (camera.js apply(): the offset is
+    // (sin yaw, ., cos yaw) and +z is south), so yaw 30 stands the camera at
+    // bearing 150 = SSE — square onto the bowed south-west two-thirds of the
+    // front (normal 179.7 deg) and still oblique enough to read the straight
+    // north-east third (135.2 deg). Pitch 30 rather than this block's usual 26
+    // so the courtyard between the two blocks clears the front parapet; it is
+    // half of what this asset is. 200 m suits a 42 m-deep lot. No `key`: at
+    // 14.7 m this is texture in the block, not a destination.
+    camera: { distance: 200, yaw: 30, pitch: 30 },
+  },
 ];
 
 // Parks/green spaces the landcover bake must match at least one source polygon

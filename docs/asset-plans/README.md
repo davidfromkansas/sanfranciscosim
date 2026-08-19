@@ -142,12 +142,13 @@ route, and the park plans depend on it (§E8 of the parks README).
 | [248–250 Ritch Street](./248-ritch.md) | `248-ritch` | 8.6 m (cornice crest; measured twice — LiDAR mixture 8.65 m, rectified panorama 8.50 m) | new landmark |
 | [1 South Park (One South Park)](./1-south-park.md) | `1-south-park` | 20.2 m (LiDAR `hgt_max`; penthouse roof 18.6 m, cornice crest 15.75 m) | new landmark |
 
-## Shared contract (all 104)
+## Shared contract (all 105)
 | [252–254 Ritch Street](./254-ritch.md) | `254-ritch` | 8.8 m (LiDAR maximum, the roof flue; cornice crest 8.05 m estimated) | new landmark |
 | [434 Brannan Street (Art Deco loft, 1929)](./434-brannan.md) | `434-brannan` | 13.79 m (LiDAR maximum, read as the rooftop mechanical penthouse; roof deck 11.46 m measured, parapet crest ~12.4 m estimated) | new landmark |
 | [226 Ritch Street (226 Ritch Street Condominiums)](./226-ritch.md) | `226-ritch` | 18.1 m (roof crest, LiDAR-derived; 16.0 m parapet) | new landmark |
 | [414 Brannan Street (Epic Church)](./414-brannan.md) | `414-brannan` | 14.0 m (monitor crest; 10.4 m street parapet) | new landmark |
 | [501 Third Street](./501-third.md) | `501-third` | 16.4 m (LiDAR-derived) | new landmark |
+| [10 South Park (South Park Lofts)](./10-south-park.md) | `10-south-park` | 14.67 m (roof bulkhead, LiDAR maximum; parapet crest 13.10 m photogrammetric) | new landmark |
 
 - Style: `docs/styles/miniature-toy.md` (authoritative for artistic decisions)
 - Technical contract: `.agents/skills/sf-asset-check/SKILL.md` (authoritative for the GLB)
@@ -247,6 +248,17 @@ Where a plan cites a DataSF `mblr`/`sf16_bldgid` footprint, that is the survey; 
 geometry on small SoMa lots is a Bing trace and should be treated as a cross-check
 only. Getting from an address to the right DataSF polygon goes through the parcels
 dataset (`acdm-wktn`, `blklot` -> address range), not through a spatial guess.
+
+10 South Park is the set's hardest *resolution* case, and it fails in two ways at once.
+First, no OSM way carries its address at all, so Nominatim TIGER-interpolates onto the
+South Park roadway and returns `osm_type: way` — the 350 Brannan failure mode, and it
+looks like a building hit. Second, it is a **condominium**: the address exists ten
+times over, on lots 3775/106 through 3775/115, all sharing one parcel polygon. Only the
+address -> DataSF address table -> APN -> parcel -> footprint route survives both. It
+is also the set's clearest case of a lot with **two** baked buildings and an open
+courtyard between them, so like 132 South Park it needs one exclusion zone per
+structure plus a guard zone at the anchor; the difference is that here both buildings
+are traced twice, by DataSF and by Overture, so a correct exclusion drops four rings.
 that could plausibly be a sea-level datum. 181 South Park is a fifth: its `height=14`
 matches the LiDAR median to within 0.2 m, which makes it look corroborated rather than
 merely repeated, and the crest is still 2.3 m above it.
