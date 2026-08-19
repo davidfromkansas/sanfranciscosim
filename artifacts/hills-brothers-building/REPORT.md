@@ -109,3 +109,32 @@ committed for after-the-fact review.
   "tris": 10242
 }
 ```
+
+## Stage 5 — integration QA (batch mode, 19 Aug 2026)
+
+Case B: manifest entry (`loadRadius: 2500`) + registry entry
+(`hillsBrothersBuilding`, `exclude: 12`, camera SE 480 m). Bake run for QA and
+then discarded per batch mode; the branch is source-only
+(`git diff --name-only origin/main` carries nothing under `app/public/tiles/`
+or `api/_data/`). Rebased onto origin/main f4f5f99f5 after mid-session drift.
+
+| Check | Result |
+|---|---|
+| Re-validation (fresh scene, shipped GLB) | PASS — all contract checks |
+| Manifest entry + id round-trip | PASS — `hills-brothers-building` → `hillsBrothersBuilding` |
+| Registry + re-bake + audit | PASS — zero-churn bake (585/585 cells unchanged), audit "clear ground under every asset" |
+| Exclusion proof | PASS — settled from the tile: origin/main ctx 24_11 carries the 56 m baked block (pick 102838, 18.8 m from anchor); the new bake's ctx does not. verify-rebake's "dropped nothing" is its count blindspot |
+| Single building / no twin | PASS — qa/day.png |
+| Uniform scale | PASS — x1.0000 at (4243, −2146) |
+| Orientation | PASS — tower NW, sign to the bay (qa/day.png vs satellite) |
+| Terrain seating | PASS — no float/sink at the flat Embarcadero site |
+| Night glow | PASS — sign red + tower arcade white only (qa/night.png) |
+| Draw calls | PASS — avg 98/frame at the landmark (budget 300) |
+| Fallback drill | PASS — boots, exactly one `failed to load` warning (streamed-entry wording), empty site inside the exclusion as Case B expects |
+| Lint + build | PASS — eslint clean; `npm run build` (tests included) exit 0 |
+| Deployed QA | deferred to the batch integrate per BATCH-INTEGRATE.md |
+
+Known collateral: the DataSF trace merges two low plaza-side arcade strips
+into this building's ring, so they drop with it (unavoidable — same-ring).
+The Overture height-correction retarget risk was checked: nearest survivor is
+39.2 m away and 8.8 m tall.
