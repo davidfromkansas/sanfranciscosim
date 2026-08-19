@@ -27,10 +27,11 @@ plans reference the landmark plans here (de Young, Cal Academy, Conservatory,
 Painted Ladies, Mission Dolores Basilica, Palace of Fine Arts) rather than
 duplicating them.
 
-[**civic-center-plaza.md**](./civic-center-plaza.md) is the exception to that rule:
-a designed hardscape with a fixed surveyed layout and no natural component, planned
-as a single landmark GLB on the same argument that made the Palace of Fine Arts
-grounds a landmark. See its §2.15 risk 5.
+[**civic-center-plaza.md**](./civic-center-plaza.md) and
+[**un-plaza.md**](./un-plaza.md) are the exceptions to that rule: designed hardscapes
+with fixed surveyed layouts and no natural component, planned as single landmark GLBs
+on the same argument that made the Palace of Fine Arts grounds a landmark. See
+civic-center-plaza's §2.15 risk 5 and un-plaza's §2.15 risk 8.
 
 [**flora-kit.md**](./flora-kit.md) is the one plan here that is not a landmark:
 an authored Blender kit of tree species and landscape props to replace the single
@@ -151,6 +152,7 @@ route, and the park plans depend on it (§E8 of the parks README).
 | [414 Brannan Street (Epic Church)](./414-brannan.md) | `414-brannan` | 14.0 m (monitor crest; 10.4 m street parapet) | new landmark |
 | [501 Third Street](./501-third.md) | `501-third` | 16.4 m (LiDAR-derived) | new landmark |
 | [10 South Park (South Park Lofts)](./10-south-park.md) | `10-south-park` | 14.67 m (roof bulkhead, LiDAR maximum; parapet crest 13.10 m photogrammetric) | new landmark |
+| [United Nations Plaza](./un-plaza.md) | `un-plaza` | 13.0 m (authored tree crest, estimated) | new landmark |
 
 - Style: `docs/styles/miniature-toy.md` (authoritative for artistic decisions)
 - Technical contract: `.agents/skills/sf-asset-check/SKILL.md` (authoritative for the GLB)
