@@ -11,11 +11,11 @@ contact sheet, REFERENCE.md, validation.json.
 | | |
 |---|---|
 | Triangles | 10,242 (budget 24,000) |
-| Objects | 516 (the app loader merges to one body + one glow set) |
+| Objects | 13 (516 authored; stage 4 joined per material — 15 draw submeshes) |
 | Dimensions | 84.85 × 84.85 × 53.2 m (world-axis bbox of the 45°-rotated quad) |
 | min Z / centre offset | 0.0 / (0.0, 0.0) |
 | Crest | 53.2 m exactly = `targetHeightM` (loader scale lands at 1.0) |
-| File | 753 KB raw (pre-optimize; stage 4 shrinks it) |
+| File | **267 KB raw** shipped (stage-4 meshopt; 753 KB pre-optimize archived at `optimize/input/`) |
 | Materials | Toy_brick, Toy_rust, Toy_trim, Toy_cream, Toy_glass, Toy_ink, Toy_stone, Toy_roofd, Toy_steel, Toy_red, Toy_red_Glow, Toy_white_Glow |
 | Validation | `validation.json` — **all checks PASS** |
 
