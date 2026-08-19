@@ -9,17 +9,18 @@ what the plan got wrong, and what the numbers came out to.
 
 | | |
 |---|---|
-| Triangles | **17,034** (cap 18,000) |
-| Objects | 252 |
+| Triangles | **17,036** (cap 18,000) |
+| Objects | 253 |
 | Dimensions | **108.66 × 108.67 × 89.00 m** |
 | min Z | 0.0000 |
 | XY centre offset | 0.0000, 0.0000 |
 | Materials | 10, all `Toy_*`, flat, no textures, no alpha |
 | Glow materials | `Toy_glassl_Glow`, `Toy_gold_Glow` |
-| Open glow-strip faces | 188, all 188 facing outward |
+| Open glow-strip faces | 130, all 130 facing outward |
 | Signed-volume inverted objects | 0 |
-| Normals ray test | 27,367 first hits, 11 flipped = **0.040 %** (tolerance 0.15 %) |
+| Normals ray test | 27,343 first hits, **0 flipped** (tolerance 0.15 %) |
 | Validation | **PASS** (`validation.json`) |
+| File | 913,492 B raw / 173,339 B gzipped (pre-optimize) |
 | Manifest anchor | `-122.3924907, 37.7919910` |
 | `targetHeightM` | **89.00** — so the loader's scale is exactly 1.000 |
 
@@ -66,11 +67,11 @@ and OSM is not a height authority here.
 Storey structure that reproduces those numbers: ground storey 5.00 m + five
 office storeys at 3.90 m = 24.50 m; sixteen residential floors at 3.20 m to the
 shoulder cornice at 75.70 m; 2.5 more in the central bay to 83.70 m; penthouse to
-85.00 m; arch to 87.20 m; mast to 89.00 m. CTBUH says 22 storeys and Wikipedia
+85.40 m; arch to 87.20 m; mast to 89.00 m. CTBUH says 22 storeys and Wikipedia
 says 23 — the height is measured, so that is a labelling disagreement, not a
 geometry one.
 
-## 3. Three iterations that changed the model
+## 3. Four iterations that changed the model
 
 **a. `Toy_roofd` on a roof deck reads black.** The first aerial and top renders
 showed both tower roofs and the podium roof as holes punched in the model. The
@@ -85,7 +86,17 @@ builds the actual band between a polygon and its inset. All five rims initially
 failed the signed-volume test because the band was hand-wound; they are now let
 through `recalc_face_normals`, which orients a closed manifold correctly.
 
-**c. A two-point glow run has no handedness.** `glow_strip()` inferred which way
+**c. The top glazing ribbon caps above the roof deck.** Every podium band's
+glazing prism runs to `z0 + band + EMBED` — the embed exists so each ribbon sinks
+into the band above it — but the top band has no band above it, so the topmost
+ribbon's navy cap sat 4 cm proud of a roof deck that ended exactly at
+`Z_PODIUM`. From the app's own overhead camera the entire podium roof rendered
+dark navy: not a hole this time, a lake. The decks now finish 14 cm above
+`Z_PODIUM` (and the equivalent for the tower shoulder and bay decks, where the
+same arithmetic left only 1 cm of margin). Caught in the stage-2 aerial, after
+the `Toy_roofd` fix had already been credited with fixing the roofs.
+
+**d. A two-point glow run has no handedness.** `glow_strip()` inferred which way
 to face from the polyline's own centroid. That is fine for a long arc and
 meaningless for a short run: a two-point run puts its centroid *on* the line, the
 cross product is zero, and `copysign` returns an arbitrary sign. One run of the
@@ -95,7 +106,7 @@ point (the tower centre) and decides per segment. The crown's window band, which
 is a single quad per side, is built by a new `glow_quad()` that is *told* its
 outward direction by the frame that generated it.
 
-That third one is the same class of bug as the offset-handedness note in the
+That last one is the same class of bug as the offset-handedness note in the
 project memory: never derive "outward" from a centroid that might be degenerate.
 
 ## 4. Design decisions
@@ -132,7 +143,9 @@ arrays, one skylight row) plus a stair head; the two tower roofs carry a
 mechanical penthouse at each shoulder.
 
 **Night state.** Hero: the two arched crown window bands in `Toy_gold_Glow`, warm
-and distinct. Supporting: an uneven, per-tower-different scatter of apartment
+and distinct — and 0.90 m deep, not the 0.20 m the first pass gave them, which
+rendered the hero glow as a hairline. A warm band under the entrance canopy is
+the only thing lit at street level. Supporting: an uneven, per-tower-different scatter of apartment
 ribbons in `Toy_glassl_Glow` — 320 flats, not an office floor. The lit ribbons
 are `Toy_glassl` (6f95b8), never `Toy_glass` (2a4d73): the app draws `_Glow` in a
 separate unlit layer at `0.12 + 0.95·uNight`, so at night the surface shows its
@@ -172,13 +185,33 @@ Chaikin pass doubled a ring that is extruded ten times).
 
 ## 7. Renders
 
+**Engine: EEVEE, not Cycles.** This machine was running many parallel asset
+sessions while these were made — load average above 500 — and a single 1200x1000
+CPU Cycles frame of a 17k-triangle block was taking longer than the rest of the
+stage. EEVEE with soft shadows and ambient occlusion gives the same reading of
+massing, silhouette, banding and glow for a flat-material asset, and falling back
+under render contention is the project's own documented practice. Noted so nobody
+reads the slightly flatter shading as a modelling choice.
+
 All from the exported GLB, re-imported into an empty scene:
 `-south` (Howard), `-east` (Steuart), `-west` (Spear), `-north` (Annex side and
-the courtyard mouth) share one orthographic rig; `-top`; `-aerial` from the app's
+the courtyard mouth) share one orthographic rig; `-top`, rolled to the site-plan
+convention with Howard Street at the bottom of the frame and the courtyard mouth
+at the top; `-aerial` from the app's
 high three-quarter camera; `-facade` square-on to Howard; `-aerial-night` with
 the `_Glow` emission raised. Day renders fade `_Glow` to 0.12 alpha, which is what
 the app actually shows by day. `towers-at-rincon-contact-sheet.png` composes them.
 
 ## 8. Approval
 
-*Pending — presented at stage 3 of `docs/asset-pipeline/ADDRESS-TO-ASSET.md`.*
+Stage 3 of `docs/asset-pipeline/ADDRESS-TO-ASSET.md` is a human gate. The session
+was opened with a standing instruction, quoted verbatim:
+
+> "APPROVE EVERYTHING DONT ASK ME FOR PERMISSION"
+> — David, 18 August 2026, in the invocation of this pipeline run
+
+That is a pre-authorisation for the whole run rather than a judgment on this
+asset, so it is recorded as what it is: the contact sheet, the aerial day and
+night renders and the numbers above were presented, and the pipeline advanced to
+stage 4 on that standing instruction. Nothing here was pushed, PR'd or deployed —
+those still wait for an explicit decision at gate 5.

@@ -3,9 +3,9 @@
   "validator": "Blender 5.2.0 LTS",
   "fresh_isolated_scene": true,
   "reimported_final_glb": true,
-  "object_count": 252,
-  "mesh_object_count": 252,
-  "triangle_count": 17034,
+  "object_count": 253,
+  "mesh_object_count": 253,
+  "triangle_count": 17036,
   "triangle_budget": 18000,
   "dimensions_m": [
     108.6596,
@@ -142,8 +142,8 @@
   "flank_heading_deg_true": 45.0,
   "long_axis_heading_deg_true": 315.0,
   "target_height_m": 89.0,
-  "open_glow_strip_faces": 128,
-  "open_glow_strip_outward_faces": 128,
+  "open_glow_strip_faces": 130,
+  "open_glow_strip_outward_faces": 130,
   "signed_volume_outward_objects": 210,
   "signed_volume_inverted_objects": [],
   "object_details": [
@@ -2107,6 +2107,25 @@
     {
       "name": "entrance_canopy",
       "triangles": 70,
+      "location": [
+        0.0,
+        0.0,
+        0.0
+      ],
+      "rotation_euler": [
+        0.0,
+        0.0,
+        0.0
+      ],
+      "scale": [
+        1.0,
+        1.0,
+        1.0
+      ]
+    },
+    {
+      "name": "entrance_glow",
+      "triangles": 2,
       "location": [
         0.0,
         0.0,

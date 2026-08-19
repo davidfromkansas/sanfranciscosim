@@ -376,7 +376,10 @@ EAST_C, EAST_U = _axis(EAST_PLAN)
 BAY_HALF = 10.0        # half-length of the taller central bay along the axis
 ARCH_HALF = 7.0        # half-length of the arched penthouse
 ARCH_W = 9.4           # its width across the axis
-Z_PENT = 85.00         # top of the penthouse wall the arch springs from
+Z_PENT = 85.40         # top of the penthouse wall the arch springs from.
+                       # Tall enough for the crown's window band to be a
+                       # BAND: at 85.00 the band was 0.20 m deep and the
+                       # night render showed the hero glow as a hairline.
 ARCH_SEGS = 12
 
 
@@ -627,8 +630,15 @@ def podium(mats):
               mats["Toy_glass"])
 
     # Roof deck and parapet. The camera looks down: this is a facade.
-    prism("podium_deck", inset_polygon(outer, PARAPET_OUT), Z_PODIUM - 0.30, Z_PODIUM,
-          mats["Toy_steel"])
+    #
+    # The deck sits ABOVE Z_PODIUM, not below it. The topmost glazing ribbon runs
+    # to Z_PODIUM + EMBED (the embed exists so each ribbon sinks into the band
+    # above it), and the top band has no band above it — so a deck ending at
+    # Z_PODIUM left the ribbon's navy cap as the topmost surface and the whole
+    # podium roof rendered dark blue from the app's own camera. Caught in the
+    # stage-2 aerial; see REPORT.md 3d.
+    prism("podium_deck", inset_polygon(outer, PARAPET_OUT), Z_PODIUM - 0.30,
+          Z_PODIUM + 0.14, mats["Toy_steel"])
     rim("podium_parapet", outer, PARAPET_OUT, Z_PODIUM - 0.40, Z_PARAPET, mats["Toy_trim"])
     roofscape(mats)
 
@@ -673,7 +683,7 @@ def roofscape(mats):
         if any(_inside(WEST_PLAN, p) or _inside(EAST_PLAN, p) for p in corners):
             print(f"[build] ! roof prop {name} collides with a tower - skipped")
             continue
-        box(f"roof_{name}", cx, cy, sx, sy, Z_PODIUM - 0.10, Z_PODIUM + h,
+        box(f"roof_{name}", cx, cy, sx, sy, Z_PODIUM + 0.06, Z_PODIUM + h,
             mats[mat], math.radians(rot))
 
 
@@ -700,6 +710,12 @@ def entrance(mats):
         mats["Toy_stone"], math.atan2(uy, ux))
     box("entrance_pier_b", cx - ux * hw, cy - uy * hw, 1.0, 1.0, 0.0, 4.10,
         mats["Toy_stone"], math.atan2(uy, ux))
+
+    # A warm band under the canopy: at night the front door of a 320-flat tower
+    # should be the one thing lit at street level.
+    glow_quad("entrance_glow", (ex + ux * 4.6, ey + uy * 4.6),
+              (ex - ux * 4.6, ey - uy * 4.6), 3.30, 4.60, (nx, ny),
+              mats["Toy_gold_Glow"], 0.18)
 
     # The arched window: a half-round-headed recess 12 m wide, springing at
     # 13.5 m, crown at 21.5 m. Built as a glazed plate standing slightly proud of
@@ -842,7 +858,7 @@ def tower(tag, plan, centre, axis, lit, mats):
     prism(f"{tag}_cornice_cap", inset_polygon(plan, -(CORNICE_OUT - 0.45)),
           Z_SHOULDER - 0.55, Z_SHOULDER, mats["Toy_trim"])
     prism(f"{tag}_shoulder_deck", inset_polygon(plan, 0.45), Z_SHOULDER - 0.30,
-          Z_SHOULDER + 0.05, mats["Toy_steel"])
+          Z_SHOULDER + 0.16, mats["Toy_steel"])
     rim(f"{tag}_shoulder_parapet", plan, 0.45, Z_SHOULDER - 0.10, Z_SHOULDER + 0.85,
         mats["Toy_trim"])
 
@@ -867,7 +883,7 @@ def tower(tag, plan, centre, axis, lit, mats):
           Z_BAY - 0.40, mats["Toy_trim"])
     prism(f"{tag}_bay_cornice_cap", inset_polygon(bayp, -0.50), Z_BAY - 0.50, Z_BAY,
           mats["Toy_trim"])
-    prism(f"{tag}_bay_deck", inset_polygon(bayp, 0.50), Z_BAY - 0.30, Z_BAY + 0.05,
+    prism(f"{tag}_bay_deck", inset_polygon(bayp, 0.50), Z_BAY - 0.30, Z_BAY + 0.16,
           mats["Toy_steel"])
     rim(f"{tag}_bay_parapet", bayp, 0.50, Z_BAY - 0.10, Z_BAY + 0.70, mats["Toy_trim"])
 
@@ -884,7 +900,7 @@ def tower(tag, plan, centre, axis, lit, mats):
             pen(ARCH_W / 2.0, 1.0), pen(-ARCH_W / 2.0, 1.0)]
     prism(f"{tag}_penthouse", wall, Z_BAY - 0.20, Z_PENT, mats["Toy_sand"])
     prism(f"{tag}_penthouse_glass", inset_polygon(wall, 0.28), Z_BAY + 0.35,
-          Z_PENT - 0.45, mats["Toy_glass"])
+          Z_PENT - 0.35, mats["Toy_glass"])
 
     prof = []
     for i in range(ARCH_SEGS + 1):
@@ -912,7 +928,7 @@ def tower(tag, plan, centre, axis, lit, mats):
              centre[1] + uy * (-ARCH_HALF + 0.9) + vy * s_ * ARCH_W / 2.0)
         b = (centre[0] + ux * (ARCH_HALF - 0.9) + vx * s_ * ARCH_W / 2.0,
              centre[1] + uy * (ARCH_HALF - 0.9) + vy * s_ * ARCH_W / 2.0)
-        glow_quad(f"{tag}_glow_crown_{int(s_)}", a, b, Z_BAY + 0.55, Z_PENT - 0.55,
+        glow_quad(f"{tag}_glow_crown_{int(s_)}", a, b, Z_BAY + 0.45, Z_PENT - 0.35,
                   (vx * s_, vy * s_), mats["Toy_gold_Glow"], 0.12)
 
     # Mast.

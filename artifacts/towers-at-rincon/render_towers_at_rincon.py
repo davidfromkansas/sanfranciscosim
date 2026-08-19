@@ -59,8 +59,8 @@ VIEWS = [
 # rounded corner turret that joins them and carries the crown. It is also the
 # view the app's own camera preset is set to (landmarks.mjs yaw 270).
 AERIAL_AZ = 90.0
-AERIAL_PITCH = 36.0
-AERIAL_R = 2.10
+AERIAL_PITCH = 33.0
+AERIAL_R = 3.40
 
 
 def clear():
@@ -83,10 +83,20 @@ def import_glb(path):
 
 def setup_world(night=False):
     scene = bpy.context.scene
-    scene.render.engine = "CYCLES"
-    scene.cycles.device = "CPU"
-    scene.cycles.samples = 48
-    scene.cycles.use_denoising = True
+    # EEVEE, not Cycles. This machine runs many asset sessions in parallel and
+    # was sitting at a load average above 500 while these were made; a 1200x1000
+    # CPU Cycles frame of a 17k-triangle block was taking longer than the whole
+    # rest of the stage. EEVEE with soft shadows and AO gives the same reading of
+    # massing, silhouette, banding and glow for this flat-material asset, and it
+    # is what the project's own render-contention note recommends falling back to.
+    scene.render.engine = "BLENDER_EEVEE"
+    try:
+        scene.eevee.taa_render_samples = 48
+        scene.eevee.use_gtao = True
+        scene.eevee.gtao_distance = 3.0
+        scene.eevee.use_soft_shadows = True
+    except AttributeError:
+        pass
     scene.render.film_transparent = False
     scene.view_settings.view_transform = "Standard"
     world = bpy.data.worlds.new("Studio")
@@ -246,7 +256,7 @@ def main():
         aer = make_camera("cam_night")
         aer.data.lens = 78.0
         aer.location = orbit(center, AERIAL_AZ, AERIAL_PITCH, span * AERIAL_R)
-        aim(aer, Vector((center.x, center.y, center.z * 0.9)))
+        aim(aer, Vector((center.x, center.y, center.z * 0.58)))
         render_to(os.path.join(out, f"{prefix}-aerial-night.png"), aer, AER_RES)
         return
 
@@ -271,10 +281,11 @@ def main():
     top.data.type = "ORTHO"
     top.data.ortho_scale = 125.0   # portrait frame: this is the VERTICAL extent
     top.location = Vector((center.x, center.y, mx.z + span))
-    # Roll so image-up is the front direction (bearing LONG_AXIS + 180), i.e.
-    # the street end at the top of the frame. For a top-down camera image-up
-    # maps to world (-sin rz, cos rz), which gives rz = LONG_AXIS - 90.
-    top.rotation_euler = (0, 0, math.radians(LONG_AXIS - 90.0))
+    # Site-plan convention: Howard Street (the address elevation, bearing 135)
+    # at the BOTTOM of the frame, the Rincon Annex party side and the mouth of
+    # the courtyard at the top. Verified by eye against the entrance canopy
+    # rather than trusted from the formula.
+    top.rotation_euler = (0, 0, math.radians(LONG_AXIS - 90.0 + 180.0))
     render_to(os.path.join(out, f"{prefix}-top.png"), top, TOP_RES)
 
     # --- beauty render from the app's high three-quarter aerial camera -----
@@ -282,7 +293,7 @@ def main():
     aer.data.type = "PERSP"
     aer.data.lens = 78.0  # long lens, restrained perspective (style bible §18)
     aer.location = orbit(center, AERIAL_AZ, AERIAL_PITCH, span * AERIAL_R)
-    aim(aer, Vector((center.x, center.y, center.z * 0.92)))
+    aim(aer, Vector((center.x, center.y, center.z * 0.58)))
     render_to(os.path.join(out, f"{prefix}-aerial.png"), aer, AER_RES)
 
     # --- square-on look at the 315.8 deg park front ------------------------
