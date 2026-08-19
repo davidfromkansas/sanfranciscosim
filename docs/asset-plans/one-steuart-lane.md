@@ -668,39 +668,48 @@ Draft registry entry:
 },
 ```
 
-**Sizing `exclude`.** `excluded()` in `pipeline/buildings.mjs` drops a ring when
-`min(nearestVertexDistance, centroidDistance)` from the **landmark anchor** is under
-`r`. Measured against DataSF's bake input from the anchor above:
+**Sizing `exclude` — measured at stage 5, 18 August 2026.** `excluded()` in
+`pipeline/buildings.mjs` drops a ring when `min(nearestVertexDistance,
+centroidDistance)` from the **landmark anchor** is under `r`. Swept over both
+real bake inputs:
 
-| Ring | Gate (m) | Role |
-|---|---|---|
-| `SF3741031` — the demolished 75 Howard garage, on this parcel | ≈ 0 (centroid) | must drop |
-| this building's own Overture ring (OSM-derived) | ≈ 0 (centroid) | must drop — see below |
-| `SF3741032` — the 72 m neighbour to the south-west | **28.3** | must survive |
+| Gate (m) | Source | Ring | |
+|---|---|---|---|
+| **0.92** | Overture | "One Steuart Lane" — this building's own ring | **must drop** |
+| **11.41** | DataSF | `SF3741031` — the demolished 75 Howard garage | **must drop** |
+| 28.14 | Overture | "201 Spear" | must survive |
+| 28.29 | DataSF | `SF3741032` (72 m) | must survive |
+| 43.88 / 43.92 | DataSF / Overture | `SF3716021` / The Towers at Rincon | must survive |
 
-That is a wide band, not a tight one: anything from a few metres up to 28 m drops
-exactly the two rings that must go. **24 m** sits comfortably in the middle and is
-the proposed value.
+Band `11.41 < r <= 28.14`, 16.7 m wide. **Shipped `exclude: 20`**, the middle of
+it. The draft value of 24 above was estimated from DataSF alone and sat closer
+to the ceiling than it needed to.
 
-Two things the integrator must still do rather than take on trust:
+Two things the draft got wrong, both worth reading before trusting a similar
+estimate on a neighbouring site:
 
-1. **Re-measure against both bake inputs**, not just DataSF. The ceiling is often
-   Overture's rather than DataSF's, and the two files disagree about party-wall
-   positions by a metre or more. The sweep is ~50 lines over `streamFeatures` +
-   `outerRings` and takes well under a minute.
-2. **Confirm the floor against this building's own Overture centroid**, not its
-   DataSF one. Overture is the gap-fill source for current buildings, and since
-   DataSF has no post-2010 footprint here, Overture's ring is almost certainly the
-   *only* thing currently drawing a procedural block on this site — a ~67 m one,
-   taller than most of its neighbours. An excluded DataSF ring never calls
-   `markOccupied()`, so if Overture's ring survives the exclusion it will re-add the
-   building straight through the asset.
+1. **`streamFeatures()` silently yields zero features from a `.geojsonseq`.**
+   Overture is newline-delimited JSON and `buildings.mjs` reads it with
+   `readline`, not the GeoJSON streamer. A sweep that uses `streamFeatures` for
+   both inputs returns a DataSF-only answer and reports it as if both had been
+   scanned. The binding neighbour here happens to be Overture's ("201 Spear" at
+   28.14 m, 0.15 m tighter than DataSF's ceiling).
 
-**Expect the procedural block to be tall and obvious.** Unlike most Case B sites,
-where the fallback massing is a low box, the thing being replaced here is a
-full-height tower. That makes the before/after unusually easy to verify — and makes
-an unbaked check useless, because the procedural block and the asset are nearly the
-same size.
+2. **The procedural block here is the 2010 parking garage, ~21.6 m — not a
+   tower.** Overture carries this building at `height = 25.16`, which is simply
+   wrong (it is 67 m). That matters because of the order of operations in
+   `buildings.mjs`: a `h >= 20` Overture ring within 30 m of an existing DataSF
+   building takes the *height-correction* branch instead of being added, and
+   25.16 is not greater than the garage's 21.55 x 1.4, so it corrects nothing
+   and then `continue`s past its own ring entirely. The site therefore bakes as
+   a ~21.6 m block today. Both rings still have to go: once the garage is
+   excluded it never calls `markOccupied()`, so the Overture ring reaches
+   `addBuilding()` on the gap-fill path and would re-add the building on top of
+   the asset.
+
+   The practical consequence is the opposite of what this plan first assumed:
+   the before/after is **obvious rather than subtle**, because a 67 m asset
+   replaces a 22 m block rather than a same-sized twin.
 
 **Batch warning.** The shared landmark `BatchedMesh` was measured at 99% full in
 SoMa at 84 landmarks, and it overflows silently: each reload drops a *different*

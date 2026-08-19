@@ -1939,5 +1939,24 @@
     ],
     "tris": 3366,
     "loadRadius": 2500
+  },
+  {
+    "id": "one-steuart-lane",
+    "file": "one-steuart-lane.glb",
+    "anchor": [
+      -122.3916888,
+      37.7915643
+    ],
+    "targetHeightM": 67.06,
+    "cat": 2,
+    "name": "One Steuart Lane",
+    "estimated": false,
+    "dims": [
+      62.95,
+      62.493,
+      67.06
+    ],
+    "tris": 17064,
+    "loadRadius": 2500
   }
 ]
