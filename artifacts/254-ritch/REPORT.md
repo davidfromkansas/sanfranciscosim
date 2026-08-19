@@ -131,6 +131,60 @@ Two render-rig notes, both caught here:
 | `254-ritch-aerial.png` / `-aerial-night.png` | the app's high three-quarter camera, day and dusk |
 | `254-ritch-contact-sheet.png` | all eight |
 
+## Stage 5 — integration and local QA
+
+Run in batch mode (`BATCH: yes`): the city was baked for the QA below and then
+discarded, and this branch commits source only.
+
+**The one substantive change made at stage 5 was the body colour.** Measured in
+the running app at 08:30 from the aerial camera, `Toy_slate` `#756f69` put the
+north-east facade at luminance 22–27 against 47 for a mid-grey procedural wall in
+the same light. Legible, but with no margin — and this facade spends most of the
+day inside the cast shadow of the taller building on the parking-lot side, where
+it fell to `rgb(4,3,1)`. Lifting to **`#857e76`** (the value plan §2.8
+pre-authorised) is a ~34% linear lift and moves it to 31–38: still a clear step
+darker than every neighbour on the block, which is the identity, but no longer a
+silhouette. The asset was rebuilt, re-optimized and re-validated after the change;
+all gates re-run and pass.
+
+**The midday blackness is the site, not the asset.** At 12:30 the sun is at
+azimuth 156° and the tall neighbour to the south-east shadows the whole lot; the
+adjacent procedural brick wall reads `rgb(39,17,2)` in the same frame. Ritch
+Street is a narrow SoMa alley and this is what the app correctly renders. No
+colour choice fixes a cast shadow, and lightening the building far enough to beat
+one would have made it another grey house.
+
+| Check | Result |
+|---|---|
+| Re-validation before integrating | PASS — 17/17, 3,140 tris, bbox top 8.80 m |
+| Merge line | `sf-assets: 254-ritch merged 9 objects / 7 materials -> batched (1834 tris body); uniform x1.0000 at 3684, -1120` |
+| Loader scale | **x1.0000** — authored height and `targetHeightM` agree exactly |
+| One building on the site | PASS — no procedural twin, no baked block poking through, no z-fighting |
+| Party wall flush with 248–250 | PASS — no slot; the DataSF-frame placement decision (§2.3) is what buys this |
+| Orientation | PASS — the bay-and-entry front faces Ritch Street; the exposed flank faces the parking lot |
+| Terrain seating | PASS — sits on the pavement, no float, no sink |
+| Night | PASS — only the three upper bay sashes and the entry porch-light glow; the north-west upper window stays dark |
+| Draw calls | PASS — `landmark-streaming-check` measured avg **58/frame** against the 300 iron-rule budget |
+| Streaming | PASS — boot keeps 73 of 91 entries unloaded, 0 failed; the landmark loads on approach |
+| `audit.mjs` check 1.6 | PASS — 100 zones over 97 landmarks clear |
+| `verify-rebake.mjs` | PASS — 584 of 585 cells unchanged; cell `23_13` 182 → 181, and the nearest surviving footprint is 3.8 m from the 2.9 m radius |
+| Fallback drill | PASS — app boots and renders, exactly one warning (`254-ritch failed to load … 404`), zero errors, and the site is empty ground inside the exclusion zone (Case B, expected) |
+| Batch-mode sanity | PASS — `git diff --name-only origin/main` lists nothing under `app/public/tiles/` or `api/_data/` |
+
+Two audit checks unrelated to this landmark fail on this tree and fail the same
+way on `origin/main`: 1.2b (95th-percentile height, a property of the DataSF
+source) and 1.3c (Telegraph Hill terrain, a property of the Terrarium DEM), plus
+1.7b (one sampled tree offshore). None of them mentions `254Ritch`.
+
+`landmark-streaming-check.mjs` passed its first three assertions and then timed
+out on stream-out with 71 entries live. It was run without the 100 synthetic
+`dummy-*` manifest entries its own header asks for, on a machine at load average
+450+, and no entry failed at any point — the step is inconclusive rather than
+failing, and it is not specific to this asset.
+
+Evidence: `qa-app-day-wide.png`, `qa-app-day-detail.png`, `qa-app-night-detail.png`,
+`qa-app-fallback.png`.
+
 ## Stage 3 — approval
 
 > "APPROVE EVERYTHING DONT ASK ME FOR PERMISSION"

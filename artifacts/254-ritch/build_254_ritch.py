@@ -148,7 +148,7 @@ EMBED = 0.03               # how far every applied band is sunk INTO the surface
 BEVEL_W, BEVEL_SEG = 0.10, 2
 
 PALETTE_HEX = {
-    "Toy_slate": "756f69",   # EVERY painted surface: siding on all four
+    "Toy_slate": "857e76",   # EVERY painted surface: siding on all four
                              # elevations, base band, bay, both cornices, the
                              # doors, the entry hood, the stoop, window
                              # surrounds. OFF-PALETTE (a WARN, not a fail) and
@@ -161,9 +161,23 @@ PALETTE_HEX = {
                              # too light and destroys the one cue this building
                              # has, and Toy_roofd (45454a) has already been
                              # observed rendering as rgb(9,9,12) - effectively
-                             # black - on a roof deck in this app. If the aerial
-                             # render still reads muddy, lift toward 857e76;
-                             # never go darker.
+                             # black - on a roof deck in this app.
+                             #
+                             # 857e76 IS that lift, applied at stage 5 after
+                             # measuring the asset in the running app. The
+                             # measured paint is #6b696a overcast / #5e5652 in
+                             # shade, and the plan shipped #756f69. In the app's
+                             # 8:30 aerial the north-east facade then read at
+                             # luminance 22-27 against 47 for a mid-grey
+                             # procedural wall in the same light - legible, but
+                             # with no margin, and this facade spends most of the
+                             # day inside the shadow of the taller neighbour on
+                             # the parking-lot side. 857e76 is a ~34% lift in
+                             # LINEAR terms and moves it to ~32, still a clear
+                             # step darker than every neighbour on the block,
+                             # which is the whole identity of this building.
+                             # Do not go lighter: at Toy_steel (9aa0a6) it stops
+                             # being the dark house and becomes another grey one.
     "Toy_stone": "d9d2c2",   # the roof membrane and the light-well curbs. The
                              # roof is LIGHTER than the walls. That is the real
                              # relationship (measured #cac8c9 overcast against
