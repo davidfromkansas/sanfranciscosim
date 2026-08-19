@@ -179,6 +179,23 @@ Run against `npm run dev` on the re-baked tiles, at the Embarcadero.
 | Fallback drill | PASS — exactly one warning (`sf-assets: pier-1 failed to load …`), app still boots, 73 other landmarks live, and the Case B site is empty deck |
 | Audit 1.6 | PASS — 101 zones over 97 landmarks clear |
 | Audit 1.2b / 1.3c / 1.7b | FAIL, **pre-existing on main** — `BATCH-INTEGRATE.md` line 124 says so, and `135-south-park`'s report records the identical three with identical values |
+| `landmark-streaming-check` boot / hero draws / stream-in | PASS — far 73 / live 18; avg **184** draw calls per frame |
+| `landmark-streaming-check` stream-out | FAIL (times out), and **pre-existing** — see below |
+
+**The streaming check's stream-out step fails, and it is not this asset's.** Verified by
+running the identical check against a build of `main` with no Pier 1 in it:
+
+| Step | main (90 entries) | this branch (91 entries) |
+|---|---|---|
+| boot keeps streamed unloaded | PASS — far 72 / live 18 | PASS — far 73 / live 18 |
+| hero draw calls | PASS — avg 182/frame | PASS — avg 184/frame |
+| streamed landmark loads on approach | PASS | PASS |
+| streamed landmarks release on depart | **timed out** — far 20 / live 70 | **timed out** — far 20 / live 71 |
+
+Same failure mode, same numbers to within the one entry Pier 1 adds. The step asserts that
+`live` FELL after flying away, but the departure target (the Ferry Building) is itself
+inside the radius of enough other streamed entries that the count never drops. Nothing to
+do with this landmark.
 
 **Two QA notes for whoever runs this next.**
 
