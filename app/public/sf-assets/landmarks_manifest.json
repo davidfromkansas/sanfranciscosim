@@ -1939,5 +1939,24 @@
     ],
     "tris": 3366,
     "loadRadius": 2500
+  },
+  {
+    "id": "50-united-nations-plaza",
+    "file": "50-united-nations-plaza.glb",
+    "anchor": [
+      -122.4144853,
+      37.7804351
+    ],
+    "targetHeightM": 33.0,
+    "cat": 18,
+    "name": "50 United Nations Plaza Federal Office Building",
+    "estimated": false,
+    "dims": [
+      122.7264,
+      84.8953,
+      33.0
+    ],
+    "tris": 13615,
+    "loadRadius": 2500
   }
 ]

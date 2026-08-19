@@ -3160,6 +3160,43 @@ export const LANDMARKS = [
     // the canopy are the whole recognition.
     camera: { distance: 120, yaw: 85, pitch: 26 },
   },
+  {
+    // Arthur Brown Jr.'s 1936 Federal Office Building, the last piece of the
+    // Civic Center. A whole city block: 112.53 x 66.93 m on the grid, wrapped
+    // around an open courtyard.
+    //
+    // `exclude: 40` is MEASURED against the rings the bake actually consumes
+    // (DataSF and Overture, projected and simplifyRing'd at 0.6 m), from this
+    // anchor, using the metric `excluded()` applies - ring centroid OR any ring
+    // vertex:
+    //   DataSF SF0351035 (area_id 225), this building        centroid  1.64 m
+    //   Overture ...7285e5e8827e (height 29), this building  centroid  0.27 m
+    //   DataSF SF0348007 (area_id 2493), across McAllister   vertex   54.54 m
+    //   nearest Overture NEIGHBOUR vertex                             55.47 m
+    // So the window is (1.70, 54.54) m and 40 sits inside it with 14.5 m of
+    // headroom. BOTH datasets trace this block, so a correct exclusion drops
+    // TWO rings, not one; only the DataSF one is a baked building, but without
+    // dropping the Overture ring the gap-fill pass puts it straight back.
+    //
+    // Do NOT reach for the half-diagonal rule here: the OBB half-diagonal is
+    // 65.46 m, which is past the 54.54 m neighbour and would delete a building
+    // across McAllister.
+    //
+    // The courtyard ring never reaches the bake - outerRings() in
+    // lib/geojsonStream.mjs discards inner rings - so it needs no exclusion.
+    id: '50UnitedNationsPlaza',
+    name: '50 United Nations Plaza Federal Office Building',
+    lon: -122.4144853,
+    lat: 37.7804351,
+    height: 33.0,
+    exclude: 40,
+    // camera.js puts the eye at target + distance*(sin yaw, ., cos yaw) with +x
+    // east and +z south, so camera bearing = 180 - yaw. The hero front is the
+    // south colonnade facing United Nations Plaza, so yaw 0 stands the camera
+    // due south of the building looking north up the plaza - the view the
+    // building was composed for.
+    camera: { distance: 380, yaw: 0, pitch: 24 },
+  },
 ];
 
 // Parks/green spaces the landcover bake must match at least one source polygon

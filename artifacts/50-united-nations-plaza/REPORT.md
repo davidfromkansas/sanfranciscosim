@@ -188,12 +188,123 @@ artifacts/50-united-nations-plaza/
   50-united-nations-plaza-aerial.png   the app's high three-quarter camera
   50-united-nations-plaza-night.png    the glow set
   50-united-nations-plaza-contact-sheet.png
+  qa_local.mjs                         stage-5 local QA over CDP (--drill)
+  qa/                                  day/night/wide + the drill's three
   REFERENCE.md  REPORT.md  validation.json
 ```
 
 Rebuild: `blender -b --python build_50_united_nations_plaza.py`
 Re-render: `blender -b --python render_50_united_nations_plaza.py`
 Re-validate: `blender -b --python validate_50_united_nations_plaza.py`
+
+## Stage 5 — integrate (batch mode, source-only)
+
+Run of `docs/asset-plans/INTEGRATION-PROMPT.md` Part 1, Case B, with
+ADDRESS-TO-ASSET's batch-mode amendment: the bake was run and fully QA'd, then
+discarded, so this branch carries source only.
+
+### Local QA — all PASS
+
+`node artifacts/50-united-nations-plaza/qa_local.mjs` drives the BUILT app
+(`app/dist`) in real headless Chrome over CDP rather than the editor's Browser
+pane: parallel landmark sessions hold every preview slot, and a hidden pane
+throttles `requestAnimationFrame` to nothing, which makes a perfectly healthy
+streaming landmark look broken.
+
+| Step 5 check | Result |
+|---|---|
+| manifest entry loads | PASS — `sf-assets: 50-united-nations-plaza merged 11 objects / 11 materials -> batched (7417 tris body); uniform x1.0000 at 2025, -1153` |
+| uniform scale ≈ 1.0 | PASS — **x1.0000** exactly; the authored height and `targetHeightM` agree |
+| exactly one building on the site | PASS — no procedural twin, no baked block poking through, no z-fighting (see `qa/wide.png`) |
+| footprint size against the neighbours | PASS — reads as a whole city block, correctly larger in plan than the Asian Art Museum next door |
+| orientation | PASS — the colonnade faces United Nations Plaza; no `yawDeg` override needed |
+| terrain seating | PASS — no float, no sink |
+| night glow | PASS — only the six arched entrances and the attic band light up (`qa/night.png`) |
+| draw calls < 300 | PASS — **98/frame** at the landmark |
+| no asset warnings | PASS — none |
+
+`stats()` at the landmark: `{entries: 104, live: 83–89, fading: 0, failed: 0}`.
+Screenshots in `qa/`: `day.png`, `night.png`, `wide.png`.
+
+### Step 6 — fallback drill (mandatory), all PASS
+
+The drill serves a real **404** for the GLB rather than renaming the file: Vite
+answers a missing public path with `index.html` and HTTP 200, so the rename
+trick cannot produce a fetch failure at all.
+
+| Check | Result |
+|---|---|
+| app still boots with the GLB missing | PASS — `{entries: 104, live: 97, failed: 1}`, no crash |
+| exactly one fallback warning | PASS — `sf-assets: 50-united-nations-plaza failed to load (… responded with 404: Not Found)` |
+| Case B site behaviour | PASS — **empty ground** inside the exclusion zone, which is the documented Case B outcome, not a hole or a crash (`qa/drill-wide.png`) |
+
+Note the warning *wording*: INTEGRATION-PROMPT Step 6 quotes the RESIDENT
+fallback text ("… — keeping the code-built landmark"). A landmark with a
+`loadRadius` is STREAMED and fails through `scan()` instead, with
+`failed to load (…)` and no "keeping" suffix. The drill matches on the id, not
+on the prompt's wording.
+
+### The Case B re-bake
+
+Ran the full chain — `terrain → bridges → buildings → streets → landcover →
+validate → lore → toy → notables → context → muni-shapes`. Stopping at `toy` is
+a trap: `context.mjs` owns this landmark's pick box, its search-index entry and
+its `context/landmarks.json` row, and `validate.mjs` drops `tiles/ctx/` and
+`context/` on publish.
+
+- **`pipeline/audit.mjs` check 1.6 PASS** — "no procedural footprint inside a
+  bespoke landmark exclusion zone — 114 zones over 110 landmarks clear".
+  (Three unrelated checks fail on this bake and on the baseline: 1.2b p95
+  height, 1.3c Telegraph Hill DEM, 1.7b one offshore tree. All three are
+  city-wide terrain/source-data properties that no single landmark touches.)
+- **`pipeline/verify-rebake.mjs` PASS** — "only the new landmarks' cells moved,
+  and every asset has clear ground under it". 584 of 585 cells unchanged;
+  `20_13` went 184 → 183; nearest surviving footprint 53.9 m against the 40 m
+  radius.
+- **Settled from the tile, not from the counts.** `verify-rebake` reported cell
+  `19_13` as "exclusion dropped nothing", which is the known blind spot — it
+  compares per-cell counts, and the circle overlaps that cell without any of
+  this building's footprint living there. Decoding the baked blob directly:
+
+  ```
+  baked footprints in the 3x3 cell neighbourhood : 1918
+  footprint VERTICES inside the 40 m exclusion   : 0
+  distinct footprints intruding                  : 0
+  nearest baked footprint vertex                 : 53.91 m
+  ```
+
+  53.91 m against the 54.54 m predicted from the raw rings before baking — the
+  0.6 m is `simplifyRing` plus the 0.02 m tile quantisation.
+- **The single-footprint delta is the two-ring story confirming itself.** On
+  `main` the DataSF ring was baked, so Overture's ring was skipped by
+  `occupiedFraction`. With DataSF excluded the block is empty, Overture's ring
+  is attempted — and dropped by the same radius. Net 184 → 183. Without the
+  Overture ring inside the radius the gap-fill would have put the building
+  straight back and the count would not have moved at all.
+- **Zero data-vintage churn.** The bake reused the same raw downloads that
+  produced the committed tiles, so exactly one building tile changed. A bake off
+  fresher downloads would have rewritten ~520 tiles that have nothing to do with
+  this landmark.
+
+### Batch mode — what this branch carries
+
+Per `ADDRESS-TO-ASSET.md`, the bake was **discarded** after the QA above:
+`git checkout -- app/public/tiles api/_data`. Sanity check against the
+merge-base: `git diff --name-only 74aa2dbe8` lists **nothing** under
+`app/public/tiles/` or `api/_data/`.
+
+Source committed: the GLB (both under `artifacts/` and
+`app/public/sf-assets/landmarks/`), the `landmarks_manifest.json` entry, the
+`pipeline/lib/landmarks.mjs` entry, the asset plan and `artifacts/`. All three
+shared files are append-only lists that merge mechanically. The city is baked
+once for the whole batch by `docs/asset-pipeline/BATCH-INTEGRATE.md`.
+
+`cd app && npm test` → 26/26 pass. `npm run build` → clean.
+
+### Not done, by design
+
+Step 7 (push, PR, deploy, production QA) is replaced by a stop, per
+ADDRESS-TO-ASSET stage 5. Nothing was pushed and no PR was opened.
 
 ## Draft manifest entry
 
@@ -219,12 +330,16 @@ Re-validate: `blender -b --python validate_50_united_nations_plaza.py`
 }
 ```
 
+**This entry is now live in `app/public/sf-assets/landmarks_manifest.json`** (it
+was appended as TEXT, not by re-serialising the file: `json.dumps` rewrites
+floats like `11.0` → `11` across unrelated entries — 19 lines added, nothing
+else touched).
+
 `loadRadius` is the default rule `max(2500, 33.0 × 30)` = 2500 — the streaming
 decision, made explicitly: at 33 m this building is small on screen well before
 2.5 km, and because it is Case B the baked footprint is carved out, so past the
 radius the site reads as empty ground rather than as a wrong building. 2500 m is
-where that absence is illegible. The production manifest was not edited by this
-stage.
+where that absence is illegible.
 
 ## Stage 4 — optimize
 
