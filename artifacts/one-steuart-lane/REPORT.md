@@ -301,6 +301,41 @@ than 30 m offshore). All three are properties of the source data and the terrain
 DEM, none is a building tile this change touches, and `verify-rebake` proves only
 cell `24_11` differs from `origin/main`. They are pre-existing, not caused here.
 
+### Fallback drill (INTEGRATION-PROMPT Step 6) — NOT COMPLETED
+
+**This mandatory step did not run to completion and is not claimed as a pass.**
+
+`node artifacts/one-steuart-lane/qa_local.mjs --drill` serves a real 404 for the
+landmark GLB and asserts that the app still boots, that exactly one
+`sf-assets: … — keeping the code-built landmark` warning appears, and that the
+site is empty ground inside the exclusion zone (the expected Case B outcome).
+
+Three attempts, all defeated by machine contention rather than by anything in
+the asset:
+
+| Attempt | Outcome |
+|---|---|
+| 1 | `boot timed out` at the harness's 120 s default |
+| 2 | reached the app, then `manifest timed out` after 600 s — `stats().entries` never left 0 |
+| 3 | still running when the session ended |
+
+The machine carried a load average between 150 and 736 throughout, with up to
+144 headless Chrome instances belonging to parallel landmark sessions; the built
+app runs at a fraction of a frame per second in software rendering under that.
+The boot allowance in `qa_local.mjs` was raised from 120 s to 600 s as part of
+attempt 2 and that change is committed.
+
+**What IS verified about the fallback, and what is not.** `app/test/asset-loading.test.mjs`
+passes 6/6 and the single-warning fallback path is present in `app/src/assets.js`.
+That establishes the code path exists and its rules are locked by tests; it does
+**not** establish the runtime behaviour, which is precisely what the drill is
+for. Re-run it on a quiet machine before this asset is considered fully signed
+off:
+
+```
+node artifacts/one-steuart-lane/qa_local.mjs --drill
+```
+
 ### Shared batch reserve — measured, and a warning for the batch
 
 `main` raised the body reserve to 1,600,000 vertices (49b8d19). Summing the
@@ -318,3 +353,35 @@ about a dozen sibling landmarks in flight at ~30k each — they do not all fit.*
 The overflow is silent (each reload drops a different landmark rather than
 erroring), so the batch integrator must re-run that check over the merged
 manifest and raise `BODY_VERTS` again if it crosses.
+
+---
+
+## Final stage table
+
+| Stage | Gate | Result |
+|---|---|---|
+| 0 RESOLVE | building confirmed | **PASS** — One Steuart Lane, OSM way 667097308, Case B |
+| 1 PLAN | plan committed with sources | **PASS** — `docs/asset-plans/one-steuart-lane.md` |
+| 2 BUILD | validation all-PASS | **PASS** — 15/15, normals residual 0 |
+| 3 APPROVE | approval quoted | **PASS** — standing approval, recorded above |
+| 4 OPTIMIZE | G1–G8 | **PASS** — all eight, re-run in full after the stage-5 rebuild |
+| 5 INTEGRATE | local QA + fallback drill | **PARTIAL** — QA 4/4, audit 1.6, verify-rebake all PASS; **fallback drill did not complete** |
+
+Shipped numbers: **17,064 triangles · 411,752 B (402 KB) · loader scale
+×1.000000 · 96 draw calls/frame · 62.95 × 62.493 × 67.06 m**, anchor
+`-122.3916888, 37.7915643`, `exclude: 20`, `loadRadius: 2500`, `cat: 2`.
+
+Dossier corrections made along the way: six, listed above and in REFERENCE.md §7
+— the ziggurat massing, the buried (invisible) facade plates, roof furniture
+sized to the lot instead of the top volume, a night rig that rendered every glow
+white, navy glazing that read too dark at city distance, and a hero glow band
+that was sub-pixel in the app.
+
+Open risks carried forward: the **220 ft vs 240 ft height dispute** (220
+shipped, on the architect, the general contractor, the developer's release,
+SF YIMBY and OSM; CTBUH and the SF Chronicle say 240) and the **shared landmark
+batch reserve at 91.6%** with roughly a dozen Embarcadero siblings still in
+flight.
+
+Nothing has been pushed, no PR opened and no deploy run — per
+`docs/asset-pipeline/ADDRESS-TO-ASSET.md` stage 5, that decision is the owner's.
