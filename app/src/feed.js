@@ -536,11 +536,6 @@ function createDetailView({ onOpen }) {
     openId = thread.id;
     draw(thread);
     view.hidden = false;
-    // The create-post button is fixed to the window at a z-index above the
-    // panel, so it floats over the detail and sits on the last comment. While
-    // somebody is reading one post, writing another is not the offer being
-    // made — Reddit hides it on a post page for the same reason.
-    document.body.classList.add("rs-reading");
     // Its own scroll, starting at the top of the post being opened.
     view.scrollTop = 0;
     back.focus({ preventScroll: true });
@@ -549,7 +544,6 @@ function createDetailView({ onOpen }) {
   function close() {
     openId = null;
     view.hidden = true;
-    document.body.classList.remove("rs-reading");
     body.replaceChildren();
   }
 

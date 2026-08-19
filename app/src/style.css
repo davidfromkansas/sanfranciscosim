@@ -546,13 +546,6 @@ button:hover {
   cursor: pointer;
 }
 
-/* Reading one post is not the moment to be asked to write another, and the
-   button is fixed above the panel so it would otherwise sit on the last
-   comment. */
-body.rs-reading .rs-create-fab {
-  display: none;
-}
-
 .rs-create-fab:hover,
 .rs-compose-post:hover {
   background: #5d7ec5;
@@ -1185,7 +1178,9 @@ body.rs-reading .rs-create-fab {
 
 .rs-detail-body {
   padding: 10px;
-  padding-bottom: calc(18px + env(safe-area-inset-bottom, 0px));
+  /* The create button is fixed above the panel and stays on screen while a
+     post is open, so the rail ends above it rather than under it. */
+  padding-bottom: calc(72px + env(safe-area-inset-bottom, 0px));
 }
 
 /* The post reads as the subject here, not as one card in a list, so it drops
