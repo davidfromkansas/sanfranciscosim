@@ -1692,5 +1692,24 @@
     ],
     "tris": 9262,
     "loadRadius": 2500
+  },
+  {
+    "id": "49-zoe",
+    "file": "49-zoe.glb",
+    "anchor": [
+      -122.3960338,
+      37.7800764
+    ],
+    "targetHeightM": 17.0,
+    "cat": 2,
+    "name": "49 Zoe Street",
+    "estimated": false,
+    "dims": [
+      34.1084,
+      34.6128,
+      17.0
+    ],
+    "tris": 7688,
+    "loadRadius": 2500
   }
 ]
