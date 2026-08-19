@@ -20,9 +20,9 @@ prompt, Part 2 is the research and design dossier behind it.
 | Manifest id | `fulton-plaza` |
 | Existing procedural builder | none — new landmark (needs a `pipeline/lib/landmarks.mjs` entry and a re-bake, see 2.13) |
 | WGS84 anchor | `-122.4159189, 37.7796904` (oriented-bounding-box centre, measured from DataSF parcels) |
-| Target height | **10.67 m** — the crest of the Pioneer Monument (Minerva's finial). SFAC records the monument with base at 420 in = 10.668 m. Deck +0.55 m; tree crowns 10.0 m (*estimated*, deliberately kept below the monument — see 2.15 risk 2) |
+| Target height | **12.80 m — the model's VERTICAL EXTENT** (this plan first said 10.67 m; corrected during stage 2, see the note at the end of 2.15). The asset is terrain-draped, so `min_z` is negative and `targetHeightM` is the extent, per the `64-south-park` convention. The crest is still the Pioneer Monument: SFAC records it at 420 in = 10.668 m, standing on the plaza's 0.63 m apron |
 | Footprint | 119.51 m × 48.59 m oriented (heading 81.15°), 5,805 m² = 1.435 acres, measured from DataSF parcel blocks `0354001` and `0353001` |
-| Axis-aligned XY bbox | ~126.1 m × 66.3 m — expected, the plaza is 8.85° off the world axes |
+| Axis-aligned XY bbox | 128.5 m × 67.6 m as built — the 8.85° rotation of the right-of-way, widened by the planting beds' 2 m overhang and the tree crowns (this plan first said 126.1 × 66.3, the right-of-way alone) |
 | Triangle cap | 16,000 |
 | Category | `0` (Miscellaneous — the slot Civic Center Plaza, Palace of Fine Arts, Coit Tower and Chase Center use) |
 
@@ -806,7 +806,15 @@ for its `yaw: 90`. Verify it by render rather than trusting the arithmetic.
    positions in 2.7 are eyeballed from aerial imagery. Only the right-of-way, the anchor,
    the terrain drape, the monument's footprint and the monument's height are survey-grade.
    Label the rest *estimated* in `REFERENCE.md` and do not let the report imply otherwise.
-6. **The plaza may stop being a plaza.** The SFMTA closure runs to 31 August 2027 and is a
+6. **Corrected at stage 2 — the height datum.** This plan's Part 1 asked for
+   `max_z == 10.67 m` and a manifest `targetHeightM` of 10.67. That is incompatible with the
+   terrain drape the same Part 1 mandates: once z = 0 means the anchor's ground, the export
+   spans −1.50 to +11.27 m and the loader's `targetHeightM / bbox height` scale must be
+   computed against the 12.80 m extent. The shipped values are in
+   `artifacts/fulton-plaza/REPORT.md`, which beats this plan. The monument is still 10.668 m
+   of monument and still the model's crest.
+
+7. **The plaza may stop being a plaza.** The SFMTA closure runs to 31 August 2027 and is a
    renewable permit, not a permanent change; the street is still a street in DataSF, which
    is exactly why a ribbon still bakes under it. If the closure lapses, this asset becomes
    historical rather than wrong — but the bollards would be the first thing to remove.
