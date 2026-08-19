@@ -452,7 +452,20 @@ sweep:  r=13 -> 2 rings   r=16..41 -> 3 rings (correct)   r=42 -> 4 (eats the po
 
 The safe window is **16–41 m**; `exclude: 28` sits in the middle with 12.4 m of
 headroom over the last target and 13.1 m under the neighbour. THREE rings is the
-correct answer, not one. Do not raise past 41 without re-running the sweep.
+correct answer against the raw inputs — but **the bake drops TWO**, because
+`buildings.mjs` dedupes Overture against DataSF before excluding, so the Overture
+copy was never baked as its own footprint. Settled from the tile, not from the
+counts: in `origin/main`'s `23_10.bin` three footprints reach within 60 m of this
+anchor (centroids 5.23 / 29.33 / 59.38 m); after the re-bake only the 59.38 m one
+survives, nearest vertex 40.83 m — 12.8 m clear of the radius. The two that went
+were 7.4 m and 6.1 m tall: the baked Hyatt was a podium block, not a tower.
+
+`verify-rebake` also reports cell **23_13** changing (169 → 182 footprints). That
+is **not** this radius. The control the tool itself prescribes was run — remove
+the entry from `landmarks.mjs`, re-run `buildings.mjs` — and 23_13 still differs
+from `origin/main` by exactly the same amount, as the *only* cell that differs.
+It is the `pipeline/data/` snapshot vintage, not the exclusion. In batch mode the
+bake is discarded anyway, so nothing about 23_13 ships from this branch.
 
 Registry entry:
 
@@ -464,13 +477,15 @@ Registry entry:
   lat: 37.7943469,
   height: 80.8,
   exclude: 28,
-  camera: { distance: 430, yaw: 85, pitch: 24 },
+  camera: { distance: 420, yaw: 160, pitch: 28 },
 }
 ```
 
-`camera.yaw` is `180 - true bearing` of the eye. Bearing 95 deg puts the eye over
-Embarcadero Plaza looking WSW — the classic view, prow left, terraces falling away
-to the right.
+`camera.yaw` is `180 - true bearing` of the eye. Bearing 20 deg (NNE) is the one
+quarter that shows both recognition cues at once: the plaza prow (outward normal
+45.8) and the terrace field on the north-west frontage (351.2). Pitch 28 at 420 m
+puts the eye 197 m up, clear of Embarcadero Center 4's ~171 m roof, which stands
+directly across the north-west site line.
 
 ### 2.14 Validation checklist
 

@@ -2545,6 +2545,58 @@ export const LANDMARKS = [
     // destination.
     camera: { distance: 165, yaw: 270, pitch: 26 },
   },
+  // John Portman's 1973 stepped concrete wedge at the foot of Market Street.
+  // Measured against the real bake inputs (buildings_datasf.geojson +
+  // overture_buildings.geojsonseq) from this anchor. `excluded()` in
+  // pipeline/buildings.mjs drops a footprint when its ring centroid OR any ring
+  // vertex falls inside the circle:
+  //
+  //   TARGET rings - THREE, not one. Overture traces the whole building; DataSF
+  //   splits it into a Market half and a terraced half (which is also the
+  //   evidence for the section - see docs/asset-plans/hyatt-regency.md 2.3):
+  //     overture 2121409a  h 83    6672 m2  centroid  0.00  nearest vertex 31.21
+  //     datasf   ...0636   h 63.2  3211 m2  centroid 12.91  nearest vertex 19.62
+  //     datasf   ...0477   h 36.7  3730 m2  centroid 15.54  nearest vertex 19.62
+  //   nearest NEIGHBOUR (the Embarcadero Center 4 podium):
+  //     datasf   ...0734   h 10.0  3164 m2  centroid 65.30  nearest vertex 41.11
+  //     overture be43e192  h 17.0  3090 m2  centroid 61.72  nearest vertex 46.75
+  //
+  //   exclude 13 m    -> drops 2 rings  (misses the second DataSF half)
+  //   exclude 16-41 m -> drops 3        (correct)
+  //   exclude 42 m    -> drops 4        (eats the EC4 podium on its nearest vertex)
+  //
+  // Safe window 16-41 m. 28 is the middle: 12.4 m of headroom over the last
+  // target and 13.1 m under the neighbour. Do not raise past 41 without
+  // re-running the sweep.
+  //
+  // THE BAKE DROPS TWO, NOT THREE, AND THAT IS CORRECT. The sweep above counts
+  // rings in the raw INPUT files; buildings.mjs dedupes Overture against DataSF
+  // before excluding, so the Overture copy of this building was never baked as
+  // its own footprint. Settled from the tile rather than from the counts, which
+  // cell 23_13's unrelated churn would otherwise confuse: in origin/main's
+  // 23_10.bin three footprints reach within 60 m of this anchor (centroids
+  // 5.23 m / 29.33 m / 59.38 m); after the re-bake only the 59.38 m one
+  // survives, its nearest vertex 40.83 m out, i.e. 12.8 m clear of the radius.
+  // The two that went were 7.4 m and 6.1 m tall - the baked Hyatt was a podium
+  // block, not a tower, which is why the exclusion matters for the base and not
+  // for the crown. The 28 m circle does NOT reach the EC4 podium, so
+  // that neighbour keeps its procedural block and the join is a hard edge -
+  // accepted, see the plan's 2.15 risk 5.
+  {
+    id: 'hyattRegency',
+    name: 'Hyatt Regency San Francisco',
+    lon: -122.3958308,
+    lat: 37.7943469,
+    height: 80.8,
+    exclude: 28,
+    // Camera offset is (sin yaw, ., cos yaw) with +z south, so the eye sits at
+    // true bearing 180 - yaw. Bearing 20 (NNE) is the one quarter that shows
+    // both recognition cues at once: the Embarcadero Plaza prow (outward normal
+    // 45.8) and the terrace field on the north-west frontage (351.2). Pitch 28
+    // at 420 m puts the eye 197 m up, clear of Embarcadero Center 4's ~171 m
+    // roof standing directly across the north-west site line. No `key`.
+    camera: { distance: 420, yaw: 160, pitch: 28 },
+  },
 ];
 
 // Parks/green spaces the landcover bake must match at least one source polygon

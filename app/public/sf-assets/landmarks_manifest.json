@@ -1692,5 +1692,24 @@
     ],
     "tris": 9262,
     "loadRadius": 2500
+  },
+  {
+    "id": "hyatt-regency",
+    "file": "hyatt-regency.glb",
+    "anchor": [
+      -122.3957275,
+      37.7942899
+    ],
+    "targetHeightM": 80.8,
+    "cat": 7,
+    "name": "Hyatt Regency San Francisco",
+    "estimated": false,
+    "dims": [
+      121.1997,
+      98.796,
+      80.8
+    ],
+    "tris": 13604,
+    "loadRadius": 2500
   }
 ]
