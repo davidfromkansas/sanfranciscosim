@@ -3160,6 +3160,91 @@ export const LANDMARKS = [
     // the canopy are the whole recognition.
     camera: { distance: 120, yaw: 85, pitch: 26 },
   },
+  {
+    // Measured against the real bake input (DataSF ynuv-fyni footprints, plus
+    // the Overture/OSM ring for the same building), by nearest ring VERTEX and
+    // by centroid — excluded() in buildings.mjs fires on either:
+    //
+    //    0.62 m  this building's own DataSF footprint (SF3775039, 278.6 m2),
+    //            via CENTROID. Its own nearest vertex is 4.76 m out.
+    //    1.36 m  the SAME building's Overture/OSM ring (way/71211339), also via
+    //            centroid — the two traces disagree by 1.4 m. In the event only
+    //            ONE ring drops: Overture is gap-fill only, and DataSF already
+    //            covers this footprint, so the second trace never reaches the
+    //            bake. Measured, not assumed — verify-rebake reports cell 23_13
+    //            going 201 -> 200 and no other cell moving at all.
+    //    7.18 m  41-43 South Park (SF3775040) — a PARTY-WALL neighbour, and the
+    //            first thing at risk
+    //   15.67 m  the Gran Oriente Filipino Masonic Temple, 95 Jack London Alley
+    //            (SF3775039's second footprint, same lot). It must SURVIVE: it
+    //            is a separate 1951 building this asset does not contain, and
+    //            there is no extraExclusions entry for it on purpose.
+    //   21.48 m  101 South Park
+    //
+    // Safe window (1.4, 7.18) m. 3 sits in it with 1.6 m of margin below and
+    // 4.2 m above, and matches the rest of this block — 165SouthPark uses 1.3,
+    // 160SouthPark 1.2, 132SouthPark 2, 106SouthPark 2.1, 101SouthPark 4. On a
+    // party-wall site the radius must NOT reach this footprint's own far
+    // corners (up to 15.4 m); reaching them would delete both neighbours.
+    id: '49SouthPark',
+    name: 'Gran Oriente Filipino Residence (45-49 South Park)',
+    lon: -122.3935929,
+    lat: 37.7814646,
+    height: 13.0,
+    exclude: 3,
+    // Camera offset is (sin yaw, ., cos yaw) with +z south, so camera bearing =
+    // 180 - yaw and yaw 270 stands the eye due WEST — the bisector of the South
+    // Park front (315.8 deg) and the Jack London Alley flank (225.8 deg). Both
+    // elevations are hero elevations here and the rounded corner turret joins
+    // them, so the corner is the only view worth flying to. 165 m suits a 13 m
+    // building (cf. 106SouthPark at 150 for 11.58 m, 181SouthPark at 190 for
+    // 16.5 m). No `key`: at 13 m this is texture in the block, not a
+    // destination.
+    camera: { distance: 165, yaw: 270, pitch: 26 },
+  },
+  {
+    // Measured against the real bake input (DataSF ynuv-fyni footprints, plus
+    // the Overture/OSM ring for the same building), by area-weighted ring
+    // CENTROID and by nearest ring VERTEX -- excluded() in buildings.mjs fires
+    // on either:
+    //
+    //    0.00 m  this building's own Overture/OSM ring (way/256969674), via
+    //            centroid: the ring's centroid IS this anchor.
+    //    1.83 m  this building's own DataSF footprint (SF3715002, 625 m2), also
+    //            via centroid. Its own nearest vertex is 20.40 m out -- this is
+    //            a 41.9 x 13.9 m through-lot, so every corner is far away and
+    //            only the centroid test can reach it.
+    //   13.95 m  the Audiffred Building's Overture/OSM ring (way/193054136), via
+    //            centroid -- a PARTY-WALL neighbour sharing two of this
+    //            footprint's vertices, and the first thing at risk.
+    //   14.27 m  the seven-storey office to the south-east (SF3715003), via
+    //            centroid -- the other party wall.
+    //   14.55 m  the Audiffred's DataSF footprint (SF3715001), via centroid.
+    //   15.60 m  the south-east office's Overture/OSM ring (way/193054135).
+    //   28.35 m  the next lot south-east (SF3715025).
+    //
+    // Safe window (1.83, 13.95) m. 5 sits in it with 2.7x of margin below and
+    // 2.8x above, and is the largest radius this block can carry: both long
+    // sides are literal party walls, so reaching this footprint's own far
+    // corners (20.4 m) would delete both neighbours.
+    id: '110Embarcadero',
+    name: 'The Commonwealth Club (110 The Embarcadero)',
+    // The FOOTPRINT centroid, which is what the exclusion above is measured
+    // from. The manifest anchor is 0.09 m away because it is the model's XY
+    // bbox centre, and the roof fascia projects past the Embarcadero face.
+    lon: -122.3926624,
+    lat: 37.7932325,
+    height: 17.4,
+    exclude: 5,
+    // Camera offset is (sin yaw, ., cos yaw) with +z south, so camera bearing =
+    // 180 - yaw; yaw 135 stands the eye at bearing 45 -- north-east, out on The
+    // Embarcadero, looking back down the long axis over the glass front and
+    // across the roof terrace to the Steuart pediment beyond. That is the only
+    // view that carries both of this building's faces at once. 190 m suits a
+    // 17.4 m building (cf. 181SouthPark at 190 for 16.5 m). No `key`: this is
+    // block texture on the waterfront, not a destination.
+    camera: { distance: 190, yaw: 135, pitch: 26 },
+  },
 ];
 
 // Parks/green spaces the landcover bake must match at least one source polygon
