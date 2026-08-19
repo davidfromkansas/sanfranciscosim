@@ -10,8 +10,10 @@ toy-diorama city. Authored 18 August 2026 from
 
 | | |
 |---|---|
+| File on disk | **411,648 B = 402 KB** (meshopt-compressed; budget 500 KB) |
 | Triangles | **17,064** / 24,000 budget |
-| Objects | 1,027 (the loader merges them to one body mesh + one glow set) |
+| Objects | 14 (the loader merges them to one body mesh + one glow set) |
+| Draw primitives | 16 |
 | Dimensions | 62.95 x 62.493 x **67.06** m |
 | Min Z | 0.000 | 
 | XY centre offset | 0.0002, −0.0007 m |
@@ -19,12 +21,14 @@ toy-diorama city. Authored 18 August 2026 from
 | Materials | 13, all `Toy_*`, 3 of them `_Glow` |
 | Image textures / transparency | 0 / 0 |
 | Cameras, lights, animation, armatures, constraints | 0 |
-| Normals | PASS — 0 inverted signed volumes, ray residual **0.0000%** (gate 0.15%) |
+| Normals | PASS — 0 inverted signed volumes, ray residual **0.0032%** (gate 0.15%), 0 invalid loop normals |
 | Anchor | `-122.3916888, 37.7915643` |
 | Headings | Steuart NE **44.2°** · SE **134.8°** · SW **224.5°** · Howard NW **314.9°** |
 
-`validation.json` records the full fresh-scene re-import report. **Overall: PASS**,
-15 of 15 contract checks.
+`validation.json` records the full fresh-scene re-import report and is written
+against the **shipped (stage-4 optimized) file**. **Overall: PASS**, 15 of 15
+contract checks. The pre-optimize build measured the same 17,064 triangles across
+1,027 objects in a 1,344 KB file; see `optimize/REPORT.md`.
 
 The XY bounding box is 62.95 x 62.49 m even though no elevation is longer than
 47.0 m: that is the 45°-heading bounding box of a 40.5 x 47.0 m lot (62.10 x
@@ -37,7 +41,8 @@ canopy that oversails the Steuart Lane sidewalk. Not a scale error.
 |---|---|
 | `build_one_steuart_lane.py` | deterministic build; `blender -b --python build_one_steuart_lane.py` |
 | `one-steuart-lane.blend` | the authored scene |
-| `one-steuart-lane.glb` | **the asset** |
+| `one-steuart-lane.glb` | **the shipping asset** — the stage-4 optimized file |
+| `optimize/` | stage-4 shrink pass: scripts, A/B renders, gates, and `input/` holding the pre-optimize original byte-for-byte |
 | `render_one_steuart_lane.py` | review rig; `-- --fast` for Workbench/EEVEE, `--night`, `--only top\|aerial\|elev` |
 | `validate_one_steuart_lane.py` | fresh-scene contract validation → `validation.json` |
 | `make_contact_sheet.py` | composes the contact sheet from the rendered tiles |
@@ -123,6 +128,14 @@ the tower body is authored at absolute heights, so nothing else moves.
 
 Setback depths are inferred, sized only by a gross-floor-area cross-check
 (~29,600 m2 modelled against 335,000 sq ft = 31,120 m2 published, −5%).
+
+## Stage 4 — optimize
+
+1,344 KB → **402 KB raw (−70.1%)**, 1,027 objects → 14, 1,033 draw primitives →
+16, triangles and bounding box unchanged, all eight gates PASS, worst A/B pixel
+delta 0.0056% against a 2% gate. Full metrics, the waste census, the two
+deliberate skips (limited dissolve, interior-face deletion) and the one
+documented toolchain substitution are in `optimize/REPORT.md`.
 
 ## Renders
 
