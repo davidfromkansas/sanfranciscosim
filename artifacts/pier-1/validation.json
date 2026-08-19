@@ -5,7 +5,7 @@
   "reimported_final_glb": true,
   "object_count": 792,
   "mesh_object_count": 792,
-  "triangle_count": 13304,
+  "triangle_count": 13330,
   "triangle_budget": 24000,
   "dimensions_m": [
     215.4308,
@@ -124,9 +124,9 @@
   "degenerate_triangle_count": 0,
   "invalid_or_nonunit_loop_normal_count": 0,
   "normal_ray_cast_first_hits": 17425,
-  "normal_ray_cast_flipped_visible_faces": 250,
-  "normal_ray_cast_flipped_fraction": 0.014347,
-  "normal_orientation_status": "FAIL",
+  "normal_ray_cast_flipped_visible_faces": 0,
+  "normal_ray_cast_flipped_fraction": 0.0,
+  "normal_orientation_status": "PASS",
   "normal_orientation_method": "All source meshes run bmesh.ops.recalc_face_normals before export; reimported loop normals must be finite/unit; per-object signed volume is authoritative for this union of solids; 31,500 deterministic visibility rays test the first visible face from nine interior targets, with a 0.15% residual allowed at coincident faces.",
   "unexpected_geometry_or_objects": [],
   "material_contract_violations": [],
@@ -145,12 +145,10 @@
   "target_height_is_vertical_extent": true,
   "origin_convention": "Local Z = 0 is the TOP OF THE PIER DECK, not the model's lowest point. placeGeneric() seats the origin on one terrain sample at the anchor and the app's DEM carries this pier as a ~2.4 m ridge, so a model sitting on z = 0 would float 2.6 m above its own deck. The deck fascia and pile stubs therefore run to z = -2.6 m and min_z_m is NEGATIVE BY DESIGN. See docs/asset-plans/pier-1.md 2.3.",
   "open_glow_strip_faces": 74,
-  "open_glow_strip_outward_faces": 73,
-  "signed_volume_outward_objects": 753,
-  "signed_volume_inverted_objects": [
-    "shed_cope",
-    "voussoirs"
-  ],
+  "open_glow_strip_outward_faces": 74,
+  "open_glow_strip_inward_objects": [],
+  "signed_volume_outward_objects": 755,
+  "signed_volume_inverted_objects": [],
   "object_details": [
     {
       "name": "arch_band",
@@ -13625,7 +13623,7 @@
     },
     {
       "name": "voussoirs",
-      "triangles": 74,
+      "triangles": 100,
       "location": [
         0.0,
         0.0,
@@ -15215,11 +15213,11 @@
     "no_animation_skin_or_constraints": true,
     "transforms_applied": true,
     "no_negative_scales": true,
-    "normals_outward_signed_volume": false,
-    "glow_strips_face_outward": false,
-    "normals_outward_ray_residual_within_tolerance": false,
+    "normals_outward_signed_volume": true,
+    "glow_strips_face_outward": true,
+    "normals_outward_ray_residual_within_tolerance": true,
     "no_degenerate_geometry": true,
     "no_unexpected_objects": true
   },
-  "overall": "FAIL"
+  "overall": "PASS"
 }

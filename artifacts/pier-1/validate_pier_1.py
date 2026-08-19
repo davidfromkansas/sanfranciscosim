@@ -156,6 +156,7 @@ def main():
     volume_bad = []
     glow_strip_faces = 0
     glow_strip_outward = 0
+    glow_strip_bad = []
     for obj in meshes:
         # The night-glow surfaces are deliberately OPEN single-layer strips, not
         # closed shells: the app draws _Glow in a separate translucent layer, and
@@ -182,6 +183,8 @@ def main():
                 )
                 if hit and hn.dot(nrm) > 0.9:
                     glow_strip_outward += 1
+                else:
+                    glow_strip_bad.append(obj.name)
             ev.to_mesh_clear()
             continue
     for obj in meshes:
@@ -263,6 +266,7 @@ def main():
         ),
         "open_glow_strip_faces": glow_strip_faces,
         "open_glow_strip_outward_faces": glow_strip_outward,
+        "open_glow_strip_inward_objects": sorted(set(glow_strip_bad)),
         "signed_volume_outward_objects": volume_ok,
         "signed_volume_inverted_objects": sorted(volume_bad),
         "object_details": sorted(object_rows, key=lambda x: x["name"]),

@@ -261,7 +261,10 @@ def rim(name, poly_xy, thickness, z0, z1, mat):
         faces.append((2 * n + j, 2 * n + i, 3 * n + i, 3 * n + j))      # inside
         faces.append((n + i, n + j, 3 * n + j, 3 * n + i))              # top
         faces.append((j, i, 2 * n + i, 2 * n + j))                      # bottom
-    return new_mesh(name, verts, faces, [mat], recalc=False)
+    # recalc=True: the band is a closed manifold shell, so bmesh can settle the
+    # winding. Hand-wound, it came out inside-out on the concave taper corner and
+    # failed the validator's signed-volume test.
+    return new_mesh(name, verts, faces, [mat], recalc=True)
 
 
 def prism(name, poly_xy, z0, z1, mat, mat_top=None):
@@ -286,15 +289,30 @@ def box(name, a0, a1, p0, p1, z0, z1, mat, mat_top=None):
                  mat, mat_top)
 
 
-def glow_quad(name, a0, a1, p0, p1, z0, z1, mat, outward):
+def glow_quad(name, a0, a1, p0, p1, z0, z1, mat, out_dir):
     """One OPEN, single-layer, outward-facing quad. Night glow is never a closed
     shell: the app draws _Glow in a separate translucent layer, so a box shows
-    its front AND back face and reads at roughly twice the intended day alpha."""
+    its front AND back face and reads at roughly twice the intended day alpha.
+
+    `out_dir` is the actual outward direction in the pier frame as `(da, dp)` —
+    e.g. `(-1, 0)` for the Embarcadero facade, `(0, -1)` for the shed's
+    north-west flank. The winding is then CHECKED against it and flipped if it
+    disagrees, rather than being derived by hand from a sign flag: the flag
+    version got the facade quads backwards and the mistake was invisible in the
+    renders, because nothing here culls back faces."""
     c = [W(a0, p0), W(a1, p1)]
     verts = [(c[0][0], c[0][1], z0), (c[1][0], c[1][1], z0),
              (c[1][0], c[1][1], z1), (c[0][0], c[0][1], z1)]
-    # Winding is set explicitly, never recalculated, so the one face points out.
-    faces = [(0, 1, 2, 3)] if outward > 0 else [(3, 2, 1, 0)]
+    ex = (verts[1][0] - verts[0][0], verts[1][1] - verts[0][1], 0.0)
+    ey = (0.0, 0.0, z1 - z0)
+    nrm = (ex[1] * ey[2] - ex[2] * ey[1],
+           ex[2] * ey[0] - ex[0] * ey[2],
+           ex[0] * ey[1] - ex[1] * ey[0])
+    ox = out_dir[0] * U[0] + out_dir[1] * V[0]
+    oy = out_dir[0] * U[1] + out_dir[1] * V[1]
+    faces = [(0, 1, 2, 3)] if (nrm[0] * ox + nrm[1] * oy) > 0 else [(3, 2, 1, 0)]
+    # Winding is set explicitly, never recalculated: an open strip has no inside
+    # for recalc_face_normals to reason about.
     return new_mesh(name, verts, faces, [mat], recalc=False)
 
 
@@ -581,7 +599,7 @@ def build():
                 WING_GF_Z[1] - 0.70, mats["Toy_glassl"])
             glow_quad(f"wgf_{wi}_{b}_glow", A_FRONT - 0.10, A_FRONT - 0.10,
                       pc - bw / 2, pc + bw / 2, WING_GF_Z[0], WING_GF_Z[1],
-                      mats["Toy_glassl_Glow"], -1)
+                      mats["Toy_glassl_Glow"], (-1, 0))
 
     # 4. the frontispiece: pavilion, quoins, entablature, pediment, arch.
     #
@@ -642,13 +660,19 @@ def build():
         for p, z in prof_o:
             x, y = W(a_at, p)
             verts.append((x, y, z))
+    # Vertex blocks: [0, m) inner arc at a0 · [m, 2m) outer arc at a0 ·
+    # [2m, 3m) inner arc at a1 · [3m, 4m) outer arc at a1.
     m = len(prof)
+    k = 2 * m
     for i in range(m - 1):
-        faces.append((i, i + 1, m + i + 1, m + i))
-        k = 2 * m
-        faces.append((k + i + 1, k + i, k + m + i, k + m + i + 1))
-        faces.append((i, m + i, k + m + i, k + i))
-        faces.append((i + 1, k + i + 1, k + m + i + 1, m + i + 1))
+        faces.append((i, i + 1, m + i + 1, m + i))                       # front
+        faces.append((k + i, k + m + i, k + m + i + 1, k + i + 1))       # back
+        faces.append((i, k + i, k + i + 1, i + 1))                       # soffit
+        faces.append((m + i, m + i + 1, k + m + i + 1, k + m + i))       # extrados
+    # Cap both springing ends, or the archivolt is an open tube with no signed
+    # volume for the validator's authoritative normals test to work on.
+    faces.append((0, m, k + m, k))
+    faces.append((m - 1, k + m - 1, k + 2 * m - 1, 2 * m - 1))
     new_mesh("voussoirs", verts, faces, [mats["Toy_white"]])
     box("arch_band", A_PAV - 0.14, A_PAV - 0.04, PAV_P - ARCH_W / 2 + 0.5,
         PAV_P + ARCH_W / 2 - 0.5, 3.55, 4.15, mats["Toy_navy"])
@@ -658,7 +682,8 @@ def build():
         4.15, ARCH_SPRING + ARCH_W / 2 - 0.4, mats["Toy_glassl"])
     glow_quad("arch_glow", A_PAV - 0.20, A_PAV - 0.20,
               PAV_P - ARCH_W / 2 + 0.35, PAV_P + ARCH_W / 2 - 0.35,
-              0.3, ARCH_SPRING + ARCH_W / 2 - 0.5, mats["Toy_glassl_Glow"], -1)
+              0.3, ARCH_SPRING + ARCH_W / 2 - 0.5, mats["Toy_glassl_Glow"],
+              (-1, 0))
 
     # 5. the shed: one lofted solid so the taper is a real chamfer, not a step.
     shed_poly = [(A_BULK_BACK, 0.0), (A_SHED_END, 0.0),
@@ -710,7 +735,7 @@ def build():
                 glow_quad(f"scl_{b}_{side}_glow", a0 + 1.5, a1 - 1.5,
                           p_w + out * 0.07, p_w + out * 0.07,
                           SHED_CLERE_Z[0], SHED_CLERE_Z[1],
-                          mats["Toy_glass_Glow"], out)
+                          mats["Toy_glass_Glow"], (0, out))
             nb += 1
         # belt course, run per bay so it follows the taper
         for side in (0, 1):

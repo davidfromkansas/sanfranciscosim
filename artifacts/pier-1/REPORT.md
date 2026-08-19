@@ -12,7 +12,7 @@ what was built and why.
 | | |
 |---|---|
 | Objects | 792 |
-| Triangles | 13,304 (cap 24,000) |
+| Triangles | 13,330 (cap 24,000) |
 | Dimensions (axis-aligned) | 215.43 × 185.43 × 15.40 m |
 | Vertical extent = `targetHeightM` | **15.400 m** — loader scale 1.0000 |
 | bbox min Z | **−2.60 m** (deliberate, see §2) |
@@ -21,6 +21,7 @@ what was built and why.
 | Manifest anchor | **−122.3941164, 37.7974191** |
 | Long-axis heading | 053.77° true; facade normal 233.77° |
 | Raw GLB | 1,051 KB (149.6 KB gzip) — meshopt compression is stage 4's job |
+| Contract validation | **PASS**, all 18 checks; 0 / 17,425 flipped ray hits; 74 / 74 glow faces outward; no inverted solids |
 | Materials | 11 `Toy_*`, of which 2 `_Glow` |
 
 The axis-aligned XY box is 215 × 185 m for a pier that is 234 × 55 m. That is the expected
@@ -96,6 +97,12 @@ Four, all re-measured during this build and carried into `REFERENCE.md` §8:
 | 9 | The top view rendered the pier diagonally across a 2600×900 frame and cropped both ends | For a top-down camera image-right maps to world `(cos rz, sin rz)`, so `rz = 90 − AXIS` |
 | 10 | The deck stepped out to meet the bulkhead's own 50.6 m face and left a wart beside the frontispiece | The SE deck edge runs as one converging line |
 | 11 | Night render at emission strength 3.0 blew the cool clerestory to flat white | 1.8 — the app's night layer draws `_Glow` at its own base colour with no multiplier, so a strong push here would flatter a wrong colour |
+| 12 | `shed_cope` was inside-out — the parapet band was hand-wound and flipped on the taper's concave corner | `rim()` now lets bmesh settle the winding; the band is a closed manifold shell |
+| 13 | `voussoirs` had no usable signed volume: the archivolt was built as a radial quad at *every* profile index — a stack of internal partitions — with its two springing ends left open | Rebuilt as two longitudinal surfaces (soffit + extrados) plus two end caps |
+| 14 | One glow quad faced inward, and every facade glow quad was wound backwards without it showing in any render (nothing here culls back faces) | `glow_quad()` now takes the real outward direction as a `(da, dp)` vector and **checks** its own winding against it, instead of deriving it from a ±1 flag |
+
+Iterations 12–14 were all found by `validate_pier_1.py`, not by looking at renders,
+and the ray residual fell 1.43% → 0.19% → **0.00%** across them.
 
 ## 5. Night state
 
@@ -157,7 +164,7 @@ Draft manifest entry:
   "name": "Pier 1",
   "estimated": false,
   "dims": [215.4314, 185.4287, 15.4],
-  "tris": 13304,
+  "tris": 13330,
   "loadRadius": 3000
 }
 ```
