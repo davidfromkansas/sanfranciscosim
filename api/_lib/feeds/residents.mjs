@@ -819,7 +819,14 @@ async function readState() {
     if (!found || found.statusCode !== 200) return;
     const saved = JSON.parse(await new Response(found.stream).text());
     if (saved.version !== STATE_VERSION) return; // shape changed; start fresh
-    etag = found.blob.etag;
+    // get() reports the etag in HTTP weak form — `W/"abc"` — but put()'s
+    // ifMatch only accepts the strong form `"abc"`, and treats the mismatch as
+    // a precondition failure. So every write conditioned on an etag learned
+    // from READING failed, always, while writes conditioned on an etag from a
+    // previous WRITE succeeded — which is why one long-lived dev server saved
+    // fine and every fresh serverless instance "lost" a race that never
+    // happened. Strip the weak marker at the only place a read hands us one.
+    etag = found.blob.etag.replace(/^W\//, "");
     // Drop anything already past its life rather than reviving a stale feed.
     const now = Date.now();
     const kept = (saved.threads ?? []).filter(
@@ -828,7 +835,16 @@ async function readState() {
     const changed = kept.length !== live.length;
     live.length = 0;
     live.push(...kept);
-    if (Number.isInteger(saved.lastWindow)) lastWindow = saved.lastWindow;
+    // FORWARD only. This adopts a window another instance has already used, so
+    // two servers do not both post into it — but it must never rewind ours. It
+    // used to assign unconditionally, which was harmless while restore() ran
+    // once per instance and became a live-lock the moment it ran on every read:
+    // a tick would claim the window, the next visitor's read would reset the
+    // claim from a blob that had not been updated yet, and the following minute
+    // every instance thought it was due again. They generated at once, fought
+    // over one etag, and all but one threw the work away.
+    if (Number.isInteger(saved.lastWindow) && saved.lastWindow > lastWindow)
+      lastWindow = saved.lastWindow;
     // Only when the count moves. This runs on every read now, and a line a
     // minute per instance saying the same number is how a log stops being
     // somewhere you look.
@@ -864,12 +880,42 @@ async function persist() {
     etag = saved.etag;
   } catch (error) {
     if (error instanceof BlobPreconditionFailedError) {
-      // Another instance got there first. Theirs stands; ours is dropped, and
-      // the next cold start will read whatever won.
+      // Another instance wrote after we read. Do NOT throw this tick's work
+      // away — the posts in `live` cost real generation calls, and "skipping"
+      // here is how a whole evening of posts got paid for and never shown.
+      // Merge instead: re-read what won, fold in any thread of ours it lacks,
+      // and write once more against the fresh etag. One retry only; two
+      // instances cannot both lose the second round with fresh etags, and if
+      // something stranger is going on the next tick's merge picks it up.
       console.warn(
-        `${SUBREDDIT.name}: another instance saved first — skipping`,
+        `${SUBREDDIT.name}: another instance saved first — merging over it`,
       );
+      const ours = [...live];
       etag = null;
+      await restore(); // refreshes both `live` and the etag from the winner
+      const have = new Set(live.map((t) => t.id));
+      for (const t of ours) if (!have.has(t.id)) live.push(t);
+      live.sort((a, b) => b.startedAt - a.startedAt);
+      try {
+        const again = await put(
+          STATE_PATH,
+          JSON.stringify({ version: STATE_VERSION, lastWindow, threads: live }),
+          {
+            access: "private",
+            contentType: "application/json",
+            allowOverwrite: true,
+            cacheControlMaxAge: 60,
+            ...blobAuth(),
+            ...(etag ? { ifMatch: etag } : {}),
+          },
+        );
+        etag = again.etag;
+      } catch (retryError) {
+        etag = null;
+        console.warn(
+          `${SUBREDDIT.name}: merge retry failed — ${retryError.message}`,
+        );
+      }
       return;
     }
     // Any other failure — the blob deleted underneath us, a transient network
