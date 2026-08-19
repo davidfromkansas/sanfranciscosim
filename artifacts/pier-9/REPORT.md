@@ -97,6 +97,39 @@ submeshes, appearance identical within gates (worst 0.33 % night far). The shipp
 `pier-9.glb` re-passed the full stage-2 contract validator after the swap; the original
 is archived at `optimize/input/pier-9.glb`.
 
+## Stage 5 (integration, batch mode) — local QA
+
+Case B integrated on this branch as **source only** (batch mode): the GLB at
+`app/public/sf-assets/landmarks/pier-9.glb`, the manifest entry (text-appended), and the
+`pier9` registry entry with the solved three-zone exclusion. The full bake was run for
+QA and then discarded (`git checkout -- app/public/tiles api/_data`).
+
+Bake evidence (before discard):
+
+| Check | Result |
+|---|---|
+| `verify-rebake` | **PASS** — 584/585 cells unchanged; only 23_9 moved (17 -> 16); all three zones show clear ground (111.1 m vs 80, 75.2 m vs 14, 63.0 m vs 12) |
+| `audit` 1.6 | **PASS** — 116 zones over 110 landmarks clear (1.2b/1.3c/1.7b FAILs are pre-existing dataset items, untouched by this change) |
+| Tile replay | zero surviving footprints within 130 m of the anchor, both tiers, cells 22_9 + 23_9 |
+| Overture retarget check | Pier 15 tops identical to origin/main in both tiers (15.4 / 13.7) |
+
+Local QA (`qa_local.mjs`, built app in GPU-backed headless Chrome — under parallel-session
+load ~300 the SwiftShader rasterizer never produced a first frame, so the driver now uses
+the real GPU; screenshots in `qa/`):
+
+| Check | Result |
+|---|---|
+| Merge line | `sf-assets: pier-9 merged 19 objects / 13 materials -> batched (7171 tris body); uniform x1.0000 at 3581, -3390` |
+| Uniform scale | **x1.0000** |
+| Seat | **y = 2.492** on the DEM deck ridge (the deck-top origin working as designed; 0 would mean the anchor drifted to open water) |
+| Draw calls | avg 88/frame at the landmark (< 300) |
+| Warnings | none |
+| Night | lit monitor stretches + amber lamp line + lookout read; arch faces the Embarcadero |
+| Fallback drill (`--drill`) | app boots, loader attempts the GLB, **exactly one** `pier-9 failed to load` warning, site left as empty water inside the zones — Case B expected |
+
+The white diagonal ribbon crossing the pier in the QA shots is the baked Pier 7
+recreational walkway (a verified keeper at 169 m) — real city geometry, not collateral.
+
 ## Approval
 
 - Stage 3 (2026-08-19): approval granted by standing instruction in the session brief —

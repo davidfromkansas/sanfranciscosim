@@ -1939,5 +1939,24 @@
     ],
     "tris": 3366,
     "loadRadius": 2500
+  },
+  {
+    "id": "pier-9",
+    "file": "pier-9.glb",
+    "anchor": [
+      -122.3967994,
+      37.8006708
+    ],
+    "targetHeightM": 17.6,
+    "cat": 3,
+    "name": "Pier 9",
+    "estimated": false,
+    "dims": [
+      235.2816,
+      188.4245,
+      17.6
+    ],
+    "tris": 11788,
+    "loadRadius": 2500
   }
 ]

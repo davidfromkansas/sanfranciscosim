@@ -3160,6 +3160,26 @@ export const LANDMARKS = [
     // the canopy are the whole recognition.
     camera: { distance: 120, yaw: 85, pitch: 26 },
   },
+  {
+    id: 'pier9',
+    name: 'Pier 9',
+    lon: -122.3967994,
+    lat: 37.8006708,
+    height: 15.0,
+    // The bake carries Pier 9 as one full-pier ring per tier plus three toy
+    // rooftop-garnish blocks. One circle cannot take all five without taking
+    // Pier 15 (its nearest vertex, 111.6 m, is closer than the bulkhead
+    // garnish at 115.9 m), so two small zones sit on the garnish clusters.
+    // Solved and replay-verified in docs/asset-plans/pier-9.md 2.13.
+    exclude: 80,
+    extraExclusions: [
+      { lon: -122.3958844, lat: 37.8013416, r: 14 },
+      { lon: -122.3978390, lat: 37.8000253, r: 12 },
+    ],
+    // yaw 235 stands the eye south-west over the Embarcadero: the arched
+    // frontispiece head-on with the shed and its monitor running away NE.
+    camera: { distance: 450, yaw: 235, pitch: 20 },
+  },
 ];
 
 // Parks/green spaces the landcover bake must match at least one source polygon
