@@ -161,7 +161,41 @@ slivers that no area-based test catches and that only surface after the shipping
 The stage-2 contract validation above was re-run on the optimized file, not inherited from
 the pre-optimize build.
 
-## 8. Integration
+## 8. Local QA (stage 5)
+
+Run against `npm run dev` on the re-baked tiles, at the Embarcadero.
+
+| Check | Result |
+|---|---|
+| Merge line / scale | `uniform x1.0000 at 3818, -3031` — the authored vertical extent and `targetHeightM` agree exactly |
+| Seated height | placed at **y = 2.44 m**, the DEM ridge at the anchor. The deck lands at 2.44, the pile stubs reach −0.16 m, just under the water plane — the origin decision in §2 works as designed |
+| One building, no twin | PASS — the frontispiece stands clear on the Embarcadero with no procedural slab through it. This is what the second exclusion zone exists for and it is invisible from the aerial camera |
+| Orientation | PASS — the arched facade faces the Embarcadero at 233.8° |
+| Footprint against neighbours | PASS — the pier reads at the right length against Piers 1½/3 and the Ferry Building |
+| Night glow | PASS — the arch reads warm amber, the shopfront band supports it, the clerestory bays are cool-white dashes up the flank. Confirmed **in the app**, whose night layer draws `_Glow` at its raw base colour with no multiplier |
+| Draw calls | **73** with 74 landmarks live, against a 300 budget |
+| Asset states | 91 entries, 0 failed |
+| Lint / tests | `eslint` clean; `npm test` 26/26 pass |
+| Fallback drill | PASS — exactly one warning (`sf-assets: pier-1 failed to load …`), app still boots, 73 other landmarks live, and the Case B site is empty deck |
+| Audit 1.6 | PASS — 101 zones over 97 landmarks clear |
+| Audit 1.2b / 1.3c / 1.7b | FAIL, **pre-existing on main** — `BATCH-INTEGRATE.md` line 124 says so, and `135-south-park`'s report records the identical three with identical values |
+
+**Two QA notes for whoever runs this next.**
+
+1. **The Browser pane is backgrounded between tool calls, which throttles rAF**, so the
+   streaming scan barely ticks and every streamed landmark sits in `far` forever. That is
+   an artefact of the harness, not of the asset — one manual `SF.assets.update(camera, dt)`
+   promoted 18 entries immediately. Pump it with a `setInterval` for the duration of QA.
+   Same cause makes `renderer.info.render` report a partial frame; force one
+   `SF.renderer.render(scene, camera)` and read it straight after.
+2. **`verify-rebake` reports 23_9 as "exclusion dropped nothing (no footprint in the source
+   data?)"** and that is wrong. It compares per-cell COUNTS, and the count is 17 either way
+   because two footprints were dropped while two others shifted in from the data snapshot.
+   Decode the tile. It also flags cell 23_13 as a stray; a control bake with `pier1` removed
+   from the registry produces the identical 169 → 182 change, so that is the
+   `pipeline/data` vintage, not the radius.
+
+## 9. Integration
 
 Case **B**. The registry entry, the two-zone exclusion and its verified drop set live in
 `docs/asset-plans/pier-1.md` §2.13, which also names the collateral. Do not re-derive the
