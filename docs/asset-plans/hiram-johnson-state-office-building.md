@@ -1,13 +1,13 @@
 # Hiram W. Johnson State Office Building — SF-SIM asset plan
 
 SOM's 1998 addition to the Civic Center: a 127 m, 14-storey slab of near-white
-granite filling the northern half of the Earl Warren block, whose whole identity is
-the **shallow bow** its south front makes toward Civic Center Plaza and City Hall,
-the pale sea-green glass grid punched into the stone, and the two rounded end drums
-with their tall recessed curved glass bays. On Golden Gate Avenue a convex glass
-bay bulges out over a wide curved canopy with STATE OF CALIFORNIA cut into the
-glass. From the app's aerial camera it is a long pale roof with an arced parapet
-crest and a raised mechanical band.
+granite filling the northern half of the Earl Warren block, whose identity is the
+pale sea-green glass grid punched into near-white stone, the **two sculpted end
+drums** — a pair of convex granite piers flanking a deeply recessed curved glass
+bay at each short end — and, on Golden Gate Avenue, a convex glass bay bulging out
+over a wide curved canopy with STATE OF CALIFORNIA cut into the glass. From the
+app's aerial camera it is a long pale roof with a set-back mechanical penthouse
+running along its centre.
 
 **Deliverable:** a validated miniature GLB plus dossier, renders and report under
 `artifacts/hiram-johnson-state-office-building/`. This document is the plan only:
@@ -20,6 +20,7 @@ behind it.
 | Existing procedural builder | none — new landmark (Case B: needs a `pipeline/lib/landmarks.mjs` entry and a re-bake, see 2.14) |
 | WGS84 anchor | `-122.4179151, 37.7810345` (oriented-bounding-box centre, measured) |
 | Target height | **61.9 m** architectural crest (SOM 203 ft); main roof plane **53.6 m** |
+| Long/short faces | south and north fronts measure **flat**; the curves are at the two ends and the entrance (see 2.5) |
 | OSM footprint | 127.38 x 47.81 m oriented box, 5,614 m2 polygon (OSM way/35176304, measured) |
 | Long-axis bearing | 81.27 deg — the Civic Center grid, 8.73 deg north of due east |
 | Triangle cap | 26,000 |
@@ -96,19 +97,22 @@ Two traps, both on this block and one across the street:
 
 - A long pale slab — 127 m by 48 m by 62 m, near-white granite in large ashlar
   panels, with a dense regular grid of punched square windows
-- The **bow**: the south (Civic Center Plaza) front is a shallow convex arc, not a
-  flat wall. This is the recognition cue and SOM's own description of the design —
-  "the sweeping curve of the tallest slab gestures out toward the plaza"
-- The **two rounded end drums** (east onto Polk, west onto Larkin), each a convex
-  granite curve carrying a tall recessed **curved glass bay** ten storeys high,
-  flanked by narrow full-height louvre slots
+- The **two sculpted end drums** (east onto Polk, west onto Larkin). Each end is
+  not a flat wall and not a single round bulge: it is **two convex granite piers
+  with a deeply recessed curved glass bay between them**, the bay set back about
+  7 m, ten storeys high, in teal glass. The outer corners are cut back again. This
+  is the recognition cue, and the OSM polygon's stepped ends are the mapper's
+  polygonal trace of exactly this profile (2.5)
+- Narrow full-height **louvre slots** cut into the granite of the piers
 - The **Golden Gate Avenue entrance**: a convex curved glass bay bulging north out
   of the flat granite wall, over a wide, gently curved projecting glass-and-metal
   canopy carried on square granite piers, two storeys tall
-- The **stepped skyline**: the mass steps down at both far ends, and the parapet
-  arcs up to a crest over the centre with a set-back mechanical band above it
-- The designed roof: pale deck, arced parapet crest, mechanical penthouse cluster,
-  and the skylights over the twin ten-storey atria
+- The **top band**: the uppermost three storeys read as a lighter, more
+  continuously glazed ribbon than the punched grid below them
+- The **set-back mechanical penthouse** running along the centre of the roof,
+  above an otherwise level parapet
+- The designed roof: pale deck, level parapet ring, the long set-back mechanical
+  penthouse, and the skylights over the twin ten-storey atria
 - Night: the entrance canopy and its curved bay lit, and the two end glass bays
   glowing as the stair/atrium volumes they are
 
@@ -127,10 +131,16 @@ orientation, and gather references covering:
 - **The height.** Three numbers disagree and 2.3 reconciles them: SOM publishes
   203 ft, the 2010 city LiDAR gives a 53.61 m median roof plane and a 60.04 m
   maximum, and OSM tags `height=54`. Do not take any one of them alone.
-- **The bow.** The OSM polygon draws the south edge as a perfectly straight line
-  and the two ends as rectangular steps. Photographs show curves in both places.
-  OSM is a simplification here; the sagitta of the bow in 2.5 is *estimated* and
-  is worth one measurement against a nadir orthophoto if you can find one.
+- **SOM's "sweeping curve".** SOM's own project text says *"the sweeping curve of
+  the tallest slab gestures out toward the plaza"*. Do not turn that sentence into
+  a bowed south wall without checking: the OSM polygon's south edge is
+  mathematically straight (its four intermediate nodes are exactly collinear), and
+  a **rectilinear** re-projection of the Civic Center Plaza panorama shows the
+  parapet running dead straight next to the Earl Warren's straight cornice. A
+  cylindrical/equirectangular crop of the same panorama makes both of them arc,
+  which is how this dossier got it wrong the first time. 2.5 resolves the curve as
+  the end drums and the entrance bay. If you find a drawing that shows a curved
+  south wall, that beats this reasoning — but a panorama does not.
 
 Prefer architect/engineer publications, owner or institutional material,
 planning and permitting documents, architectural press, geolocated photography,
@@ -372,15 +382,27 @@ would do; the OBB centre is the convention for a slab of this shape.
 
 **South (Civic Center Plaza) — the hero elevation, and the only one most people
 ever read.** From the plaza, above the Earl Warren's modillion cornice, a broad
-pale wall rises for about nine storeys. It is **bowed** — a shallow convex arc
-toward the plaza, its crown at the centre, dying back into the end masses. The
-parapet follows the same arc, rising to a crest over the middle of the bow and
-stepping down at both ends, with a lower set-back mechanical band above the crest.
-The facade is a dense grid of square punched windows in near-white granite; the
-glass reads pale **sea-green** in daylight, which is the one colour on the
-building. At the far left and right the mass steps down two or three storeys.
-Sagitta of the bow over the ~110 m of curved front: **~5 m, estimated** from the
-plaza photograph and the roof band in the nadir imagery; nobody has published it.
+pale wall rises for about nine storeys. It is **flat**, not bowed — see the note
+below. The facade is a dense grid of square punched windows in near-white granite,
+grouped three-to-a-bay between wider piers; the glass reads pale **sea-green** in
+daylight, which is the one colour on the building. The uppermost three storeys
+change: the punched grid gives way to a lighter, more continuously glazed ribbon
+with thin white mullions. Above that, a level parapet, and set back behind it a
+long **mechanical penthouse** running most of the length of the roof, reading as a
+dark recessed band with pale posts.
+
+*On the curve.* SOM writes that "the sweeping curve of the tallest slab gestures
+out toward the plaza", and this dossier's first draft turned that into a 5 m bow
+across the south front. It is not there. Two independent checks: the OSM polygon's
+south edge is a straight line to within 1 cm over 91 m (nodes at E = 26.4, 51.1,
+77.5, 103.2 in the grid frame are exactly collinear), and a **rectilinear**
+re-projection of the Civic Center Plaza panorama shows the Johnson parapet running
+dead straight beside the Earl Warren's straight cornice. The arcs that appear in a
+cylindrical crop of the same panorama are the projection, not the building — the
+Earl Warren cornice arcs identically in those frames and it is known to be
+straight. The curves SOM is describing are real, but they are the **end drums and
+the north entrance bay**, which are unmistakable from three separate Street View
+positions.
 
 **North (Golden Gate Avenue) — the entrance.** A flatter granite wall with the
 same punched grid, interrupted at the centre by the building's best piece of
@@ -393,47 +415,61 @@ STATE OFFICE BUILDING** in smaller letters beneath. A flagpole stands in front.
 (Directly across the street, and in every frame, is the Phillip Burton Federal
 Building — not this asset.)
 
-**East (Polk Street) and west (Larkin Street) — the drums.** Both short ends are
-**convex granite drums**: the wall curves continuously round the corner in large
-ashlar panels, with no punched windows at all over long stretches, and tall,
-narrow, full-height **louvre slots** cut into the stone at intervals. Set into the
-middle of each drum is a tall **recessed curved glass bay** about ten storeys
-high — teal-green glass in horizontal bands with light metal spandrels — reading
-as a great glazed slot in a stone cylinder. The ground floor on Polk carries a
-small retail/café window; Larkin's base is blind stone and louvres. Above the
-drums the mass steps: the east end drops to a lower block with a flat top and a
-glazed re-entrant corner before it reaches full height.
+**East (Polk Street) and west (Larkin Street) — the drums.** The best-resolved part
+of the building, because the OSM polygon and the photographs agree exactly. Each
+short end is a five-part profile, read here off the reprojected polygon in the grid
+frame (E measured from the west face, N from the south face):
 
-**Top.** A pale roof deck inside a parapet ring that arcs with the south front. Over
-the centre, the raised crest and a set-back mechanical band reaching ~62 m. Long
-skylight strips run over the two ten-storey atria, and a cluster of low mechanical
-enclosures and a stair penthouse sit toward the Golden Gate Avenue edge. *The roof
-reading is the weakest part of this dossier* — the only imagery available is
-off-nadir and half in the building's own shadow. See 2.16.
+| N band | west end E | what it is |
+|---|---|---|
+| 0.0 – 7.5 | 7.2 | south corner, cut back |
+| 7.5 – 18.3 | 0.0 | **convex granite pier**, the full projection |
+| 18.3 – 30.7 | 8.0 | the **recessed curved glass bay**, set back ~7.5 m |
+| 30.7 – 40.5 | 1.4 | **convex granite pier** |
+| 40.5 – 47.8 | 8.0 | north corner, cut back |
+
+The east end mirrors it (piers at E = 126.7 and 127.4, bay recessed to E = 120.1,
+corners at E = 119.6). Photographs turn that stepped trace into what it really is:
+large-panel granite walls curving continuously round each pier, no punched windows
+over long stretches, tall narrow full-height **louvre slots** cut into the stone,
+and between the piers a tall **recessed curved glass bay** about ten storeys high
+in teal glass with horizontal mullion bands — a great glazed slot between two stone
+drums. The ground floor on Polk carries a small retail/café window; Larkin's base
+is blind stone and louvres.
+
+**Top.** A pale roof deck inside a level parapet ring. Along the centre, set back
+from both long faces, the **mechanical penthouse** rises to ~60 m and carries the
+architectural crest to 61.9 m — this is the 60.04 m LiDAR maximum and the 6 m gap
+between the 53.61 m median roof plane and SOM's 203 ft. Long skylight strips run
+over the two ten-storey atria, and a cluster of low mechanical enclosures and a
+stair penthouse sit toward the Golden Gate Avenue edge. *The roof reading is the
+weakest part of this dossier* — the only imagery available is off-nadir and half in
+the building's own shadow. See 2.16.
 
 ### 2.6 Recognition cues (ranked)
 
-1. **The bow.** A 127 m pale slab whose south front curves toward Civic Center
-   Plaza — SOM's own one-line description of the building, and the thing that
-   separates it from every other 1990s office slab in the city
-2. The proportion and colour pair: near-white granite, dense square window grid,
-   pale sea-green glass, standing twice the height of the Beaux-Arts bar in front
-   of it
-3. The **two rounded end drums**, each with a tall recessed curved glass bay
-4. The Golden Gate Avenue **entrance bay and canopy** — a convex glass bulge over a
-   curved canopy on granite piers
-5. From above: the arced parapet crest with its set-back mechanical band, and the
-   stepped-down ends
+1. **The end drums.** Two convex granite piers with a deeply recessed ten-storey
+   curved glass bay between them, at both short ends. Nothing else in Civic Center
+   does this, and it is the one thing every close view of the building shows
+2. The proportion and colour pair: a 127 m near-white granite slab, dense square
+   window grid, pale sea-green glass, standing twice the height of the Beaux-Arts
+   bar in front of it
+3. The Golden Gate Avenue **entrance bay and canopy** — a convex glass bulge over a
+   wide curved canopy on granite piers, with STATE OF CALIFORNIA on the glass
+4. The lighter, more glazed **top three storeys** over the punched grid below
+5. From above: a level parapet with a long set-back **mechanical penthouse** down
+   the centre of the roof
 
 ### 2.7 Miniature translation
 
 **Preserve**
 
 - The 127 x 48 x 62 m proportion and the 8.73 deg grid rotation
-- The bow, as one continuous arc across the whole south front. If it flattens, the
-  building becomes a box and stops being this building
-- The two end drums as real cylindrical curves, not chamfers
-- The stepped skyline: low ends, arced crest, set-back mechanical band
+- The five-part end profile — pier, recessed glass bay, pier — at both ends, with
+  the piers genuinely curved. If the ends flatten into a box, the building stops
+  being this building
+- The level parapet with the set-back mechanical penthouse behind it
+- The lighter glazed band over the top three storeys
 - The near-white granite / one-accent-colour discipline — this building's job in
   the skyline is to be calm
 
@@ -443,63 +479,64 @@ off-nadir and half in the building's own shadow. See 2.16.
   ~6.4 m horizontal pitch and one per storey vertically, grouped into readable
   bands rather than 14 x 20 individually modelled openings
 - The curved glass bays become single smooth recessed cylindrical surfaces with
-  three or four horizontal mullion bands, not curtain-wall grids
+  four horizontal mullion bands, not curtain-wall grids
 - The entrance bay and canopy are semantically enlarged — a storey taller and a
   metre deeper than scale demands, because they are the building's face and are a
   few pixels from the app's camera
 - All ashlar jointing collapses into the material colour; all louvre blades
   collapse into a single dark recessed slot
-- Rooftop clutter becomes: two skylight strips, one mechanical band, three
+- Rooftop clutter becomes: one penthouse mass, two skylight strips, three
   mechanical boxes, one stair penthouse
 
 ### 2.8 Massing recipe
 
-Build order for the deterministic script; author axis-aligned (X along the 127.4 m
-length, +Y north) then rotate the whole assembly +8.73 deg about Z. Dimensions are
-the starting point, not a straitjacket — adjust after the first aerial review render.
+Build order for the deterministic script. Author in the **grid frame** — E from 0
+(west face) to 127.38 (east face), N from 0 (south face) to 47.81 (north face),
+Z up — then rotate the whole assembly +8.73 deg about Z and recentre. Dimensions
+are the starting point, not a straitjacket; adjust after the first aerial render.
 
-1. Ground base: full footprint, z=0 to z=6.0, `Toy_stone`, projecting 0.3 m — the
-   two-storey granite base, blind except for the entrance and the Polk shopfront.
-2. Main body: z=6.0 to z=53.6, `Toy_cream`. Plan = a rounded-end slab: an east
-   drum and a west drum of radius ~23.9 m (half the 47.8 m depth) joined by a
-   south face bowed 5 m convex south and a straight north face. Author the plan as
-   one closed profile curve and extrude it, so the bow and the drums are the same
-   surface.
-3. Window grid: recessed `Toy_glass` panels 3.6 m wide x 2.4 m tall, 0.35 m deep,
-   at 6.4 m horizontal pitch and 3.83 m vertical pitch, from z=9.8 to z=51.5, on
-   the north and south faces and around the outer thirds of both drums. Skip the
-   drum centres — that is where the glass bays go.
-4. Storey banding: `Toy_trim` bands 0.35 m tall at every third storey line,
-   projecting 0.15 m — enough rhythm to stop the grid reading as wallpaper.
-5. East and west curved glass bays: a 26 m wide, 0.9 m deep concave recess in the
-   middle of each drum, glazed `Toy_teal` from z=13.4 to z=51.5, with four
-   `Toy_trim` mullion bands. Flank each with two 1.6 m wide, 0.5 m deep
-   `Toy_roofd` louvre slots running the full height of the drum.
-6. Stepped ends: knock the outer 16 m of each end down from 53.6 m to **42.1 m**
-   (11 storeys) with its own parapet — the step SOM describes and the plaza
-   photograph shows.
-7. Parapet: `Toy_trim` ring z=53.6 to z=55.2, inset 1.0 m, 1.0 m thick and hollow,
-   so the roof deck reads inside it. Its top edge arcs with the south front.
-8. Roof deck at z=53.6, `Toy_roofd`, spanning inside the parapet.
-9. Crest / mechanical band: a `Toy_cream` block 62 m long x 26 m deep centred on
-   the bow, z=53.6 to z=60.4, inset 6 m from the south face, with a `Toy_trim` cap
-   z=60.4 to z=61.9 — this is what carries the bbox to 61.90 m.
-10. Atrium skylights: two `Toy_teal` panels, each 22 x 7 m, centred at x = ±26 m,
-    y = 0, top at z=54.6, on 0.5 m `Toy_trim` curbs.
-11. Mechanical: three `Toy_roofd` boxes 5 x 4 x 2.2 m and one 10 x 5 x 3.0 m stair
+The plan outline (used for the base, the body and the parapet) is the reprojected
+OSM polygon of 2.5, with the two end profiles rebuilt as arcs: each granite pier
+is a convex arc bulging to the end face, and the bay between them a concave arc
+recessed 7.5 m, with the outer corners cut back.
+
+1. Granite base: full outline, z=0 to z=6.0, `Toy_stone`, projecting 0.3 m — the
+   two-storey base, blind except for the entrance and the Polk shopfront.
+2. Main body: same outline inset 0.3 m, z=6.0 to z=53.6, `Toy_cream`.
+3. Punched window grid: recessed `Toy_glass` panels 3.6 m wide x 2.4 m tall,
+   0.35 m deep, at 6.4 m horizontal pitch and 3.83 m vertical pitch, from z=9.8 to
+   z=42.1, on the north and south faces only.
+4. Storey banding: `Toy_trim` bands 0.3 m tall projecting 0.12 m at z=9.5, 21.0,
+   32.5 and 42.1 — enough rhythm to stop the grid reading as wallpaper.
+5. Top band: z=42.1 to z=53.6, inset 0.5 m from the body face, a lighter, more
+   continuously glazed ribbon — three `Toy_glass` bands 2.8 m tall running the full
+   length of the north and south faces, separated by `Toy_trim` spandrels.
+6. End glass bays: in the recessed middle of each end, a concave `Toy_teal`
+   cylindrical surface 12.4 m wide (N 18.3-30.7), from z=13.4 to z=51.5, with four
+   `Toy_trim` mullion bands.
+7. Louvre slots: four `Toy_roofd` slots per end, 1.6 m wide, 0.5 m deep, running
+   z=6.0 to z=53.6 on the pier faces.
+8. Parapet: `Toy_trim` ring z=53.6 to z=55.0, inset 1.0 m, 1.0 m thick and hollow,
+   so the roof deck reads inside it.
+9. Roof deck at z=53.6, `Toy_roofd`, spanning inside the parapet.
+10. Mechanical penthouse: `Toy_cream` block, E 22 to 96, N 13 to 35, z=53.6 to
+    z=60.4, with a `Toy_roofd` louvre band around it z=56.0 to z=58.6 and a
+    `Toy_trim` cap z=60.4 to z=61.9 — this is what carries the bbox to 61.90 m.
+11. Atrium skylights: two `Toy_teal` panels, each 20 x 7 m, centred at E = 34 and
+    E = 93, N = 24, top at z=54.6, on 0.5 m `Toy_trim` curbs.
+12. Mechanical: three `Toy_roofd` boxes 5 x 4 x 2.2 m and one 10 x 5 x 3.0 m stair
     penthouse along the north edge of the deck.
-12. Entrance bay: a convex `Toy_glassl_Glow` cylindrical bulge on the north face,
-    24 m wide, projecting 3.5 m, from z=6.0 to z=27.0, with three `Toy_trim`
-    mullion bands and a `Toy_trim` eyebrow cap projecting 1.2 m at its top.
-13. Entrance canopy: a curved `Toy_trim` slab 30 m wide, 7 m deep, 0.8 m thick at
+13. Entrance bay: a convex `Toy_glassl_Glow` cylindrical bulge on the north face,
+    centred at E = 63.7, 24 m wide, projecting 3.5 m, from z=6.0 to z=27.0, with
+    three `Toy_trim` mullion bands and a `Toy_trim` eyebrow cap projecting 1.2 m at
+    its top.
+14. Entrance canopy: a curved `Toy_trim` slab 30 m wide, 7 m deep, 0.8 m thick at
     z=10.5, carried on four `Toy_stone` piers 2.2 x 2.2 m; `Toy_gold_Glow` soffit
     plate beneath it.
-14. Lobby glazing: `Toy_gold_Glow` recessed plane 22 m wide, z=1.0 to z=9.6, set
+15. Lobby glazing: `Toy_gold_Glow` recessed plane 22 m wide, z=1.0 to z=9.6, set
     2.0 m back behind the canopy.
-15. Polk shopfront: one `Toy_glass` recess 7 x 3 m in the east drum base at z=1.5.
-16. Flagpole: one `Toy_trim` cylinder radius 0.2 m, 16 m tall, on the north plaza
-    edge at x = −18 m.
-17. Curve segments 14; bevel 0.12 m, 2 segments.
+16. Polk shopfront: one `Toy_glass` recess 7 x 3 m in the east base at z=1.5.
+17. Curve segments 14 per arc; bevel 0.12 m, 2 segments.
 
 ### 2.9 Materials and palette
 
@@ -654,25 +691,30 @@ mechanical ~3k; entrance bay, canopy, piers, lobby and flagpole ~3k.
   "twin atria rising ten storeys" and the roof band, not seen clearly. Positions,
   sizes and count in 2.8 steps 10–11 are *estimated*. One good oblique aerial would
   settle all of it.
-- **The bow's sagitta (~5 m) is estimated**, not measured. OSM draws the south edge
-  as a mathematically straight line — the four intermediate nodes are exactly
-  collinear, which is a simplification, not evidence of a flat wall. If a nadir
-  orthophoto can be found, measure it; if the real value turns out to be 3 m or
-  8 m, the massing recipe absorbs it without redesign.
-- **Which end steps down, and by how much, is *inferred*** from the plaza
-  photograph, where both ends fall away from the crest. 42.1 m (11 storeys) is a
-  choice, not a measurement. The LiDAR standard deviation of 4.21 m over the
-  footprint says there is real height variation on this roof; it does not say where.
+- **The flat-south-front finding is a correction to this dossier's own first
+  draft**, and it is argued from two sources (the collinear OSM nodes and a
+  rectilinear panorama re-projection), not from a drawing. It is the strongest
+  claim here that a plan set could overturn. If it is overturned, the fix is local:
+  bow the body profile and the parapet, nothing else changes.
+- **The z=42.1 m break between the punched grid and the glazed top band is
+  *inferred*** from the plaza photograph, where the upper three storeys visibly
+  change character. Three storeys is a reading, not a count off drawings.
+- **The mechanical penthouse footprint (E 22-96, N 13-35) is *estimated*.** The
+  LiDAR maximum of 60.04 m and standard deviation of 4.21 m over 22,530 cells say
+  something substantial stands ~6.4 m above the median roof plane; they do not say
+  where it sits or how big it is. The plaza photograph shows it running along the
+  centre. Size and position are a design choice consistent with both.
 - **Wrong-building risk runs both ways on this block.** Working from the address
   "455 Golden Gate Avenue" is safe; working from a Golden Gate Avenue Street View
   frame is not, because the Phillip Burton Federal Building fills the north side of
   the street and is also a big pale curved-plan slab with a flag and a glazed
   entrance. The STATE OF CALIFORNIA lettering is the tell.
 - **SOM's "slim slabs that gradually step upward" may describe more steps than this
-  plan models.** The dossier resolves it into one main plate, two lower ends and one
-  raised crest. That is a defensible simplification at toy scale, and it matches
-  what the plaza photograph shows, but it is a compression of the architect's own
-  description — say so in `REPORT.md` rather than presenting it as measured.
+  plan models.** The dossier resolves it into one main plate at 53.6 m plus a
+  set-back penthouse at 60.4-61.9 m. That is a defensible simplification at toy
+  scale and it satisfies every measured number, but it is a compression of the
+  architect's own description — say so in `REPORT.md` rather than presenting it as
+  measured.
 - This building is 200 m from City Hall's gilded dome and stands directly behind a
   Beaux-Arts landmark that is already shipped. SOM designed it to defer to the
   dome. If it reads as loud in the aerial render, take saturation out of everything
