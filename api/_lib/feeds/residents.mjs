@@ -1111,6 +1111,152 @@ export async function advanceSubreddit() {
   return shape(people, allowance - budget);
 }
 
+// ------------------------------------------------------ the human's own post
+//
+// One person from outside the simulation can post into it. Everything AFTER the
+// submission is the machinery the residents already live under: the accepted
+// post is an ordinary thread, so the same sampled voters judge it and the same
+// continuation loop decides whether anybody answers — no special path, which is
+// the only way the reaction to it means anything.
+//
+// The door in front of it is one grading call against the community's own goal
+// and rules. The residents are held to those rules by having them in every
+// prompt they write from; a submission nobody wrote a persona for has to be held
+// to them explicitly, and this is where that happens.
+
+const HUMAN = {
+  id: "human-person",
+  name: "Human Person",
+  // The spec's limits, and shorter than the residents' own title allowance on
+  // purpose: a headline somebody types should read like one.
+  maxChars: { title: 80, body: 240 },
+  // Below this the post does not land. This is the whole product decision of
+  // the feature, so it is stated once, here.
+  passingScore: 70,
+};
+
+export const humanLimits = () => ({ ...HUMAN.maxChars });
+
+// Rejected before a single token is spent: length and emptiness are facts, not
+// judgements, and the client enforces the same numbers so this only ever fires
+// on a request that did not come from it.
+export function validateSubmission({ title, body } = {}) {
+  const clean = (value) =>
+    String(value ?? "")
+      .replace(/\s+/g, " ")
+      .trim();
+  const t = clean(title);
+  const b = clean(body);
+  if (!t) return { error: "Write a header before posting." };
+  if (!b) return { error: "Write some body text before posting." };
+  if (t.length > HUMAN.maxChars.title)
+    return { error: `The header must be ${HUMAN.maxChars.title} characters or fewer.` };
+  if (b.length > HUMAN.maxChars.body)
+    return { error: `The body must be ${HUMAN.maxChars.body} characters or fewer.` };
+  return { title: t, body: b };
+}
+
+// One call, one number, and a sentence the author can read. Alignment ONLY —
+// the score is not a review of the writing, and a dull post about a bus stop is
+// as aligned as a good one about a bus stop.
+export async function gradeSubmission({ title, body }) {
+  const system =
+    `You are the moderator of ${SUBREDDIT.name}, a subreddit about San Francisco.\n\n` +
+    `SUBREDDIT GOAL\n${SUBREDDIT.goal}\n\n` +
+    `SUBREDDIT RULES\n${rulesBlock()}`;
+  const user =
+    `A person has submitted this post to the community.\n\n` +
+    `TITLE\n${title}\n\n` +
+    `BODY\n${body}\n\n` +
+    `Score from 0 to 100 how well the title AND the body TOGETHER are aligned with the subreddit's stated goal and its rules.\n\n` +
+    `Judge alignment only — not the writing quality, not whether you agree with it, not how interesting it is.\n\n` +
+    `- 100: squarely about news, events, politics, culture, or everyday life in San Francisco, and breaks no rule.\n` +
+    `- 70: genuinely relevant to San Francisco and breaks no rule, even if it is small, mundane, or narrow.\n` +
+    `- below 70: not really about San Francisco, or it breaks a rule — intolerant, insulting, hateful, threatening, crude, slanderous, an unsourced criminal allegation against a private individual — or it is spam, advertising, or nonsense.\n` +
+    `- 0: no relationship to San Francisco at all, or it is abusive.\n\n` +
+    `Both parts count: a San Francisco title over an unrelated body is not aligned.\n\n` +
+    `Then write ONE sentence for the author, addressed to them, saying why it scored that.\n\n` +
+    `Return JSON:\n{ "score": 0, "reason": "..." }`;
+
+  const raw = parseJson(await complete(system, user, 200));
+  const value = Number(raw.score);
+  if (!Number.isFinite(value)) throw new Error("grader returned no score");
+  const score = Math.min(100, Math.max(0, Math.round(value)));
+  const reason = String(raw.reason ?? "")
+    .replace(/\s+/g, " ")
+    .trim()
+    .slice(0, 240);
+  return { score, reason, passed: score >= HUMAN.passingScore };
+}
+
+// Grade, then — only if it passed — write it into the same store the residents'
+// posts live in, with its first votes already cast so the next tick can see
+// what the room made of it and decide whether to reply.
+export async function submitHumanPost({ title, body }) {
+  const checked = validateSubmission({ title, body });
+  if (checked.error) return { status: 400, body: { error: checked.error } };
+
+  const { score, reason, passed } = await gradeSubmission(checked);
+  if (!passed)
+    return {
+      status: 200,
+      body: { posted: false, score, threshold: HUMAN.passingScore, reason },
+    };
+
+  await restore();
+  const people = await loadCast();
+  // The same sample size a resident's post gets, on its own small allowance:
+  // this is one post, not a tick, and it must not be able to spend a tick's
+  // budget.
+  let voteBudget = votingConfig.postVoterSampleSize;
+  const spendVote = () => (voteBudget > 0 ? (voteBudget--, true) : false);
+  const votes = await simulateVotes({
+    cast: people,
+    authorId: HUMAN.id,
+    content: `${checked.title}\n\n${checked.body}`,
+    size: votingConfig.postVoterSampleSize,
+    spend: spendVote,
+  });
+
+  const at = Date.now();
+  const thread = {
+    id: `${HUMAN.id}-${at}`,
+    authorId: HUMAN.id,
+    // No occupation and no PUMA, because this person genuinely has neither in
+    // this city — inventing them would put a fake resident in the panel beside
+    // real ones. `human` is what the panel labels instead.
+    author: { name: HUMAN.name, occupation: null, puma: null },
+    human: true,
+    title: checked.title,
+    body: checked.body,
+    votes,
+    replies: [],
+    replyProbability: sampleReplyProbability(),
+    // Left open on purpose: the next tick's resume pass grows it exactly the
+    // way it grows a thread of its own that ran out of budget.
+    done: false,
+    startedAt: at,
+    at,
+  };
+  live.push(thread);
+  live.sort((a, b) => b.startedAt - a.startedAt);
+  await persist();
+
+  return {
+    status: 200,
+    body: {
+      posted: true,
+      score,
+      threshold: HUMAN.passingScore,
+      reason,
+      id: thread.id,
+    },
+    // Handed back so the route can publish it into the registry: without this
+    // the visitor's own post would be invisible until the read TTL lapsed.
+    payload: shape(people, 0),
+  };
+}
+
 registerFeed("feed", {
   // Reads are one blob GET, so they can be frequent. They have to be: the tick
   // that wrote the new post may have run on a different serverless instance

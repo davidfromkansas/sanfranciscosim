@@ -13,6 +13,7 @@
 // contract the ferry and Muni layers keep.
 
 const ENDPOINT = `${import.meta.env.BASE_URL}api/feed`;
+const COMPOSE_ENDPOINT = `${import.meta.env.BASE_URL}api/compose`;
 // The server writes a post every ten minutes or so; polling a touch under that
 // means a viewer who leaves the tab open sees new posts without a reload.
 const POLL_MS = 2 * 60 * 1000;
@@ -206,6 +207,157 @@ function createProfileCard({ onVisit }) {
   };
 }
 
+function createComposer({ onPosted }) {
+  const fab = el("button", "rs-create-fab", "+ Create Post");
+  fab.type = "button";
+  fab.setAttribute("aria-label", "Create a post");
+
+  const back = el("div", "rs-compose-back");
+  back.hidden = true;
+  back.setAttribute("aria-labelledby", "rs-compose-title");
+  const card = el("div", "rs-modal rs-composer");
+  const heading = el("h2", "rs-compose-title", "Create a post");
+  heading.id = "rs-compose-title";
+  const intro = el(
+    "p",
+    "rs-compose-intro",
+    "Share something relevant to San Francisco. Every post is reviewed before it appears.",
+  );
+  const form = el("form", "rs-compose-form");
+  const headerLabel = el("label", "rs-compose-label", "Header");
+  const header = el("input", "rs-compose-input");
+  header.id = "rs-compose-header";
+  header.name = "title";
+  header.type = "text";
+  header.maxLength = 80;
+  header.required = true;
+  header.autocomplete = "off";
+  header.setAttribute("aria-describedby", "rs-compose-header-count");
+  const headerCount = el("span", "rs-compose-count", "80 characters remaining");
+  headerCount.id = "rs-compose-header-count";
+  headerLabel.htmlFor = header.id;
+  headerLabel.append(headerCount);
+
+  const bodyLabel = el("label", "rs-compose-label", "Body Text");
+  const body = el("textarea", "rs-compose-input rs-compose-body");
+  body.id = "rs-compose-body";
+  body.name = "body";
+  body.maxLength = 240;
+  body.required = true;
+  body.rows = 5;
+  body.setAttribute("aria-describedby", "rs-compose-body-count");
+  const bodyCount = el("span", "rs-compose-count", "240 characters remaining");
+  bodyCount.id = "rs-compose-body-count";
+  bodyLabel.htmlFor = body.id;
+  bodyLabel.append(bodyCount);
+
+  const message = el("p", "rs-compose-message");
+  message.setAttribute("aria-live", "polite");
+  const actions = el("div", "rs-compose-actions");
+  const cancel = el("button", "rs-compose-cancel", "Cancel");
+  cancel.type = "button";
+  const post = el("button", "rs-compose-post", "Post");
+  post.type = "submit";
+  actions.append(cancel, post);
+  form.append(headerLabel, header, bodyLabel, body, message, actions);
+  card.append(heading, intro, form);
+  back.append(card);
+  document.body.append(fab, back);
+
+  let loading = false;
+
+  function updateCounts() {
+    headerCount.textContent = `${80 - header.value.length} characters remaining`;
+    bodyCount.textContent = `${240 - body.value.length} characters remaining`;
+    post.disabled = loading || !header.value.trim() || !body.value.trim();
+  }
+
+  function clear() {
+    header.value = "";
+    body.value = "";
+    message.textContent = "";
+    message.className = "rs-compose-message";
+    updateCounts();
+  }
+
+  function hide({ reset = true } = {}) {
+    if (loading) return;
+    back.hidden = true;
+    if (reset) clear();
+    fab.focus();
+  }
+
+  function show() {
+    back.hidden = false;
+    updateCounts();
+    header.focus();
+  }
+
+  async function submit() {
+    if (loading || !header.value.trim() || !body.value.trim()) return;
+    loading = true;
+    message.textContent = "Reviewing your post…";
+    message.className = "rs-compose-message rs-compose-loading";
+    form.classList.add("rs-compose-is-loading");
+    post.innerHTML =
+      '<span class="rs-compose-spinner" aria-hidden="true"></span> Reviewing…';
+    cancel.disabled = true;
+    header.disabled = true;
+    body.disabled = true;
+    updateCounts();
+    try {
+      const response = await fetch(COMPOSE_ENDPOINT, {
+        method: "POST",
+        headers: { "content-type": "application/json" },
+        body: JSON.stringify({ title: header.value, body: body.value }),
+      });
+      let result;
+      try {
+        result = await response.json();
+      } catch {
+        throw new Error("The post review returned an unreadable response.");
+      }
+      if (!response.ok) throw new Error(result.error || "Could not review the post.");
+      if (result.posted) {
+        clear();
+        back.hidden = true;
+        fab.focus();
+        onPosted();
+        return;
+      }
+      message.textContent = `Score ${result.score}/${result.threshold}: ${result.reason}`;
+      message.className = "rs-compose-message rs-compose-verdict";
+    } catch (error) {
+      message.textContent = error?.message || "Could not post right now.";
+      message.className = "rs-compose-message rs-compose-error";
+    } finally {
+      loading = false;
+      form.classList.remove("rs-compose-is-loading");
+      post.textContent = "Post";
+      cancel.disabled = false;
+      header.disabled = false;
+      body.disabled = false;
+      updateCounts();
+    }
+  }
+
+  header.addEventListener("input", updateCounts);
+  body.addEventListener("input", updateCounts);
+  fab.addEventListener("click", show);
+  cancel.addEventListener("click", () => hide());
+  form.addEventListener("submit", (event) => {
+    event.preventDefault();
+    submit();
+  });
+  back.addEventListener("click", (event) => {
+    if (event.target === back) hide();
+  });
+  document.addEventListener("keydown", (event) => {
+    if (event.key === "Escape" && !back.hidden) hide();
+  });
+  updateCounts();
+}
+
 // ----------------------------------------------------------------- rendering
 
 // The stock profile silhouette, drawn rather than fetched: it stays sharp at any
@@ -252,27 +404,31 @@ function avatar(who, size) {
 // from a particular life rather than from nobody — "Cook, part time" over a
 // post about a bakery is most of the meaning — so it belongs on screen and not
 // in a tooltip nobody hovers.
-function identity(who, at, onOpen) {
+function identity(who, at, onOpen, human = false) {
   const block = el("div", "rs-who");
 
   const top = el("div", "rs-who-top");
-  const name = el("button", "rs-author", who.name);
-  name.addEventListener("click", () => onOpen(who));
-  top.append(name, el("span", "rs-sep", "·"), timeLabel(at));
+  const name = human
+    ? el("span", "rs-author rs-author-human", who.name)
+    : el("button", "rs-author", who.name);
+  if (!human) name.addEventListener("click", () => onOpen(who));
+  top.append(name);
+  if (human) top.append(el("span", "rs-human-pill", "HUMAN"));
+  top.append(el("span", "rs-sep", "·"), timeLabel(at));
 
-  // A resident with no job still has a place. Census wording like "Not in the
-  // labour force" is theirs and is printed as written; only a genuinely empty
-  // field falls back to the neighbourhood alone.
-  const where = PUMA_NAMES[who.puma] ?? "San Francisco";
-  const sub = who.occupation ? `${who.occupation} · ${where}` : where;
+  const sub = human
+    ? "Visiting from outside the simulation"
+    : who.occupation
+      ? `${who.occupation} · ${PUMA_NAMES[who.puma] ?? "San Francisco"}`
+      : PUMA_NAMES[who.puma] ?? "San Francisco";
 
   block.append(top, el("div", "rs-who-sub", sub));
   return block;
 }
 
-function byline(who, at, onOpen) {
+function byline(who, at, onOpen, human = false) {
   const row = el("div", "rs-byline");
-  row.append(avatar(who, 22), identity(who, at, onOpen));
+  row.append(avatar(who, 22), identity(who, at, onOpen, human));
   return row;
 }
 
@@ -291,7 +447,7 @@ function renderThread(thread, speakers, onOpen) {
   const who = { ...thread.author, ...(speakers[thread.authorId] ?? {}) };
   const card = el("article", "rs-post");
 
-  card.append(byline(who, thread.at, onOpen));
+  card.append(byline(who, thread.at, onOpen, thread.human));
   card.append(el("h2", "rs-title", thread.title));
   card.append(el("p", "rs-body", thread.body));
 
@@ -395,13 +551,15 @@ export function createFeedPanel({
 
   const profile = createProfileCard({ onVisit });
   const rulesCard = createRulesCard();
+  let refresh;
+  createComposer({ onPosted: () => refresh?.() });
   let community = { name: "r/simfrancisco", rules: [] };
   rulesButton.addEventListener("click", () =>
     rulesCard.show(community.name, community.rules),
   );
   let lastKey = "";
 
-  async function refresh() {
+  refresh = async function refresh() {
     let payload;
     try {
       const res = await fetch(ENDPOINT);
@@ -446,7 +604,7 @@ export function createFeedPanel({
     list.replaceChildren(
       ...threads.map((t) => renderThread(t, speakers, profile.show)),
     );
-  }
+  };
 
   refresh();
   setInterval(refresh, POLL_MS);

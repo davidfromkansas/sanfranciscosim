@@ -32,6 +32,8 @@ const tilesVersion = [stamp("manifest.json"), stamp("toy.json")]
 // costs that one feed — locally, a missing dependency should disable a feed,
 // not the dev server.
 let feedsPromise = null;
+const composeHits = new Map();
+
 function loadFeeds(server) {
   if (feedsPromise) return feedsPromise;
   feedsPromise = (async () => {
@@ -155,6 +157,86 @@ function liveFeeds() {
               res.end(JSON.stringify(body));
             },
           };
+          if (pathname === "/api/compose") {
+            if (req.method !== "POST") {
+              return void shim.status(405).json({ error: "method not allowed" });
+            }
+            const credential =
+              process.env.AI_GATEWAY_API_KEY || process.env.VERCEL_OIDC_TOKEN;
+            if (!credential) {
+              return void shim
+                .status(503)
+                .json({ error: "cannot review posts right now" });
+            }
+            const ip = (req.headers["x-forwarded-for"] || "")
+              .split(",")[0]
+              .trim() || "local";
+            let body;
+            try {
+              body = await new Promise((resolve, reject) => {
+                let raw = "";
+                req.setEncoding("utf8");
+                req.on("data", (chunk) => {
+                  raw += chunk;
+                });
+                req.on("end", () => {
+                  try {
+                    resolve(raw ? JSON.parse(raw) : {});
+                  } catch {
+                    reject(new Error("request body must be valid JSON"));
+                  }
+                });
+                req.on("error", reject);
+              });
+            } catch {
+              return void shim
+                .status(400)
+                .json({ error: "request body must be valid JSON" });
+            }
+            // Keep the local route's budget aligned with the deployed route.
+            // This map lives in the dev server process, just like Vercel's
+            // warm function instance map does in production.
+            const now = Date.now();
+            const record = composeHits.get(ip) || {
+              minute: [],
+              day: [],
+            };
+            record.minute = record.minute.filter((at) => now - at < 60_000);
+            record.day = record.day.filter(
+              (at) => now - at < 24 * 60 * 60 * 1000,
+            );
+            if (record.minute.length >= 3 || record.day.length >= 24) {
+              composeHits.set(ip, record);
+              return void shim
+                .status(429)
+                .json({ error: "too many posts for now — try again shortly" });
+            }
+            record.minute.push(now);
+            record.day.push(now);
+            composeHits.set(ip, record);
+            if (composeHits.size > 5000) composeHits.clear();
+            try {
+              const mod = await import(
+                /* @vite-ignore */
+                `${new URL("../api/_lib/feeds/", import.meta.url).href}residents.mjs`
+              );
+              const result = await mod.submitHumanPost({
+                title: body.title,
+                body: body.body,
+              });
+              if (result.payload) {
+                const entry = core.getFeed("feed");
+                if (entry) core.publish(entry, result.payload);
+              }
+              return void shim.status(result.status).json(result.body);
+            } catch (error) {
+              return void shim
+                .status(502)
+                .json({
+                  error: `post review failed: ${error?.message || error}`,
+                });
+            }
+          }
           if (pathname === "/api/live")
             return void (await core.serveLive(shim));
           // The scheduled tick, so the cron path can be exercised locally
