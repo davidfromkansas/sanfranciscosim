@@ -540,6 +540,43 @@ export const LANDMARKS = [
     exclude: 11,
     camera: { distance: 170, yaw: 90, pitch: 26 },
   },
+  // The 1929 Art Deco concrete loft on the NE corner of Brannan and Zoe, two
+  // doors southwest of 400. Measured against the real bake inputs, from the
+  // anchor below, using the metric excluded() applies — ring centroid OR any
+  // ring vertex:
+  //
+  //   target: DataSF  SF3776151 (763.6 m2, h 11.46)  centroid 4.65 m, vertices 12.45 m
+  //           Overture b9c9690e (788.0 m2, h 11)     centroid 8.11 m, vertices 12.00 m
+  //   nearest NEIGHBOUR — 426 Brannan, in BOTH sources:
+  //           DataSF  SF3776015 (163.8 m2, h 5.75)   nearest vertex 12.45 m
+  //           Overture b9c91621 (178.4 m2, h 6)      nearest vertex 12.00 m
+  //
+  //   exclude  8 m    -> drops 1  (DataSF only; Overture's copy survives and fights the GLB)
+  //   exclude  9-12 m -> drops 2  (correct: this building in both sources)
+  //   exclude 12.5 m  -> drops 4  (eats 426 Brannan in both sources)
+  //
+  // TWO rings is the right answer, not one. The gate BELOW is Overture's
+  // CENTROID at 8.11 m, not a vertex — its ring reaches 4 m further northwest
+  // than DataSF's and pulls the centroid off the anchor. The gate ABOVE is a
+  // SHARED PARTY-WALL VERTEX: 426 Brannan's nearest vertex is numerically
+  // identical to this building's own in both sources, so any radius that reaches
+  // our corner reaches the neighbour's. Safe band 8.11 < r < 12.00; 10 sits in
+  // the middle with 1.9 m under and 2.0 m over. Do not raise past 11.5 or lower
+  // under 9 without re-running the measurement.
+  {
+    id: '434Brannan',
+    name: '434 Brannan Street',
+    lon: -122.3954103,
+    lat: 37.7796003,
+    height: 13.79,
+    exclude: 10,
+    // camera.js apply() puts the eye at pivot + (sin yaw, sin pitch, cos yaw)
+    // * distance with +z south, so yaw = 180 - the outward bearing you want to
+    // look down. The Brannan front's normal is 134.8 deg true -> yaw 45, which
+    // also catches the long Zoe flank obliquely. yaw 225 would be the mirror
+    // image and stare at the rear car park.
+    camera: { distance: 240, yaw: 45, pitch: 26 },
+  },
   {
     // Shell service station, across 3rd Street from 550 Third. The asset is a
     // forecourt, not a building, and the lot carries TWO baked footprints — the

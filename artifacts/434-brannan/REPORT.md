@@ -159,3 +159,170 @@ night aerial were presented with the numbers above at the moment of the gate.
 This is a standing pre-approval rather than a reaction to the renders. If the
 building is later judged wrong, the fix is a stage-2 revision loop logged in this
 section, not a retro-justification here.
+
+## Gate 5 — local integration QA (stage 5, batch mode)
+
+Run 18 August 2026 per `docs/asset-plans/INTEGRATION-PROMPT.md` Steps 1–6, with
+Step 7 replaced by the pipeline's stop-and-ask. Case **B** (new landmark).
+
+### What changed
+
+| File | Change |
+|---|---|
+| `app/public/sf-assets/landmarks/434-brannan.glb` | the shipped asset, byte-identical to `artifacts/434-brannan/434-brannan.glb` |
+| `app/public/sf-assets/landmarks_manifest.json` | one 19-line entry appended **as text** — a `JSON.parse`/`stringify` round trip rewrites unrelated `targetHeightM` values such as `11.0` → `11` across other landmarks |
+| `pipeline/lib/landmarks.mjs` | `434Brannan` registry entry, `exclude: 10`, camera `{240, 45, 26}`, with the measurement that sized the radius in the comment above it |
+
+`camelId('434-brannan')` → `434Brannan`, which is the registry id — verified, not
+assumed, because a mismatch shows up as two buildings rather than as an error.
+
+`loadRadius`: **2500 m**, the default rule `max(2500, 13.79 × 30)`. Streamed, not
+resident. Past the radius this site is empty ground rather than a stand-in
+building (Case B), and 2.5 km is far enough that the absence is illegible.
+
+`estimated: true`, because the crest is the LiDAR maximum and the parapet is
+inferred — 33 of the 91 manifest entries already carry the flag for the same
+reason.
+
+### Step 1 — re-validation of the shipped file
+
+`validate_434_brannan.py` re-run against the **optimized** GLB in a factory-reset
+Blender: `overall PASS`, all sixteen checks, 5,872 tris, 40.196 × 40.668 ×
+13.79 m, min Z 0.0, XY offset (0.206, −0.205), 11 `Toy_*` materials with three
+`_Glow`, 12 objects.
+
+### Step 4 — Case B bake
+
+Full chain run in this worktree: `terrain → bridges → buildings → streets →
+landcover → validate → lore → toy → notables → context → muni-shapes`
+(`buildings` and `lore` under `--max-old-space-size=12288`; `muni-shapes` no-ops
+without a 511 key and leaves the committed file alone). 174,695 buildings baked
+into 585 cells.
+
+| Check | Result |
+|---|---|
+| `pipeline/audit.mjs` 1.6 — no procedural footprint inside a bespoke exclusion zone | **PASS** — 100 zones over 97 landmarks clear |
+| `pipeline/verify-rebake.mjs` | **PASS** — 584 of 585 cells unchanged; `23_13` 182 → 181; nearest surviving footprint 12.4 m against a 10 m radius |
+| tile decode, near tier `buildings/23_13.bin` | 1 neighbour vertex on the GLB footprint boundary, **0.00 m** inside |
+| tile decode, `toy/23_13.bin` | same vertex, **0.24 m** inside |
+
+That 0.24 m is the shared party-wall vertex with 426 Brannan plus tile
+quantisation (`QUANT` 0.02 m). It is unavoidable and documented: the two
+footprints share that node exactly, so no radius can clear ours without eating
+the neighbour — the same geometry that made the safe band 8.11 < r < 12.00 in the
+first place. 0.24 m is well inside the modelled wall thickness.
+
+Three audit checks fail and all three are pre-existing global data properties,
+untouched by this landmark: 1.2b (p95 height 13.9 m — the DataSF source's own
+p95 is 12.4 m), 1.3c (Telegraph Hill 90.5 m from the Terrarium DEM against a
+surveyed 84 m), 1.7b (1 of 792 sampled trees more than 30 m offshore).
+
+### Steps 5 and 6 — local QA
+
+Driven through the **built** `app/dist` in real headless Chrome over CDP
+(`artifacts/434-brannan/qa_local.mjs`), not the editor's browser pane: parallel
+landmark sessions hold the preview slots, and a hidden pane throttles
+`requestAnimationFrame` so hard that a healthy streamed landmark looks broken.
+
+| Check | Result |
+|---|---|
+| manifest entry loads | **PASS** — `sf-assets: 434-brannan merged 13 objects / 11 materials -> batched (3425 tris body); uniform x1.0000 at 3704, -1061` |
+| uniform scale ≈ 1.0 | **PASS** — exactly `x1.0000`; the authored crest and `targetHeightM` agree |
+| exactly one building on the site | **PASS** — no procedural twin, no baked block through the walls, no z-fighting (`qa/day.png`) |
+| orientation | **PASS** — the dressed Brannan front faces Brannan; the plain Zoe flank runs down Zoe |
+| terrain seating | **PASS** — no float, no sink |
+| night glow | **PASS** — the five frieze panels read as a salmon crown, ~10 sash panes and the entry light, nothing else (`qa/night.png`) |
+| draw calls | **PASS** — 96/frame averaged over 30 frames, against a 300 budget |
+| asset warnings | **PASS** — none. All 85 landmarks in range merged and batched; nothing was dropped from the shared `BatchedMesh` |
+| wide shot | **PASS** — `qa/wide.png`, no holes or artifacts in the district |
+
+The QA run itself is committed as `artifacts/434-brannan/qa_local.mjs` with its
+output in `artifacts/434-brannan/qa/`.
+
+### Step 6 — fallback drill (mandatory)
+
+Run by serving a real **404** for `/sf-assets/landmarks/434-brannan.glb` rather
+than renaming the file: Vite and the dist server both answer a missing public
+path with `index.html` and HTTP 200, so the rename trick the prompt describes
+cannot produce a fetch failure at all.
+
+**Empirically confirmed (twice):** with the GLB returning 404, the app boots, the
+district renders, every neighbour is present, and the site itself is **empty
+ground inside the exclusion zone** — `qa/drill-day.png` and `qa/drill-night.png`.
+That is the documented Case B outcome, not a bug: there is no procedural version
+of this building to fall back to, which is exactly why the exclusion radius had
+to be measured rather than guessed.
+
+**Not empirically confirmed: the console line itself.** The assertion pass of the
+drill was attempted four times and never completed — the machine sat at load
+**400–620** for the whole window (a dozen parallel landmark sessions, five
+concurrent Blender processes), and under SwiftShader the app's throttled
+streaming scan left the entry `far` past a 600 s budget. The two screenshots above
+come from the one run that got through before load climbed. Rather than keep
+waiting, the harness was hardened for the next attempt (`until` budget raised to
+600 s; an `SF.assets.update(camera, 0.4)` pump added, which is the documented fix
+for a throttled scan) and the run is reproducible in one command:
+
+```
+node artifacts/434-brannan/qa_local.mjs --drill
+```
+
+**What the code guarantees, by reading rather than by observation.**
+`INTEGRATION-PROMPT` Step 6 says to expect exactly one
+`... — keeping the code-built landmark` warning. **That wording describes the
+RESIDENT path only.** This entry has a `loadRadius`, so it is streamed, and a
+streamed failure goes through `scan()` in `app/src/assets.js` (line 560), which
+deliberately does *not* use the single-shot `warn()` helper and emits
+`sf-assets: 434-brannan failed to load (<reason>)` with no "keeping" suffix — the
+comment there says why. It is still exactly once: `place()` sets
+`state.status = 'failed'`, and no branch in `scan()` matches `'failed'`, so the
+entry can never be retried or re-warned. The harness's filter matches on the
+asset id rather than on the prompt's wording, which is the correct test.
+
+This is a partial PASS and it is recorded as one. If the reviewer wants the
+console line in a log before shipping, re-run the command above on an idle
+machine.
+
+### Batch mode — what is committed
+
+`BATCH: yes`, so per `ADDRESS-TO-ASSET.md` the bake was run and QA'd and then
+**discarded** before committing:
+
+```
+git checkout -- app/public/tiles api/_data
+```
+
+586 generated files changed in the bake and none of them are committed here. The
+branch carries source only — the GLB, the manifest entry, the registry entry, the
+asset plan and `artifacts/434-brannan/` — all of which are append-only and merge
+mechanically. `git diff --name-only origin/main` lists nothing under
+`app/public/tiles/` or `api/_data/`. The city gets rebaked once for the whole
+batch by `docs/asset-pipeline/BATCH-INTEGRATE.md`.
+
+`npm run lint` and `npm run build` in `app/` both clean.
+
+### Gate 5 — PASS table
+
+| # | Item | Result |
+|---|---|---|
+| 1 | shipped GLB re-validated against the contract | PASS |
+| 2 | asset dropped in, byte-identical | PASS |
+| 3 | manifest entry, appended as text, no collateral edits | PASS |
+| 4a | registry entry, `exclude` measured against both bake sources | PASS |
+| 4b | re-bake; `audit.mjs` 1.6 | PASS |
+| 4c | `verify-rebake.mjs` | PASS |
+| 5a | merge line, uniform scale 1.0000 | PASS |
+| 5b | one building, orientation, terrain seating | PASS |
+| 5c | night glow restrained to the intended surfaces | PASS |
+| 5d | draw calls 96 < 300 | PASS |
+| 5e | no asset warnings, nothing dropped from the shared batch | PASS |
+| 6 | fallback drill — boot and render with the GLB missing | PASS |
+| 6 | fallback drill — the console line captured in a log | **NOT CONFIRMED** (machine at load 400–620; see above) |
+| 7 | `npm run lint`, `npm run build` | PASS |
+| — | batch sanity: nothing under `app/public/tiles/` or `api/_data/` | PASS |
+
+### Gate 5 — ship decision
+
+Pending. Nothing has been pushed, no PR opened, no deploy run. The one
+outstanding item is the drill's console line, which is one command on an idle
+machine.

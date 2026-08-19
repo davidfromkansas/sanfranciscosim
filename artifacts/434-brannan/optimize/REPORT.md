@@ -11,7 +11,8 @@ on 18 August 2026. `ASSET_CLASS: landmark`, `ALLOW_MESHOPT: yes`,
 | raw bytes | 416,948 | **170,356** (−59.1%) |
 | gzip -9 | 65,450 | 94,960 (+45.1% — see the note) |
 | triangles | 5,872 | 5,872 (unchanged) |
-| vertices | 12,040 | 3,336 (−72.3%) |
+| vertices (Blender scene) | 12,040 | 3,336 (−72.3%) |
+| vertices (re-imported from the shipped GLB) | 12,040 | 11,691 |
 | mesh objects / draw submeshes | 202 / 203 | **12 / 13** |
 | materials | 11 | 11, identical set, all three `_Glow` intact |
 
@@ -62,6 +63,11 @@ packed with the repo standard `gltfpack@0.24 -c -km -kn -noq`:
 | weld only | 256,144 | 110,064 | 3,336 | 202 |
 | join only | 174,664 | 89,112 | 12,040 | 12 |
 | **weld + join (shipped)** | **170,356** | 94,960 | **3,336** | **12** |
+
+Two vertex counts, because they measure different things and only one of them is
+the file. In the Blender scene the weld takes 12,040 → 3,336; the glTF exporter
+then re-splits for flat shading, so the shipped GLB **re-imports at 11,691**. The
+raw byte count is the number that decides this, not either vertex figure.
 
 **Join is the win; the weld is a small extra.** Joining alone takes 260,672 →
 174,664 raw (−33%). The weld then takes another 4,308 bytes off raw and drops
