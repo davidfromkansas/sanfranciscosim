@@ -128,3 +128,15 @@ day alpha a full-arch shell washed the hero mauve.
   and the night glow on one of them is wrong.
 - Office block dimensions are read off imagery and over-supply LoopNet's 39,700 SF by ~16%.
 - Pile spacing (7.5 m) is inferred; only the edge band and a centre spine are modelled.
+
+## Gate 3 — approval
+
+> "APPROVE EVERYTHING DONT ASK ME FOR PERMISSION"
+
+— David, 18 August 2026, in the session prompt that invoked
+`docs/asset-pipeline/ADDRESS-TO-ASSET.md` for this building.
+
+Taken as standing approval for the pipeline's gates including stage 3, so the session did not
+stop here. The contact sheet, the day and night aerials and the numbers above were presented
+at this point rather than withheld; nothing was approved on the user's behalf that they had
+not already pre-authorised in writing.
