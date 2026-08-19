@@ -3160,6 +3160,54 @@ export const LANDMARKS = [
     // the canopy are the whole recognition.
     camera: { distance: 120, yaw: 85, pitch: 26 },
   },
+  {
+    // Steuart Place, a 1907 brick through-lot running the full block depth from
+    // Steuart Street to The Embarcadero, with a set-back barrel-roofed penthouse
+    // at the Embarcadero end that is the crest and the only silhouette break on
+    // this row. Party walls on both long flanks: 121 Steuart northwest,
+    // 141 Steuart southeast, and 141 shares this PARCEL (3715-025 is recorded as
+    // "131-141 Steuart") but is a separate mass that stays procedural.
+    //
+    // Measured against the real bake input (DataSF ynuv-fyni footprints plus the
+    // Overture/OSM ring for the same building), by nearest ring VERTEX and by
+    // centroid -- excluded() in buildings.mjs fires on either:
+    //
+    //    0.08 m  this building's Overture/OSM ring (602 m2), via CENTROID
+    //    1.80 m  the SAME building's DataSF footprint (SF3715025, 610 m2), also
+    //            via centroid -- the two traces disagree by 1.8 m
+    //   13.59 m  121 Steuart (SF3715003) -- the first thing at risk
+    //   14.57 m  141 Steuart (SF3715025's second footprint, same parcel). It
+    //            must SURVIVE: it is a separate two-storey block with a glass
+    //            addition that this asset does not contain
+    //   19.54 m  this building's own nearest party-wall vertex
+    //
+    //   exclude  1 m     -> drops 1 (only the Overture ring; a DataSF block is
+    //                       left standing inside the asset)
+    //   exclude  2-13 m  -> drops 2 (correct: both rings of this building only)
+    //   exclude 14 m     -> drops 4 (eats 121 Steuart and its Overture twin)
+    //   exclude 16-25 m  -> drops 6 (also eats 141 Steuart)
+    //   exclude 30 m     -> drops 10 (a crater through the row)
+    //
+    // 8 m sits in the middle of the (1.80, 13.59) window with 6 m of margin
+    // above. Note it does NOT reach this footprint's own far corners at 19.5 m
+    // and does not need to -- on a party-walled slot the centroid test does all
+    // the work, and a radius that reached the corners would delete both
+    // neighbours.
+    id: '131Steuart',
+    name: 'Steuart Place (131 Steuart Street)',
+    lon: -122.3924386,
+    lat: 37.7930568,
+    height: 27.7,
+    exclude: 8,
+    // Camera offset is (sin yaw, ., cos yaw) with +z south, so camera bearing =
+    // 180 - yaw and yaw 135 stands the eye to the NORTHEAST, out over the
+    // Embarcadero. That is the only view that shows the barrel-roofed penthouse
+    // against the brick cornice behind it; from Steuart Street the penthouse is
+    // set back 32 m and invisible. 200 m suits a 27.7 m building (cf.
+    // 340Brannan at 240 for 17.79 m). No `key`: this is texture in the row, not
+    // a destination.
+    camera: { distance: 200, yaw: 135, pitch: 28 },
+  },
 ];
 
 // Parks/green spaces the landcover bake must match at least one source polygon

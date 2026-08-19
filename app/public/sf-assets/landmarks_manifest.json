@@ -1939,5 +1939,24 @@
     ],
     "tris": 3366,
     "loadRadius": 2500
+  },
+  {
+    "id": "131-steuart",
+    "file": "131-steuart.glb",
+    "anchor": [
+      -122.3924386,
+      37.7930568
+    ],
+    "targetHeightM": 27.7,
+    "cat": 3,
+    "name": "Steuart Place (131 Steuart Street)",
+    "estimated": false,
+    "dims": [
+      41.2209,
+      41.3458,
+      27.7
+    ],
+    "tris": 6842,
+    "loadRadius": 2500
   }
 ]
