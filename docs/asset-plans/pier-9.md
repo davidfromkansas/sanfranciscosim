@@ -216,7 +216,7 @@ Re-import into a fresh scene and validate the re-import. Write
 **not** failures and must be stated as such:
 
 - **min Z ≈ −2.6 m, not 0** — the deck-top origin rule (plan 2.3).
-- The axis-aligned XY bbox will be roughly **215 × 175 m** despite the pier being
+- The axis-aligned XY bbox will be roughly **235 × 188 m** despite the pier being
   254 × 49 m — the consequence of the 54.6° heading, not a scale error.
 
 ## Manifest draft
@@ -227,7 +227,7 @@ Include in `REPORT.md`; do not edit the production manifest in this task.
 {
   "id": "pier-9",
   "file": "pier-9.glb",
-  "anchor": [-122.3967912, 37.8006745],
+  "anchor": [-122.3967994, 37.8006708],
   "targetHeightM": 17.6,
   "cat": 3,
   "name": "Pier 9",
@@ -548,7 +548,7 @@ bays third. The frontispiece is last.
 {
   "id": "pier-9",
   "file": "pier-9.glb",
-  "anchor": [-122.3967912, 37.8006745],
+  "anchor": [-122.3967994, 37.8006708],
   "targetHeightM": 17.6,
   "cat": 3,
   "name": "Pier 9",
@@ -645,7 +645,7 @@ Other integration notes:
 - Binary GLB, real metres, applied transforms, no negative scales
 - **min Z ≈ −2.6 m — expected, stated as a PASS in `validation.json` with the reason**
 - XY centre offset ≈ 0 (bbox centre); vertical extent exactly **17.6 m**
-- Axis-aligned XY bbox ≈ 215 × 175 m — expected at 54.6°, not a scale error
+- Axis-aligned XY bbox ≈ 235 × 188 m — expected at 54.6°, not a scale error
 - ≤ 24,000 triangles; ≤ 500 KB after `pipeline/compress-assets.mjs`
 - No textures/transparency/cameras/lights/animation; all materials `Toy_*`, no `Toy_body`
 - `_Glow` only on the 2.9 surfaces; glow shells open and proud, never closed boxes
