@@ -1,8 +1,9 @@
 # Fulton Plaza — build report
 
-`fulton-plaza.glb`: 21 objects, **13,364 triangles**, 676 KB raw / 196 KB gzip, 16 palette
-materials, **draped on the baked terrain**, all 19 contract checks PASS in a fresh-scene
-re-import of the exported file (`validation.json`).
+`fulton-plaza.glb`: 21 objects, **13,364 triangles**, **345 KB raw / 220 KB gzip** as
+shipped (meshopt-compressed; 676 KB before stage 4), 16 palette materials, **draped on the
+baked terrain**, all 19 contract checks PASS in a fresh-scene re-import of the *shipped*
+file (`validation.json`).
 
 The asset is the pedestrianised block of Fulton Street between Larkin and Hyde — the 120 m
 × 49 m right-of-way between the Asian Art Museum and the Main Library, with the 1894 Pioneer
@@ -26,6 +27,7 @@ asphalt.
 | Monument crest | 11.268 m above local grade — apron 0.63 + 10.668 m (SFAC 420 in) |
 | Koi | two bodies, 20.642 m each |
 | Triangles | 13,364 of a 16,000 cap |
+| File | 353,476 B raw / 225,263 B gzip9, meshopt-compressed. Pre-optimize 692,360 B; see `optimize/REPORT.md` |
 | Category / streaming | `cat: 0`, `loadRadius: 2500` |
 
 ## Triangles by object
@@ -77,6 +79,17 @@ writes `validation.json`. Overall **PASS**.
 `min_z ≈ 0` is **not** among the checks and its absence is deliberate: this asset is the
 ground, so z = 0 is the anchor's elevation and `min_z` is −1.50 m. The drape check above
 replaces it. See REFERENCE.md, "The terrain drape".
+
+## Stage 4 — optimize
+
+`gltfpack@0.24 -c -km -kn -noq` applied to the approved build: **692,360 → 353,476 bytes
+raw, −48.9%**, geometry byte-identical, max A/B pixel delta 0.046%, all gates PASS.
+
+**Phase B was measured and reverted in full.** Six variants; every one produced a *larger*
+file than doing nothing, including the join — the Blender import/re-export round-trip alone
+costs 67 KB and 6,924 vertices on this asset, which no cleanup step recovers. The 1 mm weld
+cost a further 117 KB (the flat-shading topology is not waste), and the limited dissolve,
+which did help by 22 KB, could not close the gap. Full table in `optimize/REPORT.md`.
 
 ## Renders
 

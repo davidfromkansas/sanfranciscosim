@@ -1,0 +1,396 @@
+{
+ "file_bytes": {
+  "raw": 692360,
+  "gzip9": 201656
+ },
+ "objects": 21,
+ "total_tris": 13364,
+ "total_verts": 24895,
+ "primitives_est": 26,
+ "top20": [
+  {
+   "name": "monument",
+   "tris": 4160,
+   "verts": 8268,
+   "dims": [
+    17.889,
+    12.594,
+    10.818
+   ],
+   "materials": [
+    "Toy_bronze",
+    "Toy_stone"
+   ]
+  },
+  {
+   "name": "joints",
+   "tris": 2304,
+   "verts": 4608,
+   "dims": [
+    117.899,
+    61.108,
+    2.148
+   ],
+   "materials": [
+    "Toy_seam"
+   ]
+  },
+  {
+   "name": "bollards",
+   "tris": 1568,
+   "verts": 2688,
+   "dims": [
+    120.356,
+    58.58,
+    3.012
+   ],
+   "materials": [
+    "Toy_ink",
+    "Toy_steel"
+   ]
+  },
+  {
+   "name": "trees",
+   "tris": 1104,
+   "verts": 1932,
+   "dims": [
+    118.971,
+    61.727,
+    8.396
+   ],
+   "materials": [
+    "Toy_steel",
+    "Toy_verdigris"
+   ]
+  },
+  {
+   "name": "deck",
+   "tris": 970,
+   "verts": 1689,
+   "dims": [
+    126.08,
+    66.312,
+    3.176
+   ],
+   "materials": [
+    "Toy_tarmac"
+   ]
+  },
+  {
+   "name": "koi",
+   "tris": 408,
+   "verts": 672,
+   "dims": [
+    67.638,
+    34.519,
+    1.224
+   ],
+   "materials": [
+    "Toy_koiOrange",
+    "Toy_koiWhite"
+   ]
+  },
+  {
+   "name": "koi_glow",
+   "tris": 384,
+   "verts": 624,
+   "dims": [
+    67.245,
+    33.639,
+    1.17
+   ],
+   "materials": [
+    "Toy_koiOrange_Glow",
+    "Toy_koiWhite_Glow"
+   ]
+  },
+  {
+   "name": "lamps",
+   "tris": 384,
+   "verts": 720,
+   "dims": [
+    105.972,
+    57.92,
+    7.647
+   ],
+   "materials": [
+    "Toy_steel"
+   ]
+  },
+  {
+   "name": "people",
+   "tris": 384,
+   "verts": 768,
+   "dims": [
+    56.049,
+    21.719,
+    3.204
+   ],
+   "materials": [
+    "Toy_navy"
+   ]
+  },
+  {
+   "name": "terrace_s_wall",
+   "tris": 288,
+   "verts": 576,
+   "dims": [
+    116.956,
+    18.615,
+    2.471
+   ],
+   "materials": [
+    "Toy_stone"
+   ]
+  },
+  {
+   "name": "terrace_s",
+   "tris": 256,
+   "verts": 394,
+   "dims": [
+    118.444,
+    28.17,
+    2.406
+   ],
+   "materials": [
+    "Toy_stone"
+   ]
+  },
+  {
+   "name": "walk_n",
+   "tris": 210,
+   "verts": 302,
+   "dims": [
+    117.712,
+    22.85,
+    2.084
+   ],
+   "materials": [
+    "Toy_stone"
+   ]
+  },
+  {
+   "name": "furniture",
+   "tris": 180,
+   "verts": 360,
+   "dims": [
+    89.16,
+    49.638,
+    2.269
+   ],
+   "materials": [
+    "Toy_roofd"
+   ]
+  },
+  {
+   "name": "apron",
+   "tris": 156,
+   "verts": 320,
+   "dims": [
+    19.959,
+    19.959,
+    0.415
+   ],
+   "materials": [
+    "Toy_cream"
+   ]
+  },
+  {
+   "name": "lamps_glow",
+   "tris": 144,
+   "verts": 288,
+   "dims": [
+    106.041,
+    57.988,
+    2.212
+   ],
+   "materials": [
+    "Toy_gold_Glow"
+   ]
+  },
+  {
+   "name": "bed_east_kerb",
+   "tris": 100,
+   "verts": 134,
+   "dims": [
+    52.27,
+    14.813,
+    1.463
+   ],
+   "materials": [
+    "Toy_stone"
+   ]
+  },
+  {
+   "name": "bed_east_soil",
+   "tris": 100,
+   "verts": 134,
+   "dims": [
+    49.395,
+    13.998,
+    1.336
+   ],
+   "materials": [
+    "Toy_soil"
+   ]
+  },
+  {
+   "name": "bed_west_kerb",
+   "tris": 100,
+   "verts": 148,
+   "dims": [
+    54.205,
+    15.255,
+    1.321
+   ],
+   "materials": [
+    "Toy_stone"
+   ]
+  },
+  {
+   "name": "bed_west_soil",
+   "tris": 100,
+   "verts": 150,
+   "dims": [
+    51.224,
+    14.416,
+    1.196
+   ],
+   "materials": [
+    "Toy_soil"
+   ]
+  },
+  {
+   "name": "ashurbanipal",
+   "tris": 52,
+   "verts": 96,
+   "dims": [
+    2.17,
+    2.17,
+    4.086
+   ],
+   "materials": [
+    "Toy_bronze"
+   ]
+  }
+ ],
+ "vertex_attrs": [
+  "NORMAL"
+ ],
+ "materials": [
+  {
+   "name": "Toy_bronze",
+   "glow": false,
+   "user_objects": 2
+  },
+  {
+   "name": "Toy_cream",
+   "glow": false,
+   "user_objects": 1
+  },
+  {
+   "name": "Toy_gold_Glow",
+   "glow": true,
+   "user_objects": 2
+  },
+  {
+   "name": "Toy_ink",
+   "glow": false,
+   "user_objects": 1
+  },
+  {
+   "name": "Toy_koiOrange",
+   "glow": false,
+   "user_objects": 1
+  },
+  {
+   "name": "Toy_koiOrange_Glow",
+   "glow": true,
+   "user_objects": 1
+  },
+  {
+   "name": "Toy_koiWhite",
+   "glow": false,
+   "user_objects": 1
+  },
+  {
+   "name": "Toy_koiWhite_Glow",
+   "glow": true,
+   "user_objects": 1
+  },
+  {
+   "name": "Toy_navy",
+   "glow": false,
+   "user_objects": 1
+  },
+  {
+   "name": "Toy_roofd",
+   "glow": false,
+   "user_objects": 1
+  },
+  {
+   "name": "Toy_seam",
+   "glow": false,
+   "user_objects": 1
+  },
+  {
+   "name": "Toy_soil",
+   "glow": false,
+   "user_objects": 2
+  },
+  {
+   "name": "Toy_steel",
+   "glow": false,
+   "user_objects": 3
+  },
+  {
+   "name": "Toy_stone",
+   "glow": false,
+   "user_objects": 6
+  },
+  {
+   "name": "Toy_tarmac",
+   "glow": false,
+   "user_objects": 1
+  },
+  {
+   "name": "Toy_verdigris",
+   "glow": false,
+   "user_objects": 1
+  }
+ ],
+ "textures": [],
+ "bbox": {
+  "dims": [
+   128.4915,
+   67.6286,
+   12.7999
+  ],
+  "min": [
+   -64.2458,
+   -33.8143,
+   -1.5
+  ],
+  "origin_offset_xy": [
+   0.0,
+   0.0
+  ],
+  "base_z": -1.5
+ },
+ "duplicate_mesh_groups": [],
+ "dup_redundant_tris": 0,
+ "join_candidates": {
+  "Toy_bronze": 2,
+  "Toy_gold_Glow": 2,
+  "Toy_soil": 2,
+  "Toy_steel": 3,
+  "Toy_stone": 6
+ },
+ "degenerate_tris": 8,
+ "coincident_vert_pairs": 18095,
+ "over_tess": {
+  "near_distance_m": 192.74,
+  "one_px_world_m": 0.1299,
+  "note": "cylinders whose chord error < one_px_world_m can halve segments"
+ }
+}
