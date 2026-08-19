@@ -193,3 +193,187 @@ verbatim:
 The stage-3 gate was therefore granted in advance rather than after the fact. The contact
 sheet, the aerial day and night renders and the numbers in §1 were still presented before
 the pipeline advanced, so the evidence exists even though no confirmation was waited for.
+
+## 9. Stage 5 — integration (batch mode)
+
+Run of `docs/asset-plans/INTEGRATION-PROMPT.md` Part 1 with `<slug> 2-folsom`,
+`<Name> 2 Folsom Street (Gap Inc. headquarters)`, **Case B**. Batch mode: the re-bake was
+run and QA'd, then discarded, and this branch carries source only.
+
+### 9.1 What went in
+
+| File | Change |
+|---|---|
+| `app/public/sf-assets/landmarks/2-folsom.glb` | the shipped meshopt asset, byte-identical to `artifacts/2-folsom/2-folsom.glb` |
+| `app/public/sf-assets/landmarks_manifest.json` | one appended entry, **19 insertions, 0 deletions** — appended as TEXT, never re-serialised, because `JSON.stringify` rewrites `11.0` to `11` across six other landmarks' `targetHeightM` and `dims` |
+| `pipeline/lib/landmarks.mjs` | one `LANDMARKS` entry, `id: '2Folsom'`, `exclude: 60`, camera preset |
+| `artifacts/2-folsom/qa_local.mjs` | the stage-5 QA harness for this asset |
+
+`camelId('2-folsom')` = `2Folsom`, which is the registry id — verified, so the loader
+finds the landmark it is meant to replace. There is no procedural builder for it in
+`app/src/landmarks.js` (Case B), so nothing is being hidden and the fallback state is bare
+ground inside the exclusion zone.
+
+`loadRadius: 2640` = the default `max(2500, 88.0 * 30)`. **Not** `alwaysLoaded`: at 88 m
+this is well below skyline scale, and the shared batch is the scarce resource (§9.4).
+
+### 9.2 The exclusion, measured
+
+`exclude: 60` m, chosen against the real bake inputs and then verified against the baked
+tile rather than against a count.
+
+| | distance from the anchor |
+|---|---|
+| this footprint, DataSF `201006.0000175` | centroid **0.10 m**, vertices 35.64-57.04 m |
+| this footprint, Overture `d31f359f` | centroid 2.26 m, vertices 34.98-56.83 m |
+| the asset's own furthest corner | 57.14 m |
+| **nearest neighbour vertex** | **66.93 m** (Overture `98232020`, the 17.2 m block across Folsom) |
+| then | 69.53 m (MIRA), 70.10 m, 71.23 m (201 Spear) |
+
+Safe window (0.10, 66.93). 60 m sits 2.9 m outside the asset's own corners and 6.9 m
+inside the nearest neighbour. `excluded()` in `pipeline/buildings.mjs` fires on the
+centroid **or** any ring vertex, so both were measured.
+
+**Only one footprint was ever baked here, not two.** Both sources trace this building, but
+`buildings.mjs` takes Overture as gap-fill, so a footprint DataSF already has is not added
+again. Measured origin/main → this branch across cells `23_11` + `24_11`: **98 → 97**
+footprints, a delta of exactly one. The plan's §2.13 and the first draft of the registry
+comment both assumed two; corrected.
+
+**The dropped block topped out at 94.5 m** — 6.5 m taller than the 88.0 m asset. That is
+why a Case B landmark cannot be judged without its re-bake applied: unexcluded, the
+procedural building swallows the GLB whole and the asset simply never appears. It is also
+why the exclusion was verified by decoding the tile, not by `verify-rebake.mjs`'s per-cell
+counts alone.
+
+After the bake, in cells `23_11` + `24_11`:
+
+- footprints with any vertex inside r=60: **0**
+- nearest surviving footprint vertex to the anchor: **67.86 m**
+
+### 9.3 What the re-bake touched
+
+Ran `terrain, bridges, buildings, streets, landcover, validate, lore, toy, notables,
+context, muni-shapes` — the whole chain, because `context.mjs` imports `LANDMARKS` and
+owns this landmark's pick box, its search-index entry and its `context/landmarks.json`
+row, and `validate.mjs`'s publish step drops `app/public/tiles/ctx/` and `context/`.
+
+`pipeline/data/` was not re-downloaded: it was hardlinked from an existing worktree's
+identical snapshot, so the bake ran against the same inputs as `origin/main` and nothing
+churned for data-vintage reasons. That is visible in the diff — only the cells this
+landmark touches moved.
+
+### 9.4 Shared BatchedMesh headroom — a note for the batch integrator
+
+Measured from the GLB accessor counts across all 104 manifest entries, no browser needed:
+
+| reserve | used | headroom |
+|---|---|---|
+| `BODY_VERTS` 1,600,000 | **1,468,496 (91.8%)** | 131,504 |
+| `GLOW_VERTS` 250,000 | 78,614 (31.4%) | 171,386 |
+| `BODY_INDICES` 3,600,000 | 2,457,606 (68.3%) | — |
+| `GLOW_INDICES` 750,000 | 127,326 (17.0%) | — |
+
+This asset contributes 33,732 body and 2,253 glow vertices — 2.3% of the body reserve. It
+fits. But the body reserve is at 91.8% with roughly four more landmarks of this size left
+in it, and an overflow is not a crash: `addGeometry` throws, that landmark drops to its
+procedural stand-in, and the symptom is **one arbitrary landmark quietly missing on each
+reload**. Raise `BODY_VERTS` in `app/src/assets.js` before the next batch, not after.
+
+### 9.5 Local QA (INTEGRATION-PROMPT Step 5)
+
+Driven by `artifacts/2-folsom/qa_local.mjs` against the BUILT app (`app/dist`) in real
+headless Chrome over CDP, not the in-editor Browser pane: parallel landmark sessions hold
+the preview slots, and a hidden pane throttles `requestAnimationFrame` to nothing, which
+makes a healthy streaming landmark look broken.
+
+| Check | Result | Evidence |
+|---|---|---|
+| Manifest entry loads | **PASS** | `sf-assets: 2-folsom merged 16 objects / 13 materials -> batched (11244 tris body)` |
+| Uniform scale ~ 1.0 | **PASS** | **x1.0000** — the authored crown and `targetHeightM` agree exactly |
+| Placed at the projected anchor | **PASS** | loader `4094, -2298` vs the tangent projection's `4094.00, -2297.79` |
+| Draw calls < 300 | **PASS** | avg **99**/frame over 30 frames at the landmark |
+| Atrium skylight is the night hero | **PASS** | median luminance **68** on the skylight vs **8** on the terrace beside it, same material, same moon |
+| No asset warnings | **PASS** | none |
+| Exactly one building on the block | **PASS** | `plan.png`, `wide.png`; and §9.2's tile decode — 0 survivors inside r=60 |
+| Terrain seating | **PASS** | `low-from-embarcadero.png`, `low-from-spear.png` — no float, no sink; the site is dead-flat made ground (sigma 0.07 m) |
+| Orientation | **PASS** | `wide.png` — the Embarcadero elevation faces the water, the Folsom front faces the street |
+
+Screenshots in `artifacts/2-folsom/qa/`.
+
+**Two harness bugs found here, both worth recording because they fail SILENTLY and would
+pass a careless asset just as happily as a good one.**
+
+1. **Diorama mode hard-locks the camera pitch to 42 degrees.** `camera.js` line 50 sets
+   `DIORAMA.pitch = 42 * DEG` and its `update()` reassigns `state.pitch = DIORAMA.pitch`
+   every frame while diorama is on — which, by AGENTS rule 1, is always. So
+   `SF.goTo(lon, lat, distance, yaw, pitch)` sets the pitch and the next frame takes it
+   straight back. The first version of this QA tried to prove the three-mass step-up from
+   a 10-degree view and reported "no building in any column"; the asset was fine and the
+   view did not exist. There is no sky-behind-the-tower shot to be had in this app. (The
+   proof was a `silhouette.png` byte-identical to `day.png` — the camera had not moved at
+   all. It is not kept here, being a duplicate of a shot that is.)
+2. **Reading pixels back off `SF.renderer.domElement` returns all zeroes.** The renderer
+   runs without `preserveDrawingBuffer`, so by the time a `Runtime.evaluate` runs, the
+   presented frame's drawing buffer is gone and `drawImage` copies nothing. The night
+   check first reported skylight 0 / terrace 0 — identical to what a completely unlit
+   asset would report. `Page.captureScreenshot` samples at composite time and does not
+   have the problem, so the harness now measures the PNG it just wrote.
+
+### 9.6 Fallback drill (INTEGRATION-PROMPT Step 6, mandatory)
+
+Run as `node artifacts/2-folsom/qa_local.mjs --drill`, which serves a real **404** for the
+landmark GLB rather than renaming the file — Vite answers a missing public path with
+`index.html` and HTTP 200, so the usual rename trick cannot produce a fetch failure at all.
+
+| Check | Result |
+|---|---|
+| App still boots with the GLB missing | **PASS** — 104 entries, 83 live, 1 failed |
+| Exactly one fallback warning | **PASS** |
+| `2Folsom` absent from `placed` | **PASS** |
+| Draw calls < 300 | **PASS** — avg 99/frame |
+| Site degrades to empty ground inside the exclusion zone | **PASS** — `qa/drill-day.png` |
+
+The warning is:
+
+```
+sf-assets: 2-folsom failed to load (fetch for ".../sf-assets/landmarks/2-folsom.glb" responded with 404: Not Found)
+```
+
+**Not** the `... — keeping the code-built landmark` text INTEGRATION-PROMPT Step 6 quotes.
+That wording belongs to the RESIDENT path (`assets.js` `warn()`); a STREAMED entry — which
+this is, it has a `loadRadius` — fails through `scan()` instead, which does not use the
+single-shot `warn()`. It is still exactly once: `place()` sets `status = 'failed'` and no
+branch in `scan()` matches `'failed'`, so it can never be retried or re-warned. Match on
+the id, not on the prompt's wording.
+
+Empty ground is the CORRECT Case B outcome and not a defect: there is no procedural
+builder for `2Folsom` in `app/src/landmarks.js` to reappear, and the exclusion has cleared
+the baked footprint by design. `drill-day.png` shows bare terrain with the streets,
+sidewalks and neighbours intact — no hole, no crash, city renders normally.
+
+### 9.7 Batch mode — what this branch carries
+
+Per `ADDRESS-TO-ASSET.md` "Batch mode": the re-bake was run and fully QA'd, then discarded.
+Other landmark sessions were confirmed in flight on this machine during the run, so the
+assumption is not hypothetical.
+
+```
+git checkout -- app/public/tiles api/_data
+```
+
+Source committed: the GLB, the manifest entry, the registry entry, the asset plan, the
+`artifacts/2-folsom/` tree and this QA harness. All three shared files are append-only
+lists that merge mechanically. The city is rebuilt once for the whole batch by
+`docs/asset-pipeline/BATCH-INTEGRATE.md`.
+
+Sanity check required by the pipeline doc — `git diff --name-only origin/main` must list
+nothing under `app/public/tiles/` or `api/_data/`: **0 files**, confirmed after the
+discard.
+
+One unrelated path does show in that diff, `api/_lib/feeds/residents.mjs`, and it is not a
+leak: `origin/main` advanced during this session (PR #159, "Strip the weak-etag marker,
+merge on write conflicts, never rewind the window"), so this branch is one commit behind on
+a file it never touched. It will merge cleanly. No rebase was done — a batch branch should
+touch as little as possible.
+
