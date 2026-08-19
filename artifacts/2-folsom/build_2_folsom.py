@@ -129,17 +129,17 @@ FOOTPRINT = [P(u, v) for u, v in FOOTPRINT_UV]
 # from the polygon winding, not asserted.
 BAYS = {
     1: 2,    # northwest service recess back wall, 13.20 m
-    3: 4,    # northwest face, 32.70 m
-    6: 8,    # Spear Street (southwest), 68.56 m — the long elevation
-    9: 4,    # Folsom Street (southeast), 33.48 m
+    3: 3,    # northwest face, 32.70 m
+    6: 7,    # Spear Street (southwest), 68.56 m — the long elevation
+    9: 3,    # Folsom Street (southeast), 33.48 m
     11: 2,   # Folsom entrance recess back wall, 13.59 m
-    13: 4,   # Folsom Street (southeast), 32.68 m
+    13: 3,   # Folsom Street (southeast), 32.68 m
     14: 3,   # Embarcadero (northeast), 24.72 m
     16: 1,   # Embarcadero north step, 5.99 m
     18: 2,   # EMBARCADERO CENTRAL PAVILION, 15.15 m
     20: 1,   # Embarcadero south step, 6.40 m
     22: 3,   # Embarcadero (northeast), 24.87 m
-    23: 4,   # northwest face, 33.37 m — the second long NW plane
+    23: 3,   # northwest face, 33.37 m — the second long NW plane
 }
 EDGE_EMB_PAVILION = 18   # the harbour entrance
 EDGE_FOLSOM_RECESS = 11  # the mid-block entrance
@@ -499,7 +499,7 @@ def articulate(edge, n_bays, z_start, floors, floor_h, pier_mat, glass_mat,
                 SKIN,
                 glass_mat,
             )
-            if glow_mat is not None and (i * 7 + k * 3 + edge + lit_seed) % 11 < 2:
+            if glow_mat is not None and (i * 7 + k * 3 + edge + lit_seed) % 13 < 2:
                 g = 0.30
                 wall_panel(
                     f"{tag}lit{edge}_{i}_{k}",
@@ -523,7 +523,7 @@ def uv_articulate(tag, cu, cv, su, sv, z_start, floors, floor_h,
         t = (dx / length, dy / length)
         n = (t[1], -t[0])
         frame = (a, t, n)
-        n_bays = max(3, int(round(length / 7.5)))
+        n_bays = max(3, int(round(length / 8.5)))
         pitch = length / n_bays
         z_end = z_start + floors * floor_h
         for i in range(n_bays + 1):
@@ -560,7 +560,7 @@ def uv_articulate(tag, cu, cv, su, sv, z_start, floors, floor_h,
                     SKIN,
                     glass_mat,
                 )
-                if glow_mat is not None and (i * 5 + k * 3 + e) % 9 < 2:
+                if glow_mat is not None and (i * 5 + k * 3 + e) % 11 < 2:
                     g = 0.30
                     wall_panel(
                         f"{tag}lit{e}_{i}_{k}",
@@ -651,13 +651,13 @@ def build():
     uv_box("skylight_kerb", sku, skv, Z_TERRACE, Z_TERRACE + 0.45,
            skw + 1.0, skd + 1.0, stone)
     uv_box("skylight_glass", sku, skv, Z_TERRACE + 0.35, Z_TERRACE + 1.35, skw, skd, glassl)
-    # a coarse 6 x 5 rib grid: the real glazing is ~11 x 8 cells and is
+    # a coarse 5 x 4 rib grid: the real glazing is ~11 x 8 cells and is
     # sub-pixel at city scale
-    for i in range(1, 6):
-        uv_box(f"skylight_ribu{i}", sku - skw / 2 + skw * i / 6.0, skv,
+    for i in range(1, 5):
+        uv_box(f"skylight_ribu{i}", sku - skw / 2 + skw * i / 5.0, skv,
                Z_TERRACE + 1.30, Z_TERRACE + 1.50, 0.35, skd, stone)
-    for j in range(1, 5):
-        uv_box(f"skylight_ribv{j}", sku, skv - skd / 2 + skd * j / 5.0,
+    for j in range(1, 4):
+        uv_box(f"skylight_ribv{j}", sku, skv - skd / 2 + skd * j / 4.0,
                Z_TERRACE + 1.30, Z_TERRACE + 1.50, skw, 0.35, stone)
     uv_box("skylight_glow", sku, skv, Z_TERRACE + 1.36, Z_TERRACE + 1.44,
            skw - 0.8, skd - 0.8, skylight_glow)
@@ -707,7 +707,7 @@ def build():
     tow_poly = uv_rect(TOWER_CU, TOWER_CV, TOWER_W, TOWER_W)
     prism("tower_body", tow_poly, Z_TERRACE - 0.30, Z_TOWER_1 - 0.60, stone, mat_caps=sand)
     uv_articulate("t", TOWER_CU, TOWER_CV, TOWER_W, TOWER_W, Z_BASE_PARAPET + 0.60,
-                  9, FLOOR_H, stone, glass, glass_glow, trim, tow_poly)
+                  8, FLOOR_H, stone, glass, glass_glow, trim, tow_poly)
     ring_band("tower_ledge1", tow_poly, Z_TOWER_1 - 0.60, Z_TOWER_1, -0.10, 0.55, trim)
 
     tow1 = uv_rect(TOWER_CU, TOWER_CV, TOWER_W1, TOWER_W1)
@@ -722,10 +722,10 @@ def build():
             z0 = Z_TOWER_1 + 0.6 + k * FLOOR_H
             wall_panel(f"tw1band{e}_{k}", frame, length / 2.0,
                        rect_profile(length, z0, z0 + BAND_H), 0.0, BAND_PROJ, trim)
-            for i in range(3):
-                u = (i + 0.5) * length / 3.0
+            for i in range(2):
+                u = (i + 0.5) * length / 2.0
                 wall_panel(f"tw1win{e}_{i}_{k}", frame, u,
-                           rect_profile(length / 3.0 - 1.7, z0 + WIN_SILL,
+                           rect_profile(length / 2.0 - 3.4, z0 + WIN_SILL,
                                         z0 + WIN_SILL + WIN_H), 0.0, SKIN, glass)
     ring_band("tower_ledge2", tow1, Z_TOWER_2 - 0.60, Z_TOWER_2, -0.10, 0.55, trim)
 
@@ -769,7 +769,6 @@ def build():
     uv_box("stair_ph", -31.0, 10.0, Z_SUP_DECK, Z_SUP_DECK + 3.00, 7.0, 5.0, steel)
     uv_box("vent0", -14.0, -18.0, Z_SUP_DECK, Z_SUP_DECK + 1.10, 2.60, 2.60, roofd)
     uv_box("vent1", -33.0, -6.0, Z_SUP_DECK, Z_SUP_DECK + 1.10, 2.60, 2.60, roofd)
-    uv_box("screen", -30.0, 17.0, Z_SUP_DECK, Z_SUP_DECK + 1.60, 10.0, 3.0, steel)
 
     # Bevel budget: the three masses, the cornices, the parapets and the
     # crenellation carry the miniature read and get the full 0.12/2. The
@@ -779,17 +778,25 @@ def build():
         if obj.type != "MESH":
             continue
         n = obj.name
-        if "win" in n or "lit" in n or "glow" in n.lower() or "band" in n:
-            # Spandrel bands are 0.12 m proud and 0.55 m tall: a bevel on them
-            # is sub-pixel at city scale and cost 3,900 triangles of the 24,000
-            # cap, which the three mass transitions need more.
+        # Bevel policy, tightened twice. The first pass beveled everything at
+        # 0.12/2 and cost 9,300 triangles; the second dropped the spandrel
+        # bands; this one drops every applied panel and gives the small
+        # freestanding roof/crown solids one segment instead of two. The
+        # deciding test is the app's camera, not Blender's: a 0.05 m bevel on
+        # a 0.18 m proud pier is far under one screen pixel at the near
+        # landmark distance (0.115 m/px, measured in optimize/inspect.json),
+        # so it was paying vertices for nothing — and vertices, not triangles,
+        # are what the meshopt file size follows.
+        if ("win" in n or "lit" in n or "glow" in n.lower() or "band" in n
+                or "pier" in n
+                or n.startswith(("hedge", "vent", "skylight_rib", "crenel"))):
             continue
-        if n.startswith(("hedge", "vent", "skylight_rib")) or "pier" in n:
-            bevel(obj, width=0.05, segments=1)
-        elif "cornice" in n or "parapet" in n or "coping" in n or "ledge" in n or n == "base_course":
-            # 24-vertex rings: a 2-segment bevel on these alone was 7,900
-            # triangles. One segment keeps the lit top edge that makes the
-            # cornice read from directly above and costs a third as much.
+        if ("cornice" in n or "parapet" in n or "coping" in n or "ledge" in n
+                or n == "base_course" or n.startswith(("emb_entry_col",
+                                                       "fol_entry_col", "crownlintel"))):
+            # 24-vertex rings and the small repeated crown/portico solids: one
+            # segment keeps the lit top edge that makes them read from directly
+            # above and costs a third of what two segments cost.
             bevel(obj, width=0.06, segments=1)
         else:
             bevel(obj, width=0.12, segments=2)

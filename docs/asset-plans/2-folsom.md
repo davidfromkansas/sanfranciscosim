@@ -25,7 +25,7 @@ Part 2 is the research and design dossier behind it.
 | WGS84 anchor | `-122.390975, 37.790787` |
 | Target height | **88.0 m** to the limestone crown; superstructure roof deck 72.1 m (measured); base roof / 7th-floor terrace 32.3 m (measured) |
 | Footprint | 84.32 m (Folsom / northwest axis) x 77.15 m (Embarcadero / Spear axis); 6,341 m2, measured |
-| Triangle cap | 24,000 |
+| Triangle cap | 24,000 (shipped: 16,996 — see `artifacts/2-folsom/optimize/REPORT.md` §6) |
 | Category | `3` (office) |
 
 ---

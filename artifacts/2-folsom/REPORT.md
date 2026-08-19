@@ -7,20 +7,27 @@ San Francisco, for the SF-SIM toy-diorama city.
 **REPORT beats plan.** Where this file disagrees with `docs/asset-plans/2-folsom.md`, this
 file is what was built and verified. Corrections are listed in §4.
 
-## 1. Shipped numbers (pre-optimize)
+## 1. Shipped numbers
 
-| | |
-|---|---|
-| Objects | 919 |
-| Triangles | **23,852** (cap 24,000) |
-| Dimensions (axis-aligned) | 113.92 x 113.96 x **88.00** m |
-| `min Z` | 0.000 m |
-| XY centre offset of the AABB | (1.455, 1.427) m — see §2 |
-| Materials | 13, all `Toy_*`, flat, no textures, no alpha |
-| Glow materials | `Toy_glassl_Glow`, `Toy_glass_Glow`, `Toy_gold_Glow` |
-| Normals | PASS — every object's signed volume outward, ray-cast flipped fraction **0.000000** |
-| File | 1,662,484 B raw / 221,146 B gzip (pre-meshopt) |
-| Validation | `validation.json` — **overall PASS**, all 16 checks |
+Updated to the **post-optimize** figures (stage 4 ran on 19 August 2026 and its output is
+now the shipping file — see `optimize/REPORT.md`).
+
+| | shipped | pre-optimize |
+|---|---|---|
+| Objects | **14** | 801 |
+| Draw submeshes | **16** | 806 |
+| Triangles | **16,996** | 16,996 |
+| Dimensions (axis-aligned) | 113.92 x 113.96 x **88.00** m | identical |
+| `min Z` | 0.000 m | identical |
+| XY centre offset of the AABB | (1.455, 1.427) m — see §2 | identical |
+| Materials | 13, all `Toy_*`, flat, no textures, no alpha | identical |
+| Glow materials | `Toy_glassl_Glow`, `Toy_glass_Glow`, `Toy_gold_Glow` | identical |
+| Normals | PASS — signed volume outward on every solid, ray-cast flipped fraction **0.000000** | identical |
+| File | **494,180 B** raw (meshopt) / 257,150 B gzip | 1,248,312 B / 165,765 B |
+| Validation | `validation.json` — **overall PASS**, all 16 checks, re-run against the shipped meshopt file | — |
+
+494.2 KB is inside the 500 KB on-disk landmark budget. Getting there took three trims of
+the build script, not a better packer — the reasoning is in `optimize/REPORT.md` §6.
 
 Anchor `-122.390975, 37.790787`; `targetHeightM` **88.0**, so the loader's
 `targetHeightM / measuredHeight` scale lands at exactly 1.0000.
@@ -119,8 +126,17 @@ surfaces are thin shells proud of the opaque surface behind them.
    was articulated, so it read as a hole in an otherwise complete facade. Added at 4 bays;
    one bay each removed from the two Embarcadero flanks and one from Spear to stay under
    the cap. → **23,852**.
-5. Re-rendered all six day views, the night view and the contact sheet from the final
-   export; revalidated in a fresh scene. **PASS.**
+5. **Stage 4 sent it back three more times.** The first optimize run passed every gate and
+   still produced a 721 KB file — 44% over the 500 KB landmark budget — because packing
+   cannot fix geometry. The bevel policy was tightened until no applied panel carries one
+   (`inspect.json` measures one screen pixel at the near landmark distance as 0.115 m, so
+   a 0.05 m bevel on a 0.18 m proud pier was buying nothing), the bay pitch widened from
+   ~6.2 m to ~8.5 m, the tower's window bands went 9 → 8 and its second setback 3 bays →
+   2, and the skylight rib grid 6x5 → 5x4. **23,852 → 16,996 triangles**, and the same
+   optimize chain then landed at 494 KB.
+6. Re-rendered all six day views, the night view and the contact sheet from the final
+   export; revalidated in a fresh scene, then again against the shipped meshopt file.
+   **PASS both times.**
 
 ## 6. Deliverables
 
@@ -158,15 +174,14 @@ cd artifacts/2-folsom && /Applications/Blender.app/Contents/MacOS/Blender -b --p
   "name": "2 Folsom Street (Gap Inc. headquarters)",
   "estimated": false,
   "dims": [113.9196, 113.9579, 88.0],
-  "tris": 23852,
+  "tris": 16996,
   "loadRadius": 2640
 }
 ```
 
 `"estimated": false`: all three roof planes are LiDAR measurements over 25,463 cells and
 the crown is independently corroborated by OSM's `height` tag. `loadRadius` is the default
-formula, `max(2500, 88.0 * 30) = 2640`. `dims` and `tris` are the pre-optimize figures and
-are updated by stage 4.
+formula, `max(2500, 88.0 * 30) = 2640`. `dims` and `tris` are the **shipped** figures.
 
 ## 8. Approval
 

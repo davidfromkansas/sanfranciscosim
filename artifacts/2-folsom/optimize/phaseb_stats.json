@@ -1,0 +1,93 @@
+{
+ "input_materials": [
+  "Toy_brick",
+  "Toy_glass",
+  "Toy_glass_Glow",
+  "Toy_glassl",
+  "Toy_glassl_Glow",
+  "Toy_gold_Glow",
+  "Toy_ink",
+  "Toy_mint",
+  "Toy_roofd",
+  "Toy_sand",
+  "Toy_steel",
+  "Toy_stone",
+  "Toy_trim"
+ ],
+ "steps": [
+  {
+   "step": "weld+degenerate",
+   "tris": 16996,
+   "verts": 10080
+  },
+  {
+   "step": "interior-faces",
+   "tris": 16996,
+   "verts": 10080
+  },
+  {
+   "step": "limited-dissolve-SKIPPED",
+   "tris": 16996,
+   "verts": 10080
+  },
+  {
+   "step": "join-per-material",
+   "tris": 16996,
+   "verts": 10080
+  }
+ ],
+ "input": {
+  "tris": 16996,
+  "verts": 33068,
+  "objects": 801
+ },
+ "interior_faces_removed": 0,
+ "limited_dissolve": "skipped: coplanar parapet+coping ring bands (prompt s.3 step 3)",
+ "joins": {
+  "grp_Toy_brick_Toy_sand": 2,
+  "grp_Toy_trim": 57,
+  "grp_Toy_stone": 200,
+  "grp_Toy_glass_Glow": 76,
+  "grp_Toy_glass": 421,
+  "grp_Toy_sand_Toy_stone": 3,
+  "grp_Toy_glassl_Glow": 5,
+  "grp_Toy_glassl": 7,
+  "grp_Toy_ink": 2,
+  "grp_Toy_gold_Glow": 2,
+  "grp_Toy_roofd": 4,
+  "grp_Toy_mint": 18,
+  "grp_Toy_steel": 2,
+  "grp_Toy_sand": 2
+ },
+ "inverted_solids": [],
+ "reimport": {
+  "objects": 14,
+  "materials": [
+   "Toy_brick",
+   "Toy_glass",
+   "Toy_glass_Glow",
+   "Toy_glassl",
+   "Toy_glassl_Glow",
+   "Toy_gold_Glow",
+   "Toy_ink",
+   "Toy_mint",
+   "Toy_roofd",
+   "Toy_sand",
+   "Toy_steel",
+   "Toy_stone",
+   "Toy_trim"
+  ],
+  "bbox_dims": [
+   113.9196,
+   113.9579,
+   88.0
+  ],
+  "bbox_min": [
+   -55.505,
+   -55.5518,
+   0.0
+  ]
+ },
+ "bbox_ok": true,
+ "material_set_ok": true
+}
