@@ -1,0 +1,1154 @@
+{
+ "file_bytes": {
+  "raw": 817276,
+  "gzip9": 131070
+ },
+ "objects": 361,
+ "total_tris": 12152,
+ "total_verts": 25268,
+ "primitives_est": 361,
+ "top20": [
+  {
+   "name": "arch_voussoir",
+   "tris": 724,
+   "verts": 1404,
+   "dims": [
+    6.363,
+    8.632,
+    10.291
+   ],
+   "materials": [
+    "Toy_stone"
+   ]
+  },
+  {
+   "name": "curb",
+   "tris": 288,
+   "verts": 504,
+   "dims": [
+    195.823,
+    161.206,
+    0.5
+   ],
+   "materials": [
+    "Toy_ink"
+   ]
+  },
+  {
+   "name": "railing",
+   "tris": 216,
+   "verts": 432,
+   "dims": [
+    193.453,
+    158.301,
+    0.55
+   ],
+   "materials": [
+    "Toy_steel"
+   ]
+  },
+  {
+   "name": "arch_reveal",
+   "tris": 152,
+   "verts": 312,
+   "dims": [
+    6.874,
+    8.404,
+    9.492
+   ],
+   "materials": [
+    "Toy_ink"
+   ]
+  },
+  {
+   "name": "cornice",
+   "tris": 128,
+   "verts": 224,
+   "dims": [
+    34.589,
+    41.715,
+    0.6
+   ],
+   "materials": [
+    "Toy_stone"
+   ]
+  },
+  {
+   "name": "office_parapet",
+   "tris": 128,
+   "verts": 224,
+   "dims": [
+    69.584,
+    64.979,
+    0.75
+   ],
+   "materials": [
+    "Toy_sand"
+   ]
+  },
+  {
+   "name": "parapet_cap",
+   "tris": 128,
+   "verts": 224,
+   "dims": [
+    34.896,
+    42.023,
+    0.22
+   ],
+   "materials": [
+    "Toy_stone"
+   ]
+  },
+  {
+   "name": "attic",
+   "tris": 108,
+   "verts": 216,
+   "dims": [
+    5.336,
+    6.027,
+    2.8
+   ],
+   "materials": [
+    "Toy_cream"
+   ]
+  },
+  {
+   "name": "attic_cap",
+   "tris": 108,
+   "verts": 216,
+   "dims": [
+    5.927,
+    6.618,
+    0.2
+   ],
+   "materials": [
+    "Toy_stone"
+   ]
+  },
+  {
+   "name": "bulkhead",
+   "tris": 108,
+   "verts": 216,
+   "dims": [
+    34.426,
+    41.553,
+    9.6
+   ],
+   "materials": [
+    "Toy_cream"
+   ]
+  },
+  {
+   "name": "office",
+   "tris": 108,
+   "verts": 216,
+   "dims": [
+    68.583,
+    63.978,
+    9.4
+   ],
+   "materials": [
+    "Toy_sand"
+   ]
+  },
+  {
+   "name": "pavilion",
+   "tris": 108,
+   "verts": 216,
+   "dims": [
+    15.933,
+    15.758,
+    11.0
+   ],
+   "materials": [
+    "Toy_cream"
+   ]
+  },
+  {
+   "name": "deck_slab",
+   "tris": 104,
+   "verts": 216,
+   "dims": [
+    195.823,
+    161.206,
+    0.6
+   ],
+   "materials": [
+    "Toy_stone"
+   ]
+  },
+  {
+   "name": "deck_surface",
+   "tris": 104,
+   "verts": 216,
+   "dims": [
+    194.689,
+    159.817,
+    0.05
+   ],
+   "materials": [
+    "Toy_conc"
+   ]
+  },
+  {
+   "name": "arch_screen",
+   "tris": 100,
+   "verts": 208,
+   "dims": [
+    4.312,
+    5.9,
+    7.645
+   ],
+   "materials": [
+    "Toy_glass"
+   ]
+  },
+  {
+   "name": "parapet",
+   "tris": 96,
+   "verts": 192,
+   "dims": [
+    34.589,
+    41.715,
+    0.58
+   ],
+   "materials": [
+    "Toy_cream"
+   ]
+  },
+  {
+   "name": "pediment",
+   "tris": 80,
+   "verts": 162,
+   "dims": [
+    9.675,
+    11.405,
+    2.78
+   ],
+   "materials": [
+    "Toy_cream"
+   ]
+  },
+  {
+   "name": "bollard0",
+   "tris": 68,
+   "verts": 144,
+   "dims": [
+    0.392,
+    0.397,
+    0.45
+   ],
+   "materials": [
+    "Toy_ink"
+   ]
+  },
+  {
+   "name": "bollard1",
+   "tris": 68,
+   "verts": 144,
+   "dims": [
+    0.392,
+    0.397,
+    0.45
+   ],
+   "materials": [
+    "Toy_ink"
+   ]
+  },
+  {
+   "name": "bollard2",
+   "tris": 68,
+   "verts": 144,
+   "dims": [
+    0.392,
+    0.397,
+    0.45
+   ],
+   "materials": [
+    "Toy_ink"
+   ]
+  }
+ ],
+ "vertex_attrs": [
+  "NORMAL"
+ ],
+ "materials": [
+  {
+   "name": "Toy_amber_Glow",
+   "glow": true,
+   "user_objects": 17
+  },
+  {
+   "name": "Toy_conc",
+   "glow": false,
+   "user_objects": 4
+  },
+  {
+   "name": "Toy_cream",
+   "glow": false,
+   "user_objects": 14
+  },
+  {
+   "name": "Toy_glass",
+   "glow": false,
+   "user_objects": 27
+  },
+  {
+   "name": "Toy_glass_Glow",
+   "glow": true,
+   "user_objects": 6
+  },
+  {
+   "name": "Toy_glassl",
+   "glow": false,
+   "user_objects": 2
+  },
+  {
+   "name": "Toy_glassl_Glow",
+   "glow": true,
+   "user_objects": 1
+  },
+  {
+   "name": "Toy_ink",
+   "glow": false,
+   "user_objects": 64
+  },
+  {
+   "name": "Toy_roofd",
+   "glow": false,
+   "user_objects": 10
+  },
+  {
+   "name": "Toy_sand",
+   "glow": false,
+   "user_objects": 4
+  },
+  {
+   "name": "Toy_steel",
+   "glow": false,
+   "user_objects": 50
+  },
+  {
+   "name": "Toy_stone",
+   "glow": false,
+   "user_objects": 116
+  },
+  {
+   "name": "Toy_trim",
+   "glow": false,
+   "user_objects": 46
+  }
+ ],
+ "textures": [],
+ "bbox": {
+  "dims": [
+   195.8228,
+   161.2056,
+   18.5
+  ],
+  "min": [
+   -98.6589,
+   -83.2403,
+   0.0
+  ],
+  "origin_offset_xy": [
+   -0.7475,
+   -2.6375
+  ],
+  "base_z": 0.0
+ },
+ "duplicate_mesh_groups": [
+  {
+   "signature": {
+    "verts": 144,
+    "tris": 68,
+    "dims": [
+     0.3916,
+     0.397,
+     0.45
+    ]
+   },
+   "objects": [
+    "bollard0",
+    "bollard1",
+    "bollard2",
+    "bollard3",
+    "bollard4",
+    "bollard5",
+    "bollard6",
+    "bollard7",
+    "bollard8",
+    "bollard9",
+    "bollard10",
+    "bollard11",
+    "bollard12",
+    "bollard13",
+    "bollard14",
+    "bollard15",
+    "bollard16",
+    "bollard17",
+    "bollard18",
+    "bollard19",
+    "bollard20",
+    "bollard21",
+    "bollard22",
+    "bollard23",
+    "bollard24",
+    "bollard25",
+    "bollard26",
+    "bollard27",
+    "bollard28",
+    "bollard29"
+   ]
+  },
+  {
+   "signature": {
+    "verts": 24,
+    "tris": 12,
+    "dims": [
+     1.2574,
+     1.2574,
+     2.4
+    ]
+   },
+   "objects": [
+    "pile0",
+    "pile1",
+    "pile2",
+    "pile3",
+    "pile4",
+    "pile5",
+    "pile6",
+    "pile7",
+    "pile8",
+    "pile9",
+    "pile10",
+    "pile11",
+    "pile12",
+    "pile13",
+    "pile14",
+    "pile15",
+    "pile16",
+    "pile17",
+    "pile18",
+    "pile19",
+    "pile20",
+    "pile21",
+    "pile22",
+    "pile23",
+    "pile24",
+    "pile25",
+    "pile26",
+    "pile27",
+    "pile28",
+    "pile29",
+    "pile30",
+    "pile31",
+    "pile32",
+    "pile33",
+    "pile34",
+    "pile35",
+    "pile36",
+    "pile37",
+    "pile38",
+    "pile39",
+    "pile40",
+    "pile41",
+    "pile42",
+    "pile43",
+    "pile44",
+    "pile45",
+    "pile46",
+    "pile47",
+    "pile48",
+    "pile49",
+    "pile50",
+    "pile51",
+    "pile52",
+    "pile53",
+    "pile54",
+    "pile55",
+    "pile56",
+    "pile57",
+    "pile58",
+    "pile59",
+    "pile60",
+    "pile61",
+    "pile62",
+    "pile63",
+    "pile64",
+    "pile65",
+    "pile66",
+    "pile67",
+    "pile68",
+    "pile69",
+    "pile70",
+    "pile71",
+    "pile72",
+    "pile73",
+    "pile74",
+    "pile75",
+    "pile76",
+    "pile77",
+    "pile78",
+    "pile79",
+    "pile80",
+    "pile81",
+    "pile82",
+    "pile83",
+    "pile84"
+   ]
+  },
+  {
+   "signature": {
+    "verts": 96,
+    "tris": 44,
+    "dims": [
+     0.3401,
+     0.3401,
+     5.5
+    ]
+   },
+   "objects": [
+    "lamp0",
+    "lamp1",
+    "lamp2",
+    "lamp3",
+    "lamp4",
+    "lamp5",
+    "lamp6",
+    "lamp7",
+    "lamp8",
+    "lamp9",
+    "lamp10",
+    "lamp11",
+    "lamp12",
+    "lamp13",
+    "lamp14",
+    "lamp15"
+   ]
+  },
+  {
+   "signature": {
+    "verts": 96,
+    "tris": 44,
+    "dims": [
+     1.2555,
+     1.1415,
+     0.39
+    ]
+   },
+   "objects": [
+    "lamphead0",
+    "lamphead1",
+    "lamphead2",
+    "lamphead3",
+    "lamphead4",
+    "lamphead5",
+    "lamphead6",
+    "lamphead7",
+    "lamphead8",
+    "lamphead9",
+    "lamphead10",
+    "lamphead11",
+    "lamphead12",
+    "lamphead13",
+    "lamphead14",
+    "lamphead15"
+   ]
+  },
+  {
+   "signature": {
+    "verts": 24,
+    "tris": 12,
+    "dims": [
+     6.6235,
+     8.9962,
+     0.02
+    ]
+   },
+   "objects": [
+    "bay0",
+    "bay1",
+    "bay2",
+    "bay3",
+    "bay4",
+    "bay5",
+    "bay6",
+    "bay7",
+    "bay8",
+    "bay9",
+    "bay10",
+    "bay11",
+    "bay12",
+    "bay13",
+    "bay14",
+    "bay15",
+    "bay16",
+    "bay17",
+    "bay18",
+    "bay19",
+    "bay20",
+    "bay21",
+    "bay22",
+    "bay23",
+    "bay24",
+    "bay25",
+    "bay26",
+    "bay27",
+    "bay28",
+    "bay29",
+    "bay30",
+    "bay31",
+    "bay32",
+    "bay33",
+    "bay34",
+    "bay35",
+    "bay36",
+    "bay37",
+    "bay38",
+    "bay39",
+    "bay40",
+    "bay41",
+    "bay42",
+    "bay43"
+   ]
+  },
+  {
+   "signature": {
+    "verts": 96,
+    "tris": 44,
+    "dims": [
+     0.7667,
+     0.9597,
+     9.6
+    ]
+   },
+   "objects": [
+    "pilaster0",
+    "pilaster1",
+    "pilaster2",
+    "pilaster3",
+    "pilaster7",
+    "pilaster8",
+    "pilaster9",
+    "pilaster10",
+    "pilaster11"
+   ]
+  },
+  {
+   "signature": {
+    "verts": 96,
+    "tris": 44,
+    "dims": [
+     3.2202,
+     3.0887,
+     1.42
+    ]
+   },
+   "objects": [
+    "rtu0",
+    "rtu1",
+    "rtu2",
+    "rtu3",
+    "rtu4",
+    "rtu5",
+    "rtu6",
+    "rtu7",
+    "rtu8"
+   ]
+  },
+  {
+   "signature": {
+    "verts": 96,
+    "tris": 44,
+    "dims": [
+     2.6728,
+     3.0137,
+     0.2
+    ]
+   },
+   "objects": [
+    "awning0",
+    "awning1",
+    "awning2",
+    "awning3",
+    "awning7",
+    "awning8",
+    "awning9",
+    "awning10"
+   ]
+  },
+  {
+   "signature": {
+    "verts": 96,
+    "tris": 44,
+    "dims": [
+     1.6014,
+     2.1572,
+     3.3
+    ]
+   },
+   "objects": [
+    "shop_reveal0",
+    "shop_reveal1",
+    "shop_reveal2",
+    "shop_reveal3",
+    "shop_reveal7",
+    "shop_reveal8",
+    "shop_reveal9",
+    "shop_reveal10"
+   ]
+  },
+  {
+   "signature": {
+    "verts": 96,
+    "tris": 44,
+    "dims": [
+     0.227,
+     0.227,
+     2.65
+    ]
+   },
+   "objects": [
+    "gang0_post0",
+    "gang0_post1",
+    "gang1_post0",
+    "gang1_post1",
+    "gang2_post0",
+    "gang2_post1"
+   ]
+  },
+  {
+   "signature": {
+    "verts": 96,
+    "tris": 44,
+    "dims": [
+     2.7713,
+     3.7471,
+     1.0
+    ]
+   },
+   "objects": [
+    "gang0_rail_a",
+    "gang0_rail_b",
+    "gang1_rail_a",
+    "gang1_rail_b",
+    "gang2_rail_a",
+    "gang2_rail_b"
+   ]
+  },
+  {
+   "signature": {
+    "verts": 24,
+    "tris": 12,
+    "dims": [
+     1.979,
+     1.8211,
+     0.14
+    ]
+   },
+   "objects": [
+    "lampglow0",
+    "lampglow1",
+    "lampglow2",
+    "lampglow3",
+    "lampglow4",
+    "lampglow5",
+    "lampglow6",
+    "lampglow7",
+    "lampglow8",
+    "lampglow9",
+    "lampglow10",
+    "lampglow11",
+    "lampglow12",
+    "lampglow13",
+    "lampglow14",
+    "lampglow15"
+   ]
+  },
+  {
+   "signature": {
+    "verts": 96,
+    "tris": 44,
+    "dims": [
+     2.507,
+     1.9018,
+     2.8
+    ]
+   },
+   "objects": [
+    "bulkend_nw0",
+    "bulkend_nw1",
+    "bulkend_se0",
+    "bulkend_se1"
+   ]
+  },
+  {
+   "signature": {
+    "verts": 96,
+    "tris": 44,
+    "dims": [
+     7.8802,
+     7.0908,
+     0.24
+    ]
+   },
+   "objects": [
+    "gang0_canopy",
+    "gang1_canopy",
+    "gang2_canopy"
+   ]
+  },
+  {
+   "signature": {
+    "verts": 96,
+    "tris": 44,
+    "dims": [
+     10.7321,
+     9.548,
+     0.4
+    ]
+   },
+   "objects": [
+    "gang0_deck",
+    "gang1_deck",
+    "gang2_deck"
+   ]
+  },
+  {
+   "signature": {
+    "verts": 96,
+    "tris": 44,
+    "dims": [
+     25.5243,
+     34.9972,
+     0.16
+    ]
+   },
+   "objects": [
+    "rustic0",
+    "rustic1",
+    "rustic2"
+   ]
+  },
+  {
+   "signature": {
+    "verts": 64,
+    "tris": 28,
+    "dims": [
+     1.4675,
+     1.9837,
+     3.2
+    ]
+   },
+   "objects": [
+    "win_reveal7",
+    "win_reveal8",
+    "win_reveal9",
+    "win_reveal10"
+   ]
+  },
+  {
+   "signature": {
+    "verts": 24,
+    "tris": 12,
+    "dims": [
+     1.4409,
+     1.9046,
+     2.9
+    ]
+   },
+   "objects": [
+    "shop_glass0",
+    "shop_glass1",
+    "shop_glass2",
+    "shop_glass3",
+    "shop_glass7",
+    "shop_glass8",
+    "shop_glass9",
+    "shop_glass10"
+   ]
+  },
+  {
+   "signature": {
+    "verts": 24,
+    "tris": 12,
+    "dims": [
+     1.3231,
+     1.7429,
+     2.8
+    ]
+   },
+   "objects": [
+    "win_glass0",
+    "win_glass1",
+    "win_glass2",
+    "win_glass3",
+    "win_glass7",
+    "win_glass8",
+    "win_glass9",
+    "win_glass10"
+   ]
+  },
+  {
+   "signature": {
+    "verts": 96,
+    "tris": 44,
+    "dims": [
+     32.72,
+     27.238,
+     0.67
+    ]
+   },
+   "objects": [
+    "monitor0_frame",
+    "monitor1_frame"
+   ]
+  },
+  {
+   "signature": {
+    "verts": 96,
+    "tris": 44,
+    "dims": [
+     3.7416,
+     4.995,
+     3.0772
+    ]
+   },
+   "objects": [
+    "pediment_rake_l",
+    "pediment_rake_r"
+   ]
+  },
+  {
+   "signature": {
+    "verts": 96,
+    "tris": 44,
+    "dims": [
+     97.0624,
+     70.7925,
+     0.11
+    ]
+   },
+   "objects": [
+    "rail0",
+    "rail1"
+   ]
+  },
+  {
+   "signature": {
+    "verts": 96,
+    "tris": 44,
+    "dims": [
+     8.7623,
+     7.8852,
+     3.15
+    ]
+   },
+   "objects": [
+    "shed_a",
+    "shed_b"
+   ]
+  },
+  {
+   "signature": {
+    "verts": 96,
+    "tris": 44,
+    "dims": [
+     9.6065,
+     8.7294,
+     0.15
+    ]
+   },
+   "objects": [
+    "shed_a_roof",
+    "shed_b_roof"
+   ]
+  },
+  {
+   "signature": {
+    "verts": 64,
+    "tris": 28,
+    "dims": [
+     1.4675,
+     1.9838,
+     3.2
+    ]
+   },
+   "objects": [
+    "win_reveal1",
+    "win_reveal2",
+    "win_reveal3"
+   ]
+  },
+  {
+   "signature": {
+    "verts": 24,
+    "tris": 12,
+    "dims": [
+     1.0979,
+     1.4651,
+     2.4
+    ]
+   },
+   "objects": [
+    "win_glow0",
+    "win_glow2",
+    "win_glow3",
+    "win_glow7",
+    "win_glow8",
+    "win_glow10"
+   ]
+  },
+  {
+   "signature": {
+    "verts": 24,
+    "tris": 12,
+    "dims": [
+     0.5208,
+     0.6262,
+     0.1628
+    ]
+   },
+   "objects": [
+    "letter1",
+    "letter2",
+    "letter6",
+    "letter8"
+   ]
+  },
+  {
+   "signature": {
+    "verts": 24,
+    "tris": 12,
+    "dims": [
+     0.5208,
+     0.6263,
+     0.1628
+    ]
+   },
+   "objects": [
+    "letter10",
+    "letter11",
+    "letter15",
+    "letter17"
+   ]
+  },
+  {
+   "signature": {
+    "verts": 24,
+    "tris": 12,
+    "dims": [
+     42.9757,
+     31.4064,
+     2.4
+    ]
+   },
+   "objects": [
+    "office_glass_nw0",
+    "office_glass_nw1",
+    "office_glass_se0",
+    "office_glass_se1"
+   ]
+  },
+  {
+   "signature": {
+    "verts": 24,
+    "tris": 12,
+    "dims": [
+     0.2332,
+     0.2316,
+     1.05
+    ]
+   },
+   "objects": [
+    "letter0",
+    "letter5",
+    "letter9"
+   ]
+  },
+  {
+   "signature": {
+    "verts": 24,
+    "tris": 12,
+    "dims": [
+     92.2521,
+     67.2979,
+     0.02
+    ]
+   },
+   "objects": [
+    "bay_aisle_n",
+    "bay_aisle_s"
+   ]
+  },
+  {
+   "signature": {
+    "verts": 24,
+    "tris": 12,
+    "dims": [
+     0.2332,
+     0.2317,
+     0.525
+    ]
+   },
+   "objects": [
+    "letter18",
+    "letter19"
+   ]
+  },
+  {
+   "signature": {
+    "verts": 24,
+    "tris": 12,
+    "dims": [
+     31.8009,
+     26.3189,
+     0.22
+    ]
+   },
+   "objects": [
+    "monitor0_glass",
+    "monitor1_glass"
+   ]
+  },
+  {
+   "signature": {
+    "verts": 24,
+    "tris": 12,
+    "dims": [
+     19.0392,
+     26.0036,
+     2.4
+    ]
+   },
+   "objects": [
+    "office_glass_ne0",
+    "office_glass_ne1"
+   ]
+  }
+ ],
+ "dup_redundant_tris": 7920,
+ "join_candidates": {
+  "Toy_amber_Glow": 17,
+  "Toy_conc": 4,
+  "Toy_cream": 14,
+  "Toy_glass": 27,
+  "Toy_glass_Glow": 6,
+  "Toy_glassl": 2,
+  "Toy_ink": 64,
+  "Toy_roofd": 10,
+  "Toy_sand": 4,
+  "Toy_steel": 50,
+  "Toy_stone": 116,
+  "Toy_trim": 46
+ },
+ "degenerate_tris": 0,
+ "coincident_vert_pairs": 18482,
+ "over_tess": {
+  "near_distance_m": 293.73,
+  "one_px_world_m": 0.198,
+  "note": "cylinders whose chord error < one_px_world_m can halve segments"
+ }
+}

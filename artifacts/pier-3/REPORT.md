@@ -4,7 +4,7 @@
 Beaux-Arts bulkhead with its arched "PIER · 3" portal, and the 2006 office block behind it —
 built for the SF toy-diorama city. Stage 2 of `docs/asset-pipeline/ADDRESS-TO-ASSET.md`.
 
-## Shipped numbers (pre-optimize)
+## Shipped numbers
 
 | | |
 |---|---|
@@ -14,10 +14,12 @@ built for the SF toy-diorama city. Stage 2 of `docs/asset-pipeline/ADDRESS-TO-AS
 | Min Z | **0.000 m** — and Z = 0 is the **waterline**, with the pile feet on it |
 | XY centre offset | −0.75, −2.64 m (see "tolerances" below) |
 | Materials | 13, all `Toy_*`, 3 of them `_Glow` |
-| File | 817,276 B raw / 132,302 B gzip (pre-meshopt) |
+| File | **371,724 B raw** / 214,363 B gzip, meshopt-compressed (pre-optimize: 817,276 B / 132,302 B) |
+| Draw submeshes | **13** (pre-optimize: 361) |
 | Anchor | `-122.3947017, 37.7982322` |
 | targetHeightM | **18.50 m** (attic crest over the arch pediment, above water) |
-| Validation | **PASS**, all 16 checks — `validation.json` |
+| Validation | **PASS**, all 16 checks, re-run against the shipped optimized file — `validation.json` |
+| Optimize | all gates G1–G6, G8 PASS — `optimize/REPORT.md` |
 
 Normals: 361 of 361 objects enclose positive signed volume; 13,453 deterministic visibility
 rays from nine interior targets found **zero** flipped visible faces (0.0000% against a
@@ -25,7 +27,8 @@ rays from nine interior targets found **zero** flipped visible faces (0.0000% ag
 
 ## Deliverables
 
-`build_pier_3.py` (deterministic build) · `pier-3.blend` · `pier-3.glb` ·
+`build_pier_3.py` (deterministic build) · `pier-3.blend` · `pier-3.glb` (optimized, shipping) ·
+`optimize/` (stage 4: scripts, stats, A/B renders, `input/pier-3.glb` archive, report) ·
 `render_pier_3.py` · `validate_pier_3.py` · `make_contact_sheet.py` · `validation.json` ·
 `REFERENCE.md` (the dossier and the sources) · nine renders: north / east / south / west /
 frontage / top / water / aerial / aerial-night, plus the contact sheet.
