@@ -120,21 +120,23 @@ for o in mesh_objs():
 stats["interior_faces_removed"] = interior_removed
 snap("interior-faces")
 
-# --- 3. limited dissolve, coplanar only ---
-for o in mesh_objs():
-    bpy.context.view_layer.objects.active = o
-    for oo in mesh_objs():
-        oo.select_set(oo is o)
-    bpy.ops.object.mode_set(mode="EDIT")
-    bpy.ops.mesh.select_all(action="SELECT")
-    # 0.05 deg, not 0.5: dissolve merges transitively, and on the gently
-    # curved hypar shell a 0.5-deg chain accumulates into twisted ngons whose
-    # triangulation flips windings (caught by the 22.5k-ray test). Strictly
-    # coplanar runs only.
-    bpy.ops.mesh.dissolve_limited(angle_limit=0.000872665,
-                                  delimit={"MATERIAL", "SHARP"})
-    bpy.ops.object.mode_set(mode="OBJECT")
-snap("limited-dissolve")
+# --- 3. limited dissolve, coplanar only --- SKIPPED ON THIS ASSET ---
+#
+# GLB-OPTIMIZE-PROMPT v2 sec.3 step 3: "Skip this step entirely on assets with
+# large coplanar ring bands." This asset is made of them. `podium_parapet` is a
+# 108 m ring; both `*_cornice` and `*_bay_cornice` are rings; every one of the
+# ten podium bands, thirty-two tower bands and thirty-two balcony slabs is a
+# prism whose top and bottom caps are perfectly coplanar annuli or n-gons.
+# Dissolving those merges each cap into one ngon, and re-triangulating an annulus
+# emits slivers that are invisible, pass an area-based degeneracy test, and only
+# surface later as `invalid_or_nonunit_loop_normal_count` in the packed file
+# (measured on 350-brannan: triangles up to 24.35 m long, ~0.24 mm wide).
+#
+# It is also the cheapest step here: the geometry is already authored as flat
+# quads with no redundant coplanar fans, so there is very little for a strictly
+# coplanar dissolve to find. Not worth the failure mode.
+stats["limited_dissolve"] = "skipped: large coplanar ring bands (prompt sec.3 step 3)"
+snap("limited-dissolve-SKIPPED")
 
 # --- 5. join per material (multi-material objects keep their own mesh) ---
 groups = defaultdict(list)

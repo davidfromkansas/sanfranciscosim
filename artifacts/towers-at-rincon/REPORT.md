@@ -9,8 +9,8 @@ what the plan got wrong, and what the numbers came out to.
 
 | | |
 |---|---|
-| Triangles | **17,036** (cap 18,000) |
-| Objects | 253 |
+| Triangles | **17,035** (cap 18,000) |
+| Objects (draw submeshes) | **10** — one per material, after the stage-4 join |
 | Dimensions | **108.66 × 108.67 × 89.00 m** |
 | min Z | 0.0000 |
 | XY centre offset | 0.0000, 0.0000 |
@@ -18,9 +18,9 @@ what the plan got wrong, and what the numbers came out to.
 | Glow materials | `Toy_glassl_Glow`, `Toy_gold_Glow` |
 | Open glow-strip faces | 130, all 130 facing outward |
 | Signed-volume inverted objects | 0 |
-| Normals ray test | 27,343 first hits, **0 flipped** (tolerance 0.15 %) |
+| Normals ray test | **0 flipped** first hits (tolerance 0.15 %) |
 | Validation | **PASS** (`validation.json`) |
-| File | 913,492 B raw / 173,339 B gzipped (pre-optimize) |
+| File | **352,836 B** raw, meshopt-compressed (913,492 B before stage 4) |
 | Manifest anchor | `-122.3924907, 37.7919910` |
 | `targetHeightM` | **89.00** — so the loader's scale is exactly 1.000 |
 
@@ -202,7 +202,18 @@ high three-quarter camera; `-facade` square-on to Howard; `-aerial-night` with
 the `_Glow` emission raised. Day renders fade `_Glow` to 0.12 alpha, which is what
 the app actually shows by day. `towers-at-rincon-contact-sheet.png` composes them.
 
-## 8. Approval
+## 8. Stage 4 — optimize
+
+The shipping file is the optimized one: 253 objects joined to 10 (one draw
+submesh per material), 29,942 vertices welded to 9,123, meshopt-packed with
+`-c -km -kn -noq`. Raw bytes 913,492 → 352,836 (−61.4 %); triangles, bounding
+box, origin, material set and glow behaviour all unchanged; A/B pixel deltas
+peak at 0.186 % and contain nothing but Cycles sampling noise. All gates G1–G6
+and G8 pass (G7 n/a, no bake). Full metrics, census and per-phase savings in
+`optimize/REPORT.md`; the pre-optimize asset is archived at
+`optimize/input/towers-at-rincon.glb`.
+
+## 9. Approval
 
 Stage 3 of `docs/asset-pipeline/ADDRESS-TO-ASSET.md` is a human gate. The session
 was opened with a standing instruction, quoted verbatim:
