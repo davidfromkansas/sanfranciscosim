@@ -578,7 +578,7 @@ def build():
     bcen = l_mkt / 2.0
     for k, ds in enumerate((-3.4, 0.0, 3.4)):
         bevel(wall_box(f"balc_brk{k}", E_MARKET, bcen + ds - 0.45, bcen + ds + 0.45,
-                       H_BELT0 - 1.55, H_BELT0 - 0.25, 0.80, 1.95, cream), width=0.10)
+                       H_BELT0 - 1.55, H_BELT0 - 0.25, 0.80, 1.95, cream), width=0.10, segments=1)
     bevel(wall_box("balc_slab", E_MARKET, bcen - 4.6, bcen + 4.6, H_BELT0 - 0.25,
                    H_BELT0 + 0.20, 0.70, 2.35, cream), width=0.08)
     bevel(wall_box("balc_rail", E_MARKET, bcen - 4.6, bcen + 4.6, H_BELT0 + 0.20,
@@ -614,20 +614,20 @@ def build():
     # crest and the only thing that breaks the cornice silhouette.
     vm = (V_MARKET_WALL + V_COURT_NW) / 2.0     # -17.95, centre of the Market wing
     bevel(uv_box("plant_pad", -6.0, vm + 1.0, H_ROOF, H_ROOF + 0.30, 30.0, 11.0, stone),
-          width=0.08)
+          width=0.08, segments=1)
     for i, (u, sv) in enumerate(((-17.0, 8.4), (2.0, 8.4))):
         bevel(uv_box(f"plant{i}", u, vm + 1.0, H_ROOF + 0.30, H_PLANT, 11.0, sv, slate),
-              width=0.16)
+              width=0.16, segments=1)
         bevel(uv_box(f"plant_cap{i}", u, vm + 1.0, H_PLANT, H_PLANT_CAP, 11.6,
-                     sv + 0.6, steel), width=0.10)
+                     sv + 0.6, steel), width=0.10, segments=1)
         for k in range(3):
-            bevel(uv_cyl(f"fan{i}_{k}", u - 3.4 + k * 3.4, vm + 1.0, H_PLANT_CAP,
-                         H_CREST, 1.55, steel, segs=10), width=0.07)
-    bevel(uv_box("bulk_a", 20.0, vm - 3.0, H_ROOF, H_BULK, 6.0, 5.0, slate), width=0.14)
+            uv_cyl(f"fan{i}_{k}", u - 3.4 + k * 3.4, vm + 1.0, H_PLANT_CAP,
+                   H_CREST, 1.55, steel, segs=10)
+    bevel(uv_box("bulk_a", 20.0, vm - 3.0, H_ROOF, H_BULK, 6.0, 5.0, slate), width=0.14, segments=1)
     bevel(uv_box("bulk_a_cap", 20.0, vm - 3.0, H_BULK, H_BULK + 0.28, 6.4, 5.4, steel),
           width=0.08)
     bevel(uv_box("bulk_b", 33.0, vm + 4.0, H_ROOF, H_ROOF + 2.10, 5.0, 4.4, slate),
-          width=0.12)
+          width=0.12, segments=1)
     # flank-wing furniture
     for i, (u, v, su, sv, h) in enumerate((
         (36.0, 10.0, 4.2, 3.0, 1.30), (36.5, 22.0, 3.4, 3.4, 0.95),
@@ -635,10 +635,10 @@ def build():
         (-24.0, vm - 8.0, 3.0, 2.4, 0.90), (10.0, vm - 8.5, 3.0, 2.4, 0.90),
         (28.0, vm + 6.0, 2.6, 2.2, 0.80), (-32.0, vm + 6.0, 2.6, 2.2, 0.80),
     )):
-        bevel(uv_box(f"vent{i}", u, v, H_ROOF, H_ROOF + h, su, sv, roofd), width=0.07)
+        bevel(uv_box(f"vent{i}", u, v, H_ROOF, H_ROOF + h, su, sv, roofd), width=0.07, segments=1)
     for i, (u, v, su) in enumerate(((-8.0, vm - 9.5, 22.0), (36.0, 16.0, 9.0),
                                     (-36.0, 15.0, 9.0))):
-        bevel(uv_box(f"duct{i}", u, v, H_ROOF, H_ROOF + 0.60, su, 1.10, steel), width=0.06)
+        bevel(uv_box(f"duct{i}", u, v, H_ROOF, H_ROOF + 0.60, su, 1.10, steel), width=0.06, segments=1)
     uv_box("walk_a", 0.0, vm - 12.0, H_ROOF, H_ROOF + 0.07, 62.0, 3.0, stone)
     uv_box("walk_b", 36.0, 14.0, H_ROOF, H_ROOF + 0.07, 3.0, 26.0, stone)
     uv_box("walk_c", -36.0, 13.0, H_ROOF, H_ROOF + 0.07, 3.0, 26.0, stone)

@@ -230,17 +230,19 @@ def main():
         "unexpected_geometry_or_objects": unexpected,
         "material_contract_violations": sorted(off_contract),
         "glow_materials": sorted(m["name"] for m in mat_rows if m["glow"]),
-        "anchor_lonlat": [-122.3925543, 37.7818313],
-        "long_axis_heading_deg_true": 135.5,
-        "front_normal_heading_deg_true": 45.2,
+        "anchor_lonlat": [-122.3948075, 37.7938412],
+        "long_axis_heading_deg_true": 45.2,
+        "front_normal_heading_deg_true": 315.2,
         "object_details": sorted(object_rows, key=lambda x: x["name"]),
     }
     results["checks"] = {
-        # XY is the 45-degree-heading bounding box of a 36.6 x 30.0 m building
-        # plus the 0.74 m cornice projection, not any single elevation length.
-        "meters_and_plausible_dimensions": 25.1 <= dims.z <= 25.3
-        and 46.5 <= dims.x <= 48.5
-        and 48.3 <= dims.y <= 50.3,
+        # 1 Market: crest 48.70 m; the XY box is ~112 m because the footprint
+        # is a 45-deg-rotated U 85.2 x 66.2 m at the wall plane and the cornice
+        # projects 1.85 m beyond it. Ranges adapted from the 300-brannan copy.
+        "meters_and_plausible_dimensions": (
+            48.6 <= dims.z <= 48.8 and 108.0 <= dims.x <= 116.0
+            and 108.0 <= dims.y <= 116.0
+        ),
         "base_at_z_zero": abs(mn.z) <= 0.5,
         "crest_is_target_height": abs(mx.z - TARGET_HEIGHT_M) <= 0.01,
         "centered_xy": abs(center.x) <= 1.0 and abs(center.y) <= 1.0,

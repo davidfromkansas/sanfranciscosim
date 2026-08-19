@@ -653,10 +653,18 @@ treatment before touching anything on a street elevation.
   working exclusion; settle any disagreement by decoding the tile.
 - `loadRadius`: the default formula gives `max(2500, 48.7 × 30) = 2500` m. Take the
   default. Do **not** set `alwaysLoaded`.
-- **Check the shared landmark `BatchedMesh` headroom before integrating.** This is a
-  large asset in a district that already holds many landmarks; the batch has
-  overflowed before, and the symptom is a *different* landmark silently disappearing
-  on each reload, not this one failing.
+- **The shared landmark `BatchedMesh` is 91.8% full with this asset in, and the
+  rest of this batch will overflow it.** Measured from the GLB accessor counts
+  after integration: 104 landmarks now total **1,468,242** body vertices against
+  `BODY_VERTS = 1_600_000` in `app/src/assets.js` — 131,758 spare. 1 Market alone
+  is 33,478 of them (the fourth-heaviest landmark in the manifest). The rest of the
+  Embarcadero/Steuart family is roughly eleven more landmarks; at the manifest's
+  ~20k average they need ~220k vertices and there are 132k. An overflow is not a
+  crash — `addGeometry` throws, that landmark drops to its procedural stand-in, and
+  it reads as *a different* landmark quietly missing on each reload.
+  **`BATCH-INTEGRATE.md` should raise `BODY_VERTS` to 2,000,000 once, in the batch
+  PR**, not here: it is a shared constant and eleven branches editing it is exactly
+  the collision batch mode exists to avoid.
 - **Batch mode applies** — this landmark is being built alongside the rest of the
   Embarcadero/Steuart family (110 Embarcadero, 121/131/165/169 Steuart, 8 Mission,
   the Audiffred Building, Pier 1, Pier 3, Hyatt Regency, Rincon Center). Stage 5 must

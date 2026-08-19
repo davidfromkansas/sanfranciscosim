@@ -1939,5 +1939,24 @@
     ],
     "tris": 3366,
     "loadRadius": 2500
+  },
+  {
+    "id": "1-market",
+    "file": "1-market.glb",
+    "anchor": [
+      -122.3948075,
+      37.7938412
+    ],
+    "targetHeightM": 48.7,
+    "cat": 3,
+    "name": "1 Market Street (Southern Pacific Building)",
+    "estimated": false,
+    "dims": [
+      112.2081,
+      112.0981,
+      48.7
+    ],
+    "tris": 18508,
+    "loadRadius": 2500
   }
 ]
