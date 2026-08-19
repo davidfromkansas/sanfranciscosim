@@ -181,3 +181,62 @@ the numbers above. Pipeline invocation carried a standing approval
 ("APPROVE EVERYTHING DONT ASK ME FOR PERMISSION", 19 August 2026), which is
 recorded here as the stage-3 gate. No design feedback was received, so no
 revision loop was run.
+
+## 10. Stage 5 — local QA (Case B, batch mode)
+
+Driven by `qa_local.mjs` against the BUILT app (`app/dist`) in real headless
+Chrome over CDP. The in-editor Browser pane cannot do this job: it reports
+`document.hidden === true`, which throttles `requestAnimationFrame` to nothing,
+so the render loop froze at frame 50 and a perfectly healthy streamed landmark
+looked broken.
+
+| check | result | evidence |
+|---|---|---|
+| Manifest entry loads and merges | **PASS** | `sf-assets: hiram-johnson-state-office-building merged 9 objects / 9 materials -> batched (9663 tris body); uniform x1.0000 at 1723, -1220` |
+| Uniform scale ≈ 1.0 | **PASS** | exactly `x1.0000` — the authored bbox top and `targetHeightM` agree |
+| Placed at the real anchor | **PASS** | 1723, −1220 in the local frame = −122.4179151, 37.7810345 |
+| Exactly one building at the site | **PASS** | `qa/day.png` vs `qa/drill-day.png`: with the GLB 404'd the site is bare ground, so nothing else is standing there |
+| Draw calls < 300 (AGENTS rule 2) | **PASS** | avg **124/frame** over 30 frames at the landmark |
+| No asset warnings | **PASS** | zero `sf-assets:` warnings in the healthy run |
+| Night glow | **PASS** | `qa/night.png` — the slab is dark; only the Golden Gate Avenue entrance group lights |
+| Terrain seating | **PASS** | `qa/day.png`, `qa/wide.png` — no float, no sink |
+| Fallback drill (mandatory) | **PASS** | app boots with the GLB 404ing (104 entries, 96 live, 1 failed); **exactly one** warning: `sf-assets: hiram-johnson-state-office-building failed to load (… 404 …)`; Case B site is empty ground inside the exclusion zone, as designed |
+
+Pipeline side:
+
+| check | result | evidence |
+|---|---|---|
+| `pipeline/audit.mjs` 1.6 | **PASS** | no procedural footprint inside a bespoke exclusion zone — 114 zones over 110 landmarks clear |
+| `pipeline/verify-rebake.mjs` | **PASS** | only `19_13` moved, 102 → 101 buildings; nearest surviving footprint 73.7 m vs the 12 m radius |
+| `cd app && npm run lint` | **PASS** | |
+| `cd app && npm test` | **PASS** | 26 tests |
+
+Three audit checks fail on this branch — 1.2b (p95 height), 1.3c (Telegraph Hill
+DEM 90.5 m vs a surveyed 84 m) and 1.7b (1 of 792 sampled trees offshore). All
+three are pre-existing properties of the source data across the whole city and
+none of them is in this landmark's cell; this integration neither caused nor
+fixed them.
+
+**Note on the fallback warning's wording.** `INTEGRATION-PROMPT.md` Step 6 says to
+expect `… — keeping the code-built landmark`. That is the RESIDENT path. This
+entry has a `loadRadius`, so it fails through `scan()` instead and emits
+`sf-assets: <id> failed to load (…)` with no "keeping" suffix. Still exactly once.
+Match on the id, not on the prompt's wording.
+
+**Note on the camera preset.** `camera.pitch` in the registry entry is inert in
+diorama mode — `DIORAMA.pitch` in `app/src/camera.js` locks the rig to 42°, and
+diorama is the only user-facing style (AGENTS rule 1). `distance` and `yaw` are
+what the preset actually controls.
+
+## 11. Batch-mode handoff
+
+Run in **batch mode** per `ADDRESS-TO-ASSET.md` stage 5: the Case B re-bake was
+run in full and used for the QA above, then discarded
+(`git checkout -- app/public/tiles api/_data`) so this branch carries source only.
+`git diff --name-only origin/main` lists nothing under `app/public/tiles/` or
+`api/_data/`. The city is baked once for the whole batch by
+`docs/asset-pipeline/BATCH-INTEGRATE.md`.
+
+The branch is `pipeline/hiram-johnson-state-office-building`. It has **not** been
+pushed, no PR has been opened and nothing has been deployed — the pipeline ends
+with a local, verified integration and asks.
