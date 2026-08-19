@@ -747,11 +747,25 @@ const blobConfigured = () =>
 const blobAuth = () => (storeId() ? { storeId: storeId() } : {});
 
 let etag = null; // of the copy we last read or wrote
-let restored = false;
+let reading = null; // in-flight read, so parallel callers share one GET
 
+// Reads the blob EVERY time, not once per instance. It used to latch on a
+// `restored` flag, which quietly broke the whole design the moment there was
+// more than one serverless instance: the one that happened to run the cron
+// generated a post and served it, while an instance that had started earlier —
+// and read an empty blob then — kept answering with nothing, forever. Visitors
+// saw the feed flicker between one post and none depending on which instance
+// took the request. Re-reading is how an instance learns what the others wrote,
+// and it is one GET, throttled by the registry's TTL above.
 async function restore() {
-  if (restored) return;
-  restored = true;
+  if (reading) return reading;
+  reading = readState().finally(() => {
+    reading = null;
+  });
+  return reading;
+}
+
+async function readState() {
   if (!blobConfigured()) return;
   try {
     const found = await get(STATE_PATH, {
@@ -768,12 +782,17 @@ async function restore() {
     const kept = (saved.threads ?? []).filter(
       (t) => now - t.startedAt <= RETIRE_AFTER,
     );
+    const changed = kept.length !== live.length;
     live.length = 0;
     live.push(...kept);
     if (Number.isInteger(saved.lastWindow)) lastWindow = saved.lastWindow;
-    console.log(
-      `${SUBREDDIT.name}: restored ${kept.length} threads from blob storage`,
-    );
+    // Only when the count moves. This runs on every read now, and a line a
+    // minute per instance saying the same number is how a log stops being
+    // somewhere you look.
+    if (changed)
+      console.log(
+        `${SUBREDDIT.name}: restored ${kept.length} threads from blob storage`,
+      );
   } catch (error) {
     // A store that is unreachable must not take the subreddit down with it.
     console.warn(
