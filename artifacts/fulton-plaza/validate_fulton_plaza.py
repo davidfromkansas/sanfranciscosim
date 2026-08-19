@@ -42,7 +42,7 @@ TRI_BUDGET = 16000
 # model against a mirrored frame.
 HEADING_LONG = 81.15
 HEADING_CROSS = 171.15
-Z_DECK = 0.55            # deck top above local grade, from the build script
+Z_DECK = 0.95            # deck top above local grade, from the build script
 DRAPE_TOLERANCE = 0.10   # metres of standoff error allowed anywhere on the deck
 
 
@@ -386,7 +386,7 @@ def main():
         # 120.0 x 48.6 m right-of-way, widened by the planting beds' overhang
         # and the tree crowns. Not an oversized model. See REPORT.md.
         "meters_and_plausible_dimensions": (
-            12.4 <= dims.z <= 13.2
+            12.8 <= dims.z <= 13.6
             and 127.0 <= dims.x <= 130.0
             and 66.0 <= dims.y <= 69.0
         ),

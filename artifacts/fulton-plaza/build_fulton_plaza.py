@@ -80,19 +80,35 @@ V_DIR = (U_DIR[1], -U_DIR[0])
 # the deck has to clear the baked street underneath it (see below).
 Z_BOT = -1.50      # deck underside, flat. dy_min is -1.165, so this is 0.34 m
                    # of skirt below the lowest terrain the plate covers.
-Z_DECK = 0.55      # asphalt field top. The 0.55 is NOT arbitrary: exclusionZones()
-                   # clears buildings, not streets, so the DataSF centreline for
-                   # Fulton still bakes a 9 m charcoal ribbon here with 3 m
-                   # sidewalk plinths at TOY_CURB_H = 0.35 m and a centre dash at
-                   # +0.03. 0.55 puts the deck 0.20 m clear of the kerb.
-Z_KOI = 0.61       # the mural, painted ON the asphalt. 60 mm of body over the
+# THE DECK HEIGHT IS SET BY THE BAKED STREET UNDERNEATH, NOT BY TASTE.
+# exclusionZones() clears buildings, not streets, so the DataSF centreline for
+# Fulton still bakes here: a 9 m charcoal ribbon at v=0, two 3 m pale sidewalk
+# plinths at v=+-6 lifted TOY_CURB_H = 0.35 m, and a centre dash at +0.03
+# (toystreets/19_13.bin lines 169-172, measured).
+#
+# 0.55 was the first value and it is NOT enough. Two things eat the margin:
+#   * the ribbon's y is quantised to decimetres and rounds UP to 0.20 m above
+#     the terrain sample in places, so the sidewalk top reaches terrain + 0.55;
+#   * createGroundMaterial() in app/src/materials.js runs the ground with
+#     polygonOffsetFactor/Units = -2, which pulls it toward the camera in depth.
+# At 0.55 the measured clearance inside the right-of-way was 0.06-0.15 m, the
+# offset won, and two pale stone stripes drew straight over the deck, the koi
+# and the monument's apron in the running app. Nothing in the Blender renders
+# or the contract validator can see this: it is a depth-bias fight against
+# geometry that is not in the file.
+# 0.95 leaves 0.40 m of clearance over the worst station. The cost is a plaza
+# that stands a little proud of the crossings at Larkin and Hyde — semantic
+# exaggeration in authoring, which the style bible allows and AGENTS rule 5
+# does not touch (nothing has been moved or rescaled).
+Z_DECK = 0.95      # asphalt field top
+Z_KOI = 1.01       # the mural, painted ON the asphalt. 60 mm of body over the
                    # deck: the deck's own top is a 4 m drape grid and a 20 m koi
                    # interpolates it differently, so 5 mm of clearance sank the
                    # fish into the asphalt in patches.
-Z_APRON = 0.63     # the monument's pale granite apron. 80 mm clear of the
+Z_APRON = 1.03     # the monument's pale granite apron. 80 mm clear of the
                    # scored joints (Z_DECK + 0.02), which otherwise draw across it.
-Z_WALK = 0.70      # terrace and sidewalks, one step up from the roadway
-Z_BED = 0.95       # the north planting beds, kerbed
+Z_WALK = 1.10      # terrace and sidewalks, one step up from the roadway
+Z_BED = 1.35       # the north planting beds, kerbed
 
 # The Pioneer Monument. SF Arts Commission accession 1894.4.a-o records the work
 # as 420 x 488 x 676 in overall: 10.668 m tall on a 12.40 x 17.17 m base, with

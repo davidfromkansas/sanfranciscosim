@@ -14,8 +14,8 @@ before the model existed and two of its numbers moved (see "Corrections to the p
 | Manifest id | `fulton-plaza` |
 | Manifest anchor | `-122.4159308, 37.7796961` (model XY bbox centre) |
 | Right-of-way OBB centre | `-122.4159189, 37.7796904`, measured; the model sits 1.05 m west / 0.63 m north of it |
-| `targetHeightM` | **12.7999 m** — the model's VERTICAL EXTENT, not an architectural height. See "The terrain drape" |
-| Monument crest | 11.268 m above local grade (apron 0.63 + 10.668 m of monument) |
+| `targetHeightM` | **13.1999 m** — the model's VERTICAL EXTENT, not an architectural height. See "The terrain drape" |
+| Monument crest | 11.698 m above local grade (apron 1.03 + 10.668 m of monument) |
 | Right-of-way | 120.04 m × 48.59 m oriented, 5,805 m² = 1.435 acres, heading 81.15° |
 | Axis-aligned XY bbox | 128.49 × 67.63 m — the 8.85° rotation, plus the beds' overhang and the tree crowns |
 | Triangles | 13,364 (cap 16,000) |
@@ -84,7 +84,7 @@ pale terrace, a low wall on its plaza edge, and a thinner row of smaller trees.
 ## The terrain drape — read this before changing anything
 
 **This asset is draped on the baked terrain, and that is why `min_z` is −1.50 m and
-`targetHeightM` is 12.80 m.** Both are deliberate, both are asserted by
+`targetHeightM` is 13.20 m.** Both are deliberate, both are asserted by
 `validate_fulton_plaza.py`, and neither is a contract slip.
 
 `placeGeneric()` in `app/src/assets.js` seats a landmark from a single terrain sample:
@@ -105,7 +105,7 @@ Consequences:
   that replaces "min_z ≈ 0" is that the deck stands `Z_DECK` above the terrain everywhere:
   measured by ray-casting onto the deck at 32 points across the right-of-way, **max
   standoff error 0.0039 m**.
-- **`targetHeightM` is the vertical extent**, 12.7999 m, because the loader's scale is
+- **`targetHeightM` is the vertical extent**, 13.1999 m, because the loader's scale is
   `targetHeightM / bbox height` and it must be 1.0.
 - `sample_terrain.mjs` reads `app/public/tiles/terrain.bin` through `manifest.terrain` —
   the shipped copy of the bake output and the exact array `app/src/data.js` indexes at
@@ -127,10 +127,28 @@ points of which 12 lie inside the plaza quad. In toy mode that renders, under th
 9 m `#3c3c40` road ribbon on the terrain, 3 m pale sidewalk plinths lifted `TOY_CURB_H =
 0.35 m` at the kerb, and a 0.5 m centre dash at `TOY_MARK_LIFT = 0.03 m`.
 
-The deck top is therefore at **+0.55 m above local grade** — 0.20 m clear of the kerb — and
-that number is not a style choice. Verify it in the app from a low camera at both ends as
-well as from above; the failure shows as a charcoal stripe or a white dash bleeding through
-the deck.
+**The deck top is at +0.95 m above local grade, and that number was measured in the running
+app, not chosen.** 0.55 m — nominally 0.20 m of clearance over the kerb — was not enough,
+and the reason is two effects that stack:
+
+- the ribbon's `y` is quantised to decimetres and rounds **up** to 0.20 m above the terrain
+  sample in places, so the sidewalk top actually reaches terrain + 0.55 m;
+- `createGroundMaterial()` in `app/src/materials.js` runs the whole ground mesh with
+  `polygonOffsetFactor = polygonOffsetUnits = -2`, which pulls it toward the camera in
+  depth so that draped geometry wins ties.
+
+Measured station by station along the block, the clearance at 0.55 m was **0.06–0.15 m**,
+the offset won, and in the running app two pale stone stripes drew straight over the deck,
+across both koi and across the monument's apron. **Nothing upstream can see this**: the
+Blender renders are of a file that does not contain the street, and the contract validator
+only knows about the file. It is a depth-bias fight against geometry that is not in the
+asset. At 0.95 m the worst station has 0.40 m of clearance.
+
+The cost is a plaza that stands a little proud of the crossings at Larkin and Hyde. That is
+semantic exaggeration in authoring, which the style bible allows; nothing has been moved or
+rescaled, so AGENTS rule 5 is untouched. Verify it in the app from a low camera at both ends
+as well as from above — the failure shows as a charcoal stripe or a pale plinth bleeding
+through the deck.
 
 ## What each side shows
 
@@ -164,19 +182,19 @@ surfaces. All heights are **above local grade**, with the drape added per vertex
 | z | element |
 |---|---|
 | −1.50 | deck underside (flat; 0.34 m below the lowest terrain it covers) |
-| 0.55 | asphalt field top — 0.20 m clear of the baked street's 0.35 m kerb |
-| 0.57 | scored joints |
-| 0.58 → 0.61 | koi bodies and pectorals |
-| 0.61 → 0.625 | koi markings |
-| 0.625 → 0.652 | koi `_Glow` shells (white body, then the markings on top of it) |
-| 0.63 | the monument's granite apron |
-| 0.70 | south terrace, north sidewalk |
-| 0.95 | north planting beds (kerb 1.01) |
-| 1.02 | terrace low wall |
-| 1.78 | monument platform (apron + 1.15) |
-| 3.38 | the four cardinal piers |
-| 8.10 | central pedestal top (apron + 7.468) |
-| 11.27 | **Minerva's finial** (apron + 10.668) — the crest |
+| 0.95 | asphalt field top — 0.40 m clear of the baked street's sidewalk plinths |
+| 0.97 | scored joints |
+| 0.98 → 1.01 | koi bodies and pectorals |
+| 1.01 → 1.025 | koi markings |
+| 1.025 → 1.052 | koi `_Glow` shells (white body, then the markings on top of it) |
+| 1.03 | the monument's granite apron |
+| 1.10 | south terrace, north sidewalk |
+| 1.35 | north planting beds (kerb 1.41) |
+| 1.42 | terrace low wall |
+| 2.18 | monument platform (apron + 1.15) |
+| 3.78 | the four cardinal piers |
+| 8.50 | central pedestal top (apron + 7.468) |
+| 11.70 | **Minerva's finial** (apron + 10.668) — the crest |
 
 ## Palette
 
@@ -259,10 +277,10 @@ which is why the koi glow.
 `docs/asset-plans/fulton-plaza.md` was written before the model existed. Two of its numbers
 moved, and REPORT.md beats the plan:
 
-1. **`targetHeightM` is 12.7999 m, not 10.67 m.** The plan set the target to the Pioneer
+1. **`targetHeightM` is 13.1999 m, not 10.67 m.** The plan set the target to the Pioneer
    Monument's catalogue height and asked the validator to assert `max_z == 10.67`. That is
    incompatible with the drape the same plan mandates: once z = 0 means the anchor's ground,
-   the export spans −1.50 to +11.27 and the loader's scale is `targetHeightM / 12.80`. The
+   the export spans −1.50 to +11.70 and the loader's scale is `targetHeightM / 13.20`. The
    monument crest is still the model's crest, and is still 10.668 m of monument — it now
    stands on a 0.63 m apron on a draped deck. This follows the convention `64-south-park`
    and `424-brannan` already ship under.

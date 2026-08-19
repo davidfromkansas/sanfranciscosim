@@ -1,7 +1,7 @@
 {
  "input": {
   "tris": 13364,
-  "verts": 24895,
+  "verts": 24893,
   "objects": 21,
   "primitives": 26,
   "materials": [
@@ -25,7 +25,7 @@
   "bbox_dims": [
    128.49153,
    67.62864,
-   12.7999
+   13.19989
   ],
   "bbox_min": [
    -64.24577,
@@ -39,7 +39,7 @@
  },
  "output": {
   "tris": 13364,
-  "verts": 24119,
+  "verts": 24107,
   "objects": 21,
   "primitives": 26,
   "materials": [
@@ -63,7 +63,7 @@
   "bbox_dims": [
    128.49153,
    67.62864,
-   12.7999
+   13.19989
   ],
   "bbox_min": [
    -64.24577,
@@ -76,34 +76,34 @@
   ]
  },
  "output_signed_volumes": {
-  "apron": 30.550313,
-  "ashurbanipal": 6.223437,
-  "bed_east_kerb": 170.535917,
-  "bed_east_soil": 125.328521,
-  "bed_west_kerb": 171.325761,
-  "bed_west_soil": 126.446643,
-  "bollards": 2.865391,
-  "deck": 11849.080477,
-  "furniture": 6.097931,
-  "joints": 2.852023,
-  "koi": 4.070816,
-  "koi_glow": 1.297183,
-  "lamps": 3.987718,
-  "lamps_glow": 0.737755,
-  "monument": 326.145504,
-  "monument_glow": 26.517705,
-  "people": 13.187292,
-  "terrace_s": 441.007119,
-  "terrace_s_wall": 23.35396,
-  "trees": 869.929454,
-  "walk_n": 105.924975
+  "apron": 30.550318,
+  "ashurbanipal": 6.223432,
+  "bed_east_kerb": 171.698187,
+  "bed_east_soil": 125.462705,
+  "bed_west_kerb": 170.863542,
+  "bed_west_soil": 124.138495,
+  "bollards": 2.865654,
+  "deck": 14171.264908,
+  "furniture": 6.097785,
+  "joints": 2.852093,
+  "koi": 4.070773,
+  "koi_glow": 1.297138,
+  "lamps": 3.987916,
+  "lamps_glow": 0.737391,
+  "monument": 326.145528,
+  "monument_glow": 26.517708,
+  "people": 13.187294,
+  "terrace_s": 441.007381,
+  "terrace_s_wall": 23.354095,
+  "trees": 868.371748,
+  "walk_n": 105.924912
  },
  "inverted_solids": [],
  "ray_test_output": {
   "rays": 22500,
-  "hits": 14975,
-  "flipped": 3,
-  "flipped_fraction": 0.0002
+  "hits": 15050,
+  "flipped": 2,
+  "flipped_fraction": 0.000133
  },
  "gates": {
   "G1_materials_identical": true,

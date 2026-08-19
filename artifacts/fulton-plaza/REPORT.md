@@ -1,6 +1,6 @@
 # Fulton Plaza — build report
 
-`fulton-plaza.glb`: 21 objects, **13,364 triangles**, **345 KB raw / 220 KB gzip** as
+`fulton-plaza.glb`: 21 objects, **13,364 triangles**, **344 KB raw / 220 KB gzip** as
 shipped (meshopt-compressed; 676 KB before stage 4), 16 palette materials, **draped on the
 baked terrain**, all 19 contract checks PASS in a fresh-scene re-import of the *shipped*
 file (`validation.json`).
@@ -16,18 +16,18 @@ asphalt.
 |---|---|
 | Manifest anchor | `-122.4159308, 37.7796961` (model XY bbox centre) |
 | Right-of-way OBB centre | `-122.4159189, 37.7796904`; the model sits 1.051 m west / 0.626 m north of it |
-| `targetHeightM` | **12.7999 m** — the vertical extent, so the loader's scale is 1.0 |
-| Dimensions | 128.4915 × 67.6286 × 12.7999 m |
+| `targetHeightM` | **13.1999 m** — the vertical extent, so the loader's scale is 1.0 |
+| Dimensions | 128.492 × 67.629 × 13.1999 m |
 | `min_z` | **−1.50 m** — negative by design; z = 0 is the anchor's ground |
 | XY centre offset | 0.0000, 0.0000 |
 | Long axis | 81.15° true (toward Hyde Street); cross axis 171.15° |
 | Right-of-way | 120.04 × 48.59 m oriented, 5,805 m² = 1.435 acres |
 | Terrain | draped; falls 2.366 m along the axis, **cross-falls 0.874 m**, anchor 17.788 m |
-| Deck standoff | Z_DECK = 0.55 m above grade, max error over 32 ray-cast samples **0.0039 m** |
-| Monument crest | 11.268 m above local grade — apron 0.63 + 10.668 m (SFAC 420 in) |
+| Deck standoff | Z_DECK = 0.95 m above grade, max error over 32 ray-cast samples **0.0039 m** |
+| Monument crest | 11.698 m above local grade — apron 1.03 + 10.668 m (SFAC 420 in) |
 | Koi | two bodies, 20.642 m each |
 | Triangles | 13,364 of a 16,000 cap |
-| File | 353,476 B raw / 225,263 B gzip9, meshopt-compressed. Pre-optimize 692,360 B; see `optimize/REPORT.md` |
+| File | 352,004 B raw / 224,3xx B gzip9, meshopt-compressed. Pre-optimize 692,300 B; see `optimize/REPORT.md` |
 | Category / streaming | `cat: 0`, `loadRadius: 2500` |
 
 ## Triangles by object
@@ -60,7 +60,7 @@ writes `validation.json`. Overall **PASS**.
 
 | check | result |
 |---|---|
-| meters and plausible dimensions | PASS — 128.5 × 67.6 × 12.8 m |
+| meters and plausible dimensions | PASS — 128.5 × 67.6 × 13.2 m |
 | vertical extent matches the build's own metadata | PASS |
 | height datum is the monument | PASS — the crest vertex belongs to `monument`, not to a tree |
 | **deck drapes the terrain** | PASS — 32 samples, max standoff error 0.0039 m (tolerance 0.10) |
@@ -82,8 +82,8 @@ replaces it. See REFERENCE.md, "The terrain drape".
 
 ## Stage 4 — optimize
 
-`gltfpack@0.24 -c -km -kn -noq` applied to the approved build: **692,360 → 353,476 bytes
-raw, −48.9%**, geometry byte-identical, max A/B pixel delta 0.046%, all gates PASS.
+`gltfpack@0.24 -c -km -kn -noq` applied to the approved build: **692,300 → 352,004 bytes
+raw, −49.2%**, geometry byte-identical, max A/B pixel delta 0.046%, all gates PASS.
 
 **Phase B was measured and reverted in full.** Six variants; every one produced a *larger*
 file than doing nothing, including the join — the Blender import/re-export round-trip alone
@@ -135,7 +135,17 @@ zoomed to fit, so the four share one rig.
    saddles. The markings now glow on top of the shell in their own colour.
 10. **The scored joints read as a grid of black bars.** `Toy_ink` divided the plaza into
     tiles. `Toy_seam` (`5f5f68`) gives the asphalt a scale instead of a pattern of its own.
-11. **The validator's first drape sample missed a quarter of its points.** The outer row at
+11. **Two pale stone stripes drew straight across the plaza in the running app.** They are
+    the baked toy sidewalk plinths of the Fulton Street centreline — `exclusionZones()`
+    clears buildings, not streets — and at the first deck height of 0.55 m the measured
+    clearance over them was only 0.06–0.15 m, because the ribbon's `y` quantises up to
+    0.20 m above the terrain and `createGroundMaterial()` runs the ground with
+    `polygonOffset{Factor,Units} = -2`. The deck moved to 0.95 m (0.40 m clear) and the
+    whole Z stack with it, which is why `targetHeightM` is 13.20 m rather than 12.80 m.
+    **This defect is invisible everywhere upstream** — it is a depth fight against geometry
+    that is not in the file, so no Blender render and no contract check can see it, and only
+    the stage-5 app QA does.
+12. **The validator's first drape sample missed a quarter of its points.** The outer row at
     `v = 16` landed on the south terrace, not the deck, and rays that hit an overlay are
     skipped — so a badly chosen grid shrinks the sample silently rather than failing. Moved
     to `v = 12`, and the koi cluster now seeds from the **surveyed** koi centres rather than
@@ -145,11 +155,11 @@ zoomed to fit, so the four share one rig.
 
 `docs/asset-plans/fulton-plaza.md` was written before the model existed. Two numbers moved:
 
-1. **`targetHeightM` is 12.7999 m, not 10.67 m.** The plan set the target to the Pioneer
+1. **`targetHeightM` is 13.1999 m, not 10.67 m.** The plan set the target to the Pioneer
    Monument's catalogue height and asked the validator to assert `max_z == 10.67`. That is
    incompatible with the terrain drape the same plan mandates: once z = 0 means the anchor's
-   ground, the export spans −1.50 to +11.27 m and the loader's scale is
-   `targetHeightM / 12.80`. The monument is still 10.668 m of monument and still the model's
+   ground, the export spans −1.50 to +11.70 m and the loader's scale is
+   `targetHeightM / 13.20`. The monument is still 10.668 m of monument and still the model's
    crest; it now stands on a 0.63 m apron on a draped deck. This is the convention
    `64-south-park` (21.0415 m) and `424-brannan` already ship under, and the plans README
    already documents it.
@@ -169,7 +179,7 @@ Everything else in the plan held — including the exclusion measurement, the "n
    recognition.
 2. **The tree height is a design decision, not a measurement.** Crowns are set at 7.80 m
    (north) and 5.60 m (south) above local grade so the Pioneer Monument stays the tallest
-   thing on its own plaza after the 2.37 m drape. A measured plane above 11.27 m would be a
+   thing on its own plaza after the 2.37 m drape. A measured plane above 11.70 m would be a
    real conflict; the honest resolution is to keep the monument as the datum and record the
    trees as restrained, not to move the datum onto a lollipop.
 3. **SPECTRA is deliberately absent** — it would occlude the koi from the app's own camera,
@@ -181,6 +191,53 @@ Everything else in the plan held — including the exclusion measurement, the "n
 5. **The plaza may stop being a plaza.** The SFMTA closure runs to 31 August 2027 and is a
    renewable permit, not a permanent change — which is exactly why a street ribbon still
    bakes underneath.
+
+## Stage 5 — local integration QA
+
+Driven by `qa_local.mjs`: the **built** app (`app/dist`) in real headless Chrome over CDP,
+because a hidden Browser pane throttles `requestAnimationFrame` to nothing and makes a
+healthy streamed landmark look broken.
+
+| check | result |
+|---|---|
+| manifest entry loads | **PASS** — `sf-assets: fulton-plaza merged 26 objects / 16 materials -> batched (7724 tris body); uniform x1.0000 at 1898, -1072` |
+| uniform scale ≈ 1.0 | **PASS** — exactly x1.0000, so `targetHeightM` and the authored extent agree |
+| id mapping | **PASS** — `camelId('fulton-plaza') = 'fultonPlaza'`, and `SF.assets.placed` carries `fultonPlaza` |
+| one building on the spot | **PASS** — the re-bake dropped the one baked footprint (the traced Pioneer Monument); nothing pokes through |
+| terrain seating | **PASS** — the deck sits on the ground end to end across a 2.37 m fall; validator standoff error 0.0039 m |
+| asphalt reads as a surface | **PASS** — median luminance **38** (p10 36, p90 38) over two bands of open deck, against **8** for the baked toy streets in the same frame. `Toy_roofd` measures 9 in this renderer, so `6f7076` clears the dark cliff by 4× |
+| no baked street bleeding through | **PASS** — p90 38 against a median of 38. Before the deck lift the same window read p90 **196**: that gap *was* the defect |
+| night glow | **PASS** — both koi glow with their markings, the lamp lenses light, the monument is washed; nothing else |
+| draw calls | **PASS** — 122/frame at the landmark (budget < 300) |
+| asset warnings | **PASS** — none; 104 entries, 0 failed |
+| **fallback drill** | **PASS** — with the GLB served as a 404: the app still boots, 96 landmarks live, `failed: 1`, and **exactly one** warning: `sf-assets: fulton-plaza failed to load (… 404 …)`. Case B, so the site is empty ground inside the exclusion zone — expected |
+| lint + build | **PASS** — `eslint src test` clean, `vite build` clean, `npm test` green (it runs first) |
+
+Note on the drill's wording: `INTEGRATION-PROMPT.md` Step 6 says to expect one
+`… — keeping the code-built landmark` line, which is the **resident** path. A **streamed**
+entry — anything with a `loadRadius`, which is this one — fails through `scan()` instead and
+emits `sf-assets: <id> failed to load (…)` with no "keeping" suffix. It is still exactly
+once. Match on the id, not on the prompt's wording.
+
+Screenshots in `qa/`: `day`, `night`, `wide`, `low-from-hyde`, `low-from-larkin`, `plan`,
+and `drill-day` / `drill-night`.
+
+## Case B — registry, re-bake and audit
+
+| step | result |
+|---|---|
+| registry entry | `fultonPlaza`, lon/lat = the right-of-way OBB centre, `height: 11.27`, `exclude: 25`, camera `{340, 99, 26}` |
+| re-bake | full chain `terrain → bridges → buildings → streets → landcover → validate → lore → toy → notables → context → muni-shapes`, all green |
+| what moved | **one** baked footprint, in **one** cell: `19_13` 102 → 101. The dropped ring is the 17-vertex cruciform 1.00 m from the anchor — the Pioneer Monument, which DataSF traces as a building and the bake extruded to 4.6 m |
+| `audit.mjs` check 1.6 | **PASS** — "114 zones over 110 landmarks clear". The three unrelated pre-existing failures (1.2b citywide height p95, 1.3c Telegraph Hill DEM, 1.7b one offshore tree) are unchanged |
+| `verify-rebake.mjs` | **PASS** — "only the new landmarks' cells moved"; 584 of 585 cells unchanged; nearest surviving footprint 86.2 m against a 25 m radius |
+| exclusion proved by **penetration depth** | `origin/main` **+24.22 m** — a 4.6 m block (baked 17.3 → 21.9 m) standing 24 m *inside* the right-of-way rectangle, exactly where the modelled monument goes. After the re-bake **−63.82 m** — the nearest surviving ring is 64 m *outside* it. A count or a boolean cannot say this; the depth can |
+| generated churn | 596 files: 585 `ctx/*.json` sidecars (expected — dropping one footprint renumbers the global building ids their pick lists reference), 1 `buildings/19_13.bin`, 1 `toy/19_13.bin`, 3 `context/`, 2 `api/_data/`, 4 manifests |
+
+**Batch mode**: the bake was run for this QA and then discarded
+(`git checkout -- app/public/tiles api/_data`). `git diff --name-only origin/main` lists
+**nothing** under `app/public/tiles/` or `api/_data/`. The city is baked once for the whole
+batch by `docs/asset-pipeline/BATCH-INTEGRATE.md`.
 
 ## Approval
 

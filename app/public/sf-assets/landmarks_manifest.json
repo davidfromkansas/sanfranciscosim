@@ -1939,5 +1939,24 @@
     ],
     "tris": 3366,
     "loadRadius": 2500
+  },
+  {
+    "id": "fulton-plaza",
+    "file": "fulton-plaza.glb",
+    "anchor": [
+      -122.4159308,
+      37.7796961
+    ],
+    "targetHeightM": 13.1999,
+    "cat": 0,
+    "name": "Fulton Plaza",
+    "estimated": false,
+    "dims": [
+      128.492,
+      67.629,
+      13.1999
+    ],
+    "tris": 13364,
+    "loadRadius": 2500
   }
 ]

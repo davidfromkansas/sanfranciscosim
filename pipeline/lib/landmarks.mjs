@@ -1415,6 +1415,63 @@ export const LANDMARKS = [
     // explains what this place is.
     camera: { distance: 620, yaw: 90, pitch: 30 },
   },
+  {
+    // Fulton Plaza: the pedestrianised block of Fulton Street between Larkin and
+    // Hyde, one block east of civicCenterPlaza on the same civic spine and the
+    // same 8.85 deg grid. The third PLAZA entry, and the first whose subject is
+    // not even a block — it is a STREET that stopped being a street in spring
+    // 2020, so it has no parcel of its own and its polygon is the right-of-way
+    // between two parcel lines.
+    //
+    // `exclude: 25` has exactly ONE job and it is measured, not guessed. Counted
+    // over the 1,772 baked footprints in cells 18-20 x 12-14 of the committed
+    // bake, with the metric excluded() uses (ring centroid OR any vertex inside
+    // the radius, from this anchor):
+    //    1.85 m  buildings/19_13 #101 — a 17-vertex cruciform, 16.90 x 11.36 m,
+    //            47.2 m2, baked 17.3 -> 21.9 m. This IS the Pioneer Monument:
+    //            DataSF traces it as a building and the bake extrudes it into a
+    //            4.6 m block standing exactly where the GLB's monument goes.
+    //   86.19 m  nearest surviving neighbour vertex (20_13 #8, 61.9 m tall)
+    // So r <= 1.0 drops nothing and anything from ~1 to ~86 m drops that one
+    // footprint and nothing else. 25 m is chosen over the minimum because it
+    // also covers the plaza's full half-width (24.29 m), so a future data
+    // vintage that traces a kiosk or a market stall inside the roadway band is
+    // cleared too.
+    //
+    // Do NOT raise it on the theory that bigger is safer. The window only looks
+    // this generous because the Main Library and the Asian Art Museum — whose
+    // walls are 24 m either side — are already cleared by their own 40 m
+    // exclusions, and a radius that leans on someone else's exclusion is a trap
+    // for whoever edits those next.
+    //
+    // No clearTrees, and that is measured too: the landcover scatter drops ZERO
+    // trees inside the plaza quad and zero within 80 m of the anchor, in both
+    // landcover/19_13.bin (11 trees in the whole cell) and toyland/19_13.bin
+    // (41). Fulton Plaza is tagged as a street, not leisure=park, so the scatter
+    // never reaches it — unlike civicCenterPlaza and 64SouthPark, both of which
+    // needed the flag.
+    //
+    // `height` is the Pioneer Monument's crest above local grade, not the
+    // manifest's targetHeightM (12.7999 m). Those differ on purpose: the asset is
+    // terrain-draped, so the manifest carries its VERTICAL EXTENT — the same
+    // split 64SouthPark ships under.
+    //
+    // The lon/lat here is the right-of-way's own OBB centre; the manifest anchor
+    // sits 1.2 m from it, at the model's XY bbox centre. The exclusion wants the
+    // plaza's centre (the monument's ring centroid is 0.995 m from it); the
+    // loader wants the model's.
+    id: 'fultonPlaza',
+    name: 'Fulton Plaza',
+    lon: -122.4159189,
+    lat: 37.7796904,
+    height: 11.27,
+    exclude: 25,
+    // App yaw = 180 - true bearing, so yaw 99 stands the camera at bearing 81 —
+    // the Hyde (east) end, ON the plaza's own axis — looking west past the
+    // Pioneer Monument toward City Hall. Same reasoning as civicCenterPlaza's
+    // yaw 90, and verified by the -axis.png render rather than derived on paper.
+    camera: { distance: 340, yaw: 99, pitch: 26 },
+  },
   // A PARTY-WALL site, so this radius is far tighter than the usual
   // half-diagonal rule. The Earl Warren Building shares its block with the
   // 54 m Hiram W. Johnson State Office Building, whose wall is a few metres

@@ -20,7 +20,7 @@ prompt, Part 2 is the research and design dossier behind it.
 | Manifest id | `fulton-plaza` |
 | Existing procedural builder | none — new landmark (needs a `pipeline/lib/landmarks.mjs` entry and a re-bake, see 2.13) |
 | WGS84 anchor | `-122.4159189, 37.7796904` (oriented-bounding-box centre, measured from DataSF parcels) |
-| Target height | **12.80 m — the model's VERTICAL EXTENT** (this plan first said 10.67 m; corrected during stage 2, see the note at the end of 2.15). The asset is terrain-draped, so `min_z` is negative and `targetHeightM` is the extent, per the `64-south-park` convention. The crest is still the Pioneer Monument: SFAC records it at 420 in = 10.668 m, standing on the plaza's 0.63 m apron |
+| Target height | **13.20 m — the model's VERTICAL EXTENT** (this plan first said 10.67 m; corrected during stage 2, see the note at the end of 2.15). The asset is terrain-draped, so `min_z` is negative and `targetHeightM` is the extent, per the `64-south-park` convention. The crest is still the Pioneer Monument: SFAC records it at 420 in = 10.668 m, standing on the plaza's 1.03 m apron |
 | Footprint | 119.51 m × 48.59 m oriented (heading 81.15°), 5,805 m² = 1.435 acres, measured from DataSF parcel blocks `0354001` and `0353001` |
 | Axis-aligned XY bbox | 128.5 m × 67.6 m as built — the 8.85° rotation of the right-of-way, widened by the planting beds' 2 m overhang and the tree crowns (this plan first said 126.1 × 66.3, the right-of-way alone) |
 | Triangle cap | 16,000 |
@@ -809,12 +809,22 @@ for its `yaw: 90`. Verify it by render rather than trusting the arithmetic.
 6. **Corrected at stage 2 — the height datum.** This plan's Part 1 asked for
    `max_z == 10.67 m` and a manifest `targetHeightM` of 10.67. That is incompatible with the
    terrain drape the same Part 1 mandates: once z = 0 means the anchor's ground, the export
-   spans −1.50 to +11.27 m and the loader's `targetHeightM / bbox height` scale must be
-   computed against the 12.80 m extent. The shipped values are in
+   spans −1.50 to +11.70 m and the loader's `targetHeightM / bbox height` scale must be
+   computed against the 13.20 m extent. The shipped values are in
    `artifacts/fulton-plaza/REPORT.md`, which beats this plan. The monument is still 10.668 m
    of monument and still the model's crest.
 
-7. **The plaza may stop being a plaza.** The SFMTA closure runs to 31 August 2027 and is a
+7. **Corrected at stage 5 — the deck height.** Part 1 sets the deck at +0.55 m "0.20 m of
+   clearance over the kerb", and that is not enough. The baked ribbon's `y` quantises up to
+   0.20 m above the terrain, and `createGroundMaterial()` runs the whole ground mesh with
+   `polygonOffset{Factor,Units} = -2`; the measured clearance was 0.06–0.15 m, the offset
+   won, and two pale sidewalk plinths drew straight over the deck, both koi and the
+   monument's apron in the running app. The deck ships at **+0.95 m**. The lesson generalises
+   to any future ground-plane landmark over a surviving street: size the deck against the
+   ribbon's *quantised* height plus a depth-bias margin, and confirm it in the app — no
+   Blender render and no contract check can see this failure.
+
+8. **The plaza may stop being a plaza.** The SFMTA closure runs to 31 August 2027 and is a
    renewable permit, not a permanent change; the street is still a street in DataSF, which
    is exactly why a ribbon still bakes under it. If the closure lapses, this asset becomes
    historical rather than wrong — but the bollards would be the first thing to remove.
