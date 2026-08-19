@@ -27,7 +27,7 @@ prompt, Part 2 is the research and design dossier behind it.
 |---|---|
 | Manifest id | `131-steuart` |
 | Existing procedural builder | none — new landmark (Case B: needs a `pipeline/lib/landmarks.mjs` entry and a re-bake, see 2.13) |
-| WGS84 anchor | `-122.3924393, 37.7930564` |
+| WGS84 anchor | `-122.3924386, 37.7930568` |
 | Target height | **27.7 m** to the penthouse barrel crown; brick cornice 21.8 m (measured); string course 17.6 m; ground-floor cornice 5.2 m |
 | Footprint | 14.16 m (Steuart Street frontage) x 42.07 m (depth to The Embarcadero); 601.8 m2, measured from OSM way 193054132 |
 | Triangle cap | 12,000 |
@@ -256,8 +256,8 @@ entry in `REPORT.md`. Do not edit the production manifest in this task.
   "id": "131-steuart",
   "file": "131-steuart.glb",
   "anchor": [
-    -122.3924393,
-    37.7930564
+    -122.3924386,
+    37.7930568
   ],
   "targetHeightM": 27.7,
   "cat": 3,
@@ -362,8 +362,10 @@ Local tangent projection (`AGENTS.md`): `x=(lon−(−122.4375))·111320·cos(37
 Signed area (x,z) = −601.8 m2 (clockwise). Minimum-area OBB **14.462 x 42.068 m**,
 608.4 m2, long axis at 44.8° true.
 
-**Anchor.** OBB centre and polygon centroid agree to 14 mm: `x = 3965.155, z = −2548.65`
-→ **`-122.3924393, 37.7930564`**. Use this, not the DataSF parcel centroid
+**Anchor.** OBB centre, polygon centroid and footprint AABB centre agree to
+7.6 cm. The model is authored on the **AABB centre**, `x = 3965.213,
+z = −2548.704` → **`-122.3924386, 37.7930568`**, because that is what makes the
+exported XY offset exactly zero. Use this, not the DataSF parcel centroid
 (−122.3923736, 37.7930116) or CompStak's lat/lon — both of those are the centroid of the
 **131+141** parcel and sit ~7 m southeast of this building.
 
@@ -571,7 +573,7 @@ before touching the cornice or the penthouse.
 {
   "id": "131-steuart",
   "file": "131-steuart.glb",
-  "anchor": [-122.3924393, 37.7930564],
+  "anchor": [-122.3924386, 37.7930568],
   "targetHeightM": 27.7,
   "cat": 3,
   "name": "Steuart Place (131 Steuart Street)",
@@ -626,8 +628,8 @@ Registry entry sketch for `pipeline/lib/landmarks.mjs`:
 {
   id: '131Steuart',
   name: 'Steuart Place (131 Steuart Street)',
-  lon: -122.3924393,
-  lat: 37.7930564,
+  lon: -122.3924386,
+  lat: 37.7930568,
   exclude: 8,
 }
 ```
