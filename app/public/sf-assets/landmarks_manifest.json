@@ -1711,5 +1711,24 @@
     ],
     "tris": 7688,
     "loadRadius": 2500
+  },
+  {
+    "id": "246-ritch",
+    "file": "246-ritch.glb",
+    "anchor": [
+      -122.3958481,
+      37.7802253
+    ],
+    "targetHeightM": 18.76,
+    "cat": 2,
+    "name": "246 Ritch Street",
+    "estimated": false,
+    "dims": [
+      28.3678,
+      28.1556,
+      18.76
+    ],
+    "tris": 8492,
+    "loadRadius": 2500
   }
 ]
