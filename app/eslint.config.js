@@ -41,4 +41,20 @@ export default [
       globals: { ...globals.node },
     },
   },
+  // The serverless handlers. They are not bundled and never run in a browser,
+  // so nothing else here reaches them — and `node --check` only parses, which
+  // is how a handler shipped calling a function it had forgotten to import and
+  // 500'd on every cron fire for hours. no-undef is what catches that.
+  {
+    files: ['../api/**/*.mjs'],
+    languageOptions: {
+      ecmaVersion: 2023,
+      sourceType: 'module',
+      globals: { ...globals.node },
+    },
+    rules: {
+      'no-unused-vars': ['error', { argsIgnorePattern: '^_' }],
+      'no-console': 'off',
+    },
+  },
 ];

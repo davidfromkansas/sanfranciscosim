@@ -365,7 +365,28 @@ export function createFeedPanel({
   refreshOnline();
   // Fast while the city is loading, when the number moves every second.
   setInterval(refreshOnline, 2000);
-  bar.append(icon, titles);
+
+  // Below the desktop breakpoint the panel is a bottom sheet, and this raises
+  // and lowers it. CSS hides the button above that width; the class it toggles
+  // means nothing there, so there is no state to keep in sync with the layout.
+  // It starts closed: on a phone the city is what somebody came for, and a
+  // panel that opens over two thirds of it uninvited is a wall.
+  const sheet = el("button", "rs-sheet");
+  sheet.type = "button";
+  sheet.innerHTML =
+    '<svg viewBox="0 0 16 16" aria-hidden="true" fill="none" ' +
+    'stroke="currentColor" stroke-width="2.4" stroke-linecap="round" ' +
+    'stroke-linejoin="round"><path d="M3 10l5-5 5 5"/></svg>';
+  function setSheet(open) {
+    root.classList.toggle("rs-open", open);
+    sheet.setAttribute("aria-expanded", String(open));
+    sheet.setAttribute("aria-label", open ? "Hide the feed" : "Show the feed");
+  }
+  setSheet(false);
+  sheet.addEventListener("click", () =>
+    setSheet(!root.classList.contains("rs-open")),
+  );
+  bar.append(icon, titles, sheet);
 
   const status = el("p", "rs-status", "Loading…");
   head.append(bar, status);

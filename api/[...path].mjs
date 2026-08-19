@@ -6,8 +6,11 @@
 //
 // Adding a feed touches only api/_lib/feeds/ — see the recipe in feedcore.mjs.
 
-import { getFeed, serveFeed, serveLive } from "./_lib/feedcore.mjs";
+import { getFeed, publish, serveFeed, serveLive } from "./_lib/feedcore.mjs";
 import "./_lib/feeds/index.mjs";
+// serveTick calls into the subreddit directly. index.mjs only registers feeds;
+// it exports nothing, so these have to be named here.
+import { advanceSubreddit, postIsDue } from "./_lib/feeds/residents.mjs";
 
 // The scheduled tick (vercel.json → crons). Without it the subreddit only
 // advances when somebody is looking at it: generation was tied to a visitor
@@ -39,7 +42,7 @@ async function serveTick(req, res) {
   // invocations do nothing and return immediately — that is the mechanism, not
   // a fault. `?force=1` skips the check for testing.
   const forced = new URL(req.url, "http://localhost").searchParams.get("force");
-  if (!forced && !postIsDue() && !(await stillFilling())) {
+  if (!forced && !postIsDue()) {
     res.status(200).json({ ticked: false, reason: "not this minute" });
     return;
   }

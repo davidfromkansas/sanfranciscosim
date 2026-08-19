@@ -124,7 +124,7 @@ function liveFeeds() {
             /* @vite-ignore */
             `${new URL("../api/_lib/feeds/", import.meta.url).href}residents.mjs`
           );
-          if (!mod.postIsDue() && !(await mod.stillFilling())) return;
+          if (!mod.postIsDue()) return;
           core.publish(feed, await mod.advanceSubreddit());
           server.config.logger.info("sf-live-feeds: ticked");
         } catch (error) {
