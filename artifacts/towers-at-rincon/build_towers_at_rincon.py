@@ -138,12 +138,19 @@ PALETTE_HEX = {
     "Toy_steel": "9aa0a6",      # every roof deck, and the two masts
     "Toy_navy": "2c4a70",       # the courtyard atrium's dark frame
     "Toy_mint": "8fd0a8",       # courtyard planting — the one saturated accent
-    "Toy_glassl_Glow": "6f95b8",   # lit apartment ribbons. NOT Toy_glass_Glow:
-                                # the app draws _Glow unlit at
+    "Toy_cream_Glow": "f2ede3",  # lit apartment ribbons. NOT Toy_glass_Glow
+                                # (2a4d73) and NOT Toy_glassl_Glow (6f95b8): the
+                                # app draws _Glow in a separate UNLIT layer at
                                 # 0.12 + 0.95*uNight, so at night the surface
-                                # shows its RAW base colour, and 2a4d73 is the
-                                # navy of UNLIT glass — a lit window painted the
-                                # colour of a dark one.
+                                # shows its RAW base colour. 2a4d73 is the navy of
+                                # an unlit window; 6f95b8 is a cool blue, and this
+                                # tower stands next to procedural blocks whose
+                                # windows emit vec3(1.0, 0.78, 0.5) — a warm amber
+                                # (app/src/materials.js:296). Measured in local QA
+                                # at 22:00: the blue read as the one cold building
+                                # on the block. Warm off-white sits in the same
+                                # family as its neighbours and still stays a step
+                                # cooler than the gold crown.
     "Toy_gold_Glow": "caa64a",  # the hero: the arched crown window band and the
                                 # entrance canopy. Warm, and distinct from the
                                 # cool flats above it.
@@ -968,7 +975,7 @@ def tower(tag, plan, centre, axis, lit, mats):
         z0 = Z_PODIUM + FLOOR_H * i + T_SPANDREL
         for r, run in enumerate(runs):
             glow_strip(f"{tag}_glow_lit_{i}_{r}", run, z0 + 0.12,
-                       z0 + FLOOR_H - T_SPANDREL - 0.12, mats["Toy_glassl_Glow"],
+                       z0 + FLOOR_H - T_SPANDREL - 0.12, mats["Toy_cream_Glow"],
                        0.36, ref=(cxv, cyv))
 
 

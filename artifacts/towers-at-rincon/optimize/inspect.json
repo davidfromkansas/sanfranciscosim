@@ -1,7 +1,7 @@
 {
  "file_bytes": {
-  "raw": 913492,
-  "gzip9": 171317
+  "raw": 913488,
+  "gzip9": 171352
  },
  "objects": 253,
  "total_tris": 17036,
@@ -274,6 +274,11 @@
  ],
  "materials": [
   {
+   "name": "Toy_cream_Glow",
+   "glow": true,
+   "user_objects": 38
+  },
+  {
    "name": "Toy_glass",
    "glow": false,
    "user_objects": 44
@@ -282,11 +287,6 @@
    "name": "Toy_glassl",
    "glow": false,
    "user_objects": 4
-  },
-  {
-   "name": "Toy_glassl_Glow",
-   "glow": true,
-   "user_objects": 38
   },
   {
    "name": "Toy_gold_Glow",
@@ -866,9 +866,9 @@
  ],
  "dup_redundant_tris": 7528,
  "join_candidates": {
+  "Toy_cream_Glow": 38,
   "Toy_glass": 44,
   "Toy_glassl": 4,
-  "Toy_glassl_Glow": 38,
   "Toy_gold_Glow": 5,
   "Toy_ink": 3,
   "Toy_mint": 6,

@@ -1,8 +1,8 @@
 {
  "input_materials": [
+  "Toy_cream_Glow",
   "Toy_glass",
   "Toy_glassl",
-  "Toy_glassl_Glow",
   "Toy_gold_Glow",
   "Toy_ink",
   "Toy_mint",
@@ -49,16 +49,16 @@
   "grp_Toy_steel": 7,
   "grp_Toy_glass": 44,
   "grp_Toy_gold_Glow": 5,
-  "grp_Toy_glassl_Glow": 38,
+  "grp_Toy_cream_Glow": 38,
   "grp_Toy_ink": 3
  },
  "inverted_solids": [],
  "reimport": {
   "objects": 10,
   "materials": [
+   "Toy_cream_Glow",
    "Toy_glass",
    "Toy_glassl",
-   "Toy_glassl_Glow",
    "Toy_gold_Glow",
    "Toy_ink",
    "Toy_mint",

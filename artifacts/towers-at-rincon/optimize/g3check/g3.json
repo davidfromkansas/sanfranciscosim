@@ -3,9 +3,9 @@
  "meshes": 10,
  "tris": 17036,
  "materials": [
+  "Toy_cream_Glow",
   "Toy_glass",
   "Toy_glassl",
-  "Toy_glassl_Glow",
   "Toy_gold_Glow",
   "Toy_ink",
   "Toy_mint",
