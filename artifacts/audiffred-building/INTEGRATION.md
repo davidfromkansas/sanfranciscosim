@@ -209,3 +209,67 @@ than the Blender rig suggests, which is the known trap — but it is dark
 `Toy_roofd` (which measures rgb(9,9,12) in the live scene) would have been
 genuinely black. At night the amber entablature band running all 41.8 m of
 Mission and turning the Embarcadero corner is the hero, exactly as designed.
+
+## Step 6 — fallback drill (mandatory)
+
+Run by serving a real **404** for `/sf-assets/landmarks/audiffred-building.glb`
+rather than renaming the file: Vite answers a missing public path with
+`index.html` and HTTP 200, so the rename trick cannot produce a fetch failure at
+all.
+
+| Check | Result |
+|---|---|
+| app still boots with the GLB missing | **PASS** — `{"entries":91,"far":20,"loading":0,"live":70,"fading":0,"failed":1}` |
+| exactly one fallback warning | **PASS** — `sf-assets: audiffred-building failed to load (… responded with 404: Not Found)`, and nothing else |
+| Case B: the site is empty ground inside the exclusion zone | **PASS, expected** — `qa/drill-day.png`. The lot renders as bare ground, the streets and the 100 The Embarcadero neighbour are intact, no hole, no crash |
+| draw calls still under 300 | **PASS** — avg 81/frame |
+
+The landmark is absent from `assets.placed` and `failed` is exactly 1. Rule 3 is
+satisfied: one console warning, graceful degradation, no crash.
+
+**The drill took four attempts, and three of those failures were the machine,
+not the asset.** Several sibling landmark sessions were running their own
+headless-Chrome QA concurrently; at load average 500–725 the page could not
+finish fetching `landmarks_manifest.json` inside the harness's 120 s gate, and
+the failure surfaced as a bare `manifest timed out (last null)` — which looks
+exactly like a broken asset. Two changes to `qa_local.mjs` came out of it and
+are committed:
+
+1. **`until()` now dumps diagnostics before throwing** — `hasSF`, `hasAssets`,
+   `stats()`, a direct `fetch()` of the manifest, and the last 25 console lines.
+   `entries: 0` with no `no landmark manifest` warning is what proved the fetch
+   was still in flight rather than failed, because `states` is populated
+   immediately after the manifest parses.
+2. **The verdict is written before the screenshots.** The third attempt passed
+   all four checks and was then killed mid-capture, leaving no `drill.json` at
+   all. Screenshots are evidence, not the verdict, and losing them must not lose
+   the verdict.
+
+The default `until()` timeout also went from 120 s to 300 s for the same reason.
+
+## Step 7 — stopped, per the pipeline
+
+`ADDRESS-TO-ASSET.md` stage 5 **replaces** INTEGRATION-PROMPT Step 7 with a
+stop. Lint, tests and build were run; push, PR and deploy were not, and are not
+covered by the session's standing pre-approval.
+
+```
+app: eslint src test          clean
+app: npm test                 26 tests, 26 pass, 0 fail
+app: npm run build            built, 3,315 tiles compressed 56.8 -> 31.8 MB
+```
+
+Branch `pipeline/audiffred-building`, four commits, rebased onto
+`origin/main` (`3d98a6a`).
+
+**The rebase hit three conflicts, all of them the append-only kind batch mode
+predicts** — sibling landmarks had landed on main mid-session in
+`docs/asset-plans/README.md`, `landmarks_manifest.json` and
+`pipeline/lib/landmarks.mjs`. Each was resolved by keeping **both** sides, main's
+rows first. Verified afterwards: 104 manifest entries, 110 registry landmarks,
+no duplicate ids in either, both files parse.
+
+```
+git diff --name-only $(git merge-base origin/main HEAD) HEAD -- app/public/tiles api/_data
+  (0 files)
+```
