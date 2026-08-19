@@ -170,4 +170,11 @@ are updated by stage 4.
 
 ## 8. Approval
 
-Pending — stage 3.
+Approved 19 August 2026. The user's instruction opening this pipeline session was, quoted
+verbatim:
+
+> "APPROVE EVERYTHING DONT ASK ME FOR PERMISSION"
+
+The stage-3 gate was therefore granted in advance rather than after the fact. The contact
+sheet, the aerial day and night renders and the numbers in §1 were still presented before
+the pipeline advanced, so the evidence exists even though no confirmation was waited for.
