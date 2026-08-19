@@ -120,17 +120,13 @@ function liveFeeds() {
           const core = await loadFeeds(server);
           const feed = core?.getFeed("feed");
           if (!feed) return;
-          const { postIsDue } = await import(
+          const mod = await import(
             /* @vite-ignore */
             `${new URL("../api/_lib/feeds/", import.meta.url).href}residents.mjs`
           );
-          if (!postIsDue()) return;
-          const failed = await core.forceRefresh(feed);
-          server.config.logger.info(
-            failed
-              ? `sf-live-feeds: tick failed — ${failed}`
-              : "sf-live-feeds: ticked",
-          );
+          if (!mod.postIsDue() && !(await mod.stillFilling())) return;
+          core.publish(feed, await mod.advanceSubreddit());
+          server.config.logger.info("sf-live-feeds: ticked");
         } catch (error) {
           server.config.logger.warn(
             `sf-live-feeds: tick — ${error?.message || error}`,
@@ -182,12 +178,16 @@ function liveFeeds() {
                 .status(200)
                 .json({ ticked: false, reason: "not this minute" });
             }
-            const failed = await core.forceRefresh(feed);
-            return void shim.status(failed ? 503 : 200).json({
-              ticked: !failed,
-              error: failed ?? null,
-              threads: feed.data?.threads?.length ?? 0,
-              written: feed.data?.written ?? 0,
+            const mod = await import(
+              /* @vite-ignore */
+              `${new URL("../api/_lib/feeds/", import.meta.url).href}residents.mjs`
+            );
+            const data = await mod.advanceSubreddit();
+            core.publish(feed, data);
+            return void shim.status(200).json({
+              ticked: true,
+              threads: data.threads.length,
+              written: data.written,
             });
           }
           const entry = core.getFeed(pathname.replace(/^\/api\//, ""));
