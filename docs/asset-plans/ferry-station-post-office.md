@@ -86,12 +86,14 @@ Authority order: `docs/styles/miniature-toy.md` governs artistic interpretation,
   ~17 m deep running the full 50.74 m frontage, hipped at both ends, eave at
   10.8 m, ridge at 12.65 m. This is the single most identifying feature from the
   app's aerial camera and the one place semantic exaggeration is spent — the real
-  pitch is only ~8°, and it may be steepened a little (up to ~12°) so the roof
-  still reads as a *tile hip roof* from above rather than as a flat cap.
+  measured band depth and eave-to-ridge rise give **12.3°** on their own, which is
+  enough for the hip to read as a *tile hip roof* from above; no further
+  steepening is needed and none should be applied.
 - The **stepped section**: tiled two-storey front band → flat two-storey deck at
-  ~9.8 m → flat one-storey work-room deck at ~6.6 m with roof monitors → open
-  concrete wharf apron on the bay side. Seen from above the building is a set of
-  descending terraces, not one box.
+  ~9.8 m over the middle of the frontage only → flat one-storey work-room deck at
+  ~6.6 m with roof monitors, running from the tile straight back to the bay at
+  both ends → the 1918/19 tiled wing along the SE flank. Seen from above the
+  building is a set of descending terraces, not one box.
 - The **three-pavilion Embarcadero front**: full-height light terracotta piers
   set in from each end mark off end pavilions, and the same terracotta frames the
   central entrance. Between them, red brick.
@@ -111,8 +113,9 @@ Authority order: `docs/styles/miniature-toy.md` governs artistic interpretation,
   carrying the same brick and cornice, and stepping out over the former driveway.
 - The **roof monitors** (three raised, light-topped clerestory boxes) on the
   one-storey rear deck, plus a restrained scatter of vents and mechanical cubes.
-- The **wharf apron** on the NE (bay) side: a low open concrete deck at the base,
-  no building on it, matching the 8.22 x 11.20 m bump-out in the footprint ring.
+- The **bump-out on the NE (bay) side** is *built on*, not an open apron: the
+  1918/19 wing's tiled hip roof covers it out to 47.2 m and hips at the end.
+  (This corrects an earlier reading of this plan — see 2.15 risk 9.)
 
 ## Research the Ferry Station Post Office Building independently
 
@@ -255,9 +258,9 @@ status, negative-scale status, normal-orientation status, unexpected geometry, a
 per-material contract compliance. Write
 `artifacts/ferry-station-post-office/validation.json` and `REPORT.md`.
 
-The axis-aligned XY bounding box will be roughly **68.2 x 63.7 m** even though no
+The axis-aligned XY bounding box will be roughly **69.8 x 65.2 m** even though no
 elevation is longer than 50.7 m — that is the expected consequence of a ~54°
-real-world heading, not a scale error.
+real-world heading plus the tile eave overhang, not a scale error.
 
 ## Manifest draft
 
@@ -510,46 +513,49 @@ it is the model the documents independently describe:
 
 | Level | Plan area | Height | Contribution |
 |---|---|---|---|
-| Tiled front band (hipped, eave 10.8 → ridge 12.65) | ~862 m2 (50.74 x 17.0) | mean ≈ 11.7 m | 41% |
-| Flat deck behind it, still two storeys | ~520 m2 | **9.80 m** | 25% |
-| One-storey work-room deck + SE flank | ~690 m2 | **6.60 m** | 33% |
+| Tiled front band (hipped, eave 10.8 → ridge 12.65) | ~842 m2 (50.74 x 16.6) | mean ≈ 11.7 m | 41% |
+| Flat deck behind it, still two storeys | ~256 m2 (s 9.0–36.5 only) | **9.80 m** | 12% |
+| One-storey work-room deck + the 1918/19 SE wing | ~970 m2 | **6.60 m** / wing 9.9–11.05 | 47% |
 
 That set reproduces the reported **median 9.80** exactly (the 50th percentile lands
 in the middle band) and the reported **mode 6.66** (the largest single flat area),
-and its area-weighted mean of 9.3 m sits just above the reported 8.72 m — the
-balance being the 50 cm edge cells that catch the wharf deck (`hgt_mincm = 42`).
-Independently, the NRHP nomination says the **second floor was only 85 ft (25.9 m)
-deep** against a 125 ft (38.1 m) first floor, and the Port describes a **"one-story
-east portion"**. 17.0 m of tile + ~8.9 m of flat deck = 25.9 m of two-storey block.
-Three lines of evidence, none tuned to the others.
+and its area-weighted mean of ~9.6 m sits above the reported 8.72 m — the
+balance being the 50 cm edge cells that catch the wharf deck (`hgt_mincm = 42`;
+the DataSF polygon is 2,221 m2 against the ring's 2,069 m2, so ~7% of its cells
+are eave-overhang cells) and the sloped tile spreading across bins rather than
+concentrating in one. Independently, the NRHP nomination says the **second floor
+was only 85 ft (25.9 m) deep** against a 125 ft (38.1 m) first floor, and the Port
+describes a **"one-story east portion"**. 16.6 m of tile + ~9.3 m of flat deck =
+25.9 m of two-storey block. Three lines of evidence, none tuned to the others.
 
 Build order:
 
 1. **Base plinth.** Granite band, the full six-vertex ring, 0 → 1.0 m, inset 0.
-2. **Two-storey front block.** From edge V1→V2 inward 25.9 m, full 50.74 m width,
+2. **Two-storey front block.** From edge V1→V2 inward 25.9 m over s 9.0–36.5 and
+   16.6 m elsewhere, full 50.74 m width,
    walls to the cornice at 10.8 m. Cornice: a projecting band 10.4 → 10.8 m,
    ~0.5 m proud, returning around both flanks for the block's depth.
-3. **Tile hip roof.** Over the front 17.0 m of that block: eave at 10.8 m at the
-   outer face, ridge at **12.65 m** running parallel to the frontage, hipped at
-   both ends (hip lines from the ridge ends to the eave corners). Ridge length
-   ≈ 50.74 − 2 x 17.0 x (rise/run) … simply: set the hips at the same pitch as the
-   main slopes, which puts the ridge ends ~8.5 m in from each corner.
+3. **Tile hip roof.** Over the front 16.6 m of that block: eave at 10.8 m at the
+   outer face, ridge at **12.65 m** 8.3 m in from the frontage and running
+   parallel to it, hipped at both ends at the same pitch, which puts the ridge
+   ends ~8.3 m in from each corner.
 4. **Mid flat deck.** The remaining ~8.9 m of the two-storey block: deck at 9.80 m,
    brick parapet to 10.40 m, coping a lighter terracotta.
 5. **One-storey block.** The rest of the main ring (to the V5→V0 rear line): deck
    at **6.60 m**, brick parapet to **7.30 m** with a terracotta coping band (the
    NRHP's "artificial stone band" crowning the original rear).
-6. **SE addition.** A wing ~9 m wide along edge V2→V3, running back ~30 m from the
-   front block: walls to a cornice at ~9.6 m, its own tile hip to a ridge at
-   ~11.0 m. Between it and the central block, a **light-well slot** ~4 m wide
-   recessed to 6.60 m.
+6. **SE addition.** A wing **10.74 m** wide along edge V2→V3, running the full
+   depth from the tiled front band out to the bump-out (30.6 m): walls to 9.40 m,
+   cornice to 9.90 m, its own tile hip to a ridge at **11.05 m** on the wing's
+   centre line, hipped at the bay end. Between it and the central block, a
+   **light-well slot** 3.5 m wide dropped to 5.40 m.
 7. **Roof monitors.** Three boxes on the one-storey deck, in a row parallel to the
    frontage, each ~7 x 2.5 m, rising 1.5 m above the deck, with a light-toned top
    and a dark glazed side band.
 8. **Roof furniture.** A restrained scatter of low vents, two duct runs and one
    mechanical cube on the mid and low decks. Nothing on the tile.
-9. **Wharf apron.** The V3–V4–V5 bump-out and a ~3 m strip along the rear wall:
-   a flat concrete deck at ~0.6 m with a simple edge kerb. No building above it.
+9. **No wharf apron.** The V3–V4–V5 bump-out is roofed by the SE wing (step 6),
+   not open deck. Nothing inside the footprint ring is at ground level.
 10. **Facade detail.** Terracotta piers at ~8.5 m and ~17 m in from each end of
     the frontage, full height and ~0.35 m proud; a string course at 6.6 m; two
     window bands; the central entrance bay 6 m wide with a terracotta surround,
@@ -650,11 +656,11 @@ recess and pane into one inset box), then from the brick panel motif.
   "name": "Ferry Station Post Office Building (Agriculture Building)",
   "estimated": false,
   "dims": [
-    68.2,
-    63.7,
+    69.8386,
+    65.2024,
     12.65
   ],
-  "tris": 0,
+  "tris": 11596,
   "loadRadius": 2500
 }
 ```
@@ -678,9 +684,15 @@ Draft registry entry:
   lon: -122.3921505,
   lat: 37.7941368,
   exclude: 39,
-  camera: { distance: 260, yaw: 234, pitch: 14 },
+  camera: { distance: 260, yaw: 290, pitch: 22 },
 },
 ```
+
+The camera's `yaw` is **not** the frontage bearing: the offset is
+`(sin yaw, ·, cos yaw)` with `+z` south, so the camera's compass bearing from the
+building is `180 − yaw`. Standing the eye at bearing 250° — just off the
+frontage's 234° normal, so the SE flank rakes away behind the front — needs
+`yaw: 290`.
 
 **Sizing `exclude` — measured, not guessed.** `excluded()` in
 `pipeline/buildings.mjs` drops a source footprint if its centroid **or any ring
@@ -695,15 +707,25 @@ anchor against the DataSF footprints the bake actually reads:
 So the window is **37.4 ≤ r < 41.5 m** and **39 m** sits comfortably in it —
 1.7 m of clearance below, 2.5 m above.
 
-**Known, accepted collateral.** Overture also carries two OSM `building=roof`
-rings — way/979811981 and way/979811987, the gangway canopies at the Downtown
-Ferry Terminal — whose nearest vertices are **29.93 m** and **32.87 m** from the
-anchor, i.e. *inside* any radius that can clear this building's own footprint. No
-value of `exclude` both drops this building and spares them; this is the
-unavoidable-collateral case. Losing them is acceptable and arguably correct: they
-are untagged-height canopies immediately against the rear apron that would
-otherwise poke through the asset. **Verify at integration** which rings actually
-disappear — check *which*, not *how many* — and record it in the report.
+**Predicted collateral that did not happen.** Overture also carries two OSM
+`building=roof` rings — way/979811981 and way/979811987, the gangway canopies at
+the Downtown Ferry Terminal — whose nearest vertices are **29.93 m** and
+**32.87 m** from the anchor, i.e. *inside* any radius that can clear this
+building's own footprint, so on paper they read as unavoidable collateral.
+
+They are not. Measured from the baked tile rather than from the source data
+(18 August 2026), neither ring reaches the baked city at all — the cross-source
+gap-fill in `pipeline/buildings.mjs` does not emit them. In cell `23_10`,
+`origin/main`'s nearest footprint vertex *after* this building's own is 80.31 m
+from the anchor; `24_10`'s nearest is the DataSF gangway kiosk at 41.45 m, and
+the exclusion leaves it untouched. **The exclusion drops exactly one baked
+footprint — this building's own, 12.2 m tall.** Rings penetrating the asset
+footprint go 1 → 0; per-cell counts go 49 → 48 in `23_10` and are unchanged in
+all 584 other cells.
+
+This is why the check is "which rings disappear", not "how many": the source-data
+answer (four rings at risk) and the baked answer (one ring dropped, no
+collateral) are different, and only the tile settles it.
 
 **Terrain seating is the risk to check first.** This building stands on a wharf
 over the Bay, so its base is the wharf deck at ~3.07 m NAVD88 while the app's
@@ -772,6 +794,14 @@ seating, night glow, draw calls < 300) and the mandatory fallback drill.
    three-step value ladder in 2.8 (tile darker than brick, trim lighter than both)
    plus the cool grey base and decks. Check it in the aerial render specifically —
    the Blender review rig is more forgiving than the app's flatter lighting.
-8. **It must not out-shout the Ferry Building** 150 m away. If the two are ever
+9. **Corrections made during the build**, all of which this plan has been updated
+   for and all of which are argued in
+   `artifacts/ferry-station-post-office/REFERENCE.md` §8: the NE bump-out is
+   roofed by the 1918/19 wing rather than being an open apron; the two-storey
+   block is 25.9 m deep only over the middle of the frontage; the clay tile is
+   *lighter and more saturated* than the brick, not darker; and the registry
+   camera's `yaw` had been written as the frontage bearing rather than
+   `180 − bearing`.
+10. **It must not out-shout the Ferry Building** 150 m away. If the two are ever
    framed together and this one draws the eye first, the tile is too saturated or
    the roof pitch has been pushed too far.

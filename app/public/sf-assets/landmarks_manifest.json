@@ -1692,5 +1692,24 @@
     ],
     "tris": 9262,
     "loadRadius": 2500
+  },
+  {
+    "id": "ferry-station-post-office",
+    "file": "ferry-station-post-office.glb",
+    "anchor": [
+      -122.3921505,
+      37.7941368
+    ],
+    "targetHeightM": 12.65,
+    "cat": 18,
+    "name": "Ferry Station Post Office Building (Agriculture Building)",
+    "estimated": false,
+    "dims": [
+      69.8386,
+      65.2024,
+      12.65
+    ],
+    "tris": 11596,
+    "loadRadius": 2500
   }
 ]
