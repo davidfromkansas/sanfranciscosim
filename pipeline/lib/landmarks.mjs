@@ -3099,6 +3099,67 @@ export const LANDMARKS = [
     exclude: 5,
     camera: { distance: 200, yaw: 270, pitch: 28 },
   },
+  {
+    // 164 South Park — a 1907 single-storey brick warehouse at the west tip of
+    // the oval, wearing a 2024-25 Stanley Saitowitz | Natoma Architects front:
+    // large-format red panels in stretcher bond, one black ribbon window that
+    // tracks the shift around the oval and drops to become a glazed entry
+    // recess, and a slender canopy over the door. Twitter (2006-2008) and
+    // Instagram (2010) were both founded in this room; the concrete doormat at
+    // that entry says so.
+    //
+    // HEIGHT NOTE — this is the one entry on this oval that REFUSES the LiDAR
+    // maximum, and it is deliberate. DataSF `SF3775069` reports hgt_max 9.25 m,
+    // but over 1,715 cells the distribution is median 5.44, modal 4.61, mean
+    // 5.53, sd 0.84 m. A two-mass building (156 South Park's front bar over its
+    // rear shed) spreads much wider than that; 0.84 m cannot contain a 4 m step.
+    // The assessor records ONE storey on both parcels (068 and 069 are both
+    // addressed 164), the aerial shows an unbroken flat membrane roof, and the
+    // two-storey neighbours at 160 and 166 visibly overtop this building. The
+    // 9.25 m is unexplained — the record's peak_1st_m is 16.53 m, a tree, and
+    // there is a large tree overhanging the north-west end of this roof. Height
+    // is the MEDIAN, 5.4 m, which also matches the photogrammetry: the new
+    // street screen measures 4.10 m and the old wall behind it 4.7-5.6 m.
+    // See docs/asset-plans/164-south-park.md 2.15.
+    //
+    // The exclusion is measured against the bake's OWN input (DataSF first,
+    // Overture gap-fill, both simplified at SIMPLIFY_TOLERANCE 0.6), not
+    // against the live APIs, and neighbours already dropped by an existing
+    // landmark are discounted because a GLB stands in their place. From this
+    // anchor:
+    //    0.60 m  DataSF SF3775069, our own footprint, via its centroid
+    //    1.43 m  Overture 469 m2, our own footprint again, via its centroid
+    //            -> the FLOOR: below 1.43 the Overture ring survives and the
+    //               procedural block pokes through the model
+    //    3.06 m  DataSF SF3775067 (160 South Park) nearest vertex - already
+    //            dropped by 160SouthPark's own exclude, so not a constraint
+    //    3.76 m  Overture 76 m2 (the OSM `158 South Park` sliver) nearest
+    //            vertex -> the CEILING. It shares a party-wall vertex with our
+    //            own ring, nothing fills it, and above 3.76 the re-bake punches
+    //            a hole there.
+    //    8.57 m+ everything else, all covered by 156/168/188SouthPark
+    // Safe window (1.43, 3.76), 2.33 m wide. 2.6 sits in the middle with 1.17 m
+    // below and 1.16 m above, both comfortably over the 0.6 m simplify
+    // tolerance. Verified on the re-bake: exactly the two 164 footprints drop
+    // and the 158 sliver still stands. Do not widen without re-running that.
+    //
+    // No clearTrees: there are four real street trees on this frontage - they
+    // are in every photograph of the building and they belong to the app's tree
+    // system, not to this asset.
+    id: '164SouthPark',
+    name: '164 South Park',
+    lon: -122.3949366,
+    lat: 37.7812097,
+    height: 5.4,
+    exclude: 2.6,
+    // camera.js puts the eye at target + distance*(sin yaw, ., cos yaw) with +x
+    // east and +z south, so camera bearing = 180 - yaw; the street facets face
+    // 86-101 deg, so yaw 85 stands the camera out over the oval square onto
+    // them. 120 m, closer than the 150-190 m used elsewhere on this rim,
+    // because at 5.4 m this is the shortest landmark on it and the ribbon and
+    // the canopy are the whole recognition.
+    camera: { distance: 120, yaw: 85, pitch: 26 },
+  },
 ];
 
 // Parks/green spaces the landcover bake must match at least one source polygon
