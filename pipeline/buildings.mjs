@@ -346,6 +346,17 @@ if (existsSync(overturePath)) {
       const [cx, cz] = ringCentroid(ring);
       const bbox = ringBBox(ring);
 
+      // A ring standing on a bespoke landmark's site is that landmark, and its
+      // height belongs to the hand-built GLB, not to whatever footprint happens
+      // to survive nearest. Without this guard the height-correction below
+      // re-targets: excluding 132 The Embarcadero's own footprint left its
+      // Overture ring (28.7 m) matching the party-wall neighbour 13.7 m away
+      // and raised 110-116 The Embarcadero from its measured 17.9 m to 29.2 m,
+      // i.e. 1.8 m above the landmark's own parapet along a 43 m shared wall.
+      // The ring cannot be ADDED here either (addBuilding runs excluded()), so
+      // skipping it outright is the whole correct behaviour.
+      if (exclusions.some((e) => (cx - e.x) ** 2 + (cz - e.z) ** 2 < e.r2)) continue;
+
       // Correct heights on parcels DataSF measured before the current building
       // existed (Salesforce Tower's block was a bus terminal in 2010).
       if (h >= 20) {
