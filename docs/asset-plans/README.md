@@ -139,7 +139,8 @@ route, and the park plans depend on it (§E8 of the parks README).
 | [49 Zoe Street](./49-zoe.md) | `49-zoe` | 17.0 m (LiDAR max, stair/elevator penthouse crest; parapet 14.4 m) | new landmark |
 | [246 Ritch Street](./246-ritch.md) | `246-ritch` | 18.76 m (LiDAR max, read as the roof stair/elevator penthouse — see its 2.15 risk 1; parapet 15.87 m) | new landmark |
 
-## Shared contract (all 96)
+## Shared contract (all 97)
+| [252–254 Ritch Street](./254-ritch.md) | `254-ritch` | 8.8 m (LiDAR maximum, the roof flue; cornice crest 8.05 m estimated) | new landmark |
 
 - Style: `docs/styles/miniature-toy.md` (authoritative for artistic decisions)
 - Technical contract: `.agents/skills/sf-asset-check/SKILL.md` (authoritative for the GLB)

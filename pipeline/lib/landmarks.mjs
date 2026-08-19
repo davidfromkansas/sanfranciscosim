@@ -2639,6 +2639,53 @@ export const LANDMARKS = [
     // the neighbours.
     camera: { distance: 130, yaw: 135, pitch: 26 },
   },
+  {
+    // 1915 two-flat on Ritch Street, the alley between Bryant and Brannan.
+    // Case B: no procedural builder, so this entry exists only to carve the
+    // baked footprints out from under the asset.
+    //
+    // `lon`/`lat` are NOT the manifest anchor. The manifest anchor
+    // (-122.3956322, 37.7801278) is the model's XY bbox centre, pushed 0.53 m
+    // north-east by the bay, the cornice and the stoop, which all project
+    // toward the street. This point is the design footprint's centre, 0.09 m
+    // from the DataSF footprint's own area centroid, and it is where the
+    // exclusion window below was measured.
+    //
+    // `exclude` is the whole difficulty here and the window is 1.87 m wide.
+    // excluded() in pipeline/buildings.mjs drops a footprint when its centroid
+    // OR any ring vertex falls inside the circle. Measured from this point
+    // against the real bake input, each ring first simplified at the bake's own
+    // 0.6 m tolerance:
+    //
+    //    0.09 m  this building, DataSF 201006.0125003 (104 m2), via centroid
+    //    1.95 m  this building, Overture — the OSM way 147508935 (100 m2)
+    //    3.82 m  248-250 Ritch, DataSF 201006.0040021 (167 m2), nearest vertex
+    //    5.08 m  248-250 Ritch, Overture (101 m2), nearest vertex
+    //
+    // So r must exceed 1.95 (both of OUR rings have to go — DataSF and Overture
+    // each trace this building, 1.9 m apart, and a radius that clears only the
+    // DataSF one leaves the Overture gap-fill standing on top of the asset) and
+    // stay under 3.82 (or the party-wall neighbour goes with it). 2.9 sits
+    // 0.95 m above the floor and 0.92 m below the ceiling.
+    //
+    // No clearTrees: at 2.9 m the circle is inside the building's own footprint,
+    // there is no street tree in front of 252-254, and the surface parking lot
+    // next door has no furniture to clear.
+    id: '254Ritch',
+    name: '252-254 Ritch Street',
+    lon: -122.3956361,
+    lat: 37.7801244,
+    height: 8.8,
+    exclude: 2.9,
+    // Camera offset is (sin yaw, ., cos yaw) with +z south, so camera bearing =
+    // 180 - yaw. The street front faces 45.05 deg, so yaw 135 stands the eye to
+    // the north-east, out over Ritch Street, looking back at the only two
+    // designed elevations — the bay-and-entry front and the exposed south-east
+    // flank, which reads in three-quarter from there. 120 m suits an 8.8 m
+    // building (cf. 49SouthPark at 165 for 13.0 m). No `key`: this is texture
+    // in the block, not a destination.
+    camera: { distance: 120, yaw: 135, pitch: 26 },
+  },
 ];
 
 // Parks/green spaces the landcover bake must match at least one source polygon
