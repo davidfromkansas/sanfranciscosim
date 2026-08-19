@@ -120,21 +120,14 @@ for o in mesh_objs():
 stats["interior_faces_removed"] = interior_removed
 snap("interior-faces")
 
-# --- 3. limited dissolve, coplanar only ---
-for o in mesh_objs():
-    bpy.context.view_layer.objects.active = o
-    for oo in mesh_objs():
-        oo.select_set(oo is o)
-    bpy.ops.object.mode_set(mode="EDIT")
-    bpy.ops.mesh.select_all(action="SELECT")
-    # 0.05 deg, not 0.5: dissolve merges transitively, and on the gently
-    # curved hypar shell a 0.5-deg chain accumulates into twisted ngons whose
-    # triangulation flips windings (caught by the 22.5k-ray test). Strictly
-    # coplanar runs only.
-    bpy.ops.mesh.dissolve_limited(angle_limit=0.000872665,
-                                  delimit={"MATERIAL", "SHARP"})
-    bpy.ops.object.mode_set(mode="OBJECT")
-snap("limited-dissolve")
+# --- 3. limited dissolve: SKIPPED for pier-7 (GLB-OPTIMIZE-PROMPT §3.3) ---
+# The asset is built of coplanar ring bands (bullrail ring, two railing tubes
+# following the 49-vertex footprint): even a strictly-coplanar dissolve merges
+# each band's top/bottom into annulus ngons whose re-triangulation emits
+# invisible slivers that fail the stage-2 validator only after gltfpack
+# (the 350-brannan failure mode). The step's upside here is a few dozen
+# triangles on the deck caps; not worth the trap.
+snap("limited-dissolve-skipped")
 
 # --- 5. join per material (multi-material objects keep their own mesh) ---
 groups = defaultdict(list)

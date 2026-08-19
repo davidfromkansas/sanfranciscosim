@@ -4,12 +4,12 @@ Asset: `pier-7.glb` — Pier 7, the Broadway public access pier (1990, ROMA Desi
 Group + T.Y. Lin International; 1993 ASLA National Honor Award). Stage 2 of
 `docs/asset-pipeline/ADDRESS-TO-ASSET.md`, executed from `docs/asset-plans/pier-7.md`.
 
-## Shipped numbers (pre-optimize)
+## Shipped numbers (post-optimize, stage 4)
 
 | Metric | Value |
 |---|---|
-| Triangles | **13,860** (cap 14,000) |
-| Objects | 540 |
+| Triangles | **13,860** (cap 14,000; unchanged by optimize) |
+| Objects | 7 (joined per material at stage 4; authored as 540) |
 | Dims (AABB) | **219.57 × 165.99 × 7.60 m** — a 257.3 × 26.9 m pier at a 54.65° heading; the diagonal AABB is expected, not a scale error |
 | min Z | **0.000 — the WATERLINE**, by design (pier-3 water-datum rule); pile feet reach it, deck top is +3.0 m |
 | bbox top | **7.600 m = targetHeightM** (lamp-globe tops; loader scale lands at 1.0) |
@@ -81,8 +81,7 @@ colour otherwise).
 }
 ```
 
-(`dims`/`tris` to be re-measured at integration Step 1 from the shipped — i.e.
-post-optimize — file.)
+Stage 4 (see `optimize/REPORT.md`): 957,804 → **349,512 bytes raw** (−63.5%), 540 → 7 draw submeshes, geometry and appearance identical within gates; `validation.json` here is the packed shipping file's run (all PASS).
 
 ## Stage 3 — approval
 
