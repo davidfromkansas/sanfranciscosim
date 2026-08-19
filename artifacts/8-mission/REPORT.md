@@ -136,28 +136,130 @@ which surfaces glow — needs path tracing. All eight images are rendered from t
 `-top.png` (the three parapet rings), `-aerial.png` (due east, the app's own preset
 azimuth), `-aerial-night.png`, `-contact-sheet.png`.
 
-## Integration (stage 5, not done here)
+## Integration (stage 5) — DONE, source-only per `BATCH: yes`
 
-Case B. Cell **`23_10`**. The bake currently puts a 64.4 × 41.8 m, **24.2 m** procedural
-block on this exact footprint (`app/public/tiles/ctx/23_10.json`, pick id `103461`), so
-the asset cannot be judged before the re-bake.
+Case B. Cell **`23_10`**. Ran on `pipeline/8-mission`, rebased onto `origin/main`
+`2c14d5f9f`.
 
-**`exclude: 10` m**, re-measured against the *shipping* anchor rather than the plan's
-OBB centre:
+### The branch moved under us
 
-| Ring | centroid distance | nearest vertex |
+`origin/main` advanced 20 commits mid-session — PR #157 merged thirteen more SoMa
+landmarks **and their city re-bake**. The first `verify-rebake.mjs` run therefore
+flagged a stray cell (`23_13`, 169 → 182 buildings) that had nothing to do with this
+radius: it is the South Park / Brannan super-cell carrying 52 exclusions, and the
+thirteen new ones were missing from the pre-rebase registry. Rebasing onto current
+`main` took the registry from 97 to **110 landmarks** and the whole bake was redone
+against it. The rebase also picks up `perf(assets): raise the landmark body reserve to
+1.6M vertices`, which matters here: the shared landmark `BatchedMesh` was running near
+full in SoMa and silently dropping a different landmark on each reload, so a QA pass on
+the old tree could have shown this building missing for an unrelated reason.
+
+After the rebase the diff against `origin/main` is a pure append — 19 manifest lines,
+40 registry lines, one README row — and **nothing under `app/public/tiles/` or
+`api/_data/`**.
+
+### Exclusion: `exclude: 10` m, proven from the tile
+
+The window, measured against `excluded()`'s real test (ring CENTROID inside the circle
+**or** any ring vertex inside it) from the shipping anchor, against all three bake
+sources — including `pipeline/data/overture_buildings.geojsonseq`, which is what the
+bake actually reads:
+
+| Ring | centroid | nearest vertex |
 |---|---|---|
-| The hotel, OSM `193054134` | **2.29 m** | 15.01 m |
-| The hotel, DataSF `201006.0001079` | **3.36 m** | 14.69 m |
-| Muni vent pavilion, OSM `260290226` | 31.22 m | **21.07 m** |
-| Muni vent pavilion, DataSF `201006.0017562` | 31.89 m | 21.37 m |
-| Audiffred Building, OSM `193054136` | 60.48 m | 56.16 m |
+| The hotel — OSM `193054134` | **2.29 m** | 15.01 m |
+| The hotel — DataSF `201006.0001079` | **3.36 m** | 14.69 m |
+| The hotel — Overture (h 27.4 m, area 2,133 m²) | **2.29 m** | 15.01 m |
+| Muni vent pavilion — OSM `260290226` | 31.22 m | **21.07 m** |
+| Muni vent pavilion — Overture (h 4.0 m) | 31.22 m | **21.07 m** |
+| Audiffred Building | 60.48 m | 56.16 m |
+| One Market Plaza | 90.09 m | 45.72 m |
 
-Safe window **3.36 < r < 21.07 m** against `excluded()`'s real test (ring centroid inside
-the circle **or** any ring vertex inside it). `r = 10` sits with 6.6 m of margin below
-and 11.1 m above. The footprint half-diagonal is 39.35 m and would delete the vent
-pavilion. Re-verify both bounds against `pipeline/data/overture_buildings.geojsonseq`
-before committing, and prove the result from penetration depth, not from a file count.
+Safe window **3.36 < r < 21.07 m**; `r = 10` sits with 6.6 m of margin below and 11.1 m
+above. Overture carries exactly ONE ring for this building, so there is no second trace
+to catch. The footprint half-diagonal is 39.35 m and would have deleted the Muni subway
+vent shaft.
+
+**Penetration depth, before and after** — not a boolean and not a changed-file count:
+
+| | `origin/main` | re-baked |
+|---|---|---|
+| buildings in cell `23_10` | 49 | **48** |
+| deepest penetration into the 64.08 × 42.07 m OBB | **+19.78 m** (top 27.5 m) | +14.70 m (top 8.9 m) |
+| rings with a vertex inside the **real L footprint** | **1** | **0** |
+
+The residual +14.70 m is the vent pavilion, which sits inside the OBB *rectangle* but
+outside the L — the rectangle covers the notch at the north corner. A rectangle-only
+test reads that as a permanent failure; the point-in-polygon test against the real
+36-vertex footprint is the one that answers the question, and it goes 1 → 0. Exactly one
+footprint was dropped and it is the right one.
+
+### Verification
+
+| Check | Result |
+|---|---|
+| `verify-rebake.mjs` | **PASS** — 584 of 585 cells unchanged; only `23_10` moved (49 → 48); nearest surviving footprint 21.4 m vs the 10 m radius |
+| `audit.mjs` check 1.6 | **PASS** — 114 zones over 110 landmarks clear |
+| `audit.mjs` overall | 29 passed, 3 failed, 1 info. The three (1.2b citywide p95 height, 1.3c Telegraph Hill Terrarium DEM, 1.7b one offshore tree) are pre-existing on `main` and unrelated |
+| `context` validation | ok on all four checks; 174,682 / 174,682 buildings have a pick box and an identity |
+| `npm run lint` | **PASS** |
+| `npm test` | **PASS** — 26/26 |
+
+### Local QA (Step 5)
+
+Real headless Chrome over CDP against the Vite dev server; rAF measured at **30 frames
+in 3 s**, so the app's own loop drove the pass rather than hand-pumping.
+
+```
+sf-assets: 8-mission merged 16 objects / 12 materials -> batched
+           (11740 tris body); uniform x1.0000 at 3891, -2618
+```
+
+| Item | Result |
+|---|---|
+| Served manifest | 104 entries, `8-mission` present |
+| Placed | yes — `SF.assets.placed.has('8Mission')` |
+| **Scale factor** | **×1.0000** — the authored crest and `targetHeightM` agree exactly |
+| Position | 3891, −2618, the anchor to the metre |
+| Merge | 16 objects / 12 materials → one batched body + glow set |
+| Single building | yes — no procedural twin, no baked block poking through, no z-fighting |
+| Orientation | Mission arcade and turret face the real street corner |
+| Terrain seating | sits on the ground, no float, no sink |
+| Night glow | only the turret lantern, the canopy strip and scattered rooms |
+| Streamer | `entries 104, live 84, loading 0, fading 0, failed 0` |
+| **Draw calls** | **171** peak (hooked `renderer.render`, max over the app's own frames) against the 300 budget |
+
+Screenshots: day at the landmark, day wide, night at the landmark.
+
+### Fallback drill (Step 6)
+
+GLB moved aside, page reloaded with a cache-buster:
+
+- `failed: 1` — the loader genuinely reached for the file. (`failed: 0` would have been
+  meaningless: it also describes a run where the camera never got near enough to try.)
+- Exactly **one** console line:
+  `sf-assets: 8-mission failed to load (Unexpected token '<', "<!doctype "... is not valid JSON)`
+  — Vite answers a missing `public/` path with the SPA shell at HTTP 200, so the failure
+  is a parse error rather than a 404. That is a dev-server artifact, not a bug.
+- `live: 83` (was 84): only this landmark dropped. App booted, city alive, every other
+  landmark still placed.
+- Case B, so the site is **empty ground** inside the exclusion zone rather than a
+  procedural building. Expected and correct.
+- GLB restored byte-identical; no `.drill-aside` left behind.
+
+### Batch handoff
+
+`BATCH: yes`, so the bake was run, QA'd on, and then thrown away
+(`git checkout -- app/public/tiles api/_data`). The `pipeline/data` symlink into a
+sibling worktree was deleted before committing. `compress-assets.mjs` was never run —
+the stage-4 output already carries `EXT_meshopt_compression` — so the usual
+`vehicles/passenger-airplane.glb` collateral does not appear.
+
+Sanity check passes: `git diff --name-only origin/main` lists **nothing** under
+`app/public/tiles/` or `api/_data/`.
+
+The city gets rebuilt once for the whole batch by
+`docs/asset-pipeline/BATCH-INTEGRATE.md`.
 
 ## Gate 3 — approval
 
