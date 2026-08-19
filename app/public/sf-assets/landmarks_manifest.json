@@ -1825,5 +1825,24 @@
     ],
     "tris": 5144,
     "loadRadius": 2500
+  },
+  {
+    "id": "414-brannan",
+    "file": "414-brannan.glb",
+    "anchor": [
+      -122.3948685,
+      37.7799308
+    ],
+    "targetHeightM": 14.0,
+    "cat": 8,
+    "name": "414 Brannan Street (Epic Church)",
+    "estimated": false,
+    "dims": [
+      33.1626,
+      33.0725,
+      14.0
+    ],
+    "tris": 8312,
+    "loadRadius": 2500
   }
 ]
