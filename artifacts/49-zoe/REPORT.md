@@ -29,13 +29,14 @@ Re-validate: `blender -b --python validate_49_zoe.py`
 | | |
 |---|---|
 | Triangles | **7,688** (cap 11,000) |
-| Mesh objects | 216 |
+| Mesh objects | **13** (216 before stage 4) |
+| Draw submeshes | **14** (217 before stage 4) |
 | Dimensions (x, y, z) | **34.108 × 34.613 × 17.000 m** |
 | min Z | 0.000 |
 | XY centre offset | (−0.029, −0.237) m |
 | Materials | 12, all `Toy_*`, of which **3** are `_Glow` |
 | Image textures / transparency | none / none |
-| File | 492.2 KB raw, **74.2 KB gzip** (pre-stage-4) |
+| File | **213.6 KB raw**, 123.5 KB gzip — meshopt-compressed, stage 4 applied (492.2 KB / 73.3 KB before) |
 | Anchor | −122.3960338, 37.7800764 |
 | Zoe elevation heading | 225.4° true |
 | Target height | **17.00 m** |
@@ -49,6 +50,10 @@ extent runs 0.4 m longer than the x extent because the entry awning projects
 
 `validation.json`, produced by re-importing `49-zoe.glb` into a **fresh isolated
 Blender scene** (the source `.blend` is not inspected). **Overall: PASS.**
+
+Re-run after the stage-4 shipping swap, against the **packed** file — gltfpack
+re-emits stored normals, so that is the only place a sliver or a zero-length
+vertex normal can appear. Both runs are all-PASS with identical geometry numbers.
 
 | Check | Result |
 |---|---|
@@ -68,6 +73,7 @@ Blender scene** (the source `.blend` is not inspected). **Overall: PASS.**
 | normals outward — ray residual | PASS (**31,500 rays, 0 flipped, 0.000%**) |
 | no degenerate geometry | PASS (0) |
 | no unexpected objects | PASS |
+| invalid or non-unit loop normals | 0 |
 
 Normals were tested two ways, as the pipeline requires: per-object signed volume
 is authoritative for this union of interpenetrating solids, and 31,500
@@ -240,6 +246,30 @@ exclusion radius must be **measured against the real bake inputs** (DataSF *and*
 Overture), not reasoned about — and the party wall with 33–35 Zoe touching at
 0.00 m is the hard constraint. See `docs/asset-plans/49-zoe.md` §2.13.
 
+## Stage 4 — optimize
+
+Full report: `optimize/REPORT.md`. Headline: **504,024 → 218,708 B raw (−56.6%)**
+and **217 → 14 draw submeshes (−93.5%)**, with triangles unchanged at 7,688 and
+the bounding box identical to five decimal places. All eight gates PASS; the
+worst A/B pixel delta across day/night × near/far and four elevations is
+**0.026%** against a 2%/4% allowance.
+
+Two per-asset judgement calls are recorded there: the **limited dissolve was
+skipped** (this asset has two full-footprint coplanar ring bands, `parapet` and
+`coping`, which is the exact case that manufactures 34 m slivers), and **curve
+retessellation was declined** (the six vent cans would legally halve to 5
+segments for ~350 triangles, but the penthouse vent is already at the
+one-pixel budget and defines the crest silhouette).
+
+The optimized file is now `49-zoe.glb`; the pre-optimize original is archived at
+`optimize/input/49-zoe.glb`.
+
 ## Gate 3 — approval
 
-Pending.
+**Approved 2026-08-18.** Presented the contact sheet, the aerial day and night
+renders and the numbers above; the owner's reply, verbatim:
+
+> do it
+
+No revisions were requested. Advancing to stage 4 (optimize) and stage 5
+(integrate, batch mode).
