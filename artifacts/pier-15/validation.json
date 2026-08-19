@@ -5,7 +5,7 @@
   "reimported_final_glb": true,
   "object_count": 12,
   "mesh_object_count": 12,
-  "triangle_count": 11152,
+  "triangle_count": 10852,
   "triangle_budget": 22000,
   "dimensions_m": [
     249.251,
@@ -139,9 +139,9 @@
   "negative_scales": false,
   "degenerate_triangle_count": 0,
   "invalid_or_nonunit_loop_normal_count": 0,
-  "normal_ray_cast_first_hits": 17052,
-  "normal_ray_cast_flipped_visible_faces": 0,
-  "normal_ray_cast_flipped_fraction": 0.0,
+  "normal_ray_cast_first_hits": 17067,
+  "normal_ray_cast_flipped_visible_faces": 1,
+  "normal_ray_cast_flipped_fraction": 5.9e-05,
   "normal_orientation_status": "PASS",
   "normal_orientation_method": "All source meshes run bmesh.ops.recalc_face_normals before export; reimported loop normals must be finite/unit; per-object signed volume is authoritative for this union of solids; 31,500 deterministic visibility rays test the first visible face from nine interior targets, with a 0.15% residual allowed at coincident faces.",
   "unexpected_geometry_or_objects": [],
@@ -202,7 +202,7 @@
     },
     {
       "name": "grp_Toy_conc",
-      "triangles": 328,
+      "triangles": 284,
       "location": [
         0.0,
         0.0,
@@ -240,7 +240,7 @@
     },
     {
       "name": "grp_Toy_glass",
-      "triangles": 720,
+      "triangles": 708,
       "location": [
         0.0,
         0.0,
@@ -316,7 +316,7 @@
     },
     {
       "name": "grp_Toy_ink",
-      "triangles": 3316,
+      "triangles": 3288,
       "location": [
         0.0,
         0.0,
@@ -335,7 +335,7 @@
     },
     {
       "name": "grp_Toy_steel",
-      "triangles": 1556,
+      "triangles": 1472,
       "location": [
         0.0,
         0.0,
@@ -354,7 +354,7 @@
     },
     {
       "name": "grp_Toy_stone",
-      "triangles": 3148,
+      "triangles": 3016,
       "location": [
         0.0,
         0.0,

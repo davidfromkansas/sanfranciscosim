@@ -2,7 +2,7 @@
 
 **Asset:** `artifacts/pier-15/pier-15.glb` · built 19 Aug 2026 · Blender 5.2.0 LTS
 (headless, deterministic script `build_pier_15.py`) · **stage-4 optimized**:
-360,516 B raw (from 749,952), 324 → 12 draw submeshes, tris unchanged; original
+350,496 B raw (from 731,528 rebuilt), 315 → 12 draw submeshes, tris unchanged; original
 archived at `optimize/input/pier-15.glb`, full metrics in `optimize/REPORT.md`.
 The stage-2 validator re-ran PASS against the shipped packed file.
 
@@ -11,7 +11,7 @@ The stage-2 validator re-ran PASS against the shipped packed file.
 | Metric | Value | Gate |
 |---|---|---|
 | Overall validation | **PASS** (`validation.json`, all checks) | PASS |
-| Triangles | **11,152** | ≤ 22,000 ✓ |
+| Triangles | **10,852** | ≤ 22,000 ✓ |
 | Objects | 12 meshes after optimize (loader merges to ≤ 2 draw calls) | ✓ |
 | Dimensions | 249.25 x 221.09 x **16.40** m | ✓ |
 | min Z | 0.000 (waterline; pile feet touch it exactly) | ✓ |
@@ -42,6 +42,15 @@ the only image that proves the pile field, deck soffit and courtyard notch.
 3. **Validation catch:** three terrace railings carried an unapplied
    `location.z` offset → `rail_chain` gained a `base` parameter; transforms now
    all identity. OVERALL PASS.
+4. **Review 3 (post-bake tile decode):** the first re-bake left a 13.8 m baked
+   block 23 m deep inside the deck at the bay end. Root cause: the plan mis-read
+   the bay-end massing — the real Bay Observatory Gallery is OSM w738027034 on
+   the NORTH APRON (t -45.4..-25.5), the shed runs near-full-width to s ≈ 106.6,
+   and there is no deck-level terrace. Model rebuilt to match (10,852 tris,
+   315 objects); the baked ring is taken by a 12 m `extraExclusions` circle
+   (its 87.4 m gate from the anchor is past Pier 17's 84.9 m ceiling; from the
+   circle's own centre Pier 17's nearest vertex is 29.1 m). Full render rig,
+   stage-2 validation and the optimize gates re-ran clean on the rebuilt asset.
 
 ## Dossier corrections (REPORT beats plan)
 
@@ -81,7 +90,7 @@ separate design sign-off was requested or given.
     221.09,
     16.4
   ],
-  "tris": 11152,
+  "tris": 10852,
   "loadRadius": 2500
 }
 ```
@@ -91,6 +100,38 @@ separate design sign-off was requested or given.
 with the range recorded here. Integration notes incl. the measured exclusion
 window (70 m; ceiling 84 m — Pier 17's gate) are in `docs/asset-plans/pier-15.md`
 §2.13. **Note for integration: `SF9900015` is one merged DataSF polygon covering
-Piers 15 AND 17 — excluding it un-bakes Pier 17 too, which then gap-fills whole
-from its own Overture ring (h 16.4). Accepted collateral; verify Pier 17 still
-stands in local QA.**
+Piers 15 AND 17 — excluding it un-bakes Pier 17 too, and Pier 17's Overture ring
+does NOT gap-fill (bbox occupancy 0.464 > the 0.25 gate — measured, see §2.13).
+Pier 17's site bakes empty until a pier-17 asset lands; follow-up task flagged.**
+
+## Stage 5 — integration QA (batch mode, 19 Aug 2026)
+
+Local QA against the BUILT app (`app/dist`) in headless Chrome over CDP
+(`qa_local.mjs`; screenshots in `artifacts/pier-15/qa/`):
+
+| Check | Result |
+|---|---|
+| Re-validation of the shipped GLB (stage-2 validator) | PASS (10,852 tris, 12 objects) |
+| Manifest entry loads / merge line | PASS — `sf-assets: pier-15 merged 12 objects / 12 materials -> batched (8180 tris body); uniform x1.0000 at 3523, -3494 on the water plane` |
+| Uniform scale | PASS — x1.0000 |
+| id round trip (`camelId('pier-15')` → `pier-15`) | PASS (digit segments don't camelise) |
+| Case B registry + re-bake + audit 1.6 | PASS — 115 zones clear; verify-rebake: 584/585 cells unchanged, only 22_8 (21→20) |
+| Exclusion proof from the tiles | PASS — decoded cells 22_8/22_9/23_8/23_9: zero surviving rings overlap the deck polygon (overlap area 0.0 m², penetration 0.00 m) |
+| Single building / no baked block poking through | PASS |
+| Terrain seating | PASS — `seaLevel: true`, seated at exactly y = 0 (the anchor samples a spurious 2.5 m Terrarium bump; the loader's water-plane datum from the pier-3 branch was ported verbatim, identical hunks for the batch merge) |
+| Night glow | PASS — monitor lightband + amber arch + apron points only |
+| Draw calls at the landmark | PASS — avg 85/frame (< 300) |
+| Fallback drill (real 404) | PASS — boots, exactly one `pier-15 failed to load` warning, site empties inside the exclusion (Case B expected) |
+| app `npm test` + `npm run build` + `npm run lint` | PASS |
+
+**Known, documented collateral:** Pier 17's site bakes empty (the merged DataSF
+record covered both piers; Pier 17's Overture ring fails the bbox-occupancy
+gap-fill gate at 0.464 > 0.25). Follow-up pier-17 asset task flagged.
+
+Batch mode: the bake was verified as above and then DISCARDED; this branch
+commits source only (GLB, manifest entry, registry entry, seaLevel loader
+patch, plan, artifacts). The city is re-baked once for the whole batch by
+`docs/asset-pipeline/BATCH-INTEGRATE.md`. Note for the batch session: run
+`node pipeline/landmark-streaming-check.mjs` against the batch build, and
+this branch and `pipeline/pier-3` carry IDENTICAL `app/src/assets.js` seaLevel
+hunks — they merge clean, but merge pier-3 first if git complains.

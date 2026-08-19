@@ -1,12 +1,12 @@
 {
  "file_bytes": {
-  "raw": 749952,
-  "gzip9": 139907
+  "raw": 727752,
+  "gzip9": 136108
  },
- "objects": 324,
- "total_tris": 11152,
- "total_verts": 22856,
- "primitives_est": 324,
+ "objects": 315,
+ "total_tris": 10852,
+ "total_verts": 22192,
+ "primitives_est": 315,
  "top20": [
   {
    "name": "O_ring",
@@ -130,8 +130,8 @@
    "tris": 128,
    "verts": 224,
    "dims": [
-    29.194,
-    28.367,
+    32.757,
+    31.492,
     0.5
    ],
    "materials": [
@@ -208,8 +208,8 @@
    "tris": 108,
    "verts": 216,
    "dims": [
-    28.334,
-    27.507,
+    31.897,
+    30.632,
     8.85
    ],
    "materials": [
@@ -281,7 +281,7 @@
   {
    "name": "Toy_conc",
    "glow": false,
-   "user_objects": 5
+   "user_objects": 4
   },
   {
    "name": "Toy_cream",
@@ -291,7 +291,7 @@
   {
    "name": "Toy_glass",
    "glow": false,
-   "user_objects": 42
+   "user_objects": 41
   },
   {
    "name": "Toy_glass_Glow",
@@ -311,7 +311,7 @@
   {
    "name": "Toy_ink",
    "glow": false,
-   "user_objects": 73
+   "user_objects": 72
   },
   {
    "name": "Toy_roofd",
@@ -321,12 +321,12 @@
   {
    "name": "Toy_steel",
    "glow": false,
-   "user_objects": 37
+   "user_objects": 34
   },
   {
    "name": "Toy_stone",
    "glow": false,
-   "user_objects": 132
+   "user_objects": 129
   },
   {
    "name": "Toy_trim",
@@ -662,22 +662,6 @@
   },
   {
    "signature": {
-    "verts": 96,
-    "tris": 44,
-    "dims": [
-     9.7794,
-     13.232,
-     2.9
-    ]
-   },
-   "objects": [
-    "terrace_leg0",
-    "terrace_leg1",
-    "terrace_leg2"
-   ]
-  },
-  {
-   "signature": {
     "verts": 64,
     "tris": 28,
     "dims": [
@@ -767,8 +751,8 @@
     "verts": 96,
     "tris": 44,
     "dims": [
-     15.5179,
-     17.6819,
+     16.3804,
+     18.9091,
      0.14
     ]
    },
@@ -793,21 +777,6 @@
     "pv_d1",
     "pv_d2",
     "pv_d3"
-   ]
-  },
-  {
-   "signature": {
-    "verts": 64,
-    "tris": 28,
-    "dims": [
-     9.833,
-     13.9495,
-     0.55
-    ]
-   },
-   "objects": [
-    "rail_t0_0",
-    "rail_t1_0"
    ]
   },
   {
@@ -940,8 +909,8 @@
     "verts": 24,
     "tris": 12,
     "dims": [
-     9.7419,
-     13.8024,
+     10.6044,
+     15.0296,
      2.3
     ]
    },
@@ -955,14 +924,29 @@
     "verts": 24,
     "tris": 12,
     "dims": [
-     9.7419,
-     13.8024,
+     10.6044,
+     15.0296,
      2.9
     ]
    },
    "objects": [
     "obs_glass_e1",
     "obs_glass_w1"
+   ]
+  },
+  {
+   "signature": {
+    "verts": 24,
+    "tris": 12,
+    "dims": [
+     50.1339,
+     40.6998,
+     0.6322
+    ]
+   },
+   "objects": [
+    "pv_a1",
+    "pv_a3"
    ]
   },
   {
@@ -1026,22 +1010,22 @@
    ]
   }
  ],
- "dup_redundant_tris": 5200,
+ "dup_redundant_tris": 5096,
  "join_candidates": {
   "Toy_amber_Glow": 14,
-  "Toy_conc": 5,
+  "Toy_conc": 4,
   "Toy_cream": 8,
-  "Toy_glass": 42,
+  "Toy_glass": 41,
   "Toy_glass_Glow": 3,
   "Toy_glassl": 5,
   "Toy_glassl_Glow": 2,
-  "Toy_ink": 73,
-  "Toy_steel": 37,
-  "Toy_stone": 132,
+  "Toy_ink": 72,
+  "Toy_steel": 34,
+  "Toy_stone": 129,
   "Toy_trim": 2
  },
  "degenerate_tris": 0,
- "coincident_vert_pairs": 16644,
+ "coincident_vert_pairs": 16148,
  "over_tess": {
   "near_distance_m": 373.88,
   "one_px_world_m": 0.252,

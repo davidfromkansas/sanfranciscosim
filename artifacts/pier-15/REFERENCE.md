@@ -20,7 +20,7 @@ above the WATERLINE (Z = 0); the deck sits at 3.05 m.
 | Roof layout | 3 longitudinal PV bands + monitor band, pale walkway seams, cross-platforms at ~55 m stations | same rectified aerial |
 | Bulkhead composition | central gabled pavilion, monumental arch, tapering piers, "PIER 15" raised letters, white Exploratorium "O" on the fanlight, 2 window bays per wing, flagpole on the gable | 2025 pano + National Register nomination pp. 131-135 |
 | Shed construction | 1931 steel frame, precast scored concrete walls, clerestory steel sash, roll-up door bays, canopies both flanks | nomination + 2022 pano |
-| Bay end | Observatory Building (2013, glazed, 2 storeys, PV roof + square skylight) at the north corner; Observatory Terrace between it and the shed's original narrow east bays; faintly Art Deco shed end wall | Port project sheet, Architectural Record, z21 aerial |
+| Bay end | Observatory Building (2013, glazed, 2 storeys, PV roof + square skylight) = **OSM w738027034 on the north apron**, s 83.5-108.6 / t -45.4..-25.5 in the pier frame, abutting the shed's NW wall line; the shed itself runs near-full-width to s ≈ 106.6 with a 5 m narrow stub at the end face | rectified Aug-2026 aerial with footprints overlaid + Overpass w738027034 (building:levels 2) — **corrected in build review 3**; the plan's original placement (inside the shed way, with a deck-level terrace notch) was wrong |
 | Water courtyard | deck notch along the NW flank kept open (valley paved area removed 2010-13) | Port project sheet + aerial |
 
 ## Primary sources
@@ -75,7 +75,13 @@ above the WATERLINE (Z = 0); the deck sits at 3.05 m.
   AABB of "~250 x 178 m" was a rotation-math slip — the correct expectation for
   a 245 x 94.8 m OBB at 54.9° is ~249 x 221 m, which is what the build
   measures. The monitor centreline sits at t = +9.0 (7.5 m SE of the shed
-  centreline), used in place of the plan's provisional "t = 11".
+  centreline), used in place of the plan's provisional "t = 11". **Build
+  review 3 (caught by the post-bake tile decode):** the Bay Observatory
+  Gallery is OSM w738027034 on the north apron (t -45.4..-25.5), not the
+  shed-way k-l-m-n region; the shed runs near-full-width to s ≈ 106.6 and
+  there is no deck-level terrace. The model's bay end was rebuilt to match,
+  and the baked w738027034 ring is taken by a 12 m `extraExclusions` circle
+  (its gate from the main anchor, 87.4 m, is past Pier 17's 84.9 m ceiling).
 
 ## Night design
 

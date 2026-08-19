@@ -1939,5 +1939,25 @@
     ],
     "tris": 3366,
     "loadRadius": 2500
+  },
+  {
+    "id": "pier-15",
+    "file": "pier-15.glb",
+    "anchor": [
+      -122.3974662,
+      37.8016046
+    ],
+    "targetHeightM": 16.4,
+    "cat": 25,
+    "name": "Pier 15 (Exploratorium)",
+    "estimated": false,
+    "seaLevel": true,
+    "dims": [
+      249.25,
+      221.09,
+      16.4
+    ],
+    "tris": 10852,
+    "loadRadius": 2500
   }
 ]

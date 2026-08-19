@@ -7,18 +7,18 @@
 
 | | input | shipped | delta |
 |---|---|---|---|
-| File, raw | 749,952 B | **360,516 B** | **−51.9%** |
-| File, gzip | 139,907 B | 238,145 B | +70% (same meshopt-vs-gzip trade documented on pier-3 §6) |
-| Draw submeshes (primitives) | 324 | **12** | −96.3% |
-| Objects / nodes | 324 | 12 | −96.3% |
-| Triangles | 11,152 | 11,152 | 0 |
-| Verts (welded) | 22,856 | 6,212 | −72.8% |
+| File, raw | 727,752 B | **350,496 B** | **−51.8%** (rebuilt asset, review 3) |
+| File, gzip | 137,619 B | 231,350 B | +68% (same meshopt-vs-gzip trade documented on pier-3 §6) |
+| Draw submeshes (primitives) | 315 | **12** | −96.2% |
+| Objects / nodes | 315 | 12 | −96.2% |
+| Triangles | 10,852 | 10,852 | 0 |
+| Verts (welded) | 22,192 | 6,044 | −72.8% |
 | Materials | 12 | 12 | identical set |
 
 **All gates pass.** The optimized file is now `artifacts/pier-15/pier-15.glb`;
 the pre-optimize original is archived byte-for-byte at `optimize/input/pier-15.glb`.
-The 500 KB on-disk budget was BLOWN by the raw build (750 KB) and is now met
-with 28% headroom.
+The 500 KB on-disk budget was BLOWN by the raw build (728-750 KB across
+reviews) and is now met with 30% headroom.
 
 ## Toolchain
 
@@ -27,9 +27,9 @@ Blender 5.2.0 LTS (fbe6228777e7) · gltfpack@0.24 via npx · three ^0.185 in
 
 ## Phase A — census (`inspect.json`)
 
-324 objects/primitives · 11,152 tris · 22,856 verts · POSITION+NORMAL only ·
+315 objects/primitives · 10,852 tris · 22,192 verts · POSITION+NORMAL only ·
 no textures · 12 materials (3 glow). Dominant waste: node/accessor overhead
-(324 single-material objects) and 16,644 coincident vertex pairs. 0 degenerate
+(315 single-material objects) and ~16k coincident vertex pairs. 0 degenerate
 tris. The 115 piles / 12 lamps / bollards are repeated boxes — joining removes
 the overhead, not the geometry.
 
@@ -37,11 +37,11 @@ the overhead, not the geometry.
 
 | Step | tris | verts |
 |---|---|---|
-| input | 11,152 | 22,856 |
-| weld ≤ 1 mm + degenerate | 11,152 | **6,212** |
-| interior faces (0 found) | 11,152 | 6,212 |
+| input | 10,852 | 22,192 |
+| weld ≤ 1 mm + degenerate | 10,852 | **6,044** |
+| interior faces (0 found) | 10,852 | 6,044 |
 | limited dissolve | **SKIPPED** (prompt §3.3) | |
-| join per material (12 groups) | 11,152 | 6,212 |
+| join per material (12 groups) | 10,852 | 6,044 |
 
 Dissolve skipped deliberately: this asset carries the same large coplanar ring
 bands as pier-3 (deck slab/surface, fender curb ring, bulkhead cornice/parapet/
@@ -54,11 +54,11 @@ fail the stage-2 validator only after packing (350-brannan incident).
 
 | Variant | raw | gzip |
 |---|---|---|
-| input (unpacked) | 749,952 | 139,907 |
-| pack only (no Phase B) | 449,116 | 178,467 |
-| **weld+join+pack (shipped)** | **360,516** | 238,145 |
+| input (unpacked, rebuilt asset) | 727,752 | 137,619 |
+| pack only (no Phase B, measured on review-2 asset) | 449,116 | 178,467 |
+| **weld+join+pack (shipped)** | **350,496** | 231,350 |
 
-Phase B earns its round-trip: −88.6 KB raw vs pack-only. Gzip regresses on both
+Phase B earns its round-trip: ~−90 KB raw vs the pack-only control. Gzip regresses on both
 packed variants (meshopt streams gzip worse than raw duplicated floats); raw
 on-disk bytes are the budget metric and the CDN serves its own encoding.
 
@@ -66,11 +66,11 @@ on-disk bytes are the budget metric and the CDN serves its own encoding.
 
 - **G1** materials identical (12, glow set intact) — PASS
 - **G2** bbox identical to 4 dp; origin exact; 0 inverted solids; ray flips 0.0% — PASS
-- **G3** Blender re-import + pinned-three g3check: 12 meshes, 11,152 tris, no decode errors — PASS
-- **G4** A/B day+night × near+far + 4 elevations: means ≤ 0.76% (night glow layer),
+- **G3** Blender re-import + pinned-three g3check: 12 meshes, 10,852 tris, no decode errors — PASS
+- **G4** A/B day+night × near+far + 4 elevations: means ≤ 0.66% (night glow layer),
   day ≤ 0.004%; diffs are isolated 1-2 px edge-AA sparkles, nothing structural — PASS
-- **G5** submeshes 324 → 12 — PASS
-- **G6** −51.9% raw — PASS
+- **G5** submeshes 315 → 12 — PASS
+- **G6** −51.8% raw — PASS
 - **G8** deterministic re-run reproduces; no foreign geometry; no .blend1 — PASS
 
 ## Post-swap check

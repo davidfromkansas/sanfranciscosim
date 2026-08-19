@@ -1,7 +1,7 @@
 {
  "ok": true,
  "meshes": 12,
- "tris": 11152,
+ "tris": 10852,
  "materials": [
   "Toy_amber_Glow",
   "Toy_conc",

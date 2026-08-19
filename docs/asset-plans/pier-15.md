@@ -282,6 +282,16 @@ derived estimates, not published figures — the executing agent must re-verify 
 relies on. Everything marked *measured* was computed in this session from the named dataset
 and the arithmetic is reproducible from 2.3 and 2.16.
 
+> **Corrections from the build session (REPORT beats plan):** (1) the expected
+> AABB is ~249 x 221 m, not "250 x 178" — a rotation-math slip. (2) The Bay
+> Observatory Gallery is **OSM w738027034 on the north apron** (s 83.5-108.6,
+> t -45.4..-25.5 in the pier frame), abutting the shed's NW wall line and
+> overlooking the courtyard mouth — NOT the k-l-m-n region of the shed way,
+> which is shed roof; and the shed runs near-full-width to s ≈ 106.6, so there
+> is no deck-level terrace notch. §2.3/2.4/2.7's bay-end description is
+> superseded by `artifacts/pier-15/REFERENCE.md` and the rectified-aerial
+> verification recorded there. (3) The monitor centreline is t = +9.0.
+
 ### 2.1 Verified facts
 
 | Item | Value | Source / confidence |
@@ -656,20 +666,25 @@ monitor are last.
   | 36.6 | DataSF `SF9900015` h 15.64 — the pier's baked block today (centroid) | **must go** |
   | 61.4 | Overture 6x5 m kiosk (OSM w1323673815) on the courtyard-notch deck | **should go** — orphaned once the pier is ours |
   | 84.9 | Overture "Pier 17" h 16.4 (centroid) | **must stay** |
-  | 87.4 | Overture h 11.2 (OSM w738027034) — Baydelta building on Pier 17's apron | must stay |
+  | 87.4 | OSM w738027034 — the **Bay Observatory Gallery, on THIS pier's north apron** (corrected: not on Pier 17). Inside the GLB; baked 23 m deep into the deck once SF9900015 dropped | **must go — via `extraExclusions`** |
   | 120.5 | Pier 9 (Overture h 8 / DataSF `SF9900009` h 15.5) | must stay — a sibling asset branch owns it |
 
-  Anything in (61.4, 84.9) that also clears 61.4 works. **70 m** takes all three "go" rings
-  with a 14.9 m margin to Pier 17's gate. Do not exceed 84 m ever.
+  Anything in (61.4, 84.9) that also clears 61.4 works. **70 m** takes the three main "go"
+  rings with a 14.9 m margin to Pier 17's gate. Do not exceed 84 m ever. The observatory
+  ring gates at 87.4 — past that ceiling — so it is taken by
+  `extraExclusions: [{ lon: -122.3968015, lat: 37.8023693, r: 12 }]` centred on its own
+  centroid; from THAT centre Pier 17's nearest ring **vertex** is 29.1 m, so r must stay
+  under 29.
 
 - **Known, accepted collateral: `SF9900015` is a merged polygon covering Piers 15 AND 17**
-  (point-in-polygon verified on both sheds). Excluding it un-bakes Pier 17's DataSF block
-  as well. Pier 17 is then gap-filled whole by its own Overture ring (h 16.4, bbox spans
-  its full length including the bulkhead), so Pier 17 keeps a procedural block — sourced
-  from Overture, ~0.8 m taller, slightly different outline. Verify in local QA that Pier
-  17 is still standing; its silhouette changing subtly is expected and accepted. Also
-  remember the Overture height-correction can re-target onto the nearest survivor — check
-  Pier 17's baked height afterwards rather than assuming.
+  (point-in-polygon verified on both sheds). Excluding it un-bakes Pier 17's block as
+  well — and (measured at integration, superseding this plan's earlier prediction)
+  **Pier 17's Overture ring does NOT gap-fill**: its diagonal bbox reads 46% occupied in
+  the bbox-based occupancy grid (`occupiedFraction 0.464 > 0.25` in
+  `pipeline/buildings.mjs`), a pre-existing coarseness triggered by the neighbouring
+  piers' own diagonal bboxes. **Pier 17's site bakes empty until a pier-17 asset lands**
+  (follow-up task flagged). There is no safe radius that avoids this: ≥ 36.6 m kills the
+  merged block, anything less leaves a 15.6 m block through the GLB.
 
 - **Prove the exclusion from the tile, not the radius**: decode the four cells before and
   after the bake and point-in-polygon surviving rings against the deck polygon, reporting

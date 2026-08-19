@@ -83,14 +83,18 @@ DECK_ST = [
 # reprojected the same way (plan 2.3).
 BULK_S0, BULK_S1 = -139.0, -124.0     # bulkhead building
 BULK_T0, BULK_T1 = -16.4, 37.9
-SHEDW_S0, SHEDW_S1 = -124.0, 59.9     # full-width shed (incl. 1955 north aisle)
+# The shed runs near-full-width all the way to s 106.6 (rectified Aug-2026
+# aerial + the OSM way's own m->n edge at t -25.5); only the last ~5 m narrow.
+SHEDW_S0, SHEDW_S1 = -124.0, 106.6    # full-width shed (incl. 1955 north aisle)
 SHEDW_T0, SHEDW_T1 = -24.5, 30.1
-SHEDN_S0, SHEDN_S1 = 59.7, 111.5      # original narrow east bays
+SHEDN_S0, SHEDN_S1 = 106.4, 111.5     # narrow east stub at the end face
 SHEDN_T0, SHEDN_T1 = -7.2, 30.1
-OBS_S0, OBS_S1 = 85.0, 106.8          # Bay Observatory Gallery
-OBS_T0, OBS_T1 = -25.6, -7.2
-TERR_S0, TERR_S1 = 59.7, 85.0         # Observatory Terrace
-TERR_T0, TERR_T1 = -24.6, -7.2
+# Bay Observatory Gallery = OSM w738027034, ON THE NORTH APRON abutting the
+# shed's NW wall line and overlooking the courtyard mouth (build review 3: the
+# plan's original placement inside the shed way was wrong; the aerial's
+# PV-roof-plus-skylight block is this footprint).
+OBS_S0, OBS_S1 = 83.5, 108.6
+OBS_T0, OBS_T1 = -45.4, -25.5
 
 MON_T0, MON_T1 = 5.0, 13.0            # monitor over the 1931 central aisle
 MON_TC = 9.0
@@ -113,7 +117,6 @@ Z_CREST = 16.40       # crest cap on the gable = the bbox top (measured, 2.16)
 Z_ARCH_SPRING = 5.50
 Z_ARCH_CROWN = 10.00
 Z_OBS_TOP = 12.40
-Z_TERRACE = 6.40
 
 CURB_W = 0.50
 RAIL_H = 1.10
@@ -585,11 +588,9 @@ def build():
     while s <= 52.0:
         lamps.append((s, 33.2))
         s += 24.0
-    s = 68.0
-    while s <= 112.0:
-        lamps.append((s, -46.0 + (s - 68.0) * 0.10))  # follows the north apron taper
-        s += 22.0
-    lamps += [(113.5, 20.0), (113.5, -10.0), (113.5, -35.0)]
+    # North-apron lamps hug the deck edge walkway NW of the observatory.
+    lamps += [(68.0, -45.6), (90.0, -47.9), (112.0, -50.3)]
+    lamps += [(113.5, 20.0), (113.5, -10.0), (113.5, -32.0)]
     for i, (ls, lt) in enumerate(lamps):
         ngon_post(f"lamp{i}", ls, lt, Z_DECK, Z_DECK + 5.50, 0.22, ink, seg=4)
         sbox(f"lamphead{i}", ls - 0.58, ls + 0.58, lt - 0.32, lt + 0.32,
@@ -646,11 +647,9 @@ def build():
             k += 1
 
     plane_nw = (SHEDW_T0, Z_SHED_EAVE, MON_T0, Z_ROOF_HI)
-    plane_nw_n = (SHEDN_T0, Z_SHED_EAVE, MON_T0, Z_ROOF_HI)
     plane_se = (MON_T1, Z_ROOF_HI, SHEDW_T1, Z_SHED_EAVE)
     pv_run("a", plane_nw, -23.2, -10.0, SHEDW_S0 + 1.5, SHEDW_S1 - 1.5)
     pv_run("b", plane_nw, -8.2, 4.2, SHEDW_S0 + 1.5, SHEDW_S1 - 1.5)
-    pv_run("bn", plane_nw_n, -6.2, 4.2, SHEDN_S0 + 1.5, SHEDN_S1 - 4.0)
     pv_run("c", plane_se, 13.8, 21.0, SHEDW_S0 + 1.5, SHEDN_S1 - 4.0)
     pv_run("d", plane_se, 22.0, 29.2, SHEDW_S0 + 1.5, SHEDN_S1 - 4.0)
 
@@ -695,10 +694,7 @@ def build():
                SHEDW_T0 - 0.08, SHEDW_T0 + 0.02, ink)
     side_panel("clere_nww_glass", srect_profile(SHEDW_S0 + 3.5, SHEDW_S1 - 3.5, 7.1, 8.05),
                SHEDW_T0 - 0.16, SHEDW_T0 - 0.08, glass)
-    side_panel("clere_nwn_frame", srect_profile(SHEDN_S0 + 3.0, SHEDN_S1 - 3.0, 6.9, 8.2),
-               SHEDN_T0 - 0.08, SHEDN_T0 + 0.02, ink)
-    side_panel("clere_nwn_glass", srect_profile(SHEDN_S0 + 3.5, SHEDN_S1 - 3.5, 7.1, 8.05),
-               SHEDN_T0 - 0.16, SHEDN_T0 - 0.08, glass)
+    # (The 5 m narrow stub carries no clerestory of its own.)
 
     for k, sc in enumerate((-100.0, -62.0, -24.0, 14.0)):
         # South apron door bays with canopy slabs.
@@ -749,18 +745,10 @@ def build():
     side_panel("obs_glow", srect_profile(OBS_S0 + 1.2, OBS_S1 - 1.2, 8.7, 11.0),
                OBS_T0 - 0.17, OBS_T0 - 0.11, g_glass)
 
-    # Observatory Terrace: a raised public deck between the shed's narrow east
-    # bays and the observatory, with its own railing.
-    sbox("terrace", TERR_S0, TERR_S1, TERR_T0, TERR_T1, Z_TERRACE - 0.45, Z_TERRACE, conc)
-    for k, sc in enumerate((TERR_S0 + 4.0, (TERR_S0 + TERR_S1) / 2, TERR_S1 - 4.0)):
-        sbox(f"terrace_leg{k}", sc - 0.6, sc + 0.6, TERR_T0 + 1.0, TERR_T1 - 1.0,
-             Z_DECK, Z_TERRACE - 0.45, stone)
-    rail_chain("rail_t", [(TERR_S0 + 0.2, TERR_T0 + 0.15), (TERR_S1 - 0.2, TERR_T0 + 0.15)],
-               steel, base=Z_TERRACE)
-    for i in range(2):
-        (s0, t0), (s1, t1) = [((TERR_S0 + 0.15, TERR_T0 + 0.15), (TERR_S0 + 0.15, TERR_T1 - 0.2)),
-                              ((TERR_S1 - 0.15, TERR_T0 + 0.15), (TERR_S1 - 0.15, TERR_T1 - 0.2))][i]
-        rail_chain(f"rail_t{i}_", [(s0, t0), (s1, t1)], steel, base=Z_TERRACE)
+    # The "Observatory Terrace" of the 2013 project is an upper-level deck ON
+    # the observatory/shed junction, not a freestanding platform — at toy scale
+    # it reads as the observatory's parapet roofline and is not modelled
+    # separately (build review 3).
 
     # ---------------------------------------------------------------- bulkhead
     sbox("bulkhead", BULK_S0, BULK_S1 + 0.4, BULK_T0, BULK_T1, Z_DECK, Z_BULK_EAVE, cream)
