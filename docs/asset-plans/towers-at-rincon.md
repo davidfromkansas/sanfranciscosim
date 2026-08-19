@@ -14,7 +14,7 @@ prompt, Part 2 is the research and design dossier behind it.
 |---|---|
 | Manifest id | `towers-at-rincon` (registry id `towersAtRincon`) |
 | Existing procedural builder | none — **Case B**, new landmark (needs a `pipeline/lib/landmarks.mjs` entry and a re-bake, see 2.13) |
-| WGS84 anchor | `-122.3924873, 37.7919896` (AABB centre of the DataSF footprint) |
+| WGS84 anchor | `-122.3924907, 37.7919910` (AABB centre of the DataSF footprint, after the build's recentring shift) |
 | Target height | **89.0 m** to the mast tip (CTBUH architectural = to tip); LiDAR crest 87.2 m; podium roof 24.5 m |
 | DataSF footprint | 5,008 m², AABB 112.3 × 112.6 m, oriented box 89.2 × 76.0 m at −44.7° (`sf16_bldgid 201006.0000265`) |
 | Triangle cap | 18,000 |
@@ -72,8 +72,10 @@ and do not copy visual instructions from unrelated prompts.
   with a band of small square windows, and a slim mast on the apex
 - The Howard/Steuart corner **entrance**: a glass pyramid canopy and, above it, a large
   semicircular arched window in the precast wall
-- The podium roof **courtyard terrace** in the north-west quadrant: a circular paved plaza,
-  curved planting beds and low curved pergola structures
+- The **open garden courtyard** cut into the north-west side of the block — a ~45 m
+  wedge, open to the sky, with a circular paved plaza, curved stepped planting terraces,
+  a pergola bar and a glazed canopy over its narrow south-east end. The footprint is a
+  **C, not a diamond**
 
 ## Research The Towers at Rincon independently
 
@@ -84,7 +86,7 @@ orientation, and gather references covering:
 - North-west (Annex party wall), north-east (Steuart St), south-east (Howard St) and
   south-west (Spear St) elevations
 - Aerial and roof/top views — the two tower roofs, their mechanical penthouses, and the
-  podium terrace
+  open courtyard at grade
 - Ground-level views of the arcade, the entrance canopy and the arched window
 - Day and night appearance
 - The tower crown in detail: cornice profiles, the arched penthouse, the mast
@@ -120,9 +122,9 @@ low-poly, and never accurate in one view while invented in the others.
 
 ## Scope of the exported asset
 
-Export the 88 Howard block only: the six-storey podium on its real footprint, the two
-residential towers with their crowns, the entrance canopy and arched window, and the podium
-roof terrace.
+Export the 88 Howard block only: the six-storey podium on its real C-shaped footprint, the
+two residential towers with their crowns, the entrance canopy and arched window, the podium
+roofscape and the open garden courtyard at grade.
 
 Do not include the historic Rincon Annex post office on the north-west half of the block
 (it is a separate DataSF footprint and will be its own asset), nor Howard, Spear or Steuart
@@ -196,8 +198,8 @@ draft entry in `REPORT.md`. Do not edit the production manifest in this task.
   "id": "towers-at-rincon",
   "file": "towers-at-rincon.glb",
   "anchor": [
-    -122.3924873,
-    37.7919896
+    -122.3924907,
+    37.7919910
   ],
   "targetHeightM": 89.0,
   "cat": 2,
@@ -358,11 +360,19 @@ face and rounded west end read here.
 **North-west (Annex party line)** — Stepped, plainer, largely blocked by the 29.7 m Annex. Keep
 it simple, but not blank: continue the band rhythm.
 
-**Top** — Two tower roofs, each with a long rectangular mechanical penthouse and the arched cap;
-between them, in the north-west quadrant, the podium roof terrace: a circular paved plaza,
-curved planting beds, low curved pergola structures (OSM ways 1301393950/1301393951, one storey,
-3 m) and, at the 7th floor, the resident lounge. The remaining podium roof carries mechanical
-plant and skylight rows. This is the surface the app camera sees most; design it fully.
+**Top** — Two tower roofs, each with a mechanical penthouse at either shoulder, the central bay,
+the arched cap and the mast; the podium roof around them with its mechanical masses, dark solar
+arrays and skylight rows; and, cut into the north-west side, the **open garden courtyard at
+grade**: a circular paved plaza, curved stepped planting terraces, a pergola bar (OSM ways
+1301393950/1301393951, one storey, 3 m) and a glazed canopy over its narrow south-east end.
+This is the surface the app camera sees most; design it fully.
+
+> **Correction (stage 2, 18 Aug 2026).** An earlier draft of this plan put the plaza and its
+> planting on the podium ROOF, reading the owner's "7th-floor outdoor resident lounge" as the
+> whole story. The DataSF ring is a **C** — whatever is in that wedge returned ground, not a
+> roof at 24.5 m — and z21 satellite imagery shows an open-air garden court, which is the
+> "ground floor promenade ... and a central garden courtyard" the *LA Times* described in
+> October 1988. See `artifacts/towers-at-rincon/REPORT.md` §1.
 
 ### 2.5 Recognition cues (ranked)
 
@@ -371,7 +381,7 @@ plant and skylight rows. This is the surface the app camera sees most; design it
 2. **The crown**: rolled bullnose cornices, taller central bay, arched penthouse, mast
 3. **The six-storey podium filling a whole diamond block**, banded and bowed, with a street arcade
 4. The **glass pyramid entrance canopy** and the big **arched window** at the Howard/Steuart corner
-5. The **circular courtyard terrace** on the podium roof
+5. The **open garden courtyard** with its circular plaza, cut into the block
 
 ### 2.6 Miniature translation
 
@@ -474,8 +484,9 @@ The whole block is roof, and the camera looks straight at it. Three designed zon
 
 ### 2.10 Scope
 
-**In the GLB:** the 88 Howard podium on its DataSF footprint, both towers with crowns and masts,
-the entrance canopy and arched window, the podium roof terrace and mechanical zones.
+**In the GLB:** the 88 Howard podium on its DataSF footprint (a C — the courtyard is a void,
+not a roof), both towers with crowns and masts, the entrance canopy and arched window, the
+podium roofscape, and the courtyard at grade.
 
 **Not in the GLB:** the Rincon Annex post office (separate footprint, separate asset), Howard /
 Spear / Steuart Streets, the Embarcadero, neighbouring buildings, street trees, people, vehicles,
@@ -496,8 +507,8 @@ reads at 12k.
   "id": "towers-at-rincon",
   "file": "towers-at-rincon.glb",
   "anchor": [
-    -122.3924873,
-    37.7919896
+    -122.3924907,
+    37.7919910
   ],
   "targetHeightM": 89.0,
   "cat": 2,
