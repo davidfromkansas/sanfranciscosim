@@ -8,12 +8,12 @@ the plan** wherever they disagree; the disagreements are listed in §1–§4 bel
 |---|---|
 | Asset | `artifacts/audiffred-building/audiffred-building.glb` |
 | Triangles | **9,256** (cap 12,000) |
-| Objects | 228 |
+| Objects | 11 shipped (228 before the stage-4 join); 13 draw submeshes |
 | Dimensions | 40.42 x 40.28 x **17.500 m** (axis-aligned; the building is 41.82 x 14.00 m at a 45.2° heading) |
 | min Z / XY centre | 0.000 m / (0.000, 0.000) |
 | Materials | 12, all `Toy_*`, flat, no textures, no alpha |
 | Glow | `Toy_gold_Glow` (entablature sign band), `Toy_glassl_Glow` (scattered lit windows) — 40 single-sided faces, 40 outward |
-| File | 588,384 bytes raw / 88,207 gzip (pre-optimize) |
+| File | **297,888 bytes** shipped (meshopt); 588,384 pre-optimize, −49.4% — see `optimize/REPORT.md` |
 | Validation | **PASS**, 17 of 17 checks, normals ray residual **0 of 31,500** |
 | Manifest anchor | **−122.3927766, 37.7933230** |
 
@@ -185,8 +185,21 @@ the entablature and corbel table project on three sides and not on the fourth.
 `"estimated": true` because the 17.5 m crest the model is normalized to is an
 Overture figure corroborated photogrammetrically, not a LiDAR measurement.
 
-`dims` and `tris` will be re-measured after stage 4 (optimize) and updated here.
+`dims` and `tris` are the SHIPPED numbers: stage 4 changed neither (the join and
+the meshopt pack are both triangle-preserving), only the object count 228 -> 11
+and the file size 588,384 -> 297,888 bytes. See `optimize/REPORT.md`.
 
 ## Approval
 
-*Pending — stage 3 of `docs/asset-pipeline/ADDRESS-TO-ASSET.md`.*
+**Standing pre-approval, 18 August 2026.** The session was opened with, verbatim:
+
+> APPROVE EVERYTHING DONT ASK ME FOR PERMISSION
+
+That is a blanket authorisation covering gate 3 (and gates 0, 1, 4 and 5), given
+before the asset existed rather than after seeing it. It was taken at face value
+and the pipeline was run straight through; the contact sheet, both aerials and
+the numbers above were presented at the gate rather than withheld for a reply.
+
+The one thing it does NOT cover, because `ADDRESS-TO-ASSET.md` stage 5 puts it
+outside the pipeline entirely, is pushing, opening a PR or deploying. Those wait
+for a specific instruction.
