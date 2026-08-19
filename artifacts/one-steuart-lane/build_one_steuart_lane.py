@@ -136,8 +136,8 @@ PALETTE_HEX = {
     "Toy_cream": "f2ede3",       # travertine — pilasters, lintels, parapet, slabs
     "Toy_sand": "ece4d4",        # base band stone, one step down
     "Toy_stone": "d9d2c2",       # terrace soffits
-    "Toy_glass": "2a4d73",       # recessed vision glass — supplies all the dark
-    "Toy_glassl": "6f95b8",      # sky-reflecting panes and balustrades
+    "Toy_glass": "2a4d73",       # base storefront only — the one genuinely dark glass
+    "Toy_glassl": "6f95b8",      # tower vision glass (sky-reflecting) and rails
     "Toy_ink": "3a3530",         # blackened stainless: mullion caps, rails, fittings
     "Toy_steel": "9aa0a6",       # roof deck and plant  (NOT Toy_roofd — reads black)
     "Toy_navy": "2c4a70",        # rooftop photovoltaic array
@@ -397,8 +397,13 @@ def elevation(tag, poly, edge, z0, z1, floors, mats, deep_idx, lit, openness=0.0
                                         mats["Toy_glassl"], mats["Toy_ink"],
                                         mats["Toy_stone"])
 
-    # the glass plate — one box for the whole elevation, just proud of the shell
-    wall_box(f"{tag}_glass", poly, edge, 0.0, length, z0, z1, -0.05, GLASS_D, glass)
+    # The glass plate — one box for the whole elevation, just proud of the shell.
+    # `Toy_glassl`, not `Toy_glass`: the tower's low-iron glazing reflects sky and
+    # reads MID-BLUE in every street-level reference, and the first build's navy
+    # made a cream travertine building one of the darkest objects on its block in
+    # the app's wide shot. The dark `Toy_glass` is kept for the base storefront,
+    # which really is dark.
+    wall_box(f"{tag}_glass", poly, edge, 0.0, length, z0, z1, -0.05, GLASS_D, glassl)
 
     # the deep terrace bay: glass held back at the shell, with a slab and a rail
     # per floor standing in front of it
@@ -524,7 +529,7 @@ def build_base(mats):
                            mats["Toy_sage"]), width=0.07)
         # night: the base cornice downlight, the fifth band of the glow composition
         wall_box(f"{tag}_baseglow", FOOTPRINT, edge, 0.6, length - 0.6,
-                 H_GF - 0.98, H_GF - 0.84, 0.10, 0.32, mats["Toy_cream_Glow"])
+                 H_GF - 1.18, H_GF - 0.82, 0.10, 0.34, mats["Toy_cream_Glow"])
 
     # the Steuart Lane entrance: bronze portal under a projecting glass canopy
     _, _, length, _, _ = poly_edge(FOOTPRINT, E_STEUART)
@@ -612,8 +617,12 @@ def build_terrace(tag, insets_lo, insets_hi, z_top, mats):
 
     ring_band(f"{tag}_soffit", plan, z_top - 0.24, z_top, -0.32, SLAB_OUT - 0.08, stone)
     ring_band(f"{tag}_slab", plan, z_top, z_top + SLAB_T, -0.42, SLAB_OUT, cream)
-    # hero night band: the downlight line under every cantilever
-    ring_band(f"{tag}_glow", plan, z_top - 0.40, z_top - 0.26, 0.02, SLAB_OUT - 0.10,
+    # Hero night band: the downlight line under every cantilever. 0.38 m deep,
+    # not the 0.14 m the first build used — at the app's 400 m preset distance a
+    # 0.14 m band is sub-pixel and the designed hero simply did not appear, while
+    # in the Blender rig at 295 m with a long lens it read perfectly. Judge glow
+    # thickness from the APP screenshot, never from the review render.
+    ring_band(f"{tag}_glow", plan, z_top - 0.64, z_top - 0.26, 0.03, SLAB_OUT - 0.04,
               mats["Toy_cream_Glow"])
 
     for edge, etag, lo, hi in zip(EDGES, EDGE_TAGS, insets_lo, insets_hi):

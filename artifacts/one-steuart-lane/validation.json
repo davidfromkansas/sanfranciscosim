@@ -253,7 +253,7 @@
     {
       "name": "grp_Toy_cream_Glow",
       "triangles": 176,
-      "signed_volume_m3": 22.22977,
+      "signed_volume_m3": 73.71008,
       "location": [
         0.0,
         0.0,
@@ -292,8 +292,8 @@
     },
     {
       "name": "grp_Toy_glass",
-      "triangles": 336,
-      "signed_volume_m3": 1093.27308,
+      "triangles": 96,
+      "signed_volume_m3": 135.466,
       "location": [
         0.0,
         0.0,
@@ -312,8 +312,8 @@
     },
     {
       "name": "grp_Toy_glassl",
-      "triangles": 888,
-      "signed_volume_m3": 17.61861,
+      "triangles": 1128,
+      "signed_volume_m3": 975.42569,
       "location": [
         0.0,
         0.0,

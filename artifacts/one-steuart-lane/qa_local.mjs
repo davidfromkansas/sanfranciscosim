@@ -156,8 +156,14 @@ async function main() {
     console.log(`${ok ? 'PASS' : 'FAIL'}  ${name} — ${detail}`);
   };
 
-  await until('boot', 'window.SF && window.SF.assets ? true : null');
-  await until('manifest', 'window.SF.assets.stats().entries > 0 ? true : null');
+  // 600 s, not the 120 s default: this machine routinely carries a >150 load
+  // average from sibling landmark sessions, and a cold boot of the built app in
+  // software-rendered headless Chrome can take several minutes there. A boot
+  // timeout is a machine-contention artefact, not an app defect, but it aborts
+  // the run before a single check executes — which is indistinguishable from a
+  // real failure unless you read the log.
+  await until('boot', 'window.SF && window.SF.assets ? true : null', 600000);
+  await until('manifest', 'window.SF.assets.stats().entries > 0 ? true : null', 600000);
   console.log('  entries:', JSON.stringify(await evaluate('window.SF.assets.stats()')));
 
   // SF.goTo takes DEGREES; rig.set multiplies by DEG internally.

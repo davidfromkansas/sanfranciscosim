@@ -254,3 +254,26 @@ Recorded because they are the kind of thing that gets silently re-inherited.
    and gold.
 5. **`Toy_roofd` was avoided on the roof deck** on the standing note that it
    renders near-black under the app's lighting. The deck is `Toy_steel`.
+6. **The vision glass was navy and had to be re-valued** — noticed at stage-5
+   QA, not in the review renders. `Toy_glass` (2a4d73) behind a frame covering
+   ~35% of the elevation averages to a mid-dark grey at city distance, so the
+   tower read much darker than a cream travertine building should. The change is
+   justified by the references, not by the app screenshot: every street-level
+   photograph shows the low-iron glazing reflecting sky as a **mid-blue**, so the
+   tower's vision glass is now `Toy_glassl` (6f95b8) and `Toy_glass` is kept for
+   the base storefront, which genuinely is dark.
+
+   **The app-side value comparison that first raised this is not usable as
+   evidence.** At the QA clock (14:00, 17 Aug) the whole site sits in a cast
+   shadow from the towers to the south-west, so a facade sample reads the shadow
+   rather than the material — measured luma 57 before the change and 60 after,
+   i.e. unchanged within noise. The fair before/after is the Blender day aerial,
+   where the lighter glazing is unmistakable. Judge material *value* from a
+   sunlit frame or from the review rig; the shadowed wide shot can only show
+   placement, massing and silhouette.
+7. **The hero night band was too thin to see in the app.** At 0.14 m it read
+   perfectly in the Blender rig (295 m, long lens, 1500 px) and was effectively
+   sub-pixel at the registry camera's 400 m in the app viewport — the designed
+   hero simply did not appear. Widened to 0.38 m, and the base cornice band to
+   0.36 m. **Judge glow thickness from an app screenshot, never from the review
+   render.**

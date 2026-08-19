@@ -1,7 +1,7 @@
 {
  "file_bytes": {
-  "raw": 1375888,
-  "gzip9": 182630
+  "raw": 1375900,
+  "gzip9": 182536
  },
  "objects": 1027,
  "total_tris": 17064,
@@ -292,12 +292,12 @@
   {
    "name": "Toy_glass",
    "glow": false,
-   "user_objects": 28
+   "user_objects": 8
   },
   {
    "name": "Toy_glassl",
    "glow": false,
-   "user_objects": 74
+   "user_objects": 94
   },
   {
    "name": "Toy_glassl_Glow",
@@ -2592,8 +2592,8 @@
  "join_candidates": {
   "Toy_cream": 731,
   "Toy_cream_Glow": 8,
-  "Toy_glass": 28,
-  "Toy_glassl": 74,
+  "Toy_glass": 8,
+  "Toy_glassl": 94,
   "Toy_glassl_Glow": 31,
   "Toy_ink": 60,
   "Toy_navy": 17,

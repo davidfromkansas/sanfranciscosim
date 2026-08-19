@@ -711,12 +711,28 @@ estimate on a neighbouring site:
    the before/after is **obvious rather than subtle**, because a 67 m asset
    replaces a 22 m block rather than a same-sized twin.
 
-**Batch warning.** The shared landmark `BatchedMesh` was measured at 99% full in
-SoMa at 84 landmarks, and it overflows silently: each reload drops a *different*
-landmark rather than erroring. This corner of the Embarcadero has a large cluster of
-sibling landmarks in flight at the same time. Whoever runs
-`docs/asset-pipeline/BATCH-INTEGRATE.md` must check the reserve buffer before
-blaming this asset for a neighbour that stopped rendering.
+**Batch warning — measured, 19 August 2026.** The shared landmark `BatchedMesh`
+body reserve was raised to **1,600,000 vertices** on `main` (49b8d19). Summing the
+non-glow `POSITION` accessors of every GLB in the manifest — the worst case where
+every landmark is resident at once, which streaming normally prevents:
+
+```
+104 landmarks:  body 1,465,064 / 1,600,000  (91.6%)
+                glow    77,446 /   250,000  (31.0%)
+```
+
+One Steuart Lane contributes 30,300 body + 1,085 glow, about 2% of the total —
+above the median but not an outlier (the heaviest are palace-of-fine-arts at
+37,976 and city-hall at 34,240).
+
+**The headroom is ~135,000 vertices, and this corner of the Embarcadero has on
+the order of a dozen sibling landmarks in flight.** At ~30k each they do not all
+fit. Whoever runs `docs/asset-pipeline/BATCH-INTEGRATE.md` should re-run this
+measurement over the merged manifest before shipping, and raise `BODY_VERTS`
+again if it crosses. The overflow is silent — each reload drops a *different*
+landmark rather than erroring — so it will not announce itself.
+
+Reproduce with the accessor scan; it needs no browser and takes a second.
 
 ### 2.15 Open risks and conflicting evidence
 

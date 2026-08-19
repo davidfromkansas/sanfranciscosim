@@ -36,7 +36,7 @@
  },
  "output": {
   "tris": 17064,
-  "verts": 31385,
+  "verts": 31379,
   "objects": 14,
   "primitives": 16,
   "materials": [
@@ -74,10 +74,10 @@
   "entry_glow": 3.693579,
   "entry_portal": 7.757979,
   "grp_Toy_cream": 3339.606696,
-  "grp_Toy_cream_Glow": 22.229773,
+  "grp_Toy_cream_Glow": 73.710082,
   "grp_Toy_cream_Toy_steel": 75106.920741,
-  "grp_Toy_glass": 1093.273085,
-  "grp_Toy_glassl": 17.61861,
+  "grp_Toy_glass": 135.466003,
+  "grp_Toy_glassl": 975.425692,
   "grp_Toy_glassl_Glow": 12.95335,
   "grp_Toy_ink": 13.970235,
   "grp_Toy_navy": 144.071004,
@@ -88,7 +88,7 @@
  "inverted_solids": [],
  "ray_test_output": {
   "rays": 22500,
-  "hits": 17059,
+  "hits": 17072,
   "flipped": 0,
   "flipped_fraction": 0.0
  },

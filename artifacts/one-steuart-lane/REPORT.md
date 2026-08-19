@@ -111,6 +111,19 @@ Full detail in `REFERENCE.md` §7. In short:
    which is what the app does. Fixed before the night render was judged.
 5. **`Toy_roofd` is not used.** It renders near-black under the app's lighting;
    the roof deck is `Toy_steel`.
+6. **The vision glass was re-valued from navy to mid-blue.** `Toy_glass`
+   behind a 35%-coverage frame averages mid-dark at city distance; every
+   street-level reference shows sky-reflecting mid-blue. Tower glazing is now
+   `Toy_glassl`, the base storefront keeps `Toy_glass`. Noticed at stage-5 QA,
+   but justified by the references — the app wide shot that raised it has the
+   site in a cast shadow, and measures luma 57 before / 60 after, i.e. nothing.
+   See REFERENCE.md §7.6.
+7. **The hero night band was widened 0.14 m → 0.38 m** (base cornice 0.36 m).
+   At 0.14 m it read in the Blender rig and was sub-pixel at the registry
+   camera's 400 m in the app. Judge glow thickness from an app screenshot.
+
+Both were caught by the local QA and fixed by a rebuild + a full re-run of the
+stage-4 gates, not patched at integration.
 
 Two plan values were *confirmed*, not corrected: the 67.06 m height (the plan's
 reasoning holds — see the open risk below) and the four face headings.
@@ -188,3 +201,120 @@ withheld, and the pipeline advanced on that standing approval rather than on a
 fresh one. Recorded here explicitly because gate 3 normally requires a specific
 approval of *this asset*, and a blanket pre-authorisation is not the same thing:
 if any of the design calls above are wrong, they were not individually reviewed.
+
+---
+
+## Stage 5 — integration (Case B)
+
+Run per `docs/asset-plans/INTEGRATION-PROMPT.md` on 18–19 August 2026, in
+**batch mode**: the bake was run and QA'd, then discarded, and the branch ships
+source only. The city is baked once for the whole batch by
+`docs/asset-pipeline/BATCH-INTEGRATE.md`.
+
+### The exclusion radius, measured
+
+`excluded()` drops a ring when `min(nearestVertex, centroid)` from the landmark
+**anchor** is under `r`. Swept over both real bake inputs
+(`artifacts/one-steuart-lane/exclusion_sweep.mjs`):
+
+| Gate | Source | Ring | |
+|---|---|---|---|
+| **0.92 m** | Overture | "One Steuart Lane" — this building's own ring | must drop |
+| **11.41 m** | DataSF | `SF3741031` — the demolished 75 Howard garage | must drop |
+| 28.14 m | Overture | "201 Spear" | must survive |
+| 28.29 m | DataSF | `SF3741032` (72 m) | must survive |
+
+Band `11.41 < r <= 28.14`. **Shipped `exclude: 20`**, the middle of it.
+
+**The first sweep was wrong and would have shipped quietly.**
+`streamFeatures()` yields **zero** features from a `.geojsonseq` — Overture is
+newline-delimited JSON and `buildings.mjs` reads it with `readline` — so a sweep
+that uses the GeoJSON streamer for both inputs returns a DataSF-only answer and
+reports it as though both were scanned. The binding neighbour here is Overture's,
+0.15 m tighter than DataSF's.
+
+**What is actually being replaced is the 2010 parking garage at ~21.6 m, not a
+tower.** Overture carries this building at `height = 25.16`, which is wrong (it
+is 67 m), and 25.16 is not greater than the garage's `21.55 x 1.4`, so
+`buildings.mjs`'s height-correction branch declines to raise the garage and then
+`continue`s past the Overture ring entirely.
+
+### Proof in the baked tile
+
+`artifacts/one-steuart-lane/exclusion_check.mjs` decodes cell `24_11` with the
+pipeline's own `readBuildingsBlob`:
+
+| | rings in cell | rings intruding into r=20 | nearest survivor |
+|---|---|---|---|
+| origin/main | 26 | **1**, reaching 10.06 m past the edge, topY 27.4 m | 9.94 m |
+| after re-bake | 25 | **0** | 28.28 m |
+
+### The stray-cell diagnosis
+
+`verify-rebake` first reported cell `23_13` changing 169 → **182** outside my
+landmark. An exclusion can only remove footprints, never add 13, so this was not
+the radius. `origin/main` had moved: the `soma-thirteen` batch merged after this
+branch was cut, and **all thirteen of its landmarks project into cell `23_13`**
+— the +13 were the footprints their exclusions removed on main and this
+pre-rebase tree still carried. Rebased onto `2c14d5f9f` and re-baked; the stray
+cell disappeared.
+
+### Local QA (INTEGRATION-PROMPT Step 5)
+
+Driven by `artifacts/one-steuart-lane/qa_local.mjs` — the built app in real
+headless Chrome over CDP, because a hidden Browser pane throttles
+`requestAnimationFrame` to nothing and makes a healthy streaming landmark look
+broken.
+
+| Check | Result |
+|---|---|
+| manifest entry loads | PASS — `sf-assets: one-steuart-lane merged 16 objects / 13 materials -> batched (10100 tris body); uniform x1.0000 at 4031, -2384` |
+| uniform scale ≈ 1.0 | PASS — **x1.0000** |
+| placed at the real anchor | PASS — x 4031, z −2384, matching the projected anchor |
+| exactly one building on the site | PASS — no procedural twin, no baked block through the asset (day/wide screenshots) |
+| orientation | PASS — the Steuart Lane face looks across to the Embarcadero and the Bay (wide screenshot) |
+| terrain seating | PASS — no floating, no sinking |
+| night glow | PASS — under-slab bands, lobby patch and scattered units light; nothing else |
+| draw calls < 300 | PASS — **96/frame** averaged over 30 frames |
+| asset warnings | PASS — none |
+
+Screenshots in `artifacts/one-steuart-lane/qa/` (`day.png`, `night.png`,
+`wide.png`) with the raw numbers in `qa.json`.
+
+### Case B gates
+
+| Check | Result |
+|---|---|
+| `pipeline/audit.mjs` check 1.6 | **PASS** — "114 zones over 110 landmarks clear" |
+| `pipeline/verify-rebake.mjs` | **PASS** — "584 of 585 cells unchanged"; only `24_11` moved, 26 → 25; "every asset has clear ground under it" |
+| nearest surviving footprint vs radius | 28.3 m vs 20 m |
+| `context` tier picked up the landmark | `landmark:oneSteuartLane` at x 4031.2, z −2383.7, height 67.06, camera preset intact |
+| search index | `One Steuart Lane` present, 7,905 entries |
+| `muni-shapes.bin` | unmodified (the wipe trap avoided) |
+| `app && npm run lint` | PASS |
+| `app && npm test` | PASS, 26/26 |
+| `app && npm run build` | PASS |
+
+Three audit checks fail — 1.2b (citywide 95th-percentile height), 1.3c (Telegraph
+Hill terrain 90.5 m against an 85 m gate) and 1.7b (1 sampled tree of 792 more
+than 30 m offshore). All three are properties of the source data and the terrain
+DEM, none is a building tile this change touches, and `verify-rebake` proves only
+cell `24_11` differs from `origin/main`. They are pre-existing, not caused here.
+
+### Shared batch reserve — measured, and a warning for the batch
+
+`main` raised the body reserve to 1,600,000 vertices (49b8d19). Summing the
+non-glow POSITION accessors of every manifest GLB
+(`artifacts/one-steuart-lane/batch_reserve_check.mjs`):
+
+```
+104 landmarks:  body 1,465,064 / 1,600,000  (91.6%)
+                glow    77,446 /   250,000  (31.0%)
+```
+
+One Steuart Lane contributes 30,300 body + 1,085 glow, ~2% of the total.
+**~135,000 vertices of headroom remain, and this corner of the Embarcadero has
+about a dozen sibling landmarks in flight at ~30k each — they do not all fit.**
+The overflow is silent (each reload drops a different landmark rather than
+erroring), so the batch integrator must re-run that check over the merged
+manifest and raise `BODY_VERTS` again if it crosses.

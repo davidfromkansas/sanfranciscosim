@@ -1,15 +1,18 @@
 # One Steuart Lane — GLB optimize report
 
 Stage 4 of `docs/asset-pipeline/ADDRESS-TO-ASSET.md`, run per
-`docs/asset-pipeline/GLB-OPTIMIZE-PROMPT.md` v2 on 18 August 2026.
+`docs/asset-pipeline/GLB-OPTIMIZE-PROMPT.md` v2 on 18 August 2026, and **re-run
+in full on 19 August** after stage-5 QA sent two material/geometry corrections
+back to stage 2 (vision-glass value, hero glow-band thickness). Every number
+below is from the re-run; all eight gates were re-evaluated, not carried over.
 `ASSET_CLASS: landmark` · `ALLOW_MESHOPT: yes` · `ALLOW_BAKE: no`.
 
 ## Headline
 
 | Metric | Input | Shipped | Δ |
 |---|---|---|---|
-| **File, raw** | 1,375,888 B (1,344 KB) | **411,648 B (402 KB)** | **−70.1%** |
-| File, gzip −9 | 182,630 B | 214,151 B | +17.3% (see below) |
+| **File, raw** | 1,375,900 B (1,344 KB) | **411,752 B (402 KB)** | **−70.1%** |
+| File, gzip −9 | 182,536 B | 214,162 B | +17.3% (see below) |
 | Objects | 1,027 | **14** | −98.6% |
 | Draw primitives | 1,033 | **16** | −98.5% |
 | Triangles | 17,064 | 17,064 | 0 |
@@ -117,13 +120,13 @@ emission driven from Base Color.
 
 | View | Mean abs RGB Δ | Max pixel Δ |
 |---|---|---|
-| day near | 0.0030% | 4/255 |
-| day far | 0.0050% | 3/255 |
+| day near | 0.0035% | 5/255 |
+| day far | 0.0054% | 3/255 |
 | night near | 0.0030% | 3/255 |
-| night far | 0.0030% | 2/255 |
-| elevation N / E / S / W | 0.0053 / 0.0009 / 0.0024 / 0.0056% | 8 / 5 / 9 / 8 |
+| night far | 0.0032% | 2/255 |
+| elevation N / E / S / W | 0.0044 / 0.0006 / 0.0021 / 0.0053% | 8 / 5 / 7 / 8 |
 
-Gates are ≤2% far and ≤4% near; the worst view here is **0.0056%**, three orders
+Gates are ≤2% far and ≤4% near; the worst view here is **0.0054%**, three orders
 of magnitude inside.
 
 **Looked at the diffs, honestly:** the ×8-amplified diff row is black except for
