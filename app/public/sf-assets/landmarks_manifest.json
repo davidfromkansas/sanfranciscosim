@@ -1939,5 +1939,24 @@
     ],
     "tris": 3366,
     "loadRadius": 2500
+  },
+  {
+    "id": "audiffred-building",
+    "file": "audiffred-building.glb",
+    "anchor": [
+      -122.3927766,
+      37.7933230
+    ],
+    "targetHeightM": 17.5,
+    "cat": 3,
+    "name": "Audiffred Building (1 Mission Street)",
+    "estimated": true,
+    "dims": [
+      40.4244,
+      40.2848,
+      17.5
+    ],
+    "tris": 9256,
+    "loadRadius": 2500
   }
 ]

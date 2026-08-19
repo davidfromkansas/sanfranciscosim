@@ -3160,6 +3160,49 @@ export const LANDMARKS = [
     // the canopy are the whole recognition.
     camera: { distance: 120, yaw: 85, pitch: 26 },
   },
+  {
+    // 1-21 Mission Street / 100 The Embarcadero, San Francisco Landmark No. 7
+    // (1968) and NRHP 79000528 (1979). Block 3715 Lot 001.
+    //
+    // height 17.5 is the 1983-84 barrel-vaulted penthouse crest, not the roof
+    // deck: DataSF LiDAR measures the deck at 15.36-15.44 m over 2,238 cells and
+    // its hgt_max of 19.18 m is rooftop plant (1.64 sd above the median on a
+    // 2.33 sd distribution, and visible as a mechanical unit and a tank in the
+    // reference photograph). Overture independently carries 17.4 m.
+    //
+    // exclude 7 measured against the REAL bake input - the DataSF ynuv-fyni
+    // footprints and the Overture ring for the same building - by nearest ring
+    // VERTEX and by centroid, because excluded() in buildings.mjs fires on
+    // either. From this anchor:
+    //
+    //   Overture "The Audiffred Building"   centroid  0.04 m   vertex 21.99 m
+    //   DataSF SF3715001                    centroid  1.95 m   vertex 19.99 m
+    //   DataSF SF3715002 (100 Embarcadero)  centroid 13.70 m   vertex 19.99 m
+    //   Overture equivalent of that neighbour centroid 13.92 m vertex 22.03 m
+    //   DataSF SF3715003                    centroid 28.16 m   vertex 28.47 m
+    //
+    // Both of this building's own rings are caught by CENTROID at under 2 m, so
+    // the safe window is (1.95, 13.70) and 7 sits near its middle with 3.6x
+    // margin below and 2.0x above. Note that the nearest vertex of this
+    // building and the nearest vertex of the neighbour are THE SAME TWO POINTS
+    // at 19.99 m - they share the party wall - so no radius can ever reach this
+    // footprint's vertices without eating the neighbour. It does not need to.
+    //
+    // Camera offset is (sin yaw, ., cos yaw) with +z south, so camera bearing =
+    // 180 - yaw and yaw 180 stands the eye due NORTH - the bisector of the
+    // Mission Street elevation (315.2 deg) and The Embarcadero end (44.8 deg),
+    // which is the only azimuth that reads the 41.8 m address elevation, the
+    // short waterfront end and the mansard-and-vault roof together. 230 m suits
+    // a 17.5 m building that is 42 m long (cf. 340Brannan at 240 for 17.79 m,
+    // 181SouthPark at 190 for 16.5 m). No `key`: this is a small landmark.
+    id: 'audiffredBuilding',
+    name: 'Audiffred Building (1 Mission Street)',
+    lon: -122.3927748,
+    lat: 37.7933216,
+    height: 17.5,
+    exclude: 7,
+    camera: { distance: 230, yaw: 180, pitch: 26 },
+  },
 ];
 
 // Parks/green spaces the landcover bake must match at least one source polygon
