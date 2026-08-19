@@ -89,3 +89,31 @@ The user pre-approved the full pipeline for this session:
 **"APPROVE EVERYTHING DONT ASK ME FOR PERMISSION"** (2026-08-19, session
 instruction accompanying `BUILDING: Pier 7`, `BATCH: yes`). Logged here per
 Gate 3; renders are presented in the session's final report.
+
+## Stage 5 — local QA (batch mode)
+
+Bake: full chain (terrain → muni-shapes) on the cloned 12 Aug `pipeline/data`
+(zero-churn recipe); `verify-rebake`: **584 of 585 cells unchanged**, only `23_9`
+moved (17 → 18: the pier slab dropped; the fresher input added the San Francisco
+Belle at 98.6 m — which *survived* the r = 60 exclusion, proving the sizing) —
+overall PASS. `audit.mjs` check 1.6 PASS (114 zones clear; 1.7 allowlists pier
+vertices, 0 offenders; the three failing checks — 1.2b p95 height, 1.3c Telegraph
+Hill DEM, 1.7b one offshore tree — are dataset-vintage items unrelated to this
+landmark). Penetration test on the fresh tiles: **no ring intrudes into the pier
+footprint in either tier**. Streets tier: no footway within 110 m.
+
+Headless-Chrome QA against `app/dist` (`qa_local.mjs`, screenshots in `qa/`):
+
+| Check | Result |
+|---|---|
+| Merge line | PASS — `sf-assets: pier-7 merged 7 objects / 7 materials -> batched (7332 tris body); uniform x1.0000 at 3694, -3255` |
+| Uniform scale | PASS — exactly 1.0000 |
+| Water seat | PASS — placement matrix y = **0.000** (the water plane; anchor confirmed over open bay) |
+| One building at the spot | PASS — pier slab carved out; day screenshot shows only the GLB |
+| Night state | PASS — two dotted rows of warm lamp globes, nothing else lit |
+| Draw calls | PASS — avg 85/frame at the landmark (< 300) |
+| Asset warnings | PASS — none |
+| Fallback drill | see `qa/drill.json` — GLB served 404, app boots, one `pier-7 failed to load` warning, empty water at the site (expected for Case B over the bay) |
+
+Batch mode: the bake was then discarded (`git checkout -- app/public/tiles api/_data`)
+and only source committed — GLB, manifest entry, registry entry, plan, artifacts.

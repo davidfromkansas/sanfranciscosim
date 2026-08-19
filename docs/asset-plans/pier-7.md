@@ -21,7 +21,7 @@ exactly on the water plane y = 0. Every height in this plan is quoted **above wa
 
 | | |
 |---|---|
-| Manifest id | `pier-7` (registry id `pier7`) |
+| Manifest id | `pier-7` (registry id `pier-7` — camelId keeps the hyphen before a digit, the pier-3 rule) |
 | Existing procedural builder | none — new landmark, **Case B** (registry entry + tile re-bake; the bake DOES carry the pier as a 1.2 m slab, see 2.13) |
 | WGS84 anchor | `-122.3955159, 37.7994429` (footprint OBB centre, over open water) |
 | Target height | **7.6 m** — waterline to lamp-globe tops: deck top +3.0 m, lamps +4.6 m above deck. A vertical extent, not an architectural height |
@@ -422,7 +422,7 @@ Registry entry:
 
 ```js
 {
-  id: 'pier7',
+  id: 'pier-7',
   name: 'Pier 7',
   lon: -122.3955159,
   lat: 37.7994429,
