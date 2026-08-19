@@ -136,8 +136,9 @@ route, and the park plans depend on it (§E8 of the parks README).
 | [326 Brannan Street (JAX Vineyards Wine Court)](./326-brannan.md) | `326-brannan` | 5.9 m (shed parapet; LiDAR deck 5.66 m) | new landmark |
 | [340 Brannan Street](./340-brannan.md) | `340-brannan` | 17.79 m | new landmark |
 | [45–49 South Park (Gran Oriente Filipino Residence)](./49-south-park.md) | `49-south-park` | 13.0 m (LiDAR-derived) | new landmark |
+| [Pier 1](./pier-1.md) | `pier-1` | 15.4 m (vertical extent — the asset carries its own pier deck and pile stubs below the origin; the bulkhead pavilion crest is 12.8 m above the deck) | new landmark |
 
-## Shared contract (all 94)
+## Shared contract (all 95)
 
 - Style: `docs/styles/miniature-toy.md` (authoritative for artistic decisions)
 - Technical contract: `.agents/skills/sf-asset-check/SKILL.md` (authoritative for the GLB)
@@ -304,3 +305,15 @@ strength 1.0 — that is also exactly what the app does, since its night layer i
 an unlit overlay drawn at the material's own baked colour. Caught on
 `chase-center` (its blue video board rendered pure white);
 `tools/glb-optimize/render_ab.py` already does it correctly.
+
+Pier 1 is the first plan in the set whose subject stands in **water**, and it breaks two
+conventions on purpose. Its origin is at **pier-deck level**, not on z=0, because
+`placeGeneric()` seats a GLB on one terrain sample and the app's DEM already carries the pier
+as a ~2.3 m ridge — a model that "sits on z=0" would float 2.6 m. Its `targetHeightM` is
+therefore a **vertical extent** (pile stubs to pavilion apex), the convention `64-south-park`
+established, and its `min Z` is a negative number that `validation.json` must record as a
+PASS. It is also the set's clearest merged-polygon exclusion case: the Overture footprint that
+covers Pier 1's Beaux-Arts facade is the *same ring* that traces Pier 3's bulkhead, so the
+solved two-zone list in that plan's 2.13 comes with named, unavoidable collateral rather than
+a radius that pretends there is none. Piers 3 and 5 should copy 2.3 and 2.13, not re-derive
+them.
