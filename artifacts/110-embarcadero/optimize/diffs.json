@@ -10,13 +10,13 @@
   "fg_pixels": 15907
  },
  "night_near": {
-  "mean_abs_rgb_pct": 0.1864,
-  "max_px_delta": 28,
+  "mean_abs_rgb_pct": 0.1815,
+  "max_px_delta": 27,
   "fg_pixels": 258568
  },
  "night_far": {
-  "mean_abs_rgb_pct": 0.1437,
-  "max_px_delta": 83,
+  "mean_abs_rgb_pct": 0.1363,
+  "max_px_delta": 91,
   "fg_pixels": 15907
  },
  "elev_n": {
@@ -30,12 +30,12 @@
   "fg_pixels": 286177
  },
  "elev_s": {
-  "mean_abs_rgb_pct": 0.0441,
+  "mean_abs_rgb_pct": 0.0439,
   "max_px_delta": 67,
   "fg_pixels": 289608
  },
  "elev_w": {
-  "mean_abs_rgb_pct": 0.0439,
+  "mean_abs_rgb_pct": 0.0438,
   "max_px_delta": 50,
   "fg_pixels": 288963
  }

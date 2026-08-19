@@ -13,8 +13,8 @@
 | Objects / triangles | **13** / **4,944** (cap 13,000) — 137 objects before the stage-4 join |
 | Dimensions (m) | 40.476 × 40.192 × 17.400 |
 | min Z / XY centre offset | 0.000 / (0.000, 0.000) |
-| Materials | 10 (`Toy_stone`, `Toy_trim`, `Toy_glass`, `Toy_glassl`, `Toy_ink`, `Toy_mint`, `Toy_sand`, `Toy_glassl_Glow`, `Toy_trim_Glow`, `Toy_mustard_Glow`) |
-| File size (shipped, meshopt-packed) | **144,144 B / 140.8 KB** raw, from 320,764 B pre-optimize (−55.1%) |
+| Materials | 10 (`Toy_stone`, `Toy_trim`, `Toy_glass`, `Toy_glassl`, `Toy_ink`, `Toy_mint`, `Toy_sand`, `Toy_glassl_Glow`, `Toy_trim_Glow`, `Toy_cream_Glow`) |
+| File size (shipped, meshopt-packed) | **144,128 B / 140.8 KB** raw, from 320,756 B pre-optimize (−55.1%) |
 | Draw submeshes | 16 (140 pre-optimize) |
 | Blender | 5.2.0 LTS, headless, Cycles CPU |
 
@@ -223,6 +223,61 @@ in the packed file.
 | glow surfaces | 20 faces, **20 outward** — all open single-layer quads |
 | normals | per-object signed volume all outward; ray residual within tolerance |
 | cameras / lights / animations / armatures / constraints | 0 / 0 / 0 / 0 / 0 |
+
+### 11. The ground-level night glow read ORANGE in the app, and only the app showed it
+
+Stage 2 moved the lobby band and the Steuart storefront to `Toy_mustard_Glow`
+(d9a441) on the strength of a Blender night render (correction 4). Local QA at
+21:45 in the running app showed what that actually is: a **saturated orange strip
+across 23 % of the Embarcadero elevation**, against neighbouring buildings whose
+lit windows are pale warm yellow. The app draws `_Glow` unlit, so the base colour
+*is* the night colour, and the render rig's emission had been flattering it — the
+exact failure the rig's own comment warns about, made one step further along.
+
+They are now `Toy_cream_Glow` (f2ede3): warm white, one step off the signage
+band's f3efe6, in the neighbours' family, and clearly subordinate to the cool
+`Toy_glassl_Glow` curtain wall above. The app wins over any render
+(GLB-OPTIMIZE-PROMPT §11).
+
+Because this changed the material name set, **stage 4 was re-run from Phase A**
+rather than assumed, and every review render was regenerated.
+
+---
+
+## Local QA (stage 5, integration Steps 5–6)
+
+Run against a built `app/dist` served from an in-process `node:http` server and
+driven in real headless Chrome over CDP (`--headless=new`,
+`--disable-background-timer-throttling`, `--disable-renderer-backgrounding`,
+`--enable-unsafe-swiftshader`), with `Network.setCacheDisabled` before navigation
+and the clock pinned with `SF.setClock`. Draw calls measured by monkey-patching
+`renderer.render` and keeping the peak — the stats overlay reads the post-quad,
+not the scene.
+
+| Item | Result | Evidence |
+|---|---|---|
+| Manifest served contains the entry | **PASS** | asserted before anything else ran |
+| Asset streams in and merges | **PASS** | `sf-assets: 110-embarcadero merged 16 objects / 10 materials -> batched (2993 tris body)` |
+| Loader scale factor | **PASS** | `uniform x1.0000 at 3946, -2568` — exactly 1.0, and the position matches the computed anchor (3945.5, −2568.1) |
+| Exactly one building on the site | **PASS** | proven from the tile, not the picture: every surviving ring in `buildings/23_10.bin` point-in-polygon tested against the real footprint — **zero intruding vertices**. `verify-rebake` independently reports the nearest surviving footprint at 20.4 m |
+| Orientation | **PASS** | glass front faces The Embarcadero, pediment end faces Steuart, in the day screenshot |
+| Terrain seating | **PASS** | flat made ground (LiDAR mean 3.43 m NAVD88, range 0.36 m); no float, no sink |
+| Night glow | **PASS** *(after correction 11)* | cool curtain-wall lantern, warm-white lobby and sign band, three roof lights; the 1910 front dark |
+| Draw calls | **PASS** | peak **109** against the 300 budget (81 parked at the landmark) |
+| Streaming | **PASS** | `entries: 104, live: 84, far: 20, loading: 0, fading: 0, failed: 0` |
+| Fallback drill | **PASS** | server returned a real 404 for the GLB: `failed: 1`, `live: 83`, app boots, every other landmark merges, no crash. Case B, so the site is empty ground inside the exclusion zone — expected |
+| Lint / build | **PASS** | `npm run lint` clean; `npm run build` green (tests run first) |
+| Audit 1.6 | **PASS** | `no procedural footprint inside a bespoke landmark exclusion zone — 115 zones over 111 landmarks clear` |
+| `verify-rebake` | **PASS** | `584 of 585 cells unchanged; 23_10 49 -> 48` |
+
+Screenshots: `/tmp/qa110/day_landmark.jpg`, `day_wide.jpg`, `night_landmark.jpg`.
+
+**A note on the re-bake baseline.** The first bake reported a stray cell —
+`23_13` going 169 → 182, thirteen buildings appearing in South Park. That was not
+the exclusion radius: `origin/main` had moved mid-session and merged a
+**thirteen-landmark SoMa batch** (PR #157) that re-baked the city. The branch was
+rebased onto current main and the bake re-run; it then came back clean. A stray
+cell is almost always a moved baseline, and the count matched the batch exactly.
 
 ## Approval (stage 3)
 

@@ -136,10 +136,17 @@ PALETTE_HEX = {
                              # slab brighter than the hero curtain wall above
                              # it. The app shows a _Glow surface's RAW base
                              # colour at night, so the colour IS the brightness.
-    "Toy_mustard_Glow": "d9a441",  # the lobby spill and the Steuart storefront.
-                             # Warm amber at ground level under the cool lantern
-                             # is the composition; it also keeps the two ground
-                             # cues clearly subordinate to the curtain wall.
+    "Toy_cream_Glow": "f2ede3",    # the lobby spill and the Steuart storefront.
+                             # Warm white, one step off the signage band's
+                             # f3efe6. This started as Toy_mustard_Glow
+                             # (d9a441) on the strength of a Blender night
+                             # render; local QA in the app at 21:45 showed it
+                             # as a saturated ORANGE strip across 23% of the
+                             # elevation, against neighbours whose lit windows
+                             # are pale warm yellow. The app draws _Glow unlit,
+                             # so the base colour IS the night colour and the
+                             # render rig's emission had been flattering it.
+                             # The app wins (GLB-OPTIMIZE-PROMPT s.11).
 }
 
 
@@ -593,10 +600,10 @@ def build():
     glow_quad("sign_glow", EMB, 0.36, tw - 0.36, Z_L2 - 0.38, Z_L2 + 0.24,
               mats["Toy_trim_Glow"], -REC + 0.20)
     glow_quad("lobby_glow", EMB, 0.62, tw - 0.62, 0.30, Z_L2 - 0.50,
-              mats["Toy_mustard_Glow"], -REC + 0.20)
+              mats["Toy_cream_Glow"], -REC + 0.20)
     for i, (a, b) in enumerate(((2.75, 6.05), (6.45, 9.75), (10.15, 13.35))):
         glow_quad(f"shop{i}_glow", STE, a, b, 0.90, 4.00,
-                  mats["Toy_mustard_Glow"], 0.18)
+                  mats["Toy_cream_Glow"], 0.18)
     # aerial cues
     # The set-back third floor glows on its own SOUTH-WEST face, the one that
     # shows above the historic Steuart parapet - that is where the teal band is

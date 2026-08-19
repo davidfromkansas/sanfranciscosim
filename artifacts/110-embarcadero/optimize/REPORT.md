@@ -1,15 +1,18 @@
 # 110 The Embarcadero — GLB optimize pass (stage 4)
 
 Run of `docs/asset-pipeline/GLB-OPTIMIZE-PROMPT.md` against
-`artifacts/110-embarcadero/`, 19 August 2026.
+`artifacts/110-embarcadero/`, 19 August 2026. Run **twice**: the second time after
+local QA sent the asset back to stage 2 for a glow-colour fix (`../REPORT.md` 11).
+Because that changed the material name set, every gate was re-run from Phase A
+rather than assumed; the numbers below are the second run.
 `ASSET_CLASS: landmark`, `ALLOW_MESHOPT: yes`, `ALLOW_BAKE: no`.
 
 ## Metrics
 
 | | Input | Optimized | Δ |
 |---|---|---|---|
-| File, raw | 320,764 B (313.2 KB) | **144,144 B (140.8 KB)** | **−55.1%** |
-| File, gzip -9 | 49,899 B (48.7 KB) | 86,520 B (84.5 KB) | +73.4% — see G6 |
+| File, raw | 320,756 B (313.2 KB) | **144,128 B (140.8 KB)** | **−55.1%** |
+| File, gzip -9 | 49,923 B (48.8 KB) | 86,511 B (84.5 KB) | +73.3% — see G6 |
 | Objects / nodes | 137 | **13** | −90.5% |
 | Draw submeshes (primitives, via GLTFLoader) | 140 | **16** | −88.6% |
 | Triangles | 4,944 | 4,944 | 0 |
@@ -94,7 +97,8 @@ npx gltfpack@0.24 -i mid.glb -o 110-embarcadero.optimized.glb -c -km -kn -noq
 ```
 
 `-km -kn` mandatory: glow-ness is name-only, and without `-km` gltfpack would
-merge `Toy_glassl` with `Toy_glassl_Glow` (identical parameters, different names)
+merge `Toy_glassl` with `Toy_glassl_Glow`, and `Toy_cream_Glow` with nothing else
+but `Toy_trim_Glow` is a near neighbour (identical parameters, different names),
 and silently kill the night layer. `-noq` mandatory per the repo standard —
 `pipeline/compress-assets.mjs` produces unquantized output, and a quantized build
 fails the stage-2 contract validator on `transforms_applied` and
@@ -106,7 +110,7 @@ Verified on the output rather than trusting flags: material name set identical
 
 **The pack-only control (memory: always measure it).** Running the same gltfpack
 line straight on the input, with no Blender round-trip at all, gives
-**200,096 B**. Phase B is therefore worth 55,952 B on top of packing — a further
+**200,092 B**. Phase B is therefore worth 55,964 B on top of packing — a further
 −28.0% — which is the node-and-accessor overhead of 124 extra objects. On this
 asset the round-trip pays; that is a measurement, not an assumption, and the
 control is recorded so the next asset re-measures rather than inheriting the
@@ -128,12 +132,12 @@ emission ≈ 6, dusk world), plus four orthographic elevations. `diff_ab.py` →
 |---|---|---|
 | day near | 0.0275% | 29 |
 | day far | 0.0222% | 22 |
-| night near | 0.1864% | 28 |
-| night far | 0.1437% | 83 |
+| night near | 0.1815% | 27 |
+| night far | 0.1363% | 91 |
 | elev N (Embarcadero front) | 0.0012% | 13 |
 | elev E (SE party wall) | 0.0022% | 20 |
-| elev S (Steuart front) | 0.0441% | 67 |
-| elev W (NW party wall) | 0.0439% | 50 |
+| elev S (Steuart front) | 0.0439% | 67 |
+| elev W (NW party wall) | 0.0438% | 50 |
 
 **Looked at, honestly:** the ×8-amplified diff column is black except for
 hairlines along shared edges — the five deck-joint bands, the trellis posts, the
@@ -153,7 +157,7 @@ absolute edge difference is a larger fraction of a small mean.
 | G1 Contract | **PASS** | Material set identical (10); `Toy_glassl` / `Toy_glassl_Glow` and `Toy_trim` / `Toy_trim_Glow` kept separate by `-km`; no `Toy_body` (landmark); no manifest-named nodes to preserve |
 | G2 Geometry | **PASS** | bbox identical to 5 dp; origin offset 0; all signed volumes positive; ray flipped fraction 0.0% (0 / 14,996) |
 | G3 Round-trip | **PASS** | Re-imports in Blender; `g3check` (pinned three) reports `{"ok":true,"meshes":16,"tris":4944}` with all 10 materials and the identical bbox |
-| G4 Appearance | **PASS** | Worst delta 0.1864% (night near) against a 4% near / 2% far tolerance; visual review above |
+| G4 Appearance | **PASS** | Worst delta 0.1815% (night near) against a 4% near / 2% far tolerance; visual review above |
 | G5 Draw submeshes | **PASS** | 16 ≤ 140 |
 | G6 Size | **PASS** | −55.1% raw. Short of the 60% aspiration because this asset had no geometry waste to remove — 0 degenerate faces, 0 buried faces, no curves to retessellate, and the dissolve was correctly declined. The remainder is silhouette geometry, as the census shows |
 | G7 GPU budget | n/a | bake mode not used |
@@ -168,9 +172,9 @@ matters is what the decoder reads: 141 KB against 313 KB, well inside the
 
 ## The shipping swap
 
-`110-embarcadero.optimized.glb` (144,144 B) was copied over
+`110-embarcadero.optimized.glb` (144,128 B) was copied over
 `artifacts/110-embarcadero/110-embarcadero.glb`; the pre-optimize original is
-archived byte-for-byte at `optimize/input/110-embarcadero.glb` (320,764 B,
+archived byte-for-byte at `optimize/input/110-embarcadero.glb` (320,756 B,
 verified with `cmp`).
 
 The **stage-2 contract validator was then re-run against the packed shipping
