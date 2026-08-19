@@ -4,22 +4,26 @@
 8 Mission Street, San Francisco. Built from `docs/asset-plans/8-mission.md`
 via `docs/asset-pipeline/ADDRESS-TO-ASSET.md`, `BATCH: yes`.
 
-## Shipped numbers (pre-optimize)
+## Shipped numbers (post-optimize — these are the numbers the manifest is written from)
 
-| | |
-|---|---|
-| Triangles | **19,082** (cap 26,000) |
-| Mesh objects | 689 |
-| Dimensions | 74.138 × 56.548 × **28.660** m |
-| min Z / XY centre offset | 0.000 m / (0.000, 0.000) |
-| Materials | 12, all `Toy_*`, flat, no textures, no alpha, no `Toy_body` |
-| Glow materials | `Toy_glass_Glow`, `Toy_glassl_Glow`, `Toy_gold_Glow` |
-| File | 1,330,784 B raw / 242,232 B gzip (pre-meshopt) |
-| Roof plateaus | 25.10 / 19.64 / 14.18 m; turret crown 28.66 m |
-| **Manifest anchor** | **`-122.3932861, 37.7936872`** |
-| Validation | `validation.json` — **overall PASS**, 17/17 checks |
+| | pre-optimize | **shipped** |
+|---|---|---|
+| Triangles | 19,082 | **19,082** (cap 26,000) |
+| Mesh objects | 689 | **14** |
+| Draw submeshes | 696 | **16** |
+| Dimensions | 74.138 × 56.548 × 28.660 m | **identical to 5 dp** |
+| min Z / XY centre offset | 0.000 m / (0.000, 0.000) | unchanged |
+| Materials | 12, all `Toy_*` | 12, identical set |
+| Glow materials | `Toy_glass_Glow`, `Toy_glassl_Glow`, `Toy_gold_Glow` | unchanged |
+| File | 1,330,784 B raw | **485,656 B** raw (−63.5%), meshopt |
+| Roof plateaus | 25.10 / 19.64 / 14.18 m; turret crown 28.66 m | |
+| **Manifest anchor** | **`-122.3932861, 37.7936872`** | |
+| Validation | overall PASS | `validation.json` — **overall PASS**, 17/17, re-run on the packed file |
 
-Normals: 636/636 closed solids enclose positive signed volume; 206/206 open glow-strip
+Stage 4 detail is in `optimize/REPORT.md`; the pre-optimize asset is archived
+byte-for-byte at `optimize/input/8-mission.glb`.
+
+Normals (on the shipped file): 14/14 closed solids enclose positive signed volume; 206/206 open glow-strip
 faces are the first face a ray along their own normal meets; 31,432 visibility rays from
 nine interior targets, **0 flipped** (tolerance 0.15%); 0 degenerate triangles; 0
 non-unit loop normals.
