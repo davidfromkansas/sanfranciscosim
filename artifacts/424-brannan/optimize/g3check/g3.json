@@ -1,0 +1,37 @@
+{
+ "ok": true,
+ "meshes": 22,
+ "tris": 8940,
+ "materials": [
+  "Toy_coral",
+  "Toy_cream",
+  "Toy_glass",
+  "Toy_gold_Glow",
+  "Toy_ink",
+  "Toy_mustard",
+  "Toy_navy",
+  "Toy_red",
+  "Toy_red_Glow",
+  "Toy_rust",
+  "Toy_sand",
+  "Toy_sky",
+  "Toy_steel",
+  "Toy_stone",
+  "Toy_teal",
+  "Toy_trim",
+  "Toy_trim_Glow",
+  "Toy_verdigris",
+  "Toy_white",
+  "Toy_white_Glow"
+ ],
+ "bbox_dims": [
+  88.8432,
+  8.5649,
+  59.934
+ ],
+ "bbox_min": [
+  -44.4217,
+  -1.0844,
+  -30.078
+ ]
+}

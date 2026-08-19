@@ -1787,5 +1787,24 @@
     ],
     "tris": 3572,
     "loadRadius": 2500
+  },
+  {
+    "id": "424-brannan",
+    "file": "424-brannan.glb",
+    "anchor": [
+      -122.3954857,
+      37.7798744
+    ],
+    "targetHeightM": 8.5649,
+    "cat": 23,
+    "name": "424 Brannan Street Parking",
+    "estimated": false,
+    "dims": [
+      88.8432,
+      59.934,
+      8.5649
+    ],
+    "tris": 8940,
+    "loadRadius": 2500
   }
 ]
