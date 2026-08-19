@@ -3160,6 +3160,41 @@ export const LANDMARKS = [
     // the canopy are the whole recognition.
     camera: { distance: 120, yaw: 85, pitch: 26 },
   },
+  {
+    // 345 Spear Street — the 1989-91 Whisler-Patri half of Hills Plaza:
+    // buff-brick office podium (Google SF), the 18-storey One Hills Plaza
+    // condo tower rotated 45 deg off the grid to face the bay, terracotta hip
+    // pavilion on Spear, level-8 roof garden. The Hills Brothers Building
+    // (2 Harrison) is its own landmark on the same block — in flight on the
+    // pipeline/2-harrison branch; the two exclusions are independent.
+    //
+    // Exclusion sizing, measured against BOTH bake inputs from the registry
+    // anchor (the footprint OBB centre — the manifest anchor is the model's
+    // bbox centre 12.3 m away, they differ by design):
+    //    3.2 m  Overture 98232020 (h=17.2, the OSM levels=5 copy), centroid
+    //    5.6 m  DataSF 201006.0000159 (hgt_max 68.46), centroid
+    //           -> the FLOOR: both own rings caught by centroid at r > 5.6
+    //   15.8 m  own rings' nearest vertices (same building, harmless)
+    //   47.1 m  DataSF 201006.0000430 (Hills Brothers) nearest vertex
+    //           -> the CEILING: above 47.1 the re-bake deletes the sibling
+    //              landmark's baked stand-in
+    //   47.4 m+ everything else (Overture fragments on the Embarcadero apron,
+    //           360 Spear data center, The Infinity II)
+    // Safe window (5.6, 47.1); 25 sits mid-window with ~19 m margin below and
+    // ~22 m above. No other footprint's centroid falls inside 47 m and no ring
+    // covers the anchor except our own two (overlap-area check, 19 Aug 2026).
+    id: '345Spear',
+    name: 'Hills Plaza (345 Spear)',
+    lon: -122.3900655,
+    lat: 37.7900324,
+    height: 68.5,
+    exclude: 25,
+    // camera.js puts the eye at target + distance*(sin yaw, ., cos yaw) with
+    // +x east and +z south; yaw 115 stands the camera ENE over the Embarcadero
+    // — the identity view: the arch arcade, the terraced staircase and the
+    // bay-facing tower face-on, with the red pavilion behind.
+    camera: { distance: 450, yaw: 115, pitch: 26 },
+  },
 ];
 
 // Parks/green spaces the landcover bake must match at least one source polygon

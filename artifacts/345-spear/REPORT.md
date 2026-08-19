@@ -88,6 +88,35 @@ under the tower's setback parapet, the gold entry sign strip on Spear, and a
 scatter of six lit windows on the tower shaft. Day colors of all glow surfaces
 match their non-glow neighbours.
 
+## Stage 5 — integration QA (batch mode, 19 Aug 2026)
+
+Case B, batch mode: the full bake ran for QA (registry entry `345Spear`,
+`exclude: 25`), audits passed, and the tiles were then discarded per
+`ADDRESS-TO-ASSET.md` — this branch ships source only. QA drove the BUILT app
+(`app/dist`) in headless Chrome over CDP (`qa_local.mjs`; GPU headless — the
+SwiftShader flags were dropped because under sibling-session load ~300 the
+diorama never finished booting, the documented harness trap).
+
+| check | result |
+|---|---|
+| Re-validation of shipped GLB | PASS (all-PASS validation.json) |
+| Manifest entry + id mapping (`345-spear` → `345Spear`) | PASS |
+| Registry + re-bake + audit 1.6 | PASS — 114 zones clear |
+| verify-rebake | PASS — only cell 24_11 changed (26 → 25); nearest survivor 47.1 m (the 2 Harrison stand-in) vs r=25 |
+| Merge line | `sf-assets: 345-spear merged 17 objects / 15 materials -> batched (10765 tris body); uniform x1.0000 at 4163, -2219` |
+| Single building / no twin / no poke-through | PASS (day + wide + west screenshots in `qa/`) |
+| Scale | ×1.0000 |
+| Orientation | PASS — arcade on the Embarcadero, pavilion on Spear (west shots) |
+| Terrain seating | PASS — no float/sink |
+| Night glow | PASS — arcade hero + gold crown band + window scatter only |
+| Draw calls | avg 105/frame at the landmark (< 300), 78 landmarks live |
+| Fallback drill (served 404) | PASS — app boots, exactly one warning, empty site inside the exclusion (expected Case B) |
+| Lint + build (`npm run lint`, `npm run build` incl. tests) | PASS |
+| Batch sanity (`git diff --name-only origin/main` has no tiles/api/_data) | PASS (after rebase onto f4f5f99f5 — origin/main advanced mid-session) |
+
+Audit failures 1.2b/1.3c/1.7b are pre-existing dataset-wide items (height p95,
+Telegraph Hill DEM, one offshore tree) unrelated to this landmark.
+
 ## Approval
 
 - Gate 3: the user pre-approved the full pipeline for this batch session in the

@@ -1939,5 +1939,24 @@
     ],
     "tris": 3366,
     "loadRadius": 2500
+  },
+  {
+    "id": "345-spear",
+    "file": "345-spear.glb",
+    "anchor": [
+      -122.3901941,
+      37.7900769
+    ],
+    "targetHeightM": 68.5,
+    "cat": 3,
+    "name": "Hills Plaza (345 Spear)",
+    "estimated": false,
+    "dims": [
+      106.3305,
+      118.9857,
+      68.5
+    ],
+    "tris": 17054,
+    "loadRadius": 2500
   }
 ]
