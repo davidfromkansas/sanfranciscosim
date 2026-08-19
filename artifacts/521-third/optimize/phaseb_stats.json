@@ -1,0 +1,93 @@
+{
+ "input_materials": [
+  "Toy_cobalt",
+  "Toy_cocoa",
+  "Toy_cream",
+  "Toy_glass",
+  "Toy_glass_Glow",
+  "Toy_greige",
+  "Toy_ink",
+  "Toy_mint",
+  "Toy_mustard",
+  "Toy_orange",
+  "Toy_orange_Glow",
+  "Toy_oxblood",
+  "Toy_p_tan",
+  "Toy_steel"
+ ],
+ "steps": [
+  {
+   "step": "weld+degenerate",
+   "tris": 8848,
+   "verts": 4930
+  },
+  {
+   "step": "interior-faces",
+   "tris": 8848,
+   "verts": 4930
+  },
+  {
+   "step": "limited-dissolve-skipped",
+   "tris": 8848,
+   "verts": 4930
+  },
+  {
+   "step": "join-per-material",
+   "tris": 8848,
+   "verts": 4930
+  }
+ ],
+ "input": {
+  "tris": 8848,
+  "verts": 17890,
+  "objects": 255
+ },
+ "interior_faces_removed": 0,
+ "limited_dissolve": "skipped: parapet + coping ring bands (prompt 3.3)",
+ "joins": {
+  "grp_Toy_ink": 89,
+  "grp_Toy_cream": 25,
+  "grp_Toy_orange": 2,
+  "grp_Toy_orange_Glow": 2,
+  "grp_Toy_greige": 76,
+  "grp_Toy_oxblood": 6,
+  "grp_Toy_steel": 14,
+  "grp_Toy_glass": 18,
+  "grp_Toy_cobalt": 2,
+  "grp_Toy_mint": 2,
+  "grp_Toy_glass_Glow": 7,
+  "grp_Toy_cocoa": 9
+ },
+ "inverted_solids": [],
+ "reimport": {
+  "objects": 15,
+  "materials": [
+   "Toy_cobalt",
+   "Toy_cocoa",
+   "Toy_cream",
+   "Toy_glass",
+   "Toy_glass_Glow",
+   "Toy_greige",
+   "Toy_ink",
+   "Toy_mint",
+   "Toy_mustard",
+   "Toy_orange",
+   "Toy_orange_Glow",
+   "Toy_oxblood",
+   "Toy_p_tan",
+   "Toy_steel"
+  ],
+  "bbox_dims": [
+   27.3615,
+   27.1014,
+   11.4
+  ],
+  "bbox_min": [
+   -13.9684,
+   -13.6591,
+   0.0
+  ]
+ },
+ "bbox_ok": true,
+ "material_set_ok": true
+}

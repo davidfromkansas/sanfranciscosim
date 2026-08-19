@@ -1,6 +1,6 @@
 {
- "generated": "2026-08-17T21:58:23.160Z",
- "buildings": 174696,
+ "generated": "2026-08-19T04:32:31.177Z",
+ "buildings": 174683,
  "cells": 596,
  "categories": [
   {
@@ -21,28 +21,28 @@
    "cat": 2,
    "id": "apartments",
    "label": "Apartments",
-   "count": 14009,
+   "count": 14008,
    "night": 0
   },
   {
    "cat": 3,
    "id": "office",
    "label": "Office",
-   "count": 2734,
+   "count": 2730,
    "night": 3
   },
   {
    "cat": 4,
    "id": "retail",
    "label": "Retail",
-   "count": 8033,
+   "count": 8035,
    "night": 1
   },
   {
    "cat": 5,
    "id": "restaurant_cafe",
    "label": "Restaurant / Café",
-   "count": 2840,
+   "count": 2839,
    "night": 1
   },
   {
@@ -56,21 +56,21 @@
    "cat": 7,
    "id": "hotel",
    "label": "Hotel",
-   "count": 1460,
+   "count": 1459,
    "night": 0
   },
   {
    "cat": 8,
    "id": "worship",
    "label": "Place of worship",
-   "count": 632,
+   "count": 630,
    "night": 3
   },
   {
    "cat": 9,
    "id": "school",
    "label": "School",
-   "count": 1059,
+   "count": 1058,
    "night": 3
   },
   {
@@ -119,7 +119,7 @@
    "cat": 16,
    "id": "museum",
    "label": "Museum",
-   "count": 232,
+   "count": 231,
    "night": 1
   },
   {
@@ -161,21 +161,21 @@
    "cat": 22,
    "id": "supermarket",
    "label": "Supermarket",
-   "count": 345,
+   "count": 344,
    "night": 1
   },
   {
    "cat": 23,
    "id": "parking_garage",
    "label": "Parking garage",
-   "count": 1844,
+   "count": 1843,
    "night": 3
   },
   {
    "cat": 24,
    "id": "gym",
    "label": "Gym",
-   "count": 404,
+   "count": 402,
    "night": 1
   },
   {
@@ -205,17 +205,17 @@
   {
    "sub": "restaurant",
    "label": "Restaurant",
-   "count": 1825
+   "count": 1824
   },
   {
    "sub": "hotel",
    "label": "Hotel",
-   "count": 1307
+   "count": 1306
   },
   {
    "sub": "salon",
    "label": "Salon",
-   "count": 1026
+   "count": 1027
   },
   {
    "sub": "clinic",
@@ -230,7 +230,7 @@
   {
    "sub": "parking_garage",
    "label": "Parking garage",
-   "count": 897
+   "count": 896
   },
   {
    "sub": "community_center",
@@ -245,7 +245,7 @@
   {
    "sub": "church",
    "label": "Church",
-   "count": 569
+   "count": 567
   },
   {
    "sub": "cafe",
@@ -265,7 +265,7 @@
   {
    "sub": "elementary_school",
    "label": "Elementary school",
-   "count": 445
+   "count": 444
   },
   {
    "sub": "bar",
@@ -285,7 +285,7 @@
   {
    "sub": "gym",
    "label": "Gym",
-   "count": 304
+   "count": 302
   },
   {
    "sub": "corner_store",
@@ -310,7 +310,7 @@
   {
    "sub": "grocery",
    "label": "Grocery store",
-   "count": 218
+   "count": 217
   },
   {
    "sub": "laundromat",
@@ -335,7 +335,7 @@
   {
    "sub": "gallery",
    "label": "Gallery",
-   "count": 169
+   "count": 168
   },
   {
    "sub": "bakery",
@@ -355,7 +355,7 @@
   {
    "sub": "tech_hq",
    "label": "Tech office",
-   "count": 133
+   "count": 132
   },
   {
    "sub": "supermarket",
@@ -654,18 +654,18 @@
   }
  ],
  "sources": {
-  "landuse": 140666,
-  "business": 10202,
+  "landuse": 140663,
+  "business": 10201,
   "heuristic": 7280,
-  "osm": 8614,
-  "overture": 6649,
+  "osm": 8608,
+  "overture": 6646,
   "datasf": 1285
  },
  "confidence": [
-  147946,
-  15309,
-  4489,
-  6952
+  147943,
+  15305,
+  4486,
+  6949
  ],
  "streets": {
   "named": 2509,

@@ -540,6 +540,43 @@ export const LANDMARKS = [
     exclude: 11,
     camera: { distance: 170, yaw: 90, pitch: 26 },
   },
+  // The 1929 Art Deco concrete loft on the NE corner of Brannan and Zoe, two
+  // doors southwest of 400. Measured against the real bake inputs, from the
+  // anchor below, using the metric excluded() applies — ring centroid OR any
+  // ring vertex:
+  //
+  //   target: DataSF  SF3776151 (763.6 m2, h 11.46)  centroid 4.65 m, vertices 12.45 m
+  //           Overture b9c9690e (788.0 m2, h 11)     centroid 8.11 m, vertices 12.00 m
+  //   nearest NEIGHBOUR — 426 Brannan, in BOTH sources:
+  //           DataSF  SF3776015 (163.8 m2, h 5.75)   nearest vertex 12.45 m
+  //           Overture b9c91621 (178.4 m2, h 6)      nearest vertex 12.00 m
+  //
+  //   exclude  8 m    -> drops 1  (DataSF only; Overture's copy survives and fights the GLB)
+  //   exclude  9-12 m -> drops 2  (correct: this building in both sources)
+  //   exclude 12.5 m  -> drops 4  (eats 426 Brannan in both sources)
+  //
+  // TWO rings is the right answer, not one. The gate BELOW is Overture's
+  // CENTROID at 8.11 m, not a vertex — its ring reaches 4 m further northwest
+  // than DataSF's and pulls the centroid off the anchor. The gate ABOVE is a
+  // SHARED PARTY-WALL VERTEX: 426 Brannan's nearest vertex is numerically
+  // identical to this building's own in both sources, so any radius that reaches
+  // our corner reaches the neighbour's. Safe band 8.11 < r < 12.00; 10 sits in
+  // the middle with 1.9 m under and 2.0 m over. Do not raise past 11.5 or lower
+  // under 9 without re-running the measurement.
+  {
+    id: '434Brannan',
+    name: '434 Brannan Street',
+    lon: -122.3954103,
+    lat: 37.7796003,
+    height: 13.79,
+    exclude: 10,
+    // camera.js apply() puts the eye at pivot + (sin yaw, sin pitch, cos yaw)
+    // * distance with +z south, so yaw = 180 - the outward bearing you want to
+    // look down. The Brannan front's normal is 134.8 deg true -> yaw 45, which
+    // also catches the long Zoe flank obliquely. yaw 225 would be the mirror
+    // image and stare at the rear car park.
+    camera: { distance: 240, yaw: 45, pitch: 26 },
+  },
   {
     // Shell service station, across 3rd Street from 550 Third. The asset is a
     // forecourt, not a building, and the lot carries TWO baked footprints — the
@@ -2544,6 +2581,584 @@ export const LANDMARKS = [
     // 16.5 m). No `key`: at 13 m this is texture in the block, not a
     // destination.
     camera: { distance: 165, yaw: 270, pitch: 26 },
+  },
+  {
+    // 49 Zoe Street — a 16-unit artist live/work loft of 1996-97, re-clad in
+    // 2011-13, on the north-east side of a 25 ft SoMa alley between Bryant and
+    // Brannan. Height is the DataSF LiDAR maximum 16.99 m, attributed to the
+    // stair/elevator penthouse the aerial shows at the south-east end; the roof
+    // plane itself is 14.42 m (median over 2,268 cells, sd 1.13 m — one flat
+    // plane, no second level).
+    //
+    // Exclusion measured against the REAL bake inputs, both of them, with the
+    // metric `excluded()` actually uses (ring CENTROID or ANY ring VERTEX
+    // inside r, distance taken from THIS anchor):
+    //
+    //                                        nearest vertex   centroid   gate
+    //   SF3776128        this building            14.13         0.11     0.11
+    //   Overture twin    this building            15.94         5.37     5.37
+    //   SF3776144        33-35 Zoe, PARTY WALL    14.28        21.87    14.28
+    //   SF3776144        33-35 Zoe, second ring   14.29        19.37    14.29
+    //   Overture         (33-35 Zoe)              14.39        26.52    14.39
+    //   SF3776456        Ritch St, rear           14.92        24.17    14.92
+    //   SF3776105        Ritch St, rear           15.51        30.26    15.51
+    //
+    // So the band is (5.37, 14.28] — 8.9 m wide, unusually comfortable for a
+    // party-wall site. The floor is this building's own OVERTURE centroid, not
+    // its DataSF one: an excluded DataSF ring never calls markOccupied(), so
+    // the Overture gap-fill would re-add the building on top of the asset.
+    // Shipping 9.5, near the middle, with 4.1 m of margin below and 4.8 m above.
+    //
+    // Note for anyone reading the plan's 2.13: that table listed each
+    // neighbour's nearest vertex to THIS FOOTPRINT (33-35 Zoe touches at 0.00 m
+    // across the party wall) and read it as the ceiling. It is not — the gate is
+    // measured from the ANCHOR, and the party wall's nearest vertex to the
+    // anchor is 14.28 m. Measuring is what turned an apparently impossible site
+    // into an 8.9 m window.
+    id: '49Zoe',
+    name: '49 Zoe Street',
+    lon: -122.3960338,
+    lat: 37.7800764,
+    height: 17.0,
+    exclude: 9.5,
+    // Camera offset is (sin yaw, ., cos yaw) with +z south, so camera bearing =
+    // 180 - yaw. The Zoe elevation faces 225.4 deg and the parking-lot flank
+    // 135.4; yaw 338 stands the eye south-south-west, square enough to the
+    // striped Zoe facade to read its rhythm while the blank south-east flank
+    // rakes away. 180 m suits a 17 m building (cf. 181SouthPark at 190 for
+    // 16.5 m, 49SouthPark at 165 for 13.0 m). No `key`: this is fabric, not a
+    // destination.
+    camera: { distance: 180, yaw: 338, pitch: 28 },
+  },
+  {
+    // 2014, five storeys, nineteen units over a ground-floor restaurant and
+    // garage — the newest and tallest building on this face of Ritch Street by
+    // eight metres. The bounding-box top is the roof stair/elevator penthouse at
+    // 18.76 m (DataSF LiDAR maximum), NOT the 15.87 m parapet; see
+    // docs/asset-plans/246-ritch.md 2.15 risk 1 and artifacts/246-ritch/REPORT.md.
+    //
+    // The address is a condominium: block 3776 lots 456-475 all share ONE parcel
+    // polygon, and lot 456 also carries 240 Ritch (the ground-floor commercial
+    // space). That is this building, not a neighbour — only one asset per parcel
+    // can own the exclusion.
+    //
+    // Exclusion window measured from THIS point with the metric excluded() uses
+    // (area centroid OR any ring vertex), against BOTH bake inputs, with the
+    // bake's own simplifyRing(0.6) applied first:
+    //
+    //    0.01 m  this building, Overture 0e69af6c (the OSM trace, 379 m2)  <- must go
+    //    1.69 m  this building, DataSF SF3776456 (394 m2)                  <- must go
+    //    8.89 m  248-250 Ritch, Overture d280b71a (101 m2)                 <- must survive
+    //   11.10 m  248-250 Ritch, DataSF SF3776105 (167 m2)                  <- must survive
+    //   12.71 m  230/236 Ritch, DataSF SF3776144 (484 m2)                  <- must survive
+    //   14.03 m  230/236 Ritch, Overture 2259b5ef (472 m2)                 <- must survive
+    //
+    // Safe band (1.69, 8.89) — 7.2 m wide, unusually generous for a party-wall
+    // lot. 5.3 sits dead centre with 3.6 m of margin either side. Both of this
+    // building's rings go by their CENTROIDS, so do not reason "the radius has to
+    // cover the building": the footprint reaches 13.98 m from the anchor and that
+    // is fine. Do not raise past 7 without re-running the measurement.
+    //
+    // No clearTrees: at 5.3 m the circle is entirely inside the building, and the
+    // three street trees in front are real — the project was required to plant
+    // them, and they are in every photograph of it.
+    id: '246Ritch',
+    name: '246 Ritch Street',
+    lon: -122.3958481,
+    lat: 37.7802253,
+    height: 18.76,
+    exclude: 5.3,
+    // camera.js places the rig at (sin yaw, sin pitch, cos yaw) x distance from
+    // the pivot and this project's +z is SOUTH, so yaw 135 stands the camera
+    // north-east of the building — square onto the 45 deg Ritch Street front,
+    // which is the only designed elevation. 130 m rather than the ~90 m its
+    // height suggests, because Ritch is a 13 m alley and a closer rig clips into
+    // the neighbours.
+    camera: { distance: 130, yaw: 135, pitch: 26 },
+  },
+  {
+    // 1915 two-flat on Ritch Street, the alley between Bryant and Brannan.
+    // Case B: no procedural builder, so this entry exists only to carve the
+    // baked footprints out from under the asset.
+    //
+    // `lon`/`lat` are NOT the manifest anchor. The manifest anchor
+    // (-122.3956322, 37.7801278) is the model's XY bbox centre, pushed 0.53 m
+    // north-east by the bay, the cornice and the stoop, which all project
+    // toward the street. This point is the design footprint's centre, 0.09 m
+    // from the DataSF footprint's own area centroid, and it is where the
+    // exclusion window below was measured.
+    //
+    // `exclude` is the whole difficulty here and the window is 1.87 m wide.
+    // excluded() in pipeline/buildings.mjs drops a footprint when its centroid
+    // OR any ring vertex falls inside the circle. Measured from this point
+    // against the real bake input, each ring first simplified at the bake's own
+    // 0.6 m tolerance:
+    //
+    //    0.09 m  this building, DataSF 201006.0125003 (104 m2), via centroid
+    //    1.95 m  this building, Overture — the OSM way 147508935 (100 m2)
+    //    3.82 m  248-250 Ritch, DataSF 201006.0040021 (167 m2), nearest vertex
+    //    5.08 m  248-250 Ritch, Overture (101 m2), nearest vertex
+    //
+    // So r must exceed 1.95 (both of OUR rings have to go — DataSF and Overture
+    // each trace this building, 1.9 m apart, and a radius that clears only the
+    // DataSF one leaves the Overture gap-fill standing on top of the asset) and
+    // stay under 3.82 (or the party-wall neighbour goes with it). 2.9 sits
+    // 0.95 m above the floor and 0.92 m below the ceiling.
+    //
+    // No clearTrees: at 2.9 m the circle is inside the building's own footprint,
+    // there is no street tree in front of 252-254, and the surface parking lot
+    // next door has no furniture to clear.
+    id: '254Ritch',
+    name: '252-254 Ritch Street',
+    lon: -122.3956361,
+    lat: 37.7801244,
+    height: 8.8,
+    exclude: 2.9,
+    // Camera offset is (sin yaw, ., cos yaw) with +z south, so camera bearing =
+    // 180 - yaw. The street front faces 45.05 deg, so yaw 135 stands the eye to
+    // the north-east, out over Ritch Street, looking back at the only two
+    // designed elevations — the bay-and-entry front and the exposed south-east
+    // flank, which reads in three-quarter from there. 120 m suits an 8.8 m
+    // building (cf. 49SouthPark at 165 for 13.0 m). No `key`: this is texture
+    // in the block, not a destination.
+    camera: { distance: 120, yaw: 135, pitch: 26 },
+  },
+  {
+    // 248-250 Ritch Street, a 1915 wood-frame two-flat on a 25 x 75 ft alley lot
+    // and the last pre-1920 domestic fabric on this face of Ritch. Two storeys
+    // against the five of 246 Ritch immediately north-west, which is the whole
+    // point of the asset - the height here is the story and it is not rounded up.
+    //
+    // THE REGISTRY POINT IS NOT THE MANIFEST ANCHOR, deliberately. The manifest
+    // anchor -122.3956749, 37.7801751 is the model's bbox centre, which is where
+    // the GLB has to sit. Measured from THAT point the exclusion window is only
+    // (1.95, 2.88) m - 0.93 m wide - because the Bing-traced OSM ring of this
+    // building sits ~2.5 m north-west of the survey while 252-254's equally
+    // offset OSM ring pushes back from the other side. Moving the circle's
+    // centre 5.4 m south-west, to the point below (still inside the house, on
+    // the north-west flank 8.9 m back), opens the window to (0.92, 5.04) m.
+    //
+    // Measured against the REAL bake input, on the SIMPLIFIED rings - the
+    // exclusion test runs after simplifyRing(ring, 0.6), and measuring on the
+    // raw rings gives a window less than half as wide because 0.6 m of
+    // simplification deletes exactly the small jogs that sit closest to this lot:
+    //
+    //   this building, DataSF SF3776105          0.91 m  vertex   <- the FLOOR
+    //   this building, Overture/OSM w147508934   0.92 m  vertex
+    //   252-254 Ritch, Overture/OSM w147508935   5.04 m  vertex   <- the CEILING
+    //   252-254 Ritch, DataSF SF3776106          6.07 m  vertex
+    //   246 Ritch,     Overture/OSM w1174904714  7.33 m  vertex
+    //   246 Ritch,     DataSF SF3776456          7.83 m  vertex
+    //
+    // exclude 3 leaves 2.08 m of margin below and 2.04 m above. A correct
+    // exclusion drops exactly TWO rings, this footprint and its Overture twin;
+    // one means the gap-fill re-added the building, three or more means the
+    // circle has eaten 252-254 and left a hole in the alley wall. Never above
+    // 4.5, and treat a count of two as necessary but not sufficient - confirm
+    // from the tile which rings went, not how many.
+    id: '248Ritch',
+    name: '248-250 Ritch Street',
+    lon: -122.3957213,
+    lat: 37.7801827,
+    height: 8.6,
+    exclude: 3,
+    // Camera offset is (sin yaw, ., cos yaw) with +z south, so camera bearing =
+    // 180 - yaw. This building has exactly ONE public elevation, looking
+    // 45.05 deg, so yaw 135 stands the eye on Ritch Street north-east of the
+    // pivot, square onto it. 560Third arrived at the same value by render for a
+    // 44.1 deg elevation two blocks away. 120 m suits an 8.6 m building (cf.
+    // 370Brannan 150 at 7.63 m, 550Third 190 at 11 m). No `key`: at 8.6 m this
+    // is texture in the alley, not a destination.
+    camera: { distance: 120, yaw: 135, pitch: 28 },
+  },
+  // 424 Brannan Street — a 2,026 m2 surface parking lot, and the ONLY entry in
+  // this registry with no `exclude`. That is measured, not an oversight.
+  //
+  // Every other landmark here needs a radius to delete the procedural building
+  // standing where its GLB goes. This site has no procedural building: DataSF's
+  // footprint layer returns ZERO records for parcel 3776455, the assessor
+  // carries it as class V vacant with $0 of improvements, and a scan of the
+  // committed tiles (23_13 plus 22_13, 23_14, 24_13) finds no footprint whose
+  // centroid lands inside the parcel. So the whole risk here runs the other
+  // way: any radius large enough to matter eats a neighbour.
+  //
+  // Measured against the real bake inputs from this anchor — nearest ring
+  // VERTEX or centroid, which is what excluded() fires on:
+  //
+  //   10.27 m  Overture b9c9690e-43b   <- the first thing at risk
+  //   10.63 m  DataSF SF3776151 (426 Brannan, the Brickhouse block)
+  //   19.58 m  Overture b9c91621-afe
+  //   21.27 m  DataSF SF3776015 (434 Brannan)
+  //   25.18 m  DataSF SF3776106
+  //
+  // Footprints with a centroid inside the parcel: DataSF 0, Overture 0. So the
+  // safe band is (0, 10.27) and EVERY radius in it drops exactly nothing —
+  // there is no value of `exclude` that does useful work, and omitting the key
+  // is what exclusionZones() wants (it skips a falsy `exclude`). The buildings
+  // and toy tiers are therefore bit-identical across this landmark's re-bake;
+  // only the context tier changes, to give the lot a pick box and a search row.
+  // Do not "fix" this by adding a radius: 11 m, the value 400 Brannan uses
+  // 60 m away, would delete the Brickhouse.
+  {
+    id: '424Brannan',
+    name: '424 Brannan Street Parking',
+    lon: -122.3954857,
+    lat: 37.7798744,
+    height: 8.5649,
+    // The eye stands over Brannan (bearing 135 = 180 - yaw), which is the only
+    // angle from which the 15.8 m neck, the gate and the sign all read at once;
+    // straight down the Ritch fence foreshortens 68 m of lot into a line. 260 m
+    // suits an 88 m site (cf. 400Brannan at 170 for 24 m).
+    camera: { distance: 260, yaw: 45, pitch: 30 },
+  },
+  {
+    // 226 Ritch Street (1994-96) — eight live/work lofts on the south-west side
+    // of Ritch, the alley between Bryant and Brannan. Sage-green stucco over a
+    // sand-tiled garage band, a galvanised fire escape up the front, and a roof
+    // deck. Three storeys, but the lofts have 15-foot ceilings, which is why the
+    // parapet is 16.0 m — as tall as a five-storey building on the same block.
+    //
+    // `height` is the CREST (the stair bulkhead), not the parapet, because the
+    // manifest scales the GLB by targetHeightM / measuredHeight and the model's
+    // bbox top is the bulkhead. The parapet itself lands at 16.0 m, which is
+    // where OSM's height=16 and the DataSF LiDAR median (15.90 m) both put it.
+    // The 18.1 m crest is the LiDAR hgt_max (18.14 m) and is corroborated by
+    // hgt_majority 17.63 m — a REPEATED value 1.7 m above a roof plane whose
+    // mean and median agree to 0.1 m, which a single spurious return cannot
+    // produce. See artifacts/226-ritch/REPORT.md §2 for what is still unproven.
+    //
+    // exclude: 5 is MEASURED, not guessed, against both bake inputs from this
+    // anchor. `excluded()` in pipeline/buildings.mjs drops a footprint whose
+    // ring centroid OR any ring vertex is inside the radius:
+    //
+    //   0.85 m  this footprint's centroid, DataSF SF3776120
+    //   0.68 m  this footprint's centroid, OSM 148217483 (Overture proxy)
+    //   9.75 m  the CENTROID of 218 Ritch (OSM 148217499) — the binding limit
+    //  10.23 m  the nearest vertex of 218 Ritch, DataSF SF3776144
+    //
+    // So the window that drops exactly this footprint is 0.9 < r < 9.75 and it
+    // is unusually wide for a party-wall row: 218 Ritch is a small 144 m2
+    // building whose centroid, not a shared party-wall vertex, sets the ceiling.
+    // 5 sits in the middle with ~4.1 m of margin below and ~4.75 m above. The
+    // exclusion fires on this footprint's CENTROID — its own nearest vertex is
+    // 6.1 m out — so do not shrink r below 1 expecting the vertices to catch it.
+    //
+    // App yaw = 180 - true bearing (camera.js `apply()`: the offset is
+    // (sin yaw, ., cos yaw) with +z south). The Ritch Street front faces 45.6
+    // deg, so yaw 134 stands the camera north-east, out over the alley, looking
+    // back at the one designed elevation — the other three faces are two party
+    // walls and a rear that the 1998 permits clad in vinyl siding. 180 m suits
+    // an 18.1 m building (cf. 188SouthPark 190 at 15.93 m, 181SouthPark 190 at
+    // 16.5 m). No `key`: this is texture in the block, not a destination.
+    id: '226Ritch',
+    name: '226 Ritch Street',
+    lon: -122.3960899,
+    lat: 37.7804376,
+    height: 18.1,
+    exclude: 5,
+    camera: { distance: 180, yaw: 134, pitch: 28 },
+  },
+  // 414 Brannan (Epic Church, 1924) — the next lot southwest, on the Ritch
+  // Street corner. ONE building, but the LiDAR footprint layer splits it into
+  // THREE ~180 m2 strips under `mblr = SF3776011`, one per structural bay, and
+  // all three have to go or the GLB shares its site with a procedural triplet.
+  // Overture carries three more rings over the same lot. Measured against the
+  // real bake input, both sources:
+  //
+  //   exclude  6-8 m  -> drops 2  (the middle bay + one Overture ring)
+  //   exclude 10 m    -> drops 4  (two bays)
+  //   exclude 11-13 m -> drops 6  (correct: all three bays + all three Overture
+  //                                rings, zero collateral)
+  //   exclude 14 m    -> drops 8  (eats 566-586 Third, SF3776008, vertex 13.73 m)
+  //   exclude 16 m    -> drops 10 (eats 400 Brannan above, SF3776114, vertex 15.78 m)
+  //
+  // 12 m is the middle of the band. Note the binding limit at the BOTTOM is the
+  // southwest bay's CENTROID at 10.71 m, not any vertex — this lot's own corners
+  // are 16.4 m out and the radius never has to reach them.
+  //
+  // camera.yaw = 180 - eye bearing. This is a corner site with two finished
+  // elevations, Brannan facing SE 135.2 deg and Ritch facing SW 225.2 deg; their
+  // bisector is 180.2, so the eye goes due south and yaw is 0.
+  {
+    id: '414Brannan',
+    name: '414 Brannan Street (Epic Church)',
+    lon: -122.3948685,
+    lat: 37.7799308,
+    height: 14,
+    exclude: 12,
+    camera: { distance: 200, yaw: 0, pitch: 28 },
+  },
+  {
+    // One South Park: the 1919-20 concrete tobacco warehouse that closes the
+    // EAST end of the oval, converted 2004-07 by LDP Architecture into 35 lofts
+    // with two set-back storeys added on the roof. At 1,570 m2 it is the
+    // largest building on the oval by a factor of two, which is what makes its
+    // exclusion different from every other entry on this block: those are
+    // party-wall teeth whose radius must stay small enough not to reach their
+    // own far corners, and this one is a whole corner block whose own footprints
+    // are dropped by their CENTROIDS long before any radius could reach its
+    // 28 m-distant vertices.
+    //
+    // excluded() in buildings.mjs drops a footprint when its centroid OR any
+    // ring vertex falls inside the radius. Measured from THIS anchor against the
+    // real committed bake inputs (pipeline/data/buildings_datasf.geojson and
+    // overture_buildings.geojsonseq), after projection and simplifyRing(0.6):
+    //
+    //    0.69 m  own Overture footprint (h 18), via CENTROID
+    //    3.90 m  own DataSF footprint SF3775181 (h_med 17.77), via CENTROID
+    //            -> the FLOOR. Above 3.90 both of this building's own
+    //               footprints are gone; their nearest VERTICES are 16.98 m and
+    //               12.37 m out and are irrelevant here.
+    //   18.20 m  17-19 South Park, DataSF SF3775046 (h_med 6.60), via CENTROID
+    //            -> the CEILING, and the binding constraint. A real standing
+    //               1934 building with no GLB; it must survive (AGENTS rules 3
+    //               and 5). Its nearest vertex is 22.58 m out, so reading this
+    //               neighbour off vertices alone would overstate the window by
+    //               4.4 m.
+    //   20.44 m  the same neighbour in Overture (h 6.7), via centroid
+    //   26.52 m  300 Brannan, DataSF SF3775008 (h_med 20.84), nearest vertex
+    //   27.84 m  21-29 South Park, DataSF SF3775042, nearest vertex - already
+    //            dropped by 21SouthPark's own exclude: 16
+    //
+    // Safe window (3.90, 18.20) m. 11 sits almost exactly in the middle with
+    // 7.10 m of margin below and 7.20 m above, both an order of magnitude
+    // larger than the bake's 0.6 m SIMPLIFY_TOLERANCE. No Overture polygon
+    // other than this building's own overlaps the footprint, so there is
+    // nothing for the gap-fill to re-add into the area markOccupied() no longer
+    // covers.
+    //
+    // No clearTrees: the street trees on both frontages are real, they are in
+    // every photograph of this building, and they stand in the road reserve
+    // outside the building line - at 11 m the radius does not reach the kerb.
+    // See docs/asset-plans/1-south-park.md 2.13 and
+    // artifacts/1-south-park/REPORT.md.
+    id: '1SouthPark',
+    name: 'One South Park (1 South Park)',
+    lon: -122.3928634,
+    lat: 37.782048,
+    height: 20.2,
+    exclude: 11,
+    // Camera offset is (sin yaw, ., cos yaw) with +z south, so camera bearing =
+    // 180 - yaw and yaw 180 stands the eye due NORTH - the bisector of the
+    // Second Street elevation (45.3 deg) and the South Park elevation
+    // (315.0 deg). Both are hero elevations, the re-entrant step is on the
+    // Second Street run, and the roof - which is half this building's design -
+    // only reads from above the corner they meet at. 240 m suits a 59 m-wide
+    // 20 m block (cf. 300Brannan at 240 for 25.2 m, 49SouthPark at 165 for
+    // 13 m). No `key`: keys 0-9 are taken.
+    camera: { distance: 240, yaw: 180, pitch: 28 },
+  },
+  {
+    // 501 Third Street, the 1920 unreinforced-masonry industrial loft on the
+    // EAST corner of 3rd and Bryant. 23.6 x 25.05 m rhombus on the 45 deg SoMa
+    // grid, 592 m2, parapet 14.0 m and a rooftop bulkhead crest at 16.4 m (OSM
+    // height=14 and LiDAR hgt_median 13.73 / hgt_max 16.42 agreeing).
+    //
+    // Exclusion sized against the REAL bake inputs (pipeline/data/
+    // buildings_datasf.geojson AND overture_buildings.geojsonseq), by
+    // min(nearest ring VERTEX, centroid) -- excluded() in buildings.mjs fires
+    // on either:
+    //
+    //    3.43 m  this building's own Overture ring (h=14)   <- floor
+    //    5.70 m  this building's own DataSF ring (SF3775073) <- floor, both go
+    //   16.23 m  this footprint's own nearest vertex
+    //   16.31 m  DataSF SF3775075 (h=14.90), the NE party neighbour <- ceiling
+    //   17.17 m  Overture 0f2baf8a (h=11), that neighbour's twin
+    //   19.55 m  DataSF SF3775072 (h=13.53), across Taber Place
+    //
+    // Safe window (5.70, 16.23) m, 10.5 m wide; 11 is its middle, so the centre
+    // needs no offset from the manifest anchor. The asset plan's original
+    // suggestion of ~20 was reasoned from the half-diagonal rather than
+    // measured and would delete three neighbours. Note 11 does NOT reach this
+    // footprint's own corners at 17.3 m; it does not need to, and reaching them
+    // would delete SF3775075, which shares a party-wall survey vertex sitting
+    // 0.147 m inside this footprint -- inside a wall thickness.
+    id: '501Third',
+    name: '501 Third Street',
+    lon: -122.3954601,
+    lat: 37.7813246,
+    height: 16.4,
+    exclude: 11,
+    // Camera offset is (sin yaw, ., cos yaw) with +z south, so yaw 270 stands
+    // the camera due WEST -- the bisector of the 3rd Street front (225.4 deg)
+    // and the Bryant Street elevation (315.6 deg). Both are hero elevations on
+    // this corner. 190 m suits a 16.4 m building (cf. 49SouthPark at 165 for
+    // 13.0 m, 106SouthPark at 150 for 11.58 m). No `key`: at 16 m this is
+    // texture in the block, not a destination.
+    camera: { distance: 190, yaw: 270, pitch: 26 },
+  },
+  {
+    // The South Park Lofts, 1993, Ramon Zambrano: ten live/work loft
+    // condominiums on one 585 m2 through-lot running from South Park at the
+    // south-east to Taber Place at the north-west. The lot carries TWO baked
+    // footprints — the front block 262 m2 and the rear block 181 m2 — with a
+    // ~142 m2 courtyard between them, and the anchor sits at the courtyard's
+    // edge because that is where the GLB's bounding-box centre lands. This is
+    // the 132SouthPark case: no single radius works, so there is one zone per
+    // structure plus a guard at the anchor.
+    //
+    // height is the roof stair bulkhead (LiDAR max). The parapet crest is
+    // 13.10 m, photogrammetric from Street View pano aFRDCNG9w0lcHJ9ngJI8LQ and
+    // flat to +-0.06 m over a 41% range change; the roof deck is 12.27 m (LiDAR
+    // median). See artifacts/10-south-park/REFERENCE.md section 3 for why the
+    // maximum is believed here — briefly, both neighbours are TALLER, so
+    // party-wall bleed could only pull it down, and the rear block reports the
+    // same 2.4 m step against different neighbours.
+    //
+    // excluded() drops a footprint whose ring CENTROID or any vertex is inside
+    // a zone. Measured from each candidate centre against the rings the bake
+    // actually reads — DataSF ynuv-fyni AND the Overture gap-fill, both
+    // extracted from pipeline/data/:
+    //
+    //   from the anchor:        1.35 m  own front block, nearest vertex
+    //                           5.21 m  2 South Park (Overture) vertex  <- ceiling
+    //                           5.90 m  own rear block, nearest vertex
+    //   from the front zone:    1.24 m  own front block, DataSF ring CENTROID
+    //                           1.48 m  own front block, Overture ring CENTROID
+    //                           8.94 m  22-24 South Park (DataSF) vertex <- ceiling
+    //   from the rear zone:     2.38 m  own rear block, DataSF ring CENTROID
+    //                           2.43 m  own rear block, Overture ring CENTROID
+    //                           7.09 m  22-24 South Park (Overture) vertex <- ceiling
+    //
+    // So each block is dropped by its own ring CENTROID and no radius ever
+    // reaches this lot's far corners (14.7 m front, 7.3 m rear) — reaching them
+    // would delete 22-24 South Park (14.22 m) or 2 South Park (17.72 m), neither
+    // of which has a GLB to replace it, and both failures are silent. Margins
+    // 3.5/3.9 m on the front zone and 2.1/2.6 m on the rear.
+    //
+    // The 2 m guard at the anchor happens to drop the front block by vertex, but
+    // its real job is 132SouthPark's: stopping the Overture gap-fill re-filling a
+    // lot that markOccupied() no longer sees as occupied once the DataSF
+    // footprints are excluded. A whole-lot Overture polygon would centre within
+    // about a metre of the anchor and sail past both other zones. Do NOT raise
+    // it — 2 South Park's Overture vertex is 5.21 m out.
+    //
+    // Both blocks are traced twice, by DataSF and by Overture, so a correct
+    // exclusion drops FOUR rings here, not two. See
+    // docs/asset-plans/10-south-park.md 2.13.
+    id: '10SouthPark',
+    name: '10 South Park (South Park Lofts)',
+    lon: -122.3935162,
+    lat: 37.7823704,
+    height: 14.67,
+    exclude: 2,
+    extraExclusions: [
+      { lon: -122.3934359, lat: 37.7823083, r: 5 },   // front block, on South Park
+      { lon: -122.3936335, lat: 37.7824581, r: 4.5 }, // rear block, on Taber Place
+    ],
+    // Camera bearing = 180 - yaw (camera.js apply(): the offset is
+    // (sin yaw, ., cos yaw) and +z is south), so yaw 30 stands the camera at
+    // bearing 150 = SSE — square onto the bowed south-west two-thirds of the
+    // front (normal 179.7 deg) and still oblique enough to read the straight
+    // north-east third (135.2 deg). Pitch 30 rather than this block's usual 26
+    // so the courtyard between the two blocks clears the front parapet; it is
+    // half of what this asset is. 200 m suits a 42 m-deep lot. No `key`: at
+    // 14.7 m this is texture in the block, not a destination.
+    camera: { distance: 200, yaw: 30, pitch: 30 },
+  },
+  {
+    // 521-527 Third Street: the 1914 three-storey brick apartment-over-store
+    // block on the east corner of 3rd and Taber Place (Neill's Grocery &
+    // Liquor). The committed bake gives this footprint a 12.9 m block (base
+    // 5.4, top 18.3) against the asset's 11.40 m parapet, so without the
+    // exclusion the GLB is invisible inside a taller procedural building.
+    //
+    // Exclusion window, measured both ways from this anchor:
+    //
+    //   against app/public/tiles/buildings/23_13.bin (ring 98, what excluded()
+    //   consumes today)     own centroid 0.18 m, own nearest vertex 8.60 m,
+    //                       nearest NEIGHBOUR vertex 18.39 m (SF3775073,
+    //                       501 Third across Taber Place)
+    //   against the raw DataSF LiDAR polygons (what a re-bake consumes)
+    //                       own polygon centroid 1.91 m, nearest NEIGHBOUR
+    //                       vertex 8.60 m — and that neighbour is 549 Third
+    //                       (SF3775125), which SHARES the party-wall vertex.
+    //
+    // excluded() drops a ring on centroid OR any vertex, so the window that
+    // drops exactly this building is 1.91 m < r < 8.60 m. 5 sits in the middle
+    // with 3.1 m of margin below and 3.6 m above. It fires on the CENTROID
+    // test — do not shrink it below 2 m expecting the vertices to catch it, and
+    // do not push it past 8.6 m or it deletes 549 Third.
+    //
+    // Note 549 Third is currently ABSENT from the committed bake even though
+    // DataSF carries it (565 m2, 13.03 m, 24 m to the south-east). That is a
+    // pre-existing gap in the procedural city, not something this exclusion
+    // causes, and the radius is NOT widened to tidy it.
+    //
+    // Camera: bearing = 180 - yaw, so yaw 270 stands the eye due WEST — the
+    // bisector of the 3rd Street front (normal 225.1 deg) and the Taber Place
+    // flank (normal 315.1 deg). Those are the two designed elevations and the
+    // corner between them is the whole point of the building. 200 m suits an
+    // 11.4 m building (cf. 550Third 190 at 11 m, 592Third 200 at 8.2 m). No
+    // `key`: at 11.4 m this is block texture, not a destination.
+    id: '521Third',
+    name: '521 Third Street',
+    lon: -122.3952384,
+    lat: 37.7811509,
+    height: 11.4,
+    exclude: 5,
+    camera: { distance: 200, yaw: 270, pitch: 28 },
+  },
+  {
+    // 164 South Park — a 1907 single-storey brick warehouse at the west tip of
+    // the oval, wearing a 2024-25 Stanley Saitowitz | Natoma Architects front:
+    // large-format red panels in stretcher bond, one black ribbon window that
+    // tracks the shift around the oval and drops to become a glazed entry
+    // recess, and a slender canopy over the door. Twitter (2006-2008) and
+    // Instagram (2010) were both founded in this room; the concrete doormat at
+    // that entry says so.
+    //
+    // HEIGHT NOTE — this is the one entry on this oval that REFUSES the LiDAR
+    // maximum, and it is deliberate. DataSF `SF3775069` reports hgt_max 9.25 m,
+    // but over 1,715 cells the distribution is median 5.44, modal 4.61, mean
+    // 5.53, sd 0.84 m. A two-mass building (156 South Park's front bar over its
+    // rear shed) spreads much wider than that; 0.84 m cannot contain a 4 m step.
+    // The assessor records ONE storey on both parcels (068 and 069 are both
+    // addressed 164), the aerial shows an unbroken flat membrane roof, and the
+    // two-storey neighbours at 160 and 166 visibly overtop this building. The
+    // 9.25 m is unexplained — the record's peak_1st_m is 16.53 m, a tree, and
+    // there is a large tree overhanging the north-west end of this roof. Height
+    // is the MEDIAN, 5.4 m, which also matches the photogrammetry: the new
+    // street screen measures 4.10 m and the old wall behind it 4.7-5.6 m.
+    // See docs/asset-plans/164-south-park.md 2.15.
+    //
+    // The exclusion is measured against the bake's OWN input (DataSF first,
+    // Overture gap-fill, both simplified at SIMPLIFY_TOLERANCE 0.6), not
+    // against the live APIs, and neighbours already dropped by an existing
+    // landmark are discounted because a GLB stands in their place. From this
+    // anchor:
+    //    0.60 m  DataSF SF3775069, our own footprint, via its centroid
+    //    1.43 m  Overture 469 m2, our own footprint again, via its centroid
+    //            -> the FLOOR: below 1.43 the Overture ring survives and the
+    //               procedural block pokes through the model
+    //    3.06 m  DataSF SF3775067 (160 South Park) nearest vertex - already
+    //            dropped by 160SouthPark's own exclude, so not a constraint
+    //    3.76 m  Overture 76 m2 (the OSM `158 South Park` sliver) nearest
+    //            vertex -> the CEILING. It shares a party-wall vertex with our
+    //            own ring, nothing fills it, and above 3.76 the re-bake punches
+    //            a hole there.
+    //    8.57 m+ everything else, all covered by 156/168/188SouthPark
+    // Safe window (1.43, 3.76), 2.33 m wide. 2.6 sits in the middle with 1.17 m
+    // below and 1.16 m above, both comfortably over the 0.6 m simplify
+    // tolerance. Verified on the re-bake: exactly the two 164 footprints drop
+    // and the 158 sliver still stands. Do not widen without re-running that.
+    //
+    // No clearTrees: there are four real street trees on this frontage - they
+    // are in every photograph of the building and they belong to the app's tree
+    // system, not to this asset.
+    id: '164SouthPark',
+    name: '164 South Park',
+    lon: -122.3949366,
+    lat: 37.7812097,
+    height: 5.4,
+    exclude: 2.6,
+    // camera.js puts the eye at target + distance*(sin yaw, ., cos yaw) with +x
+    // east and +z south, so camera bearing = 180 - yaw; the street facets face
+    // 86-101 deg, so yaw 85 stands the camera out over the oval square onto
+    // them. 120 m, closer than the 150-190 m used elsewhere on this rim,
+    // because at 5.4 m this is the shortest landmark on it and the ribbon and
+    // the canopy are the whole recognition.
+    camera: { distance: 120, yaw: 85, pitch: 26 },
   },
 ];
 
