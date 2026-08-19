@@ -7,15 +7,16 @@ miniature of the Jewish Community Federation Building, 132 The Embarcadero /
 | | |
 |---|---|
 | Triangles | **4,960** (cap 14,000) |
-| Objects | 179 |
+| Objects | 16 (shipped, post-optimize; 179 as authored) |
 | Dimensions (AABB) | 40.437 x 40.473 x **29.570** m |
 | Min Z | 0.000 |
 | XY centre offset | 0.000, 0.000 |
-| File | 362,428 bytes raw, 53,530 bytes gzip |
+| File | **159,340 bytes** raw (shipped, meshopt); 362,428 bytes as authored |
 | Materials | 16, all `Toy_*`, 4 with `_Glow` |
 | Anchor | −122.3925476, 37.7931482 |
 | Target height | 29.57 m (bulkhead crest); parapet 27.40 m; roof deck 26.82 m |
-| Validation | **PASS** — all 16 checks, `validation.json` |
+| Draw submeshes | 17 (from 180) |
+| Validation | **PASS** — all 16 checks on the SHIPPED file, `validation.json` |
 
 ## 1. What was built
 
@@ -161,7 +162,31 @@ Recorded as a standing pre-approval covering the pipeline's stage-3 gate. It was
 not a response to these renders — no reviewer has seen them — so §2 and §3 above
 are written to be the record a reviewer would need.
 
-## 9. Reproducing
+## 9. Optimize pass (stage 4)
+
+The shipping file is the optimized one. Full record in
+`optimize/REPORT.md`; the pre-optimize original is archived byte-for-byte at
+`optimize/input/132-embarcadero.glb`.
+
+| | Authored | Shipped |
+|---|---|---|
+| File, raw | 362,428 B | **159,340 B** (−56.0%) |
+| Triangles | 4,960 | 4,960 |
+| Objects | 179 | 16 |
+| Draw submeshes | 180 | 17 |
+| Materials | 16 | 16 |
+| Bounding box | 40.43706 x 40.47308 x 29.57 | identical |
+
+All eight optimize gates pass. Worst A/B pixel delta across day and night, near
+and far, is 0.09% against a 2% gate. The limited-dissolve step was skipped on
+purpose: this asset has three stacked coplanar ring bands (crown, parapet,
+coping) and dissolving annuli manufactures the 20 m slivers that fail the
+contract validator after the swap.
+
+The numbers in the table at the top of this report are the SHIPPED numbers.
+`validation.json` was re-run against the optimized file and passes all 16 checks.
+
+## 10. Reproducing
 
 ```
 blender -b --python build_132_embarcadero.py
@@ -169,6 +194,19 @@ blender -b --python render_132_embarcadero.py -- --glb $PWD/132-embarcadero.glb 
 blender -b --python render_132_embarcadero.py -- --glb $PWD/132-embarcadero.glb --out $PWD --prefix 132-embarcadero --night
 blender -b --python validate_132_embarcadero.py -- --glb $PWD/132-embarcadero.glb --out $PWD/validation.json
 python3 make_contact_sheet.py
+```
+
+Then stage 4, from `optimize/`:
+
+```
+blender -b --python inspect.py  -- $PWD/input/132-embarcadero.glb $PWD/inspect.json
+blender -b --python optimize.py -- $PWD/input/132-embarcadero.glb $PWD/mid.glb $PWD/phaseb_stats.json
+npx gltfpack@0.24 -i mid.glb -o 132-embarcadero.optimized.glb -c -km -kn -noq
+blender -b --python validate.py -- $PWD/input/132-embarcadero.glb $PWD/132-embarcadero.optimized.glb $PWD/validation.json
+(cd g3check && npm install && node check.mjs ../132-embarcadero.optimized.glb)
+blender -b --python render_ab.py -- $PWD/input/132-embarcadero.glb $PWD/renders/in
+blender -b --python render_ab.py -- $PWD/132-embarcadero.optimized.glb $PWD/renders/out
+python3 diff_ab.py
 ```
 
 The render and validate scripts take absolute paths; Blender's working directory

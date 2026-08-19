@@ -1,0 +1,33 @@
+{
+ "ok": true,
+ "meshes": 17,
+ "tris": 4960,
+ "materials": [
+  "Toy_brick",
+  "Toy_glass",
+  "Toy_glass_Glow",
+  "Toy_glassl",
+  "Toy_glassl_Glow",
+  "Toy_gold",
+  "Toy_gold_Glow",
+  "Toy_ink",
+  "Toy_navy",
+  "Toy_roofd",
+  "Toy_sand",
+  "Toy_slate",
+  "Toy_steel",
+  "Toy_stone",
+  "Toy_trim",
+  "Toy_trim_Glow"
+ ],
+ "bbox_dims": [
+  40.4371,
+  29.57,
+  40.4731
+ ],
+ "bbox_min": [
+  -20.2185,
+  0,
+  -20.2365
+ ]
+}
