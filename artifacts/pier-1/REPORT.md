@@ -11,7 +11,7 @@ what was built and why.
 
 | | |
 |---|---|
-| Objects | 792 |
+| Objects | 792 authored, 13 shipped (joined per material at stage 4) |
 | Triangles | 13,330 (cap 24,000) |
 | Dimensions (axis-aligned) | 215.43 × 185.43 × 15.40 m |
 | Vertical extent = `targetHeightM` | **15.400 m** — loader scale 1.0000 |
@@ -20,8 +20,10 @@ what was built and why.
 | XY centre offset | 0.000, 0.000 |
 | Manifest anchor | **−122.3941164, 37.7974191** |
 | Long-axis heading | 053.77° true; facade normal 233.77° |
-| Raw GLB | 1,051 KB (149.6 KB gzip) — meshopt compression is stage 4's job |
-| Contract validation | **PASS**, all 18 checks; 0 / 17,425 flipped ray hits; 74 / 74 glow faces outward; no inverted solids |
+| Shipped GLB | **329.2 KB** raw (158.6 KB gzip), meshopt-compressed at stage 4 |
+| Pre-optimize GLB | 1,052.1 KB raw — archived at `optimize/input/pier-1.glb` |
+| Draw submeshes | **16** (798 before stage 4) |
+| Contract validation | **PASS**, all 18 checks, re-run on the SHIPPED (optimized) file; 0 / 17,425 flipped ray hits; 74 / 74 glow faces outward; no inverted solids |
 | Materials | 11 `Toy_*`, of which 2 `_Glow` |
 
 The axis-aligned XY box is 215 × 185 m for a pier that is 234 × 55 m. That is the expected
@@ -144,7 +146,22 @@ lit glazing is a warm pale rather than a saturated yellow.
 5. **The build date is contested** (1918 vs 1931); both are recorded rather than resolved.
 6. **No flagpole.** Deliberate — see `REFERENCE.md` §7.
 
-## 7. Integration
+## 7. Optimize (stage 4)
+
+Full report: `optimize/REPORT.md`. Headline: 1,052.1 → **329.2 KB** raw (−68.7%, target
+60%) and 798 → **16** draw submeshes, with triangles unchanged at 13,330 — the whole win
+is object-count overhead, which is what a 792-object procedural build costs. All gates
+G1–G6 and G8 PASS (G7 n/a, no bake); worst appearance delta 0.40% against a 2% gate.
+
+One judgment call: the **limited dissolve was skipped**, per `GLB-OPTIMIZE-PROMPT` §3
+step 3. This asset is built from long coplanar ring bands — the 234 m deck slab, the shed
+plinth, the parapet coping annulus, the 200 m monitor spine — and dissolving those emits
+slivers that no area-based test catches and that only surface after the shipping swap.
+
+The stage-2 contract validation above was re-run on the optimized file, not inherited from
+the pre-optimize build.
+
+## 8. Integration
 
 Case **B**. The registry entry, the two-zone exclusion and its verified drop set live in
 `docs/asset-plans/pier-1.md` §2.13, which also names the collateral. Do not re-derive the

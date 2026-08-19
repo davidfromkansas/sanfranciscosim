@@ -120,8 +120,21 @@ for o in mesh_objs():
 stats["interior_faces_removed"] = interior_removed
 snap("interior-faces")
 
-# --- 3. limited dissolve, coplanar only ---
-for o in mesh_objs():
+# --- 3. limited dissolve, coplanar only --- SKIPPED ON THIS ASSET ---
+#
+# GLB-OPTIMIZE-PROMPT v2 s.3 step 3: "Skip this step entirely on assets with
+# large coplanar ring bands - a parapet, coping, string course or cornice that
+# follows the footprint all the way round." Pier 1 is made of them: the 234 m
+# deck slab, the shed plinth, the shed parapet coping (a genuine closed annulus)
+# and the 200 m monitor spine all have perfectly coplanar top and bottom faces
+# running the whole length of the pier. A strictly-coplanar dissolve merges each
+# into one annulus ngon, and re-triangulating an annulus emits slivers tens of
+# metres long and fractions of a millimetre wide - invisible, area-test-clean,
+# and fatal to the stage-2 contract validator only AFTER the shipping swap,
+# because gltfpack re-emits the stored normals that Blender would have hidden.
+# On 350-brannan the same step was worth 0.4% of triangles. Not worth it here.
+DISSOLVE = False
+for o in (mesh_objs() if DISSOLVE else []):
     bpy.context.view_layer.objects.active = o
     for oo in mesh_objs():
         oo.select_set(oo is o)
@@ -134,7 +147,7 @@ for o in mesh_objs():
     bpy.ops.mesh.dissolve_limited(angle_limit=0.000872665,
                                   delimit={"MATERIAL", "SHARP"})
     bpy.ops.object.mode_set(mode="OBJECT")
-snap("limited-dissolve")
+snap("limited-dissolve" if DISSOLVE else "limited-dissolve-SKIPPED")
 
 # --- 5. join per material (multi-material objects keep their own mesh) ---
 groups = defaultdict(list)
