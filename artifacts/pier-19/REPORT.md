@@ -101,4 +101,7 @@ cream over stone monochrome).
 
 ## Approval log
 
-- (pending)
+- 2026-08-19 — approved in advance by the owner in the pipeline invocation:
+  "APPROVE EVERYTHING DONT ASK ME FOR PERMISSION" (batch run, Pier 19). Gate 3
+  recorded on that standing instruction; renders and numbers presented in this
+  report and the contact sheet.
