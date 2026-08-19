@@ -10,10 +10,12 @@
 | Registry id (Case B) | `110Embarcadero` |
 | Anchor (WGS84) | **−122.3926614, 37.7932332** |
 | Target height | **17.40 m** (bbox top = the Embarcadero roof fascia) |
-| Objects / triangles | 137 / **4,944** (cap 13,000) |
+| Objects / triangles | **13** / **4,944** (cap 13,000) — 137 objects before the stage-4 join |
 | Dimensions (m) | 40.476 × 40.192 × 17.400 |
 | min Z / XY centre offset | 0.000 / (0.000, 0.000) |
 | Materials | 10 (`Toy_stone`, `Toy_trim`, `Toy_glass`, `Toy_glassl`, `Toy_ink`, `Toy_mint`, `Toy_sand`, `Toy_glassl_Glow`, `Toy_trim_Glow`, `Toy_mustard_Glow`) |
+| File size (shipped, meshopt-packed) | **144,144 B / 140.8 KB** raw, from 320,764 B pre-optimize (−55.1%) |
+| Draw submeshes | 16 (140 pre-optimize) |
 | Blender | 5.2.0 LTS, headless, Cycles CPU |
 
 **Why the XY box is 40 m for a 13.9 m-wide building.** The footprint is a
@@ -207,12 +209,14 @@ street furniture, people, vehicles, plinths, cameras or lights.
 
 ## Validation
 
-`validation.json`, produced by re-importing the exported GLB into a fresh
-isolated Blender scene: **overall PASS**, all 17 checks green.
+`validation.json`, produced by re-importing the **shipped, meshopt-packed** GLB
+into a fresh isolated Blender scene: **overall PASS**, all 17 checks green. It was
+re-run after the stage-4 shipping swap, because stored-normal defects surface only
+in the packed file.
 
 | | |
 |---|---|
-| objects / triangles | 137 / 4,944 (cap 13,000) |
+| objects / triangles | 13 / 4,944 (cap 13,000) |
 | dimensions (m) | 40.4759 × 40.1923 × 17.4000 |
 | min Z / XY centre offset | 0.0 / (0.0, 0.0) |
 | materials | 10, all `Toy_*`, flat, no textures, no alpha, no `Toy_body` |
