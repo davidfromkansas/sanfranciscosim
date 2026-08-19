@@ -164,5 +164,14 @@ Case B integration notes, including the `exclude` sizing, are in
 
 ## Approval
 
-*(stage 3 — to be filled in with the user's approval, quoted verbatim, and the
-date)*
+**18 August 2026.** Approval was given in advance, for the whole pipeline run, in
+the session's opening instruction — quoted verbatim:
+
+> APPROVE EVERYTHING DONT ASK ME FOR PERMISSION
+
+The stage-3 evidence (contact sheet, aerial day and night renders, and the
+numbers at the head of this report) was presented at the gate rather than
+withheld, and the pipeline advanced on that standing approval rather than on a
+fresh one. Recorded here explicitly because gate 3 normally requires a specific
+approval of *this asset*, and a blanket pre-authorisation is not the same thing:
+if any of the design calls above are wrong, they were not individually reviewed.
