@@ -1692,5 +1692,24 @@
     ],
     "tris": 9262,
     "loadRadius": 2500
+  },
+  {
+    "id": "169-steuart",
+    "file": "169-steuart.glb",
+    "anchor": [
+      -122.3919821,
+      37.7926993
+    ],
+    "targetHeightM": 46.64,
+    "cat": 7,
+    "name": "Army & Navy YMCA Building (169 Steuart Street)",
+    "estimated": false,
+    "dims": [
+      60.1394,
+      60.2778,
+      46.64
+    ],
+    "tris": 19908,
+    "loadRadius": 2500
   }
 ]

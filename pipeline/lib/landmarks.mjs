@@ -2545,6 +2545,43 @@ export const LANDMARKS = [
     // destination.
     camera: { distance: 165, yaw: 270, pitch: 26 },
   },
+  {
+    // Army & Navy YMCA Building, 1924 — the Embarcadero YMCA (169 Steuart) and
+    // the Harbor Court Hotel (161-165 Steuart) inside ONE structure on ONE
+    // parcel. DataSF condo lots 3715028 and 3715029 share a mapblklot and a
+    // polygon; OSM traces the same outline as three ways. Height 46.64 m is the
+    // LiDAR crest at the tile-roof apex (tower eave 35.0 m, wing roof 28.14 m).
+    //
+    // Exclusion: excluded() drops a footprint whose CENTROID OR ANY VERTEX is
+    // within r of this anchor, so r has to reach our own rings and miss every
+    // neighbour's vertex. Measured from the anchor:
+    //    2.05 m  our DataSF LiDAR ring, centroid
+    //    6.44 m  our OSM rings 32862485 / 193054138, nearest vertex
+    //    7.67 m  our DataSF LiDAR ring, nearest vertex
+    //    9.11 m  our OSM ring 193054131 (the YMCA gym), nearest vertex
+    //   21.44 m  Hotel Griffon (155 Steuart), nearest vertex  <- the ceiling
+    //   21.58 m  177 Steuart, DataSF SF3715013, nearest vertex
+    //   22.10 m  188 The Embarcadero, nearest vertex
+    //
+    // Safe window (9.11, 21.44) m. 15 sits near its centre: 5.9 m of margin over
+    // the worst of our own sub-rings and 6.4 m to the nearest neighbour vertex,
+    // which absorbs the usual ~1.25 m parcel-vs-footprint disagreement. The
+    // half-diagonal (29.8 m) would have deleted the Griffon and 177 Steuart.
+    id: '169Steuart',
+    name: 'Army & Navy YMCA Building (169 Steuart Street)',
+    lon: -122.3919821,
+    lat: 37.7926993,
+    height: 46.64,
+    exclude: 15,
+    // Camera offset is (sin yaw, ., cos yaw) with +z south, so camera bearing =
+    // 180 - yaw; yaw 125 stands the eye to the NORTHEAST, square on the
+    // Embarcadero entry front (45.1 deg) with the red tile hip against the sky.
+    // That is the only elevation worth flying to: the Steuart front is a
+    // three-storey street wall and both flanks are party edges. 450 m for a
+    // 46.6 m building sits between 501Second (420 at 37.7 m) and the wide
+    // museum complexes at 700. No `key`: keys 0-9 are taken.
+    camera: { distance: 450, yaw: 125, pitch: 24 },
+  },
 ];
 
 // Parks/green spaces the landcover bake must match at least one source polygon
