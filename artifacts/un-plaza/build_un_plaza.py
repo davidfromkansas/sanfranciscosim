@@ -373,6 +373,31 @@ def ring_prism(name, outer, inner, z0, z1, mat, mat_top=None):
                     mats_idx)
 
 
+def profile(bm_verts, bm_faces, nsides, ec, nc, rings, rot=0.0):
+    """Closed solid of revolution from a list of (radius, z) rings: one bottom
+    cap, n-1 side bands, one top cap, and NO internal caps.
+
+    Stacking two closed frusta instead — which is what this build did first —
+    buries a pair of coincident, opposite-facing polygons inside the solid.
+    They are invisible in every render, but stage 4's weld collapses them onto
+    one another and the limited dissolve then merges them into a single face,
+    which breaks the shell: `globes_glow` came out of Phase B with a signed
+    volume of -1.62 where the source measured +1.36. Emit the profile in one
+    piece and the hazard does not exist."""
+    b = len(bm_verts)
+    for r, z in rings:
+        for e, n in ngon(nsides, ec, nc, r, rot):
+            bm_verts.append(to_world(e, n) + (z,))
+    for k in range(len(rings) - 1):
+        lo, hi = b + k * nsides, b + (k + 1) * nsides
+        for i in range(nsides):
+            j = (i + 1) % nsides
+            bm_faces.append((lo + i, lo + j, hi + j, hi + i))
+    bm_faces.append(tuple(b + i for i in range(nsides - 1, -1, -1)))
+    top = b + (len(rings) - 1) * nsides
+    bm_faces.append(tuple(top + i for i in range(nsides)))
+
+
 def make_material(name):
     mat = bpy.data.materials.new(name)
     mat.use_nodes = True
@@ -669,8 +694,8 @@ def colonnade(data, mats):
     v, f = [], []
     for e, n in data["light_standards"]:
         z0 = Z_COLUMN - 2 * GLOBE_R
-        frustum(v, f, 8, e, n, 0.13, GLOBE_R, z0, z0 + GLOBE_R * 0.7)
-        frustum(v, f, 8, e, n, GLOBE_R, 0.11, z0 + GLOBE_R * 0.7, Z_COLUMN)
+        profile(v, f, 8, e, n, [(0.13, z0), (GLOBE_R, z0 + GLOBE_R * 0.7),
+                                (0.11, Z_COLUMN)])
     new_mesh("globes_glow", v, f, [mats["Toy_white_Glow"]])
 
     # The 2023 Tivoli/festoon lighting, strung along each column row. BULBS, not
@@ -759,8 +784,8 @@ def monuments(data, mats):
 
     oe, on = data["points"]["obelisk"]
     v, f = [], []
-    frustum(v, f, 4, oe, on, 0.62, 0.40, Z_BED, Z_OBELISK - 0.55, rot=math.pi / 4)
-    frustum(v, f, 4, oe, on, 0.40, 0.02, Z_OBELISK - 0.55, Z_OBELISK, rot=math.pi / 4)
+    profile(v, f, 4, oe, on, [(0.62, Z_BED), (0.40, Z_OBELISK - 0.55),
+                              (0.02, Z_OBELISK)], rot=math.pi / 4)
     new_mesh("obelisk", v, f, [mats["Toy_ink"]])
 
     for key, flagmat in (("flagpole_un", "Toy_navy"), ("flagpole_us", "Toy_red")):
@@ -881,8 +906,8 @@ def trees(data, mats):
         h = Z_TREE if i == tallest else Z_TREE * (0.74 + 0.20 * hash01(i * 197))
         trunk = h * 0.42
         z0 = trunk + (h - trunk) * 0.30
-        frustum(v, f, 8, e, n, 2.20, 2.45, z0, z0 + (h - z0) * 0.45)
-        frustum(v, f, 8, e, n, 2.45, 0.45, z0 + (h - z0) * 0.45, h)
+        profile(v, f, 8, e, n, [(2.20, z0), (2.45, z0 + (h - z0) * 0.45),
+                                (0.45, h)])
     new_mesh("crowns", v, f, [mats["Toy_verdigris"]])
     return pos
 

@@ -5,7 +5,7 @@
   "reimported_final_glb": true,
   "object_count": 57,
   "mesh_object_count": 57,
-  "triangle_count": 17772,
+  "triangle_count": 16934,
   "triangle_budget": 18000,
   "dimensions_m": [
     215.2233,
@@ -494,7 +494,7 @@
     },
     {
       "name": "crowns",
-      "triangles": 2856,
+      "triangles": 2244,
       "location": [
         0.0,
         0.0,
@@ -684,7 +684,7 @@
     },
     {
       "name": "globes_glow",
-      "triangles": 896,
+      "triangles": 704,
       "location": [
         0.0,
         0.0,
@@ -798,7 +798,7 @@
     },
     {
       "name": "obelisk",
-      "triangles": 208,
+      "triangles": 174,
       "location": [
         0.0,
         0.0,
@@ -1333,5 +1333,16 @@
     "no_degenerate_geometry": true,
     "no_unexpected_objects": true
   },
-  "overall": "PASS"
+  "overall": "PASS",
+  "note": "This is the AUTHORING validation, run on the pre-optimize asset now archived byte-for-byte at optimize/input/un-plaza.glb. The shipping file artifacts/un-plaza/un-plaza.glb is the stage-4 meshopt output; its gate evidence is optimize/gates.json and optimize/REPORT.md. The subject-specific checks here (16 named light standards, a named crown carrying the datum, the two signed bearings) are run against the named objects, which stage 4 joins per material, so they can only be run on this file.",
+  "shipped": {
+    "file": "un-plaza.glb",
+    "bytes": 452532,
+    "bytes_pre_optimize": 911264,
+    "triangle_count": 16778,
+    "triangle_count_pre_optimize": 16934,
+    "draw_submeshes": 26,
+    "draw_submeshes_pre_optimize": 62,
+    "bbox_identical": true
+  }
 }

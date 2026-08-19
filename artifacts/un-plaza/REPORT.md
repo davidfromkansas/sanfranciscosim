@@ -9,12 +9,14 @@ and **REPORT beats plan**.
 
 | | |
 |---|---|
-| File | `un-plaza.glb` (pre-optimize) |
-| Triangles | **17,772** (cap 18,000; hard gate 30,000) |
+| File | `un-plaza.glb` |
+| Triangles | **16,778** shipping / 16,934 pre-optimize (cap 18,000; hard gate 30,000) |
+| Bytes | **452,532** shipping (meshopt, stage 4); pre-optimize 911,264 |
+| Draw submeshes | **26** shipping / 62 pre-optimize |
 | Dimensions | **215.22 × 157.94 × 13.00 m** |
 | min Z | 0.0000 |
 | XY centre offset | 0.0000, 0.0000 |
-| Mesh objects | 57 |
+| Mesh objects | 22 shipping / 57 pre-optimize |
 | Materials | 19 `Toy_*`, three of them `_Glow` |
 | Anchor | −122.4138900, 37.7801415 |
 | Height datum | tallest tree crown, exactly 13.00 m |
@@ -22,7 +24,7 @@ and **REPORT beats plan**.
 | Colonnade bearing (both rows) | 81.03° / 81.03° true |
 | Market frontage bearing | 45.20° true |
 | Normals | signed volume outward on **57/57** objects; ray-test flipped fraction **0.000000** |
-| Validation | `validation.json` — **overall PASS**, 21/21 checks |
+| Validation | `validation.json` — **overall PASS**, 21/21 checks (authoring side); `optimize/gates.json` — G1–G5 all PASS (shipping side) |
 
 ## 2. What was verified before modelling, and what changed
 
@@ -108,7 +110,15 @@ each is the kind of thing that ships silently:
 8. **The crowns cost 22,134 triangles** — the bevel pass caught them because
    `crowns` was not in `UNBEVELLED`. Also `bike_racks` and `fitness`. Total went
    40,082 → 17,340.
-9. **The studio floor in the review rig was sized off the model's HEIGHT**
+9. **Two closed frusta stacked on a shared ring bury a pair of coincident,
+   opposite-facing caps** — invisible in every render, but stage 4's weld
+   collapses them and the coplanar dissolve merges them into one face, breaking
+   the shell. `globes_glow` came out of Phase B at signed volume **−1.620**
+   against **+1.365** in the source. Fixed at source with a `profile()` helper
+   that emits a solid of revolution in one piece with no internal caps; the
+   globes, tree crowns and obelisk were rewired onto it, which also removed 838
+   buried triangles (17,772 → 16,934). Full write-up in `optimize/REPORT.md`.
+10. **The studio floor in the review rig was sized off the model's HEIGHT**
    (65 m), so it appeared as a beige rectangle inside the frame of a 215 m
    asset. Now sized off the plan.
 
@@ -152,13 +162,12 @@ Full working in `docs/asset-plans/un-plaza.md` §2.13.
     157.94,
     13.0
   ],
-  "tris": 17772,
+  "tris": 16778,
   "loadRadius": 2500
 }
 ```
 
-`dims` and `tris` are the pre-optimize numbers and are updated to the shipped
-figures at stage 4.
+`dims` and `tris` are the **shipped** figures, measured after stage 4.
 
 ## 8. Files
 
@@ -175,5 +184,11 @@ figures at stage 4.
 
 ## 9. Approval
 
-_Stage 3 of the pipeline. To be filled in with the user's verbatim approval and
-date before stage 4 runs._
+Stage 3 gate, satisfied by a standing pre-authorisation given with the building
+brief on **2026-08-19**, quoted verbatim:
+
+> APPROVE EVERYTHING DONT ASK ME FOR PERMISSION
+
+The contact sheet, the day and night aerials and the top view were presented at
+the same time rather than held for a reply, per that instruction. The numbers
+presented were those in §1.
