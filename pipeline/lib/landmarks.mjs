@@ -3160,6 +3160,46 @@ export const LANDMARKS = [
     // the canopy are the whole recognition.
     camera: { distance: 120, yaw: 85, pitch: 26 },
   },
+  {
+    // 1 Hotel San Francisco, formerly Hotel Vitale (Heller Manus, 2005): the
+    // whole block between Mission, Steuart, The Embarcadero and Don Chee Way,
+    // across the water side of the Embarcadero from the Ferry Building. Eight
+    // storeys on the Mission end (LiDAR mode 25.10 m) terracing down to six
+    // (median 19.64) and four (14.18) toward Harry Bridges Plaza; the crest is
+    // the circular turret's lantern crown at 28.66 m (LiDAR max, corroborated
+    // against Street View - one storey proud of the parapet, no party wall for
+    // it to bleed from).
+    //
+    // The exclusion is sized against `excluded()`'s real test - ring CENTROID
+    // inside the circle OR any ring vertex inside it - not against the
+    // footprint. Distances from this anchor:
+    //
+    //    2.29 m  our own centroid, OSM way 193054134   <- the lower bound
+    //    3.36 m  our own centroid, DataSF 201006.0001079
+    //   14.69 m  our own nearest vertex
+    //   21.07 m  the Muni vent pavilion's nearest vertex <- the upper bound
+    //   56.16 m  the Audiffred Building's nearest vertex
+    //
+    // Safe window (3.36, 21.07) m. 10 sits in it with 6.6 m of margin below and
+    // 11.1 m above. The half-diagonal (39.35 m) would delete the Muni subway
+    // vent shaft that shares this parcel and sits in the notch at the north
+    // corner - a real, standing structure that is deliberately NOT part of the
+    // asset and has to survive the re-bake.
+    id: '8Mission',
+    name: '1 Hotel San Francisco (8 Mission Street)',
+    lon: -122.3932861,
+    lat: 37.7936872,
+    height: 28.66,
+    exclude: 10,
+    // Camera offset is (sin yaw, ., cos yaw) with +z south, so camera bearing =
+    // 180 - yaw and yaw 90 stands the eye due EAST - the bisector of the Mission
+    // elevation (135.4 deg) and the Embarcadero elevation (45.4 deg), with the
+    // turret on the corner between them. Both are hero elevations and the turret
+    // only reads from that corner. 320 m suits a 28.66 m crest (cf. 181SouthPark
+    // 190 for 16.5 m, 49SouthPark 165 for 13 m). No `key`: the waterfront's
+    // numbered destination is the Ferry Building.
+    camera: { distance: 320, yaw: 90, pitch: 24 },
+  },
 ];
 
 // Parks/green spaces the landcover bake must match at least one source polygon

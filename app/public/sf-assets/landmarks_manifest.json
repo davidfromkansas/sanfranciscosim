@@ -1939,5 +1939,24 @@
     ],
     "tris": 3366,
     "loadRadius": 2500
+  },
+  {
+    "id": "8-mission",
+    "file": "8-mission.glb",
+    "anchor": [
+      -122.3932861,
+      37.7936872
+    ],
+    "targetHeightM": 28.66,
+    "cat": 7,
+    "name": "1 Hotel San Francisco (8 Mission Street)",
+    "estimated": false,
+    "dims": [
+      74.1381,
+      56.5484,
+      28.66
+    ],
+    "tris": 19082,
+    "loadRadius": 2500
   }
 ]
