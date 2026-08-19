@@ -1,0 +1,31 @@
+{
+ "ok": true,
+ "meshes": 16,
+ "tris": 8848,
+ "materials": [
+  "Toy_cobalt",
+  "Toy_cocoa",
+  "Toy_cream",
+  "Toy_glass",
+  "Toy_glass_Glow",
+  "Toy_greige",
+  "Toy_ink",
+  "Toy_mint",
+  "Toy_mustard",
+  "Toy_orange",
+  "Toy_orange_Glow",
+  "Toy_oxblood",
+  "Toy_p_tan",
+  "Toy_steel"
+ ],
+ "bbox_dims": [
+  27.3615,
+  11.4,
+  27.1014
+ ],
+ "bbox_min": [
+  -13.9684,
+  0,
+  -13.4423
+ ]
+}

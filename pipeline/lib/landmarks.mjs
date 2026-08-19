@@ -3056,6 +3056,49 @@ export const LANDMARKS = [
     // 14.7 m this is texture in the block, not a destination.
     camera: { distance: 200, yaw: 30, pitch: 30 },
   },
+  {
+    // 521-527 Third Street: the 1914 three-storey brick apartment-over-store
+    // block on the east corner of 3rd and Taber Place (Neill's Grocery &
+    // Liquor). The committed bake gives this footprint a 12.9 m block (base
+    // 5.4, top 18.3) against the asset's 11.40 m parapet, so without the
+    // exclusion the GLB is invisible inside a taller procedural building.
+    //
+    // Exclusion window, measured both ways from this anchor:
+    //
+    //   against app/public/tiles/buildings/23_13.bin (ring 98, what excluded()
+    //   consumes today)     own centroid 0.18 m, own nearest vertex 8.60 m,
+    //                       nearest NEIGHBOUR vertex 18.39 m (SF3775073,
+    //                       501 Third across Taber Place)
+    //   against the raw DataSF LiDAR polygons (what a re-bake consumes)
+    //                       own polygon centroid 1.91 m, nearest NEIGHBOUR
+    //                       vertex 8.60 m — and that neighbour is 549 Third
+    //                       (SF3775125), which SHARES the party-wall vertex.
+    //
+    // excluded() drops a ring on centroid OR any vertex, so the window that
+    // drops exactly this building is 1.91 m < r < 8.60 m. 5 sits in the middle
+    // with 3.1 m of margin below and 3.6 m above. It fires on the CENTROID
+    // test — do not shrink it below 2 m expecting the vertices to catch it, and
+    // do not push it past 8.6 m or it deletes 549 Third.
+    //
+    // Note 549 Third is currently ABSENT from the committed bake even though
+    // DataSF carries it (565 m2, 13.03 m, 24 m to the south-east). That is a
+    // pre-existing gap in the procedural city, not something this exclusion
+    // causes, and the radius is NOT widened to tidy it.
+    //
+    // Camera: bearing = 180 - yaw, so yaw 270 stands the eye due WEST — the
+    // bisector of the 3rd Street front (normal 225.1 deg) and the Taber Place
+    // flank (normal 315.1 deg). Those are the two designed elevations and the
+    // corner between them is the whole point of the building. 200 m suits an
+    // 11.4 m building (cf. 550Third 190 at 11 m, 592Third 200 at 8.2 m). No
+    // `key`: at 11.4 m this is block texture, not a destination.
+    id: '521Third',
+    name: '521 Third Street',
+    lon: -122.3952384,
+    lat: 37.7811509,
+    height: 11.4,
+    exclude: 5,
+    camera: { distance: 200, yaw: 270, pitch: 28 },
+  },
 ];
 
 // Parks/green spaces the landcover bake must match at least one source polygon

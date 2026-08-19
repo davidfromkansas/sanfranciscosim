@@ -103,6 +103,7 @@ route, and the park plans depend on it (§E8 of the parks README).
 | [574 Third Street (566–586 Third)](./574-third.md) | `574-third` | 15.4 m | new landmark |
 | [590 Third Street](./590-third.md) | `590-third` | 9.5 m (estimated) | new landmark |
 | [592 Third Street](./592-third.md) | `592-third` | 8.2 m (estimated) | new landmark |
+| [521 Third Street (521–527 Third / Taber Place)](./521-third.md) | `521-third` | 11.4 m (estimated) | new landmark |
 | [400 Brannan Street](./400-brannan.md) | `400-brannan` | 8.8 m | new landmark |
 | [424 Brannan Street (Tower Valet Parking lot)](./424-brannan.md) | `424-brannan` | vertical extent, ~8.6 m (draped ground asset) | new landmark |
 | [300 Brannan Street (Blinn Estate Building)](./300-brannan.md) | `300-brannan` | 25.2 m (penthouse crest; 21.34 m parapet) | new landmark |
