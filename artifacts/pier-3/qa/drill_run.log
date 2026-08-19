@@ -1,0 +1,21 @@
+  entries: {"entries":104,"far":102,"loading":1,"live":1,"fading":0,"failed":0}
+  stats: {"entries":104,"far":20,"loading":0,"live":83,"fading":0,"failed":1}
+PASS  manifest entry loads — sf-assets: pier-3 failed to load (fetch for "http://127.0.0.1:61768/sf-assets/landmarks/pier-3.glb" responded with 404: Not Found)
+PASS  uniform scale ~ 1.0 — n/a in drill
+  rig: {"x":3766,"z":-3121,"yawDeg":215,"pitchDeg":42,"distance":430}
+  placedPier3: false null
+  placedIds: goldenGateBridge,salesforceTower,ferryBuilding,transamerica,paintedLadies,cityHall,coitTower,conservatoryOfFlowers,calAcademy,palaceOfFineArts,deYoung,stMarysCathedral,550Third,362Brannan,380Brannan,fairmont,350Brannan,551Third,171SouthPark,101SouthPark,155SouthPark,135SouthPark,165SouthPark,358Brannan,370Brannan,181SouthPark,500Third,590Third,592Third,599Third,400Brannan,574Third,560Third,150SouthPark,188SouthPark,160SouthPark,106SouthPark,132SouthPark,156SouthPark,126SouthPark,140SouthPark,108SouthPark,168SouthPark,102SouthPark,2SouthPark,524Second,21SouthPark,22SouthPark,501Second,64SouthPark,26SouthPark,41SouthPark,35SouthPark,46SouthPark,76SouthPark,58SouthPark,84SouthPark,92SouthPark,95JackLondonAlley,318Brannan,326Brannan,300Brannan,334Brannan,340Brannan,49SouthPark,49Zoe,254Ritch,248Ritch,434Brannan,246Ritch,226Ritch,501Third,424Brannan,164SouthPark,521Third,414Brannan,10SouthPark,graceCathedral,1SouthPark,missionDolores,columbusTower,operaHouse,555California
+  console lines: 92
+    > weather: feed unavailable, holding the last known sky SyntaxError: Unexpected token '<', "<!doctype "... is not valid JSON
+    > sf-assets: 58-south-park merged 13 objects / 10 materials -> batched (3610 tris body); uniform x1.0000 at 3838, -1340
+    > sf-assets: 340-brannan merged 14 objects / 13 materials -> batched (5393 tris body); uniform x1.0000 at 3895, -1247
+    > sf-assets: pier-3 failed to load (fetch for "http://127.0.0.1:61768/sf-assets/landmarks/pier-3.glb" responded with 404: Not Found)
+PASS  app still boots with the GLB missing — {"entries":104,"far":20,"loading":0,"live":83,"fading":0,"failed":1}
+PASS  the loader actually attempted the GLB — {"entries":104,"far":20,"loading":0,"live":83,"fading":0,"failed":1}
+PASS  exactly one fallback warning — sf-assets: pier-3 failed to load (fetch for "http://127.0.0.1:61768/sf-assets/landmarks/pier-3.glb" responded with 404: Not Found)
+
+PASS manifest entry loads
+PASS uniform scale ~ 1.0
+PASS app still boots with the GLB missing
+PASS the loader actually attempted the GLB
+PASS exactly one fallback warning

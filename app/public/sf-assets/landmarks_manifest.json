@@ -1939,5 +1939,25 @@
     ],
     "tris": 3366,
     "loadRadius": 2500
+  },
+  {
+    "id": "pier-3",
+    "file": "pier-3.glb",
+    "anchor": [
+      -122.3947017,
+      37.7982322
+    ],
+    "targetHeightM": 18.5,
+    "cat": 25,
+    "name": "Pier 3 (Hornblower Landing)",
+    "estimated": true,
+    "seaLevel": true,
+    "dims": [
+      195.8228,
+      161.2056,
+      18.5
+    ],
+    "tris": 12152,
+    "loadRadius": 2500
   }
 ]

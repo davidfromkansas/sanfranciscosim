@@ -1,0 +1,14 @@
+  entries: {"entries":104,"far":97,"loading":1,"live":6,"fading":0,"failed":0}
+  stats: {"entries":104,"far":20,"loading":1,"live":83,"fading":0,"failed":0}
+PASS  manifest entry loads — sf-assets: pier-3 merged 13 objects / 13 materials -> batched (8939 tris body); uniform x1.0000 at 3766, -3121
+PASS  uniform scale ~ 1.0 — x1
+  rig: {"x":3766,"z":-3121,"yawDeg":215,"pitchDeg":42,"distance":430}
+  placedPier3: true {"log":"uniform x1.0000 at 3766, -3121"}
+  placedIds: goldenGateBridge,salesforceTower,ferryBuilding,transamerica,paintedLadies,cityHall,coitTower,conservatoryOfFlowers,calAcademy,palaceOfFineArts,deYoung,362Brannan,380Brannan,550Third,350Brannan,171SouthPark,551Third,101SouthPark,155SouthPark,135SouthPark,165SouthPark,358Brannan,370Brannan,500Third,181SouthPark,599Third,574Third,590Third,592Third,188SouthPark,400Brannan,560Third,150SouthPark,160SouthPark,132SouthPark,106SouthPark,168SouthPark,156SouthPark,108SouthPark,126SouthPark,140SouthPark,102SouthPark,2SouthPark,64SouthPark,524Second,21SouthPark,501Second,22SouthPark,26SouthPark,35SouthPark,41SouthPark,46SouthPark,58SouthPark,76SouthPark,84SouthPark,92SouthPark,95JackLondonAlley,300Brannan,318Brannan,326Brannan,334Brannan,340Brannan,49Zoe,49SouthPark,246Ritch,254Ritch,434Brannan,248Ritch,424Brannan,226Ritch,414Brannan,1SouthPark,501Third,10SouthPark,521Third,164SouthPark,pier-3,stMarysCathedral,fairmont,graceCathedral,missionDolores,columbusTower,operaHouse,555California
+  console lines: 92
+    > weather: feed unavailable, holding the last known sky SyntaxError: Unexpected token '<', "<!doctype "... is not valid JSON
+    > sf-assets: 58-south-park merged 13 objects / 10 materials -> batched (3610 tris body); uniform x1.0000 at 3838, -1340
+    > sf-assets: 340-brannan merged 14 objects / 13 materials -> batched (5393 tris body); uniform x1.0000 at 3895, -1247
+PASS  draw calls under 300 at the landmark — avg 86/frame
+  seat: {"x":3766.07,"y":2.234,"z":-3120.79,"scale":1}
+FAIL  seated on the water plane (y = 0) — y=2.234 scale=1
