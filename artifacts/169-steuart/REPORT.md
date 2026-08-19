@@ -12,7 +12,9 @@ checks true, from a fresh-scene re-import of the exported GLB.
 | | |
 |---|---|
 | Triangles | **19,908** (cap 22,000) |
-| Objects | 600 |
+| Objects | 14 (600 before the stage-4 join-per-material pass) |
+| File size | **575,032 bytes** meshopt-compressed (1,352,416 pre-optimize, −57.5%) |
+| Draw submeshes | 15 (602 pre-optimize) |
 | Dimensions (axis-aligned) | 60.14 × 60.28 × **46.64** m |
 | Building along its own axes | 42.35 × 41.84 m |
 | min Z | 0.0000 m |
@@ -105,6 +107,18 @@ blender -b --python render_169_steuart.py -- --night
 python3 make_contact_sheet.py
 blender -b --python validate_169_steuart.py
 ```
+
+## Stage 4 — optimize
+
+The shipping `169-steuart.glb` is the **stage-4 output**: welded, joined per material
+and meshopt-packed with `gltfpack@0.24 -c -km -kn -noq`. All eight optimize gates PASS;
+the pre-optimize asset is archived byte-for-byte at `optimize/input/169-steuart.glb`
+and the full metrics, waste census and A/B pixel deltas are in `optimize/REPORT.md`.
+Geometry is unchanged — same triangles, same bounding box to the last decimal, worst
+A/B pixel delta 0.919% and that is Monte-Carlo noise on the emissive arcade.
+
+The renders above were made from the pre-optimize export; the A/B sheet in
+`optimize/renders/contact_sheet.png` shows the two are indistinguishable.
 
 ## Stage 3 — approval
 
