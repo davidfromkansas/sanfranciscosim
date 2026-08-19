@@ -354,8 +354,9 @@ Anchor on the **OSM OBB centre**, `−122.4144797, 37.7804306`. Two notes:
   `sf3d-parcel-vs-footprint-offset`), and here it is also *informative*: the DataSF
   outline is LiDAR tracing the cornice, the OSM outline is the wall plane. Build
   the wall plane at 112.53 x 66.93 and give the main cornice a ~0.9 m projection
-  and the roof outline lands at ~114.3 x 68.7 — DataSF's box to within 0.3 m. Use
-  that as a free cross-check on the cornice.
+  and the CORNICE outline lands at ~114.3 x 68.7 — DataSF's box to within 0.3 m
+  (the metal roof itself sits inboard of that). Use it as a free cross-check on
+  the cornice depth.
 - The area centroid of the built annulus is only 1.2 m from the OBB centre
   (2024.87, −1153.87 vs 2025.69, −1153.00 in local metres), so there is no
   centroid-vs-box argument here; the box centre is what the model centres on.
