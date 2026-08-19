@@ -340,7 +340,9 @@ export async function generateReply({
       ? `You downvoted this. You did not think it belonged here or did not like it. Say what you think, the way you would actually say it.\n\n`
       : stance === "up"
         ? `You upvoted this. You are glad somebody said it, and others in the thread disagree.\n\n`
-        : "";
+        : stance === "defend"
+          ? `You did not vote on this, but the thread has turned on the author and you think that is too harsh. Push back the way you actually would.\n\n`
+          : "";
   const user =
     `DISCUSSION\n\n` +
     voted +
@@ -504,7 +506,24 @@ function votersOf(cast, thread, value) {
 // voted, because their reply is an account of that vote.
 function pickResponder(cast, thread, mood) {
   if (mood === "negative") {
+    // Not only the critics. A downvoted post on a real board draws two kinds
+    // of reply — the objections, and people arguing the pile-on is unfair —
+    // so the floor is open to both, weighted by the vote. The +1 in the
+    // denominator keeps a defender's slot open even when nobody upvoted:
+    // somebody who never clicked anything can still think the thread is being
+    // too hard on the author.
     const down = votersOf(cast, thread, -1);
+    const { upvotes, downvotes } = tally(thread.votes);
+    const wantCritic =
+      Math.random() < downvotes / (downvotes + upvotes + 1) ||
+      thread.replies.length === 0; // the first word goes to an objector —
+    // a defence of a post nobody has criticised yet reads as noise
+    if (wantCritic && down.length)
+      return { persona: pick(down), stance: "down" };
+    const up = votersOf(cast, thread, 1);
+    if (up.length) return { persona: pick(up), stance: "up" };
+    const anyone = pickAnyone(cast, thread);
+    if (anyone) return { persona: anyone, stance: "defend" };
     return down.length ? { persona: pick(down), stance: "down" } : null;
   }
   if (mood === "contested") {
