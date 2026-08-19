@@ -221,7 +221,39 @@ Note the QA harness's drill-mode gate was changed for this asset: the inherited
 merges during boot and satisfies `live > 20` long before the loader ever reaches
 for the file. It now waits on `failed > 0` alone.
 
-### 6.4 Housekeeping
+### 6.4 Fallback drill (Step 6) — all six checks PASS
+
+The throwaway file server returned a real **404** for
+`/sf-assets/landmarks/one-market-plaza-towers.glb` rather than renaming the file.
+
+| Check | Result |
+|---|---|
+| **The drill actually exercised the loader** | `failed: 1` — a drill reporting `failed: 0` measured nothing, however healthy it looks |
+| App still boots with the GLB missing | `entries: 104`, **84 live**, 0 loading, 0 fading — the area renders |
+| This landmark absent | `SF.assets.placed.has('oneMarketPlazaTowers')` **false** |
+| Exactly one warning naming it | yes, 1 of 93 console lines |
+| Draw calls with it missing | 87/frame |
+| Case B site behaviour | empty ground inside the exclusion zone, as designed |
+
+**The warning text differs from the neighbouring asset's, and the difference is
+informative.** This one reads:
+
+```
+sf-assets: one-market-plaza-towers failed to load (... 404: Not Found)
+  — keeping the code-built landmark
+```
+
+The 1 Market asset next door produced the same line **without** the "keeping the
+code-built landmark" suffix. That is the streaming mode showing through: a
+**resident** entry (no `loadRadius`, as here) fails through the resident path and
+gets INTEGRATION-PROMPT Step 6's quoted wording verbatim, while a **streamed**
+entry fails through `scan()` and gets the bare `failed to load`. Match on the
+id, not on the prompt's wording — and note that Step 6's text is only literally
+correct for resident assets.
+
+Full log: `qa/drill.log`. The GLB was verified byte-identical afterwards.
+
+### 6.5 Housekeeping
 
 - `node pipeline/compress-assets.mjs` skips this asset (already carries
   `EXT_meshopt_compression` from stage 4); its only effect was to re-compress

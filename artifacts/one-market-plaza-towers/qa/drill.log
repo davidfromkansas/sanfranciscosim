@@ -1,0 +1,21 @@
+  entries: {"entries":104,"far":102,"loading":1,"live":1,"fading":0,"failed":0}
+  stats: {"entries":104,"far":19,"loading":0,"live":84,"fading":0,"failed":1}
+PASS  manifest entry loads — sf-assets: one-market-plaza-towers failed to load (fetch for "http://127.0.0.1:62051/sf-assets/landmarks/one-market-plaza-towers.glb" responded with 404: Not Found) — keeping the code-built landmark
+PASS  uniform scale ~ 1.0 — n/a in drill
+  rig: {"x":3812,"z":-2577,"yawDeg":58,"pitchDeg":42,"distance":700}
+  placedThis: false null
+  placedIds: goldenGateBridge,salesforceTower,362Brannan,380Brannan,550Third,chaseCenter,551Third,350Brannan,171SouthPark,101SouthPark,155SouthPark,135SouthPark,165SouthPark,370Brannan,358Brannan,181SouthPark,574Third,500Third,599Third,590Third,592Third,400Brannan,188SouthPark,150SouthPark,560Third,160SouthPark,132SouthPark,106SouthPark,108SouthPark,156SouthPark,168SouthPark,140SouthPark,126SouthPark,102SouthPark,2SouthPark,64SouthPark,524Second,21SouthPark,501Second,22SouthPark,26SouthPark,35SouthPark,41SouthPark,46SouthPark,58SouthPark,76SouthPark,84SouthPark,92SouthPark,300Brannan,318Brannan,95JackLondonAlley,326Brannan,334Brannan,49SouthPark,340Brannan,49Zoe,246Ritch,254Ritch,434Brannan,424Brannan,248Ritch,226Ritch,414Brannan,501Third,1SouthPark,10SouthPark,521Third,164SouthPark,ferryBuilding,transamerica,paintedLadies,cityHall,coitTower,conservatoryOfFlowers,calAcademy,palaceOfFineArts,deYoung,stMarysCathedral,fairmont,graceCathedral,missionDolores,columbusTower,operaHouse,555California
+  console lines: 93
+    > weather: feed unavailable, holding the last known sky SyntaxError: Unexpected token '<', "<!doctype "... is not valid JSON
+    > sf-assets: one-market-plaza-towers failed to load (fetch for "http://127.0.0.1:62051/sf-assets/landmarks/one-market-plaza-towers.glb" responded with 404: Not Found) — keeping the code-built landmark
+PASS  draw calls under 300 at the landmark — avg 87/frame
+PASS  drill actually exercised the loader (failed > 0) — failed=1 live=84 far=19 — INCONCLUSIVE if 0
+PASS  app still boots with the GLB missing — {"entries":104,"far":19,"loading":0,"live":84,"fading":0,"failed":1}
+PASS  exactly one fallback warning — sf-assets: one-market-plaza-towers failed to load (fetch for "http://127.0.0.1:62051/sf-assets/landmarks/one-market-plaza-towers.glb" responded with 404: Not Found) — keeping the code-built landmark
+
+PASS manifest entry loads
+PASS uniform scale ~ 1.0
+PASS draw calls under 300 at the landmark
+PASS drill actually exercised the loader (failed > 0)
+PASS app still boots with the GLB missing
+PASS exactly one fallback warning
