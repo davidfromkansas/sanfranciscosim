@@ -1,0 +1,77 @@
+{
+ "input_materials": [
+  "Toy_glass",
+  "Toy_glassl_Glow",
+  "Toy_mustard_Glow",
+  "Toy_roofd",
+  "Toy_rust",
+  "Toy_sash",
+  "Toy_steel",
+  "Toy_stone",
+  "Toy_white"
+ ],
+ "steps": [
+  {
+   "step": "weld+degenerate",
+   "tris": 8664,
+   "verts": 4588
+  },
+  {
+   "step": "interior-faces",
+   "tris": 8664,
+   "verts": 4588
+  },
+  {
+   "step": "limited-dissolve",
+   "skipped": "coplanar ring bands (parapet, coping, 2 cornice runs)"
+  },
+  {
+   "step": "join-per-material",
+   "tris": 8664,
+   "verts": 4588
+  }
+ ],
+ "input": {
+  "tris": 8664,
+  "verts": 17164,
+  "objects": 130
+ },
+ "interior_faces_removed": 0,
+ "joins": {
+  "grp_Toy_glass": 20,
+  "grp_Toy_glassl_Glow": 3,
+  "grp_Toy_sash": 37,
+  "grp_Toy_stone": 26,
+  "grp_Toy_mustard_Glow": 5,
+  "grp_Toy_white": 2,
+  "grp_Toy_roofd": 33,
+  "grp_Toy_steel": 3
+ },
+ "inverted_solids": [],
+ "reimport": {
+  "objects": 9,
+  "materials": [
+   "Toy_glass",
+   "Toy_glassl_Glow",
+   "Toy_mustard_Glow",
+   "Toy_roofd",
+   "Toy_rust",
+   "Toy_sash",
+   "Toy_steel",
+   "Toy_stone",
+   "Toy_white"
+  ],
+  "bbox_dims": [
+   47.3614,
+   51.4933,
+   11.73
+  ],
+  "bbox_min": [
+   -24.017,
+   -25.6144,
+   0.0
+  ]
+ },
+ "bbox_ok": true,
+ "material_set_ok": true
+}

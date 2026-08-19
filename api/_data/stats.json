@@ -1,6 +1,6 @@
 {
- "generated": "2026-08-14T00:15:48.280Z",
- "buildings": 174731,
+ "generated": "2026-08-17T21:58:23.160Z",
+ "buildings": 174696,
  "cells": 596,
  "categories": [
   {
@@ -14,42 +14,42 @@
    "cat": 1,
    "id": "house",
    "label": "House",
-   "count": 124515,
+   "count": 124512,
    "night": 0
   },
   {
    "cat": 2,
    "id": "apartments",
    "label": "Apartments",
-   "count": 14015,
+   "count": 14009,
    "night": 0
   },
   {
    "cat": 3,
    "id": "office",
    "label": "Office",
-   "count": 2748,
+   "count": 2734,
    "night": 3
   },
   {
    "cat": 4,
    "id": "retail",
    "label": "Retail",
-   "count": 8040,
+   "count": 8033,
    "night": 1
   },
   {
    "cat": 5,
    "id": "restaurant_cafe",
    "label": "Restaurant / Café",
-   "count": 2841,
+   "count": 2840,
    "night": 1
   },
   {
    "cat": 6,
    "id": "bar",
    "label": "Bar",
-   "count": 524,
+   "count": 523,
    "night": 1
   },
   {
@@ -63,7 +63,7 @@
    "cat": 8,
    "id": "worship",
    "label": "Place of worship",
-   "count": 633,
+   "count": 632,
    "night": 3
   },
   {
@@ -91,7 +91,7 @@
    "cat": 12,
    "id": "clinic",
    "label": "Clinic",
-   "count": 1387,
+   "count": 1386,
    "night": 2
   },
   {
@@ -140,7 +140,7 @@
    "cat": 19,
    "id": "industrial",
    "label": "Industrial",
-   "count": 2029,
+   "count": 2028,
    "night": 3
   },
   {
@@ -190,17 +190,17 @@
   {
    "sub": "apartments",
    "label": "Apartments",
-   "count": 5320
+   "count": 5318
   },
   {
    "sub": "shop",
    "label": "Shop",
-   "count": 2155
+   "count": 2152
   },
   {
    "sub": "office",
    "label": "Office",
-   "count": 1885
+   "count": 1880
   },
   {
    "sub": "restaurant",
@@ -215,12 +215,12 @@
   {
    "sub": "salon",
    "label": "Salon",
-   "count": 1028
+   "count": 1026
   },
   {
    "sub": "clinic",
    "label": "Clinic",
-   "count": 960
+   "count": 959
   },
   {
    "sub": "house",
@@ -240,17 +240,17 @@
   {
    "sub": "factory",
    "label": "Factory",
-   "count": 688
+   "count": 687
   },
   {
    "sub": "church",
    "label": "Church",
-   "count": 570
+   "count": 569
   },
   {
    "sub": "cafe",
    "label": "Café",
-   "count": 526
+   "count": 525
   },
   {
    "sub": "preschool",
@@ -300,7 +300,7 @@
   {
    "sub": "hardware_store",
    "label": "Hardware store",
-   "count": 226
+   "count": 225
   },
   {
    "sub": "theater",
@@ -355,7 +355,7 @@
   {
    "sub": "tech_hq",
    "label": "Tech office",
-   "count": 132
+   "count": 133
   },
   {
    "sub": "supermarket",
@@ -535,7 +535,7 @@
   {
    "sub": "wine_bar",
    "label": "Wine bar",
-   "count": 32
+   "count": 31
   },
   {
    "sub": "ice_cream",
@@ -654,18 +654,18 @@
   }
  ],
  "sources": {
-  "landuse": 140684,
-  "business": 10210,
+  "landuse": 140666,
+  "business": 10202,
   "heuristic": 7280,
-  "osm": 8617,
-  "overture": 6655,
+  "osm": 8614,
+  "overture": 6649,
   "datasf": 1285
  },
  "confidence": [
-  147964,
-  15322,
-  4492,
-  6953
+  147946,
+  15309,
+  4489,
+  6952
  ],
  "streets": {
   "named": 2509,

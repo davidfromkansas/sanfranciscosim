@@ -1,0 +1,574 @@
+{
+ "file_bytes": {
+  "raw": 251324,
+  "gzip9": 40273
+ },
+ "objects": 73,
+ "total_tris": 3920,
+ "total_verts": 7936,
+ "primitives_est": 77,
+ "top20": [
+  {
+   "name": "parapet",
+   "tris": 288,
+   "verts": 528,
+   "dims": [
+    26.146,
+    26.146,
+    0.18
+   ],
+   "materials": [
+    "Toy_cream"
+   ]
+  },
+  {
+   "name": "body",
+   "tris": 108,
+   "verts": 216,
+   "dims": [
+    26.108,
+    26.108,
+    11.02
+   ],
+   "materials": [
+    "Toy_cream",
+    "Toy_stone"
+   ]
+  },
+  {
+   "name": "cornice",
+   "tris": 108,
+   "verts": 216,
+   "dims": [
+    5.334,
+    5.334,
+    0.56
+   ],
+   "materials": [
+    "Toy_trim"
+   ]
+  },
+  {
+   "name": "cornice_die_ne",
+   "tris": 108,
+   "verts": 216,
+   "dims": [
+    0.32,
+    0.32,
+    0.56
+   ],
+   "materials": [
+    "Toy_trim"
+   ]
+  },
+  {
+   "name": "cornice_die_sw",
+   "tris": 108,
+   "verts": 216,
+   "dims": [
+    0.32,
+    0.32,
+    0.56
+   ],
+   "materials": [
+    "Toy_trim"
+   ]
+  },
+  {
+   "name": "pv_0",
+   "tris": 108,
+   "verts": 216,
+   "dims": [
+    6.471,
+    6.471,
+    0.14
+   ],
+   "materials": [
+    "Toy_ink"
+   ]
+  },
+  {
+   "name": "pv_1",
+   "tris": 108,
+   "verts": 216,
+   "dims": [
+    6.471,
+    6.471,
+    0.14
+   ],
+   "materials": [
+    "Toy_ink"
+   ]
+  },
+  {
+   "name": "pv_2",
+   "tris": 108,
+   "verts": 216,
+   "dims": [
+    6.471,
+    6.471,
+    0.14
+   ],
+   "materials": [
+    "Toy_ink"
+   ]
+  },
+  {
+   "name": "rear_service_door",
+   "tris": 108,
+   "verts": 216,
+   "dims": [
+    1.077,
+    1.077,
+    2.3
+   ],
+   "materials": [
+    "Toy_ink"
+   ]
+  },
+  {
+   "name": "roof_mech",
+   "tris": 108,
+   "verts": 216,
+   "dims": [
+    2.392,
+    2.392,
+    0.5
+   ],
+   "materials": [
+    "Toy_steel"
+   ]
+  },
+  {
+   "name": "roof_mech_small",
+   "tris": 108,
+   "verts": 216,
+   "dims": [
+    0.981,
+    0.981,
+    0.32
+   ],
+   "materials": [
+    "Toy_steel"
+   ]
+  },
+  {
+   "name": "skylight_0",
+   "tris": 108,
+   "verts": 216,
+   "dims": [
+    2.183,
+    2.183,
+    0.32
+   ],
+   "materials": [
+    "Toy_glass",
+    "Toy_trim"
+   ]
+  },
+  {
+   "name": "skylight_1",
+   "tris": 108,
+   "verts": 216,
+   "dims": [
+    2.183,
+    2.183,
+    0.32
+   ],
+   "materials": [
+    "Toy_glass",
+    "Toy_trim"
+   ]
+  },
+  {
+   "name": "skylight_2",
+   "tris": 108,
+   "verts": 216,
+   "dims": [
+    2.183,
+    2.183,
+    0.32
+   ],
+   "materials": [
+    "Toy_glass",
+    "Toy_trim"
+   ]
+  },
+  {
+   "name": "vestibule_recess",
+   "tris": 108,
+   "verts": 216,
+   "dims": [
+    1.883,
+    1.883,
+    2.99
+   ],
+   "materials": [
+    "Toy_ink"
+   ]
+  },
+  {
+   "name": "flank_boarding",
+   "tris": 84,
+   "verts": 168,
+   "dims": [
+    21.03,
+    21.03,
+    3.22
+   ],
+   "materials": [
+    "Toy_sand"
+   ]
+  },
+  {
+   "name": "rear_cladding",
+   "tris": 84,
+   "verts": 168,
+   "dims": [
+    5.188,
+    5.188,
+    11.02
+   ],
+   "materials": [
+    "Toy_roofd"
+   ]
+  },
+  {
+   "name": "shop_bulkhead",
+   "tris": 84,
+   "verts": 168,
+   "dims": [
+    3.303,
+    3.303,
+    1.05
+   ],
+   "materials": [
+    "Toy_steel"
+   ]
+  },
+  {
+   "name": "shop_lintel",
+   "tris": 84,
+   "verts": 168,
+   "dims": [
+    3.303,
+    3.303,
+    0.2
+   ],
+   "materials": [
+    "Toy_steel"
+   ]
+  },
+  {
+   "name": "shop_pier_mid",
+   "tris": 84,
+   "verts": 168,
+   "dims": [
+    0.29,
+    0.29,
+    3.3
+   ],
+   "materials": [
+    "Toy_steel"
+   ]
+  }
+ ],
+ "vertex_attrs": [
+  "NORMAL"
+ ],
+ "materials": [
+  {
+   "name": "Toy_cream",
+   "glow": false,
+   "user_objects": 2
+  },
+  {
+   "name": "Toy_glass",
+   "glow": false,
+   "user_objects": 16
+  },
+  {
+   "name": "Toy_glassl_Glow",
+   "glow": true,
+   "user_objects": 4
+  },
+  {
+   "name": "Toy_ink",
+   "glow": false,
+   "user_objects": 10
+  },
+  {
+   "name": "Toy_roofd",
+   "glow": false,
+   "user_objects": 1
+  },
+  {
+   "name": "Toy_sand",
+   "glow": false,
+   "user_objects": 1
+  },
+  {
+   "name": "Toy_steel",
+   "glow": false,
+   "user_objects": 18
+  },
+  {
+   "name": "Toy_stone",
+   "glow": false,
+   "user_objects": 1
+  },
+  {
+   "name": "Toy_trim",
+   "glow": false,
+   "user_objects": 23
+  },
+  {
+   "name": "Toy_trim_Glow",
+   "glow": true,
+   "user_objects": 1
+  }
+ ],
+ "textures": [],
+ "bbox": {
+  "dims": [
+   26.3728,
+   26.3678,
+   11.58
+  ],
+  "min": [
+   -13.1864,
+   -13.1839,
+   0.0
+  ],
+  "origin_offset_xy": [
+   0.0,
+   0.0
+  ],
+  "base_z": 0.0
+ },
+ "duplicate_mesh_groups": [
+  {
+   "signature": {
+    "verts": 96,
+    "tris": 44,
+    "dims": [
+     0.8415,
+     0.8415,
+     0.12
+    ]
+   },
+   "objects": [
+    "win_r2_0_sill",
+    "win_r2_1_sill",
+    "win_r2_2_sill",
+    "win_r3_0_sill",
+    "win_r3_1_sill",
+    "win_r3_2_sill",
+    "win_s2_0_sill",
+    "win_s2_1_sill",
+    "win_s2_2_sill",
+    "win_s3_0_sill",
+    "win_s3_1_sill",
+    "win_s3_2_sill"
+   ]
+  },
+  {
+   "signature": {
+    "verts": 216,
+    "tris": 108,
+    "dims": [
+     6.4706,
+     6.4706,
+     0.14
+    ]
+   },
+   "objects": [
+    "pv_0",
+    "pv_1",
+    "pv_2"
+   ]
+  },
+  {
+   "signature": {
+    "verts": 216,
+    "tris": 108,
+    "dims": [
+     2.1832,
+     2.1832,
+     0.32
+    ]
+   },
+   "objects": [
+    "skylight_0",
+    "skylight_1",
+    "skylight_2"
+   ]
+  },
+  {
+   "signature": {
+    "verts": 216,
+    "tris": 108,
+    "dims": [
+     0.3202,
+     0.3202,
+     0.56
+    ]
+   },
+   "objects": [
+    "cornice_die_ne",
+    "cornice_die_sw"
+   ]
+  },
+  {
+   "signature": {
+    "verts": 96,
+    "tris": 44,
+    "dims": [
+     2.4042,
+     2.4042,
+     0.13
+    ]
+   },
+   "objects": [
+    "fire_escape_0",
+    "fire_escape_1"
+   ]
+  },
+  {
+   "signature": {
+    "verts": 96,
+    "tris": 44,
+    "dims": [
+     0.1273,
+     0.1273,
+     4.6
+    ]
+   },
+   "objects": [
+    "fire_escape_post_0",
+    "fire_escape_post_1"
+   ]
+  },
+  {
+   "signature": {
+    "verts": 24,
+    "tris": 12,
+    "dims": [
+     2.1779,
+     2.1779,
+     0.01
+    ]
+   },
+   "objects": [
+    "pv_0_rail_1",
+    "pv_0_rail_2",
+    "pv_1_rail_1",
+    "pv_1_rail_2",
+    "pv_2_rail_1",
+    "pv_2_rail_2"
+   ]
+  },
+  {
+   "signature": {
+    "verts": 24,
+    "tris": 12,
+    "dims": [
+     0.799,
+     0.799,
+     1.85
+    ]
+   },
+   "objects": [
+    "win_r2_0_fill",
+    "win_r2_1_fill",
+    "win_r2_2_fill",
+    "win_r3_0_fill",
+    "win_r3_1_fill",
+    "win_r3_2_fill"
+   ]
+  },
+  {
+   "signature": {
+    "verts": 24,
+    "tris": 12,
+    "dims": [
+     0.7707,
+     0.7707,
+     1.85
+    ]
+   },
+   "objects": [
+    "win_s2_0_fill",
+    "win_s2_1_fill",
+    "win_s2_2_fill",
+    "win_s3_0_fill",
+    "win_s3_1_fill",
+    "win_s3_2_fill"
+   ]
+  },
+  {
+   "signature": {
+    "verts": 24,
+    "tris": 12,
+    "dims": [
+     0.6293,
+     0.6293,
+     1.73
+    ]
+   },
+   "objects": [
+    "win_s2_0_glow",
+    "win_s2_2_glow",
+    "win_s3_0_glow",
+    "win_s3_1_glow"
+   ]
+  },
+  {
+   "signature": {
+    "verts": 24,
+    "tris": 12,
+    "dims": [
+     20.743,
+     20.743,
+     0.05
+    ]
+   },
+   "objects": [
+    "flank_groove_0",
+    "flank_groove_1",
+    "flank_groove_2"
+   ]
+  },
+  {
+   "signature": {
+    "verts": 24,
+    "tris": 12,
+    "dims": [
+     0.1945,
+     0.1945,
+     2.05
+    ]
+   },
+   "objects": [
+    "shopfront_mullion_0",
+    "shopfront_mullion_1"
+   ]
+  }
+ ],
+ "dup_redundant_tris": 1364,
+ "join_candidates": {
+  "Toy_cream": 2,
+  "Toy_glass": 16,
+  "Toy_glassl_Glow": 4,
+  "Toy_ink": 10,
+  "Toy_steel": 18,
+  "Toy_trim": 23
+ },
+ "degenerate_tris": 0,
+ "coincident_vert_pairs": 5832,
+ "over_tess": {
+  "near_distance_m": 39.56,
+  "one_px_world_m": 0.0267,
+  "note": "cylinders whose chord error < one_px_world_m can halve segments"
+ }
+}

@@ -178,10 +178,10 @@ const TOY_NIGHT = {
   horizon: new Color(0x2c3a5c),
   zenith: new Color(0x1a2340),
   sun: new Color(0xb8c8e8),
-  sunIntensity: 0.63,
+  sunIntensity: 0.86,
   hemiSky: new Color(0x7688c2),
   hemiGround: new Color(0x7a6a54),
-  hemiIntensity: 1.15,
+  hemiIntensity: 1.3,
   fog: new Color(0x1e2740),
 };
 // Wildfire smoke. It is NOT fog with an orange tint: what made September 2020
@@ -203,7 +203,15 @@ const STAR_COUNT = 2000;
 // The usability floor. The plan asks for at least 0.25 key and 0.42 hemisphere;
 // on the actual model those left a Quality=Low new-moon street unreadable, so
 // the floor sits well above the minimum. The tilt-shift grade is not the lever.
-const NIGHT_KEY_FLOOR = 0.63;
+//
+// Raised 0.63 -> 0.86 (owner decision 2026-08-15). The floor is what a MOONLESS
+// night gets, and on the real calendar that is most of them — SF's moon is down
+// or a thin crescent far more often than it is full, so the floor, not the moon,
+// was setting the mood of nearly every night anyone looked at. The phase still
+// reads: the moon adds up to 0.44 on top, so a full moon (1.30) is half again
+// as bright as a moonless one. Physically this is generous — a real moonless
+// city is lit by streetlights alone — and that is the trade.
+const NIGHT_KEY_FLOOR = 0.86;
 const NIGHT_HEMI_FLOOR = TOY_NIGHT.hemiIntensity;
 // A shadow camera pointed at a key light far below the horizon is degenerate.
 const KEY_Y_FLOOR = -0.2;

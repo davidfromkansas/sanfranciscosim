@@ -67,6 +67,32 @@ LLM agent over the city's data. Rules it must keep: answers city facts ONLY from
 
 All UI (cards, search, concierge panel) follows the toy theme: cream card stock, warm-ink 2px borders, HARD offset shadows (zero blur), candy accent pills, rounded chunky type, press-down button physicality. No gradients, no glassmorphism, no pure black/white. Theme tokens live in the app's ui-theme stylesheet — if a color/shadow isn't a token, it doesn't ship.
 
+## Live vehicle motion (the regression that keeps coming back)
+
+"The buses are frozen" and "parked coaches are cluttering the city" have each been fixed several times (9e9accd8, 10b388aa, 5f0ea041, 73bb2a96, 4cd32464) and each fix was later undone by an unrelated pass through `app/src/muni.js`. The rules therefore no longer live inline in the renderer: they are pure functions in **`app/src/muni-motion.js`**, locked by **`app/test/muni-motion.test.mjs`** (`cd app && npm test`, and `npm run build` runs it first, so a broken rule fails the Vercel build). Read that file's header before touching anything that decides whether a vehicle moves or leaves the scene, and never inline a copy of one of its rules back into `muni.js`.
+
+The four invariants a live-feed layer must keep (they apply to ferries and aircraft too):
+
+1. **Dwell is a displacement test, never a speed reading.** GTFS-RT `speed` is an instantaneous sample — 260 of 507 Muni vehicles report exactly 0 at any instant. `fixStep` (metres between consecutive fixes) is the only dwell evidence; the reported speed may only bias how fast an already-moving vehicle runs.
+2. **Measure that displacement fix-to-fix, never render-position-to-target.** Dead reckoning legitimately drives a vehicle past its target, so `targetS - s` goes negative on a bus that just covered 900 m.
+3. **Vehicles keep moving between fixes.** Fresh fixes are up to ~120 s apart (60 s poll vs 90 s TTL, worse in degraded mode) and identical payloads are normal, so a moving vehicle extrapolates along its shape (`DEAD_RECKON_MAX_S`) instead of stopping at the last target.
+4. **Liveness and freshness are different clocks.** `lastFixAt` (bumped by every poll that mentions the vehicle, stale payloads included) decides whether it still exists; `lastFreshFixAt` (bumped only by a new fix) drives speed, dormancy and the dead-reckon cap. Merging them evicted the whole fleet every 3 minutes.
+
+The flip side is removal: a vehicle the data says is parked, on layover, or off its alignment sinks out of the scene, and one the feed stops reporting is dropped. If you change any threshold here, change it in `muni-motion.js` with a test, and verify on the deployed site that vehicles both MOVE and DISAPPEAR when they should.
+
+## Fog, and asset-backed effects that disappear quietly
+
+The visible fog banks (`app/src/fogbanks.js`, instanced `fog-cube.glb` placed by the weather field) were gone for two days and nobody could see why: an unrelated intake pass meshopt-compressed the asset (d730d45f) while that module was the last one still building a bare `GLTFLoader`, so the file failed to parse and rule 3 did exactly what it promises — one console warning, no banks, shader fog carrying the scene. **That is the trap: every asset-backed effect here fails silently by design, so "the feature is gone" and "the weather is calm" look identical from the outside.** Fog especially, because shader fog still dissolves the distance.
+
+The rules, locked by `app/test/asset-loading.test.mjs` (runs in `npm test`, i.e. in the Vercel build) and by `no-restricted-imports` in `app/eslint.config.js`:
+
+1. **`createGLTFLoader()` from `app/src/gltf.js` is the only loader.** Everything under `sf-assets/` is meshopt-compressed at intake, and only that factory has the decoder. A bare `GLTFLoader` is a lint error and a test failure.
+2. **A hard-coded GLB path must resolve to a file that exists.** Renaming or dropping an asset without updating its module is a silent feature deletion, not a 404 anyone will notice.
+3. **No quality tier may zero out the fog banks.** Fog thins with the tier (`BANK_CAPS`), never disappears — a `low: 0` made the fog vanish outright whenever the governor demoted a loaded machine.
+4. **Fog coverage is spatial.** It comes from the 6×6 weather field via `sampleAt(x, z, 'fog')` (visibility + low cloud, blended with GOES-18 satellite fog). Never replace it with one citywide scalar; that is the "accurate coverage" the feature is named for.
+
+When you change anything here, verify on the deployed site with `SF.weather.mean.fog`, `SF.sampleWeather(x, z)` and `SF.fogBanks.ready`/`.coverage()` — and if the sky happens to be clear, force it with the `karl` preset rather than concluding it works.
+
 ## QA norms for every change
 
 Screenshot-verify on the DEPLOYED site, not just localhost: hero view + the affected area, day and night, cold cache-cleared load boots the diorama first-frame, budgets hold (rule 2), picking/search/cards still work, and the fallback drill passes (rename the asset/data you added → app degrades gracefully). Honest reporting: a FAIL with explanation is acceptable; a hidden one is not.
@@ -77,3 +103,4 @@ Screenshot-verify on the DEPLOYED site, not just localhost: hero view + the affe
 - Socrata/DataSF bulk downloads occasionally throttle — a free app token raises limits.
 - The tile loader's cross-fade uses hashed-alpha discard with distance hysteresis; visible LOD pops are always a bug.
 - 404s in console = missing tile/resource — root-cause them, don't ignore.
+- Anything touching live vehicles: run `cd app && npm test` before shipping. A failure there means you are re-introducing a bug the city has already shipped once (see "Live vehicle motion").

@@ -1,0 +1,383 @@
+{
+  "tool": "health-probe",
+  "label": "prod-baseline",
+  "url": "https://sf-3d.vercel.app",
+  "startedAt": "2026-08-17T00-42-12-372Z",
+  "profiles": [
+    {
+      "profile": "desktop",
+      "label": "desktop (unthrottled)",
+      "crashed": false,
+      "load": {
+        "network": "Fast 4G (4 Mbps / 70 ms RTT), cold cache",
+        "timeToFirstFrameMs": 26105,
+        "timeToCurtainLiftMs": 92556,
+        "curtainLifted": true,
+        "wallSeconds": 106.5,
+        "transferredMB": 13.5,
+        "requests": 226,
+        "failedRequests": 0,
+        "notFound": [],
+        "totalBlockingMs": 78079,
+        "longTasks": 31,
+        "longTasksOver200": 25,
+        "longestTaskMs": 5094,
+        "eventLoopLagP95Ms": 10899,
+        "eventLoopLagMaxMs": 25563,
+        "heapMB": 187.5,
+        "cityStats": {
+          "cellsLoaded": 88,
+          "cellsTotal": 1656,
+          "nearChunks": 0,
+          "groupsTotal": 61,
+          "farGroups": 1,
+          "groundGroups": 0,
+          "groundDetail": 0,
+          "trees": 0,
+          "lamps": 0,
+          "kitInstances": 0,
+          "kitPieceTypes": 0,
+          "kitPlaced": 0,
+          "kitConsidered": 0,
+          "furniture": 0,
+          "furnitureDraws": 0
+        },
+        "quality": "high",
+        "errors": []
+      },
+      "flight": {
+        "seconds": 199.3,
+        "waypoints": 8,
+        "heapStartMB": 199.1,
+        "heapPeakMB": 215.1,
+        "heapEndMB": 202.9,
+        "heapGrowthMBPerMin": 1.5,
+        "heapLimitMB": 4095.8,
+        "drawCallsPeak": 1,
+        "trianglesPeak": 2,
+        "geometriesEnd": 93,
+        "texturesEnd": 15,
+        "programsEnd": 31,
+        "longTasks": 75,
+        "longTasksOver200": 74,
+        "longestTaskMs": 5028,
+        "totalBlockingMs": 185726,
+        "eventLoopLagP50Ms": 6400,
+        "eventLoopLagP95Ms": 11318,
+        "eventLoopLagMaxMs": 14819,
+        "contextLost": 0,
+        "contextRestored": 0,
+        "errors": [],
+        "cityStats": {
+          "cellsLoaded": 411,
+          "cellsTotal": 1656,
+          "nearChunks": 0,
+          "groupsTotal": 61,
+          "farGroups": 1,
+          "groundGroups": 0,
+          "groundDetail": 0,
+          "trees": 0,
+          "lamps": 0,
+          "kitInstances": 0,
+          "kitPieceTypes": 0,
+          "kitPlaced": 0,
+          "kitConsidered": 0,
+          "furniture": 0,
+          "furnitureDraws": 0
+        },
+        "quality": "high",
+        "transferredMB": 10.5,
+        "requests": 495,
+        "failedRequests": 0,
+        "notFound": [],
+        "samples": [
+          {
+            "atMs": 131302,
+            "heapMB": 199.1,
+            "geometries": 87
+          },
+          {
+            "atMs": 137513,
+            "heapMB": 203.5,
+            "geometries": 87
+          },
+          {
+            "atMs": 140692,
+            "heapMB": 200.8,
+            "geometries": 87
+          },
+          {
+            "atMs": 151171,
+            "heapMB": 196.8,
+            "geometries": 87
+          },
+          {
+            "atMs": 158744,
+            "heapMB": 204.4,
+            "geometries": 87
+          },
+          {
+            "atMs": 163094,
+            "heapMB": 205.4,
+            "geometries": 87
+          },
+          {
+            "atMs": 171652,
+            "heapMB": 213,
+            "geometries": 87
+          },
+          {
+            "atMs": 177912,
+            "heapMB": 214.5,
+            "geometries": 87
+          },
+          {
+            "atMs": 183588,
+            "heapMB": 199.9,
+            "geometries": 87
+          },
+          {
+            "atMs": 193269,
+            "heapMB": 201.8,
+            "geometries": 87
+          },
+          {
+            "atMs": 202669,
+            "heapMB": 207.4,
+            "geometries": 87
+          },
+          {
+            "atMs": 210281,
+            "heapMB": 206.6,
+            "geometries": 87
+          },
+          {
+            "atMs": 217499,
+            "heapMB": 202.9,
+            "geometries": 87
+          },
+          {
+            "atMs": 227298,
+            "heapMB": 203.9,
+            "geometries": 90
+          },
+          {
+            "atMs": 235141,
+            "heapMB": 205.1,
+            "geometries": 90
+          },
+          {
+            "atMs": 238916,
+            "heapMB": 204.9,
+            "geometries": 90
+          },
+          {
+            "atMs": 248501,
+            "heapMB": 206.2,
+            "geometries": 93
+          },
+          {
+            "atMs": 254859,
+            "heapMB": 207,
+            "geometries": 93
+          },
+          {
+            "atMs": 261720,
+            "heapMB": 208.1,
+            "geometries": 93
+          },
+          {
+            "atMs": 276206,
+            "heapMB": 212.1,
+            "geometries": 93
+          },
+          {
+            "atMs": 282451,
+            "heapMB": 213.6,
+            "geometries": 93
+          },
+          {
+            "atMs": 284621,
+            "heapMB": 214,
+            "geometries": 93
+          },
+          {
+            "atMs": 294733,
+            "heapMB": 215.1,
+            "geometries": 93
+          },
+          {
+            "atMs": 310216,
+            "heapMB": 202.9,
+            "geometries": 93
+          }
+        ]
+      }
+    },
+    {
+      "profile": "mobile",
+      "label": "mobile-class (CPU 4x, 390x844 @ dpr 3)",
+      "crashed": false,
+      "load": {
+        "network": "Fast 4G (4 Mbps / 70 ms RTT), cold cache",
+        "timeToFirstFrameMs": 31921,
+        "timeToCurtainLiftMs": 70270,
+        "curtainLifted": true,
+        "wallSeconds": 80.3,
+        "transferredMB": 13.9,
+        "requests": 254,
+        "failedRequests": 0,
+        "notFound": [],
+        "totalBlockingMs": 49498,
+        "longTasks": 64,
+        "longTasksOver200": 57,
+        "longestTaskMs": 6426,
+        "eventLoopLagP95Ms": 5371,
+        "eventLoopLagMaxMs": 8507,
+        "heapMB": 197.4,
+        "cityStats": {
+          "cellsLoaded": 112,
+          "cellsTotal": 1656,
+          "nearChunks": 0,
+          "groupsTotal": 61,
+          "farGroups": 1,
+          "groundGroups": 0,
+          "groundDetail": 0,
+          "trees": 0,
+          "lamps": 0,
+          "kitInstances": 0,
+          "kitPieceTypes": 0,
+          "kitPlaced": 0,
+          "kitConsidered": 0,
+          "furniture": 0,
+          "furnitureDraws": 0
+        },
+        "quality": "medium",
+        "errors": []
+      },
+      "flight": {
+        "seconds": 290.9,
+        "waypoints": 8,
+        "heapStartMB": 200.8,
+        "heapPeakMB": 234.5,
+        "heapEndMB": 234.5,
+        "heapGrowthMBPerMin": 13.5,
+        "heapLimitMB": 4095.8,
+        "drawCallsPeak": 1,
+        "trianglesPeak": 2,
+        "geometriesEnd": 88,
+        "texturesEnd": 15,
+        "programsEnd": 30,
+        "longTasks": 150,
+        "longTasksOver200": 142,
+        "longestTaskMs": 3835,
+        "totalBlockingMs": 274397,
+        "eventLoopLagP50Ms": 8552,
+        "eventLoopLagP95Ms": 22172,
+        "eventLoopLagMaxMs": 36033,
+        "contextLost": 0,
+        "contextRestored": 0,
+        "errors": [],
+        "cityStats": {
+          "cellsLoaded": 319,
+          "cellsTotal": 1656,
+          "nearChunks": 0,
+          "groupsTotal": 61,
+          "farGroups": 1,
+          "groundGroups": 0,
+          "groundDetail": 0,
+          "trees": 0,
+          "lamps": 0,
+          "kitInstances": 0,
+          "kitPieceTypes": 0,
+          "kitPlaced": 0,
+          "kitConsidered": 0,
+          "furniture": 0,
+          "furnitureDraws": 0
+        },
+        "quality": "medium",
+        "transferredMB": 9.7,
+        "requests": 465,
+        "failedRequests": 0,
+        "notFound": [],
+        "samples": [
+          {
+            "atMs": 100078,
+            "heapMB": 200.8,
+            "geometries": 81
+          },
+          {
+            "atMs": 112252,
+            "heapMB": 193.8,
+            "geometries": 81
+          },
+          {
+            "atMs": 159696,
+            "heapMB": 193.6,
+            "geometries": 81
+          },
+          {
+            "atMs": 170375,
+            "heapMB": 199.8,
+            "geometries": 82
+          },
+          {
+            "atMs": 188076,
+            "heapMB": 205.9,
+            "geometries": 82
+          },
+          {
+            "atMs": 234779,
+            "heapMB": 197.3,
+            "geometries": 82
+          },
+          {
+            "atMs": 245508,
+            "heapMB": 202.2,
+            "geometries": 82
+          },
+          {
+            "atMs": 261764,
+            "heapMB": 204.8,
+            "geometries": 85
+          },
+          {
+            "atMs": 273437,
+            "heapMB": 208.5,
+            "geometries": 85
+          },
+          {
+            "atMs": 288252,
+            "heapMB": 209.2,
+            "geometries": 88
+          },
+          {
+            "atMs": 307108,
+            "heapMB": 211,
+            "geometries": 88
+          },
+          {
+            "atMs": 321313,
+            "heapMB": 221.1,
+            "geometries": 88
+          },
+          {
+            "atMs": 333844,
+            "heapMB": 199.8,
+            "geometries": 88
+          },
+          {
+            "atMs": 350982,
+            "heapMB": 233.8,
+            "geometries": 88
+          },
+          {
+            "atMs": 372869,
+            "heapMB": 234.5,
+            "geometries": 88
+          }
+        ]
+      }
+    }
+  ]
+}

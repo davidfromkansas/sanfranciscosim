@@ -248,7 +248,7 @@ async function boot() {
     city.setQuality(quality, key);
     water.setGlitter(key === 'low' ? 0.6 : 1);
     water.setQuality(key);
-    agents.setQuality(key);
+    agents.setQuality(key, quality);
     population.setQuality(key);
     terrain.setQuality(key);
     clouds.setQuality(key);

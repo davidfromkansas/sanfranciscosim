@@ -49,7 +49,16 @@ const CHUNK = 1000;
 const NEAR_ENTER = 2400;
 const NEAR_EXIT = 3100;
 const TREE_RANGE = 3400;
+// Beyond this a lollipop is a few pixels tall, so the instances swap to a
+// canopy-only archetype: same silhouette mass, a fifth of the triangles.
+const TREE_DETAIL_RANGE = 1400;
 const LAMP_RANGE = 2600;
+// Ground residency. Streets, landcover, trees and lamps for a 2 km super-cell
+// are built when the pivot comes within ENTER and released past EXIT. Beyond
+// it the terrain (vertex-coloured from the same landuse raster) and the far
+// prism tier carry the view, so a released group leaves no hole.
+const GROUND_ENTER = 4500;
+const GROUND_EXIT = 6000;
 // The pool of light a lamp throws on the road. Shorter than LAMP_RANGE: the
 // lamp head still reads as a bright dot from far off, but the pool is a
 // ground-level detail that stops earning its fill rate well before that.
@@ -211,6 +220,25 @@ function toyTreeArchetype() {
   return merged;
 }
 
+// Distance archetype: the canopy only, at the coarsest icosahedron. 20
+// triangles against the toy lollipop's ~104, and past TREE_DETAIL_RANGE the
+// trunk is under a pixel anyway.
+function lowTreeArchetype() {
+  const canopy = new IcosahedronGeometry(4.2, 0);
+  canopy.scale(1, 0.92, 1);
+  canopy.translate(0, 6.6, 0);
+  const colors = new Float32Array(canopy.attributes.position.count * 3);
+  const pos = canopy.attributes.position;
+  for (let i = 0; i < pos.count; i++) {
+    const shade = 0.86 + (pos.getY(i) / 14) * 0.28;
+    colors[i * 3] = 0.24 * shade;
+    colors[i * 3 + 1] = 0.62 * shade;
+    colors[i * 3 + 2] = 0.27 * shade;
+  }
+  canopy.setAttribute('color', new BufferAttribute(colors, 3));
+  return canopy;
+}
+
 export function createCity(scene, data) {
   const { manifest, indexes } = data;
   const extent = manifest.extent;
@@ -265,6 +293,7 @@ export function createCity(scene, data) {
   const lampPoolMaterial = createLampPoolMaterial();
   const treeGeometry = treeArchetype();
   const toyTreeGeometry = toyTreeArchetype();
+  const lowTreeGeometry = lowTreeArchetype();
   const lampGeometry = new SphereGeometry(0.9, 6, 4);
   const lampPoolGeometry = createLampPoolGeometry();
 
@@ -401,6 +430,9 @@ export function createCity(scene, data) {
         quadFade: [1, 1, 1, 1],
         requested: false,
         groundRequested: false,
+        // Bumped on every release so a build that was still in a worker when
+        // the camera left cannot add its meshes back behind the eviction.
+        groundEpoch: 0,
       };
       g.center = new Vector3(g.originX + GROUP / 2, 0, g.originZ + GROUP / 2);
       groups.set(key, g);
@@ -593,12 +625,15 @@ export function createCity(scene, data) {
   async function buildGround(g) {
     if (g.groundRequested) return;
     g.groundRequested = true;
+    const epoch = ++g.groundEpoch;
+    const stale = () => !g.groundRequested || g.groundEpoch !== epoch;
     if (g.streetCells.length === 0 && g.landcoverCells.length === 0) return;
     const toyTier = tier === 'toy';
     const [streets, landcover] = await Promise.all([
       streetBlobs(g.streetCells),
       landcoverBlobs(g.landcoverCells),
     ]);
+    if (stale()) return;
     const result = await pool.run({
       type: 'ground',
       key: g.key,
@@ -609,6 +644,7 @@ export function createCity(scene, data) {
       streetClasses: toyTier ? toy.streetClasses : manifest.streetClasses,
       landKinds: manifest.landKinds,
     });
+    if (stale()) return;
 
     if (result.positions.length > 0) {
       const geometry = new BufferGeometry();
@@ -627,7 +663,7 @@ export function createCity(scene, data) {
 
     if (result.trees.length > 0) {
       const count = result.trees.length / 4;
-      const trees = new InstancedMesh(toyTier ? toyTreeGeometry : treeGeometry, treeMaterial, count);
+      const trees = new InstancedMesh(lowTreeGeometry, treeMaterial, count);
       const matrix = new Matrix4();
       const dummy = new Object3D();
       const instanceColors = new Float32Array(count * 3);
@@ -714,7 +750,13 @@ export function createCity(scene, data) {
     }
 
     if (result.paths.length) {
-      for (const path of result.paths) paths.push(path);
+      // Stamped with the group so eviction can take its traffic centrelines
+      // back out: without it a group that is left and re-entered pushes its
+      // paths again, and the list (and the traffic on it) doubles each time.
+      for (const path of result.paths) {
+        path.group = g.key;
+        paths.push(path);
+      }
       onPathsReady(paths);
     }
   }
@@ -908,8 +950,21 @@ export function createCity(scene, data) {
     c.requested = false;
   }
 
+  // Compacts `paths` in place: agents holds this exact array.
+  function dropPaths(key) {
+    let write = 0;
+    for (let i = 0; i < paths.length; i++) {
+      if (paths[i].group === key) continue;
+      paths[write++] = paths[i];
+    }
+    if (write === paths.length) return;
+    paths.length = write;
+    onPathsReady(paths);
+  }
+
   function disposeGround(g) {
     disposeGroundDetail(g);
+    dropPaths(g.key);
     if (g.groundMesh) stats.groundGroups--;
     stats.trees -= g.treeCount || 0;
     stats.lamps -= g.lampCount || 0;
@@ -1001,13 +1056,17 @@ export function createCity(scene, data) {
 
     // Stream silhouette and ground together. Streets, trees, lamps, and traffic
     // paths become alive near the opening view while distant skyline groups keep
-    // filling in behind them.
-    Promise.all([pump(ordered, buildFarGroup, 3), pump(ordered, buildGround, 3)]);
+    // filling in behind them. The far tier is the whole city — it is the
+    // skyline and it is cheap; ground is only the opening view's neighborhood,
+    // and `update` streams the rest in as the camera moves.
+    const nearOrigin = ordered.filter((g) => g.center.distanceTo(origin) < GROUND_ENTER);
+    Promise.all([pump(ordered, buildFarGroup, 3), pump(nearOrigin, buildGround, 3)]);
   }
 
   const tmp = new Vector3();
 
   function update(dt, cameraTarget, cameraPos, quality) {
+    const groundScale = quality.groundScale ?? 1;
     // Near tier activation with hysteresis so cells never thrash on the boundary.
     for (const c of chunks.values()) {
       tmp.copy(c.center);
@@ -1041,7 +1100,17 @@ export function createCity(scene, data) {
       tmp.copy(g.center);
       tmp.y = cameraTarget.y;
       const dist = cameraTarget.distanceTo(tmp);
-      if (g.trees) g.trees.visible = dist < TREE_RANGE * quality.treeScale;
+      if (g.trees) {
+        g.trees.visible = dist < TREE_RANGE * quality.treeScale;
+        const detail =
+          dist < TREE_DETAIL_RANGE ? (tier === 'toy' ? toyTreeGeometry : treeGeometry) : lowTreeGeometry;
+        if (g.trees.geometry !== detail) {
+          g.trees.geometry = detail;
+          // The instance bounds are derived from the archetype, so a swap
+          // without this leaves the group culled against the old silhouette.
+          g.trees.computeBoundingSphere();
+        }
+      }
       // The procedural glow sphere is the stand-in for a lamp this group has no
       // kit lamps for. Where kit lamps stand, they are the lamp — two glows in
       // one place read as a bloom bug.
@@ -1056,6 +1125,13 @@ export function createCity(scene, data) {
         buildGroundDetail(g).catch((err) => console.warn('streetscape failed', g.key, err));
       } else if (dist > DETAIL_EXIT && g.detailRequested) {
         disposeGroundDetail(g);
+      }
+
+      // Ground residency, with the same hysteresis shape as the near tier.
+      if (dist < GROUND_ENTER * groundScale && !g.groundRequested) {
+        buildGround(g).catch((err) => console.warn('ground group failed', g.key, err));
+      } else if (dist > GROUND_EXIT * groundScale && g.groundRequested) {
+        disposeGround(g);
       }
     }
     lampMaterial.opacity = Math.min(0.85, shared.uNight.value * 0.95);

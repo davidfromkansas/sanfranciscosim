@@ -1,0 +1,82 @@
+{
+ "input_materials": [
+  "Toy_glass",
+  "Toy_glassl_Glow",
+  "Toy_ink",
+  "Toy_mustard_Glow",
+  "Toy_navy",
+  "Toy_roofd",
+  "Toy_rust",
+  "Toy_sand",
+  "Toy_steel",
+  "Toy_stone",
+  "Toy_trim",
+  "Toy_verdigris"
+ ],
+ "steps": [
+  {
+   "step": "weld+degenerate",
+   "tris": 6708,
+   "verts": 3688
+  },
+  {
+   "step": "interior-faces",
+   "tris": 6708,
+   "verts": 3688
+  },
+  {
+   "step": "join-per-material",
+   "tris": 6708,
+   "verts": 3688
+  }
+ ],
+ "input": {
+  "tris": 6708,
+  "verts": 13572,
+  "objects": 169
+ },
+ "interior_faces_removed": 0,
+ "limited_dissolve": "skipped: closed ring bands (parapet frieze, well curb) and long coplanar cornice/belt strips",
+ "joins": {
+  "grp_Toy_rust": 38,
+  "grp_Toy_verdigris": 9,
+  "grp_Toy_sand": 64,
+  "grp_Toy_glass": 17,
+  "grp_Toy_glassl_Glow": 6,
+  "grp_Toy_trim": 13,
+  "grp_Toy_navy": 6,
+  "grp_Toy_steel": 5,
+  "grp_Toy_ink": 7,
+  "grp_Toy_mustard_Glow": 2
+ },
+ "inverted_solids": [],
+ "reimport": {
+  "objects": 12,
+  "materials": [
+   "Toy_glass",
+   "Toy_glassl_Glow",
+   "Toy_ink",
+   "Toy_mustard_Glow",
+   "Toy_navy",
+   "Toy_roofd",
+   "Toy_rust",
+   "Toy_sand",
+   "Toy_steel",
+   "Toy_stone",
+   "Toy_trim",
+   "Toy_verdigris"
+  ],
+  "bbox_dims": [
+   36.0194,
+   31.8393,
+   14.22
+  ],
+  "bbox_min": [
+   -18.0097,
+   -15.9197,
+   0.0
+  ]
+ },
+ "bbox_ok": true,
+ "material_set_ok": true
+}

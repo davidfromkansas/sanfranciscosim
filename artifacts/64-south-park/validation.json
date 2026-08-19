@@ -1,0 +1,241 @@
+{
+  "asset": "64-south-park.glb",
+  "validator": "5.2.0 LTS",
+  "fresh_isolated_scene": true,
+  "reimported_final_glb": true,
+  "object_count": 15,
+  "mesh_object_count": 15,
+  "triangle_count": 11436,
+  "triangle_budget": 12000,
+  "file_bytes": 397368,
+  "dimensions_m": [
+    122.4585,
+    121.0471,
+    21.0415
+  ],
+  "bbox_min_m": [
+    -61.7692,
+    -59.7834,
+    -4.1833
+  ],
+  "bbox_max_m": [
+    60.6893,
+    61.2637,
+    16.8582
+  ],
+  "oriented_footprint_m": [
+    159.5082,
+    23.5074
+  ],
+  "ground_plate_centre_uv": [
+    -0.0,
+    0.0
+  ],
+  "heading_long_deg": 45.4669,
+  "vertical_extent_m": 21.0415,
+  "manifest_targetHeightM": 21.0415,
+  "height_datum_m": 15.0,
+  "height_datum_source": "tallest American elm crest ABOVE ITS OWN GROUND \u2014 ESTIMATED, plan 2.15 risk 1",
+  "draped": true,
+  "terrain_fall_m": 6.106,
+  "terrain_cross_axis_range_m": 0.296,
+  "anchor_ground_elevation_m": 10.728,
+  "plate_top_above_terrain_m": 0.34,
+  "plate_top_above_terrain_spread_m": 0.0,
+  "shout": {
+    "diameter_m": 12.8356,
+    "centre_uv": [
+      -36.0336,
+      -1.2918
+    ],
+    "crest_m": 3.1506
+  },
+  "path_centreline_m": 188.0,
+  "seat_wall_total_m": 369.9,
+  "trees": {
+    "osm": 20,
+    "derived": 14,
+    "measured_positions_present": 20
+  },
+  "materials": [
+    "Toy_coral",
+    "Toy_cream",
+    "Toy_cream_Glow",
+    "Toy_gold",
+    "Toy_gold_Glow",
+    "Toy_ink",
+    "Toy_mint",
+    "Toy_roofd",
+    "Toy_rust",
+    "Toy_sand",
+    "Toy_steel",
+    "Toy_stone",
+    "Toy_verdigris"
+  ],
+  "glow_materials": [
+    "Toy_cream_Glow",
+    "Toy_gold_Glow"
+  ],
+  "off_palette_materials": [],
+  "textured_materials": [],
+  "transparent_materials": [],
+  "animated_objects": [],
+  "non_mesh_objects": [],
+  "signed_volumes_m3": {
+    "beds": 315.4239,
+    "furniture_wood": 5.3144,
+    "ground_plate": 5356.435,
+    "grp_Toy_cream": 78.639,
+    "grp_Toy_mint": 832.0794,
+    "grp_Toy_steel": 32.4519,
+    "grp_Toy_stone": 404.733,
+    "lamp_glow": 0.5836,
+    "lamp_heads": 0.5919,
+    "nest_swing": 0.486,
+    "path_glow": 21.6914,
+    "play_surfacing": 14.0148,
+    "shout_nets": 4.6182,
+    "shout_tubes": 9.7532,
+    "tree_crowns": 8957.8803
+  },
+  "objects_with_non_positive_volume": [],
+  "checks": [
+    {
+      "name": "binary GLB present",
+      "pass": true,
+      "value": 397368
+    },
+    {
+      "name": "no non-mesh objects (cameras/lights/armatures)",
+      "pass": true,
+      "value": []
+    },
+    {
+      "name": "no animation data",
+      "pass": true,
+      "value": []
+    },
+    {
+      "name": "no negative scales",
+      "pass": true,
+      "value": []
+    },
+    {
+      "name": "ground plate top is 0.34 m above the terrain, everywhere",
+      "pass": true,
+      "value": [
+        0.34,
+        0.0
+      ]
+    },
+    {
+      "name": "terrain drape present (min_z below the anchor's ground by the fall)",
+      "pass": true,
+      "value": [
+        -4.183,
+        6.106
+      ]
+    },
+    {
+      "name": "ground plate centred within 0.5 m of the origin",
+      "pass": true,
+      "value": [
+        -0.0,
+        0.0
+      ]
+    },
+    {
+      "name": "targetHeightM == the model's vertical extent (loader scale 1.0)",
+      "pass": true,
+      "value": [
+        21.0415,
+        21.0415
+      ]
+    },
+    {
+      "name": "tallest crest is the 15.00 m datum above its own ground",
+      "pass": true,
+      "value": 15.0
+    },
+    {
+      "name": "canopy peak == max_z (crest + terrain at that tree)",
+      "pass": true,
+      "value": 16.8582
+    },
+    {
+      "name": "oriented footprint 159.51 x 23.51 m +/- 0.5",
+      "pass": true,
+      "value": [
+        159.508,
+        23.507
+      ]
+    },
+    {
+      "name": "Shout is a circle 11.84 m across (centreline)",
+      "pass": true,
+      "value": 11.836
+    },
+    {
+      "name": "Shout centred at (-36.03, -1.29)",
+      "pass": true,
+      "value": [
+        -36.034,
+        -1.292
+      ]
+    },
+    {
+      "name": "Shout crest 4.34 m above its own ground (centreline)",
+      "pass": true,
+      "value": 4.31
+    },
+    {
+      "name": "Shout at the SOUTH-WEST end (mirror check)",
+      "pass": true,
+      "value": -36.03
+    },
+    {
+      "name": "all 20 measured tree positions present",
+      "pass": true,
+      "value": "20/20"
+    },
+    {
+      "name": "triangles <= cap",
+      "pass": true,
+      "value": "11436/12000"
+    },
+    {
+      "name": "no image textures",
+      "pass": true,
+      "value": []
+    },
+    {
+      "name": "no transparency",
+      "pass": true,
+      "value": []
+    },
+    {
+      "name": "all materials Toy_* and in the palette",
+      "pass": true,
+      "value": []
+    },
+    {
+      "name": "no Toy_body (landmarks are never tintable)",
+      "pass": true,
+      "value": null
+    },
+    {
+      "name": "_Glow materials present",
+      "pass": true,
+      "value": [
+        "Toy_cream_Glow",
+        "Toy_gold_Glow"
+      ]
+    },
+    {
+      "name": "per-object signed volume positive (normals outward)",
+      "pass": true,
+      "value": []
+    }
+  ],
+  "all_pass": true
+}

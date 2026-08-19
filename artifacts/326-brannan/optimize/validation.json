@@ -1,0 +1,118 @@
+{
+ "input": {
+  "tris": 6148,
+  "verts": 12840,
+  "objects": 182,
+  "primitives": 183,
+  "materials": [
+   "Toy_bark",
+   "Toy_bulb_Glow",
+   "Toy_canopy",
+   "Toy_charcoal",
+   "Toy_coral",
+   "Toy_coral_Glow",
+   "Toy_cream",
+   "Toy_fire_Glow",
+   "Toy_glass",
+   "Toy_glass_Glow",
+   "Toy_ink",
+   "Toy_olive",
+   "Toy_plaster",
+   "Toy_roofd",
+   "Toy_steel",
+   "Toy_stone",
+   "Toy_terra",
+   "Toy_vine"
+  ],
+  "bbox_dims": [
+   22.30686,
+   22.3614,
+   5.9
+  ],
+  "bbox_min": [
+   -10.96506,
+   -11.37516,
+   0.0
+  ],
+  "center_xy": [
+   0.18837,
+   -0.19446
+  ]
+ },
+ "output": {
+  "tris": 6148,
+  "verts": 13014,
+  "objects": 19,
+  "primitives": 20,
+  "materials": [
+   "Toy_bark",
+   "Toy_bulb_Glow",
+   "Toy_canopy",
+   "Toy_charcoal",
+   "Toy_coral",
+   "Toy_coral_Glow",
+   "Toy_cream",
+   "Toy_fire_Glow",
+   "Toy_glass",
+   "Toy_glass_Glow",
+   "Toy_ink",
+   "Toy_olive",
+   "Toy_plaster",
+   "Toy_roofd",
+   "Toy_steel",
+   "Toy_stone",
+   "Toy_terra",
+   "Toy_vine"
+  ],
+  "bbox_dims": [
+   22.30686,
+   22.3614,
+   5.9
+  ],
+  "bbox_min": [
+   -10.96506,
+   -11.37516,
+   0.0
+  ],
+  "center_xy": [
+   0.18837,
+   -0.19446
+  ]
+ },
+ "output_signed_volumes": {
+  "FireGlow": 0.01472,
+  "GateDisc": 0.021614,
+  "GateDisc_Glow": 0.008613,
+  "grp_Toy_bark": 0.641652,
+  "grp_Toy_bulb_Glow": 0.039838,
+  "grp_Toy_charcoal": 8.792241,
+  "grp_Toy_cream": 0.133453,
+  "grp_Toy_glass": 1.450081,
+  "grp_Toy_glass_Glow": 0.3204,
+  "grp_Toy_ink": 4.907434,
+  "grp_Toy_olive": 14.8626,
+  "grp_Toy_plaster": 21.131756,
+  "grp_Toy_steel": 1.037045,
+  "grp_Toy_stone": 11.91119,
+  "grp_Toy_terra": 10.328446,
+  "grp_Toy_vine": 9.49052,
+  "PergolaPanel": 0.367142,
+  "RoofCurb": 0.576332,
+  "ShedBody": 348.458089
+ },
+ "inverted_solids": [],
+ "ray_test_output": {
+  "rays": 22500,
+  "hits": 12576,
+  "flipped": 0,
+  "flipped_fraction": 0.0
+ },
+ "gates": {
+  "G1_materials_identical": true,
+  "G2_bbox_ok": true,
+  "G2_origin_ok": true,
+  "G2_volumes_positive": true,
+  "G2_ray_flip_ok": true,
+  "G5_primitives_ok": true
+ }
+}

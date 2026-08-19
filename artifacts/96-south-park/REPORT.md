@@ -1,0 +1,321 @@
+# 86–96 South Park — build report
+
+Asset: `artifacts/96-south-park/96-south-park.glb`
+Plan: `docs/asset-plans/96-south-park.md`
+Dossier: `REFERENCE.md`
+Built with `build_96_south_park.py` on Blender 5.2.0 LTS, 17 August 2026.
+
+**REPORT beats plan.** Where this file and the plan disagree, this file is what
+shipped.
+
+## 1. Shipped numbers
+
+| | |
+|---|---|
+| Triangles | **6,312** (cap 11,000) |
+| Objects | **14** after the stage-4 join (155 as authored) |
+| File size | **181,952 bytes** shipped (419,860 pre-optimize, −56.7%) |
+| Dimensions (m) | 31.809 × 27.621 × **13.700** |
+| bbox min / max | `[-15.905, -13.970, 0.0]` / `[15.905, 13.651, 13.700]` |
+| min Z | 0.000 |
+| XY centre offset | `[0.000, -0.159]` m |
+| Materials | 14, all `Toy_*`, flat, opaque, no textures |
+| Glow materials | `Toy_mustard_Glow`, `Toy_glassl_Glow` |
+| Anchor | `-122.3941704, 37.7818909` |
+| Front heading | 135.2° (measured in-build from the footprint polygon) |
+| Validation | `validation.json` — **overall PASS**, all 16 checks true (re-run against the shipped, optimized GLB) |
+| Optimize | stage 4 complete — see `optimize/REPORT.md`; all gates G1–G6, G8 PASS |
+
+The axis-aligned XY box is 31.8 × 27.6 m for a 14.44 × 30.06 m building. That is
+the expected consequence of the real-world 45° heading, not a scale error.
+
+## 2. Corrections this build made to the plan
+
+### 2.1 Three roof planes, not two — the biggest change
+
+The plan read the two DataSF LiDAR **medians** (11.15 m and 12.32 m) as the two
+parapet planes and put a cylinder above them. Built that way, the first aerial
+render was a **flat box**: two decks a metre apart on a 14 × 30 m plan do not
+make a silhouette, and the cylinder had only 1.3 m of clearance so it read as a
+water tank lying on the roof.
+
+The LiDAR distribution actually has three modes, and the plan only used one of
+them:
+
+| ring | majority | median | mean | max | σ |
+|---|---|---|---|---|---|
+| `201006.0022147` (front + NE) | 9.49 | 11.15 | 10.99 | 13.28 | 1.51 |
+| `201006.0149656` (rear SW) | 9.86 | 12.32 | 11.72 | 13.73 | 1.56 |
+
+The **majority** plane — what most of the roof area actually is — is 9.5–9.9 m
+on both rings. Reading it as a third plane gives:
+
+- **main plate 10.00 m** over the whole footprint (the majority)
+- **two upper volumes at 12.30 m** on diagonally opposite corners, front-northeast
+  and rear-southwest (the medians)
+- **gable ridge 13.35 m**, **cylinder cap 13.70 m** (the maxima)
+
+That is both a better fit to the data and a far better miniature: the two upper
+volumes on opposite corners are what make this read as Levy's "overlay of
+geometries" instead of a shoebox. The crest is unchanged at 13.70 m, so the
+manifest height in the plan still stands.
+
+Floor plates moved with it: ground 0–4.20 m (was 4.60), F2 4.90, F3 7.50, F4
+10.40 inside the upper volumes only. The brick base top moved 4.50 → 4.20 m.
+
+### 2.2 The cylinder moved out of the rear block onto the alley wall
+
+The plan put the drum at `(s -4.40, t +2.60)`, inside the rear volume's
+footprint. Built there it was invisible from the street and nearly invisible
+from the air. It now sits at **`(s -6.30, t +1.20)`, radius 2.75 m**, mid-flank
+on Jack London Alley and **overhanging the alley wall by 1.83 m**, rising from
+5.00 m to the 13.70 m cap. It stands 3.70 m clear of the main plate.
+
+This is closer to the Feb 2021 pano than the plan was: in that photograph the
+drum reads as part of the alley wall, not as a rooftop object. Diameter went
+4.60 → **5.50 m** (plan 2.6 licenses enlarging it; at 4.6 m it still read small
+against a 30 m wall).
+
+It is also **darker than the body** — `Toy_steel` (`#9aa0a6`) rather than
+`Toy_steel_l` — with a `Toy_slate` coping *ring* rather than a solid cap. A pale
+drum on a pale wall under a pale deck disappeared from the aerial camera, which
+is the one view it exists for; a solid dark lid, tried next, read as a hole.
+
+### 2.3 Both orange gates enlarged again
+
+The plan's 1.40 × 2.70 m gates were still invisible in the first aerial. Built
+at **1.80 m wide** and taken to the full ground-floor height (3.55 m on the
+front, 3.85 m on the alley), with a deeper `Toy_ink` reveal. They now read from
+the app's camera distance, which is the whole point of them.
+
+### 2.4 The alley window rhythm was regularised
+
+The plan asked for "a deliberate irregular rhythm of six to eight tall
+openings". Built irregular, the 30 m wall read as noise. It is now **seven bays
+at 4.30 m centres** on two registers, with the irregularity carried where it
+belongs — by the bronze panel, the volume steps and the drum. This is a
+deliberate departure from the plan's instruction and the reason is in the
+plan's own §2.6: contrast between adjoining volumes matters more than the
+number of volumes.
+
+### 2.5 The alley bronze panel moved
+
+Plan: `u 12.60`, mid-flank. Built: **`u 6.60`** (measured from the Taber Place
+end), widened to 8.60 m and taken up to 11.75 m, so the seam sits between the
+drum and the rear corner instead of colliding with the drum.
+
+### 2.6 The front gable is a triangle on top of the volume
+
+The plan's gable had eaves below the volume's own wall top, so the wall hid it.
+It is now a clean three-point triangular prism sitting **on** the front upper
+volume, eaves 12.12 m, ridge 13.35 m, extruded 7.0 m back. An eaves band tried
+between the two just added a stray horizontal line and was deleted.
+
+### 2.7 The pergola moved and shrank
+
+The plan put a 4.4 × 3.4 m pergola over a front-northeast terrace, from the
+April 2017 photosphere. The 2026 satellite imagery shows the roof terrace with
+furniture on the **neighbour's** roof (84 South Park, the "Vertex Ventures HC"
+pin), so that reading is not safe. The pergola is kept but **moved to the
+terrace between the two upper volumes** at `(s -3.2..-0.2, t -6.6..-3.2)`, top
+11.20 m, where it is a plausible roof structure rather than a claim about a
+specific photograph. **Flagged as the model's weakest invention.**
+
+### 2.8 Two small material notes
+
+- `Toy_steel_l` (`#b9bec4`) is used as the ribbed-metal body colour. It is not a
+  pre-existing palette entry; it is a lighter sibling of `Toy_steel`. Off-palette
+  is a WARN, not a FAIL, and the building needs a light metal that is clearly
+  lighter than the coping.
+- `Toy_teal` (`#3f7f86`) carries the mosaic band as one flat colour. The real
+  band is multi-coloured; at diorama scale the stripe is the detail and the
+  variation is sub-pixel.
+
+## 3. Open risks carried into approval
+
+1. **The cylinder is the model's biggest bet.** Its existence is solid (two
+   independent views); its diameter, exact position and whether it is a full drum
+   are not. Built as a full drum because that is the version that still reads
+   from the air if the guess is slightly wrong.
+2. **13.70 m is a LiDAR maximum interpreted as the drum cap**, not a measured
+   crest. If a photograph lets someone scale the drum against a storey height,
+   that measurement wins and the model and the manifest move together.
+3. **The rear-northeast yard** is inferred from LiDAR coverage (289.7 m² of
+   built footprint on a 434.1 m² lot, the gap concentrated at that corner). If
+   satellite imagery shows it built, fill it in; the roof becomes a rectangle and
+   nothing else changes.
+4. **The Taber Place rear elevation is invented.** No photograph of it exists in
+   any source consulted.
+5. **The rooftop pergola is invented** in its current position — see §2.7.
+6. **No architect's photographs were obtained.** Architizer and
+   ldparchitecture.com both host galleries that did not render to text
+   extraction. A human with a browser would likely settle risks 1, 3, 4 and 5 in
+   one pass.
+
+## 4. Contract deviations recorded
+
+- **"Front faces −Y" is not honoured, deliberately.** The asset is authored at
+  its real-world heading (front normal 135.2°) so the loader can place it with no
+  rotation, exactly as `docs/asset-plans/README.md` prescribes for the 45° SoMa
+  grid. `placeGeneric` in `app/src/assets.js` applies scale and translation only.
+- **The origin is the modelled footprint's axis-aligned bbox centre, not the lot
+  centroid.** The L-shaped plan pushes the bbox 2.261 m northwest of the lot
+  centre; anchoring on the bbox centre is what lets "centered in x/y" hold
+  exactly (measured offset `[0.000, -0.159]` m). The published anchor is that
+  point, so the building still lands where the survey says it is.
+
+## 5. Draft manifest entry
+
+```json
+{
+  "id": "96-south-park",
+  "file": "96-south-park.glb",
+  "anchor": [
+    -122.3941704,
+    37.7818909
+  ],
+  "targetHeightM": 13.7,
+  "cat": 2,
+  "name": "86–96 South Park",
+  "estimated": true,
+  "dims": [
+    31.8092,
+    27.6214,
+    13.7
+  ],
+  "tris": 6312,
+  "loadRadius": 2500
+}
+```
+
+## 6. Approval
+
+Stage 3 of `docs/asset-pipeline/ADDRESS-TO-ASSET.md`. Standing approval given by
+the user in the session's opening instruction, 16 August 2026, verbatim:
+
+> "APPROVE EVERYTHING DONT ASK ME FOR PERMISSION"
+
+Recorded as a blanket pre-approval covering this gate. The contact sheet, the
+day and night aerials and the numbers in §1 were presented at the same time so
+the approval is reviewable after the fact rather than before it, and the open
+risks in §3 stand and are not waived by it.
+
+---
+
+## 7. Stage 5 — integration (batch mode)
+
+Executed 17 August 2026 per `docs/asset-plans/INTEGRATION-PROMPT.md` Part 1 with
+the batch-mode amendment in `docs/asset-pipeline/ADDRESS-TO-ASSET.md`.
+
+**Case B**, as recorded at stage 0: no procedural builder for this id.
+
+| Step | Result |
+|---|---|
+| 1. Re-validate | PASS — fresh-scene re-import of the shipped GLB, all 16 contract checks true, 6,312 tris / 14 objects / 31.809 × 27.621 × 13.700 m / min Z 0 / XY centre `[0.000, -0.159]` |
+| 2. Drop in | `app/public/sf-assets/landmarks/96-south-park.glb`, 181,952 bytes, copied byte-for-byte, not re-exported |
+| 3. Manifest | one entry appended **as text**, +19 lines, no other entry touched (a `JSON.stringify` round-trip rewrites `11.0` → `11` across unrelated landmarks) |
+| 4. Registry + re-bake | `96SouthPark` added to `pipeline/lib/landmarks.mjs` with `exclude: 8`; full twelve-stage bake run |
+| 5. Local verify | PASS — see below |
+| 6. Fallback drill | PASS — see below |
+| 7. Ship | replaced by a stop, per the pipeline doc |
+
+### The re-bake
+
+Ran `terrain → bridges → buildings → streets → landcover → validate → lore →
+toy → notables → context → muni-shapes` on this branch, with `pipeline/out/`
+regenerated from scratch (never seeded from another worktree) and
+`pipeline/data/` symlinked from a same-day warm cache. `buildings` and `lore`
+were run with `--max-old-space-size=12288`.
+
+```
+node pipeline/verify-rebake.mjs
+  new since origin/main: 96SouthPark @ 23_13
+  584 of 585 cells unchanged
+  23_13    201 -> 199  <- 96SouthPark
+  ok   96SouthPark   16.0 m vs 8 m radius  (nearest is 13.1 m tall)
+  PASS  only the new landmarks' cells moved, and every asset has clear ground under it
+
+node pipeline/audit.mjs
+  1.6    PASS    no procedural footprint inside a bespoke landmark exclusion zone
+                 83 zones over 80 landmarks clear
+  29 passed, 3 failed  (1.2b, 1.3c, 1.7b — all three fail on main already)
+```
+
+**Two footprints dropped, not the four the plan predicted, and that is correct.**
+The plan measured four source rings over this lot. Only the two DataSF rings
+were ever *baked*: the Overture gap-fill runs second and skips anything whose
+area `markOccupied` already claims, so the two Overture/OSM copies never entered
+the tile in the first place. The exclusion still has to cover them — it is what
+stops the gap-fill re-adding a building into the ground the DataSF drop just
+freed — and it does.
+
+**Direct tile check** (decoded `app/public/tiles/buildings/23_13.bin`,
+point-in-polygon against the asset's real footprint rather than a radius):
+exactly one surviving footprint touches the asset outline, and it penetrates by
+**0.347 m** at lot coordinates `(s 6.87, t -13.71)` — the shared party-wall
+corner with 84 South Park at the South Park frontage. That is unavoidable
+collateral of a party-wall site: the two buildings share a survey vertex, so any
+radius that clears it (≥ 12.30 m) deletes 84 South Park and leaves a hole in the
+street wall. 0.35 m is well inside a wall thickness and invisible at diorama
+scale. 84's baked block runs to 23.5 m absolute over a 10.4 m base — 13.1 m
+tall, 0.6 m shorter than this asset — so the two abut cleanly.
+
+### Step 5 — local verification
+
+Driven against `app/dist` in real headless Chrome. **`requestAnimationFrame`
+does not run in that context** (measured: 0 callbacks in 3 s under
+`--headless=new` + swiftshader), so the app's frame loop never ticks and nothing
+streams on its own — `SF.assets.update(camera.position, dt)` and
+`SF.city.update(dt, pivot, cameraPos, QUALITY.high)` were pumped by hand on a
+200 ms `setInterval`. Without that the run reports `far: 56, live: 18` with the
+camera parked on the landmark, which looks exactly like a broken `loadRadius`
+and is not.
+
+| Check | Result |
+|---|---|
+| Merge line | `sf-assets: 96-south-park merged 14 objects / 14 materials -> batched (3932 tris body); uniform x1.0000 at 3813, -1314` |
+| Scale | **x1.0000** — authored crest and `targetHeightM` agree exactly |
+| Placement | batched at `3813, -1314`; the projected anchor is `3814.19, -1314.42` |
+| One building | PASS — no procedural twin, no baked block through the asset, no z-fighting (confirmed both visually and from the tile) |
+| Footprint size | PASS — reads correctly against 84 South Park and the 102/106 row |
+| Orientation | PASS — the South Park front faces the oval, the alley flank faces Jack London Alley, the blind party wall faces 84 |
+| Terrain seating | PASS — no floating, no sinking |
+| Night | PASS — only the two commercial fronts (warm) and a scatter of loft windows (blue) light; the cylinder stays dark |
+| Streaming | 74 entries, 68 live, 0 failed with the camera in South Park |
+| Draw calls | **86** at the landmark, 100 at 550 m, **117** street level in the Mission, **97** street level downtown — all under the 300 iron rule |
+| Console | no page exceptions, no failed requests (other than the offline weather feed, which is a local-run artifact) |
+
+### Step 6 — fallback drill
+
+The GLB path was served a **real 404** by the harness rather than renaming the
+file (Vite's dev server answers a missing public path with the SPA `index.html`
+and HTTP 200, which does not exercise the same path):
+
+```
+[warning] sf-assets: 96-south-park failed to load
+          (fetch for ".../sf-assets/landmarks/96-south-park.glb" responded with 404: Not Found)
+stats: {"entries":74,"far":6,"loading":0,"live":67,"fading":0,"failed":1}
+```
+
+Exactly one warning, `failed: 1`, every other landmark still live, the app boots
+and the area renders, draw calls unchanged at 86, no exceptions. The site is
+**empty ground inside the exclusion zone** — expected for Case B, and visible in
+the drill screenshot as a bare corner with its street light still standing.
+
+### Batch mode
+
+The bake was run and QA'd, then discarded:
+`git checkout -- app/public/tiles api/_data`. The commit is **source only** —
+the GLB, the manifest entry, the registry entry, the plan and this artifacts
+folder. Verified: `git diff --name-only origin/main` lists nothing under
+`app/public/tiles/` or `api/_data/`. The city gets rebuilt once for the whole
+batch by `docs/asset-pipeline/BATCH-INTEGRATE.md`.
+
+`npm run lint` and `npm run build` in `app/` both pass.
+
+### Note for whoever bakes the batch
+
+This branch leaves one exclusion pending in the committed tiles, exactly as the
+other source-only branches do. When the batch bake runs, cell **23_13** will go
+down by two footprints on this landmark's account (201 → 199 measured against
+`origin/main` on 17 Aug 2026), plus whatever the sibling branches carry.

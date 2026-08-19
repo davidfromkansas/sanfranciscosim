@@ -19,6 +19,7 @@ import {
   BufferAttribute,
   BufferGeometry,
   CanvasTexture,
+  Color,
   DynamicDrawUsage,
   InstancedBufferAttribute,
   InstancedMesh,
@@ -33,6 +34,21 @@ import { mergeGeometries } from 'three/addons/utils/BufferGeometryUtils.js';
 
 import { createGLTFLoader } from './gltf.js';
 import { shared } from './env.js';
+// Whether a vehicle is moving, dwelling, or has no business being in the scene
+// is decided in muni-motion.js: pure, tested rules. Read its header before
+// touching anything below that calls into it — every one of those rules is a
+// bug this city has already shipped, and app/test/muni-motion.test.mjs keeps
+// them fixed.
+import {
+  DWELL_STEP_M,
+  PROVISIONAL_LEAD_M,
+  STALE_MS,
+  deadReckonAdvance,
+  dormantReason,
+  seedSpeed,
+  shouldDrop,
+  targetSpeedFor,
+} from './muni-motion.js';
 
 const MANIFEST = `${import.meta.env.BASE_URL}sf-assets/vehicles_manifest.json`;
 const SHAPES_URL = `${import.meta.env.BASE_URL}tiles/muni-shapes.bin`;
@@ -42,30 +58,26 @@ const CAPACITY = 512;
 const POLL_MS = 60 * 1000;
 const POLL_JITTER_MS = 5 * 1000;
 const DEMO_POLL_MS = 20 * 1000;
-const STALE_MS = 3 * 60 * 1000; // no fix for this long -> the bus fades out
-const MISSES_TO_DROP = 2;
 
 // The street fleet renders at 1.6x (agents.js carScale); the live buses must
 // match it or they read as toys among toys.
 const CAR_SCALE = 1.6;
 
-// Movement tuning against the acceptance bar: stopped must read as stopped.
-// Displacement across one fix gap below which a bus is standing still. A
-// speed READING of 0 means nothing here — see the note in apply().
-const DWELL_STEP_M = 14; // ~one 40-foot coach at 1.6x
+// Rendering-side motion tuning (the rules that decide moving vs dwelling live
+// in muni-motion.js; these only shape how that decision is animated).
 const DECEL = 3.2; // m/s^2 easing into a stop (~2 s from cruise)
 const ACCEL = 1.4; // m/s^2 pulling away
 const CATCHUP_FACTOR = 1.3; // max overspeed while closing a gap to the fix
-const MAX_SPEED = 20; // m/s hard cap (45 mph); transit never exceeds it
 const SNAP_LIMIT_M = 150; // a fix further than this off-shape -> dead-reckon
 const SNAP_WINDOW_M = 1200; // how far along the shape a projection may jump
 const HEADING_EASE = 2.4; // rad/s toward the tangent
-// Cap on how far past the last fresh fix a bus may extrapolate along its
-// shape (seconds). The poll interval is 60 s and the server TTL is 90 s, so
-// fresh fixes arrive at most ~120 s apart in normal mode; 120 s of dead-reckon
-// bridges that gap. Beyond it the bus eases to a stop and waits for real data
-// (or drops at STALE_MS). Same pattern as ferries' DEAD_RECKON_MAX_S.
-const DEAD_RECKON_MAX_S = 120;
+// Seconds a vehicle takes to sink out of / rise back into the scene, so a
+// service change reads as arriving or leaving rather than as popping.
+const HIDE_FADE_S = 1.2;
+// Overshoot past a fresh fix that is held rather than reversed: dead reckoning
+// and the provisional guess both run ahead of the data, and yanking a bus
+// backwards is a visible teleport. Beyond this the guess was wrong -> snap.
+const OVERSHOOT_HOLD_M = 150;
 
 // Badges: cream route pills over each roof, one instanced quad layer fed by a
 // lazily-grown canvas atlas (a draw call per route would be ~40 calls).
@@ -78,9 +90,20 @@ const BADGE_COLS = 8;
 const BADGE_ROWS = 8;
 const BADGE_W = 7.2; // metres, square quad: the tail needs vertical room
 const BADGE_H = 7.2;
-// Height of the QUAD CENTRE. The tail tip sits ~0.36 x BADGE_H below centre, so
-// this lands the point just above the 5.5 m roof (3.42 m body x 1.6 carScale).
-const BADGE_Y = 8.6;
+// Where the TAIL TIP goes: just above the 5.5 m roof (3.42 m body x 1.6
+// carScale). The quad centre is derived from it, not fixed, because the bubble
+// grows with distance and its tail grows with it — see BADGE_TAIL_DROP.
+const BADGE_TIP_Y = 6.0;
+// How far the tail tip hangs below the quad centre, at scale 1. The centre is
+// therefore BADGE_TIP_Y + BADGE_TAIL_DROP * scale, which at scale 1 is the 8.6 m
+// this used to be pinned at.
+//
+// Scaling the WHOLE height by the zoom scale (the old `8.6 * scale`) is what
+// detached a badge from its bus: measured on the deployed build, a bus 8.4 km
+// out was 4 px wide with its bubble 150 px above it, on an 845 px viewport. The
+// bubble has to scale — that is what keeps it legible from the hero view — but
+// the tip it points with does not, so only the tail's own growth belongs here.
+const BADGE_TAIL_DROP = 0.36 * BADGE_H;
 // Badges follow the ZOOM, not a fixed distance in metres. A radius tuned for
 // street level shows nothing from the air, which is where this camera spends
 // most of its time; one tuned for the air carpets the Mission at street level.
@@ -112,6 +135,46 @@ const BADGE_SCALE_MAX = 26;
 // center. Matches the InstancedMesh cap (CAPACITY).
 const MAX_BADGES = 512;
 
+// ------------------------------------------------------------------ subway
+
+// Muni Metro spends most of each route in tunnel, and a GTFS shape is one
+// polyline from terminal to terminal with nothing marking what is underground.
+// Drawn on the surface like a bus, an LRV therefore climbs over Buena Vista
+// Heights and through the houses on it instead of running under them — 38% of
+// the N is tunnel, 64% of the L.
+//
+// These are the portals where Metro reaches daylight; the stretch between a
+// pair is underground. Resolved against each shape's own polyline on first use
+// (rather than baked as arc lengths) so a re-bake or a reroute can't leave a
+// stale range behind: a portal that no longer sits on the shape is dropped and
+// that stretch simply draws, which is the old behaviour.
+const PORTAL = {
+  embarcadero: [-122.39664, 37.79293], // east end of the Market St subway
+  duboceChurch: [-122.42906, 37.7695], // N/J surface portal
+  duboceFillmore: [-122.4318, 37.7695], // Sunset Tunnel, east portal
+  carlCole: [-122.4497, 37.7661], // Sunset Tunnel, west portal
+  westPortal: [-122.4665, 37.7405], // Twin Peaks Tunnel, west portal
+  fourthBrannan: [-122.3965, 37.7773], // Central Subway, south portal
+  chinatown: [-122.4066, 37.7947], // Central Subway, north end
+};
+
+// Per route, the portal pairs that bound its tunnels. K/L/M run Market and
+// Twin Peaks back to back with no daylight at Castro, so that is one span.
+const TUNNELS = {
+  N: [['embarcadero', 'duboceChurch'], ['duboceFillmore', 'carlCole']],
+  J: [['embarcadero', 'duboceChurch']],
+  K: [['embarcadero', 'westPortal']],
+  L: [['embarcadero', 'westPortal']],
+  M: [['embarcadero', 'westPortal']],
+  T: [['fourthBrannan', 'chinatown']],
+};
+
+// A portal further than this from the shape isn't on this route's alignment.
+const PORTAL_MAX_OFF_M = 220;
+// Distance either side of a portal over which the train eases under the
+// street, so it descends into the tunnel instead of blinking out.
+const PORTAL_RAMP_M = 45;
+
 const PICK_RADIUS = 16;
 const MAX_PICK_DISTANCE = 9000;
 
@@ -119,7 +182,8 @@ const MAX_PICK_DISTANCE = 9000;
 // rising from the ground to this height. Visible at the hero view without
 // dominating the skyline.
 const ROUTE_GLOW_HEIGHT = 50;
-// Per-mode neon colors for the route glow walls (RGB 0-1, saturated).
+// Per-mode neon colors for the route glow walls (RGB 0-1, saturated). Read as
+// emitted light, so they are tuned bright for additive blending after dark.
 const ROUTE_GLOW_COLORS = {
   bus: [1.0, 0.2, 0.05], // neon red-orange
   trolley: [0.1, 0.95, 0.4], // neon green
@@ -127,9 +191,62 @@ const ROUTE_GLOW_COLORS = {
   streetcar: [1.0, 0.1, 0.6], // neon pink
   cable: [1.0, 0.95, 0.1], // neon yellow
 };
-// Daytime minimum opacity; at night the full glow formula applies.
-// Both halved from original values (0.15 -> 0.075 day, night formula * 0.5).
-const ROUTE_GLOW_DAY_OPACITY = 0.01875;
+// Daytime palette. Additive light cannot beat sunlight, so by day the wall is
+// alpha-blended paint instead — and paint needs the opposite treatment from
+// neon: deeper, denser hues that contrast against pale streets and rooftops,
+// where the night colours (especially the yellow and green) wash straight out.
+// Contrast here is against the DIORAMA, not against black, so each hue is
+// picked to be what the city underneath is not — the transit green in
+// particular is pulled toward teal, because forest green over Golden Gate
+// Park is a route you cannot find.
+const ROUTE_GLOW_DAY_COLORS = {
+  bus: [0.88, 0.04, 0.02], // deep vermillion
+  trolley: [0.0, 0.42, 0.44], // deep teal — reads against park green
+  lrv: [0.33, 0.03, 0.78], // deep violet
+  streetcar: [0.82, 0.0, 0.42], // magenta
+  cable: [0.92, 0.52, 0.0], // amber
+};
+// The toy theme's warm ink, used to outline the daylight ribbon. A coloured
+// edge only contrasts where the city behind it happens to be a different
+// colour; an ink line contrasts everywhere, which is exactly why the UI cards
+// are drawn this way.
+const ROUTE_GLOW_INK = [0.13, 0.09, 0.07];
+// Overall alpha of the ribbon, per palette. These multiply the shader's own
+// profile (see ROUTE_GLOW_PROFILE), which already spends most of its alpha on
+// the two edges, so they are far higher than the flat-curtain values they
+// replaced — at the old night 0.125 the white core simply wasn't white.
+const ROUTE_GLOW_DAY_OPACITY = 0.8;
+const ROUTE_GLOW_NIGHT_OPACITY = 0.62;
+// uNight below this counts as day: the palette and blend mode swap here.
+const ROUTE_GLOW_NIGHT_AT = 0.5;
+
+// How the ribbon is shaped across its height. A Tron light trail is not a
+// tinted pane: it is a blown-out WHITE core with the colour living in the
+// falloff around it, bounded by a hard clean edge. So the wall spends its
+// alpha at the two edges — a crisp lit rim along the top and a contact flare
+// where it meets the street — and stays nearly clear through the middle,
+// which is also what lets you see the city through it.
+//   coreWhite: how far the edges wash out to white (the "hot" core)
+//   body:      alpha of the transparent interior
+//   bodyFall:  how fast the interior thins with height (1 = linear, 2+ = only
+//              a skirt near the street)
+//   topEdge:   width of the top rim, as a fraction of wall height
+//   baseEdge:  width of the ground flare
+//   ink:       width of the dark outline along the top (0 = none)
+const ROUTE_GLOW_PROFILE = {
+  // After dark the core goes properly white-hot and the interior nearly
+  // vanishes, so the route reads as a drawn line of light over the city.
+  // No ink: the wall is emitted light against a dark city, and additive
+  // blending cannot draw a dark line anyway.
+  night: { coreWhite: 0.92, body: 0.27, bodyFall: 2.2, topEdge: 0.075, baseEdge: 0.16, ink: 0 },
+  // By day the same ribbon has to survive sunlight (this is what PR #141/#143
+  // were about) AND be findable from the hero altitude, where a rim alone is
+  // a hairline. So daylight fills the interior nearly to the top (bodyFall 1
+  // instead of 2.2, i.e. a linear fade rather than a skirt), whitens the core
+  // less — a white edge on a pale street is an invisible edge — and outlines
+  // the whole thing in warm ink.
+  day: { coreWhite: 0.3, body: 1.0, bodyFall: 1.0, topEdge: 0.05, baseEdge: 0.13, ink: 0.05 },
+};
 
 // Module-scope scratch: the update loop and the picker must not allocate.
 const dummy = new Object3D();
@@ -421,8 +538,9 @@ export function createLiveMuni(scene, data) {
   // InstancedMesh pair and scale, so a bus/trolley/LRV/streetcar/cable car
   // each render with their own geometry. Modes without a dedicated model fall
   // back to the bus entry (the "placeholder" fleet).
-  const fleets = []; // { key, bodyMesh, glowMesh, scale, count }
+  const fleets = []; // { key, bodyMesh, glowMesh, scale, sinkM, count }
   let fleetByKey = {}; // mode -> fleet entry (resolved at load time)
+  const tunnelRanges = new Map(); // `${shapeIdx}|${route}` -> [[s0, s1], ...]
   let badge = null;
   let atlas = null;
   let ready = false;
@@ -433,6 +551,11 @@ export function createLiveMuni(scene, data) {
   let warnedFetch = false;
   let demoStart = 0;
   let arrivalsByStop = new Map();
+  // Is the feed predicting stop times at all this poll? On the shared ferry key
+  // it isn't (degraded mode), and then "no predictions" says nothing about a
+  // single vehicle — only when other vehicles do have them is an empty list
+  // evidence that this one isn't working yet.
+  let predictionsSeen = false;
   let lastFetchedAt = 0; // server-side fetchedAt of the last non-stale /api/muni payload
   // Adaptive badge radius, within whatever the zoom allows. A dense corridor
   // pulls it in, a quiet neighbourhood lets it back out. O(1) per frame, no
@@ -445,6 +568,50 @@ export function createLiveMuni(scene, data) {
   const activeRouteShapes = new Map(); // shapeIdx -> mode
   let routeGlowMesh = null;
   let routeGlowDirty = false;
+  // Both vertex-colour palettes for the current geometry, and which one is
+  // bound right now (starts on the day palette — setRouteGlowDay corrects it
+  // on the first frame if the city boots after dark).
+  let routeGlowPalettes = null;
+  let routeGlowUniforms = null;
+  let routeGlowIsDay = true;
+
+  // ------------------------------------------------------------- subway
+
+  // Arc length of a portal along `shapeIdx`, or null when that portal is not on
+  // this shape (a route that never enters that tunnel, or a shape that no
+  // longer runs past it).
+  function portalS(shapeIdx, key) {
+    const [lon, lat] = PORTAL[key];
+    const [x, z] = data.project(lon, lat);
+    const hit = shapes.project(shapeIdx, x, z, null, Infinity);
+    return hit.dist <= PORTAL_MAX_OFF_M ? hit.s : null;
+  }
+
+  // The underground arc-length ranges of one shape, resolved once and memoised.
+  // A route with no tunnels resolves to an empty list and costs one lookup.
+  function undergroundFor(shapeIdx, route) {
+    const key = `${shapeIdx}|${route}`;
+    const cached = tunnelRanges.get(key);
+    if (cached) return cached;
+    const ranges = [];
+    for (const [a, b] of TUNNELS[String(route).toUpperCase()] || []) {
+      const sa = portalS(shapeIdx, a);
+      const sb = portalS(shapeIdx, b);
+      if (sa == null || sb == null) continue;
+      ranges.push([Math.min(sa, sb), Math.max(sa, sb)]);
+    }
+    tunnelRanges.set(key, ranges);
+    return ranges;
+  }
+
+  // 0 at street level, 1 once fully under, ramped either side of the portal.
+  function tunnelDepth(ranges, s) {
+    for (const [s0, s1] of ranges) {
+      if (s <= s0 || s >= s1) continue;
+      return Math.min(1, Math.min(s - s0, s1 - s) / PORTAL_RAMP_M);
+    }
+    return 0;
+  }
 
   async function load() {
     // The shapes bake is an enhancement, not a requirement: without it every
@@ -472,12 +639,12 @@ export function createLiveMuni(scene, data) {
       return;
     }
 
-    // Mode -> manifest id. Trolley and LRV use the bus model as a placeholder
-    // until dedicated GLBs are built (owner decision).
+    // Mode -> manifest id. Trolley still uses the bus model as a placeholder
+    // until a dedicated GLB is built (owner decision).
     const MODE_ENTRIES = [
       { mode: 'bus', id: 'muni-bus-40' },
       { mode: 'trolley', id: 'muni-bus-40' }, // placeholder: shares bus body
-      { mode: 'lrv', id: 'muni-bus-40' }, // placeholder: shares bus body
+      { mode: 'lrv', id: 'muni-lrv' },
       { mode: 'streetcar', id: 'muni-streetcar-pcc' },
       { mode: 'cable', id: 'cable-car-powell' },
     ];
@@ -503,7 +670,8 @@ export function createLiveMuni(scene, data) {
         const measured = merged.body.boundingBox.max.z - merged.body.boundingBox.min.z;
         const target = entry.dims?.[2] ?? measured;
         const scale = (measured > 0 ? target / measured : 1) * CAR_SCALE;
-        loadedByMode[mode] = { body: merged.body, glow: merged.glow, scale };
+        const height = merged.body.boundingBox.max.y - merged.body.boundingBox.min.y;
+        loadedByMode[mode] = { body: merged.body, glow: merged.glow, scale, height };
       } catch (error) {
         console.warn(`sf-muni: ${id} failed to load (${error.message}) — ${mode} will use bus model`);
       }
@@ -534,7 +702,10 @@ export function createLiveMuni(scene, data) {
         glowMesh.castShadow = false;
         glowMesh.count = 0;
       }
-      const fleet = { key: mode, bodyMesh, glowMesh, scale: loaded.scale, count: 0 };
+      // How far to drop a vehicle for it to be wholly under the street, plus a
+      // metre so a crowned road can't leave a roof showing.
+      const sinkM = (loaded.height || 4) * loaded.scale + 1;
+      const fleet = { key: mode, bodyMesh, glowMesh, scale: loaded.scale, sinkM, count: 0 };
       fleets.push(fleet);
       fleetByKey[mode] = fleet;
       scene.add(bodyMesh);
@@ -545,17 +716,12 @@ export function createLiveMuni(scene, data) {
     badge = buildBadgeMesh(atlas);
     scene.add(badge.mesh);
 
-    // Route glow mesh: a single dynamic BufferGeometry rendered as a
-    // transparent additive wall. Rebuilt when the active route set changes.
+    // Route glow mesh: a single dynamic BufferGeometry rendered as one
+    // transparent wall. Rebuilt when the active route set changes; the blend
+    // mode starts where routeGlowIsDay does and setRouteGlowDay flips it.
     routeGlowMesh = new Mesh(
       new BufferGeometry(),
-      new MeshBasicMaterial({
-        vertexColors: true,
-        transparent: true,
-        blending: 2, // AdditiveBlending
-        depthWrite: false,
-        side: 2, // DoubleSide — visible from both sides of the wall
-      }),
+      routeGlowMaterial(),
     );
     routeGlowMesh.name = 'live-muni-route-glow';
     routeGlowMesh.frustumCulled = false;
@@ -566,6 +732,13 @@ export function createLiveMuni(scene, data) {
   }
 
   // ---------------------------------------------------------------- fixes
+
+  // Everything that keeps a vehicle out of the scene. Demo runs are exempt:
+  // they exist to exercise the dwell and dead-reckon paths.
+  function hiddenReason(state) {
+    if (demo) return null;
+    return dormantReason(state, predictionsSeen) ?? (state.shapeIdx < 0 ? 'offRoute' : null);
+  }
 
   function apply(list, now, stale) {
     for (const state of buses.values()) state.seen = false;
@@ -603,8 +776,9 @@ export function createLiveMuni(scene, data) {
           yaw: 0,
           // Seeded from the fix, not zero: otherwise every bus stands still for
           // a full poll after it appears, and a page load shows a frozen fleet.
-          speed: Number.isFinite(bus.speedMs) ? Math.min(MAX_SPEED, bus.speedMs) : 0,
-          targetSpeed: Number.isFinite(bus.speedMs) ? Math.min(MAX_SPEED, bus.speedMs) : 0,
+          // A reported 0 is not evidence of standing still — seedSpeed().
+          speed: seedSpeed(bus, now, predictionsSeen),
+          targetSpeed: seedSpeed(bus, now, predictionsSeen),
           shapeIdx: -1,
           s: 0,
           targetS: 0,
@@ -618,9 +792,22 @@ export function createLiveMuni(scene, data) {
           misses: 0,
           seen: true,
           index: -1,
+          // Last fix at which this vehicle had actually moved: the clock every
+          // parked/layover decision is made against.
+          movedAt: now,
+          // Running on a guess until a second fix confirms it, so the guess is
+          // capped (provisionalCap) and cannot reverse the bus when it lands.
+          provisional: !(Number.isFinite(bus.speedMs) && bus.speedMs > 0),
+          provisionalCap: Infinity,
+          hide: 0,
+          hidden: null,
           sample: { x, z, yaw: 0, end: 0 },
         };
         placeOnShape(state, true);
+        state.provisionalCap = state.s + PROVISIONAL_LEAD_M;
+        // Off every one of its route's alignments: start it already sunk, so it
+        // never flashes on the street before being hidden.
+        state.hide = hiddenReason(state) === 'offRoute' ? 1 : 0;
         buses.set(bus.id, state);
         continue;
       }
@@ -664,36 +851,36 @@ export function createLiveMuni(scene, data) {
           placeOnShape(state, true);
         } else {
           state.targetS = hit.s;
-          // Dead-reckon may have driven the bus past where the fresh fix
-          // says it is. Snap s back to the real position so the bus doesn't
-          // sit frozen waiting for targetS to catch up past s. The overshoot
-          // is at most a few seconds of extrapolation — a sub-bus-length
-          // correction that's invisible at diorama scale.
-          if (state.s > state.targetS) state.s = state.targetS;
+          // Dead-reckon (or a provisional first-fix guess) may have driven the
+          // bus past where the fresh fix says it is. Hold it there and let the
+          // next fix pull it forward rather than reversing it — a bus sliding
+          // backwards up the street is the one artefact the eye always catches.
+          // Only a wrong guess, not a few seconds of drift, snaps back.
+          if (state.s > state.targetS) {
+            if (state.s - state.targetS <= OVERSHOOT_HOLD_M) state.targetS = state.s;
+            else state.s = state.targetS;
+          }
         }
       }
 
-      // How fast to run so the bus covers the ground it actually covered.
-      //
-      // DWELL IS A DISPLACEMENT TEST, NOT A SPEED READING. GTFS-RT's `speed` is
-      // an instantaneous sample at the fix moment, and 260 of 507 Muni vehicles
-      // report exactly 0 at any given instant — every one sitting at a light or
-      // a stop when the sample was taken. Reading that as "parked" froze half
-      // the fleet on every poll even though those buses had plainly moved
-      // hundreds of metres since their previous fix. Only a bus that has not
-      // MOVED between two fixes is dwelling; the reported speed merely biases
-      // how fast it runs once we know it has.
+      // How fast to run so the bus covers the ground it actually covered:
+      // targetSpeedFor() owns the dwell rule (invariants 1 and 2 — displacement
+      // between FIXES, never the reported speed, never gapS).
       const reported = Number.isFinite(bus.speedMs) ? bus.speedMs : null;
       const fixStep = Math.hypot(x - prevFixX, z - prevFixZ);
-      if (state.shapeIdx >= 0) {
-        // DWELL IS A DISPLACEMENT TEST: did the bus actually move between
-        // fixes? gapS (targetS - s) can't answer this — dead-reckon may have
-        // already driven the bus past the new target, making gapS negative
-        // even though the bus moved 900 m. fixStep is the honest metric.
-        const gapS = Math.max(0, state.targetS - state.s);
-        state.targetSpeed = fixStep < DWELL_STEP_M ? 0 : Math.min(MAX_SPEED, Math.max(gapS / gap, fixStep / gap, (reported ?? 0) * 0.6));
-      } else {
-        state.targetSpeed = fixStep < DWELL_STEP_M ? 0 : Math.min(MAX_SPEED, fixStep / gap);
+      const onShape = state.shapeIdx >= 0;
+      // Two fixes in hand: the guess is over, and this is the only place that
+      // can honestly say the vehicle moved.
+      state.provisional = false;
+      if (fixStep >= DWELL_STEP_M) state.movedAt = now;
+      state.targetSpeed = targetSpeedFor({
+        fixStep,
+        gapSeconds: gap,
+        gapS: state.targetS - state.s,
+        reported,
+        onShape,
+      });
+      if (!onShape) {
         state.deadYaw = fixStep > 4 ? Math.atan2(x - prevFixX, z - prevFixZ) : state.deadYaw;
       }
     }
@@ -704,7 +891,7 @@ export function createLiveMuni(scene, data) {
         continue;
       }
       state.misses += 1;
-      if (state.misses >= MISSES_TO_DROP || now - state.lastFixAt > STALE_MS) buses.delete(id);
+      if (shouldDrop(state, now)) buses.delete(id);
     }
 
     // Rebuild the active route set for the glow walls. Only routes with at
@@ -713,8 +900,14 @@ export function createLiveMuni(scene, data) {
     if (!stale) {
       const next = new Map();
       for (const state of buses.values()) {
-        if (state.shapeIdx >= 0 && state.seen) {
-          if (!next.has(state.shapeIdx)) next.set(state.shapeIdx, state.mode || 'bus');
+        // Only routes that are actually RUNNING light up. A single coach parked
+        // in a yard used to switch on its whole route's wall, which reads as
+        // "the 5 is running" at an hour when it isn't.
+        if (state.shapeIdx >= 0 && state.seen && !hiddenReason(state)) {
+          // The route rides along so the wall builder can ask which stretches
+          // of this shape are tunnel; mode alone only picks the colour.
+          if (!next.has(state.shapeIdx))
+            next.set(state.shapeIdx, { mode: state.mode || 'bus', route: state.route });
         }
       }
       if (next.size !== activeRouteShapes.size || [...next.keys()].some((k) => !activeRouteShapes.has(k))) {
@@ -753,27 +946,12 @@ export function createLiveMuni(scene, data) {
         return;
       }
     }
-    // Last resort: the GTFS shape for this trip may be wrong or highly
-    // simplified (some shapes have 3km straight-line jumps that miss where
-    // vehicles actually are). Try ALL shapes in the bake to find one the
-    // vehicle is physically on. This only runs on first appearance or trip
-    // change, not every frame, so the cost (298 shapes × ~113 vertices) is
-    // negligible.
-    if (shapes) {
-      let bestIdx = -1, bestDist = SNAP_LIMIT_M, bestS = 0;
-      for (let idx = 0; idx < shapes.meta.shapes.length; idx++) {
-        if (routeShapeList?.includes(idx) || idx === state.shapeIdx) continue;
-        const hit = shapes.project(idx, state.fixX, state.fixZ, null);
-        if (hit.dist < bestDist) { bestDist = hit.dist; bestIdx = idx; bestS = hit.s; }
-      }
-      if (bestIdx >= 0) {
-        state.shapeIdx = bestIdx;
-        state.targetS = bestS;
-        if (fresh || Math.abs(bestS - state.s) > SNAP_WINDOW_M) state.s = bestS;
-        return;
-      }
-    }
-    state.shapeIdx = -1; // genuinely off-route -> dead-reckon this bus
+    // Nowhere on its own route. This used to fall back to searching ALL 298
+    // baked shapes for one the vehicle happened to sit on, which is how a coach
+    // deadheading to a yard ended up driving down someone else's route: being
+    // near a line is not being on it. A vehicle we cannot place on its OWN
+    // alignment is left off the map instead of invented onto another one.
+    state.shapeIdx = -1;
   }
 
   // ----------------------------------------------------------------- demo
@@ -795,12 +973,20 @@ export function createLiveMuni(scene, data) {
     if (!shapes) return [];
     const elapsed = (now - demoStart) / 1000;
     const list = [];
+    // Each mode that owns a distinct GLB needs a run here, or the only way to
+    // see it is to wait for the live feed to put one in shot.
     const runs = [
-      { id: 'DEMO:8801', route: '38R', dir: 0, speed: 9, offset: 0 },
-      { id: 'DEMO:8802', route: '38R', dir: 0, speed: 9, offset: 900 },
-      { id: 'DEMO:8632', route: '29', dir: 1, speed: 7, offset: 300 },
-      { id: 'DEMO:8641', route: '29', dir: 1, speed: 0, offset: 2200 }, // dwells forever
-      { id: 'DEMO:8899', route: '44', dir: 0, speed: 8, offset: 1500 },
+      { id: 'DEMO:8801', route: '38R', dir: 0, speed: 9, offset: 0, mode: 'bus' },
+      { id: 'DEMO:8802', route: '38R', dir: 0, speed: 9, offset: 900, mode: 'bus' },
+      { id: 'DEMO:8632', route: '29', dir: 1, speed: 7, offset: 300, mode: 'bus' },
+      { id: 'DEMO:8641', route: '29', dir: 1, speed: 0, offset: 2200, mode: 'bus' }, // dwells forever
+      { id: 'DEMO:8899', route: '44', dir: 0, speed: 8, offset: 1500, mode: 'bus' },
+      // One N out on the surface in the Sunset, one starting inside the Sunset
+      // Tunnel (s 7375-8972 on the outbound shape) so every demo run exercises
+      // the underground path and the portal ramp.
+      { id: 'DEMO:2002', route: 'N', dir: 0, speed: 10, offset: 8600, mode: 'lrv' },
+      { id: 'DEMO:2014', route: 'N', dir: 0, speed: 10, offset: 10500, mode: 'lrv' },
+      { id: 'DEMO:1051', route: 'F', dir: 0, speed: 6, offset: 400, mode: 'streetcar' },
     ];
     for (const run of runs) {
       const idx = shapes.resolve(null, run.route, run.dir);
@@ -813,7 +999,7 @@ export function createLiveMuni(scene, data) {
       list.push({
         id: run.id,
         fleetNumber: run.id.slice(5),
-        mode: 'bus',
+        mode: run.mode,
         route: run.route,
         directionId: run.dir,
         tripId: `demo-${run.route}-${run.dir}`,
@@ -874,6 +1060,7 @@ export function createLiveMuni(scene, data) {
     }
     live = true;
     degraded = !!payload.degraded;
+    predictionsSeen = payload.vehicles.some((v) => v.stops?.length);
     // CDN cache hit? The server's fetchedAt is identical to the previous poll's
     // — every vehicle in this payload is the same fix. Skip position updates so
     // buses keep dead-reckoning along their shapes instead of freezing at the
@@ -922,6 +1109,70 @@ export function createLiveMuni(scene, data) {
 
   // ------------------------------------------------------- route glow walls
 
+  // The ribbon shader. MeshBasicMaterial carries the vertex colours, the
+  // blend mode and the day/night opacity exactly as before; onBeforeCompile
+  // only reshapes the alpha across the wall's height (aRibbon: 0 at the
+  // street, 1 at the top) and burns the edges toward white.
+  function routeGlowMaterial() {
+    const material = new MeshBasicMaterial({
+      vertexColors: true,
+      transparent: true,
+      blending: 1, // NormalBlending (day); AdditiveBlending after dark
+      depthWrite: false,
+      side: 2, // DoubleSide — visible from both sides of the wall
+      toneMapped: false, // a light trail is emitted light, not a lit surface
+    });
+    const profile = ROUTE_GLOW_PROFILE[routeGlowIsDay ? 'day' : 'night'];
+    routeGlowUniforms = {
+      uCoreWhite: { value: profile.coreWhite },
+      uBody: { value: profile.body },
+      uBodyFall: { value: profile.bodyFall },
+      uTopEdge: { value: profile.topEdge },
+      uBaseEdge: { value: profile.baseEdge },
+      uInk: { value: profile.ink },
+      uInkColor: { value: new Color(...ROUTE_GLOW_INK) },
+    };
+    material.onBeforeCompile = (shader) => {
+      Object.assign(shader.uniforms, routeGlowUniforms);
+      shader.vertexShader = shader.vertexShader
+        .replace('#include <common>', '#include <common>\n        attribute float aRibbon;\n        varying float vRibbon;')
+        .replace('#include <begin_vertex>', '#include <begin_vertex>\n        vRibbon = aRibbon;');
+      shader.fragmentShader = shader.fragmentShader
+        .replace(
+          '#include <common>',
+          `#include <common>
+          uniform float uCoreWhite;
+          uniform float uBody;
+          uniform float uBodyFall;
+          uniform float uTopEdge;
+          uniform float uBaseEdge;
+          uniform float uInk;
+          uniform vec3 uInkColor;
+          varying float vRibbon;`
+        )
+        .replace(
+          '#include <dithering_fragment>',
+          `#include <dithering_fragment>
+          // Two hot edges and a near-clear interior.
+          float top = exp(-pow((1.0 - vRibbon) / uTopEdge, 2.0));
+          float base = exp(-pow(vRibbon / uBaseEdge, 2.0));
+          // The interior is brightest where the light spills off the street
+          // and thins upward, so the wall has a direction: it is lit FROM the
+          // route, not uniformly filled.
+          float body = uBody * pow(1.0 - vRibbon, uBodyFall);
+          float edge = clamp(top + base * 0.85, 0.0, 1.0);
+          gl_FragColor.rgb = mix(gl_FragColor.rgb, vec3(1.0), edge * uCoreWhite);
+          float alpha = clamp(body * 0.55 + top + base * 0.8, 0.0, 1.0);
+          // Ink outline (day only): a dark line capping the ribbon, so it is
+          // legible over a white rooftop and a dark street alike.
+          float ink = uInk > 0.0 ? smoothstep(1.0 - uInk, 1.0 - uInk * 0.35, vRibbon) : 0.0;
+          gl_FragColor.rgb = mix(gl_FragColor.rgb, uInkColor, ink);
+          gl_FragColor.a = max(alpha, ink) * opacity;`
+        );
+    };
+    return material;
+  }
+
   function rebuildRouteGlow() {
     if (!shapes || !routeGlowMesh) return;
     const F = shapes.floats;
@@ -932,18 +1183,32 @@ export function createLiveMuni(scene, data) {
     // bottom-right, top-right. Vertex colors carry the mode color.
     const positions = [];
     const colors = [];
+    const dayColors = [];
+    // Height of each vertex within the ribbon, 0 at the street and 1 at the
+    // top. The shader shapes the trail along this, so it is not derivable
+    // from world y: the wall follows the terrain up and down the hills.
+    const ribbon = [];
     const indices = [];
 
-    for (const [shapeIdx, mode] of activeRouteShapes) {
+    for (const [shapeIdx, { mode, route }] of activeRouteShapes) {
       const shape = meta.shapes[shapeIdx];
       if (!shape) continue;
       const color = ROUTE_GLOW_COLORS[mode] || ROUTE_GLOW_COLORS.bus;
+      const dayColor = ROUTE_GLOW_DAY_COLORS[mode] || ROUTE_GLOW_DAY_COLORS.bus;
       const base = shape.vertexOffset * 3;
       const count = shape.vertexCount;
+      // A wall marks where you can catch this route, so it ends at the portal
+      // for the same reason the train does: the tunnelled stretch isn't on the
+      // surface, and a beam over Buena Vista Heights says it is.
+      const tunnel = TUNNELS[String(route).toUpperCase()] ? undergroundFor(shapeIdx, route) : null;
 
       for (let i = 0; i < count - 1; i++) {
         const o = base + i * 3;
         const q = o + 3;
+        if (tunnel?.length) {
+          const mid = (F[o + 2] + F[q + 2]) / 2;
+          if (tunnel.some(([s0, s1]) => mid > s0 && mid < s1)) continue;
+        }
         const x0 = F[o], z0 = F[o + 1];
         const x1 = F[q], z1 = F[q + 1];
 
@@ -962,8 +1227,13 @@ export function createLiveMuni(scene, data) {
         // top-right (x1, y1 + height, z1)
         positions.push(x1, y1 + ROUTE_GLOW_HEIGHT, z1);
 
-        // Color all four vertices with the mode color
-        for (let j = 0; j < 4; j++) colors.push(color[0], color[1], color[2]);
+        // Color all four vertices with the mode color, in both palettes
+        for (let j = 0; j < 4; j++) {
+          colors.push(color[0], color[1], color[2]);
+          dayColors.push(dayColor[0], dayColor[1], dayColor[2]);
+        }
+        // Matches the corner order pushed above: bottom, top, bottom, top.
+        ribbon.push(0, 1, 0, 1);
 
         // Two triangles: (v, v+1, v+2) and (v+1, v+3, v+2)
         indices.push(v, v + 1, v + 2, v + 1, v + 3, v + 2);
@@ -972,10 +1242,42 @@ export function createLiveMuni(scene, data) {
 
     const geo = routeGlowMesh.geometry;
     geo.setAttribute('position', new BufferAttribute(new Float32Array(positions), 3));
-    geo.setAttribute('color', new BufferAttribute(new Float32Array(colors), 3));
+    // Both palettes are baked once here; the frame loop only swaps which
+    // attribute is bound, so the day/night flip allocates nothing.
+    routeGlowPalettes = {
+      night: new BufferAttribute(new Float32Array(colors), 3),
+      day: new BufferAttribute(new Float32Array(dayColors), 3),
+    };
+    geo.setAttribute('color', routeGlowPalettes[routeGlowIsDay ? 'day' : 'night']);
+    geo.setAttribute('aRibbon', new BufferAttribute(new Float32Array(ribbon), 1));
     geo.setIndex(indices);
     geo.computeVertexNormals();
     routeGlowMesh.visible = positions.length > 0;
+  }
+
+  // Swap palette + blend mode when the scene crosses dusk/dawn. Additive keeps
+  // the neon beam glowing after dark; NormalBlending makes the same wall an
+  // opaque painted curtain by day, which is the only way it survives sunlight.
+  function setRouteGlowDay(isDay) {
+    if (isDay === routeGlowIsDay) return;
+    routeGlowIsDay = isDay;
+    if (!routeGlowMesh) return;
+    const mat = routeGlowMesh.material;
+    mat.blending = isDay ? 1 : 2; // NormalBlending : AdditiveBlending
+    mat.needsUpdate = true;
+    if (routeGlowPalettes) {
+      routeGlowMesh.geometry.setAttribute('color', routeGlowPalettes[isDay ? 'day' : 'night']);
+    }
+    // Same ribbon, different fire: see ROUTE_GLOW_PROFILE.
+    if (routeGlowUniforms) {
+      const profile = ROUTE_GLOW_PROFILE[isDay ? 'day' : 'night'];
+      routeGlowUniforms.uCoreWhite.value = profile.coreWhite;
+      routeGlowUniforms.uBody.value = profile.body;
+      routeGlowUniforms.uBodyFall.value = profile.bodyFall;
+      routeGlowUniforms.uTopEdge.value = profile.topEdge;
+      routeGlowUniforms.uBaseEdge.value = profile.baseEdge;
+      routeGlowUniforms.uInk.value = profile.ink;
+    }
   }
 
   // ---------------------------------------------------------------- frame
@@ -994,16 +1296,18 @@ export function createLiveMuni(scene, data) {
     }
 
     // Route glow walls: rebuild when the active route set changes, and
-    // modulate opacity by day/night. Always visible — a subtle curtain by
-    // day, a vivid beam at night.
+    // modulate opacity by day/night. An active route is always drawn — a
+    // curtain against the daylight, a vivid beam once the city goes dark.
     if (routeGlowDirty) {
       rebuildRouteGlow();
       routeGlowDirty = false;
     }
     if (routeGlowMesh) {
-      // Slow pulse: 0.5-1.0 brightness factor over ~4 seconds.
+      // Slow pulse: 0.75-1.0 brightness factor over ~4 seconds.
       const pulse = 0.75 + 0.25 * Math.sin(now * 0.0015);
-      const baseOpacity = Math.max(ROUTE_GLOW_DAY_OPACITY, nightOpacity * 0.125);
+      const night = shared.uNight.value ?? 0;
+      setRouteGlowDay(night < ROUTE_GLOW_NIGHT_AT);
+      const baseOpacity = routeGlowIsDay ? ROUTE_GLOW_DAY_OPACITY : nightOpacity * ROUTE_GLOW_NIGHT_OPACITY;
       routeGlowMesh.material.opacity = baseOpacity * pulse;
     }
 
@@ -1019,6 +1323,17 @@ export function createLiveMuni(scene, data) {
 
     for (const state of buses.values()) {
       if (now - state.lastFixAt > STALE_MS) {
+        state.index = -1;
+        continue;
+      }
+
+      // In the scene only while the data says this vehicle is working: parked
+      // in a yard, waiting out a layover before its first trip, or off its own
+      // alignment -> it sinks under the street (the tunnel idiom) and rises
+      // again the moment it reports movement.
+      state.hidden = hiddenReason(state);
+      state.hide = Math.max(0, Math.min(1, state.hide + (state.hidden ? dt : -dt) / HIDE_FADE_S));
+      if (state.hide >= 1) {
         state.index = -1;
         continue;
       }
@@ -1041,12 +1356,18 @@ export function createLiveMuni(scene, data) {
         // hits — without it, the bus reaches targetS, lead hits zero, and
         // the advance clamp freezes it in place. Capped at DEAD_RECKON_MAX_S
         // seconds since the last fresh fix (ferries use the same pattern).
-        if (lead < DWELL_STEP_M && state.targetSpeed > 0) {
-          const sinceFresh = (now - state.lastFreshFixAt) / 1000;
-          if (sinceFresh < DEAD_RECKON_MAX_S) {
-            state.targetS += state.targetSpeed * dt;
-            lead = state.targetS - state.s;
-          }
+        const extra = deadReckonAdvance({
+          lead,
+          targetSpeed: state.targetSpeed,
+          sinceFreshS: (now - state.lastFreshFixAt) / 1000,
+          provisional: state.provisional,
+          targetS: state.targetS,
+          provisionalCap: state.provisionalCap,
+          dt,
+        });
+        if (extra > 0) {
+          state.targetS += extra;
+          lead = state.targetS - state.s;
         }
         const boost = lead > 200 ? CATCHUP_FACTOR : 1;
         const advance = Math.min(Math.max(0, lead + 12), state.speed * boost * dt);
@@ -1072,10 +1393,22 @@ export function createLiveMuni(scene, data) {
 
       const f = state.fleet || fleets[0];
       if (f.count >= CAPACITY) { state.index = -1; continue; }
+
+      // In tunnel? Ease it under the street across the portal and stop drawing
+      // once it is wholly below. The road is opaque, so the descent reads as
+      // entering the tunnel rather than as a vehicle winking out — and while it
+      // is under, it costs nothing to draw.
+      let sink = state.hide * f.sinkM;
+      if (shapes && state.shapeIdx >= 0 && TUNNELS[String(state.route).toUpperCase()]) {
+        const depth = tunnelDepth(undergroundFor(state.shapeIdx, state.route), state.s);
+        if (depth >= 1) { state.index = -1; continue; }
+        sink = Math.max(sink, depth * f.sinkM);
+      }
+
       state.index = f.count;
       const y = data.sampleElevation ? data.sampleElevation(state.x, state.z) : 0;
 
-      dummy.position.set(state.x, y + 0.35, state.z);
+      dummy.position.set(state.x, y + 0.35 - sink, state.z);
       dummy.rotation.set(0, state.yaw + Math.PI, 0); // model front is -Z; +Z is travel after the flip
       dummy.scale.setScalar(f.scale);
       dummy.updateMatrix();
@@ -1087,7 +1420,9 @@ export function createLiveMuni(scene, data) {
       // skipped bubble costs an instance rather than leaving a hole.
       const dist = Math.hypot(state.x - camX, state.z - camZ);
       const near = badgeRadius * 0.72; // fade over the outer quarter of the ring
-      if (dist < badgeRadius) {
+      // A bubble left hovering over the street while its train is on the way
+      // down reads as a label pinned to nothing, so it goes at the portal.
+      if (dist < badgeRadius && sink === 0) {
         eligible++;
         if (badgeCount < MAX_BADGES) {
           const fade = dist < near ? 1 : Math.max(0, 1 - (dist - near) / Math.max(1, badgeRadius - near));
@@ -1095,7 +1430,9 @@ export function createLiveMuni(scene, data) {
           // Proportional to THIS bubble's distance => constant size on screen,
           // which is the whole point: a bubble 6 km away is drawn 6 km-sized.
           const scaleAt = Math.max(BADGE_SCALE_MIN, Math.min(BADGE_SCALE_MAX, dist / BADGE_REF_DIST));
-          dummy.position.set(state.x, y + BADGE_Y * scaleAt, state.z);
+          // Pin the TIP, derive the centre: the bubble scales, the point it
+          // aims with does not drift up off the roof.
+          dummy.position.set(state.x, y + BADGE_TIP_Y + BADGE_TAIL_DROP * scaleAt, state.z);
           dummy.quaternion.copy(camQ);
           dummy.scale.setScalar(scaleAt * fade);
           dummy.updateMatrix();
@@ -1235,6 +1572,13 @@ export function createLiveMuni(scene, data) {
         moving: all.filter((s) => s.speed > 0.5).length,
         targetMoving: all.filter((s) => s.targetSpeed > 0.5).length,
         frozen: all.filter((s) => s.index >= 0 && s.speed < 0.5 && s.targetSpeed < 0.5).length,
+        // Why the rest aren't drawn — the counts to read when the scene looks
+        // emptier or busier than the street does.
+        parked: all.filter((s) => s.hidden === 'parked').length,
+        layover: all.filter((s) => s.hidden === 'layover').length,
+        offRoute: all.filter((s) => s.hidden === 'offRoute').length,
+        provisional: all.filter((s) => s.provisional).length,
+        predictionsSeen,
         live,
         degraded,
         demo,
@@ -1243,6 +1587,7 @@ export function createLiveMuni(scene, data) {
       const rows = all.slice(0, 20).map((s) => ({
         id: s.id,
         route: s.route,
+        mode: s.mode,
         speed: +s.speed.toFixed(1),
         targetSpeed: +s.targetSpeed.toFixed(1),
         s: Math.round(s.s),
@@ -1252,6 +1597,15 @@ export function createLiveMuni(scene, data) {
         fixAgeS: Math.round((now - s.lastFixAt) / 1000),
         onShape: s.shapeIdx >= 0,
         drawn: s.index >= 0,
+        hidden: s.hidden ?? null,
+        stillS: Math.round((s.lastFreshFixAt - s.movedAt) / 1000),
+        provisional: !!s.provisional,
+        // Distinguishes "in tunnel" from the other reasons a vehicle isn't
+        // drawn (stale fix, fleet at capacity).
+        inTunnel:
+          shapes && s.shapeIdx >= 0 && !!TUNNELS[String(s.route).toUpperCase()]
+            ? tunnelDepth(undergroundFor(s.shapeIdx, s.route), s.s) >= 1
+            : false,
         deadReckon: s.shapeIdx >= 0 && s.targetS - s.s < DWELL_STEP_M && s.targetSpeed > 0,
       }));
       console.log('=== SF.muni.debug ===');
