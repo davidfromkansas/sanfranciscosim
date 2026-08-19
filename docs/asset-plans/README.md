@@ -138,8 +138,9 @@ route, and the park plans depend on it (§E8 of the parks README).
 | [45–49 South Park (Gran Oriente Filipino Residence)](./49-south-park.md) | `49-south-park` | 13.0 m (LiDAR-derived) | new landmark |
 | [49 Zoe Street](./49-zoe.md) | `49-zoe` | 17.0 m (LiDAR max, stair/elevator penthouse crest; parapet 14.4 m) | new landmark |
 | [246 Ritch Street](./246-ritch.md) | `246-ritch` | 18.76 m (LiDAR max, read as the roof stair/elevator penthouse — see its 2.15 risk 1; parapet 15.87 m) | new landmark |
+| [248–250 Ritch Street](./248-ritch.md) | `248-ritch` | 8.6 m (cornice crest; measured twice — LiDAR mixture 8.65 m, rectified panorama 8.50 m) | new landmark |
 
-## Shared contract (all 98)
+## Shared contract (all 99)
 | [252–254 Ritch Street](./254-ritch.md) | `254-ritch` | 8.8 m (LiDAR maximum, the roof flue; cornice crest 8.05 m estimated) | new landmark |
 | [434 Brannan Street (Art Deco loft, 1929)](./434-brannan.md) | `434-brannan` | 13.79 m (LiDAR maximum, read as the rooftop mechanical penthouse; roof deck 11.46 m measured, parapet crest ~12.4 m estimated) | new landmark |
 
