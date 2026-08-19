@@ -263,7 +263,31 @@ def offset_poly(poly, d):
     return out
 
 
+def collinear_drops(poly, tol=1e-4):
+    """Indices whose two neighbours are collinear with them.
+
+    M1, M2 and HM are inserted mid-edge to split the wings, so several ring
+    polygons carry perfectly collinear vertex triples. Blender keeps the cap
+    n-gon happily, but the glTF exporter triangulates it and emits a zero-area
+    sliver (measured: edges 18.945 + 8.930 = 27.875 exactly). That sliver is
+    invisible, survives the weld, and fails the stage-2 contract validator on
+    `no_degenerate_geometry` two steps later - so drop the points here."""
+    n = len(poly)
+    drop = set()
+    for i in range(n):
+        (x0, y0), (x1, y1), (x2, y2) = poly[i - 1], poly[i], poly[(i + 1) % n]
+        cross = (x1 - x0) * (y2 - y1) - (y1 - y0) * (x2 - x1)
+        if abs(cross) < tol:
+            drop.add(i)
+    return drop
+
+
+def without(poly, drop):
+    return [p for i, p in enumerate(poly) if i not in drop]
+
+
 def prism(name, poly, z0, z1, mat):
+    poly = without(poly, collinear_drops(poly))
     k = len(poly)
     verts = [(x, y, z0) for x, y in poly] + [(x, y, z1) for x, y in poly]
     faces = [tuple(range(k - 1, -1, -1)), tuple(range(k, 2 * k))]
@@ -277,6 +301,8 @@ def ring_prism(name, outer, inner, z0, z1, mat):
     """Closed annular solid between two same-length CCW loops (parapets, tile
     eaves). Built as a ring, not a slab: a solid prism here would roof the whole
     block over and bury the deck it is supposed to surround."""
+    drop = collinear_drops(outer)
+    outer, inner = without(outer, drop), without(inner, drop)
     k = len(outer)
     verts = ([(x, y, z0) for x, y in outer] + [(x, y, z0) for x, y in inner]
              + [(x, y, z1) for x, y in outer] + [(x, y, z1) for x, y in inner])

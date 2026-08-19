@@ -10,14 +10,15 @@
 | | |
 |---|---|
 | File | `orpheum-theatre.glb` |
-| Triangles | **7,496** (cap 24,000) |
-| Objects | 242 |
+| Triangles | **7,193** (cap 24,000) — 7,200 as authored, meshopt-packed |
+| Objects / draw submeshes | 11 (242 as authored, joined per material by the optimize pass) |
 | Dimensions | **67.651 x 77.623 x 27.200 m** |
 | Min Z / XY centre | 0.000 / (0.000, 0.000) |
-| Size on disk | 501,316 B raw, 85,292 B gzip |
+| Size on disk | **193,912 B** raw, 119,175 B gzip (pre-optimize 488,736 B raw) |
 | Materials | 11, all `Toy_*`; 2 glow (`Toy_white_Glow`, `Toy_mustard_Glow`), both shipping at emission strength 0 |
 | Textures / transparency / cameras / lights / animation | 0 / 0 / 0 / 0 / 0 |
 | Normals | PASS — 0 inverted solids by per-object signed volume; ray test 0.0 % flipped over 22,500 first hits |
+| Degenerate triangles | 0 |
 | Heading | Market frontage 45.9° cw from true north, authored world-true (`+Y` = north) |
 | **Anchor** | **−122.4146087, 37.7793182** |
 | **targetHeightM** | **27.2** — stage-house roof, LiDAR `hgt_max`, normalised so the loader's scale lands at 1.0 |
@@ -47,13 +48,29 @@ separate raised pucks on a non-glow ground, never a closed glow shell.
 | `render_orpheum_theatre.py` | the eight review renders, always from the re-imported GLB |
 | `validate_orpheum_theatre.py` | fresh-scene contract validation → `validation.json` |
 | `make_contact_sheet.py` | composes `orpheum-theatre-contact-sheet.png` |
-| `orpheum-theatre.blend` / `.glb` | source scene / shipped asset |
+| `orpheum-theatre.blend` / `.glb` | source scene / shipped asset (meshopt-packed by stage 4) |
+| `optimize/` | stage 4: the four-variant table, gates, A/B renders, and the pre-optimize archive at `optimize/input/` |
 | `orpheum-theatre-{north,east,south,west,top,aerial,night,night-market}.png` | reviews |
 
 The four elevations share one rig — same orthographic scale, framing, lighting, exposure
 and projection — and differ only in azimuth. **The Market front bears 45.9° and faces
 south-east**, so it is split between the "south" and "east" elevations and is seen square
 only in the aerial and night views. That is the site, not a rig error.
+
+## Stage 4 — optimize
+
+488,736 → **193,912 B** raw (−60.3 %), 242 → **11** draw submeshes, appearance
+identical within 0.03–0.21 % mean RGB across day/night × near/far and the four
+elevations. Weld on, limited dissolve **off** — the dissolve buys 0.4 % of raw bytes
+and is the one Phase B step that can manufacture slivers on an asset built from
+coplanar ring bands. Full table, gates and toolchain in
+[`optimize/REPORT.md`](./optimize/REPORT.md).
+
+The pass also surfaced a build bug it did not cause: a zero-area triangle in
+`low_cap` from the collinear mid-edge inserts (`M1`, `M2`, `HM`) that the glTF
+exporter triangulates out of the cap n-gon. Fixed in the build script
+(`collinear_drops`), which took the asset from 7,496 to 7,200 authored triangles,
+and every gate was re-run from scratch on the rebuilt pair.
 
 ## Corrections made during the build
 
@@ -102,7 +119,7 @@ before push/PR/deploy, per `docs/asset-pipeline/ADDRESS-TO-ASSET.md`.
   "name": "Orpheum Theatre",
   "estimated": false,
   "dims": [67.651, 77.623, 27.2],
-  "tris": 7496,
+  "tris": 7193,
   "loadRadius": 2500
 }
 ```
