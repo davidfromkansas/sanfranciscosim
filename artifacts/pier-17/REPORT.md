@@ -3,7 +3,7 @@
 **Asset:** `artifacts/pier-17/pier-17.glb` — the 1912 pier shed on its own
 deck, Embarcadero at Green Street, Exploratorium campus.
 
-**Numbers (validated, fresh-scene re-import):** 1,998 triangles ·
+**Numbers (validated, fresh-scene re-import of the SHIPPED, optimized GLB):** 1,998 triangles · 57,784 B raw (153,280 B pre-optimize, archived at optimize/input/) · 13 draw submeshes (was 92) ·
 AABB 234.0 × 182.7 × 21.30 m · min z 0.0 (water level) · centered ·
 10 materials (2 glow) · validation.json all-PASS.
 
@@ -63,3 +63,12 @@ bbox top is normalized to it exactly).
   (corrections 3–4). Aerial camera was mis-framed down the long axis;
   re-aimed from the SSE at 65 mm.
 - Pass 2: rebuilt (1,974 tris), then a final pass aligned the strip windows to the pilaster bays and reframed the aerial (1,998 tris), re-rendered all views, re-validated: PASS.
+
+## Stage 4 — optimize
+
+GLB-OPTIMIZE-PROMPT v2 run in `optimize/`: full Phase B (weld 3,958→1,179
+verts; dissolve no-op; join 90 objects→13 meshes) + gltfpack 0.24
+`-c -km -kn -noq`. 153,280 → 57,784 B raw (−62%), submeshes 92 → 13, all
+gates G1–G8 PASS (G4 max mean pixel delta 0.084%). The packed file re-passed
+the full stage-2 contract validator (0 invalid normals). Shipping swap done;
+pre-optimize original archived at `optimize/input/pier-17.glb`.

@@ -121,7 +121,12 @@ stats["interior_faces_removed"] = interior_removed
 snap("interior-faces")
 
 # --- 3. limited dissolve, coplanar only ---
-for o in mesh_objs():
+# pier-17 adaptation: skippable via SKIP_DISSOLVE=1. The deck is a 243 m
+# beveled ring — exactly the coplanar-ring-band geometry the prompt's §3.3
+# warns can dissolve into sliver triangles that only fail after packing.
+import os as _os
+_objs = [] if _os.environ.get("SKIP_DISSOLVE") else mesh_objs()
+for o in _objs:
     bpy.context.view_layer.objects.active = o
     for oo in mesh_objs():
         oo.select_set(oo is o)
