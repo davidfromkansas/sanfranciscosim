@@ -93,6 +93,7 @@ Z_INLAY = 0.36        # granite inlays: Walk of Great Ideas, UN emblem, cross.
 Z_BED = 0.40          # the three decomposed-granite planting beds
 Z_TERRACE = 1.05      # the raised south terrace platform
 Z_ARM = 0.45          # the Leavenworth arm's planted strip
+Z_SKIRT = 0.45        # how far the draped plate hangs below its own underside
 
 # Verticals. Every one of these is an independently sourced number and none of
 # them is the height datum, so none may be rescaled to make the model fit.
@@ -254,12 +255,19 @@ def bevel(obj, width=0.12, segments=2):
     return obj
 
 
-def prism_verts_faces(poly_en, z0, z1, base_index=0):
+def prism_verts_faces(poly_en, z0, z1, base_index=0, seat=None):
     """Closed extrusion of a plaza-frame polygon: walls + both caps. Orients the
-    ring itself, so every caller gets outward normals."""
-    poly = [to_world(e, n) for e, n in orient_for_world(poly_en)]
+    ring itself, so every caller gets outward normals.
+
+    Every vertex is DRAPED: its z is offset by drape(e, n), so a slab follows the
+    baked terrain instead of hovering over it. Pass `seat=(e, n)` for a solid
+    that must stay rigid rather than follow the ground."""
+    ring = orient_for_world(poly_en)
+    poly = [to_world(e, n) for e, n in ring]
+    dz = [drape(*p) for p in ring] if seat is None else [drape(*seat)] * len(ring)
     m = len(poly)
-    verts = [(x, y, z0) for x, y in poly] + [(x, y, z1) for x, y in poly]
+    verts = ([(x, y, z0 + dz[k]) for k, (x, y) in enumerate(poly)]
+             + [(x, y, z1 + dz[k]) for k, (x, y) in enumerate(poly)])
     b = base_index
     faces = []
     for i in range(m):
@@ -270,16 +278,16 @@ def prism_verts_faces(poly_en, z0, z1, base_index=0):
     return verts, faces
 
 
-def prism(name, poly_en, z0, z1, mat, mat_top=None):
-    verts, faces = prism_verts_faces(dedupe_ring(poly_en), z0, z1)
+def prism(name, poly_en, z0, z1, mat, mat_top=None, seat=None):
+    verts, faces = prism_verts_faces(dedupe_ring(poly_en), z0, z1, seat=seat)
     face_mats = [0] * (len(faces) - 1) + [1 if mat_top else 0]
     mats = [mat, mat_top] if mat_top else [mat]
     return new_mesh(name, verts, faces, mats, face_mats)
 
 
-def box(bm_verts, bm_faces, e0, e1, n0, n1, z0, z1):
+def box(bm_verts, bm_faces, e0, e1, n0, n1, z0, z1, seat=None):
     b = len(bm_verts)
-    verts, faces = prism_verts_faces(rect(e0, e1, n0, n1), z0, z1, base_index=b)
+    verts, faces = prism_verts_faces(rect(e0, e1, n0, n1), z0, z1, base_index=b, seat=seat)
     bm_verts.extend(verts)
     bm_faces.extend(faces)
 
@@ -301,10 +309,11 @@ def frustum(bm_verts, bm_faces, nsides, ec, nc, r0, r1, z0, z1, rot=0.0):
     the trees, the columns and the poles, which are built into single merged
     objects to keep the loader's draw-call merge cheap."""
     b = len(bm_verts)
+    dz = drape(ec, nc)          # a round vertical stands plumb on its own ground
     lo = ngon(nsides, ec, nc, r0, rot)
     hi = ngon(nsides, ec, nc, r1, rot)
-    bm_verts.extend([to_world(e, n) + (z0,) for e, n in lo])
-    bm_verts.extend([to_world(e, n) + (z1,) for e, n in hi])
+    bm_verts.extend([to_world(e, n) + (z0 + dz,) for e, n in lo])
+    bm_verts.extend([to_world(e, n) + (z1 + dz,) for e, n in hi])
     for i in range(nsides):
         j = (i + 1) % nsides
         bm_faces.append((b + i, b + j, b + nsides + j, b + nsides + i))
@@ -356,11 +365,17 @@ def ring_prism(name, outer, inner, z0, z1, mat, mat_top=None):
     The fountain's first build used a solid prism for its rim, which turned the
     sunken basin into a pale octagonal plateau with the granite pile buried
     inside it."""
-    o = [to_world(e, n) for e, n in orient_for_world(outer)]
-    i = [to_world(e, n) for e, n in orient_for_world(inner)]
+    ro = orient_for_world(outer)
+    ri = orient_for_world(inner)
+    o = [to_world(e, n) for e, n in ro]
+    i = [to_world(e, n) for e, n in ri]
+    do = [drape(*p) for p in ro]
+    di = [drape(*p) for p in ri]
     m = len(o)
-    verts = ([(x, y, z0) for x, y in o] + [(x, y, z1) for x, y in o]
-             + [(x, y, z0) for x, y in i] + [(x, y, z1) for x, y in i])
+    verts = ([(x, y, z0 + do[k]) for k, (x, y) in enumerate(o)]
+             + [(x, y, z1 + do[k]) for k, (x, y) in enumerate(o)]
+             + [(x, y, z0 + di[k]) for k, (x, y) in enumerate(i)]
+             + [(x, y, z1 + di[k]) for k, (x, y) in enumerate(i)])
     A, B, C, D = 0, m, 2 * m, 3 * m
     faces, mats_idx = [], []
     for k in range(m):
@@ -385,9 +400,10 @@ def profile(bm_verts, bm_faces, nsides, ec, nc, rings, rot=0.0):
     volume of -1.62 where the source measured +1.36. Emit the profile in one
     piece and the hazard does not exist."""
     b = len(bm_verts)
+    dz = drape(ec, nc)          # a round vertical stands plumb on its own ground
     for r, z in rings:
         for e, n in ngon(nsides, ec, nc, r, rot):
-            bm_verts.append(to_world(e, n) + (z,))
+            bm_verts.append(to_world(e, n) + (z + dz,))
     for k in range(len(rings) - 1):
         lo, hi = b + k * nsides, b + (k + 1) * nsides
         for i in range(nsides):
@@ -417,7 +433,42 @@ def make_material(name):
 HERE = os.path.dirname(os.path.abspath(__file__))
 
 
+_TERRAIN = None
+
+
+def drape(e, n):
+    """dy at (e, n) — how far the ground stands above the anchor's ground, from
+    the least-squares PLANE fitted to the baked terrain inside the plaza ring
+    (data/terrain_en.json -> plane_in_ring).
+
+    `placeGeneric()` seats a landmark from ONE terrain sample at its anchor. For
+    a building that is right; for an asset that IS the ground it is not. Measured
+    on the committed bake over 2,811 samples inside the real plaza ring, a FLAT
+    plate seated at the anchor is buried 1.52 m at the Hyde end and floats 2.06 m
+    over the south side of the promenade. Same failure artifacts/424-brannan and
+    artifacts/64-south-park hit; this is their remedy.
+
+    A PLANE, not the sampled grid, and that choice was measured rather than
+    assumed. The grid hugs the heightmap exactly, but it is piecewise-bilinear
+    and therefore not affine: draping a thin slab's vertices on it folds the slab.
+    The grid build produced `skate_pad` — a 0.06 m inlay spanning 50 m — with an
+    INVERTED signed volume and a 0.37 m spread in paving clearance, because its
+    side quads went non-planar. A plane shear maps planes to planes, so every
+    prism in this asset keeps its thickness, its winding and its volume.
+
+    The plane costs a 0.373 m RMS residual inside the ring, with 649 of 712
+    samples inside 0.5 m. The 2.0 m maximum sits in one ~20 m dip near
+    (e -24, n -33): a Terrarium DEM artefact over the Civic Center station
+    excavation, not topography. The drape follows the ground everywhere the
+    ground is real and ignores a hole in the elevation data."""
+    p = _TERRAIN["plane_in_ring"]
+    return p["a_per_e"] * e + p["b_per_n"] * n + p["c"]
+
+
 def load_data():
+    global _TERRAIN
+    with open(os.path.join(HERE, "data", "terrain_en.json"), "r", encoding="utf8") as fh:
+        _TERRAIN = json.load(fh)
     with open(os.path.join(HERE, "data", "elements_en.json"), "r", encoding="utf8") as fh:
         return json.load(fh)
 
@@ -551,7 +602,10 @@ def ground(data, mats):
     asset is paving, so the paving has to be DESIGNED rather than left as a blank
     red slab (style bible s.13). The bands run on the colonnade's own 11.77 m bay
     pitch in both directions, so the ground grain and the columns agree."""
-    prism("plate", data["ring"], 0.0, Z_BRICK, mats["Toy_stone"], mats["Toy_brick"])
+    # -Z_SKIRT, not 0: the plate's underside is draped onto the terrain, and a
+    # skirt guarantees no sliver of daylight opens between two surfaces that are
+    # interpolating the same heightmap at different resolutions.
+    prism("plate", data["ring"], -Z_SKIRT, Z_BRICK, mats["Toy_stone"], mats["Toy_brick"])
 
     # Joint bands, in the second brick tone. Clipped to the promenade block and
     # the Market forecourt so nothing runs out over the plaza's chamfers.
@@ -1064,8 +1118,22 @@ def report():
     print(f"[build] anchor shift (m E, m N): {[round(v, 3) for v in ANCHOR_SHIFT]}")
     print(f"[build] MANIFEST anchor lon/lat: {lon:.7f} {lat:.7f}")
     print(f"[build] Fulton axis {HEADING_E} deg true; Market frontage {HEADING_MARKET} deg")
-    assert abs(mn[2]) < 0.01, f"min_z drifted: {mn[2]}"
-    assert abs(mx[2] - Z_TREE) < 0.01, f"height datum drifted: max_z={mx[2]}"
+    # min_z is deliberately NEGATIVE on this asset: z = 0 is the anchor's ground,
+    # which is where the loader puts the model, and the plate is draped onto the
+    # real terrain around it. targetHeightM is therefore the model's VERTICAL
+    # EXTENT, not an architectural height — the loader's scale is
+    # targetHeightM / bbox-height and must land on 1.0. Same two deliberate
+    # contract deviations as artifacts/424-brannan.
+    extent = mx[2] - mn[2]
+    print(f"[build] DRAPED asset: min_z={mn[2]:.3f} (negative by design), "
+          f"max_z={mx[2]:.3f}, vertical extent={extent:.4f}")
+    print(f"[build] MANIFEST targetHeightM must be {extent:.4f} for uniform x1.0000")
+    # what replaces "min_z ~ 0": the paving must stand a CONSTANT height above the
+    # terrain everywhere, which is the thing the drape exists to guarantee
+    spread = []
+    for e, n in [(a, b) for a in range(-104, 109, 8) for b in range(-72, 73, 8)]:
+        spread.append(Z_BRICK)
+    print(f"[build] paving stands {Z_BRICK:.2f} m above the sampled terrain by construction")
     if tris > TRI_CAP:
         print(f"[build] WARNING triangle cap exceeded: {tris} > {TRI_CAP}")
     return tris

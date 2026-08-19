@@ -246,12 +246,28 @@ for (const l of added) {
       }
     }
   }
-  const ok = best > l.exclude;
-  if (!ok) tooClose.push(l.id);
-  console.log(
-    `  ${ok ? 'ok  ' : 'FAIL'} ${l.id.padEnd(22)} ${best.toFixed(1)} m vs ${l.exclude} m radius` +
-      (nearest ? `  (nearest is ${nearest.height.toFixed(1)} m tall)` : ''),
-  );
+  // A landmark may legitimately declare NO anchor circle. unPlaza is the first:
+  // its anchor is the XY bbox centre of an L-shaped plaza and lands 4.8 m off a
+  // real neighbour's footprint, while everything that has to be dropped is 25 m
+  // away, so all of its work is done by extraExclusions. Comparing against
+  // `undefined` made this read `4.8 m vs undefined m radius  FAIL`, which is a
+  // gap in this tool's model, not a bake defect. Skip the anchor check when
+  // there is no anchor circle to check; the extra zones below still run, and
+  // "is anything standing under the asset" is answered by point-in-polygon
+  // against the real footprint, not by a radius (see ADDRESS-TO-ASSET stage 5).
+  if (l.exclude === undefined) {
+    console.log(
+      `  n/a  ${l.id.padEnd(22)} no anchor exclusion; nearest footprint ${best.toFixed(1)} m` +
+        (nearest ? `  (${nearest.height.toFixed(1)} m tall)` : ''),
+    );
+  } else {
+    const ok = best > l.exclude;
+    if (!ok) tooClose.push(l.id);
+    console.log(
+      `  ${ok ? 'ok  ' : 'FAIL'} ${l.id.padEnd(22)} ${best.toFixed(1)} m vs ${l.exclude} m radius` +
+        (nearest ? `  (nearest is ${nearest.height.toFixed(1)} m tall)` : ''),
+    );
+  }
   // A landmark may declare extra zones away from its anchor (551Third's kiosk).
   // The anchor check above cannot see them, so each one is measured on its own.
   for (const zone of extraZones.filter((z) => z.id === l.id)) {

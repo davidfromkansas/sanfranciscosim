@@ -5,24 +5,24 @@
   "reimported_final_glb": true,
   "object_count": 57,
   "mesh_object_count": 57,
-  "triangle_count": 16934,
+  "triangle_count": 16548,
   "triangle_budget": 18000,
   "dimensions_m": [
-    215.2233,
-    157.9379,
-    13.0
+    215.2063,
+    157.9219,
+    16.4028
   ],
   "bbox_min_m": [
-    -107.6117,
-    -78.969,
-    0.0
+    -107.6031,
+    -78.9609,
+    -2.5095
   ],
   "bbox_max_m": [
-    107.6117,
-    78.969,
-    13.0
+    107.6031,
+    78.9609,
+    13.8933
   ],
-  "min_z_m": 0.0,
+  "min_z_m": -2.5095,
   "xy_center_offset_m": [
     0.0,
     0.0
@@ -195,7 +195,7 @@
   "negative_scales": false,
   "degenerate_triangle_count": 0,
   "invalid_or_nonunit_loop_normal_count": 0,
-  "normal_ray_cast_first_hits": 19161,
+  "normal_ray_cast_first_hits": 19532,
   "normal_ray_cast_flipped_visible_faces": 0,
   "normal_ray_cast_flipped_fraction": 0.0,
   "normal_orientation_status": "PASS",
@@ -213,7 +213,7 @@
   ],
   "fulton_axis_deg_true": 80.94,
   "market_frontage_deg_true": 45.2,
-  "target_height_m": 13.0,
+  "target_height_m": 16.4028,
   "height_datum": "tallest London plane crown; an AUTHORED design value, not a survey (plan 2.15 risk 3). targetHeightM is set equal to it so the loader scale is exactly 1.0 and the ground plane is right by construction.",
   "height_datum_vertex_object": "crowns",
   "light_standard_count": 16,
@@ -221,6 +221,182 @@
   "measured_colonnade_bearing_north_row_deg": 81.03,
   "measured_colonnade_bearing_south_row_deg": 81.029,
   "measured_market_frontage_bearing_deg": 45.2,
+  "drape_samples": 165,
+  "drape_paving_clearance_mode_m": 0.3003,
+  "drape_paving_clearance_spread_m": 0.0207,
+  "drape_brick_samples": 85,
+  "drape_layer_histogram_m": [
+    [
+      0.3,
+      72
+    ],
+    [
+      0.31,
+      9
+    ],
+    [
+      0.32,
+      4
+    ],
+    [
+      0.33,
+      5
+    ],
+    [
+      0.34,
+      11
+    ],
+    [
+      0.35,
+      1
+    ],
+    [
+      0.36,
+      1
+    ],
+    [
+      0.39,
+      5
+    ],
+    [
+      0.42,
+      5
+    ],
+    [
+      0.44,
+      1
+    ],
+    [
+      0.45,
+      1
+    ],
+    [
+      0.48,
+      4
+    ],
+    [
+      0.66,
+      1
+    ],
+    [
+      0.72,
+      2
+    ],
+    [
+      0.74,
+      1
+    ],
+    [
+      0.94,
+      1
+    ],
+    [
+      1.05,
+      9
+    ],
+    [
+      1.17,
+      1
+    ],
+    [
+      1.2,
+      1
+    ],
+    [
+      1.26,
+      1
+    ],
+    [
+      1.47,
+      4
+    ],
+    [
+      1.55,
+      5
+    ],
+    [
+      1.64,
+      1
+    ],
+    [
+      1.65,
+      1
+    ],
+    [
+      1.99,
+      1
+    ],
+    [
+      2.19,
+      1
+    ],
+    [
+      3.46,
+      1
+    ],
+    [
+      4.03,
+      1
+    ],
+    [
+      8.06,
+      1
+    ],
+    [
+      8.34,
+      1
+    ],
+    [
+      8.68,
+      1
+    ],
+    [
+      9.14,
+      1
+    ],
+    [
+      9.28,
+      1
+    ],
+    [
+      9.61,
+      1
+    ],
+    [
+      9.76,
+      1
+    ],
+    [
+      9.82,
+      1
+    ],
+    [
+      10.25,
+      1
+    ],
+    [
+      10.67,
+      1
+    ],
+    [
+      10.85,
+      1
+    ],
+    [
+      11.27,
+      1
+    ],
+    [
+      11.75,
+      1
+    ],
+    [
+      12.78,
+      1
+    ]
+  ],
+  "drape_terrain_grid": "data/terrain_en.json (the same grid the build read)",
+  "min_z_negative_by_design": true,
   "fountain_slab_crest_m": 4.03,
   "fountain_slab_source": "DataSF LiDAR footprint 159394 hgt_maxcm 403 (measured)",
   "signed_volume_outward_objects": 57,
@@ -228,7 +404,7 @@
   "object_details": [
     {
       "name": "arm_dogrun",
-      "triangles": 248,
+      "triangles": 194,
       "location": [
         0.0,
         0.0,
@@ -266,7 +442,7 @@
     },
     {
       "name": "arm_strip",
-      "triangles": 108,
+      "triangles": 84,
       "location": [
         0.0,
         0.0,
@@ -285,7 +461,7 @@
     },
     {
       "name": "bed_ne",
-      "triangles": 68,
+      "triangles": 44,
       "location": [
         0.0,
         0.0,
@@ -323,7 +499,7 @@
     },
     {
       "name": "bed_nw",
-      "triangles": 68,
+      "triangles": 44,
       "location": [
         0.0,
         0.0,
@@ -361,7 +537,7 @@
     },
     {
       "name": "bed_sw",
-      "triangles": 44,
+      "triangles": 28,
       "location": [
         0.0,
         0.0,
@@ -703,7 +879,7 @@
     },
     {
       "name": "inlay_cross",
-      "triangles": 88,
+      "triangles": 56,
       "location": [
         0.0,
         0.0,
@@ -722,7 +898,7 @@
     },
     {
       "name": "inlay_emblem",
-      "triangles": 188,
+      "triangles": 124,
       "location": [
         0.0,
         0.0,
@@ -741,7 +917,7 @@
     },
     {
       "name": "inlay_emblem_ring",
-      "triangles": 188,
+      "triangles": 124,
       "location": [
         0.0,
         0.0,
@@ -760,7 +936,7 @@
     },
     {
       "name": "inlay_walk",
-      "triangles": 44,
+      "triangles": 28,
       "location": [
         0.0,
         0.0,
@@ -1178,7 +1354,7 @@
     },
     {
       "name": "skate_pad",
-      "triangles": 56,
+      "triangles": 36,
       "location": [
         0.0,
         0.0,
@@ -1273,7 +1449,7 @@
     },
     {
       "name": "walk_market",
-      "triangles": 44,
+      "triangles": 28,
       "location": [
         0.0,
         0.0,
@@ -1292,7 +1468,7 @@
     },
     {
       "name": "walk_spine",
-      "triangles": 88,
+      "triangles": 56,
       "location": [
         0.0,
         0.0,
@@ -1312,13 +1488,14 @@
   ],
   "checks": {
     "meters_and_plausible_dimensions": true,
-    "crest_normalized_to_target": true,
+    "vertical_extent_matches_target": true,
     "height_datum_is_a_tree_crown": true,
     "light_standard_count_matches_survey": true,
     "light_standard_positions_match_survey": true,
     "colonnade_bearing_signed_correct": true,
     "market_frontage_bearing_signed_correct": true,
-    "base_at_z_zero": true,
+    "min_z_negative_by_design": true,
+    "paving_stands_constant_above_terrain": true,
     "centered_xy": true,
     "under_triangle_budget": true,
     "no_image_textures": true,
@@ -1334,13 +1511,12 @@
     "no_unexpected_objects": true
   },
   "overall": "PASS",
-  "note": "This is the AUTHORING validation, run on the pre-optimize asset now archived byte-for-byte at optimize/input/un-plaza.glb. The shipping file artifacts/un-plaza/un-plaza.glb is the stage-4 meshopt output; its gate evidence is optimize/gates.json and optimize/REPORT.md. The subject-specific checks here (16 named light standards, a named crown carrying the datum, the two signed bearings) are run against the named objects, which stage 4 joins per material, so they can only be run on this file.",
   "shipped": {
     "file": "un-plaza.glb",
-    "bytes": 452532,
-    "bytes_pre_optimize": 911264,
-    "triangle_count": 16778,
-    "triangle_count_pre_optimize": 16934,
+    "bytes": 460340,
+    "bytes_pre_optimize": 894996,
+    "triangle_count": 16390,
+    "triangle_count_pre_optimize": 16548,
     "draw_submeshes": 26,
     "draw_submeshes_pre_optimize": 62,
     "bbox_identical": true

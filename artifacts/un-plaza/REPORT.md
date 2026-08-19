@@ -10,20 +10,23 @@ and **REPORT beats plan**.
 | | |
 |---|---|
 | File | `un-plaza.glb` |
-| Triangles | **16,778** shipping / 16,934 pre-optimize (cap 18,000; hard gate 30,000) |
-| Bytes | **452,532** shipping (meshopt, stage 4); pre-optimize 911,264 |
+| Triangles | **16,390** shipping / 16,548 pre-optimize (cap 18,000; hard gate 30,000) |
+| Bytes | **460,340** shipping (meshopt, stage 4); pre-optimize 894,996 |
 | Draw submeshes | **26** shipping / 62 pre-optimize |
-| Dimensions | **215.22 × 157.94 × 13.00 m** |
-| min Z | 0.0000 |
+| Dimensions | **215.21 × 157.92 × 16.4028 m** |
+| min Z | **−2.5095 — negative by design**, this is a terrain-draped ground asset (§10) |
+| targetHeightM | **16.4028** — the model's vertical EXTENT, not an architectural height |
 | XY centre offset | 0.0000, 0.0000 |
 | Mesh objects | 22 shipping / 57 pre-optimize |
+| Paving clearance | mode **0.3003 m** above the terrain, spread **0.0207 m** over 85 brick samples |
 | Materials | 19 `Toy_*`, three of them `_Glow` |
 | Anchor | −122.4138900, 37.7801415 |
-| Height datum | tallest tree crown, exactly 13.00 m |
+| Height datum | tallest tree crown, authored at exactly 13.00 m above its own draped ground |
 | Light standards | 16, max position error **0.00 m** against the measured survey |
 | Colonnade bearing (both rows) | 81.03° / 81.03° true |
 | Market frontage bearing | 45.20° true |
 | Normals | signed volume outward on **57/57** objects; ray-test flipped fraction **0.000000** |
+| In-app | `un-plaza merged 26 objects / 19 materials -> batched (8910 tris body); uniform x1.0000 at 2078, -1121` |
 | Validation | `validation.json` — **overall PASS**, 21/21 checks (authoring side); `optimize/gates.json` — G1–G5 all PASS (shipping side) |
 
 ## 2. What was verified before modelling, and what changed
@@ -118,7 +121,14 @@ each is the kind of thing that ships silently:
    that emits a solid of revolution in one piece with no internal caps; the
    globes, tree crowns and obelisk were rewired onto it, which also removed 838
    buried triangles (17,772 → 16,934). Full write-up in `optimize/REPORT.md`.
-10. **The studio floor in the review rig was sized off the model's HEIGHT**
+10. **The review rig's studio floor was pinned at z = −0.02**, which was fine
+    until the asset became terrain-draped and its plate fell to −2.51 m at the
+    Market end. The floor then sliced through the lower half of the plaza and
+    rendered as a pale plane over it — which reads exactly like a missing brick
+    field. It is a rig bug, not an asset one, and it is the second time this rig
+    has lied about a ground-plane asset (see the previous item). The floor now
+    follows `mn.z − 0.02`.
+11. **The studio floor in the review rig was sized off the model's HEIGHT**
    (65 m), so it appeared as a beige rectangle inside the frame of a 215 m
    asset. Now sized off the plan.
 
@@ -192,3 +202,84 @@ brief on **2026-08-19**, quoted verbatim:
 The contact sheet, the day and night aerials and the top view were presented at
 the same time rather than held for a reply, per that instruction. The numbers
 presented were those in §1.
+
+## 10. Stage 5 — integration, and the defect it found
+
+**The asset shipped in this report is terrain-draped. The first one was not, and
+that was a real defect found only by the app-side QA.**
+
+`placeGeneric()` seats a landmark from ONE terrain sample at its anchor. Measured
+on the committed bake over 2,811 samples inside the real plaza ring: the terrain
+runs 13.06–16.64 m while the anchor sits at 15.119 m, so the flat plate was
+**buried 1.52 m at the Hyde end and floating 2.06 m** over the south side of the
+promenade — invisible in all eight Blender review renders and obvious in the app.
+The plan (§2.13) flagged the risk; it did not budget for the rebuild.
+
+The fix follows `artifacts/424-brannan`: `sample_terrain.mjs` fits the baked
+terrain inside the plaza ring, `drape()` shears every vertex onto it, and the two
+deliberate contract deviations are asserted rather than left looking like slips —
+`min_z` is negative (z = 0 is the anchor's ground) and `targetHeightM` is the
+model's vertical extent (the loader divides by the bbox height and must land on
+1.0; it does, `uniform x1.0000`).
+
+**Plane, not grid — measured, not assumed.** A first attempt draped onto the
+sampled grid, which hugs the heightmap exactly. It is piecewise-bilinear and
+therefore not affine, so a thin slab folds on it: `skate_pad` (a 0.06 m inlay
+spanning 50 m) came out with an INVERTED signed volume and the paving clearance
+spread to 0.37 m. The plane shear maps planes to planes; every prism stayed
+valid, and the clearance now measures **0.3003 m mode, 0.0207 m spread**. The
+plane costs 0.373 m RMS in-ring, and its 2.0 m maximum is one ~20 m Terrarium DEM
+dip over the Civic Center station excavation — a hole in the elevation data, not
+topography.
+
+### The re-bake
+
+| | |
+|---|---|
+| Cell | `20_13`, **184 → 177** buildings |
+| Dropped | exactly the **seven fountain footprints** (18/23/20/12/51/15/25 m², 3.1–8.5 m tall). Zero added. |
+| Churn | 522 building tiles changed: **521 seed-only, 1 real** (20_13). Geometry, heights, palettes, categories, yaws and night flags byte-identical elsewhere — the per-building `seed` derives from the global index, which shifts when one footprint is dropped. |
+| `verify-rebake` | **PASS** — 584 of 585 cells unchanged; extra zone 34.8 m vs 30 m radius |
+| `audit` 1.6 | **PASS** — 114 zones over 110 landmarks clear |
+| Remaining overlap | 50 UN Plaza by **0.5 m** and a Market-side neighbour by **0.3 m** — survey slivers between two different polygon sources, not buildings standing in the plaza |
+
+`verify-rebake.mjs` needed a one-`if` guard: `unPlaza` is the first landmark with
+no anchor exclusion at all, and the tool compared `4.8 m vs undefined m radius`
+and reported FAIL. The substantive question was settled from the tile instead.
+
+### Local QA
+
+| Check | Result |
+|---|---|
+| Re-validation of the shipping GLB in a fresh Blender scene | **PASS** — 16,390 tris, all `Toy_*`, no textures/transparency/cameras/lights/animation/foreign geometry |
+| Dev server serves THIS worktree | **PASS** — `lsof` confirms `sf-worktrees/un-plaza/app`, 104 manifest entries, GLB 200 at 460,340 B |
+| Merge line + scale | **PASS** — `merged 26 objects / 19 materials -> batched (8910 tris body); uniform x1.0000 at 2078, -1121` |
+| One building at the site | **PASS** — settled from the tile, not the frame; only the two sub-metre survey slivers above |
+| Orientation | **PASS** — colonnade 81.03°, Market frontage 45.20°, both signed |
+| Terrain seating | **PASS after the drape** — paving stands 0.3003 m above terrain, spread 0.0207 m |
+| Night glow | **PASS** — plaza dark, the sixteen globes and the teal BART portal lit |
+| Draw calls | **PASS** — 56–85 at this camera, well under 300 |
+| Streaming | **PASS** — `entries 104, live 96, failed 0`, zero batch overflows on a clean load |
+| Fallback drill | **PASS** — app boots, exactly one warning naming `un-plaza`, the site is empty ground inside the exclusion zone (Case B, expected) |
+
+Screenshots in `qa/`: `in-app-day_aerial.jpg`, `in-app-night_aerial.jpg`,
+`in-app-day_axis.jpg`, `in-app-fallback.jpg`.
+
+Two notes for whoever reads the drill output. The fallback warning reads
+`failed to load (Unexpected token '<', "<!doctype "...)` rather than the
+"keeping the code-built landmark" text INTEGRATION-PROMPT Step 6 quotes: Vite
+answers a missing `public/` path with the SPA index at HTTP 200, so a streamed
+landmark fails at parse rather than at fetch. And the shared landmark
+`BatchedMesh` is at **91.2%** (1,459,122 of 1,600,000 body vertices with all 103
+generic landmarks resident; un-plaza is 26,730 of that, 1.7%). A clean load
+places all 96 with `failed: 0`; only repeated release/re-add churn fragments the
+reserve. That is the pre-existing condition, not this asset — but it is the
+number the batch integrator should watch.
+
+### Batch mode
+
+Per `ADDRESS-TO-ASSET.md`, the bake was run, QA'd on, and then discarded:
+`git checkout -- app/public/tiles api/_data`. `git diff --name-only origin/main`
+lists **nothing** under `app/public/tiles/` or `api/_data/`. The branch carries
+source only: the GLB, its manifest entry, its `pipeline/lib/landmarks.mjs` entry,
+the one-line `verify-rebake.mjs` guard, the asset plan and `artifacts/un-plaza/`.

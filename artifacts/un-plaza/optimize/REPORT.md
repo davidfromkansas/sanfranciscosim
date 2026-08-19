@@ -8,15 +8,15 @@ Stage 4 of `docs/asset-pipeline/ADDRESS-TO-ASSET.md`, run per
 
 | | Input | Shipping | |
 |---|---:|---:|---|
-| Bytes (raw) | 911,264 | **452,532** | −50.3%, 2.01× |
-| Bytes (gzip −9) | 213,343 | 323,907 | see note |
+| Bytes (raw) | 894,996 | **460,340** | −48.6%, 1.94× |
+| Bytes (gzip −9) | 229,998 | 349,157 | see note |
 | Objects | 57 | **22** | joined per material |
 | Draw submeshes (primitives) | 62 | **26** | G5 |
-| Triangles | 16,934 | 16,778 | limited dissolve, 0.05° coplanar only |
-| Vertices (in Blender, welded) | 32,466 | 29,841 | 24,355 coincident pairs welded |
+| Triangles | 16,548 | 16,390 | limited dissolve, 0.05° coplanar only |
+| Vertices (in Blender, welded) | 31,702 | 29,398 | coincident pairs welded per object |
 | Materials | 19 | 19 | identical set |
-| BBox | 215.22333 × 157.93793 × 13.0 | identical | exact |
-| Origin | (0, 0), base z 0 | identical | exact |
+| BBox | 215.2063 × 157.9219 × 16.4028 | identical | exact |
+| Origin | (0, 0), base z **−2.5095** | identical | exact — negative by design, this is a terrain-draped ground asset |
 
 The shipping file is `artifacts/un-plaza/un-plaza.glb`; the pre-optimize
 original is archived byte-for-byte at `optimize/input/un-plaza.glb`.
@@ -31,11 +31,11 @@ recorded on `civic-center-plaza` (220,836 → 339,760).
 | Gate | Result |
 |---|---|
 | **G1 Contract** — material set identical, `_Glow` separate, no `Toy_body`, node names intact | **PASS** — all 19 names identical; `Toy_white_Glow`, `Toy_cream_Glow` and `Toy_teal_Glow` still separate objects |
-| **G2 Geometry** — bbox within max(1 cm, 0.1%), origin within 1 cm, signed volumes positive, flipped ≤ 0.15% | **PASS** — bbox and origin *exact*; 22/22 volumes positive; **0 flipped of 8,104 ray hits (0.000%)** |
-| **G3 Round-trip** — re-imports in Blender and loads via pinned-three `g3check` | **PASS** — `G3-OK`, 26 meshes, 16,778 tris, 19 materials, no decode errors |
-| **G4 Appearance** — day+night × near+far, mean delta ≤ 2% far / ≤ 4% near | **PASS** — worst mean **0.41%** across all 8 views |
+| **G2 Geometry** — bbox within max(1 cm, 0.1%), origin within 1 cm, signed volumes positive, flipped ≤ 0.15% | **PASS** — bbox and origin *exact*; 22/22 volumes positive; **0 flipped of 8,130 ray hits (0.000%)** |
+| **G3 Round-trip** — re-imports in Blender and loads via pinned-three `g3check` | **PASS** — `G3-OK`, 26 meshes, 16,390 tris, 19 materials, no decode errors |
+| **G4 Appearance** — day+night × near+far, mean delta ≤ 2% far / ≤ 4% near | **PASS** — worst mean **0.40%** across all 8 views |
 | **G5 Draw submeshes** — ≤ input | **PASS** — 62 → 26 |
-| **G6 Size** — reduced; if under target, waste census must justify the remainder | **PASS with justification** — 50.3% against a 60% aspiration, see below |
+| **G6 Size** — reduced; if under target, waste census must justify the remainder | **PASS with justification** — 48.6% against a 60% aspiration, see below |
 | **G7 GPU budget** | n/a — bake mode off |
 | **G8 Hygiene** — no foreign geometry, deterministic re-run, no `.blend1` | **PASS** — re-import object/material/bbox check clean; no stray files |
 
@@ -43,14 +43,14 @@ recorded on `civic-center-plaza` (220,836 → 339,760).
 
 | View | Mean abs RGB delta | Max px delta |
 |---|---:|---:|
-| day_near | 0.023% | 35 |
-| day_far | 0.028% | 12 |
-| night_near | 0.346% | 54 |
-| night_far | 0.406% | 35 |
-| elev_n | 0.030% | 17 |
-| elev_e | 0.050% | 89 |
-| elev_s | 0.053% | 32 |
-| elev_w | 0.027% | 33 |
+| day_near | 0.016% | 32 |
+| day_far | 0.019% | 12 |
+| night_near | 0.346% | 45 |
+| night_far | 0.395% | 30 |
+| elev_n | 0.016% | 27 |
+| elev_e | 0.025% | 33 |
+| elev_s | 0.031% | 22 |
+| elev_w | 0.034% | 10 |
 
 Written description of the difference: **nothing a player would notice.** No
 element is missing, no silhouette moved, and — the specific thing to check on a
@@ -89,7 +89,7 @@ This is the case the prompt's §3 step-2 occluder rule is really about: signed
 volume is only meaningful on a closed shell, and the cheapest way to guarantee
 one is not to author buried faces in the first place.
 
-### G6 waste census — why this asset stops at 2.01×
+### G6 waste census — why this asset stops at 1.94×
 
 The prompt's 4–6× results come mostly from vertex quantization. **`-noq` is
 mandatory for this app** (`pipeline/compress-assets.mjs`, and
@@ -109,7 +109,13 @@ Beyond that, the remainder is irreducible for the same structural reason
 - **What was available was taken**: 57 objects → 22, 62 draw submeshes → 26,
   and half the bytes.
 
-The limited dissolve was kept here (it removed 156 triangles, 0.9%) after
+These numbers are from the SECOND stage-4 run. The asset was rebuilt between
+them — stage 5's app QA found it needed a terrain drape (see ../REPORT.md §10) —
+so stage 4 was re-run in full on the draped geometry rather than the earlier
+result being carried forward. Every gate above was measured on the file that
+actually ships.
+
+The limited dissolve was kept here (it removed 158 triangles, 1.0%) after
 checking for the `350-brannan` sliver failure mode: the fountain's kerb and
 bench are ring prisms, exactly the coplanar-annulus shape the prompt warns
 about, so the post-pack file was re-validated for

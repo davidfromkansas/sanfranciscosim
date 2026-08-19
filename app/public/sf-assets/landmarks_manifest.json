@@ -1939,5 +1939,24 @@
     ],
     "tris": 3366,
     "loadRadius": 2500
+  },
+  {
+    "id": "un-plaza",
+    "file": "un-plaza.glb",
+    "anchor": [
+      -122.41389,
+      37.7801415
+    ],
+    "targetHeightM": 16.4028,
+    "cat": 0,
+    "name": "United Nations Plaza",
+    "estimated": true,
+    "dims": [
+      215.2063,
+      157.9219,
+      16.4028
+    ],
+    "tris": 16390,
+    "loadRadius": 2500
   }
 ]

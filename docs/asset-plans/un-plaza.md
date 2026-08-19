@@ -22,7 +22,7 @@ Part 2 is the research and design dossier behind it.
 | Manifest id | `un-plaza` |
 | Existing procedural builder | none — new landmark (needs a `pipeline/lib/landmarks.mjs` entry and a re-bake, see 2.13) |
 | WGS84 anchor | `-122.4138900, 37.7801415` (world-axis-aligned XY bbox centre of the plaza polygon, measured) |
-| Target height | **13.00 m** — the crown of the tallest plane tree, the model's authored maximum. Light standards 5.90 m; Bolívar 8.10 m; obelisk 5.18 m; fountain crest 4.03 m |
+| Target height | **16.4028 m** — the model's *vertical extent*, not a height: this shipped as a terrain-draped ground asset (see 2.16). The plaza's own height is 13.00 m, the crown of the tallest plane tree. Light standards 5.90 m; Bolívar 8.10 m; obelisk 5.18 m; fountain crest 4.03 m |
 | Footprint | L-shaped, 220.8 m (along Fulton) × 150.3 m (across) in the plaza frame; 11,264 m² = **2.78 acres**, measured from OSM relation `1735771` / outer way `24588033` |
 | Axis-aligned XY bbox | ~215.3 m × 158.0 m — expected; the plaza is a wedge between two grids 35.7° apart |
 | Triangle cap | 18,000 |
@@ -793,6 +793,44 @@ source only, per `docs/asset-pipeline/ADDRESS-TO-ASSET.md`.
 - [ ] Top view resolves into the six shapes of §2.9 and reads **red** at 600 m
 - [ ] Night render shows two dotted lines of globes on a dark field, not a glowing slab
 - [ ] After stage 4: the brick field's flat shading survived the optimizer's weld
+
+### 2.16 What integration changed (added after the fact)
+
+This section records the four things stage 5 found that this plan did not
+predict. It is written here rather than only in `artifacts/un-plaza/REPORT.md`
+because the next ground-plane plan in this set should start from it.
+
+1. **The asset had to become terrain-draped, and the plan only flagged the risk
+   rather than budgeting for it.** §2.13's "ground-plane seating" note said to
+   measure the drape at integration. Measured: the terrain runs 13.06–16.64 m
+   under the plaza while the anchor sits at 15.119 m, so a flat plate seated at
+   the anchor is **buried 1.52 m at the Hyde end and floats 2.06 m** over the
+   south side of the promenade. That is not a placement tweak — it is a rebuild,
+   and it moved `targetHeightM` from an architectural height to a vertical
+   extent. **A ground-plane plan should specify the drape up front**, as
+   `424-brannan` does, not list it as a risk.
+2. **Drape to a PLANE, not to the sampled grid.** The grid hugs the heightmap
+   exactly but is piecewise-bilinear and therefore not affine, so draping a thin
+   slab's vertices on it folds the slab: `skate_pad`, a 0.06 m inlay spanning
+   50 m, came out with an inverted signed volume and the paving clearance
+   spread to 0.37 m. A plane shear maps planes to planes and every prism stayed
+   valid. Cost: a 0.373 m RMS residual in-ring, whose 2.0 m maximum is a single
+   ~20 m Terrarium DEM dip over the Civic Center station excavation — a hole in
+   the elevation data, not topography.
+3. **`verify-rebake.mjs` had no model for a landmark with no anchor exclusion.**
+   It compared `4.8 m vs undefined m radius` and reported FAIL. `unPlaza` is the
+   first landmark whose work is done entirely by `extraExclusions`, so the tool
+   gained a guard (one `if`), and the substantive question — is anything
+   standing under the asset — was answered by point-in-polygon against the real
+   footprint, which is what ADDRESS-TO-ASSET asks for anyway.
+4. **The shared landmark `BatchedMesh` is at 91.2% with this landmark in it**
+   (1,459,122 of 1,600,000 body vertices, all 103 generic landmarks resident;
+   un-plaza contributes 26,730, i.e. 1.7%). A clean load places all 96 with
+   `failed: 0`, but repeated release/re-add churn fragments the reserve and drops
+   landmarks with `Reserved space request exceeds the maximum buffer size`.
+   That is the pre-existing condition `sf3d-landmark-batch-full` records, not a
+   defect in this asset — but **the batch integrator should re-check the reserve
+   before adding many more**, and the headroom number above is the one to watch.
 
 ### 2.15 Open questions and risks
 

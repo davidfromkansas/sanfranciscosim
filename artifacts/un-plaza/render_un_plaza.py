@@ -35,7 +35,11 @@ from mathutils import Vector
 
 RES = (1900, 460)    # extreme letterbox: 215 m across and only 13 m tall
 AER_RES = (1700, 1150)
-TOP_RES = (2100, 1620)   # the primary review image; landscape, the plaza runs E-W
+TOP_RES = (1680, 1300)   # the primary review image; landscape, the plaza runs E-W.
+                         # 2100x1620 was killed twice by the OS on a loaded
+                         # machine (11 concurrent Blender jobs); this still
+                         # renders larger than the elevations, which is what the
+                         # plan asks for.
 BG = (0.86, 0.80, 0.69, 1.0)  # neutral warm tabletop background
 
 VIEWS = [
@@ -88,7 +92,7 @@ def setup_world(night=False):
         bg.inputs[1].default_value = 0.30
 
 
-def add_lights(height, night=False, span=None):
+def add_lights(height, night=False, span=None, floor_z=-0.02):
     """Simple tabletop lighting: broad soft key, cool fill, warm rim."""
     if night:
         moon = bpy.data.lights.new("moon", "SUN")
@@ -124,8 +128,12 @@ def add_lights(height, night=False, span=None):
     # sized off the PLAN, not the height: this asset is 215 m across and 13 m
     # tall, so height*5 left a 65 m table visible as a beige rectangle inside
     # the frame of every review render.
+    # floor_z, not a hard -0.02: this asset is TERRAIN-DRAPED, so its plate falls
+    # to z = -2.51 at the Market end. A table at -0.02 sliced straight through the
+    # lower half of the plaza and rendered as a pale plane over it — which reads
+    # exactly like a missing brick field and is a rig bug, not an asset one.
     bpy.ops.mesh.primitive_plane_add(size=max(height * 5, (span or height) * 2.4),
-                                     location=(0, 0, -0.02))
+                                     location=(0, 0, floor_z))
     plane = bpy.context.object
     plane.name = "studio_floor"
     mat = bpy.data.materials.new("Studio_Table")
@@ -206,7 +214,7 @@ def main():
     width = max(mx.x - mn.x, mx.y - mn.y)
     center = Vector(((mn.x + mx.x) / 2, (mn.y + mx.y) / 2, (mn.z + mx.z) / 2))
     setup_world(night=night)
-    add_lights(height, night=night, span=max(width, height))
+    add_lights(height, night=night, span=max(width, height), floor_z=mn.z - 0.02)
 
     if not night:
         fade_glow()
