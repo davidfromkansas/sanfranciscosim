@@ -736,15 +736,58 @@ function storeId() {
   return key ? process.env[key] : null;
 }
 
-const blobConfigured = () =>
-  Boolean(
-    process.env.BLOB_READ_WRITE_TOKEN ||
-    (process.env.VERCEL_OIDC_TOKEN && storeId()),
+// The same prefix trap as storeId(): a connection that chose a prefix names the
+// token `<prefix>_READ_WRITE_TOKEN`, which the SDK's default lookup misses.
+function blobToken() {
+  if (process.env.BLOB_READ_WRITE_TOKEN)
+    return process.env.BLOB_READ_WRITE_TOKEN;
+  const key = Object.keys(process.env).find(
+    (k) =>
+      k.endsWith("READ_WRITE_TOKEN") &&
+      /^vercel_blob_rw_/.test(process.env[k] ?? ""),
   );
+  return key ? process.env[key] : null;
+}
+
+// Says out loud, once, which credential it found — or that it found none.
+//
+// This used to return a bare boolean, and when false the whole storage layer
+// no-opped in silence: restore() read nothing, persist() wrote nothing, and the
+// feed still looked alive because each instance served the posts it had
+// generated in its own memory. Production ran that way for hours while every
+// log line said 200 and the panel showed a different number of posts on every
+// refresh. A missing credential is a deployment being wrong, not a feature
+// being off, and it has to say so.
+let announced = false;
+function blobConfigured() {
+  const token = blobToken();
+  const ok = Boolean(token || (process.env.VERCEL_OIDC_TOKEN && storeId()));
+  if (!announced) {
+    announced = true;
+    if (ok)
+      console.log(
+        `${SUBREDDIT.name}: blob storage ready via ${token ? "read-write token" : "OIDC"}, store ${storeId() ?? "(SDK default)"}`,
+      );
+    else
+      console.error(
+        `${SUBREDDIT.name}: BLOB STORAGE NOT CONFIGURED — posts cannot be ` +
+          `saved or shared between instances. Wanted BLOB_READ_WRITE_TOKEN ` +
+          `(or any *_READ_WRITE_TOKEN), or VERCEL_OIDC_TOKEN plus a store id. ` +
+          `Saw token=${token ? "yes" : "no"} ` +
+          `oidc=${process.env.VERCEL_OIDC_TOKEN ? "yes" : "no"} ` +
+          `store=${storeId() ?? "none"}`,
+      );
+  }
+  return ok;
+}
 
 // Credentials for every call in one place. An explicit storeId beats relying on
 // the SDK's env lookup, which only knows the unprefixed name.
-const blobAuth = () => (storeId() ? { storeId: storeId() } : {});
+const blobAuth = () => {
+  const token = blobToken();
+  if (token) return { token };
+  return storeId() ? { storeId: storeId() } : {};
+};
 
 let etag = null; // of the copy we last read or wrote
 let reading = null; // in-flight read, so parallel callers share one GET
