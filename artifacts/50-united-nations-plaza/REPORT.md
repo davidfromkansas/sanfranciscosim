@@ -12,15 +12,15 @@ what was actually built; `REFERENCE.md` is the record of what was measured.
 
 | | |
 |---|---|
-| Triangles | **13,624** / 24,000 cap (27,000 repo landmark ceiling) |
+| Triangles | **13,615** shipped / 24,000 cap (13,624 pre-optimize) |
 | Dimensions (axis-aligned, m) | **122.73 × 84.90 × 33.00** |
 | Oriented footprint | 112.53 × 66.93 m at bearing 80.92 deg, + 0.90 m cornice |
 | `targetHeightM` | **33.0** — bbox top normalised to it exactly, loader scale = 1.000 |
 | min Z / XY centre offset | 0.0000 m / (0.0000, 0.0000) m |
-| Objects | 548 (the loader merges them to 2 draw calls in the shared batch) |
+| Objects | **11** shipped, one per material (548 pre-optimize); the loader merges them into the shared batch at 2 draw calls |
 | Materials | 11, all `Toy_*`, flat, opaque, no textures |
 | Glow set | `Toy_gold_Glow` (6 arched entrances) + `Toy_white_Glow` (attic window band) |
-| GLB on disk | see `ls -l` below; the stage-4 optimize pass has not run yet |
+| GLB on disk | **330,680 B raw / 156,263 B gzip** (939,600 raw pre-optimize, −64.8%) — under the 500 KB budget |
 | Anchor | **−122.4144853, 37.7804351** (see "Corrections") |
 | Category | 18 (Government) |
 
@@ -48,11 +48,15 @@ Fresh factory-reset Blender scene, re-importing the exported GLB. The authoring
 
 **Normals method.** Every source mesh runs `bmesh.ops.recalc_face_normals` before
 export. Because this asset is a *union of solids*, the authoritative test is
-**per-object signed volume**: all 548 objects enclose a positive volume
-(`negative_signed_volume_objects: []`). Backing that up, 22,500 deterministic
+**per-object signed volume**: every object encloses a positive volume
+(`negative_signed_volume_objects: []`) — 548 objects pre-optimize, the 11
+per-material groups on the shipped file. Backing that up, 22,500 deterministic
 visibility rays over 15 targets (the four wings and the courtyard at three heights)
-produced 22,467 first hits and **0 flipped visible faces** — a 0.000% residual
-against the 0.15% allowance.
+produced **0 flipped visible faces** — a 0.000% residual against the 0.15%
+allowance, both before and after optimization.
+
+The table above was re-run **on the shipped (optimized) GLB**, not just the
+pre-optimize export.
 
 ## What was built
 
@@ -176,7 +180,9 @@ artifacts/50-united-nations-plaza/
   validate_50_united_nations_plaza.py  fresh-scene contract validation
   make_contact_sheet.py                composes the seven renders
   50-united-nations-plaza.blend
-  50-united-nations-plaza.glb          the shipping asset
+  50-united-nations-plaza.glb          the shipping asset (stage-4 optimized)
+  optimize/                            stage-4: input archive, adapted scripts,
+                                       four-variant table, A/B renders, REPORT
   50-united-nations-plaza-{north,east,south,west}.png   four elevations, one rig
   50-united-nations-plaza-top.png      courtyard, hip roof, green roof, PV
   50-united-nations-plaza-aerial.png   the app's high three-quarter camera
@@ -208,14 +214,51 @@ Re-validate: `blender -b --python validate_50_united_nations_plaza.py`
     84.8953,
     33.0
   ],
-  "tris": 13624,
+  "tris": 13615,
   "loadRadius": 2500
 }
 ```
 
-`loadRadius` is the default rule `max(2500, 33.0 × 30)` = 2500. The production
-manifest was not edited by this stage.
+`loadRadius` is the default rule `max(2500, 33.0 × 30)` = 2500 — the streaming
+decision, made explicitly: at 33 m this building is small on screen well before
+2.5 km, and because it is Case B the baked footprint is carved out, so past the
+radius the site reads as empty ground rather than as a wrong building. 2500 m is
+where that absence is illegible. The production manifest was not edited by this
+stage.
+
+## Stage 4 — optimize
+
+Run of `docs/asset-pipeline/GLB-OPTIMIZE-PROMPT.md`; full write-up in
+[`optimize/REPORT.md`](optimize/REPORT.md). All gates G1–G6 and G8 PASS
+(G7 n/a, bake mode off).
+
+939,600 → **330,680 bytes** (−64.8%), 548 → **11** draw submeshes, 13,624 →
+13,615 tris, bbox and origin unchanged, all 11 material names preserved.
+Maximum A/B pixel delta 0.139% mean absolute RGB against gates of 4% near /
+2% far.
+
+The judgment call: the **limited dissolve was declined**. All four
+weld × dissolve variants were built and packed; the dissolve wins 2.8% raw and
+loses 18% gzipped, and on an asset made almost entirely of coplanar ring bands
+it is the one step that can manufacture hairline slivers which only fail *after*
+the shipping swap. Weld alone was kept.
 
 ## Approval
 
-_(stage 3 — pending)_
+Gate 3 was carried by a standing pre-approval given at the top of the session,
+quoted verbatim:
+
+> **"APPROVE EVERYTHING DONT ASK ME FOR PERMISSION"**
+
+— David, 19 August 2026, in the same message that set `BUILDING: 50 United
+Nations Plaza, San Francisco, CA 94102` and `BATCH: yes`.
+
+The evidence was still presented before advancing: the contact sheet, the aerial
+day and night renders, the top view, and the one line of numbers (13,624 tris;
+122.73 x 84.90 x 33.00 m; 11 materials; 2 glow groups). No iteration was
+requested.
+
+Note that this standing approval is read as covering the pipeline's internal
+gates only. It is **not** read as authorising a push, a PR or a deploy: batch
+mode ends this session at a local source-only branch either way, and
+`AGENTS.md` requires an explicit instruction for those.
