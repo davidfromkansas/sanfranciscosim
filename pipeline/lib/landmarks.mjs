@@ -3160,6 +3160,56 @@ export const LANDMARKS = [
     // the canopy are the whole recognition.
     camera: { distance: 120, yaw: 85, pitch: 26 },
   },
+  {
+    // Pier 19, The Embarcadero at Green Street: a 1936-38 finger pier, near-
+    // identical twin of Pier 9 (153 ft x 800 ft), Contributing Resource of the
+    // Embarcadero Historic District. Classical stucco bulkhead building with a
+    // monumental arch, PIER 19 in raised letters and a gabled parapet; behind
+    // it a 195 m transit shed with a continuous roof monitor, on a pile deck.
+    // Port storage sheds today; Hornblower layberth on the south apron.
+    //
+    // ONE exclusion zone, r = 95, and the half-diagonal rule must NOT be used
+    // here (the model's half-diagonal is ~152 m and would flatten Pier 17).
+    // The bake carries this pier inside TWO merged rings that each trace the
+    // whole Pier 19 + Pier 23 + 1961-connector complex as one polygon:
+    //
+    //   DataSF 201006.0000010 (SF9900019H, 10.1 m median)  gate dist: vertex
+    //     73.8 m / centroid 94.8 m from this anchor
+    //   Overture 8fb7a212 (10.0 m)                         gate dist: vertex
+    //     73.7 m / centroid 86.1 m
+    //
+    // excluded() gates on min(centroid, any ring vertex), so r = 95 catches
+    // both with a +21 m margin. The nearest keeper is Overture 948c08a3 -
+    // named "Pier 17", 16.4 m - whose gate distance is 120.9 m (its VERTEX-MEAN
+    // centroid, which sits closer than any of its vertices at 147.2 m); the
+    // DataSF Pier 15/17 complex ring gates at 146.0 m. Margin -26 m. The
+    // window 73.8 < r < 120.9 is wide enough for one zone; Pier 1 needed two
+    // zones only because its window was 7.5 m.
+    //
+    // COLLATERAL, stated plainly: the merged rings ARE Pier 23's shed and the
+    // connector too, so dropping them empties the Pier 23 site until a pier-23
+    // landmark ships (same situation and same resolution as Pier 1/Pier 3 -
+    // there is no radius that clips one finger out of a merged polygon). Also
+    // note the Overture height-correction can re-target onto the nearest
+    // SURVIVOR after an exclusion; check Pier 17's bake height in audit.
+    //
+    // App yaw = 180 - true bearing: yaw 330 stands the eye at bearing 210 -
+    // over the Embarcadero off the facade's south shoulder, the only angle
+    // that reads the arch, the south flank and the full monitor run at once.
+    // 700 m suits a 262 m pier. No `key`: keys 0-9 are taken.
+    //
+    // `height` is the gable crest ABOVE THE DECK. The manifest targetHeightM
+    // (17.8) is a different quantity - the model's vertical extent, pile stubs
+    // to crest - because this asset stands in water and carries its own deck
+    // (the pier-1 origin convention; see artifacts/pier-19/REPORT.md).
+    id: 'pier19',
+    name: 'Pier 19',
+    lon: -122.3988181,
+    lat: 37.8030032,
+    height: 15.0,
+    exclude: 95,
+    camera: { distance: 700, yaw: 330, pitch: 22 },
+  },
 ];
 
 // Parks/green spaces the landcover bake must match at least one source polygon

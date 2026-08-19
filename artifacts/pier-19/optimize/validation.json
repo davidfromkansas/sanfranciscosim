@@ -19,12 +19,12 @@
   "bbox_dims": [
    243.38702,
    191.89195,
-   17.2
+   17.8
   ],
   "bbox_min": [
    -121.69351,
    -95.94598,
-   -2.2
+   -2.8
   ],
   "center_xy": [
    0.0,
@@ -51,12 +51,12 @@
   "bbox_dims": [
    243.38702,
    191.89195,
-   17.2
+   17.8
   ],
   "bbox_min": [
    -121.69351,
    -95.94598,
-   -2.2
+   -2.8
   ],
   "center_xy": [
    0.0,
@@ -71,7 +71,7 @@
   "grp_Toy_glass": 4277.057603,
   "grp_Toy_glass_Glow": 108.23483,
   "grp_Toy_glassl": 66.396998,
-  "grp_Toy_ink": 140.132395,
+  "grp_Toy_ink": 176.577574,
   "grp_Toy_navy": 31.782477,
   "grp_Toy_steel": 75.271968,
   "grp_Toy_stone": 15006.341103,
@@ -81,7 +81,7 @@
  "inverted_solids": [],
  "ray_test_output": {
   "rays": 22500,
-  "hits": 7647,
+  "hits": 7646,
   "flipped": 0,
   "flipped_fraction": 0.0
  },

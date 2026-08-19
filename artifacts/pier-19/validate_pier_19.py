@@ -254,7 +254,7 @@ def main():
         "front_heading_deg_true": 234.89,
         "flank_heading_deg_true": 324.89,
         "long_axis_heading_deg_true": 54.89,
-        "target_height_m": 17.2,
+        "target_height_m": 17.8,
         "target_height_is_vertical_extent": True,
         "origin_convention": (
             "Local Z = 0 is the TOP OF THE PIER DECK, not the model's lowest "
@@ -272,20 +272,20 @@ def main():
         "object_details": sorted(object_rows, key=lambda x: x["name"]),
     }
     results["checks"] = {
-        # ~243 x 192 x 17.2 m: the XY box is the 54.89 deg rotation of a
+        # ~243 x 192 x 17.8 m: the XY box is the 54.89 deg rotation of a
         # 262 x 47 m pier (plus the 53 m bulkhead frontage). See REPORT.md.
         "meters_and_plausible_dimensions": (
-            17.1 <= dims.z <= 17.3
+            17.7 <= dims.z <= 17.9
             and 238.0 <= dims.x <= 248.0
             and 186.0 <= dims.y <= 196.0
         ),
-        "vertical_extent_normalized_to_target": abs(dims.z - 17.2) <= 0.02,
+        "vertical_extent_normalized_to_target": abs(dims.z - 17.8) <= 0.02,
         # NOT "base at z zero". This asset's origin is the pier-deck plane and
         # its geometry deliberately runs below it; the check that matters is that
         # the deck itself is at z = 0 and the sub-deck structure reaches just
         # under the water line.
         "deck_plane_at_z_zero": abs(mx.z - 15.0) <= 0.02,
-        "sub_deck_depth_expected": -2.25 <= mn.z <= -2.15,
+        "sub_deck_depth_expected": -2.85 <= mn.z <= -2.75,
         "centered_xy": abs(center.x) <= 1.0 and abs(center.y) <= 1.0,
         "under_triangle_budget": tris <= TRI_BUDGET,
         "no_image_textures": not bpy.data.images and not textured,

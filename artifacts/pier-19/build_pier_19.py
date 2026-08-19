@@ -8,11 +8,11 @@ into the city at its real-world heading - the loader applies no rotation.
 
 ORIGIN: same convention as pier-1, which broke the usual "min Z = 0" rule on
 purpose and shipped. Local Z = 0 is the TOP OF THE PIER DECK; the deck fascia and
-pile stubs run down to -2.2 m. placeGeneric() seats the GLB's origin on one
+pile stubs run down to -2.8 m. placeGeneric() seats the GLB's origin on one
 terrain sample at the anchor, and the app's DEM carries these Embarcadero piers
 as low ridges (~2.4 m at Pier 1), so a model that sat on z = 0 would float above
 its own deck. `targetHeightM` is therefore the model's total VERTICAL EXTENT
-(-2.2 .. +15.0 = 17.2), not a height above water.
+(-2.8 .. +15.0 = 17.8), not a height above water.
 
 Design (see REFERENCE.md and docs/asset-plans/pier-19.md for sources):
 
@@ -74,7 +74,7 @@ P_WING = 26.5                 # bulkhead building half-frontage (53 m total)
 P_SHED = 17.15                # shed half-width (34.3 m)
 
 # --- heights above the deck (deck top = local z 0; water at -2.0)
-Z_PILE_BOT = -2.2
+Z_PILE_BOT = -2.8
 Z_DECK_BOT = -0.55
 Z_PLINTH = 0.7
 Z_EXT = 9.0                   # flat 1961 extension roof

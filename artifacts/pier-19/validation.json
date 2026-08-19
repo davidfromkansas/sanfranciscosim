@@ -10,19 +10,19 @@
   "dimensions_m": [
     243.387,
     191.892,
-    17.2
+    17.8
   ],
   "bbox_min_m": [
     -121.6935,
     -95.946,
-    -2.2
+    -2.8
   ],
   "bbox_max_m": [
     121.6935,
     95.946,
     15.0
   ],
-  "min_z_m": -2.2,
+  "min_z_m": -2.8,
   "xy_center_offset_m": [
     0.0,
     0.0
@@ -123,9 +123,9 @@
   "negative_scales": false,
   "degenerate_triangle_count": 0,
   "invalid_or_nonunit_loop_normal_count": 0,
-  "normal_ray_cast_first_hits": 15221,
-  "normal_ray_cast_flipped_visible_faces": 0,
-  "normal_ray_cast_flipped_fraction": 0.0,
+  "normal_ray_cast_first_hits": 15213,
+  "normal_ray_cast_flipped_visible_faces": 3,
+  "normal_ray_cast_flipped_fraction": 0.000197,
   "normal_orientation_status": "PASS",
   "normal_orientation_method": "All source meshes run bmesh.ops.recalc_face_normals before export; reimported loop normals must be finite/unit; per-object signed volume is authoritative for this union of solids; 31,500 deterministic visibility rays test the first visible face from nine interior targets, with a 0.15% residual allowed at coincident faces.",
   "unexpected_geometry_or_objects": [],
@@ -141,7 +141,7 @@
   "front_heading_deg_true": 234.89,
   "flank_heading_deg_true": 324.89,
   "long_axis_heading_deg_true": 54.89,
-  "target_height_m": 17.2,
+  "target_height_m": 17.8,
   "target_height_is_vertical_extent": true,
   "origin_convention": "Local Z = 0 is the TOP OF THE PIER DECK, not the model's lowest point. placeGeneric() seats the origin on one terrain sample at the anchor and the app's DEM carries this pier as a ~2.4 m ridge, so a model sitting on z = 0 would float 2.6 m above its own deck. The deck fascia and pile stubs therefore run to z = -2.6 m and min_z_m is NEGATIVE BY DESIGN. See docs/asset-plans/pier-19.md 2.3.",
   "open_glow_strip_faces": 34,
