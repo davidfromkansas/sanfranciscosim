@@ -808,6 +808,11 @@ async function persist() {
       etag = null;
       return;
     }
+    // Any other failure — the blob deleted underneath us, a transient network
+    // error — must drop the etag too. Holding a stale one meant every later
+    // write was conditional on a version that no longer existed, so persistence
+    // failed silently and permanently once someone cleared the store.
+    etag = null;
     console.warn(`${SUBREDDIT.name}: could not save state — ${error.message}`);
   }
 }

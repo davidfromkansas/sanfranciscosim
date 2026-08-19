@@ -109,6 +109,35 @@ function liveFeeds() {
           ? `sf-live-feeds: loaded ${loaded.join(", ")} from .env`
           : "sf-live-feeds: no .env.local or .env at the repo root — keyed feeds will report themselves offline",
       );
+      // Production has a cron firing every minute; a dev server has nothing, so
+      // the subreddit only ever advanced when a page happened to ask for it —
+      // and a backgrounded browser tab has its timers frozen. That made the
+      // feed look like it had stopped when it had simply never been asked.
+      // This is the local stand-in for the cron, and it honours the same
+      // once-per-window jitter.
+      setInterval(async () => {
+        try {
+          const core = await loadFeeds(server);
+          const feed = core?.getFeed("feed");
+          if (!feed) return;
+          const { postIsDue } = await import(
+            /* @vite-ignore */
+            `${new URL("../api/_lib/feeds/", import.meta.url).href}residents.mjs`
+          );
+          if (!postIsDue()) return;
+          const failed = await core.forceRefresh(feed);
+          server.config.logger.info(
+            failed
+              ? `sf-live-feeds: tick failed — ${failed}`
+              : "sf-live-feeds: ticked",
+          );
+        } catch (error) {
+          server.config.logger.warn(
+            `sf-live-feeds: tick — ${error?.message || error}`,
+          );
+        }
+      }, 60_000).unref?.();
+
       server.middlewares.use(async (req, res, next) => {
         const pathname = new URL(req.url, "http://localhost").pathname.replace(
           /\/+$/,
