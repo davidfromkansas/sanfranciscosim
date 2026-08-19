@@ -317,11 +317,13 @@ the asset:
 |---|---|
 | 1 | `boot timed out` at the harness's 120 s default |
 | 2 | reached the app, then `manifest timed out` after 600 s — `stats().entries` never left 0 |
-| 3 | still running when the session ended |
+| 3 | ran ~40 min, then the process was killed during a background-task teardown; empty log, no result written |
 
-The machine carried a load average between 150 and 736 throughout, with up to
-144 headless Chrome instances belonging to parallel landmark sessions; the built
-app runs at a fraction of a frame per second in software rendering under that.
+The machine carried a load average between 150 and 736 throughout (366 at the
+last check), with up to 144 headless Chrome instances belonging to parallel
+landmark sessions; the built app runs at a fraction of a frame per second in
+software rendering under that. A fourth attempt was not made because conditions
+had not improved and the failure mode was already understood.
 The boot allowance in `qa_local.mjs` was raised from 120 s to 600 s as part of
 attempt 2 and that change is committed.
 
