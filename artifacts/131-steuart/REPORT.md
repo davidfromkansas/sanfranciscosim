@@ -12,7 +12,7 @@ Plan of record: `docs/asset-plans/131-steuart.md`. Research dossier:
 | | |
 |---|---|
 | Triangles | **6,842** (cap 12,000) |
-| Objects | 196 |
+| Objects | **13** after the stage-4 join (196 as authored) |
 | Dimensions (axis-aligned) | 41.221 × 41.346 × **27.700** m |
 | Real dimensions | 14.16 × 42.07 m footprint, 27.7 m to the barrel crown |
 | Min Z / max Z | 0.000 / 27.700 |
@@ -20,7 +20,7 @@ Plan of record: `docs/asset-plans/131-steuart.md`. Research dossier:
 | XY centre offset | (0.0017, 0.0008) m |
 | Materials | 11, all `Toy_*` |
 | Glow materials | `Toy_glassl_Glow`, `Toy_gold_Glow` |
-| File | 448,708 B raw / 71,135 B gzip (pre-optimize) |
+| File | **191,416 B** raw, meshopt (pre-optimize 448,708 B; see `optimize/REPORT.md`) |
 | Normals — ray-cast residual | 0.000127 (gate 0.0015) |
 | Normals — inverted signed-volume objects | 0 |
 | Anchor | `-122.3924386, 37.7930568` |
@@ -106,6 +106,19 @@ intact.
    glTF importer leaves at the 0.8 grey default. The `--fast` review renders
    showed a maroon building until the render script started syncing
    `diffuse_color` from the BSDF after import.
+
+## Stage 4 — optimize
+
+Run and reported in `optimize/REPORT.md`. All gates G1–G6 and G8 PASS (G7 n/a,
+bake mode off): 196 objects → 13, 199 draw primitives → 16, 13,712 verts →
+13,444, raw bytes 448,708 → **191,416** (−57.3 %), worst A/B pixel delta
+0.1995 % against 2 %/4 % gates. Triangles unchanged at 6,842. The optimized file
+is now the shipping GLB; the pre-optimize original is archived at
+`optimize/input/131-steuart.glb`. The limited-dissolve step was deliberately
+skipped — this asset has four full-footprint coplanar ring bands and that step
+is the only one that can manufacture degenerate geometry.
+
+Post-swap re-validation: **overall PASS**, all 15 checks, numbers above.
 
 ## Approval
 
