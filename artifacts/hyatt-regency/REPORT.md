@@ -193,3 +193,26 @@ above, then **discarded** (`git checkout -- app/public/tiles api/_data`). This
 branch carries source only — the GLB, its manifest entry, its
 `pipeline/lib/landmarks.mjs` entry, the plan and this artifacts directory. The
 city gets rebuilt once for the whole batch by `docs/asset-pipeline/BATCH-INTEGRATE.md`.
+
+Sanity check, against the **merge base** rather than the branch tip:
+
+```
+git diff --name-only origin/main...HEAD   # three dots
+  app/public/sf-assets/landmarks/hyatt-regency.glb
+  app/public/sf-assets/landmarks_manifest.json
+  docs/asset-plans/README.md
+  docs/asset-plans/hyatt-regency.md
+  pipeline/lib/landmarks.mjs
+  (+ artifacts/hyatt-regency/)
+files under app/public/tiles/ or api/_data/: 0
+```
+
+Three dots matter here. `origin/main` advanced from 335cb9ac1 to 2c14d5f9f
+(PR #159) while this session was running, so the two-dot form lists every file
+those newer commits touched — 596 tiles among them — and looks alarming. The
+merge-base diff is the one that describes what this branch actually adds.
+
+That same moving reference is why the `verify-rebake` reading in the plan's
+§2.13 leans on the control experiment rather than on the raw cell counts: the
+control (remove the entry, re-bake, compare) isolates the cause regardless of
+which commit the reference happens to point at.
