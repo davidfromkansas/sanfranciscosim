@@ -1,7 +1,10 @@
 # Pier 15 (Exploratorium) — build report
 
 **Asset:** `artifacts/pier-15/pier-15.glb` · built 19 Aug 2026 · Blender 5.2.0 LTS
-(headless, deterministic script `build_pier_15.py`)
+(headless, deterministic script `build_pier_15.py`) · **stage-4 optimized**:
+360,516 B raw (from 749,952), 324 → 12 draw submeshes, tris unchanged; original
+archived at `optimize/input/pier-15.glb`, full metrics in `optimize/REPORT.md`.
+The stage-2 validator re-ran PASS against the shipped packed file.
 
 ## Shipped numbers (fresh-scene validation of the exported GLB)
 
@@ -9,7 +12,7 @@
 |---|---|---|
 | Overall validation | **PASS** (`validation.json`, all checks) | PASS |
 | Triangles | **11,152** | ≤ 22,000 ✓ |
-| Objects | 324 meshes (loader merges to ≤ 2 draw calls) | ✓ |
+| Objects | 12 meshes after optimize (loader merges to ≤ 2 draw calls) | ✓ |
 | Dimensions | 249.25 x 221.09 x **16.40** m | ✓ |
 | min Z | 0.000 (waterline; pile feet touch it exactly) | ✓ |
 | Bbox top | 16.400 = targetHeightM → loader scale **1.0** | ✓ |
