@@ -20,7 +20,7 @@ prompt, Part 2 is the research and design dossier behind it.
 | Manifest id | `fulton-plaza` |
 | Existing procedural builder | none — new landmark (needs a `pipeline/lib/landmarks.mjs` entry and a re-bake, see 2.13) |
 | WGS84 anchor | `-122.4159189, 37.7796904` (oriented-bounding-box centre, measured from DataSF parcels) |
-| Target height | **13.20 m — the model's VERTICAL EXTENT** (this plan first said 10.67 m; corrected during stage 2, see the note at the end of 2.15). The asset is terrain-draped, so `min_z` is negative and `targetHeightM` is the extent, per the `64-south-park` convention. The crest is still the Pioneer Monument: SFAC records it at 420 in = 10.668 m, standing on the plaza's 1.03 m apron |
+| Target height | **13.19 m — the model's VERTICAL EXTENT** (this plan first said 10.67 m; corrected during stage 2, see the note at the end of 2.15). The asset is terrain-draped, so `min_z` is negative and `targetHeightM` is the extent, per the `64-south-park` convention. The crest is still the Pioneer Monument: SFAC records it at 420 in = 10.668 m, standing on the plaza's 1.03 m apron |
 | Footprint | 119.51 m × 48.59 m oriented (heading 81.15°), 5,805 m² = 1.435 acres, measured from DataSF parcel blocks `0354001` and `0353001` |
 | Axis-aligned XY bbox | 128.5 m × 67.6 m as built — the 8.85° rotation of the right-of-way, widened by the planting beds' 2 m overhang and the tree crowns (this plan first said 126.1 × 66.3, the right-of-way alone) |
 | Triangle cap | 16,000 |
@@ -824,7 +824,19 @@ for its `yaw: 90`. Verify it by render rather than trusting the arithmetic.
    ribbon's *quantised* height plus a depth-bias margin, and confirm it in the app — no
    Blender render and no contract check can see this failure.
 
-8. **The plaza may stop being a plaza.** The SFMTA closure runs to 31 August 2027 and is a
+8. **Corrected after stage 5 — the Pioneer Monument's form.** This plan's 2.7 gave the
+   monument as "cruciform base, pedestal to 7.47 m, Minerva to 10.67 m, four piers at the
+   cardinal points", which is true and not enough: built from that, it came out a square
+   ziggurat with four totems on it. The monument is a **circular** composition — a name drum
+   with medallion busts, a panelled pedestal drum, a flaring cornice, a bronze collar, and
+   Eureka with her oval shield, her grizzly and her raked spear (the spear tip is the crest).
+   The four piers are **low** (1.55 m) and *Plenty* and *Commerce* are **seated**. Model it
+   from the 2017 Commons photographs of the object, not from a description of it; the radii
+   come off the elevation as a fraction of the monument's own height, and the first attempt
+   had every one ~35% over. See `artifacts/fulton-plaza/REFERENCE.md`, "The Pioneer
+   Monument".
+
+9. **The plaza may stop being a plaza.** The SFMTA closure runs to 31 August 2027 and is a
    renewable permit, not a permanent change; the street is still a street in DataSF, which
    is exactly why a ribbon still bakes under it. If the closure lapses, this asset becomes
    historical rather than wrong — but the bollards would be the first thing to remove.

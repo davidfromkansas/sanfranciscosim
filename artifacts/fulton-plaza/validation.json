@@ -5,12 +5,12 @@
   "reimported_final_glb": true,
   "object_count": 21,
   "mesh_object_count": 21,
-  "triangle_count": 13364,
+  "triangle_count": 10692,
   "triangle_budget": 16000,
   "dimensions_m": [
     128.4915,
     67.6286,
-    13.1999
+    13.1931
   ],
   "bbox_min_m": [
     -64.2458,
@@ -20,7 +20,7 @@
   "bbox_max_m": [
     64.2458,
     33.8143,
-    11.6999
+    11.6931
   ],
   "min_z_m": -1.5,
   "xy_center_offset_m": [
@@ -171,7 +171,7 @@
   "negative_scales": false,
   "degenerate_triangle_count": 0,
   "invalid_or_nonunit_loop_normal_count": 0,
-  "normal_ray_cast_first_hits": 30182,
+  "normal_ray_cast_first_hits": 30155,
   "normal_ray_cast_flipped_visible_faces": 0,
   "normal_ray_cast_flipped_fraction": 0.0,
   "normal_orientation_status": "PASS",
@@ -193,7 +193,7 @@
   ],
   "long_axis_heading_deg_true": 81.15,
   "cross_axis_heading_deg_true": 171.15,
-  "target_height_m": 13.1999,
+  "target_height_m": 13.1931,
   "target_height_is": "the model's VERTICAL EXTENT, not an architectural height: this asset is terrain-draped, so min_z is negative and the loader's targetHeightM / bbox-height scale must land on 1.0",
   "monument_crest_above_local_grade_m": 11.698,
   "height_datum": "Pioneer Monument, Minerva's finial. SF Arts Commission accession 1894.4.a-o records the work at 420 in = 10.668 m overall, standing on the plaza's granite apron",
@@ -727,7 +727,7 @@
     },
     {
       "name": "monument",
-      "triangles": 4160,
+      "triangles": 1440,
       "location": [
         0.0,
         0.0,
@@ -746,7 +746,7 @@
     },
     {
       "name": "monument_glow",
-      "triangles": 12,
+      "triangles": 60,
       "location": [
         0.0,
         0.0,

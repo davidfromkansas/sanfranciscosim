@@ -1,30 +1,30 @@
 # fulton-plaza — stage 4 optimize report
 
 **Result: ship Phase C alone.** `gltfpack@0.24 -c -km -kn -noq` applied directly to the
-approved build, **692,300 → 352,004 bytes raw (−49.2%)**, geometry byte-identical, all
+approved build, **540,052 → 268,212 bytes raw (−50.3%)**, geometry byte-identical, all
 gates PASS. **Phase B is reverted in full under §11** — every one of its variants made the
 file *larger*, including the join, and the measurement is below.
 
 | | input | shipped |
 |---|---|---|
-| raw bytes | 692,300 | **352,004** (−49.2%) |
-| gzip9 bytes | 201,491 | 223,196 (+10.8%, see "gzip goes the wrong way") |
-| triangles | 13,364 | 13,364 |
+| raw bytes | 540,052 | **268,212** (−50.3%) |
+| gzip9 bytes | 153,240 | 167,112 (+9.1%, see "gzip goes the wrong way") |
+| triangles | 10,692 | 10,692 |
 | objects / draw primitives | 21 / 26 | 21 / 26 |
 | materials | 16 | 16 (identical set) |
-| bbox | 128.492 × 67.629 × 13.1999 | identical |
+| bbox | 128.4915 × 67.6286 × 13.1931 | identical |
 
 Toolchain: Blender 5.2.0 LTS (fbe6228777e7), `gltfpack@0.24` via npx, three ^0.185.1 in
 `g3check/`, python3 + Pillow, gzip -9.
 
 ## Phase A — waste census
 
-21 objects, 13,364 triangles, 24,895 vertices, 26 primitives, no textures, no
+21 objects, 10,692 triangles, 22,157 vertices, 26 primitives, no textures, no
 transparency, no duplicate meshes, no degenerate faces. The five multi-material objects
 (`monument`, `bollards`, `trees`, `koi`, `koi_glow`) account for the 26 primitives against
 21 objects.
 
-Top objects: `monument` 4,160 · `joints` 2,304 · `bollards` 1,568 · `trees` 1,104 ·
+Top objects: `joints` 2,304 · `bollards` 1,568 · `monument` 1,440 · `trees` 1,104 ·
 `deck` 970 · `koi` 408 · `koi_glow` 384 · `lamps` 384 · `people` 384.
 
 Prediction before executing: join-per-material would fold 21 objects into 15 and 26
@@ -90,7 +90,7 @@ Blender still imports the objects as `deck`, `koi`, `monument` … and the stage
 name-keyed checks survive the pass.
 
 **gzip goes the wrong way, and both numbers are quoted above.** Meshopt buffers are already
-entropy-coded, so gzip9 rises from 201,491 to 223,196 even as raw drops 49.2%. Meshopt is
+entropy-coded, so gzip9 rises from 153,240 to 167,112 even as raw drops 50.3%. Meshopt is
 mandatory at intake (`pipeline/compress-assets.mjs`, AGENTS "Ship step"), so raw against the
 unpacked build is the honest headline.
 
@@ -124,13 +124,19 @@ control exists to expose.
 | gate | result |
 |---|---|
 | G1 contract — material set identical, `_Glow` separate, node names intact | **PASS** |
-| G2 geometry — bbox within 1 cm, origin within 1 cm, all signed volumes positive, ray-flip 0.013% (2 of 15,050 hits) | **PASS** |
-| G3 round-trip — Blender re-import + `g3check` (pinned three 0.185.1): 26 meshes, 13,364 tris, 16 materials, no decode errors | **PASS** |
+| G2 geometry — bbox within 1 cm, origin within 1 cm, all signed volumes positive, ray-flip 0.013% (2 of 15,029 hits) | **PASS** |
+| G3 round-trip — Blender re-import + `g3check` (pinned three 0.185.1): 26 meshes, 10,692 tris, 16 materials, no decode errors | **PASS** |
 | G4 appearance — max mean delta 0.046% (gates: 2% far / 4% near) | **PASS** |
 | G5 draw submeshes — 26 out ≤ 26 in | **PASS** |
-| G6 size — −49.2% raw, short of the 60% target | **PASS with justification**: the census found no waste to remove. Every geometry-cleanup variant measured *larger* than doing nothing, so the remainder is silhouette geometry — 13,364 triangles of chunky solids, already 2,600 under the asset's own cap |
+| G6 size — −50.3% raw, short of the 60% target | **PASS with justification**: the census found no waste to remove. Every geometry-cleanup variant measured *larger* than doing nothing, so the remainder is silhouette geometry — 10,692 triangles of chunky solids, already 5,300 under the asset's own cap |
 | G7 GPU budget | n/a — `ALLOW_BAKE: no` |
 | G8 hygiene — no foreign geometry (21 objects in, 21 out), deterministic re-run, no `.blend1` left | **PASS** |
+
+## Re-run after the monument rebuild
+
+Run a third time after the Pioneer Monument was rebuilt (see `../REPORT.md`, iteration 12),
+which took the asset from 13,364 to 10,692 triangles. Same table, same conclusion, same
+gates; the figures at the top are this run's.
 
 ## Re-run after the stage-5 deck lift
 

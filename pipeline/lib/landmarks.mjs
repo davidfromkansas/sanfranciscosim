@@ -1451,8 +1451,8 @@ export const LANDMARKS = [
     // never reaches it — unlike civicCenterPlaza and 64SouthPark, both of which
     // needed the flag.
     //
-    // `height` is the Pioneer Monument's crest above local grade, not the
-    // manifest's targetHeightM (12.7999 m). Those differ on purpose: the asset is
+    // `height` is the Pioneer Monument's crest above local grade — the tip of
+    // Eureka's spear — not the manifest's targetHeightM (13.1931 m). Those differ on purpose: the asset is
     // terrain-draped, so the manifest carries its VERTICAL EXTENT — the same
     // split 64SouthPark ships under.
     //
@@ -1464,7 +1464,7 @@ export const LANDMARKS = [
     name: 'Fulton Plaza',
     lon: -122.4159189,
     lat: 37.7796904,
-    height: 11.27,
+    height: 11.69,
     exclude: 25,
     // App yaw = 180 - true bearing, so yaw 99 stands the camera at bearing 81 —
     // the Hyde (east) end, ON the plaza's own axis — looking west past the

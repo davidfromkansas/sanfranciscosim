@@ -1,7 +1,7 @@
 {
  "ok": true,
  "meshes": 26,
- "tris": 13364,
+ "tris": 10692,
  "materials": [
   "Toy_bronze",
   "Toy_cream",
@@ -22,7 +22,7 @@
  ],
  "bbox_dims": [
   128.4915,
-  13.1999,
+  13.1931,
   67.6286
  ],
  "bbox_min": [

@@ -46,6 +46,12 @@ const HERE = path.dirname(fileURLToPath(import.meta.url));
 const DIST = path.resolve(HERE, '../../app/dist');
 const SHOTS = path.join(HERE, 'qa');
 const DRILL = process.argv.includes('--drill');
+// --quick: boot, stream the landmark in, take the day and night shots, stop.
+// The draw-call block runs 30 real animation frames and the full shot sequence
+// runs six; under SwiftShader on a machine at load 300+ (David runs a dozen
+// landmark sessions at once) that is 45 minutes for evidence a single frame
+// already carries. Use it to re-check a visual change, not to replace the run.
+const QUICK = process.argv.includes('--quick');
 
 // The REGISTRY lon/lat (the right-of-way's OBB centre), not the manifest anchor
 // — this is the camera preset's target, and the two differ by 1.2 m here.
@@ -293,7 +299,7 @@ async function main() {
   console.log('  console lines:', console_.length);
   for (const l of console_) if (/434|warn|fail|error|keeping/i.test(l)) console.log('    >', l.slice(0, 200));
 
-  const draws = await evaluate(`(async () => {
+  const draws = QUICK ? null : await evaluate(`(async () => {
     const info = window.SF.renderer.info;
     const raf = () => new Promise((res) => requestAnimationFrame(res));
     info.autoReset = false; await raf(); info.reset();
@@ -301,7 +307,7 @@ async function main() {
     const calls = info.render.calls / 30; info.autoReset = true;
     return Math.round(calls);
   })()`);
-  check('draw calls under 300 at the landmark', draws > 5 && draws < 300, `avg ${draws}/frame`);
+  if (!QUICK) check('draw calls under 300 at the landmark', draws > 5 && draws < 300, `avg ${draws}/frame`);
 
   // The app boots on the live wall clock, so a "day" screenshot taken as-is is
   // whatever time it happens to be. SF.setClock(iso) pins it; setTime() is
@@ -321,10 +327,15 @@ async function main() {
   // drill's evidence is the two console assertions below plus drill-day/night —
   // the wide frame proves nothing extra about a fallback.
   if (!DRILL) {
+    // The wide shot is in the quick path too: INTEGRATION-PROMPT Step 5 names
+    // "day and night plus one wide", and one extra goTo is cheap even at load
+    // 700. Everything below it is not.
     await evaluate(`window.SF.setClock('2026-08-17T14:30:00-07:00')`);
     await evaluate(`window.SF.goTo(${LON}, ${LAT}, 900, ${CAMERA.yaw}, 34)`);
     await new Promise((r) => setTimeout(r, 4000));
     await shot('wide');
+  }
+  if (!DRILL && !QUICK) {
 
     // The two ground-plane checks, both at eye level along the plaza's own axis
     // (bearing 81 deg = app yaw 99, and its reciprocal). A baked street ribbon

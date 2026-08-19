@@ -1,7 +1,7 @@
 {
  "input": {
-  "tris": 13364,
-  "verts": 24893,
+  "tris": 10692,
+  "verts": 19217,
   "objects": 21,
   "primitives": 26,
   "materials": [
@@ -25,7 +25,7 @@
   "bbox_dims": [
    128.49153,
    67.62864,
-   13.19989
+   13.19309
   ],
   "bbox_min": [
    -64.24577,
@@ -38,8 +38,8 @@
   ]
  },
  "output": {
-  "tris": 13364,
-  "verts": 24107,
+  "tris": 10692,
+  "verts": 18431,
   "objects": 21,
   "primitives": 26,
   "materials": [
@@ -63,7 +63,7 @@
   "bbox_dims": [
    128.49153,
    67.62864,
-   13.19989
+   13.19309
   ],
   "bbox_min": [
    -64.24577,
@@ -90,8 +90,8 @@
   "koi_glow": 1.297138,
   "lamps": 3.987916,
   "lamps_glow": 0.737391,
-  "monument": 326.145528,
-  "monument_glow": 26.517708,
+  "monument": 153.414696,
+  "monument_glow": 8.253726,
   "people": 13.187294,
   "terrace_s": 441.007381,
   "terrace_s_wall": 23.354095,
@@ -101,7 +101,7 @@
  "inverted_solids": [],
  "ray_test_output": {
   "rays": 22500,
-  "hits": 15050,
+  "hits": 15029,
   "flipped": 2,
   "flipped_fraction": 0.000133
  },

@@ -1,7 +1,7 @@
 # Fulton Plaza — build report
 
-`fulton-plaza.glb`: 21 objects, **13,364 triangles**, **344 KB raw / 220 KB gzip** as
-shipped (meshopt-compressed; 676 KB before stage 4), 16 palette materials, **draped on the
+`fulton-plaza.glb`: 21 objects, **10,692 triangles**, **262 KB raw / 163 KB gzip** as
+shipped (meshopt-compressed; 527 KB before stage 4), 16 palette materials, **draped on the
 baked terrain**, all 19 contract checks PASS in a fresh-scene re-import of the *shipped*
 file (`validation.json`).
 
@@ -16,30 +16,31 @@ asphalt.
 |---|---|
 | Manifest anchor | `-122.4159308, 37.7796961` (model XY bbox centre) |
 | Right-of-way OBB centre | `-122.4159189, 37.7796904`; the model sits 1.051 m west / 0.626 m north of it |
-| `targetHeightM` | **13.1999 m** — the vertical extent, so the loader's scale is 1.0 |
-| Dimensions | 128.492 × 67.629 × 13.1999 m |
+| `targetHeightM` | **13.1931 m** — the vertical extent, so the loader's scale is 1.0 |
+| Dimensions | 128.4915 × 67.6286 × 13.1931 m |
 | `min_z` | **−1.50 m** — negative by design; z = 0 is the anchor's ground |
 | XY centre offset | 0.0000, 0.0000 |
 | Long axis | 81.15° true (toward Hyde Street); cross axis 171.15° |
 | Right-of-way | 120.04 × 48.59 m oriented, 5,805 m² = 1.435 acres |
 | Terrain | draped; falls 2.366 m along the axis, **cross-falls 0.874 m**, anchor 17.788 m |
 | Deck standoff | Z_DECK = 0.95 m above grade, max error over 32 ray-cast samples **0.0039 m** |
-| Monument crest | 11.698 m above local grade — apron 1.03 + 10.668 m (SFAC 420 in) |
+| Monument crest | 11.693 m above local grade — the tip of Eureka's spear (apron 1.03 + 10.668 m, SFAC 420 in) |
 | Koi | two bodies, 20.642 m each |
-| Triangles | 13,364 of a 16,000 cap |
-| File | 352,004 B raw / 224,3xx B gzip9, meshopt-compressed. Pre-optimize 692,300 B; see `optimize/REPORT.md` |
+| Triangles | 10,692 of a 16,000 cap |
+| File | 268,212 B raw / 167,112 B gzip9, meshopt-compressed. Pre-optimize 540,052 B; see `optimize/REPORT.md` |
 | Category / streaming | `cat: 0`, `loadRadius: 2500` |
 
 ## Triangles by object
 
 | object | tris |
 |---|---|
-| `monument` | 4,160 |
 | `joints` | 2,304 |
 | `bollards` | 1,568 |
+| `monument` | 1,440 |
 | `trees` | 1,104 |
 | `deck` | 970 |
 | `koi` | 408 |
+| `bed_*_kerb`, `bed_*_soil` (4) | 400 |
 | `koi_glow` | 384 |
 | `lamps` | 384 |
 | `people` | 384 |
@@ -49,9 +50,8 @@ asphalt.
 | `furniture` | 180 |
 | `apron` | 156 |
 | `lamps_glow` | 144 |
-| `bed_*_kerb`, `bed_*_soil` (4) | 400 |
+| `monument_glow` | 60 |
 | `ashurbanipal` | 52 |
-| `monument_glow` | 12 |
 
 ## Validation
 
@@ -60,14 +60,14 @@ writes `validation.json`. Overall **PASS**.
 
 | check | result |
 |---|---|
-| meters and plausible dimensions | PASS — 128.5 × 67.6 × 13.2 m |
+| meters and plausible dimensions | PASS — 128.5 × 67.6 × 13.19 m |
 | vertical extent matches the build's own metadata | PASS |
 | height datum is the monument | PASS — the crest vertex belongs to `monument`, not to a tree |
 | **deck drapes the terrain** | PASS — 32 samples, max standoff error 0.0039 m (tolerance 0.10) |
 | koi are two bodies of the right size | PASS — 20.642 m and 20.642 m, clustered against the surveyed centres |
 | koi carry both day and night materials | PASS |
 | centred in XY | PASS |
-| under triangle budget | PASS — 13,364 / 16,000 |
+| under triangle budget | PASS — 10,692 / 16,000 |
 | no image textures / no transparency | PASS |
 | materials follow the contract | PASS — 16 `Toy_*`, no `Toy_body` |
 | no cameras, lights, animation, skins, constraints | PASS |
@@ -82,8 +82,8 @@ replaces it. See REFERENCE.md, "The terrain drape".
 
 ## Stage 4 — optimize
 
-`gltfpack@0.24 -c -km -kn -noq` applied to the approved build: **692,300 → 352,004 bytes
-raw, −49.2%**, geometry byte-identical, max A/B pixel delta 0.046%, all gates PASS.
+`gltfpack@0.24 -c -km -kn -noq` applied to the approved build: **540,052 → 268,212 bytes
+raw, −50.3%**, geometry byte-identical, max A/B pixel delta 0.046%, all gates PASS.
 
 **Phase B was measured and reverted in full.** Six variants; every one produced a *larger*
 file than doing nothing, including the join — the Blender import/re-export round-trip alone
@@ -141,11 +141,30 @@ zoomed to fit, so the four share one rig.
     clearance over them was only 0.06–0.15 m, because the ribbon's `y` quantises up to
     0.20 m above the terrain and `createGroundMaterial()` runs the ground with
     `polygonOffset{Factor,Units} = -2`. The deck moved to 0.95 m (0.40 m clear) and the
-    whole Z stack with it, which is why `targetHeightM` is 13.20 m rather than 12.80 m.
+    whole Z stack with it, which is why `targetHeightM` is 13.19 m rather than 12.80 m.
     **This defect is invisible everywhere upstream** — it is a depth fight against geometry
     that is not in the file, so no Blender render and no contract check can see it, and only
     the stage-5 app QA does.
-12. **The validator's first drape sample missed a quarter of its points.** The outer row at
+12. **The Pioneer Monument read as a square ziggurat with four totems on it.** Rebuilt
+    from the 2017 Commons photographs as the circular composition it is — a name drum with
+    medallion busts, a panelled pedestal drum, a flaring cornice, a bronze collar, and
+    Eureka with her shield, her grizzly and her spear on top; the four piers dropped to
+    their photographed 1.55 m and their groups became **seated**. Every radius in the first
+    attempt was ~35% over. Dropping the bevel on the merged object took it from 12,532
+    triangles to **1,440** — a third of the old blocky version — and the whole asset from
+    13,364 to 10,692. Requested by David after seeing the stage-5 screenshots.
+13. **A green kit apartment block stood on the monument's apron in the app** — after the
+    monument rebuild, and only because of how the bake had been restored. Two things
+    conspire. `verify-rebake.mjs` and `audit.mjs` check the **buildings** tier, but the
+    building kit (`kitplan.js`) plans from the **toy** tier, which carries its own
+    simplified copy of every footprint — here a 4-vertex ring 0.84 m from the anchor,
+    baked to 20.8 m, against the buildings tier's 17-vertex cruciform at 1.00 m / 21.9 m.
+    And `pipeline/toy.mjs` writes straight into `app/public/tiles/toy/`, so
+    `npm run validate` does **not** republish it: after a `git checkout -- app/public/tiles`
+    (which batch mode requires), re-running only `validate` restores the buildings tier and
+    leaves the toy tier at `origin/main`. Re-running `toy` → `notables` → `context` fixed
+    it: `toy/19_13.bin` 274 → 273 footprints, nothing within 30 m of the anchor.
+14. **The validator's first drape sample missed a quarter of its points.** The outer row at
     `v = 16` landed on the south terrace, not the deck, and rays that hit an overlay are
     skipped — so a badly chosen grid shrinks the sample silently rather than failing. Moved
     to `v = 12`, and the koi cluster now seeds from the **surveyed** koi centres rather than
@@ -155,11 +174,11 @@ zoomed to fit, so the four share one rig.
 
 `docs/asset-plans/fulton-plaza.md` was written before the model existed. Two numbers moved:
 
-1. **`targetHeightM` is 13.1999 m, not 10.67 m.** The plan set the target to the Pioneer
+1. **`targetHeightM` is 13.1931 m, not 10.67 m.** The plan set the target to the Pioneer
    Monument's catalogue height and asked the validator to assert `max_z == 10.67`. That is
    incompatible with the terrain drape the same plan mandates: once z = 0 means the anchor's
-   ground, the export spans −1.50 to +11.70 m and the loader's scale is
-   `targetHeightM / 13.20`. The monument is still 10.668 m of monument and still the model's
+   ground, the export spans −1.50 to +11.69 m and the loader's scale is
+   `targetHeightM / 13.19`. The monument is still 10.668 m of monument and still the model's
    crest; it now stands on a 0.63 m apron on a draped deck. This is the convention
    `64-south-park` (21.0415 m) and `424-brannan` already ship under, and the plans README
    already documents it.
@@ -179,7 +198,7 @@ Everything else in the plan held — including the exclusion measurement, the "n
    recognition.
 2. **The tree height is a design decision, not a measurement.** Crowns are set at 7.80 m
    (north) and 5.60 m (south) above local grade so the Pioneer Monument stays the tallest
-   thing on its own plaza after the 2.37 m drape. A measured plane above 11.70 m would be a
+   thing on its own plaza after the 2.37 m drape. A measured plane above 11.69 m would be a
    real conflict; the honest resolution is to keep the monument as the datum and record the
    trees as restrained, not to move the datum onto a lollipop.
 3. **SPECTRA is deliberately absent** — it would occlude the koi from the app's own camera,
@@ -205,7 +224,7 @@ healthy streamed landmark look broken.
 | id mapping | **PASS** — `camelId('fulton-plaza') = 'fultonPlaza'`, and `SF.assets.placed` carries `fultonPlaza` |
 | one building on the spot | **PASS** — the re-bake dropped the one baked footprint (the traced Pioneer Monument); nothing pokes through |
 | terrain seating | **PASS** — the deck sits on the ground end to end across a 2.37 m fall; validator standoff error 0.0039 m |
-| asphalt reads as a surface | **PASS** — median luminance **38** (p10 36, p90 38) over two bands of open deck, against **8** for the baked toy streets in the same frame. `Toy_roofd` measures 9 in this renderer, so `6f7076` clears the dark cliff by 4× |
+| asphalt reads as a surface | **PASS** — median luminance **38** (p10 37, p90 38) over two bands of open deck, against **8** for the baked toy streets in the same frame. `Toy_roofd` measures 9 in this renderer, so `6f7076` clears the dark cliff by 4× |
 | no baked street bleeding through | **PASS** — p90 38 against a median of 38. Before the deck lift the same window read p90 **196**: that gap *was* the defect |
 | night glow | **PASS** — both koi glow with their markings, the lamp lenses light, the monument is washed; nothing else |
 | draw calls | **PASS** — 122/frame at the landmark (budget < 300) |
@@ -219,8 +238,22 @@ entry — anything with a `loadRadius`, which is this one — fails through `sca
 emits `sf-assets: <id> failed to load (…)` with no "keeping" suffix. It is still exactly
 once. Match on the id, not on the prompt's wording.
 
-Screenshots in `qa/`: `day`, `night`, `wide`, `low-from-hyde`, `low-from-larkin`, `plan`,
-and `drill-day` / `drill-night`.
+Screenshots in `qa/`: `day`, `night`, `wide` and `drill-day` / `drill-night`.
+
+`day`, `night` and `wide` were re-shot after the monument rebuild **and** after the toy tier
+was corrected (build iteration 13). The earlier `low-from-hyde`, `low-from-larkin` and `plan`
+frames were **deleted rather than kept**: a fixed sample box at the plaza centre showed
+19–21% "green roof" pixels in them — the kit block — against 0.3–0.7% for a clean frame,
+which is a cheap and objective way to prove a screenshot is of the state you think it is.
+Those three views were not recaptured: the machine sat between load 270 and 736 for four
+hours (a dozen parallel landmark sessions), and a full six-shot run stopped completing at
+all. That is a FAIL on evidence I would have liked, not on the asset — the deck-clearance
+question those low shots were added to answer had already been settled at 0.55 m vs 0.95 m,
+and the day/night/wide set covers Step 5's own requirement.
+
+`qa_local.mjs --quick` boots, streams the landmark in and takes the day and night shots
+only. The draw-call block runs 30 real animation frames and the full sequence six shots;
+under SwiftShader at load 300+ that is 45 minutes for evidence one frame already carries.
 
 ## Case B — registry, re-bake and audit
 
@@ -232,6 +265,7 @@ and `drill-day` / `drill-night`.
 | `audit.mjs` check 1.6 | **PASS** — "114 zones over 110 landmarks clear". The three unrelated pre-existing failures (1.2b citywide height p95, 1.3c Telegraph Hill DEM, 1.7b one offshore tree) are unchanged |
 | `verify-rebake.mjs` | **PASS** — "only the new landmarks' cells moved"; 584 of 585 cells unchanged; nearest surviving footprint 86.2 m against a 25 m radius |
 | exclusion proved by **penetration depth** | `origin/main` **+24.22 m** — a 4.6 m block (baked 17.3 → 21.9 m) standing 24 m *inside* the right-of-way rectangle, exactly where the modelled monument goes. After the re-bake **−63.82 m** — the nearest surviving ring is 64 m *outside* it. A count or a boolean cannot say this; the depth can |
+| the **toy** tier, which is what the kit plans from | `toy/19_13.bin` 274 → 273 footprints; the 4-vertex ring 0.84 m from the anchor (baked top 20.8 m) is gone. Checked separately from the buildings tier because `verify-rebake.mjs` does not look at it — see build iteration 13 |
 | generated churn | 596 files: 585 `ctx/*.json` sidecars (expected — dropping one footprint renumbers the global building ids their pick lists reference), 1 `buildings/19_13.bin`, 1 `toy/19_13.bin`, 3 `context/`, 2 `api/_data/`, 4 manifests |
 
 **Batch mode**: the bake was run for this QA and then discarded

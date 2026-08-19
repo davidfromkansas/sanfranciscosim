@@ -14,11 +14,11 @@ before the model existed and two of its numbers moved (see "Corrections to the p
 | Manifest id | `fulton-plaza` |
 | Manifest anchor | `-122.4159308, 37.7796961` (model XY bbox centre) |
 | Right-of-way OBB centre | `-122.4159189, 37.7796904`, measured; the model sits 1.05 m west / 0.63 m north of it |
-| `targetHeightM` | **13.1999 m** — the model's VERTICAL EXTENT, not an architectural height. See "The terrain drape" |
-| Monument crest | 11.698 m above local grade (apron 1.03 + 10.668 m of monument) |
+| `targetHeightM` | **13.1931 m** — the model's VERTICAL EXTENT, not an architectural height. See "The terrain drape" |
+| Monument crest | 11.693 m above local grade — the tip of Eureka's spear (apron 1.03 + 10.668 m of monument) |
 | Right-of-way | 120.04 m × 48.59 m oriented, 5,805 m² = 1.435 acres, heading 81.15° |
 | Axis-aligned XY bbox | 128.49 × 67.63 m — the 8.85° rotation, plus the beds' overhang and the tree crowns |
-| Triangles | 13,364 (cap 16,000) |
+| Triangles | 10,692 (cap 16,000) |
 | Category | `0` (Miscellaneous), `loadRadius` 2500 |
 
 ## Sources, and what each establishes
@@ -84,7 +84,7 @@ pale terrace, a low wall on its plaza edge, and a thinner row of smaller trees.
 ## The terrain drape — read this before changing anything
 
 **This asset is draped on the baked terrain, and that is why `min_z` is −1.50 m and
-`targetHeightM` is 13.20 m.** Both are deliberate, both are asserted by
+`targetHeightM` is 13.19 m.** Both are deliberate, both are asserted by
 `validate_fulton_plaza.py`, and neither is a contract slip.
 
 `placeGeneric()` in `app/src/assets.js` seats a landmark from a single terrain sample:
@@ -105,7 +105,7 @@ Consequences:
   that replaces "min_z ≈ 0" is that the deck stands `Z_DECK` above the terrain everywhere:
   measured by ray-casting onto the deck at 32 points across the right-of-way, **max
   standoff error 0.0039 m**.
-- **`targetHeightM` is the vertical extent**, 13.1999 m, because the loader's scale is
+- **`targetHeightM` is the vertical extent**, 13.1931 m, because the loader's scale is
   `targetHeightM / bbox height` and it must be 1.0.
 - `sample_terrain.mjs` reads `app/public/tiles/terrain.bin` through `manifest.terrain` —
   the shipped copy of the bake output and the exact array `app/src/data.js` indexes at
@@ -194,7 +194,7 @@ surfaces. All heights are **above local grade**, with the drape added per vertex
 | 2.18 | monument platform (apron + 1.15) |
 | 3.78 | the four cardinal piers |
 | 8.50 | central pedestal top (apron + 7.468) |
-| 11.70 | **Minerva's finial** (apron + 10.668) — the crest |
+| 11.69 | **the tip of Eureka's spear** (apron + 10.668) — the crest |
 
 ## Palette
 
@@ -263,8 +263,49 @@ which is why the koi glow.
 - **The koi outlines are authored.** Their published length and their positions are solid;
   their silhouettes come from one aerial image at 0.110 m/px of a mural that has been on the
   ground since 2024 and wears. See REPORT.md's open risks.
-- **The bronze groups are chunky silhouettes**, not figures: a tapered body and a head,
-  turned to their own cardinal rather than to the paving grid.
+## The Pioneer Monument
+
+Modelled from the 2017 Commons photographs rather than from a written description, after a
+first build that read as a square ziggurat with four totems on it. What the photographs
+actually show is a **circular** composition:
+
+| element | z above the apron | note |
+|---|---|---|
+| bottom step | 0.00 → 0.55 | r 2.78 |
+| name band / medallion drum | 0.55 → 1.35 | r 2.52, five bronze medallion busts (Lick, Frémont, Drake, Serra, Sutter) set into it |
+| cove and step | 1.35 → 2.55 | r 2.44 → 1.98 |
+| the panelled pedestal drum | 2.55 → 5.30 | r 1.46, four recessed bronze relief panels |
+| garland frieze | 5.30 → 5.72 | r 1.58, proud of the drum |
+| cornice | 5.72 → 6.74 | flares to r 1.94 — the monument's widest moment above grade |
+| bronze collar | 6.74 → 7.14 | the dark ring under the figure |
+| plinth | 7.14 → 7.468 | SFAC's "base, 294 in" ends here |
+| **Eureka** | 7.468 → 11.693 | 126 in of figure; the spear tip is the crest |
+
+The radii come off the elevation photograph as a fraction of the monument's own height: the
+base drum is half as wide as the whole thing is tall. The first build had every radius ~35%
+over and the column read as a squat bollard.
+
+**Eureka is a figure, and the three things that make her one are sideways.** Concentric
+tapering frusta always read as a spire — the first attempt stacked three of them and
+produced a pagoda finial. What breaks the silhouette is her **oval shield** held upright at
+her left, the **California grizzly** crouched as a low horizontal mass at her right foot,
+and the **spear** raked up and forward, which is also the model's crest. She faces **west**,
+along the plaza toward City Hall, which is the axis the 1993 relocation put her on.
+
+**The four piers are low and their groups are seated.** Photographed, the granite pedestals
+are tapered blocks about 1.55 m tall with a moulded cap, and the bronzes sit *on* them at
+roughly life size: *Plenty* with her cornucopia (north) and *Commerce* with her oar (south)
+are both **seated**, so from above they read as horizontal masses rather than as three more
+spires; *In '49* (west) is a standing miner in a brimmed hat with two prospectors crouched
+over a pan. The **east pier is bare**: *Early Days* was removed on 14 September 2018 and
+never replaced, and an empty pedestal is conspicuous from the app's downward camera.
+
+`monument` is in the unbevelled set. It is one merged object of ~40 small primitives, most
+of them 8-to-16-sided drums that already read soft, and a 0.10/2 bevel over all of them cost
+**8,400 triangles** (12,532 against 1,440) for detail under a pixel.
+
+- **The bronze groups are chunky silhouettes**, not anatomy: blocky masses plus the one
+  attribute that names each figure.
 - **The farmers market and the concert stage are not modelled.** Both are twice-weekly
   temporary set-ups; their traces — the staging space kept clear at the Hyde end, the people
   clusters — are.
@@ -277,10 +318,10 @@ which is why the koi glow.
 `docs/asset-plans/fulton-plaza.md` was written before the model existed. Two of its numbers
 moved, and REPORT.md beats the plan:
 
-1. **`targetHeightM` is 13.1999 m, not 10.67 m.** The plan set the target to the Pioneer
+1. **`targetHeightM` is 13.1931 m, not 10.67 m.** The plan set the target to the Pioneer
    Monument's catalogue height and asked the validator to assert `max_z == 10.67`. That is
    incompatible with the drape the same plan mandates: once z = 0 means the anchor's ground,
-   the export spans −1.50 to +11.70 and the loader's scale is `targetHeightM / 13.20`. The
+   the export spans −1.50 to +11.69 and the loader's scale is `targetHeightM / 13.19`. The
    monument crest is still the model's crest, and is still 10.668 m of monument — it now
    stands on a 0.63 m apron on a draped deck. This follows the convention `64-south-park`
    and `424-brannan` already ship under.

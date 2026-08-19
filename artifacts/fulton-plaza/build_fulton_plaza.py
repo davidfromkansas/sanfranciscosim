@@ -391,6 +391,41 @@ def draped_slab(name, quad, h_top, mat, ns, nt, flat_bottom=None, h_bot=None):
     return obj
 
 
+def strut(verts, faces, p0, p1, r0, r1=None, sides=6):
+    """A tapered prism between two points in (u, v, height-above-grade). Used for
+    the things a bronze figure HOLDS — Eureka's spear, Commerce's oar, Plenty's
+    cornucopia — which are what make each group readable as itself and which no
+    stack of axis-aligned boxes can express."""
+    if r1 is None:
+        r1 = r0
+    ax = (p1[0] - p0[0], p1[1] - p0[1], p1[2] - p0[2])
+    ln = math.sqrt(ax[0] ** 2 + ax[1] ** 2 + ax[2] ** 2)
+    if ln < 1e-6:
+        return
+    ax = (ax[0] / ln, ax[1] / ln, ax[2] / ln)
+    # any vector not parallel to the axis, then Gram-Schmidt twice
+    tmp = (0.0, 0.0, 1.0) if abs(ax[2]) < 0.9 else (1.0, 0.0, 0.0)
+    e1 = (tmp[1] * ax[2] - tmp[2] * ax[1], tmp[2] * ax[0] - tmp[0] * ax[2],
+          tmp[0] * ax[1] - tmp[1] * ax[0])
+    n1 = math.sqrt(sum(c * c for c in e1))
+    e1 = tuple(c / n1 for c in e1)
+    e2 = (ax[1] * e1[2] - ax[2] * e1[1], ax[2] * e1[0] - ax[0] * e1[2],
+          ax[0] * e1[1] - ax[1] * e1[0])
+    b = len(verts)
+    for p, r in ((p0, r0), (p1, r1)):
+        for i in range(sides):
+            a = 2 * math.pi * i / sides
+            du = r * (math.cos(a) * e1[0] + math.sin(a) * e2[0])
+            dv = r * (math.cos(a) * e1[1] + math.sin(a) * e2[1])
+            dz = r * (math.cos(a) * e1[2] + math.sin(a) * e2[2])
+            verts.append(W(p[0] + du, p[1] + dv, p[2] + dz))
+    for i in range(sides):
+        j = (i + 1) % sides
+        faces.append((b + i, b + j, b + sides + j, b + sides + i))
+    faces.append(tuple(b + i for i in range(sides - 1, -1, -1)))
+    faces.append(tuple(b + sides + i for i in range(sides)))
+
+
 def rot_rect(uc, vc, a, b, ang):
     """A rectangle 2a x 2b centred on (uc, vc), rotated by `ang` in the plaza
     frame. Bronze figures are not axis-aligned — a statue that lines up exactly
@@ -644,85 +679,195 @@ def ground(data, mats):
 
 
 def monument(data, mats):
-    """The Pioneer Monument. A cruciform granite platform (the ring the city bake
-    traces), a tapered central pedestal to 7.468 m, Minerva to 10.668 m, and four
-    cardinal piers — THREE of which carry a bronze group. The EAST pier is empty:
-    'Early Days' was removed on 14 September 2018 and never replaced, and the
-    empty pier is visible from above, so modelling the pre-2018 monument would be
-    both wrong and conspicuous."""
+    """The Pioneer Monument — Frank Happersberger, 1894, moved here from the City
+    Hall forecourt in 1993, and the plaza's height datum.
+
+    Modelled from the 2017 Commons photographs, not from a description, and the
+    first build was wrong in the way that matters: it read as a square ziggurat
+    with four totems on it. The real thing is a **circular** composition —
+
+      * a broad drum at grade carrying the pioneers' names in a band and five
+        bronze medallion busts (Lick, Fremont, Drake, Serra, Sutter);
+      * a cove and a step up to the main pedestal drum, whose four faces carry
+        recessed bronze relief panels under a garland frieze;
+      * a wide overhanging cornice, a bronze collar above it, and a short plinth;
+      * **Eureka** on top: a draped figure with a laurel crown, a long spear held
+        up and out in her right hand, a large oval shield at her left, and the
+        California grizzly crouched at her feet. The SPEAR TIP is the crest, and
+        the crest is the model's datum.
+
+    Four granite piers stand at the ends of the traced cruciform, each facing its
+    own cardinal direction. Three carry a bronze group; they are **low, wide and
+    seated**, not standing — Plenty with her cornucopia (north), Commerce with
+    her oar (south), and the three prospectors of In '49 (west). The EAST pier is
+    bare: *Early Days* was removed on 14 September 2018 and never replaced, and
+    from the app's downward camera an empty pedestal is conspicuous, so modelling
+    the pre-2018 monument would be both wrong and obvious.
+    """
     ring = dedupe_ring(data["monument"]["ring"])
     us = [p[0] for p in ring]
     vs = [p[1] for p in ring]
     cu = (min(us) + max(us)) / 2.0
     cv = (min(vs) + max(vs)) / 2.0
 
-    # The pale apron the whole thing stands on: ~21 m across, measured from the
+    # The pale apron the whole thing stands on: ~20 m across, measured from the
     # aerial. It is the bullseye the koi orbit and it has to read at thumbnail.
     prism_uv("apron", ngon_uv(20, cu, cv, 10.1), Z_DECK, Z_APRON, mats["Toy_cream"])
 
     verts, f_stone, f_bronze = [], [], []
-    # stepped platform, two courses, on the traced cruciform
+    A = Z_APRON
+
+    # The traced cruciform, as two granite steps: this is the plan the city's own
+    # footprint records, and it is what carries the four piers.
     outer = [(u + (cu - u) * -0.06, v + (cv - v) * -0.06) for u, v in ring]
-    poly_solid(verts, f_stone, outer, Z_APRON, Z_APRON + 0.42)
-    poly_solid(verts, f_stone, ring, Z_APRON, Z_APRON + MON_PLATFORM)
+    poly_solid(verts, f_stone, outer, A, A + 0.34)
+    poly_solid(verts, f_stone, ring, A, A + 0.62)
 
-    # Central pedestal: the hub of the cross, tapering. Deliberately the widest
-    # single mass on the plaza after the apron — authored slimmer first and the
-    # aerial read as four little chapels with nothing in the middle.
-    poly_solid(verts, f_stone, rect_uv(cu - 2.85, cu + 2.85, cv - 3.05, cv + 3.05),
-               Z_APRON, Z_APRON + 1.55)
-    poly_solid(verts, f_stone, rect_uv(cu - 2.35, cu + 2.35, cv - 2.55, cv + 2.55),
-               Z_APRON + 1.55, Z_APRON + 2.55)
-    ped_top = Z_APRON + MON_PEDESTAL_TOP
-    crest = Z_APRON + MON_H
-    frustum(verts, f_stone, 4, cu, cv, 2.60, 2.10, Z_APRON + 2.55, ped_top - 0.70,
-            rot=math.pi / 4)
-    poly_solid(verts, f_stone, rect_uv(cu - 1.72, cu + 1.72, cv - 1.82, cv + 1.82),
-               ped_top - 0.70, ped_top - 0.55)
-    poly_solid(verts, f_stone, rect_uv(cu - 1.62, cu + 1.62, cv - 1.72, cv + 1.72),
-               ped_top - 0.55, ped_top)
+    # --- the central column, all circular ---------------------------------
+    D = 16  # sides on every drum; 20 looked no better and cost 40% more
 
-    # Minerva with her California grizzly: a bronze silhouette, not anatomy —
-    # but a READABLE one. She is 126 in of a 420 in monument, i.e. 30% of its
-    # height, and the first build made her a thin 0.95 m cone that vanished at
-    # the app's camera distance. Robe, torso, helmeted head, and the bear as a
-    # separate block at her feet, which is what makes the group legible from
-    # above rather than a spike.
-    figure(verts, f_bronze, cu, cv, ped_top, crest - ped_top, 0.86, 0.66,
-           math.radians(24.0))
-    # the California grizzly at her feet, a low block rather than an animal
-    poly_solid(verts, f_bronze, rot_rect(cu + 1.05, cv + 0.35, 0.62, 0.40, math.radians(24.0)),
-               ped_top, ped_top + 0.78)
+    def drum(z0, z1, r0, r1=None, bronze=False):
+        frustum(verts, f_bronze if bronze else f_stone, D, cu, cv, r0,
+                r1 if r1 is not None else r0, A + z0, A + z1)
 
-    # the four cardinal piers, at the ends of the cross arms
+    # Radii measured off the 2017 elevation photograph as a fraction of the
+    # monument's own height: the base drum is half as wide as the whole thing is
+    # tall (5.4 m across a 10.67 m monument), the panelled drum 2.9 m, the
+    # cornice 3.6 m. The first build had all three ~35% too wide and the column
+    # read as a squat bollard rather than as a column.
+    drum(0.00, 0.55, 2.78)          # bottom step
+    drum(0.55, 1.35, 2.52)          # the name band / medallion drum
+    drum(1.35, 1.95, 2.44, 2.02)    # cove
+    drum(1.95, 2.55, 1.98)          # step
+    drum(2.55, 5.30, 1.46)          # the main pedestal drum
+    drum(5.30, 5.72, 1.58)          # garland frieze, proud of the drum
+    drum(5.72, 6.32, 1.62, 1.94)    # cornice, flaring OUT — the monument's
+    drum(6.32, 6.74, 1.94, 1.58)    # widest moment above grade
+    drum(6.74, 7.14, 1.30, bronze=True)   # the bronze collar
+    drum(7.14, MON_PEDESTAL_TOP, 1.06)    # plinth the figure stands on
+
+    # Five bronze medallion busts around the name drum, and four recessed bronze
+    # relief panels on the pedestal. Both are the only dark notes below the
+    # figure, and without them the column reads as a plain bollard.
+    for k in range(5):
+        a = math.radians(18 + 72 * k)
+        frustum(verts, f_bronze, 8, cu + 2.44 * math.cos(a), cv + 2.44 * math.sin(a),
+                0.30, 0.25, A + 0.82, A + 1.12)
+    for k in range(4):
+        a = math.radians(45 + 90 * k)
+        du, dv = math.cos(a), math.sin(a)
+        poly_solid(verts, f_bronze,
+                   rot_rect(cu + 1.40 * du, cv + 1.40 * dv, 0.14, 0.62, a),
+                   A + 3.05, A + 4.75)
+
+    # --- Eureka ------------------------------------------------------------
+    F = A + MON_PEDESTAL_TOP                     # 7.468 m: the figure's own base
+    crest = A + MON_H                            # 10.668 m: the spear tip
+    # She faces WEST, along the plaza toward City Hall, which is the axis the
+    # 1993 relocation put her on.
+    fa = math.pi / 2   # +v is south, so pi/2 in rot_rect's frame points west
+    # Concentric tapering frusta always read as a SPIRE — the first build stacked
+    # three of them and produced a pagoda finial. What makes this a figure is the
+    # three things that break the silhouette sideways: the shield out to her left,
+    # the bear at her right foot, and the raked spear. The body itself is blocky
+    # on purpose.
+    poly_solid(verts, f_bronze, rot_rect(cu, cv, 0.62, 0.46, fa), F, F + 0.30)   # plinth block
+    poly_solid(verts, f_bronze, rot_rect(cu, cv, 0.56, 0.42, fa), F + 0.30, F + 1.36)  # robe
+    poly_solid(verts, f_bronze, rot_rect(cu - 0.02, cv, 0.44, 0.34, fa), F + 1.36, F + 1.92)
+    poly_solid(verts, f_bronze, rot_rect(cu - 0.02, cv, 0.34, 0.28, fa), F + 1.92, F + 2.34)
+    poly_solid(verts, f_bronze, rot_rect(cu - 0.02, cv, 0.19, 0.17, fa), F + 2.34, F + 2.74)  # head
+    poly_solid(verts, f_bronze, rot_rect(cu - 0.02, cv, 0.26, 0.24, fa), F + 2.66, F + 2.76)  # laurel
+    # The oval shield, held upright at her left: a flat disc in a VERTICAL plane,
+    # made by running a wide, short strut horizontally.
+    strut(verts, f_bronze, (cu - 0.02, cv + 0.52, F + 1.30),
+          (cu - 0.02, cv + 0.64, F + 1.30), 0.60, 0.52, sides=10)
+    # The California grizzly, crouched at her right foot — a low horizontal mass,
+    # which is what stops the group reading as one vertical.
+    poly_solid(verts, f_bronze, rot_rect(cu + 0.10, cv - 0.72, 0.34, 0.56, fa), F, F + 0.52)
+    poly_solid(verts, f_bronze, rot_rect(cu + 0.16, cv - 1.02, 0.24, 0.22, fa),
+               F + 0.30, F + 0.76)
+    # The spear, raked up and forward: the tallest thing in the model.
+    strut(verts, f_bronze, (cu - 0.30, cv - 0.46, F + 0.16),
+          (cu + 0.16, cv - 0.30, crest - 0.30), 0.075)
+    strut(verts, f_bronze, (cu + 0.16, cv - 0.30, crest - 0.30),
+          (cu + 0.19, cv - 0.29, crest), 0.13, 0.03, sides=4)
+
+    # --- the four cardinal piers -------------------------------------------
+    # Low, tapered granite blocks with a moulded cap, as photographed: the first
+    # build stood them 2.75 m tall and put standing figures on them, which made
+    # four chapels around a spire instead of a monument.
     piers = {
-        "west": (min(us) + 1.35, cv, True),
-        "east": (max(us) - 1.35, cv, False),   # <- EMPTY since 2018
-        "north": (cu, min(vs) + 1.25, True),
-        "south": (cu, max(vs) - 1.25, True),
+        "west": (min(us) + 1.35, cv, "forty_nine"),
+        "east": (max(us) - 1.35, cv, None),       # <- EMPTY since 14 Sep 2018
+        "north": (cu, min(vs) + 1.25, "plenty"),
+        "south": (cu, max(vs) - 1.25, "commerce"),
     }
-    for name, (pu, pv, has_figure) in piers.items():
-        poly_solid(verts, f_stone, rect_uv(pu - 1.45, pu + 1.45, pv - 1.45, pv + 1.45),
-                   Z_APRON, Z_APRON + MON_PIER_TOP)
-        poly_solid(verts, f_stone, rect_uv(pu - 1.68, pu + 1.68, pv - 1.68, pv + 1.68),
-                   Z_APRON + MON_PIER_TOP - 0.30, Z_APRON + MON_PIER_TOP)
-        if not has_figure:
+    facing = {"north": 0.0, "south": math.pi, "west": math.pi / 2, "east": -math.pi / 2}
+    for name, (pu, pv, group) in piers.items():
+        ang = facing[name]
+        frustum(verts, f_stone, 4, pu, pv, 1.02, 0.90, A, A + 1.55, rot=math.pi / 4)
+        poly_solid(verts, f_stone, rot_rect(pu, pv, 1.16, 1.16, ang), A + 1.55, A + 1.77)
+        if group is None:
             continue
-        top = Z_APRON + MON_PIER_TOP
-        # Plenty (north), Commerce (south) and In '49 (west) face outward, so
-        # each is turned to its own cardinal rather than to the paving grid.
-        ang = {"north": 0.0, "south": math.pi, "west": math.pi / 2}[name]
-        figure(verts, f_bronze, pu, pv, top, MON_FIGURE_H, 0.76, 0.54, ang + math.radians(12))
+        T = A + 1.77
+        # a bronze slab under every group, as cast
+        poly_solid(verts, f_bronze, rot_rect(pu, pv, 1.05, 0.86, ang), T, T + 0.14)
+        T += 0.14
+        if group == "forty_nine":
+            # three prospectors: one standing with a hat, two crouched over a pan
+            poly_solid(verts, f_bronze, rot_rect(pu - 0.20, pv - 0.14, 0.30, 0.22, ang),
+                       T, T + 1.28)                              # the standing miner
+            poly_solid(verts, f_bronze, rot_rect(pu - 0.20, pv - 0.14, 0.19, 0.16, ang),
+                       T + 1.28, T + 1.66)
+            poly_solid(verts, f_bronze, rot_rect(pu - 0.20, pv - 0.14, 0.40, 0.40, ang),
+                       T + 1.58, T + 1.68)                        # his hat brim
+            poly_solid(verts, f_bronze, rot_rect(pu + 0.44, pv + 0.22, 0.36, 0.30,
+                                                 ang + 0.5), T, T + 0.76)   # crouched
+            poly_solid(verts, f_bronze, rot_rect(pu + 0.44, pv + 0.22, 0.18, 0.16,
+                                                 ang + 0.5), T + 0.76, T + 1.06)
+            poly_solid(verts, f_bronze, rot_rect(pu + 0.04, pv + 0.50, 0.34, 0.26,
+                                                 ang - 0.4), T, T + 0.64)   # crouched
+            poly_solid(verts, f_bronze, rot_rect(pu + 0.04, pv + 0.50, 0.17, 0.15,
+                                                 ang - 0.4), T + 0.64, T + 0.92)
+        else:
+            # Plenty and Commerce are both SEATED: a low wide skirt, a short
+            # torso and a head, which from above reads as a horizontal mass
+            # rather than as another spire.
+            # SEATED, which is what the photographs show and what keeps these
+            # three from reading as three more spires: the skirt is a low mass
+            # WIDER than it is tall, thrown forward off the pedestal, with a
+            # short torso set back on it.
+            fu, fv = math.cos(ang), math.sin(ang)
+            poly_solid(verts, f_bronze, rot_rect(pu + 0.16 * fu, pv + 0.16 * fv,
+                                                 0.44, 0.72, ang), T, T + 0.70)
+            poly_solid(verts, f_bronze, rot_rect(pu - 0.12 * fu, pv - 0.12 * fv,
+                                                 0.34, 0.44, ang), T + 0.70, T + 1.46)
+            poly_solid(verts, f_bronze, rot_rect(pu - 0.14 * fu, pv - 0.14 * fv,
+                                                 0.18, 0.17, ang), T + 1.46, T + 1.84)
+            poly_solid(verts, f_bronze, rot_rect(pu - 0.14 * fu, pv - 0.14 * fv,
+                                                 0.25, 0.23, ang), T + 1.78, T + 1.87)
+            su, sv = -math.sin(ang), math.cos(ang)   # her own left
+            if group == "plenty":
+                # the cornucopia, mouth down and spilling into her lap
+                strut(verts, f_bronze,
+                      (pu + 0.34 * fu + 0.46 * su, pv + 0.34 * fv + 0.46 * sv, T + 1.28),
+                      (pu + 0.62 * fu + 0.22 * su, pv + 0.62 * fv + 0.22 * sv, T + 0.62),
+                      0.14, 0.34, sides=8)
+            else:
+                # the oar, raked up and out past her shoulder
+                strut(verts, f_bronze,
+                      (pu + 0.50 * fu + 0.30 * su, pv + 0.50 * fv + 0.30 * sv, T + 0.20),
+                      (pu - 0.30 * fu + 0.62 * su, pv - 0.30 * fv + 0.62 * sv, T + 2.45),
+                      0.08)
 
     faces = f_stone + f_bronze
     face_mats = [0] * len(f_stone) + [1] * len(f_bronze)
     new_mesh("monument", verts, faces, [mats["Toy_stone"], mats["Toy_bronze"]], face_mats)
 
-    # Night: a wash up the pedestal faces. A thin shell proud of the granite,
+    # Night: a wash up the pedestal drum. A thin shell proud of the granite,
     # never the granite itself — a _Glow primary surface reads translucent by day.
     gv, gf = [], []
-    poly_solid(gv, gf, rect_uv(cu - 2.90, cu + 2.90, cv - 3.10, cv + 3.10),
-               Z_APRON + 0.28, Z_APRON + 1.02)
+    frustum(gv, gf, D, cu, cv, 2.12, 2.12, A + 0.70, A + 1.30)
     new_mesh("monument_glow", gv, gf, [mats["Toy_gold_Glow"]])
 
     return cu, cv
@@ -866,8 +1011,13 @@ def build():
     # bevelled: their tops are 4 m grids and a bevel would multiply 1440
     # triangles by nine for detail under a pixel. Glow shells are never
     # bevelled — "_glow" anywhere in the name, not endswith().
+    # `monument` joins the unbevelled set for the same reason `trees` is in it:
+    # it is one merged object built from ~40 small primitives, most of them
+    # 8-to-16-sided drums that already read soft. A 0.10/2 bevel over all of them
+    # cost 8,400 triangles — 12,532 against 4,160 for the old blocky version —
+    # and bought nothing at the app's camera distance.
     SKIP = {"deck", "terrace_s", "walk_n", "trees", "lamps", "furniture",
-            "people", "koi", "bollards", "ashurbanipal", "joints",
+            "people", "koi", "bollards", "ashurbanipal", "joints", "monument",
             "bed_west_kerb", "bed_east_kerb", "bed_west_soil", "bed_east_soil",
             "terrace_s_wall"}
     for obj in list(bpy.data.objects):
