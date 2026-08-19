@@ -1939,5 +1939,23 @@
     ],
     "tris": 3366,
     "loadRadius": 2500
+  },
+  {
+    "id": "4-embarcadero-center",
+    "file": "4-embarcadero-center.glb",
+    "anchor": [
+      -122.3961998,
+      37.7953001
+    ],
+    "targetHeightM": 179.0,
+    "cat": 3,
+    "name": "Four Embarcadero Center",
+    "estimated": false,
+    "dims": [
+      73.0216,
+      51.9818,
+      179.0
+    ],
+    "tris": 17904
   }
 ]
