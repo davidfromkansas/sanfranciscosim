@@ -1,11 +1,11 @@
 {
-  "asset": "4-embarcadero-center.glb",
+  "asset": "all.glb",
   "validator": "Blender 5.2.0 LTS",
   "fresh_isolated_scene": true,
   "reimported_final_glb": true,
   "object_count": 9,
   "mesh_object_count": 9,
-  "triangle_count": 17904,
+  "triangle_count": 17560,
   "triangle_budget": 20000,
   "dimensions_m": [
     73.0216,
@@ -113,7 +113,7 @@
   "constraint_count": 0,
   "transforms_applied": true,
   "negative_scales": false,
-  "degenerate_triangle_count": 0,
+  "degenerate_triangle_count": 1,
   "invalid_or_nonunit_loop_normal_count": 0,
   "normal_ray_cast_first_hits": 31500,
   "normal_ray_cast_flipped_visible_faces": 0,
@@ -158,7 +158,7 @@
     },
     {
       "name": "grp_Toy_cream",
-      "triangles": 2652,
+      "triangles": 2348,
       "location": [
         0.0,
         0.0,
@@ -234,7 +234,7 @@
     },
     {
       "name": "grp_Toy_sand_Toy_steel",
-      "triangles": 1684,
+      "triangles": 1644,
       "location": [
         0.0,
         0.0,
@@ -324,8 +324,8 @@
     "no_negative_scales": true,
     "normals_outward_signed_volume": true,
     "normals_outward_ray_residual_within_tolerance": true,
-    "no_degenerate_geometry": true,
+    "no_degenerate_geometry": false,
     "no_unexpected_objects": true
   },
-  "overall": "PASS"
+  "overall": "FAIL"
 }

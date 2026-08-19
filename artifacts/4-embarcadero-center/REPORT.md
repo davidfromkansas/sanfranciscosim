@@ -15,11 +15,12 @@ triangles, all contract checks PASS.
 | Bbox (x, y, z) | 73.02 × 51.98 × **179.000** m |
 | min Z / XY centre offset | 0.000 m / (0.310, 0.000) m |
 | Triangles | **17,904** (cap 20,000) |
-| Objects | 869 |
-| File | 1,307 KB raw, **168 KB gzip** (pre-optimize) |
+| Objects | 9 shipped (869 pre-optimize) |
+| File | **466 KB raw** shipped (1,306 KB pre-optimize, −64.3%) |
 | Materials | 9, all `Toy_*`, flat, opaque |
 | Glow materials | `Toy_glassl_Glow`, `Toy_red_Glow` |
-| Validation | `validation.json` — **overall PASS**, 16/16 checks |
+| Validation | `validation.json` — **overall PASS**, 16/16 checks (re-run on the shipped file) |
+| Optimize | `optimize/REPORT.md` — all eight gates PASS, 882 primitives → 10 |
 
 ## Corrections this build made to the plan
 
@@ -158,6 +159,33 @@ objects.
 §2.13: at 179 m this is a skyline piece, and every other manifest landmark over
 100 m stays resident.
 
+## Stage 4 — optimize
+
+Run with the pipeline defaults (`ASSET_CLASS: landmark`, `ALLOW_MESHOPT: yes`,
+`ALLOW_BAKE: no`). Full detail in `optimize/REPORT.md`; the two judgment calls:
+
+- **Pack-only lost, and could not have shipped anyway.** A gltfpack-only build
+  (Phase B skipped) is smaller gzipped but 78% larger raw, because this asset's
+  waste is object-count overhead — 882 primitives for 17,904 triangles — not
+  vertex layout. It also fails the contract validator: the build leaves two
+  degenerate triangles that only Phase B's degenerate pass removes.
+- **The limited dissolve was measured and rejected.** Worth 7.9% of the bytes,
+  but this asset carries 14 large coplanar ring bands and the dissolve
+  manufactures a hairline sliver in the packed file — 1 degenerate triangle,
+  `no_degenerate_geometry` FAIL. Shipped with `--no-dissolve`.
+
+Shipped: 1,337,932 → **477,540** bytes (−64.3%), vertices 34,813 → 10,662
+(−69%), triangles unchanged at 17,904, bbox and origin identical to 4 dp,
+max A/B pixel delta 0.338% against a 4%/2% budget.
+
 ## Stage 3 — approval
 
-Pending.
+Approved 19 August 2026 by David, standing instruction given with the pipeline
+invocation, quoted verbatim:
+
+> APPROVE EVERYTHING DONT ASK ME FOR PERMISSION
+
+The contact sheet, the day and night aerials and the numbers above were
+presented in the session before the pipeline advanced. This is a blanket
+approval covering stages 3 and 5's ship decision, not a per-render sign-off —
+recorded as such so a later reader knows no image-by-image review happened.
