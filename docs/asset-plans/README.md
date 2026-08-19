@@ -143,14 +143,15 @@ route, and the park plans depend on it (§E8 of the parks README).
 | [246 Ritch Street](./246-ritch.md) | `246-ritch` | 18.76 m (LiDAR max, read as the roof stair/elevator penthouse — see its 2.15 risk 1; parapet 15.87 m) | new landmark |
 | [248–250 Ritch Street](./248-ritch.md) | `248-ritch` | 8.6 m (cornice crest; measured twice — LiDAR mixture 8.65 m, rectified panorama 8.50 m) | new landmark |
 | [1 South Park (One South Park)](./1-south-park.md) | `1-south-park` | 20.2 m (LiDAR `hgt_max`; penthouse roof 18.6 m, cornice crest 15.75 m) | new landmark |
-
-## Shared contract (all 107)
 | [252–254 Ritch Street](./254-ritch.md) | `254-ritch` | 8.8 m (LiDAR maximum, the roof flue; cornice crest 8.05 m estimated) | new landmark |
 | [434 Brannan Street (Art Deco loft, 1929)](./434-brannan.md) | `434-brannan` | 13.79 m (LiDAR maximum, read as the rooftop mechanical penthouse; roof deck 11.46 m measured, parapet crest ~12.4 m estimated) | new landmark |
 | [226 Ritch Street (226 Ritch Street Condominiums)](./226-ritch.md) | `226-ritch` | 18.1 m (roof crest, LiDAR-derived; 16.0 m parapet) | new landmark |
 | [414 Brannan Street (Epic Church)](./414-brannan.md) | `414-brannan` | 14.0 m (monitor crest; 10.4 m street parapet) | new landmark |
 | [501 Third Street](./501-third.md) | `501-third` | 16.4 m (LiDAR-derived) | new landmark |
 | [10 South Park (South Park Lofts)](./10-south-park.md) | `10-south-park` | 14.67 m (roof bulkhead, LiDAR maximum; parapet crest 13.10 m photogrammetric) | new landmark |
+| [110 The Embarcadero (The Commonwealth Club of California)](./110-embarcadero.md) | `110-embarcadero` | 17.4 m (Embarcadero roof fascia, photogrammetric; the Steuart end steps down to 11.6 m) | new landmark |
+
+## Shared contract (all 108)
 
 - Style: `docs/styles/miniature-toy.md` (authoritative for artistic decisions)
 - Technical contract: `.agents/skills/sf-asset-check/SKILL.md` (authoritative for the GLB)
