@@ -151,6 +151,7 @@ route, and the park plans depend on it (§E8 of the parks README).
 | [414 Brannan Street (Epic Church)](./414-brannan.md) | `414-brannan` | 14.0 m (monitor crest; 10.4 m street parapet) | new landmark |
 | [501 Third Street](./501-third.md) | `501-third` | 16.4 m (LiDAR-derived) | new landmark |
 | [10 South Park (South Park Lofts)](./10-south-park.md) | `10-south-park` | 14.67 m (roof bulkhead, LiDAR maximum; parapet crest 13.10 m photogrammetric) | new landmark |
+| [2 Folsom Street (Gap Inc. headquarters / 250 Embarcadero)](./2-folsom.md) | `2-folsom` | 88.0 m (LiDAR maximum, the limestone crown; superstructure deck 72.11 m and base terrace 32.28 m both measured) | new landmark |
 
 - Style: `docs/styles/miniature-toy.md` (authoritative for artistic decisions)
 - Technical contract: `.agents/skills/sf-asset-check/SKILL.md` (authoritative for the GLB)
