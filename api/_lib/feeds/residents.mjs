@@ -59,6 +59,14 @@ const simulationConfig = {
   // where every thread runs the same depth reads as machinery. Drawn per thread,
   // one post limps to a single reply and the one next to it argues for eight.
   replyProbability: { mean: 0.65, stdev: 0.18, min: 0.05, max: 0.95 },
+  // Every vote a post collects — either direction — makes its conversation
+  // likelier to keep going, added straight onto the thread's own probability.
+  // The base coin alone left roughly one liked post in three with no replies,
+  // which reads wrong: five people moved to click are five people one of whom
+  // usually says something. Engagement begets engagement, and a post divisive
+  // enough to collect downvotes earns the same pull. The 0.95 ceiling keeps
+  // silence possible everywhere; zero votes still means silence outright.
+  voteEnergy: 0.08,
   maxReplies: 8,
   newParticipantProbability: 0.5,
   // Asked for in the prompt AND enforced after, because a model told to stay
@@ -639,11 +647,18 @@ async function growThread(people, thread, spend, spendVote) {
     return;
   }
   // Score decides WHETHER a thread happens and WHO is in it; the thread's own
-  // probability still decides HOW LONG it runs. The paper's continuation loop
-  // is untouched — it just no longer runs on posts nobody looked at.
+  // probability decides HOW LONG it runs, pulled up by every vote the post
+  // collected. The paper's continuation loop is otherwise untouched — it just
+  // no longer runs on posts nobody looked at.
+  const { upvotes, downvotes } = tally(thread.votes);
+  const energy = Math.min(
+    simulationConfig.replyProbability.max,
+    thread.replyProbability +
+      simulationConfig.voteEnergy * (upvotes + downvotes),
+  );
   while (
     thread.replies.length < simulationConfig.maxReplies &&
-    Math.random() < thread.replyProbability
+    Math.random() < energy
   ) {
     if (!spend()) return;
     if (!(await addReply(people, thread, spendVote, mood))) break;
