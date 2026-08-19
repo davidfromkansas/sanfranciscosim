@@ -46,13 +46,14 @@
  "interior_faces_removed": 0,
  "joins": {
   "grp_Toy_cream": 34,
-  "grp_Toy_roofd": 4,
+  "grp_Toy_steel": 4,
   "grp_Toy_trim": 13,
   "grp_Toy_brick": 3,
   "grp_Toy_sand": 28,
-  "grp_Toy_steel": 12,
+  "grp_Toy_stone": 2,
   "grp_Toy_ink": 79,
   "grp_Toy_glass": 48,
+  "grp_Toy_roofd": 11,
   "grp_Toy_white_Glow": 19
  },
  "inverted_solids": [],

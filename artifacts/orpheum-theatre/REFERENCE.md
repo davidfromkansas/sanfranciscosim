@@ -158,9 +158,15 @@ altitude.
 8. **`Toy_stone` is not used on the stage house.** It read as a second white mass against
    the cream. `Toy_sand` walls under a `Toy_trim` roof cap keeps the bright-box read from
    above without shouting from the street.
-9. **The auditorium hip is `Toy_steel`, not `Toy_roofd`.** The satellite reads it as a
-   light silver plane against the dark flat decks, and that value break is what makes the
-   roof legible from the app's altitude.
+9. **The whole roof palette moved one step lighter, measured in the running app.**
+   `Toy_roofd` (`#45454a`) renders near-black under the diorama light — a whole city
+   block of it read as a hole in the first local QA, which the style bible forbids. The
+   flat decks are therefore `Toy_steel`, the auditorium hip is `Toy_stone` one step
+   lighter again (the satellite reads it as the light plane against darker decks, and
+   that value break is what makes the roof legible from altitude), and `Toy_roofd`
+   survives only on the small machinery units, where dark is right and the area is
+   tiny. The plan's §2.8 table predates this; it was corrected from the app, not from
+   a render.
 10. **Camera preset changed to a southern view.** The plan proposed `yaw: 44` (camera SE,
     square onto Market). The blade sign's faces point NE and SW, so from the SE the hero
     cue is edge-on and invisible. `yaw: 0` puts the camera due south: the Market front is

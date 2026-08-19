@@ -234,7 +234,7 @@
     },
     {
       "name": "grp_Toy_roofd",
-      "triangles": 108,
+      "triangles": 452,
       "location": [
         0.0,
         0.0,
@@ -272,7 +272,26 @@
     },
     {
       "name": "grp_Toy_steel",
-      "triangles": 484,
+      "triangles": 108,
+      "location": [
+        0.0,
+        0.0,
+        0.0
+      ],
+      "rotation_euler": [
+        0.0,
+        0.0,
+        0.0
+      ],
+      "scale": [
+        1.0,
+        1.0,
+        1.0
+      ]
+    },
+    {
+      "name": "grp_Toy_stone",
+      "triangles": 112,
       "location": [
         0.0,
         0.0,
@@ -330,25 +349,6 @@
     {
       "name": "marquee_soffit",
       "triangles": 12,
-      "location": [
-        0.0,
-        0.0,
-        0.0
-      ],
-      "rotation_euler": [
-        0.0,
-        0.0,
-        0.0
-      ],
-      "scale": [
-        1.0,
-        1.0,
-        1.0
-      ]
-    },
-    {
-      "name": "plinth",
-      "triangles": 80,
       "location": [
         0.0,
         0.0,

@@ -3160,6 +3160,50 @@ export const LANDMARKS = [
     // the canopy are the whole recognition.
     camera: { distance: 120, yaw: 85, pitch: 26 },
   },
+  {
+    // Orpheum Theatre (B. Marcus Priteca, 1926, opened as the Pantages) —
+    // SF Designated Landmark #94, on the trapezoidal block where Market, Hyde
+    // and Grove meet. Height is 2010 city LiDAR `hgt_max` (the 1998 stage
+    // house); OSM tags this building `height=46 m`, which is DataSF's
+    // `p2010_zmaxn88ft` 150.96 ft — the roof's ABSOLUTE NAVD88 elevation —
+    // converted to metres and mistagged. Do not restore it.
+    //
+    // Exclusion measured against the real bake input (DataSF + Overture,
+    // projected, simplifyRing(0.6)) from this anchor. `excluded()` drops a
+    // footprint when its ring centroid OR ANY vertex falls inside:
+    //
+    //    6.11 m  this footprint's centroid, DataSF SF0351022 (2,883 m2)
+    //    7.28 m  this footprint's centroid, Overture 7ad3c2dc (2,967 m2)
+    //   24.55 m  nearest vertex, Civic Center Station strip, Overture 837db0e8
+    //   25.65 m  nearest vertex, City College 1170 Market, DataSF SF0351051
+    //   28.27 m  nearest vertex, City College, Overture e757eceb
+    //
+    // The window is (7.28, 24.55); 20 m sits in the middle with 12.7 m of
+    // margin on ours and 4.5 m on the neighbours'. Two rings drop, both ours —
+    // the usual DataSF + Overture double trace, not collateral. The station
+    // polygon is a strip along Market and does not overlap this footprint
+    // (point-in-polygon: zero shared interior).
+    //
+    // Residual, by design: a 29 m2 Overture sliver at 35 Fulton St
+    // (876a881a, nearest vertex 34.90 m) shares two vertices with the NE
+    // corner and survives. No radius removes it without eating City College.
+    // If it ever shows, add
+    //   extraExclusions: [{ lon: -122.4144084, lat: 37.7796474, r: 6 }]
+    // which catches that ring on its own centroid and reaches nothing else.
+    id: 'orpheumTheatre',
+    name: 'Orpheum Theatre',
+    lon: -122.4146087,
+    lat: 37.7793182,
+    height: 27.2,
+    exclude: 20,
+    // camera.js puts the eye at target + distance*(sin yaw, ., cos yaw) with
+    // +x east and +z south, so camera bearing = 180 - yaw. The ORPHEUM blade
+    // sign is the whole recognition and its faces point NE and SW, so the
+    // obvious yaw 44 (camera SE, square onto Market) shows it EDGE-ON. yaw 0
+    // stands the camera due south: the Market front is 44 deg off-normal and
+    // the sign's SW face 45.9 deg off-normal, and both read.
+    camera: { distance: 380, yaw: 0, pitch: 22 },
+  },
 ];
 
 // Parks/green spaces the landcover bake must match at least one source polygon

@@ -70,13 +70,13 @@
   "grp_Toy_cream": 56471.367611,
   "grp_Toy_glass": 264.26822,
   "grp_Toy_ink": 883.432946,
-  "grp_Toy_roofd": 3587.999593,
+  "grp_Toy_roofd": 323.528625,
   "grp_Toy_sand": 7662.385454,
-  "grp_Toy_steel": 1373.072971,
+  "grp_Toy_steel": 3587.999593,
+  "grp_Toy_stone": 3742.896322,
   "grp_Toy_trim": 843.785809,
   "grp_Toy_white_Glow": 23.676128,
-  "marquee_soffit": 11.831955,
-  "plinth": 2693.351976
+  "marquee_soffit": 11.831955
  },
  "inverted_solids": [],
  "ray_test_output": {

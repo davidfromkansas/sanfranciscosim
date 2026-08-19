@@ -480,7 +480,7 @@ def build():
     bevel(band_prism("low_cap", low_arc(0.18), low_arc(-1.70),
                      LOW_PARAPET - 0.30, LOW_PARAPET, trim),
           width=0.07, segments=1)
-    prism("low_deck", offset_poly(CORE, -1.60), LOW_WALL_TOP - 0.2, DECK, roofd)
+    prism("low_deck", offset_poly(CORE, -1.60), LOW_WALL_TOP - 0.2, DECK, steel)
 
     # ---- the tall street block on the SW half ----
     inner_arc = [offset_poly(CORE, -TALL_INSET)[i] for i in TALL_SPAN]
@@ -494,7 +494,7 @@ def build():
     bevel(band_prism("tall_cap", arc(0.18), arc(-1.70), TALL_PARAPET - 0.30,
                      TALL_PARAPET, trim), width=0.07, segments=1)
     band_prism("tall_deck", arc(-1.60), inner_arc, TALL_WALL_TOP - 0.2,
-               TALL_DECK, roofd)
+               TALL_DECK, steel)
 
     # the north-east step-out, restored as its own solid at the NE wing heights
     bevel(prism("annex", NE_ANNEX, 0.0, LOW_WALL_TOP, cream))
@@ -504,7 +504,7 @@ def build():
                      offset_poly(NE_ANNEX, -1.60), LOW_TILE_Z[1], LOW_PARAPET,
                      trim), width=0.08, segments=1)
     prism("annex_deck", offset_poly(NE_ANNEX, -1.60), LOW_WALL_TOP - 0.2,
-          LOW_PARAPET - 0.25, roofd)
+          LOW_PARAPET - 0.25, steel)
 
     # ---- facades: arcade everywhere the street sees, bays above ----
     tall_faces = [("mkt_sw", A, M1), ("cham", H, A), ("hyde_s", HM, H)]
@@ -593,10 +593,13 @@ def build():
            (e1u, e1v, AUD_EAVE), (e0u, e1v, AUD_EAVE),
            (e0u + AUD_HIP, av, AUD_RIDGE), (e1u - AUD_HIP, av, AUD_RIDGE)]
     hip_faces = [(3, 2, 1, 0), (0, 1, 5, 4), (1, 2, 5), (2, 3, 4, 5), (3, 0, 4)]
-    # Steel, not roofd: the satellite reads the auditorium hip as a light
-    # silver plane against the dark flat decks, and that value break is what
-    # makes the roof legible from the app's altitude.
-    bevel(new_mesh("aud_roof", hip, hip_faces, [steel]), width=0.1, segments=1)
+    # The satellite reads the auditorium hip as a light plane against darker
+    # flat decks, and that value break is what makes the roof legible from the
+    # app's altitude. `Toy_stone`, not `Toy_roofd`: measured in the app, a
+    # roofd deck renders near-black under the diorama light (rgb ~9,9,12) and
+    # a whole city block of it violates the style bible's "no pure black".
+    # Decks are `Toy_steel`, the hip is one step lighter again.
+    bevel(new_mesh("aud_roof", hip, hip_faces, [stone]), width=0.1, segments=1)
     for i, du in enumerate((-6.0, 3.0)):
         bevel(box(f"aud_monitor{i}", au + du, av, AUD_RIDGE - 1.4,
                   AUD_RIDGE + 0.9, 4.0, 3.0, trim), width=0.09, segments=1)
@@ -604,7 +607,7 @@ def build():
     # back of house filling the narrow north end, where the trapezoid is too
     # tight for the auditorium rectangle
     bevel(box("boh", 3.0, 17.0, DECK - 0.5, 19.00, 18.0, 10.0, cream))
-    bevel(box("boh_cap", 3.0, 17.0, 19.00, 19.35, 18.4, 10.4, roofd),
+    bevel(box("boh_cap", 3.0, 17.0, 19.00, 19.35, 18.4, 10.4, steel),
           width=0.09, segments=1)
 
     su_ = (STAGE_U[0] + STAGE_U[1]) / 2
@@ -614,24 +617,24 @@ def build():
     bevel(box("stage_cap", su_, sv_, STAGE_TOP - 0.45, STAGE_TOP,
               ssu + 0.4, ssv + 0.4, trim), width=0.09, segments=1)
     bevel(box("stage_rig", su_ + 3.0, sv_ + 2.0, STAGE_TOP - 2.20,
-              STAGE_TOP - 0.45, 5.0, 4.0, steel), width=0.09, segments=1)
+              STAGE_TOP - 0.45, 5.0, 4.0, roofd), width=0.09, segments=1)
 
     # ---- roof plant, on the low deck along Market north-east of the entrance
     for i in range(4):
         bevel(box(f"cond{i}", 4.0 + i * 6.0, -22.5, DECK + 0.2, DECK + 2.0,
-                  4.6, 4.4, steel), width=0.09, segments=1)
+                  4.6, 4.4, roofd), width=0.09, segments=1)
     for i in range(2):
         bevel(box(f"cond_n{i}", 20.0 + i * 6.5, -12.0, DECK + 0.2, DECK + 1.7,
-                  5.0, 5.6, steel), width=0.09, segments=1)
+                  5.0, 5.6, roofd), width=0.09, segments=1)
     bevel(box("plant_ph", 24.0, -21.0, DECK + 0.2, DECK + 3.2, 7.0, 5.2, trim),
           width=0.09, segments=1)
     bevel(box("stair_ph", -4.5, -21.5, DECK + 0.2, DECK + 3.4, 4.8, 4.4, trim),
           width=0.09, segments=1)
-    box("duct", 13.0, -17.0, DECK + 0.2, DECK + 1.0, 22.0, 1.3, steel)
+    box("duct", 13.0, -17.0, DECK + 0.2, DECK + 1.0, 22.0, 1.3, roofd)
     # the Hyde-side valley, between the tall block and the auditorium
     for i in range(3):
         bevel(box(f"vent{i}", -18.0, -12.0 + i * 7.0, DECK + 0.2, DECK + 1.5,
-                  3.2, 3.0, steel), width=0.08, segments=1)
+                  3.2, 3.0, roofd), width=0.08, segments=1)
     bevel(box("tank", -18.5, 8.0, DECK + 0.2, DECK + 2.4, 4.0, 4.0, trim),
           width=0.09, segments=1)
 
