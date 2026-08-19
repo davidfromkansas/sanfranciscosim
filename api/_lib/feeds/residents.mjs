@@ -96,11 +96,6 @@ const votingConfig = {
 // needs about twelve — one post at five voters, two-ish replies at three — so
 // this is roughly double headroom.
 const MAX_VOTES_PER_REFRESH = 24;
-// A cold start writes eight posts and twenty-odd replies at once and needs
-// about a hundred votes to cover them. Rationing it to a normal tick left most
-// of the subreddit sitting at zero, which reads as broken rather than as quiet.
-// One-off, and about two cents.
-const FIRST_BUILD_VOTES = 130;
 
 const OPENING_THREADS = 8; // how many posts a cold start puts up, so a fresh
 // deploy is a subreddit rather than one lonely thread
@@ -115,12 +110,12 @@ const RETIRE_AFTER = 24 * 60 * 60 * 1000;
 // backstop against runaway generation, not a limit the normal rate walks into.
 const MAX_THREADS = 200;
 const REFRESH_MS = 10 * 60 * 1000;
+const READ_TTL_MS = 30 * 1000;
 // The budget rail. Everything else here is taste; this is the line that stops a
 // bad day costing real money. Ten covers the worst case for one tick — a post
 // whose probability earns it the full eight replies, plus a spare for resuming
 // a thread the previous tick cut short. The average tick spends about three.
 const MAX_MESSAGES_PER_REFRESH = 10;
-const FIRST_BUILD_MESSAGES = 34;
 
 // ------------------------------------------------------------------- prompts
 
@@ -817,78 +812,9 @@ async function persist() {
   }
 }
 
-async function fetchSubreddit() {
-  await restore();
-  const people = await loadCast();
-  if (!people.length)
-    throw new Error("personas.json has no people with a paragraph");
-
-  const now = Date.now();
-  const cold = live.length === 0;
-  const allowance = cold ? FIRST_BUILD_MESSAGES : MAX_MESSAGES_PER_REFRESH;
-  let budget = allowance;
-  let failures = 0;
-  // One accountant for the whole refresh. Returns false when the allowance is
-  // gone, which is how a thread's continuation loop learns to stop without
-  // knowing anything about budgets.
-  const spend = () => (budget > 0 ? (budget--, true) : false);
-  // Voting gets its own allowance so a busy tick cannot quietly spend the
-  // generation budget on opinions about posts that were never written.
-  let voteBudget = cold ? FIRST_BUILD_VOTES : MAX_VOTES_PER_REFRESH;
-  const spendVote = () => (voteBudget > 0 ? (voteBudget--, true) : false);
-
-  // Threads leave on age alone. Evicting a finished conversation to make room
-  // seems tidy and is not — a long argument gets replaced by somebody's opening
-  // line and the panel visibly loses posts. The column scrolls; it has room.
-  for (let i = live.length - 1; i >= 0; i--) {
-    if (now - live[i].startedAt > RETIRE_AFTER) live.splice(i, 1);
-  }
-
-  // Any thread the budget cut short last time resumes before anything new is
-  // started: finishing a conversation beats beginning one.
-  for (const thread of live.filter((t) => !t.done)) {
-    if (budget <= 0) break;
-    try {
-      await growThread(people, thread, spend, spendVote);
-    } catch (error) {
-      failures++;
-      console.warn(`${SUBREDDIT.name}: reply failed — ${error.message}`);
-      if (failures > 6) break;
-    }
-  }
-
-  const wanted = cold ? OPENING_THREADS : NEW_THREADS_PER_REFRESH;
-  for (let i = 0; i < wanted && budget > 0 && live.length < MAX_THREADS; i++) {
-    if (!spend()) break;
-    let thread;
-    try {
-      thread = await openThread(people, spendVote);
-    } catch (error) {
-      failures++;
-      console.warn(`${SUBREDDIT.name}: post failed — ${error.message}`);
-      if (failures > 3) break;
-      continue;
-    }
-    live.push(thread);
-    // Straight into its own continuation loop, so a post and its discussion
-    // arrive together rather than the post sitting alone until the next tick.
-    try {
-      await growThread(people, thread, spend, spendVote);
-    } catch (error) {
-      failures++;
-      console.warn(`${SUBREDDIT.name}: reply failed — ${error.message}`);
-      if (failures > 6) break;
-    }
-  }
-
-  // Nothing at all written on a cold start IS a real failure — throw, and the
-  // registry serves last-good or `empty` rather than an empty subreddit.
-  if (!live.length)
-    throw new Error("every generation failed — nothing to serve");
-
-  live.sort((a, b) => b.startedAt - a.startedAt);
-  await persist();
-
+// One payload shape for both paths, so a read and a write can never disagree
+// about what the feed looks like.
+function shape(people, written) {
   // Totals are DERIVED on the way out, never stored. The individual votes stay
   // canonical, so a score can always be explained by naming the residents who
   // produced it — and the number on screen cannot drift from the records.
@@ -901,7 +827,6 @@ async function fetchSubreddit() {
   // Everyone who actually spoke, once, with the paragraph they were written
   // from. The panel needs it to say who somebody is when you click their name,
   // and sending it per-post would repeat ~900 characters for every reply.
-  // Bounded by how many people are on screen, not by the size of the cast.
   const speaking = new Set();
   for (const t of live) {
     speaking.add(t.authorId);
@@ -934,20 +859,131 @@ async function fetchSubreddit() {
     },
     community: SUBREDDIT.name,
     goal: SUBREDDIT.goal,
-    // The rules verbatim, so the panel shows exactly what every resident is
-    // told when they write. Empty today; populate the array and both the
-    // prompts and this list pick it up with no other change.
     rules: SUBREDDIT.rules,
     model: MODEL,
     cast: people.length,
-    written: allowance - budget,
+    written,
     threads: scored,
   };
 }
 
+// What a visitor gets: whatever has been written, restored from the blob if this
+// instance is cold. It NEVER generates. A cold build is roughly 160 language-model
+// round trips and a serverless function has sixty seconds, so asking a visitor to
+// trigger one produced FUNCTION_INVOCATION_TIMEOUT in production — on the request
+// of the first person to arrive. Writing belongs on the cron.
+export async function readSubreddit() {
+  await restore();
+  const people = await loadCast();
+  const now = Date.now();
+  for (let i = live.length - 1; i >= 0; i--) {
+    if (now - live[i].startedAt > RETIRE_AFTER) live.splice(i, 1);
+  }
+  live.sort((a, b) => b.startedAt - a.startedAt);
+  return shape(people, 0);
+}
+
+// A fresh deploy starts with an empty blob and fills two threads a tick. Held
+// to one tick per ten minutes that is over an hour of near-empty panel, so
+// while the feed is below its opening count the tick runs every minute and
+// only then settles into the jittered cadence. One blob read to decide.
+export async function stillFilling() {
+  try {
+    await restore();
+    return live.length < OPENING_THREADS;
+  } catch {
+    return false;
+  }
+}
+
+export async function advanceSubreddit() {
+  await restore();
+  const people = await loadCast();
+  if (!people.length)
+    throw new Error("personas.json has no people with a paragraph");
+
+  const now = Date.now();
+  // Every invocation gets the SAME small allowance, including the first. A
+  // serverless function has sixty seconds and each generation is a round trip;
+  // an eight-thread opening build cannot fit and must not be attempted. A cold
+  // deploy instead fills over successive ticks, which is slower to watch and
+  // the only version that completes.
+  const allowance = MAX_MESSAGES_PER_REFRESH;
+  let budget = allowance;
+  let failures = 0;
+  // One accountant for the whole refresh. Returns false when the allowance is
+  // gone, which is how a thread's continuation loop learns to stop without
+  // knowing anything about budgets.
+  const spend = () => (budget > 0 ? (budget--, true) : false);
+  // Voting gets its own allowance so a busy tick cannot quietly spend the
+  // generation budget on opinions about posts that were never written.
+  let voteBudget = MAX_VOTES_PER_REFRESH;
+  const spendVote = () => (voteBudget > 0 ? (voteBudget--, true) : false);
+
+  // Threads leave on age alone. Evicting a finished conversation to make room
+  // seems tidy and is not — a long argument gets replaced by somebody's opening
+  // line and the panel visibly loses posts. The column scrolls; it has room.
+  for (let i = live.length - 1; i >= 0; i--) {
+    if (now - live[i].startedAt > RETIRE_AFTER) live.splice(i, 1);
+  }
+
+  // Any thread the budget cut short last time resumes before anything new is
+  // started: finishing a conversation beats beginning one.
+  for (const thread of live.filter((t) => !t.done)) {
+    if (budget <= 0) break;
+    try {
+      await growThread(people, thread, spend, spendVote);
+    } catch (error) {
+      failures++;
+      console.warn(`${SUBREDDIT.name}: reply failed — ${error.message}`);
+      if (failures > 6) break;
+    }
+  }
+
+  // Below the opening count the feed is still filling, so take two a tick; at
+  // steady state it is one, whatever the window allows.
+  const wanted = live.length < OPENING_THREADS ? 2 : NEW_THREADS_PER_REFRESH;
+  for (let i = 0; i < wanted && budget > 0 && live.length < MAX_THREADS; i++) {
+    if (!spend()) break;
+    let thread;
+    try {
+      thread = await openThread(people, spendVote);
+    } catch (error) {
+      failures++;
+      console.warn(`${SUBREDDIT.name}: post failed — ${error.message}`);
+      if (failures > 3) break;
+      continue;
+    }
+    live.push(thread);
+    // Straight into its own continuation loop, so a post and its discussion
+    // arrive together rather than the post sitting alone until the next tick.
+    try {
+      await growThread(people, thread, spend, spendVote);
+    } catch (error) {
+      failures++;
+      console.warn(`${SUBREDDIT.name}: reply failed — ${error.message}`);
+      if (failures > 6) break;
+    }
+  }
+
+  // Nothing at all written on a cold start IS a real failure — throw, and the
+  // registry serves last-good or `empty` rather than an empty subreddit.
+  if (!live.length)
+    throw new Error("every generation failed — nothing to serve");
+
+  live.sort((a, b) => b.startedAt - a.startedAt);
+  await persist();
+  return shape(people, allowance - budget);
+}
+
 registerFeed("feed", {
-  ttl: REFRESH_MS,
-  fetcher: fetchSubreddit,
+  // Reads are one blob GET, so they can be frequent. They have to be: the tick
+  // that wrote the new post may have run on a different serverless instance
+  // than the one answering this visitor, and the only way that instance learns
+  // about it is by re-reading. A ten-minute TTL here would hide a fresh post
+  // for ten more minutes.
+  ttl: READ_TTL_MS,
+  fetcher: readSubreddit,
   empty: { live: false, threads: [] },
   describe: `${SUBREDDIT.name} — what the residents are posting today`,
   // A generation takes a while and costs money: do not retry a broken gateway

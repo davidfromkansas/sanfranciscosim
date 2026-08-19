@@ -16,7 +16,7 @@
     },
     "api/[...path].mjs": {
       "includeFiles": "api/_data/personas.json",
-      "maxDuration": 60
+      "maxDuration": 120
     }
   },
   "headers": [

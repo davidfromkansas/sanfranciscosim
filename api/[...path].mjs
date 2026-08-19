@@ -6,12 +6,7 @@
 //
 // Adding a feed touches only api/_lib/feeds/ — see the recipe in feedcore.mjs.
 
-import {
-  forceRefresh,
-  getFeed,
-  serveFeed,
-  serveLive,
-} from "./_lib/feedcore.mjs";
+import { getFeed, serveFeed, serveLive } from "./_lib/feedcore.mjs";
 import "./_lib/feeds/index.mjs";
 
 // The scheduled tick (vercel.json → crons). Without it the subreddit only
@@ -44,20 +39,27 @@ async function serveTick(req, res) {
   // invocations do nothing and return immediately — that is the mechanism, not
   // a fault. `?force=1` skips the check for testing.
   const forced = new URL(req.url, "http://localhost").searchParams.get("force");
-  if (!forced && !postIsDue()) {
+  if (!forced && !postIsDue() && !(await stillFilling())) {
     res.status(200).json({ ticked: false, reason: "not this minute" });
     return;
   }
+  // Generation happens HERE and nowhere else. /api/feed only reads, so a
+  // visitor never waits on a language model and never times out behind one.
   const started = Date.now();
-  const failed = await forceRefresh(entry);
-  const data = entry.data ?? {};
-  res.status(failed ? 503 : 200).json({
-    ticked: !failed,
-    error: failed ?? null,
-    ms: Date.now() - started,
-    threads: data.threads?.length ?? 0,
-    written: data.written ?? 0,
-  });
+  try {
+    const data = await advanceSubreddit();
+    publish(entry, data);
+    res.status(200).json({
+      ticked: true,
+      ms: Date.now() - started,
+      threads: data.threads.length,
+      written: data.written,
+    });
+  } catch (error) {
+    res
+      .status(503)
+      .json({ ticked: false, error: String(error?.message || error) });
+  }
 }
 
 export default async function handler(req, res) {

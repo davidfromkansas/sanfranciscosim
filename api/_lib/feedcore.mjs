@@ -60,6 +60,15 @@ export const allFeeds = () => [...feeds.values()];
 // single-flight promise as ensureFresh, so a cron firing while a visitor's
 // refresh is already running joins it rather than starting a second one — and
 // paying for the same generation twice.
+// Hand the registry a payload produced elsewhere. The subreddit generates on
+// the cron rather than inside its fetcher, because a visitor must never wait on
+// a language model — this is how the result of that work gets served.
+export function publish(entry, data) {
+  entry.data = data;
+  entry.fetchedAt = Date.now();
+  entry.lastError = null;
+}
+
 export async function forceRefresh(entry) {
   entry.fetchedAt = 0;
   entry.backoffUntil = 0;
