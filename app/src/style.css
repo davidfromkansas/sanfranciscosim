@@ -1006,14 +1006,15 @@ body.rs-reading .rs-create-fab {
     padding: 18px 16px 16px;
   }
 
-  .rs-create-fab {
-    right: 16px;
-    bottom: calc(
-      var(--rs-sheet-shut) + 16px + env(safe-area-inset-bottom, 0px)
-    );
+  /* Shut, the sheet is a bar over the city and the screen belongs to the
+     diorama: the offer is to look at it, not to write a post. The button comes
+     with the subreddit and leaves with it. */
+  #feed:not(.rs-open) ~ .rs-create-fab {
+    display: none;
   }
 
-  #feed.rs-open ~ .rs-create-fab {
+  .rs-create-fab {
+    right: 16px;
     bottom: calc(16px + env(safe-area-inset-bottom, 0px));
   }
 
