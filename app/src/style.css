@@ -25,16 +25,21 @@ body {
 /* The width the residents' feed covers on the right of the window. ONE source
    of truth: the panel claims it and the right-anchored chrome steps out of it.
    The canvas keeps the full window and simply renders behind the panel — the
-   city carries on under there. Zero below the desktop breakpoint, the same
-   900 px the quality heuristic uses: a quarter of a phone screen is a gutter,
-   not a column. */
+   city carries on under there. Zero below the desktop breakpoint — there the
+   feed is a bottom sheet, not a column, so nothing on the right has to move.
+
+   Clamped, not a bare 25vw. A quarter of a 1200 px laptop window is 300 px and
+   a quarter of a 1024 px one is 256 px, which is narrower than the header type
+   was ever drawn for: the name wrapped, the description ran to four lines and
+   the rules button fell off its row. The floor keeps a readable column at any
+   window the panel appears in; the ceiling stops it eating a 5K display. */
 :root {
   --feed-w: 0px;
 }
 
 @media (min-width: 900px) {
   :root {
-    --feed-w: 25vw;
+    --feed-w: clamp(310px, 25vw, 440px);
   }
 }
 
@@ -48,7 +53,7 @@ body {
 /* The feed of residents talking. White for now, but wearing the city's ink
    border so its edge reads as a panel and not a torn canvas. */
 #feed {
-  display: none;
+  display: block;
   position: fixed;
   top: 0;
   right: 0;
@@ -59,12 +64,14 @@ body {
   overflow-y: auto;
   overscroll-behavior: contain;
   z-index: 8;
-}
-
-@media (min-width: 900px) {
-  #feed {
-    display: block;
-  }
+  /* The header sizes itself against the PANEL, not the window. Everything in
+     it is set in cqi below, so one set of numbers covers a 310 px column on a
+     laptop and a 390 px sheet on a phone — the two cases that used to need
+     separate breakpoints and drifted apart. */
+  container-type: inline-size;
+  /* Shared by the header's side padding and the banner's negative margin, so
+     the band still bleeds to both edges when the padding scales. */
+  --rs-pad: clamp(11px, 3.6cqi, 16px);
 }
 
 #attribution {
@@ -169,15 +176,15 @@ button:hover {
   z-index: 2;
   background: #fffdf8;
   border-bottom: 2px solid #2b2118;
-  padding: 0 16px 10px;
+  padding: 0 var(--rs-pad) 10px;
 }
 
 /* The banner. The gradient is not a placeholder — it is what shows if the image
    is missing, so an absent file reads as a plain painted header rather than a
    broken picture. */
 .rs-banner {
-  height: 86px;
-  margin: 0 -16px;
+  height: clamp(62px, 20cqi, 90px);
+  margin: 0 calc(-1 * var(--rs-pad));
   border-bottom: 2px solid #2b2118;
   background:
     url("/feed/banner.webp") center / cover no-repeat,
@@ -196,9 +203,9 @@ button:hover {
 /* Only the ICON breaks the banner's edge. Lifting the whole row dragged the
    name up with it and the banner cut through the type. */
 .rs-icon {
-  width: 46px;
-  height: 46px;
-  margin-top: -26px;
+  width: clamp(36px, 10.5cqi, 46px);
+  height: clamp(36px, 10.5cqi, 46px);
+  margin-top: clamp(-26px, -6cqi, -20px);
   flex: none;
   border-radius: 50%;
   border: 2px solid #2b2118;
@@ -219,14 +226,14 @@ button:hover {
 
 .rs-name {
   margin: 0;
-  font-size: 25.5px;
+  font-size: clamp(18px, 5.9cqi, 25.5px);
   font-weight: 800;
   letter-spacing: -0.2px;
 }
 
 .rs-goal {
   margin: 3px 0 0;
-  font-size: 16.5px;
+  font-size: clamp(12.5px, 3.8cqi, 16.5px);
   line-height: 1.45;
   color: #6b5a48;
 }
@@ -244,6 +251,8 @@ button:hover {
   flex-direction: column;
   gap: 10px;
   padding: 10px;
+  /* Clears the iPhone home indicator when the feed is a bottom sheet. */
+  padding-bottom: calc(10px + env(safe-area-inset-bottom, 0px));
 }
 
 /* The card. A 2 px ink border and a hard offset shadow are this project's
@@ -543,7 +552,7 @@ button:hover {
   align-items: center;
   gap: 6px;
   margin: 4px 0 0;
-  font-size: 12px;
+  font-size: clamp(11px, 2.8cqi, 12.5px);
   font-weight: 700;
   color: #3f8f6b;
 }
@@ -590,7 +599,7 @@ button:hover {
   align-items: baseline;
   flex-wrap: wrap;
   justify-content: flex-end;
-  gap: 6px 12px;
+  gap: 5px 8px;
 }
 
 .rs-name-row .rs-name {
@@ -600,9 +609,9 @@ button:hover {
 .rs-rules-open {
   appearance: none;
   flex: none;
-  padding: 5px 9px;
+  padding: clamp(4px, 1.5cqi, 5px) clamp(7px, 2.6cqi, 9px);
   font:
-    700 10.5px/1 -apple-system,
+    700 clamp(9px, 2.65cqi, 10.5px) / 1 -apple-system,
     BlinkMacSystemFont,
     "Segoe UI",
     Roboto,
@@ -658,4 +667,204 @@ button:hover {
   border-radius: 12px;
   color: #6b5a48;
   background: #f7f2e6;
+}
+
+/* ------------------------------------------------ the feed on small screens */
+
+/* Below the desktop breakpoint a 25% column is a gutter, so the feed becomes a
+   bottom sheet instead: collapsed to a single bar by default, because on a
+   phone the city IS the product and a panel that opens over two thirds of it
+   uninvited is a wall. Tapping the bar raises it. The header type needs no
+   separate rules here — it is set in container units, and a full-width sheet
+   is a wider container than a laptop's column, so it lands at full size. */
+@media (max-width: 899px) {
+  :root {
+    /* Both heights live here because the map credit has to clear them, and a
+       sheet that moves without the credit moving is how the OSM attribution
+       ends up underneath a panel. Collapsed is not measured at runtime — the
+       bar's height is set entirely by type sizes in this file, so it is a
+       number we already know rather than one to observe. */
+    --rs-sheet-open: 100svh;
+    --rs-sheet-shut: 62px;
+  }
+
+  #feed {
+    top: auto;
+    left: 0;
+    right: 0;
+    width: 100%;
+    /* Open, it takes the whole screen. A partial sheet gave the feed a third
+       of a phone and the city a third, and neither was worth looking at; you
+       are either reading the subreddit or watching the diorama. svh is the
+       viewport with the browser's chrome showing — the vh line is the fallback
+       where svh is not understood, and it over-shoots by the toolbar's height
+       rather than falling short. */
+    height: 100vh;
+    height: var(--rs-sheet-open);
+    border-left: 0;
+    border-top: 2px solid #2b2118;
+    border-radius: 16px 16px 0 0;
+    box-shadow: 0 -6px 22px rgba(20, 16, 12, 0.28);
+  }
+
+  /* Full screen is not a card, so it drops the corners and the lifted edge. */
+  #feed.rs-open {
+    border-top: 0;
+    border-radius: 0;
+    box-shadow: none;
+  }
+
+  /* The banner is the first thing in the panel, so at full height it sits
+     under the status bar. Grow it by exactly that much instead of letting the
+     clock land on the Golden Gate. */
+  #feed.rs-open .rs-banner {
+    height: calc(clamp(62px, 20cqi, 90px) + env(safe-area-inset-top, 0px));
+  }
+
+  /* Collapsed: the sheet is only as tall as its own bar. Everything that makes
+     it a feed is dropped rather than scrolled past, so the bar cannot be
+     dragged open by accident and nothing below it can be half-read. */
+  #feed:not(.rs-open) {
+    height: auto;
+    overflow: hidden;
+    padding-bottom: env(safe-area-inset-bottom, 0px);
+  }
+
+  #feed:not(.rs-open) .rs-banner,
+  #feed:not(.rs-open) .rs-goal,
+  #feed:not(.rs-open) .rs-status,
+  #feed:not(.rs-open) .rs-rules-open,
+  #feed:not(.rs-open) .rs-list {
+    display: none;
+  }
+
+  /* With no banner there is no edge for the icon to break, so it sits on the
+     line like an avatar in a message list. */
+  #feed:not(.rs-open) .rs-icon {
+    width: 32px;
+    height: 32px;
+    margin-top: 0;
+  }
+
+  #feed:not(.rs-open) .rs-head {
+    padding-top: 9px;
+    padding-bottom: 9px;
+    /* The handle is out of flow here, so the bar has to leave room for it or a
+       long online count runs underneath it. */
+    padding-right: calc(var(--rs-pad) + 44px);
+    border-bottom: 0;
+  }
+
+  #feed:not(.rs-open) .rs-bar {
+    margin-top: 0;
+  }
+
+  #feed:not(.rs-open) .rs-name {
+    font-size: 16px;
+  }
+
+  #feed:not(.rs-open) .rs-online {
+    margin-top: 1px;
+    font-size: 11px;
+  }
+
+  /* The attribution sits at the bottom-left of the window, which is now under
+     the sheet. Ride above it, and keep riding it when the sheet opens — this
+     is a licence credit for a map that is still on screen, so it does not get
+     to be covered. #attribution is the next sibling of #feed, which is what
+     makes the open state reachable without a line of JavaScript. */
+  #attribution {
+    bottom: calc(var(--rs-sheet-shut) + 9px);
+    max-width: calc(100vw - 20px);
+  }
+
+  /* Open, the feed covers the map completely. There is no map on screen to
+     credit, so the credit goes with it — and comes back the moment the sheet
+     is lowered. */
+  #feed.rs-open ~ #attribution {
+    display: none;
+  }
+
+  /* A modal in a phone-width window wants the screen, not a card floating in
+     the middle of it. */
+  .rs-modal-back {
+    padding: 14px;
+    align-items: flex-end;
+  }
+
+  .rs-modal {
+    width: 100%;
+    max-height: 82svh;
+    padding: 18px 16px 16px;
+  }
+}
+
+/* The handle that raises and lowers the sheet. Hidden on desktop, where the
+   panel is simply always there. */
+.rs-sheet {
+  display: none;
+}
+
+@media (max-width: 899px) {
+  .rs-sheet {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    flex: none;
+    /* Out of the bar's flow and onto the sheet's corner. In flow it took 44 px
+       off a 375 px row and pushed the rules button onto a line of its own; on
+       the corner it also reads as the sheet's own handle rather than another
+       control belonging to the community. `.rs-head` is sticky, so it is the
+       containing block. */
+    position: absolute;
+    /* Clears the notch once the sheet reaches the top of the screen. */
+    top: calc(12px + env(safe-area-inset-top, 0px));
+    right: var(--rs-pad);
+    z-index: 3;
+    width: 34px;
+    height: 34px;
+    appearance: none;
+    padding: 0;
+    color: #2b2118;
+    background: #f5ead4;
+    border: 2px solid #2b2118;
+    border-radius: 50%;
+    box-shadow: 2px 2px 0 #2b2118;
+    cursor: pointer;
+  }
+
+  .rs-sheet:active {
+    transform: translate(2px, 2px);
+    box-shadow: none;
+  }
+
+  /* Collapsed there is no banner to sit on, only the one bar, so it centres on
+     that instead of hanging from a top edge that is no longer there. */
+  #feed:not(.rs-open) .rs-sheet {
+    top: 50%;
+    transform: translateY(-50%);
+  }
+
+  #feed:not(.rs-open) .rs-sheet:active {
+    transform: translateY(-50%) translate(2px, 2px);
+  }
+
+  /* One glyph, rotated, so the control reads as the same object in both states
+     rather than two buttons that happen to share a spot. */
+  .rs-sheet svg {
+    display: block;
+    width: 15px;
+    height: 15px;
+    transition: transform 0.2s ease;
+  }
+
+  #feed.rs-open .rs-sheet svg {
+    transform: rotate(180deg);
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .rs-sheet svg {
+    transition: none;
+  }
 }
