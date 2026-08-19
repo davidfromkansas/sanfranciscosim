@@ -220,3 +220,132 @@ contact sheet, the aerial day and night renders and the numbers in §2 were
 presented at the same time so the approval has something behind it; no
 iteration was requested. Nothing was integrated by this stage — the production
 manifest, `pipeline/lib/landmarks.mjs` and the baked tiles are untouched.
+
+---
+
+## 10. Stage 5 — integration (batch mode), 18 August 2026
+
+Run from `docs/asset-plans/INTEGRATION-PROMPT.md` Part 1, Case B, in batch mode:
+the branch carries **source only**, and the city is baked once for the whole
+batch by `docs/asset-pipeline/BATCH-INTEGRATE.md`.
+
+### What changed
+
+| File | Change |
+|---|---|
+| `app/public/sf-assets/landmarks/424-brannan.glb` | new, 356,972 bytes, byte-identical to `artifacts/424-brannan/424-brannan.glb` |
+| `app/public/sf-assets/landmarks_manifest.json` | +19 lines, one appended entry — **appended as text**, never re-serialised, so no other landmark's `11.0` became `11` |
+| `pipeline/lib/landmarks.mjs` | +42 lines, one `424Brannan` entry **with no `exclude`** and the measurement that justifies it |
+
+`git diff --name-only origin/main` lists nothing under `app/public/tiles/` or
+`api/_data/` — the batch-mode sanity check.
+
+### The exclusion decision, measured
+
+Every other landmark in the registry needs an `exclude` radius to delete the
+procedural building standing where its GLB goes. This one has no procedural
+building. Measured against the real bake inputs from the anchor, by nearest ring
+**vertex** or centroid — which is what `excluded()` fires on:
+
+```
+  10.27 m  Overture b9c9690e-43b        <- the first thing at risk
+  10.63 m  DataSF SF3776151 (426 Brannan, the Brickhouse block)
+  19.58 m  Overture b9c91621-afe
+  21.27 m  DataSF SF3776015 (434 Brannan)
+  25.18 m  DataSF SF3776106
+```
+
+Footprints with a **centroid inside the parcel: DataSF 0, Overture 0.** So the
+safe band is (0, 10.27) m and every radius in it drops exactly nothing. The entry
+therefore ships **without** `exclude`; `exclusionZones()` skips a falsy value.
+
+Three independent proofs that this makes the geometry bake a no-op:
+
+1. `exclusionZones()` is **byte-identical** before and after the registry edit —
+   99 zones, sha256 `c6af9b30…`, over 96 → 97 landmarks.
+2. A full re-bake of the three geometry tiers from `pipeline/data` produced
+   **585/585 building tiles, 522/522 street tiles and 549/549 landcover tiles
+   byte-identical** to the committed ones. (`buildings.json` differs only because
+   `pipeline/out` writes it pretty and the publish step minifies it; parsed, the
+   two are equal.) That snapshot reproducing `main` exactly also means there is
+   no data-vintage drift to explain.
+3. `node pipeline/audit.mjs` check **1.6 PASS** — "no procedural footprint inside
+   a bespoke landmark exclusion zone: 99 zones over 97 landmarks clear".
+
+Only the **context** tier changes, to give the lot a pick box, a search-index row
+and a `context/landmarks.json` entry; the batch bake regenerates it. Audit also
+reports 1.2b, 1.3c and 1.7b as FAIL — all three are pre-existing properties of
+the source data (height percentile vs the DataSF roof distribution, the Terrarium
+DEM's 90.5 m Telegraph Hill against a surveyed 84 m, one of 792 sampled trees
+30 m offshore) and none of them touch a landmark exclusion.
+
+### Local QA
+
+Headless Chrome against the Vite dev server on this worktree (91 manifest
+entries served, this entry among them — checked before trusting anything).
+
+| Check | Result |
+|---|---|
+| id round-trip | `camelId('424-brannan')` = `424Brannan` = the registry id — **PASS** |
+| merge line | `sf-assets: 424-brannan merged 22 objects / 20 materials -> batched (7060 tris body); uniform x1.0000 at 3697, -1092` — **PASS** |
+| loader scale | **x1.0000** — the drape's `targetHeightM` = bbox-extent rule lands exactly |
+| placement | pivot `3697.08, -1091.52` against the computed anchor `3697.078, -1091.514` — **PASS** |
+| exactly one building | **PASS** — no procedural twin exists for this site, and no baked footprint has a centroid in the parcel |
+| footprint size | the Z reads at its real 88.7 x 59.6 m against the neighbouring block faces — **PASS** |
+| orientation | authored in true-world heading, no `yawDeg` override; the neck meets Brannan and the long fence meets Ritch — **PASS** |
+| terrain seating | **PASS** — no floating, no sinking; the plate follows the 1.47 m fall |
+| night glow | **PASS** — the PUBLIC PARKING sign reads red-and-white at the Brannan corner, booth window and lamp heads faint, everything else dark |
+| draw calls | **82** at the landmark, 89 on the drill pass — budget is 300 — **PASS** |
+| lint / build | `npm run lint` clean; `npm run build` succeeds — **PASS** |
+| fallback drill | **PASS** — see below |
+
+Screenshots: `424-brannan-in-app-day.png`, `424-brannan-in-app-night.png`.
+
+### Fallback drill
+
+GLB moved aside, page reloaded: the app boots, the city is alive, 84 other
+landmarks stay live, draw calls 89, and exactly **one** warning appears —
+
+```
+sf-assets: 424-brannan failed to load (Unexpected token '<', "<!doctype "... is not valid JSON)
+```
+
+The parse error rather than a 404 is Vite's dev server answering a missing
+`public/` path with the SPA `index.html` at HTTP 200; the drill still proves what
+it is for. Case B: the site degrades to **empty ground**, which is expected here
+and is also exactly what the real parcel is. The file was restored afterwards.
+
+### One FAIL, and it is not this asset
+
+On the **stock** `app/src/assets.js` constants the QA pass reports `failed: 1`.
+The measurement:
+
+```
+with 424-brannan present:  landmark-bodies  1,187,405 / 1,200,000 verts, 83 geoms   -> the 84th fails
+with 424-brannan removed:  landmark-bodies  1,187,405 / 1,200,000 verts, 83 geoms   -> identical
+with BODY_VERTS raised:    landmark-bodies  1,208,586 / 2,000,000 verts, 84 geoms   -> failed: 0
+```
+
+The shared landmark `BatchedMesh` reserve (`BODY_VERTS = 1_200_000`) is **already
+98.95% consumed by `origin/main` alone** in the SoMa/South Park cluster — the
+1,187,405 / 83 figures are identical with this landmark's file removed, and match
+what was recorded on `414-brannan` earlier the same day. Whichever landmark
+arrives 84th loses; on one run that was `555-california`, on another it was this
+one. Raising the reserve to 2,000,000 / 6,000,000 makes `failed` go to 0 and
+places all 84 including this one at `uniform x1.0000`, which is the proof that
+the asset itself is sound. **That change was reverted before committing** — a
+landmark branch must not carry an `app/src/assets.js` edit, and raising the
+reserve for real is a GPU-memory decision for the owner (1.2M → 2.0M vertices is
+roughly 43 → 72 MB of body buffer, plus indices 14 → 24 MB).
+
+### A note on the merge line's triangle count
+
+`(7060 tris body)` against a manifest `tris` of 8,940 is not dropped geometry:
+`place()` computes it as `bodyGeometry.attributes.position.count / 3`, i.e.
+vertices ÷ 3, and the merged geometry is indexed because the meshopt pass
+reindexes every GLB. Every shipped landmark shows the same understatement.
+
+### Gate 5
+
+Local QA PASS table above; the ship decision (push / PR / deploy) is the user's
+and has not been taken. Nothing has been pushed.

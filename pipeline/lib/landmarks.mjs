@@ -540,6 +540,46 @@ export const LANDMARKS = [
     exclude: 11,
     camera: { distance: 170, yaw: 90, pitch: 26 },
   },
+  // 424 Brannan Street — a 2,026 m2 surface parking lot, and the ONLY entry in
+  // this registry with no `exclude`. That is measured, not an oversight.
+  //
+  // Every other landmark here needs a radius to delete the procedural building
+  // standing where its GLB goes. This site has no procedural building: DataSF's
+  // footprint layer returns ZERO records for parcel 3776455, the assessor
+  // carries it as class V vacant with $0 of improvements, and a scan of the
+  // committed tiles (23_13 plus 22_13, 23_14, 24_13) finds no footprint whose
+  // centroid lands inside the parcel. So the whole risk here runs the other
+  // way: any radius large enough to matter eats a neighbour.
+  //
+  // Measured against the real bake inputs from this anchor — nearest ring
+  // VERTEX or centroid, which is what excluded() fires on:
+  //
+  //   10.27 m  Overture b9c9690e-43b   <- the first thing at risk
+  //   10.63 m  DataSF SF3776151 (426 Brannan, the Brickhouse block)
+  //   19.58 m  Overture b9c91621-afe
+  //   21.27 m  DataSF SF3776015 (434 Brannan)
+  //   25.18 m  DataSF SF3776106
+  //
+  // Footprints with a centroid inside the parcel: DataSF 0, Overture 0. So the
+  // safe band is (0, 10.27) and EVERY radius in it drops exactly nothing —
+  // there is no value of `exclude` that does useful work, and omitting the key
+  // is what exclusionZones() wants (it skips a falsy `exclude`). The buildings
+  // and toy tiers are therefore bit-identical across this landmark's re-bake;
+  // only the context tier changes, to give the lot a pick box and a search row.
+  // Do not "fix" this by adding a radius: 11 m, the value 400 Brannan uses
+  // 60 m away, would delete the Brickhouse.
+  {
+    id: '424Brannan',
+    name: '424 Brannan Street Parking',
+    lon: -122.3954857,
+    lat: 37.7798744,
+    height: 8.5649,
+    // The eye stands over Brannan (bearing 135 = 180 - yaw), which is the only
+    // angle from which the 15.8 m neck, the gate and the sign all read at once;
+    // straight down the Ritch fence foreshortens 68 m of lot into a line. 260 m
+    // suits an 88 m site (cf. 400Brannan at 170 for 24 m).
+    camera: { distance: 260, yaw: 45, pitch: 30 },
+  },
   {
     // Shell service station, across 3rd Street from 550 Third. The asset is a
     // forecourt, not a building, and the lot carries TWO baked footprints — the
