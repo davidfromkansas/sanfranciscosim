@@ -32,7 +32,7 @@ prompt, Part 2 is the research and design dossier behind it.
 | Manifest id | `8-mission` |
 | Existing procedural builder | none — new landmark (needs a `pipeline/lib/landmarks.mjs` entry and a re-bake, see 2.13) |
 | WGS84 anchor | `-122.3932805, 37.7937365` |
-| Target height | **28.66 m** to the turret crown (LiDAR max, measured); main Mission-end parapet **25.10 m** (LiDAR mode, measured); middle-wing parapet **19.64 m** (LiDAR median, measured); north-west wing ~13.8 m (estimated) |
+| Target height | **28.66 m** to the turret crown (LiDAR max, measured); main Mission-end parapet **25.10 m** (LiDAR mode, measured); middle-wing parapet **19.64 m** (LiDAR median, measured); north-west wing **14.18 m** (derived — see `artifacts/8-mission/REFERENCE.md`) |
 | Footprint | 64.08 m (Steuart / Embarcadero long axis, bearing 135.4°) x 42.07 m (Mission axis); L-shaped, 2,133 m2 measured from OSM way 193054134 |
 | Triangle cap | 26,000 |
 | Category | `7` (hotel) |
@@ -89,7 +89,7 @@ and do not copy visual instructions from unrelated prompts.
 
 - The **stepped massing**. This is the whole brief and the thing that fails silently.
   Three plateaus, from the Mission (south-east) end down toward the Harry Bridges Plaza
-  (north-west) end: **25.10 m**, **19.64 m**, and about **13.8 m**. The tall end is on
+  (north-west) end: **25.10 m**, **19.64 m**, and **14.18 m**. The tall end is on
   Mission, the low end is at the plaza, and the roofs in between are terraces, not
   leftovers. Read 2.7 before laying the first box.
 - The **circular turret** at the Mission/Embarcadero corner: about **9.0 m** across
@@ -257,7 +257,7 @@ status, normal-orientation status, unexpected geometry, and per-material contrac
 compliance. Render at least one review image from the re-imported asset. Write
 `artifacts/8-mission/validation.json` and `artifacts/8-mission/REPORT.md`.
 
-Note that the axis-aligned XY bounding box will be roughly **75 x 75 m** even though the
+Note that the axis-aligned XY bounding box will be roughly **74.1 x 56.5 m** (an L, not a rotated rectangle: the missing north quadrant shortens one world diagonal) even though the
 building is 64.08 x 42.07 m — that is the expected consequence of a ~45° real-world
 heading, not a scale error.
 
@@ -313,7 +313,7 @@ Do not edit `app/public/sf-assets/landmarks_manifest.json`, `pipeline/lib/landma
 | Crest (turret crown) | **28.66 m** above local ground | DataSF LiDAR `hgt_maxcm` 2866 on footprint `201006.0001079` — **measured**, corroborated visually (2.4) |
 | Main parapet, Mission end | **25.10 m** | DataSF LiDAR `hgt_majoritycm` 2510 — **measured** (the modal roof plane) |
 | Middle-wing parapet | **19.64 m** | DataSF LiDAR `hgt_mediancm` 1964 — **measured** |
-| North-west wing parapet | ~13.8 m | *estimated* — a four-storey wing at the derived storey heights; see 2.15 risk 1 |
+| North-west wing parapet | **14.18 m** | *estimated* — a four-storey wing at the derived storey heights; see 2.15 risk 1 |
 | Storey heights | ground ~6.0 m, typical ~2.73 m | *derived*: the 25.10 / 19.64 pair over an 8 / 6 storey difference gives 2.73 m per floor; the residual ground floor is 6.0 m, which matches a double-height arcaded lobby/restaurant |
 | Ground elevation | 3.20 m min, 3.57 m mean | DataSF LiDAR `gnd_mincm` / `gnd_meancm` — **measured**. The app samples its own terrain; this is only a sanity bound |
 | Footprint | L-shaped, 2,133 m2; OBB **64.08 x 42.07 m** at bearing 135.4° | OSM way 193054134 geometry via the OSM API, reprojected and reduced to a minimum-area OBB — **measured**. DataSF footprint `201006.0001079` (8,649 cells x 0.25 m2 = 2,162 m2) agrees to 1.4% |
@@ -505,7 +505,7 @@ review render.
 2. **Plateau B — the middle block.** Region u ∈ [−11.4, +6], v −20.8 … +21.0, from z=0
    to **z=19.64**. `Toy_brick`.
 3. **Plateau C — the plaza end.** Region u ∈ [−32.0, −11.4], v +3.3 … +21.0 (this is the
-   only part of the plan west of the notch), from z=0 to **z≈13.80**. `Toy_brick`.
+   only part of the plan west of the notch), from z=0 to **z=14.18**. `Toy_brick`.
 4. **Limestone plinth.** 0.12 m proud band on all elevations, z=0 to z=1.5,
    `Toy_stone`.
 5. **Arcade, Mission and Steuart.** Round-arched recessed openings, z=1.5 to z=5.4,
@@ -529,7 +529,7 @@ review render.
 11. **Parapets.** A 0.9 m `Toy_brick` ring with a `Toy_stone` coping on each plateau, and
     a `Toy_steel` railing line on B and C (the terrace decks).
 12. **The turret.** Cylinder, centre (27.6, −16.5), radius 4.5 m, 24 segments, from z=0
-    to **z=28.66**. `Toy_brick` to z=13.8, then alternating `Toy_glass` bands and
+    to **z=28.66**. `Toy_brick` to z=14.18, then alternating `Toy_glass` bands and
     `Toy_brick` piers to z=25.6; then the **crown**: a `Toy_slate` drum z=25.6 to 27.6
     (radius 4.7 m, slightly proud) and eight radiating `Toy_slate` fin canopies at
     z=27.6 to **28.66**, tips at radius 6.2 m. This block sets the bounding-box top and
@@ -607,7 +607,7 @@ itself.
 The composition, from the satellite imagery: **plateau A** (the Mission end, 25.10 m) is
 the working roof — pale membrane with the mechanical field grouped on it, the turret
 rising off its east corner, and the spa pavilion and its bamboo tucked at the notch
-corner overlooking Steuart. **Plateau B** (19.64 m) and **plateau C** (13.8 m) are the
+corner overlooking Steuart. **Plateau B** (19.64 m) and **plateau C** (14.18 m) are the
 garden: large rectangular planted decks in a grid with paved circulation between them,
 edged by railings, stepping down and away to the north-west. The vent pavilion's circular
 louvre sits in the notch beside plateau C but is **not part of this asset**.
@@ -740,9 +740,9 @@ Draft `pipeline/lib/landmarks.mjs` entry:
 - [ ] Fresh-scene re-import of the exported GLB (never validate the authoring scene)
 - [ ] `min Z` within 0.5 m of 0, XY center offset within ~1 m
 - [ ] Bounding-box top exactly 28.66 m (loader scale lands at 1.0)
-- [ ] Dimensions plausible in meters and consistent with 2.1 (XY bbox ~75 x 75 m is expected)
+- [ ] Dimensions plausible in meters and consistent with 2.1 (XY bbox ~74.1 x 56.5 m is expected)
 - [ ] Footprint proportion preserved: the building must measure 64.08 x 42.07 m along its own axes, and the **L** must be present — a full rectangle is a failure
-- [ ] Three parapet planes land at 25.10 m, 19.64 m and ~13.80 m and are separately visible from directly above
+- [ ] Three parapet planes land at 25.10 m, 19.64 m and 14.18 m and are separately visible from directly above
 - [ ] Turret present, ~9.0 m across, crown at 28.66 m; notch present and **concave**
 - [ ] Triangles at or under 26,000
 - [ ] Materials all `Toy_*`, flat, no textures, no alpha, no `Toy_body`
@@ -766,8 +766,8 @@ Draft `pipeline/lib/landmarks.mjs` entry:
    oblique before modelling, and note in REPORT.md what you changed. A wrong step
    *position* is a much cheaper error than a wrong step *count*, so keep three plateaus
    even if you move them.
-2. **The lowest plateau's height (~13.80 m) is derived, not measured.** King says
-   "four-story wings", the derived storey heights give 13.79 m, and the LiDAR summary is
+2. **The lowest plateau's height (14.18 m) is derived, not measured.** King says
+   "four-story wings", the derived storey heights (ground 5.99 m, typical 2.73 m) give 14.18 m, and the LiDAR summary is
    consistent with a substantial area well below the median — but no statistic isolates
    it. If a rectified elevation from Don Chee Way disagrees, believe the elevation.
 3. **`hgt_maxcm` = 28.66 m is being taken as the crest, which this repo's own history says
