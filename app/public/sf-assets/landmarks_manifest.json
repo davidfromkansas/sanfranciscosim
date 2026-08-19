@@ -1939,5 +1939,23 @@
     ],
     "tris": 3366,
     "loadRadius": 2500
+  },
+  {
+    "id": "one-market-plaza-towers",
+    "file": "one-market-plaza-towers.glb",
+    "anchor": [
+      -122.3941803,
+      37.7933169
+    ],
+    "targetHeightM": 177.6,
+    "cat": 3,
+    "name": "One Market Plaza (Spear and Steuart Towers)",
+    "estimated": false,
+    "dims": [
+      123.0233,
+      128.8103,
+      177.6
+    ],
+    "tris": 8917
   }
 ]

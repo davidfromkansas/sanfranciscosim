@@ -3160,6 +3160,51 @@ export const LANDMARKS = [
     // the canopy are the whole recognition.
     camera: { distance: 120, yaw: 85, pitch: 26 },
   },
+  {
+    // Welton Becket Associates, 1976. Spear Tower (43 storeys, 172 m) and
+    // Steuart Tower (27 storeys, 111 m) on the six-storey podium they share,
+    // filling the Mission Street half of the block at 1 Market Street. The 1916
+    // Southern Pacific Building on the same address is a SEPARATE landmark
+    // (`1Market`) built in the same batch; the two abut along the shared survey
+    // edge and neither asset contains the other's geometry.
+    //
+    // height 177.6 = Spear Tower's rooftop plant crest, DataSF LiDAR maximum on
+    // the shaft's own footprint (201006.0001309), whose median is 172.41 m
+    // against a published 172 m — the survey agrees with the sources to 0.4 m.
+    // Steuart has NO footprint of its own in the survey (it sits inside the
+    // podium polygon, whose median is the podium's 27.75 m and whose 163.58 m
+    // maximum is Spear spilling over the shared boundary, not Steuart). Its
+    // 111 m is published twice over and corroborated by the satellite lean:
+    // both towers lean the same way on the z20 tile, 26.7 m and 17.6 m, ratio
+    // 1.52 against the published 172/111 = 1.55.
+    //
+    // exclude 30 m, measured against the real bake input (DataSF + the Overture
+    // gap-fill, after simplifyRing, testing centroid AND vertices exactly as
+    // excluded() does). Gates, nearest first:
+    //     3.3 m  overture "One Market Plaza" h=28 — the podium envelope, caught
+    //            by its centroid rather than by any vertex
+    //    10.4 m  datasf SF3713007 h=27.75 — podium + Steuart shaft
+    //    10.4 m  datasf SF3713007 h=172.41 — the Spear shaft
+    //    51.8 m  datasf SF3713006 h=46.12 and SF3713007 h=39.71 — the Southern
+    //            Pacific Building and its atrium, which must survive here and
+    //            are dropped by `1Market`'s own exclusion instead.
+    // Safe window (10.4, 51.8), 41 m wide — the opposite of 1Market's, which is
+    // only 19 m. The two are complementary by construction: the anchors are
+    // 78.2 m apart, 1Market's 20 m stops 35.4 m short of these rings and this
+    // 30 m stops 51.8 m short of its.
+    //
+    // camera.js puts the eye at target + distance*(sin yaw, ., cos yaw), so
+    // camera bearing = 180 - yaw; yaw 58 stands it on Mission Street to the
+    // south-east, which is the one direction that shows the 172/111 m height
+    // contrast rather than one tower hiding the other.
+    id: 'oneMarketPlazaTowers',
+    name: 'One Market Plaza (Spear and Steuart Towers)',
+    lon: -122.3941803,
+    lat: 37.7933169,
+    height: 177.6,
+    exclude: 30,
+    camera: { distance: 700, yaw: 58, pitch: 20 },
+  },
 ];
 
 // Parks/green spaces the landcover bake must match at least one source polygon
