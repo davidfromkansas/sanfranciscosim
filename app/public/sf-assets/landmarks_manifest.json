@@ -1939,5 +1939,24 @@
     ],
     "tris": 3366,
     "loadRadius": 2500
+  },
+  {
+    "id": "hiram-johnson-state-office-building",
+    "file": "hiram-johnson-state-office-building.glb",
+    "anchor": [
+      -122.4179151,
+      37.7810345
+    ],
+    "targetHeightM": 61.9,
+    "cat": 18,
+    "name": "Hiram W. Johnson State Office Building",
+    "estimated": false,
+    "dims": [
+      130.6549,
+      67.1789,
+      61.9
+    ],
+    "tris": 16908,
+    "loadRadius": 2500
   }
 ]

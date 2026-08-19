@@ -453,8 +453,13 @@ def build_roof():
                   "Toy_steel", bevel_w=0.0)
     # 0.06 m proud of the ribbon block: a coincident outer wall makes Cycles
     # shade the unlit interior and punches a black notch in the parapet.
+    # bevel_w = 0: a 0.12 m bevel on a ring this long manufactures ~2,000
+    # sub-5 mm faces where the profiles meet at the drum corners, and the Phase B
+    # weld collapses two of them into zero-length vertex normals - which the
+    # contract validator counts as invalid_or_nonunit_loop_normal on the SHIPPED
+    # file only. The parapet's edge is crisp on purpose.
     outline_ring("parapet", -(INSET_RIBBON - 0.06), -INSET_RIBBON - INSET_PARAPET,
-                 Z_DECK, Z_PARAPET, "Toy_trim")
+                 Z_DECK, Z_PARAPET, "Toy_trim", bevel_w=0.0)
 
     e0, e1, s0, s1 = PENT
     box("penthouse", e0, e1, s0, s1, Z_ROOF, Z_PENT, "Toy_cream", bevel_w=BEVEL_W)

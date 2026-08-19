@@ -7,26 +7,30 @@
 
 ## 1. Numbers
 
-| | |
-|---|---|
-| Objects (mesh) | 129 |
-| Triangles | **21,068** (cap 26,000) |
-| Dimensions (x, y, z) | 130.655 × 67.179 × **61.900** m |
-| Footprint before the 8.73° grid rotation | 127.38 × 47.70 m |
-| min Z / max Z | 0.000 / 61.900 m |
-| XY centre offset | 0.000, 0.000 m |
-| `targetHeightM / measuredHeight` | **1.000000** |
-| Materials | 9, all `Toy_*`, flat, no textures, no alpha |
-| Glow materials | `Toy_glassl_Glow`, `Toy_gold_Glow` |
-| Raw GLB | 1,111,776 B (1.09 MB) — **stage 4 required**, see §6 |
-| gzip(GLB) | 252,602 B |
-| Normals | per-object signed volume positive on all 129; ray residual **0.0089 %** (tolerance 0.15 %) |
-| Contract validator | **PASS**, all 15 checks — `validation.json` |
+These are the **shipped** numbers — the file in this folder is the stage-4
+optimized asset. The pre-optimize authoring output is archived byte-for-byte at
+`optimize/input/`.
+
+| | authored | shipped |
+|---|---|---|
+| Objects (mesh) | 129 | **9** (joined per material) |
+| Triangles | 16,908 | **16,908** |
+| Dimensions (x, y, z) | 130.655 × 67.179 × **61.900** m | identical |
+| Footprint before the 8.73° grid rotation | 127.38 × 47.70 m | identical |
+| min Z / max Z | 0.000 / 61.900 m | identical |
+| XY centre offset | 0.000, 0.000 m | identical |
+| `targetHeightM / measuredHeight` | 1.000000 | **1.000000** |
+| Materials | 9, all `Toy_*`, flat, no textures, no alpha | identical set |
+| Glow materials | `Toy_glassl_Glow`, `Toy_gold_Glow` | identical |
+| GLB bytes | 893,324 | **421,380** (−52.8 %, meshopt) |
+| Normals | signed volume positive on every object; ray residual **0.018 %** (tolerance 0.15 %) | same |
+| Contract validator | PASS | **PASS**, all 15 checks — `validation.json` |
 
 Reproduce: `blender -b --python build_hiram_johnson.py`, then
 `blender -b --python render_hiram_johnson.py --`, then
 `python3 make_contact_sheet.py`, then
-`blender -b --python validate_hiram_johnson.py`.
+`blender -b --python validate_hiram_johnson.py`. Stage 4 is
+`optimize/` — see `optimize/REPORT.md`.
 
 ## 2. Orientation — read this before integrating
 
@@ -109,15 +113,23 @@ standing correction applies: a `_Glow` material's base colour *is* its night loo
    was 0.018 %. Fixed by a collinearity/duplicate cleanup on every generated ring
    (`dedupe_ring`, plus one shared keep-mask for the plan outline so the parapet's
    outer and inner rings stay index-aligned). Side benefit: 24,808 → 21,068 tris.
-6. The entrance bay was too small to read at the first review and was widened
+6. **The same failure came back in the SHIPPED file only.** A 0.12 m bevel on the
+   parapet ring manufactured 2,624 sub-5 mm faces where the bevel profiles meet at
+   the drum corners. They are harmless in the authored GLB — the validator counted
+   zero invalid normals there — but the stage-4 weld collapsed two of them, and
+   gltfpack re-emits the STORED normals, so `invalid_or_nonunit_loop_normal_count:
+   2` appeared only after the shipping swap. **Re-run the stage-2 contract
+   validator against the post-optimize file, not just the authored one.** Fixed by
+   dropping that bevel: 21,068 → 16,908 tris and zero sub-5 mm faces anywhere.
+7. The entrance bay was too small to read at the first review and was widened
    from 24 m to 30 m, raised from 27.0 m to 30.6 m, and given granite jambs and a
    wider canopy.
 
 ## 6. Known limitations
 
-- **The GLB is 1.09 MB raw, over the 500 KB compressed-on-disk budget.** Stage 4
-  (`docs/asset-pipeline/GLB-OPTIMIZE-PROMPT.md`) is mandatory before this ships;
-  the file in this folder is the pre-optimize authoring output until then.
+- Stage 4 brought the file to 421,380 B, inside the 500 KB compressed-on-disk
+  budget, at −52.8 %. That is short of the prompt's 60 % aspiration; the waste
+  census shows the remainder is silhouette geometry (`optimize/REPORT.md` G6).
 - Two ~2 px black slivers remain at the parapet's outer corners on the drums in
   the top view, where the mitred offsets of two rings diverge at a concave
   corner. Below the app's pixel budget; recorded rather than chased.
@@ -137,7 +149,7 @@ standing correction applies: a `_Glow` material's base colour *is* its night loo
   "name": "Hiram W. Johnson State Office Building",
   "estimated": false,
   "dims": [130.6549, 67.1789, 61.9],
-  "tris": 21068,
+  "tris": 16908,
   "loadRadius": 2500
 }
 ```

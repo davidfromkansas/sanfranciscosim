@@ -3160,6 +3160,33 @@ export const LANDMARKS = [
     // the canopy are the whole recognition.
     camera: { distance: 120, yaw: 85, pitch: 26 },
   },
+  {
+    // SOM, 1998: the 14-storey state office slab filling the north half of the
+    // Earl Warren block. Case B, and the exclusion radius here is deliberately
+    // TIGHT — far tighter than the 68.0 m OBB half-diagonal most entries use.
+    //
+    // `excluded()` drops a footprint when its centroid OR any ring vertex falls
+    // inside the radius. Measured against the real bake input
+    // (`pipeline/data/overture_buildings.geojsonseq`) with that exact metric,
+    // over all 45 footprints within 160 m of this anchor:
+    //
+    //   r  3-26 m  -> drops 1  (this building; its centroid is 0.2 m out)
+    //   r >= 26.81 m -> drops 2  (also the Earl Warren Building)
+    //
+    // 26.81 m is the party-wall vertex the two footprints SHARE, so it is a
+    // hard ceiling, not a preference. 12 m is the middle of the safe band and
+    // the same value earlWarrenBuilding uses one entry above, for the same
+    // party wall seen from the other side.
+    id: 'hiramJohnsonStateOfficeBuilding',
+    name: 'Hiram W. Johnson State Office Building',
+    lon: -122.4179151,
+    lat: 37.7810345,
+    height: 61.9,
+    exclude: 12,
+    // Eye to the NNE (bearing 180 - yaw = 30), over Golden Gate Avenue: the
+    // curved entrance bay and the east drum in one frame, with the roof open.
+    camera: { distance: 470, yaw: 150, pitch: 22 },
+  },
 ];
 
 // Parks/green spaces the landcover bake must match at least one source polygon
