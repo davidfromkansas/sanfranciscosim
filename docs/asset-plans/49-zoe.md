@@ -726,8 +726,8 @@ Registry entry (id follows the `550Third` / `318Brannan` / `49SouthPark` convent
   lon: -122.3960338,
   lat: 37.7800764,
   height: 17.0,
-  exclude: <MEASURE IT>,
-  camera: { distance: 170, yaw: 225, pitch: 30 },
+  exclude: 9.5,
+  camera: { distance: 180, yaw: 338, pitch: 28 },
 }
 ```
 
@@ -738,23 +738,41 @@ neighbour is frequently Overture's, not DataSF's), and for each candidate radius
 the rings satisfying `nearestVertex < r || centroid < r`. Then pick the middle of the band
 that drops exactly one.
 
-What the DataSF-only scan predicts, measured from the manifest anchor:
+**MEASURED at integration, 2026-08-18 — and the prediction below was wrong, so read
+the correction first.** The band is `(5.37, 14.28]`, 8.9 m wide, and **`exclude: 9.5`
+shipped**. Full table in `pipeline/lib/landmarks.mjs` next to the `49Zoe` entry and in
+`artifacts/49-zoe/REPORT.md`.
 
-| Ring | nearest vertex to our ring | centroid distance from anchor |
+*The prediction this section originally carried, kept because the error is instructive:*
+
+| Ring | nearest vertex **to our footprint** | centroid distance from anchor |
 |---|---|---|
 | our own `SF3776128` | — | ~1.3 m |
 | `SF3776144` (33–35 Zoe, **party wall**) | **0.00 m** | 20.7 m |
 | `SF3776105` (Ritch St, rear) | 2.41 m | 29.4 m |
 | `SF3776456` (Ritch St, rear) | 2.69 m | 23.6 m |
 
-The party wall touching at 0.00 m is the hard constraint: **any radius large enough to
-reach 33–35 Zoe's nearest vertex takes the neighbour with it, and its nearest vertex is
-zero metres away.** This is the merged-party-wall situation of `sf3d-exclusion-unavoidable-collateral`
-and `sf3d-exclusion-two-rings` — expect to have to choose between leaving a procedural
-sliver of 33–35 Zoe standing inside our footprint, or dropping it. Measure both rings'
-behaviour before choosing, consider offsetting the registry `lon`/`lat` up to ~1.5 m
-towards the parking lot to widen the band, and **write the measured table into the
-integration report** whichever way it lands.
+From that table this section concluded that the party wall touching at 0.00 m was a hard
+constraint and that the site might be an unavoidable-collateral case
+(`sf3d-exclusion-unavoidable-collateral`, `sf3d-exclusion-two-rings`). **It is not.**
+`excluded()` measures every distance from the landmark's **anchor**, not from this
+building's footprint, and 33–35 Zoe's nearest vertex *to the anchor* is 14.28 m. The
+column above answers a question the bake never asks. The real numbers, from the actual
+bake inputs including Overture:
+
+| Ring | nearest vertex to anchor | centroid to anchor | gate |
+|---|---|---|---|
+| `SF3776128` (this building) | 14.13 | 0.11 | **0.11** |
+| Overture twin (this building) | 15.94 | 5.37 | **5.37** ← floor |
+| `SF3776144` (33–35 Zoe, party wall) | 14.28 | 21.87 | **14.28** ← ceiling |
+| `SF3776144` (second ring) | 14.29 | 19.37 | 14.29 |
+| Overture (33–35 Zoe) | 14.39 | 26.52 | 14.39 |
+| `SF3776456` (Ritch St, rear) | 14.92 | 24.17 | 14.92 |
+| `SF3776105` (Ritch St, rear) | 15.51 | 30.26 | 15.51 |
+
+The floor is this building's own **Overture** centroid, not its DataSF one: an excluded
+DataSF ring never calls `markOccupied()`, so the Overture gap-fill would re-add the
+building on top of the asset. No anchor offset was needed.
 
 Because this landmark is being built in a batch, stage 5 runs in **batch mode**: run the
 re-bake and do the full QA on it, then `git checkout -- app/public/tiles api/_data`

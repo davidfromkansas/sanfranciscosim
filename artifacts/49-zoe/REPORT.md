@@ -264,6 +264,18 @@ one-pixel budget and defines the crest silhouette).
 The optimized file is now `49-zoe.glb`; the pre-optimize original is archived at
 `optimize/input/49-zoe.glb`.
 
+## Stage 5 — integration (batch mode)
+
+Full report: `integration/REPORT.md`. Headline: **Case B**, `exclude: 9.5`
+measured against both bake inputs, local QA all-PASS with the loader scale at
+**×1.0000** and **92 draw calls**. The bake was run, verified and then discarded;
+the branch ships source only.
+
+The plan's §2.13 exclusion prediction was **wrong** and has been corrected in
+place: it measured neighbours against this *footprint* (the party wall touches at
+0.00 m) where `excluded()` measures against the *anchor* (the same wall is 14.28 m
+away). The real band was 8.9 m wide, not a collision.
+
 ## Gate 3 — approval
 
 **Approved 2026-08-18.** Presented the contact sheet, the aerial day and night

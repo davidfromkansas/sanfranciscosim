@@ -2545,6 +2545,54 @@ export const LANDMARKS = [
     // destination.
     camera: { distance: 165, yaw: 270, pitch: 26 },
   },
+  {
+    // 49 Zoe Street — a 16-unit artist live/work loft of 1996-97, re-clad in
+    // 2011-13, on the north-east side of a 25 ft SoMa alley between Bryant and
+    // Brannan. Height is the DataSF LiDAR maximum 16.99 m, attributed to the
+    // stair/elevator penthouse the aerial shows at the south-east end; the roof
+    // plane itself is 14.42 m (median over 2,268 cells, sd 1.13 m — one flat
+    // plane, no second level).
+    //
+    // Exclusion measured against the REAL bake inputs, both of them, with the
+    // metric `excluded()` actually uses (ring CENTROID or ANY ring VERTEX
+    // inside r, distance taken from THIS anchor):
+    //
+    //                                        nearest vertex   centroid   gate
+    //   SF3776128        this building            14.13         0.11     0.11
+    //   Overture twin    this building            15.94         5.37     5.37
+    //   SF3776144        33-35 Zoe, PARTY WALL    14.28        21.87    14.28
+    //   SF3776144        33-35 Zoe, second ring   14.29        19.37    14.29
+    //   Overture         (33-35 Zoe)              14.39        26.52    14.39
+    //   SF3776456        Ritch St, rear           14.92        24.17    14.92
+    //   SF3776105        Ritch St, rear           15.51        30.26    15.51
+    //
+    // So the band is (5.37, 14.28] — 8.9 m wide, unusually comfortable for a
+    // party-wall site. The floor is this building's own OVERTURE centroid, not
+    // its DataSF one: an excluded DataSF ring never calls markOccupied(), so
+    // the Overture gap-fill would re-add the building on top of the asset.
+    // Shipping 9.5, near the middle, with 4.1 m of margin below and 4.8 m above.
+    //
+    // Note for anyone reading the plan's 2.13: that table listed each
+    // neighbour's nearest vertex to THIS FOOTPRINT (33-35 Zoe touches at 0.00 m
+    // across the party wall) and read it as the ceiling. It is not — the gate is
+    // measured from the ANCHOR, and the party wall's nearest vertex to the
+    // anchor is 14.28 m. Measuring is what turned an apparently impossible site
+    // into an 8.9 m window.
+    id: '49Zoe',
+    name: '49 Zoe Street',
+    lon: -122.3960338,
+    lat: 37.7800764,
+    height: 17.0,
+    exclude: 9.5,
+    // Camera offset is (sin yaw, ., cos yaw) with +z south, so camera bearing =
+    // 180 - yaw. The Zoe elevation faces 225.4 deg and the parking-lot flank
+    // 135.4; yaw 338 stands the eye south-south-west, square enough to the
+    // striped Zoe facade to read its rhythm while the blank south-east flank
+    // rakes away. 180 m suits a 17 m building (cf. 181SouthPark at 190 for
+    // 16.5 m, 49SouthPark at 165 for 13.0 m). No `key`: this is fabric, not a
+    // destination.
+    camera: { distance: 180, yaw: 338, pitch: 28 },
+  },
 ];
 
 // Parks/green spaces the landcover bake must match at least one source polygon
