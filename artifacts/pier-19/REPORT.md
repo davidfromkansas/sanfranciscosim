@@ -1,6 +1,6 @@
 # Pier 19 — build report
 
-**Status: built, validated (all-PASS), awaiting approval.**
+**Status: built, approved, optimized (626→211 KB, 447→13 draw submeshes), validated all-PASS on the shipped GLB.**
 
 A stylized miniature of Pier 19, The Embarcadero (1936–38, Contributing
 Resource, Port of San Francisco Embarcadero Historic District), delivered as
@@ -11,7 +11,8 @@ Resource, Port of San Francisco Embarcadero Historic District), delivered as
 | | |
 |---|---|
 | Triangles | **7,782** (cap 18,000) |
-| Objects | 447 |
+| File | **211,424 B meshopt** (was 626,236 raw); archive at `optimize/input/` |
+| Objects | 13 shipped (447 authored, joined per material in stage 4) |
 | Dims (axis-aligned) | 243.39 × 191.89 × **17.20** m |
 | Vertical extent = targetHeightM | **17.2** (scale lands at 1.0) |
 | Min Z | −2.2 (pile stubs; **negative by design**, see below) |
