@@ -558,8 +558,12 @@ def build():
     # base of the tower below podium reads as podium mass from outside
     box("twr_base", tx, ty, 0.0, Z_PODIUM + 0.1, TWR_W, TWR_D, sand)
     # lit-window scatter (night support): thin proud plates on two faces
+    # each plate sits centred in a GLASS strip between spandrel bands (bands
+    # start at 25.35 + 3.2k, 1.15 tall; strips span [26.5+3.2k, 28.55+3.2k]) —
+    # a plate overlapping a band z-range gets provably buried inside the band
+    # solid and stage 4's interior-face pass would gut it (learned here).
     for j, (fy, wz) in enumerate(
-        ((1, 34.0), (1, 44.2), (-1, 37.4), (-1, 50.6), (1, 53.8), (-1, 28.6))
+        ((1, 33.4), (1, 43.0), (-1, 36.6), (-1, 49.4), (1, 52.6), (-1, 27.0))
     ):
         box(
             f"twr_lit_{j}",

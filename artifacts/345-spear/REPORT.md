@@ -6,18 +6,20 @@ of Hills Plaza: buff-brick office podium + 18-storey white residential tower
 garden + sunken courtyard. The Hills Brothers Building (2 Harrison) is a
 separate in-flight landmark and is not part of this asset.
 
-## Numbers (validated re-import, `validation.json`)
+## Numbers (SHIPPED file — post stage-4 optimize; `validation.json`)
 
 | | |
 |---|---|
-| Objects / triangles | 233 / **17,428** (cap 24,000) |
-| Dimensions | 106.33 × 118.99 × **68.50 m** (bbox top = LiDAR hgt_max, scale lands at 1.0) |
+| Triangles | **17,054** (authored 17,428; 374 buried faces removed at stage 4) |
+| File size | **489,380 B** raw (authored 1,058,188 B; −53.8%), meshopt `-noq` |
+| Nodes / draw submeshes | 16 / 17 (authored 233) |
+| Dimensions | 106.3305 × 118.9857 × **68.50 m** (bbox top = LiDAR hgt_max, scale lands at 1.0) |
 | min Z / XY centre offset | 0.0 / (0.0, 0.0) |
 | Materials | 15 `Toy_*`, flat, no textures, no alpha |
 | Glow groups | `Toy_white_Glow` (arcade, hero), `Toy_gold_Glow` (crown band + entry sign), `Toy_glass_Glow` (6 lit tower windows) |
 | Cameras / lights / animations | 0 / 0 / 0 |
-| Normals | per-object signed volume all outward; ray test PASS |
-| Validation | **all-PASS** |
+| Normals | per-object signed volume all outward; ray test PASS; packed-file loop normals clean |
+| Validation | **all-PASS** on the shipped packed file (`optimize/REPORT.md` for gates G1–G8) |
 
 ## Manifest draft (integration values)
 
@@ -31,7 +33,7 @@ separate in-flight landmark and is not part of this asset.
   "name": "Hills Plaza (345 Spear)",
   "estimated": false,
   "dims": [106.3305, 118.9857, 68.5],
-  "tris": 17428
+  "tris": 17054
 }
 ```
 
@@ -72,6 +74,11 @@ separate in-flight landmark and is not part of this asset.
 3. *Validator:* `transforms_applied` FAIL — the recentring pass had shifted
    object locations instead of geometry → recentring now bakes the full world
    transform into every mesh (`mesh.transform`), objects ship at identity.
+4. *Stage-4 feedback:* four lit-window plates z-overlapped the tower's spandrel
+   band solids (one sat entirely inside a band — the optimizer's interior-face
+   pass gutted it, and it was visually wrong besides). The build script now
+   centres every lit plate in a glass strip between bands; source rebuilt and
+   re-validated before the optimize pass re-ran.
 
 ## Night state
 

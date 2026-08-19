@@ -1,5 +1,5 @@
 {
-  "asset": "345-spear.glb",
+  "asset": "out_weld.glb",
   "validator": "Blender 5.2.0 LTS",
   "fresh_isolated_scene": true,
   "reimported_final_glb": true,
