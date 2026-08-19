@@ -156,12 +156,23 @@ PALETTE_HEX = {
     "Toy_glass": "2a4d73",   # all windows
     "Toy_ink": "3a3530",     # the entry recess interior, the basement service
                              # opening, the chimney cap, the roof hatch
-    "Toy_glassl_Glow": "6f95b8",  # the lit bay panes and door transoms at night.
-                             # NOT Toy_glass_Glow (2a4d73). The app draws _Glow
-                             # in a separate UNLIT layer, so at night the surface
-                             # shows its raw BASE colour - and 2a4d73 is the dark
-                             # navy of unlit glass, which renders as a dark
-                             # window pretending to be a lit one.
+    "Toy_gold_Glow": "caa64a",  # the lit bay panes and door transoms at night.
+                             # WARM, not the 6f95b8 glazing blue this asset
+                             # shipped with at first. The app draws _Glow in a
+                             # separate UNLIT layer, so at night a surface shows
+                             # its raw BASE colour - there is no emission
+                             # multiplier to warm it up later. 6f95b8 is correct
+                             # for a glass office building and it is what the
+                             # glazing-heavy landmarks use, but in the stage-5
+                             # night QA this house read COLD against 246 Ritch
+                             # next door and the procedural residential windows
+                             # all around, both of which glow warm yellow: two
+                             # occupied flats looked like an empty office. The
+                             # plan asked for a domestic night state - "warm,
+                             # partial, uneven" - and the build did not deliver
+                             # it until this change. caa64a is a palette colour
+                             # already used by 35 shipped assets and is both
+                             # warmer and brighter (luma 167 vs 143).
 }
 
 
@@ -721,11 +732,11 @@ def build():
         # scored - accidentally, on the sign of a degenerate volume - as closed
         # solids.
         glow_plate(f"bay_glow{i}", f, t_c - w / 2.0 + 0.04, t_c + w / 2.0 - 0.04,
-                   z0 + 0.05, z1 - 0.05, mats["Toy_glassl_Glow"], GLASS_PROUD)
+                   z0 + 0.05, z1 - 0.05, mats["Toy_gold_Glow"], GLASS_PROUD)
     for k, t in enumerate(DOOR_T):
         glow_plate(f"transom_glow{k}", FRONT, t - DOOR_W / 2.0 + 0.05,
                    t + DOOR_W / 2.0 - 0.05, Z_WT + DOOR_H + 0.09,
-                   Z_WT + DOOR_H + 0.38, mats["Toy_glassl_Glow"], 0.10)
+                   Z_WT + DOOR_H + 0.38, mats["Toy_gold_Glow"], 0.10)
 
     # Bevel budget: the chunky masses carry the miniature read and get the full
     # 0.10/2. Frames, sills, bands, brackets and glow plates are small and

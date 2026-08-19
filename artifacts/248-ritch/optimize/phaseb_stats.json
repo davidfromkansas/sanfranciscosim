@@ -2,7 +2,7 @@
  "input_materials": [
   "Toy_cream",
   "Toy_glass",
-  "Toy_glassl_Glow",
+  "Toy_gold_Glow",
   "Toy_ink",
   "Toy_steel",
   "Toy_stone",
@@ -40,7 +40,7 @@
  "joins": {
   "grp_Toy_steel": 31,
   "grp_Toy_cream": 6,
-  "grp_Toy_glassl_Glow": 8,
+  "grp_Toy_gold_Glow": 8,
   "grp_Toy_glass": 13,
   "grp_Toy_trim": 54,
   "grp_Toy_cream_Toy_steel": 2,
@@ -53,7 +53,7 @@
   "materials": [
    "Toy_cream",
    "Toy_glass",
-   "Toy_glassl_Glow",
+   "Toy_gold_Glow",
    "Toy_ink",
    "Toy_steel",
    "Toy_stone",

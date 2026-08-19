@@ -2545,6 +2545,54 @@ export const LANDMARKS = [
     // destination.
     camera: { distance: 165, yaw: 270, pitch: 26 },
   },
+  {
+    // 248-250 Ritch Street, a 1915 wood-frame two-flat on a 25 x 75 ft alley lot
+    // and the last pre-1920 domestic fabric on this face of Ritch. Two storeys
+    // against the five of 246 Ritch immediately north-west, which is the whole
+    // point of the asset - the height here is the story and it is not rounded up.
+    //
+    // THE REGISTRY POINT IS NOT THE MANIFEST ANCHOR, deliberately. The manifest
+    // anchor -122.3956749, 37.7801751 is the model's bbox centre, which is where
+    // the GLB has to sit. Measured from THAT point the exclusion window is only
+    // (1.95, 2.88) m - 0.93 m wide - because the Bing-traced OSM ring of this
+    // building sits ~2.5 m north-west of the survey while 252-254's equally
+    // offset OSM ring pushes back from the other side. Moving the circle's
+    // centre 5.4 m south-west, to the point below (still inside the house, on
+    // the north-west flank 8.9 m back), opens the window to (0.92, 5.04) m.
+    //
+    // Measured against the REAL bake input, on the SIMPLIFIED rings - the
+    // exclusion test runs after simplifyRing(ring, 0.6), and measuring on the
+    // raw rings gives a window less than half as wide because 0.6 m of
+    // simplification deletes exactly the small jogs that sit closest to this lot:
+    //
+    //   this building, DataSF SF3776105          0.91 m  vertex   <- the FLOOR
+    //   this building, Overture/OSM w147508934   0.92 m  vertex
+    //   252-254 Ritch, Overture/OSM w147508935   5.04 m  vertex   <- the CEILING
+    //   252-254 Ritch, DataSF SF3776106          6.07 m  vertex
+    //   246 Ritch,     Overture/OSM w1174904714  7.33 m  vertex
+    //   246 Ritch,     DataSF SF3776456          7.83 m  vertex
+    //
+    // exclude 3 leaves 2.08 m of margin below and 2.04 m above. A correct
+    // exclusion drops exactly TWO rings, this footprint and its Overture twin;
+    // one means the gap-fill re-added the building, three or more means the
+    // circle has eaten 252-254 and left a hole in the alley wall. Never above
+    // 4.5, and treat a count of two as necessary but not sufficient - confirm
+    // from the tile which rings went, not how many.
+    id: '248Ritch',
+    name: '248-250 Ritch Street',
+    lon: -122.3957213,
+    lat: 37.7801827,
+    height: 8.6,
+    exclude: 3,
+    // Camera offset is (sin yaw, ., cos yaw) with +z south, so camera bearing =
+    // 180 - yaw. This building has exactly ONE public elevation, looking
+    // 45.05 deg, so yaw 135 stands the eye on Ritch Street north-east of the
+    // pivot, square onto it. 560Third arrived at the same value by render for a
+    // 44.1 deg elevation two blocks away. 120 m suits an 8.6 m building (cf.
+    // 370Brannan 150 at 7.63 m, 550Third 190 at 11 m). No `key`: at 8.6 m this
+    // is texture in the alley, not a destination.
+    camera: { distance: 120, yaw: 135, pitch: 28 },
+  },
 ];
 
 // Parks/green spaces the landcover bake must match at least one source polygon

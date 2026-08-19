@@ -7,7 +7,7 @@
   "materials": [
    "Toy_cream",
    "Toy_glass",
-   "Toy_glassl_Glow",
+   "Toy_gold_Glow",
    "Toy_ink",
    "Toy_steel",
    "Toy_stone",
@@ -36,7 +36,7 @@
   "materials": [
    "Toy_cream",
    "Toy_glass",
-   "Toy_glassl_Glow",
+   "Toy_gold_Glow",
    "Toy_ink",
    "Toy_steel",
    "Toy_stone",
@@ -61,7 +61,7 @@
   "grp_Toy_cream": 17.606142,
   "grp_Toy_cream_Toy_steel": 838.116602,
   "grp_Toy_glass": 1.600275,
-  "grp_Toy_glassl_Glow": 16.273846,
+  "grp_Toy_gold_Glow": 16.273846,
   "grp_Toy_ink": 2.925561,
   "grp_Toy_steel": 167.8269,
   "grp_Toy_stone": 1.119566,

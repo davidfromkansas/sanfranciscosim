@@ -501,14 +501,21 @@ body and trim. All flat, roughness ~0.85, no textures, no alpha.
 | `Toy_glass` | `2a4d73` | all windows |
 | `Toy_ink` | `3a3530` | the entry recess interior and the basement service opening |
 | `Toy_roofd` | `45454a` | the chimney cap and vent stacks only |
-| `Toy_glassl_Glow` | `6f95b8` | the lit windows at night — see below |
+| `Toy_gold_Glow` | `caa64a` | the lit windows at night — WARM, see below |
 
 **Night state (required).** This is a house, not a landmark, and its night state
 should read as *domestic*: warm, partial, uneven. Light the **bay windows on both
 levels** (the hero glow: six panes, the shape of the bay picked out) plus the
 **two door lights**, and leave the flat-wall upper window and the rear dark. Use
-`Toy_glassl_Glow` (`6f95b8`) as slim shells set **proud** of the opaque
-`Toy_glass` pane — never a closed shell around it. Two recorded traps apply here:
+a **warm** glow — `Toy_gold_Glow` (`caa64a`) — as slim shells set **proud** of
+the opaque `Toy_glass` pane, never a closed shell around it.
+
+**Do not reach for `Toy_glassl_Glow` (`6f95b8`) here**, even though it is what
+the glazing-heavy landmarks use and what 49 South Park ships. This asset was
+built with it first and it failed the stage-5 night QA: against 246 Ritch next
+door and every procedural residential window around it — all warm yellow — the
+house read cold, two occupied flats looking like an empty office. The colour is
+right for a glass office building and wrong for a Victorian flat. Two recorded traps apply here:
 a closed glow shell is two alpha layers and reads ~23% by day, tinting the
 facade; and a `_Glow` material's **base** colour is its night appearance, so
 judge the colour unlit before trusting a night render.
@@ -688,7 +695,8 @@ spurious diff across other landmarks.
 - [ ] Materials all `Toy_*`, flat, no textures, no alpha, no `Toy_body`
 - [ ] `_Glow` only on the six bay panes and the two door lights; glow shells proud
       of the opaque glazing, never a closed shell around it; the `_Glow` base
-      colour judged unlit
+      colour judged unlit **and judged at night beside the neighbours**, which is
+      the only check that catches a cold glow on a warm street
 - [ ] No utility pole, no overhead wires, no street tree, no neighbours
 - [ ] No cameras, lights, animations, armatures, constraints
 - [ ] Applied transforms, no negative scales, outward normals (per-object signed
