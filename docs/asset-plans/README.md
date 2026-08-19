@@ -32,6 +32,13 @@ a designed hardscape with a fixed surveyed layout and no natural component, plan
 as a single landmark GLB on the same argument that made the Palace of Fine Arts
 grounds a landmark. See its §2.15 risk 5.
 
+[**fulton-plaza.md**](./fulton-plaza.md) is the second, and it goes one step further: its
+subject is not even a block but a *street* — the pedestrianised block of Fulton between
+Larkin and Hyde — so its polygon is the right-of-way *between* two parcel lines rather
+than a parcel of its own, and the DataSF centreline that used to carry traffic still bakes
+a road ribbon underneath it. See its §2.3 for how the polygon is derived and §2.13 for why
+that surviving ribbon, not the exclusion radius, is the integration hazard.
+
 [**flora-kit.md**](./flora-kit.md) is the one plan here that is not a landmark:
 an authored Blender kit of tree species and landscape props to replace the single
 procedural lollipop that all 289,741 of the city's baked trees currently share.
@@ -151,6 +158,7 @@ route, and the park plans depend on it (§E8 of the parks README).
 | [414 Brannan Street (Epic Church)](./414-brannan.md) | `414-brannan` | 14.0 m (monitor crest; 10.4 m street parapet) | new landmark |
 | [501 Third Street](./501-third.md) | `501-third` | 16.4 m (LiDAR-derived) | new landmark |
 | [10 South Park (South Park Lofts)](./10-south-park.md) | `10-south-park` | 14.67 m (roof bulkhead, LiDAR maximum; parapet crest 13.10 m photogrammetric) | new landmark |
+| [Fulton Plaza (147 Fulton Street)](./fulton-plaza.md) | `fulton-plaza` | 10.67 m (Pioneer Monument crest; the asset is a terrain-draped right-of-way) | new landmark |
 
 - Style: `docs/styles/miniature-toy.md` (authoritative for artistic decisions)
 - Technical contract: `.agents/skills/sf-asset-check/SKILL.md` (authoritative for the GLB)
