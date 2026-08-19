@@ -317,7 +317,8 @@ function createComposer({ onPosted }) {
       } catch {
         throw new Error("The post review returned an unreadable response.");
       }
-      if (!response.ok) throw new Error(result.error || "Could not review the post.");
+      if (!response.ok)
+        throw new Error(result.error || "Could not review the post.");
       if (result.posted) {
         clear();
         back.hidden = true;
@@ -420,7 +421,7 @@ function identity(who, at, onOpen, human = false) {
     ? "Visiting from outside the simulation"
     : who.occupation
       ? `${who.occupation} · ${PUMA_NAMES[who.puma] ?? "San Francisco"}`
-      : PUMA_NAMES[who.puma] ?? "San Francisco";
+      : (PUMA_NAMES[who.puma] ?? "San Francisco");
 
   block.append(top, el("div", "rs-who-sub", sub));
   return block;
@@ -443,7 +444,7 @@ function score(item) {
   return wrap;
 }
 
-function renderThread(thread, speakers, onOpen) {
+function renderThread(thread, speakers, onOpen, onDetail) {
   const who = { ...thread.author, ...(speakers[thread.authorId] ?? {}) };
   const card = el("article", "rs-post");
 
@@ -454,30 +455,131 @@ function renderThread(thread, speakers, onOpen) {
   const count = thread.replies.length;
   const actions = el("div", "rs-actions");
   actions.append(score(thread));
-  actions.append(
-    el("span", "rs-count", count === 1 ? "1 comment" : `${count} comments`),
-  );
-  card.append(actions);
-
+  // The count is a button whenever there is something behind it. A thread with
+  // no replies still shows the zero — it is a fact about the post, and hiding
+  // it would make an unanswered post look like one nobody had counted.
+  const label = count === 1 ? "1 comment" : `${count} comments`;
   if (count) {
-    const comments = el("div", "rs-comments");
-    for (const reply of thread.replies) {
-      const speaker = { ...reply, ...(speakers[reply.personaId] ?? {}) };
-      // A comment is a two-column row: the face in its own column, everything
-      // said in the other. The body then hangs under the name rather than under
-      // the picture, which is what makes a long thread scannable — the eye
-      // follows one straight edge of text down the whole discussion.
-      const item = el("div", "rs-comment");
-      const main = el("div", "rs-comment-main");
-      main.append(identity(speaker, reply.at, onOpen));
-      main.append(el("p", "rs-comment-body", reply.body));
-      main.append(score(reply));
-      item.append(avatar(speaker, 22), main);
-      comments.append(item);
-    }
-    card.append(comments);
+    const open = el("button", "rs-count rs-count-btn", label);
+    open.type = "button";
+    open.addEventListener("click", () => onDetail(thread.id));
+    actions.append(open);
+  } else {
+    actions.append(el("span", "rs-count rs-count-none", label));
   }
+  card.append(actions);
   return card;
+}
+
+// The comment list, used only by the detail view now. Kept as its own function
+// because the shape of a comment is a separate decision from where it appears.
+function renderComments(thread, speakers, onOpen) {
+  const comments = el("div", "rs-comments");
+  for (const reply of thread.replies) {
+    const speaker = { ...reply, ...(speakers[reply.personaId] ?? {}) };
+    // A comment is a two-column row: the face in its own column, everything
+    // said in the other. The body then hangs under the name rather than under
+    // the picture, which is what makes a long thread scannable — the eye
+    // follows one straight edge of text down the whole discussion.
+    const item = el("div", "rs-comment");
+    const main = el("div", "rs-comment-main");
+    main.append(identity(speaker, reply.at, onOpen));
+    main.append(el("p", "rs-comment-body", reply.body));
+    main.append(score(reply));
+    item.append(avatar(speaker, 22), main);
+    comments.append(item);
+  }
+  return comments;
+}
+
+// The post detail: one thread, its comments under it, stacked OVER the feed
+// rather than replacing it. Being a real layer rather than a swap is what keeps
+// the list's scroll position — the feed underneath is never touched, so
+// dismissing this puts you back exactly where you were reading.
+function createDetailView({ onOpen }) {
+  const view = el("section", "rs-detail");
+  view.hidden = true;
+  const bar = el("div", "rs-detail-bar");
+  const back = el("button", "rs-back");
+  back.type = "button";
+  back.setAttribute("aria-label", "Back to r/simfrancisco");
+  back.innerHTML =
+    '<svg viewBox="0 0 16 16" aria-hidden="true" fill="none" stroke="currentColor" ' +
+    'stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round">' +
+    '<path d="M10 3L5 8l5 5"/></svg><span>r/simfrancisco</span>';
+  bar.append(back);
+  const body = el("div", "rs-detail-body");
+  view.append(bar, body);
+
+  let openId = null;
+  let speakers = {};
+
+  function draw(thread) {
+    if (!thread) return close();
+    const who = { ...thread.author, ...(speakers[thread.authorId] ?? {}) };
+    const post = el("article", "rs-post rs-post-full");
+    post.append(byline(who, thread.at, onOpen, thread.human));
+    post.append(el("h2", "rs-title", thread.title));
+    post.append(el("p", "rs-body", thread.body));
+    const actions = el("div", "rs-actions");
+    actions.append(score(thread));
+    const n = thread.replies.length;
+    actions.append(
+      el("span", "rs-count", n === 1 ? "1 comment" : `${n} comments`),
+    );
+    post.append(actions);
+    body.replaceChildren(post, renderComments(thread, speakers, onOpen));
+  }
+
+  function open(thread, people) {
+    speakers = people;
+    openId = thread.id;
+    draw(thread);
+    view.hidden = false;
+    // The create-post button is fixed to the window at a z-index above the
+    // panel, so it floats over the detail and sits on the last comment. While
+    // somebody is reading one post, writing another is not the offer being
+    // made — Reddit hides it on a post page for the same reason.
+    document.body.classList.add("rs-reading");
+    // Its own scroll, starting at the top of the post being opened.
+    view.scrollTop = 0;
+    back.focus({ preventScroll: true });
+  }
+
+  function close() {
+    openId = null;
+    view.hidden = true;
+    document.body.classList.remove("rs-reading");
+    body.replaceChildren();
+  }
+
+  // Called on every poll. A reply landing while somebody is reading should
+  // appear under what they are reading, not close the view or throw them to
+  // the top — so this redraws in place and puts the scroll back where it was.
+  function sync(threads, people) {
+    if (!openId) return;
+    const thread = threads.find((t) => t.id === openId);
+    if (!thread) return close(); // retired out from under us
+    speakers = people;
+    const at = view.scrollTop;
+    draw(thread);
+    view.scrollTop = at;
+  }
+
+  back.addEventListener("click", close);
+  document.addEventListener("keydown", (e) => {
+    if (e.key === "Escape" && !view.hidden) close();
+  });
+
+  return {
+    view,
+    open,
+    close,
+    sync,
+    get openId() {
+      return openId;
+    },
+  };
 }
 
 export function createFeedPanel({
@@ -547,9 +649,12 @@ export function createFeedPanel({
   const status = el("p", "rs-status", "Loading…");
   head.append(bar, status);
   const list = el("div", "rs-list");
-  root.append(head, list);
-
   const profile = createProfileCard({ onVisit });
+  // Inside the panel, so it covers exactly the panel and nothing else — the
+  // right-hand column on a desktop, the sheet on a phone, without either
+  // measurement being repeated here.
+  const detail = createDetailView({ onOpen: profile.show });
+  root.append(head, list, detail.view);
   const rulesCard = createRulesCard();
   let refresh;
   createComposer({ onPosted: () => refresh?.() });
@@ -590,6 +695,10 @@ export function createFeedPanel({
     // Only touch the DOM when something was actually said — a viewer reading a
     // post should not have it yanked out from under them every poll.
     const key = threads.map((t) => `${t.id}:${t.replies.length}`).join("|");
+    // The key includes every thread's reply count, so any new comment changes
+    // it and falls through to the render below — which is what keeps an open
+    // detail view current. A poll that changes nothing returns here and leaves
+    // both the list and the detail untouched, which is the point.
     if (key === lastKey) return;
     lastKey = key;
 
@@ -602,8 +711,16 @@ export function createFeedPanel({
     status.textContent = `${plural(threads.length, "post")} · ${plural(comments, "comment")} · last 24 hours`;
     const speakers = payload.speakers ?? {};
     list.replaceChildren(
-      ...threads.map((t) => renderThread(t, speakers, profile.show)),
+      ...threads.map((t) =>
+        renderThread(t, speakers, profile.show, (id) => {
+          const thread = threads.find((x) => x.id === id);
+          if (thread) detail.open(thread, speakers);
+        }),
+      ),
     );
+    // If somebody is reading a thread, fold whatever just arrived into it
+    // rather than leaving them on a stale copy.
+    detail.sync(threads, speakers);
   };
 
   refresh();

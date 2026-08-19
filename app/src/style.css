@@ -546,6 +546,13 @@ button:hover {
   cursor: pointer;
 }
 
+/* Reading one post is not the moment to be asked to write another, and the
+   button is fixed above the panel so it would otherwise sit on the last
+   comment. */
+body.rs-reading .rs-create-fab {
+  display: none;
+}
+
 .rs-create-fab:hover,
 .rs-compose-post:hover {
   background: #5d7ec5;
@@ -1001,7 +1008,9 @@ button:hover {
 
   .rs-create-fab {
     right: 16px;
-    bottom: calc(var(--rs-sheet-shut) + 16px + env(safe-area-inset-bottom, 0px));
+    bottom: calc(
+      var(--rs-sheet-shut) + 16px + env(safe-area-inset-bottom, 0px)
+    );
   }
 
   #feed.rs-open ~ .rs-create-fab {
@@ -1090,5 +1099,145 @@ button:hover {
 
   .rs-compose-spinner {
     animation: none;
+  }
+}
+
+/* ------------------------------------------------------- the post detail */
+
+/* One thread and its comments, stacked OVER the feed rather than replacing it.
+   A layer rather than a swap is what preserves the list's scroll position: the
+   feed underneath is never re-rendered or hidden, so dismissing this returns
+   you to exactly the line you left. Absolute against the panel, which is
+   `position: fixed`, so it inherits the panel's geometry at every breakpoint —
+   the right-hand column on a desktop, the bottom sheet on a phone — without
+   either measurement being written down twice.
+
+   It is a child of #feed, so its z-index is read inside the panel's own
+   stacking context: above the sticky header (2) and the sheet handle (3). The
+   modals live on <body> at 20, outside that context and above the panel's 8,
+   so a profile card opened from a comment still lands on top of everything. */
+.rs-detail {
+  /* FIXED, not absolute. An absolutely positioned child of a scrolling
+     container is laid out in that container's scroll flow, so a detail opened
+     after scrolling two thousand pixels down would be drawn two thousand
+     pixels above the viewport and appear not to open at all. Fixed mirrors the
+     panel's own box instead, which is why the geometry below repeats #feed's:
+     it is the same box, one layer up. */
+  position: fixed;
+  top: 0;
+  right: 0;
+  bottom: 0;
+  width: var(--feed-w);
+  z-index: 9;
+  display: flex;
+  flex-direction: column;
+  background: #f2efe8;
+  overflow-y: auto;
+  overscroll-behavior: contain;
+}
+
+.rs-detail[hidden] {
+  display: none;
+}
+
+/* Sticky so the way out is always reachable, however long the thread. It
+   replaces the subreddit header rather than stacking under it — two headers
+   for one column is how a panel starts feeling like a filing cabinet. */
+.rs-detail-bar {
+  position: sticky;
+  top: 0;
+  z-index: 1;
+  flex: none;
+  padding: 9px var(--rs-pad);
+  background: #fffdf8;
+  border-bottom: 2px solid #2b2118;
+}
+
+.rs-back {
+  display: flex;
+  align-items: center;
+  gap: 7px;
+  appearance: none;
+  padding: 4px 2px;
+  background: none;
+  border: 0;
+  font:
+    800 13px/1 -apple-system,
+    BlinkMacSystemFont,
+    "Segoe UI",
+    Roboto,
+    sans-serif;
+  color: #2b2118;
+  cursor: pointer;
+  border-radius: 4px;
+}
+
+.rs-back svg {
+  width: 15px;
+  height: 15px;
+  flex: none;
+}
+
+.rs-back:hover {
+  color: #c8442f;
+}
+
+.rs-detail-body {
+  padding: 10px;
+  padding-bottom: calc(18px + env(safe-area-inset-bottom, 0px));
+}
+
+/* The post reads as the subject here, not as one card in a list, so it drops
+   the offset shadow that makes the list scan as a stack. */
+.rs-post-full {
+  box-shadow: none;
+}
+
+/* In the list the comments are gone, so the count becomes the way in. It has
+   to look pressable without turning the action row into a toolbar. */
+.rs-count-btn {
+  appearance: none;
+  padding: 2px 6px;
+  margin: -2px -6px;
+  background: none;
+  border: 0;
+  font: inherit;
+  font-weight: 700;
+  color: #6b5a48;
+  cursor: pointer;
+  border-radius: 5px;
+}
+
+.rs-count-btn:hover,
+.rs-count-btn:focus-visible {
+  color: #2b2118;
+  background: rgba(43, 33, 24, 0.07);
+}
+
+/* Nothing to open. Stated rather than hidden — an unanswered post having zero
+   comments is a fact about it, and a missing line reads as a missing count. */
+.rs-count-none {
+  font-weight: 700;
+  color: #b8a894;
+}
+
+/* The comment rail earns more room here than it had squeezed into a list. */
+.rs-detail .rs-comments {
+  margin-top: 10px;
+  margin-left: 6px;
+  padding-left: 12px;
+}
+
+/* On a phone the panel is a bottom sheet, so the detail is the same sheet one
+   layer up. It is only reachable from an open sheet, so it takes the open
+   sheet's height and never the collapsed bar's. */
+@media (max-width: 899px) {
+  .rs-detail {
+    top: auto;
+    left: 0;
+    width: 100%;
+    height: 100vh;
+    height: var(--rs-sheet-open);
+    border-radius: 0;
   }
 }
