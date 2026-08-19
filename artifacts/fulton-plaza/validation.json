@@ -1,0 +1,884 @@
+{
+  "asset": "fulton-plaza.glb",
+  "validator": "Blender 5.2.0 LTS",
+  "fresh_isolated_scene": true,
+  "reimported_final_glb": true,
+  "object_count": 21,
+  "mesh_object_count": 21,
+  "triangle_count": 13364,
+  "triangle_budget": 16000,
+  "dimensions_m": [
+    128.4915,
+    67.6286,
+    12.7999
+  ],
+  "bbox_min_m": [
+    -64.2458,
+    -33.8143,
+    -1.5
+  ],
+  "bbox_max_m": [
+    64.2458,
+    33.8143,
+    11.2999
+  ],
+  "min_z_m": -1.5,
+  "xy_center_offset_m": [
+    0.0,
+    0.0
+  ],
+  "materials": [
+    "Toy_bronze",
+    "Toy_cream",
+    "Toy_gold_Glow",
+    "Toy_ink",
+    "Toy_koiOrange",
+    "Toy_koiOrange_Glow",
+    "Toy_koiWhite",
+    "Toy_koiWhite_Glow",
+    "Toy_navy",
+    "Toy_roofd",
+    "Toy_seam",
+    "Toy_soil",
+    "Toy_steel",
+    "Toy_stone",
+    "Toy_tarmac",
+    "Toy_verdigris"
+  ],
+  "material_details": [
+    {
+      "name": "Toy_bronze",
+      "image_texture_nodes": [],
+      "alpha": 1.0,
+      "roughness": 0.85,
+      "glow": false
+    },
+    {
+      "name": "Toy_cream",
+      "image_texture_nodes": [],
+      "alpha": 1.0,
+      "roughness": 0.85,
+      "glow": false
+    },
+    {
+      "name": "Toy_gold_Glow",
+      "image_texture_nodes": [],
+      "alpha": 1.0,
+      "roughness": 0.85,
+      "glow": true
+    },
+    {
+      "name": "Toy_ink",
+      "image_texture_nodes": [],
+      "alpha": 1.0,
+      "roughness": 0.85,
+      "glow": false
+    },
+    {
+      "name": "Toy_koiOrange",
+      "image_texture_nodes": [],
+      "alpha": 1.0,
+      "roughness": 0.85,
+      "glow": false
+    },
+    {
+      "name": "Toy_koiOrange_Glow",
+      "image_texture_nodes": [],
+      "alpha": 1.0,
+      "roughness": 0.85,
+      "glow": true
+    },
+    {
+      "name": "Toy_koiWhite",
+      "image_texture_nodes": [],
+      "alpha": 1.0,
+      "roughness": 0.85,
+      "glow": false
+    },
+    {
+      "name": "Toy_koiWhite_Glow",
+      "image_texture_nodes": [],
+      "alpha": 1.0,
+      "roughness": 0.85,
+      "glow": true
+    },
+    {
+      "name": "Toy_navy",
+      "image_texture_nodes": [],
+      "alpha": 1.0,
+      "roughness": 0.85,
+      "glow": false
+    },
+    {
+      "name": "Toy_roofd",
+      "image_texture_nodes": [],
+      "alpha": 1.0,
+      "roughness": 0.85,
+      "glow": false
+    },
+    {
+      "name": "Toy_seam",
+      "image_texture_nodes": [],
+      "alpha": 1.0,
+      "roughness": 0.85,
+      "glow": false
+    },
+    {
+      "name": "Toy_soil",
+      "image_texture_nodes": [],
+      "alpha": 1.0,
+      "roughness": 0.85,
+      "glow": false
+    },
+    {
+      "name": "Toy_steel",
+      "image_texture_nodes": [],
+      "alpha": 1.0,
+      "roughness": 0.85,
+      "glow": false
+    },
+    {
+      "name": "Toy_stone",
+      "image_texture_nodes": [],
+      "alpha": 1.0,
+      "roughness": 0.85,
+      "glow": false
+    },
+    {
+      "name": "Toy_tarmac",
+      "image_texture_nodes": [],
+      "alpha": 1.0,
+      "roughness": 0.85,
+      "glow": false
+    },
+    {
+      "name": "Toy_verdigris",
+      "image_texture_nodes": [],
+      "alpha": 1.0,
+      "roughness": 0.85,
+      "glow": false
+    }
+  ],
+  "image_texture_count": 0,
+  "textured_materials": [],
+  "transparent_materials": [],
+  "camera_count": 0,
+  "light_count": 0,
+  "animation_fcurve_count": 0,
+  "armature_count": 0,
+  "constraint_count": 0,
+  "transforms_applied": true,
+  "negative_scales": false,
+  "degenerate_triangle_count": 0,
+  "invalid_or_nonunit_loop_normal_count": 0,
+  "normal_ray_cast_first_hits": 30134,
+  "normal_ray_cast_flipped_visible_faces": 0,
+  "normal_ray_cast_flipped_fraction": 0.0,
+  "normal_orientation_status": "PASS",
+  "normal_orientation_method": "All source meshes run bmesh.ops.recalc_face_normals before export; reimported loop normals must be finite/unit; per-object signed volume is authoritative for this union of solids; 31,500 deterministic visibility rays test the first visible face from nine interior targets, with a 0.15% residual allowed at coincident faces.",
+  "unexpected_geometry_or_objects": [],
+  "material_contract_violations": [],
+  "glow_materials": [
+    "Toy_gold_Glow",
+    "Toy_koiOrange_Glow",
+    "Toy_koiWhite_Glow"
+  ],
+  "anchor_lonlat": [
+    -122.4159309,
+    37.7796961
+  ],
+  "anchor_lonlat_row_obb_centre": [
+    -122.4159189,
+    37.7796904
+  ],
+  "long_axis_heading_deg_true": 81.15,
+  "cross_axis_heading_deg_true": 171.15,
+  "target_height_m": 12.7999,
+  "target_height_is": "the model's VERTICAL EXTENT, not an architectural height: this asset is terrain-draped, so min_z is negative and the loader's targetHeightM / bbox-height scale must land on 1.0",
+  "monument_crest_above_local_grade_m": 11.298,
+  "height_datum": "Pioneer Monument, Minerva's finial. SF Arts Commission accession 1894.4.a-o records the work at 420 in = 10.668 m overall, standing on the plaza's granite apron",
+  "height_datum_vertex_object": "monument",
+  "terrain_drape": {
+    "source": "app/public/tiles/terrain.bin via manifest.terrain \u2014 the same array app/src/data.js samples at runtime",
+    "anchor_elevation_m": 17.788,
+    "fall_m": 2.366,
+    "cross_fall_max_m": 0.874,
+    "deck_height_above_grade_m": 0.55,
+    "samples": 32,
+    "max_standoff_error_m": 0.0039,
+    "tolerance_m": 0.1,
+    "detail": [
+      {
+        "u": -52,
+        "v": -16,
+        "deck_z": 1.2598,
+        "expected_z": 1.262,
+        "error": -0.0022
+      },
+      {
+        "u": -52,
+        "v": -5.5,
+        "deck_z": 1.2637,
+        "expected_z": 1.263,
+        "error": 0.0007
+      },
+      {
+        "u": -52,
+        "v": 5.5,
+        "deck_z": 1.2996,
+        "expected_z": 1.2995,
+        "error": 0.0001
+      },
+      {
+        "u": -52,
+        "v": 12,
+        "deck_z": 1.3868,
+        "expected_z": 1.387,
+        "error": -0.0002
+      },
+      {
+        "u": -40,
+        "v": -16,
+        "deck_z": 1.0274,
+        "expected_z": 1.027,
+        "error": 0.0004
+      },
+      {
+        "u": -40,
+        "v": -5.5,
+        "deck_z": 1.0892,
+        "expected_z": 1.0896,
+        "error": -0.0004
+      },
+      {
+        "u": -40,
+        "v": 5.5,
+        "deck_z": 1.1183,
+        "expected_z": 1.1175,
+        "error": 0.0008
+      },
+      {
+        "u": -40,
+        "v": 12,
+        "deck_z": 1.2309,
+        "expected_z": 1.227,
+        "error": 0.0039
+      },
+      {
+        "u": -28,
+        "v": -16,
+        "deck_z": 0.8054,
+        "expected_z": 0.803,
+        "error": 0.0024
+      },
+      {
+        "u": -28,
+        "v": -5.5,
+        "deck_z": 0.8484,
+        "expected_z": 0.848,
+        "error": 0.0004
+      },
+      {
+        "u": -28,
+        "v": 5.5,
+        "deck_z": 0.9517,
+        "expected_z": 0.9516,
+        "error": 0.0001
+      },
+      {
+        "u": -28,
+        "v": 12,
+        "deck_z": 1.1029,
+        "expected_z": 1.102,
+        "error": 0.0009
+      },
+      {
+        "u": -16,
+        "v": -16,
+        "deck_z": 0.6194,
+        "expected_z": 0.616,
+        "error": 0.0034
+      },
+      {
+        "u": -16,
+        "v": -5.5,
+        "deck_z": 0.6897,
+        "expected_z": 0.69,
+        "error": -0.0003
+      },
+      {
+        "u": -16,
+        "v": 5.5,
+        "deck_z": 0.7611,
+        "expected_z": 0.7603,
+        "error": 0.0009
+      },
+      {
+        "u": -16,
+        "v": 12,
+        "deck_z": 0.9031,
+        "expected_z": 0.901,
+        "error": 0.0021
+      },
+      {
+        "u": 20,
+        "v": -16,
+        "deck_z": 0.0643,
+        "expected_z": 0.063,
+        "error": 0.0013
+      },
+      {
+        "u": 20,
+        "v": -5.5,
+        "deck_z": 0.1037,
+        "expected_z": 0.1045,
+        "error": -0.0008
+      },
+      {
+        "u": 20,
+        "v": 5.5,
+        "deck_z": 0.2289,
+        "expected_z": 0.2289,
+        "error": -0.0
+      },
+      {
+        "u": 20,
+        "v": 12,
+        "deck_z": 0.3985,
+        "expected_z": 0.395,
+        "error": 0.0035
+      },
+      {
+        "u": 32,
+        "v": -16,
+        "deck_z": -0.1907,
+        "expected_z": -0.194,
+        "error": 0.0033
+      },
+      {
+        "u": 32,
+        "v": -5.5,
+        "deck_z": -0.0964,
+        "expected_z": -0.0965,
+        "error": 0.0001
+      },
+      {
+        "u": 32,
+        "v": 5.5,
+        "deck_z": 0.0119,
+        "expected_z": 0.0118,
+        "error": 0.0002
+      },
+      {
+        "u": 32,
+        "v": 12,
+        "deck_z": 0.1314,
+        "expected_z": 0.131,
+        "error": 0.0004
+      },
+      {
+        "u": 44,
+        "v": -16,
+        "deck_z": -0.3745,
+        "expected_z": -0.376,
+        "error": 0.0015
+      },
+      {
+        "u": 44,
+        "v": -5.5,
+        "deck_z": -0.2934,
+        "expected_z": -0.2941,
+        "error": 0.0007
+      },
+      {
+        "u": 44,
+        "v": 5.5,
+        "deck_z": -0.2496,
+        "expected_z": -0.2496,
+        "error": 0.0
+      },
+      {
+        "u": 44,
+        "v": 12,
+        "deck_z": -0.1833,
+        "expected_z": -0.183,
+        "error": -0.0003
+      },
+      {
+        "u": 52,
+        "v": -16,
+        "deck_z": -0.452,
+        "expected_z": -0.452,
+        "error": -0.0
+      },
+      {
+        "u": 52,
+        "v": -5.5,
+        "deck_z": -0.4058,
+        "expected_z": -0.4071,
+        "error": 0.0013
+      },
+      {
+        "u": 52,
+        "v": 5.5,
+        "deck_z": -0.4188,
+        "expected_z": -0.4206,
+        "error": 0.0018
+      },
+      {
+        "u": 52,
+        "v": 12,
+        "deck_z": -0.406,
+        "expected_z": -0.407,
+        "error": 0.001
+      }
+    ]
+  },
+  "koi_body_lengths_m": [
+    20.642,
+    20.642
+  ],
+  "koi_centres_uv_surveyed": [
+    [
+      -33.093,
+      -0.857
+    ],
+    [
+      27.288,
+      -5.439
+    ]
+  ],
+  "koi_materials": [
+    "Toy_koiOrange",
+    "Toy_koiWhite"
+  ],
+  "koi_glow_materials": [
+    "Toy_koiOrange_Glow",
+    "Toy_koiWhite_Glow"
+  ],
+  "signed_volume_outward_objects": 21,
+  "signed_volume_inverted_objects": [],
+  "object_details": [
+    {
+      "name": "apron",
+      "triangles": 156,
+      "location": [
+        0.0,
+        0.0,
+        0.0
+      ],
+      "rotation_euler": [
+        0.0,
+        0.0,
+        0.0
+      ],
+      "scale": [
+        1.0,
+        1.0,
+        1.0
+      ]
+    },
+    {
+      "name": "ashurbanipal",
+      "triangles": 52,
+      "location": [
+        0.0,
+        0.0,
+        0.0
+      ],
+      "rotation_euler": [
+        0.0,
+        0.0,
+        0.0
+      ],
+      "scale": [
+        1.0,
+        1.0,
+        1.0
+      ]
+    },
+    {
+      "name": "bed_east_kerb",
+      "triangles": 100,
+      "location": [
+        0.0,
+        0.0,
+        0.0
+      ],
+      "rotation_euler": [
+        0.0,
+        0.0,
+        0.0
+      ],
+      "scale": [
+        1.0,
+        1.0,
+        1.0
+      ]
+    },
+    {
+      "name": "bed_east_soil",
+      "triangles": 100,
+      "location": [
+        0.0,
+        0.0,
+        0.0
+      ],
+      "rotation_euler": [
+        0.0,
+        0.0,
+        0.0
+      ],
+      "scale": [
+        1.0,
+        1.0,
+        1.0
+      ]
+    },
+    {
+      "name": "bed_west_kerb",
+      "triangles": 100,
+      "location": [
+        0.0,
+        0.0,
+        0.0
+      ],
+      "rotation_euler": [
+        0.0,
+        0.0,
+        0.0
+      ],
+      "scale": [
+        1.0,
+        1.0,
+        1.0
+      ]
+    },
+    {
+      "name": "bed_west_soil",
+      "triangles": 100,
+      "location": [
+        0.0,
+        0.0,
+        0.0
+      ],
+      "rotation_euler": [
+        0.0,
+        0.0,
+        0.0
+      ],
+      "scale": [
+        1.0,
+        1.0,
+        1.0
+      ]
+    },
+    {
+      "name": "bollards",
+      "triangles": 1568,
+      "location": [
+        0.0,
+        0.0,
+        0.0
+      ],
+      "rotation_euler": [
+        0.0,
+        0.0,
+        0.0
+      ],
+      "scale": [
+        1.0,
+        1.0,
+        1.0
+      ]
+    },
+    {
+      "name": "deck",
+      "triangles": 970,
+      "location": [
+        0.0,
+        0.0,
+        0.0
+      ],
+      "rotation_euler": [
+        0.0,
+        0.0,
+        0.0
+      ],
+      "scale": [
+        1.0,
+        1.0,
+        1.0
+      ]
+    },
+    {
+      "name": "furniture",
+      "triangles": 180,
+      "location": [
+        0.0,
+        0.0,
+        0.0
+      ],
+      "rotation_euler": [
+        0.0,
+        0.0,
+        0.0
+      ],
+      "scale": [
+        1.0,
+        1.0,
+        1.0
+      ]
+    },
+    {
+      "name": "joints",
+      "triangles": 2304,
+      "location": [
+        0.0,
+        0.0,
+        0.0
+      ],
+      "rotation_euler": [
+        0.0,
+        0.0,
+        0.0
+      ],
+      "scale": [
+        1.0,
+        1.0,
+        1.0
+      ]
+    },
+    {
+      "name": "koi",
+      "triangles": 408,
+      "location": [
+        0.0,
+        0.0,
+        0.0
+      ],
+      "rotation_euler": [
+        0.0,
+        0.0,
+        0.0
+      ],
+      "scale": [
+        1.0,
+        1.0,
+        1.0
+      ]
+    },
+    {
+      "name": "koi_glow",
+      "triangles": 384,
+      "location": [
+        0.0,
+        0.0,
+        0.0
+      ],
+      "rotation_euler": [
+        0.0,
+        0.0,
+        0.0
+      ],
+      "scale": [
+        1.0,
+        1.0,
+        1.0
+      ]
+    },
+    {
+      "name": "lamps",
+      "triangles": 384,
+      "location": [
+        0.0,
+        0.0,
+        0.0
+      ],
+      "rotation_euler": [
+        0.0,
+        0.0,
+        0.0
+      ],
+      "scale": [
+        1.0,
+        1.0,
+        1.0
+      ]
+    },
+    {
+      "name": "lamps_glow",
+      "triangles": 144,
+      "location": [
+        0.0,
+        0.0,
+        0.0
+      ],
+      "rotation_euler": [
+        0.0,
+        0.0,
+        0.0
+      ],
+      "scale": [
+        1.0,
+        1.0,
+        1.0
+      ]
+    },
+    {
+      "name": "monument",
+      "triangles": 4160,
+      "location": [
+        0.0,
+        0.0,
+        0.0
+      ],
+      "rotation_euler": [
+        0.0,
+        0.0,
+        0.0
+      ],
+      "scale": [
+        1.0,
+        1.0,
+        1.0
+      ]
+    },
+    {
+      "name": "monument_glow",
+      "triangles": 12,
+      "location": [
+        0.0,
+        0.0,
+        0.0
+      ],
+      "rotation_euler": [
+        0.0,
+        0.0,
+        0.0
+      ],
+      "scale": [
+        1.0,
+        1.0,
+        1.0
+      ]
+    },
+    {
+      "name": "people",
+      "triangles": 384,
+      "location": [
+        0.0,
+        0.0,
+        0.0
+      ],
+      "rotation_euler": [
+        0.0,
+        0.0,
+        0.0
+      ],
+      "scale": [
+        1.0,
+        1.0,
+        1.0
+      ]
+    },
+    {
+      "name": "terrace_s",
+      "triangles": 256,
+      "location": [
+        0.0,
+        0.0,
+        0.0
+      ],
+      "rotation_euler": [
+        0.0,
+        0.0,
+        0.0
+      ],
+      "scale": [
+        1.0,
+        1.0,
+        1.0
+      ]
+    },
+    {
+      "name": "terrace_s_wall",
+      "triangles": 288,
+      "location": [
+        0.0,
+        0.0,
+        0.0
+      ],
+      "rotation_euler": [
+        0.0,
+        0.0,
+        0.0
+      ],
+      "scale": [
+        1.0,
+        1.0,
+        1.0
+      ]
+    },
+    {
+      "name": "trees",
+      "triangles": 1104,
+      "location": [
+        0.0,
+        0.0,
+        0.0
+      ],
+      "rotation_euler": [
+        0.0,
+        0.0,
+        0.0
+      ],
+      "scale": [
+        1.0,
+        1.0,
+        1.0
+      ]
+    },
+    {
+      "name": "walk_n",
+      "triangles": 210,
+      "location": [
+        0.0,
+        0.0,
+        0.0
+      ],
+      "rotation_euler": [
+        0.0,
+        0.0,
+        0.0
+      ],
+      "scale": [
+        1.0,
+        1.0,
+        1.0
+      ]
+    }
+  ],
+  "checks": {
+    "meters_and_plausible_dimensions": true,
+    "vertical_extent_matches_build_meta": true,
+    "height_datum_is_the_monument": true,
+    "deck_drapes_the_terrain": true,
+    "koi_are_two_bodies_of_the_right_size": true,
+    "koi_carry_both_day_and_night_materials": true,
+    "centered_xy": true,
+    "under_triangle_budget": true,
+    "no_image_textures": true,
+    "no_transparency": true,
+    "materials_follow_contract": true,
+    "no_cameras_or_lights": true,
+    "no_animation_skin_or_constraints": true,
+    "transforms_applied": true,
+    "no_negative_scales": true,
+    "normals_outward_signed_volume": true,
+    "normals_outward_ray_residual_within_tolerance": true,
+    "no_degenerate_geometry": true,
+    "no_unexpected_objects": true
+  },
+  "overall": "PASS"
+}
