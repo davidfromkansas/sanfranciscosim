@@ -1749,5 +1749,24 @@
     ],
     "tris": 3140,
     "loadRadius": 2500
+  },
+  {
+    "id": "434-brannan",
+    "file": "434-brannan.glb",
+    "anchor": [
+      -122.3954103,
+      37.7796003
+    ],
+    "targetHeightM": 13.79,
+    "cat": 3,
+    "name": "434 Brannan Street",
+    "estimated": true,
+    "dims": [
+      40.1962,
+      40.6682,
+      13.79
+    ],
+    "tris": 5872,
+    "loadRadius": 2500
   }
 ]
