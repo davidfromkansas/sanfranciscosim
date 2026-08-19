@@ -109,7 +109,11 @@ const RETIRE_AFTER = 24 * 60 * 60 * 1000;
 // posts blocked, nothing retiring for another sixteen. The cap has to be a
 // backstop against runaway generation, not a limit the normal rate walks into.
 const MAX_THREADS = 200;
-const REFRESH_MS = 10 * 60 * 1000;
+// How long a served payload is reused before the blob is read again. It is not
+// the posting cadence — that is WINDOW_MS, down where the tick decides its
+// minute. The two were one constant while the feed both generated and served;
+// they became different numbers the moment those split, because a read is a
+// blob GET and can be cheap and frequent while a post stays every ten minutes.
 const READ_TTL_MS = 30 * 1000;
 // The budget rail. Everything else here is taste; this is the line that stops a
 // bad day costing real money. Ten covers the worst case for one tick — a post
