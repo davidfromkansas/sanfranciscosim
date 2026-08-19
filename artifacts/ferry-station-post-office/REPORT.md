@@ -27,7 +27,9 @@ Built 18 August 2026 from `docs/asset-plans/ferry-station-post-office.md`.
 | | |
 |---|---|
 | Triangles | **11,596** of a 15,000 cap |
-| Objects | 285 |
+| Objects | 285 as authored; **13** in the shipped file (joined per material at stage 4) |
+| File size | **309,136 bytes** raw / ~198.9 KB gzipped, meshopt-compressed (stage 4; 716,492 bytes pre-optimize) |
+| Draw primitives | **15** (287 pre-optimize) |
 | Dimensions | 69.84 x 65.20 x **12.650** m |
 | Bounding-box top | **12.650 m** — the clay-tile hip ridge |
 | `targetHeightM / measuredHeight` | **1.000000** |
@@ -129,4 +131,26 @@ approval was solicited; the renders and this report are the record.
 ## Gate 2 — PASS
 
 `validation.json` `overall: PASS`, every check true, on a fresh-scene re-import
-of the exported GLB.
+of the exported GLB. It was re-run after the stage-4 shipping swap, so the
+numbers above are the **shipped** ones, not the authored ones.
+
+## Gate 4 — PASS
+
+Stage 4 (`optimize/REPORT.md`) ran on 18 August 2026: 716,492 → 309,136 bytes
+(−56.9%), 287 → 15 draw primitives, all gates G1–G6/G8 PASS, deterministic
+re-run byte-identical. The optimized file is the shipping asset; the original is
+archived at `optimize/input/`.
+
+## A judgment call worth recording
+
+The terracotta trim ships as `Toy_sand` (`ece4d4`), the palette's light warm
+neutral. The 2025 Street View pano shows it as a warm apricot, and no palette
+entry is close: `Toy_stone` is only 8% darker and just as neutral,
+`Toy_mustard` and `Toy_gold` are far too saturated. `Toy_sand` was kept rather
+than going off-palette, on three grounds: the NRHP nomination calls the material
+"artificial stone details of cement colored French ochre", i.e. a light cement
+colour rather than a terracotta one; the composition that has to survive at
+aerial distance is *light trim against dark brick*, which `Toy_sand` delivers
+most strongly; and one shared palette across 90 landmarks is worth more than one
+building matching one photograph's low-sun colour cast. If a future pass
+disagrees, the change is one line in `PALETTE_HEX`.
