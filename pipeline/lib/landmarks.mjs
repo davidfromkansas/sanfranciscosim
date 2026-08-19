@@ -2545,6 +2545,52 @@ export const LANDMARKS = [
     // destination.
     camera: { distance: 165, yaw: 270, pitch: 26 },
   },
+  {
+    // 2014, five storeys, nineteen units over a ground-floor restaurant and
+    // garage — the newest and tallest building on this face of Ritch Street by
+    // eight metres. The bounding-box top is the roof stair/elevator penthouse at
+    // 18.76 m (DataSF LiDAR maximum), NOT the 15.87 m parapet; see
+    // docs/asset-plans/246-ritch.md 2.15 risk 1 and artifacts/246-ritch/REPORT.md.
+    //
+    // The address is a condominium: block 3776 lots 456-475 all share ONE parcel
+    // polygon, and lot 456 also carries 240 Ritch (the ground-floor commercial
+    // space). That is this building, not a neighbour — only one asset per parcel
+    // can own the exclusion.
+    //
+    // Exclusion window measured from THIS point with the metric excluded() uses
+    // (area centroid OR any ring vertex), against BOTH bake inputs, with the
+    // bake's own simplifyRing(0.6) applied first:
+    //
+    //    0.01 m  this building, Overture 0e69af6c (the OSM trace, 379 m2)  <- must go
+    //    1.69 m  this building, DataSF SF3776456 (394 m2)                  <- must go
+    //    8.89 m  248-250 Ritch, Overture d280b71a (101 m2)                 <- must survive
+    //   11.10 m  248-250 Ritch, DataSF SF3776105 (167 m2)                  <- must survive
+    //   12.71 m  230/236 Ritch, DataSF SF3776144 (484 m2)                  <- must survive
+    //   14.03 m  230/236 Ritch, Overture 2259b5ef (472 m2)                 <- must survive
+    //
+    // Safe band (1.69, 8.89) — 7.2 m wide, unusually generous for a party-wall
+    // lot. 5.3 sits dead centre with 3.6 m of margin either side. Both of this
+    // building's rings go by their CENTROIDS, so do not reason "the radius has to
+    // cover the building": the footprint reaches 13.98 m from the anchor and that
+    // is fine. Do not raise past 7 without re-running the measurement.
+    //
+    // No clearTrees: at 5.3 m the circle is entirely inside the building, and the
+    // three street trees in front are real — the project was required to plant
+    // them, and they are in every photograph of it.
+    id: '246Ritch',
+    name: '246 Ritch Street',
+    lon: -122.3958481,
+    lat: 37.7802253,
+    height: 18.76,
+    exclude: 5.3,
+    // camera.js places the rig at (sin yaw, sin pitch, cos yaw) x distance from
+    // the pivot and this project's +z is SOUTH, so yaw 135 stands the camera
+    // north-east of the building — square onto the 45 deg Ritch Street front,
+    // which is the only designed elevation. 130 m rather than the ~90 m its
+    // height suggests, because Ritch is a 13 m alley and a closer rig clips into
+    // the neighbours.
+    camera: { distance: 130, yaw: 135, pitch: 26 },
+  },
 ];
 
 // Parks/green spaces the landcover bake must match at least one source polygon

@@ -169,6 +169,57 @@ the build script already joins per material, so the pass had nothing left to do 
 Blender round-trip cost ~9 KB. Full four-variant table, census and gate results in
 `optimize/REPORT.md`. The pre-optimize original is archived at `optimize/input/246-ritch.glb`.
 
+## 6b. Stage 5 — integration and local QA
+
+Case **B**. Registry entry `246Ritch` (`camelId('246-ritch')`, verified), `exclude: 5.3`,
+`camera: { distance: 130, yaw: 135, pitch: 26 }`. Manifest entry appended as text
+(+19 lines, 0 deletions). `loadRadius` 2500 — the default `max(2500, 18.76 × 30)`.
+`pipeline/compress-assets.mjs` skips the file: it is already meshopt-compressed from stage 4.
+
+**The re-bake was mandatory here, not a formality.** The procedural block on this parcel baked
+to a `topY` of **22.6 m** absolute — `datasfHeight()` takes the midpoint of the LiDAR median and
+maximum (17.32 m) and adds ~5.3 m of terrain — against this asset's 21.2 m parapet. The
+procedural version is **taller than the asset**, so an unbaked check would have shown nothing
+wrong with a building that was in fact entirely buried.
+
+| Check | Result |
+|---|---|
+| `pipeline/audit.mjs` 1.6 — no procedural footprint inside a landmark exclusion zone | **PASS** — 100 zones over 97 landmarks clear. (1.2b, 1.3c and 1.7b fail on `origin/main` too and are unrelated) |
+| `pipeline/verify-rebake.mjs` | **PASS** — 584 of 585 cells unchanged; `23_13` 182 → 181; nearest surviving footprint 11.1 m vs the 5.3 m radius |
+| Tile penetration test (decoded `buildings/23_13.bin` and `toy/23_13.bin`, point-in-polygon against the real footprint) | **PASS** — the 386 m² / 22.6 m block whose centroid sat 1.5 m from the anchor is gone from both tiers. The only ring still touching the rectangle is 230/236 Ritch (`SF3776144`) with **one vertex 0.97 m inside** — the shared party-wall corner, present identically **before** the re-bake, and unfixable without deleting a real standing building (AGENTS rule 5) |
+| Loader merge line | `sf-assets: 246-ritch merged 12 objects / 10 materials -> batched (5841 tris body); **uniform x1.0000** at 3665, -1130` |
+| Scale | **1.0000** — authored crest and `targetHeightM` agree exactly |
+| Exactly one building, no procedural twin, no z-fighting | **PASS** (screenshot + tile test) |
+| Terrain seating | **PASS** — no floating, no sinking |
+| Orientation | **PASS** — the balcony front faces Ritch Street; the camera preset (yaw 135) looks square onto it |
+| Night | **PASS** — six lit windows and the warm restaurant/lobby band at the base; balconies, parapet, penthouse and roof stay dark |
+| Draw calls | **55–94** across the QA runs, against the 300 iron-rule cap |
+| Fallback drill | **PASS** — GLB moved aside: the app boots, the area renders, exactly one warning (`246-ritch failed to load (… 404)`), and the site is empty ground inside the exclusion zone, which is the documented Case B expectation. File restored |
+
+**One finding that is not about this asset.** On `origin/main` the shared landmark
+`BatchedMesh` reserve is exhausted, and 246 Ritch is the landmark that tips it over:
+
+```
+landmark-bodies:  maxVerts 1,200,000 (origin/main)   nextVert 1,204,928   geoms 84
+```
+
+With 84 landmarks live in the SoMa/South Park cluster the batch needs **1,204,928** vertices
+against a 1,200,000 reserve — a deficit of **4,928**, about 0.4%. The first QA run therefore
+logged `sf-assets: 246-ritch failed to load (THREE.BatchedMesh: Reserved space request exceeds
+the maximum buffer size.)` and the asset was fine. Raising `BODY_VERTS` / `BODY_INDICES` in
+`app/src/assets.js` to 2,000,000 / 6,000,000 made every check above pass with `failed: 0`; the
+change was **reverted before committing**, because a landmark branch must not carry an
+`app/src/assets.js` change and the reserve is a GPU-memory decision for the owner (1.2M → 2.0M
+verts is roughly 43 → 72 MB for positions+normals+colours, plus 14 → 24 MB of indices).
+
+**Batch mode.** `248-ritch` and `254-ritch` are in flight on the two lots south-east. The bake
+was run and QA'd, then discarded with `git checkout -- app/public/tiles api/_data`; this branch
+commits source only. `git diff --name-only origin/main` lists nothing under `app/public/tiles/`
+or `api/_data/`. The city gets baked once for the whole batch by
+`docs/asset-pipeline/BATCH-INTEGRATE.md`. For the record, the discarded bake touched 583 files:
+1 `buildings/`, 1 `toy/`, 572 `ctx/*.json` (global-index renumbering after one dropped
+footprint), 3 `context/`, and the manifests plus `api/_data/{stats,search-index}.json`.
+
 ## 7. Reproducing
 
 ```bash
