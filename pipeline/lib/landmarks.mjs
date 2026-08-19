@@ -2545,6 +2545,72 @@ export const LANDMARKS = [
     // destination.
     camera: { distance: 165, yaw: 270, pitch: 26 },
   },
+  {
+    // Pier 1, the first finger pier north of the Ferry Building: a 12.5 m deep
+    // Neo-classical bulkhead building on the Embarcadero building line with a
+    // monumental round arch carved PORT OF SAN FRANCISCO, and a 213 m transit
+    // shed running north-east into the Bay behind it, all on a pile deck.
+    // Rehabilitated 2001 (SMWM) as the Port of San Francisco's headquarters and
+    // Prologis's. NRHP #98001551.
+    //
+    // TWO ZONES, and the usual half-diagonal rule must NOT be used here. The
+    // bake carries this pier as two overlapping footprints:
+    //
+    //   DataSF 146   (toy 23_9#5,  10.3 m)  the shed and the NW part of the
+    //                                       bulkhead
+    //   Overture     (toy 23_9#6,  14.4 m)  a COMB: the ~9 m deep Embarcadero
+    //                                       frontage strip from Pier 1 to
+    //                                       Pier 5, plus Pier 1's bulkhead SE
+    //                                       lobe, plus a 37 x 34 m tooth over
+    //                                       Pier 3's bulkhead
+    //
+    // The DataSF footprint alone is not enough: the front 9 m of the bulkhead —
+    // the Beaux-Arts facade itself — is covered ONLY by the Overture polygon, at
+    // 14.4 m, which is 5.8 m taller than the wings it would bury. Both have to
+    // go. But one radius around this anchor that reaches the Overture ring
+    // (71.6 m) is only 7.5 m short of reaching 23_9#14 (Pier 1 1/2 and Pier 3,
+    // 10.7 m) at 79.1 m — too tight a window to defend. So `exclude` stays small
+    // and an extra zone sits in the middle of Pier 1's own bulkhead, 1.37 m from
+    // both targets and 35.5 m from the nearest keeper.
+    //
+    // Verified by replaying excluded()'s exact test (centroid OR any ring
+    // vertex) against the committed tiles of BOTH tiers, over every footprint
+    // within 700 m:
+    //   buildings tier: drops 2 — 23_9#4 (16.0 m), 23_9#7 (13.7 m)
+    //   toy tier:       drops 2 — 23_9#6 (14.4 m), 23_9#5 (10.3 m)
+    // Nothing else, in either tier. Re-run that check after a re-bake; do not
+    // trust verify-rebake's per-cell COUNTS alone, which can call a working
+    // exclusion "dropped nothing".
+    //
+    // COLLATERAL, stated plainly: dropping the Overture polygon also removes
+    // Pier 3's bulkhead block (37 x 34 m, 14.4 m, ~110 m north-west) and the
+    // ~9 m deep frontage strip in front of Piers 1 1/2 to 5. The bulk behind it
+    // survives as 23_9#14/#15 and Pier 5 as #16, so the row keeps its mass but
+    // sits back ~9 m from the street. There is no radius that avoids this: one
+    // Overture ring traces Pier 1's facade and Pier 3's bulkhead together, and
+    // excluded() has no way to clip one. The alternative is a 14.4 m grey slab
+    // standing through the front third of a hand-built landmark. Shipping Pier 3
+    // as a landmark is the only real fix.
+    //
+    // App yaw = 180 - true bearing, so yaw 235 stands the eye at bearing 305 —
+    // over the Embarcadero off the facade's outboard shoulder, which is the only
+    // angle that reads the frontispiece, the SE flank running away, the taper
+    // and the whole roof at once. 700 m suits a 234 m pier. No `key`: keys 0-9
+    // are taken.
+    //
+    // `height` is the pavilion crest ABOVE THE PIER DECK. The manifest's
+    // targetHeightM (15.4) is a different quantity — the model's vertical
+    // extent, pile stubs to crest — because this asset stands in water and
+    // carries its own deck. See docs/asset-plans/pier-1.md 2.3.
+    id: 'pier1',
+    name: 'Pier 1',
+    lon: -122.3940736,
+    lat: 37.7974474,
+    height: 12.8,
+    exclude: 25,
+    extraExclusions: [{ lon: -122.3948198, lat: 37.7969113, r: 10 }],
+    camera: { distance: 700, yaw: 235, pitch: 22 },
+  },
 ];
 
 // Parks/green spaces the landcover bake must match at least one source polygon
