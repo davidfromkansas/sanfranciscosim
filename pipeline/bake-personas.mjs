@@ -57,10 +57,21 @@ async function main() {
 
   const people = [];
   let skipped = 0;
+  let minors = 0;
   for (const household of data.households) {
     for (const person of household.personas) {
       if (!person.iss) {
         skipped++;
+        continue;
+      }
+      // Adults only, the same cut bake-population.mjs makes. Children exist in
+      // the household records and now have paragraphs — the authoring packets
+      // list every person in a household, because a parent's paragraph has to
+      // name their kids consistently. But a three-year-old is not a poster on
+      // a city subreddit, and the cast this file feeds is the cast that writes.
+      // They stay in the source, out of the cast.
+      if (typeof person.age === 'number' && person.age < 18) {
+        minors++;
         continue;
       }
       people.push({
@@ -94,6 +105,7 @@ async function main() {
   console.log(`${people.length} people with a paragraph · ${size} KB`);
   console.log(`  by PUMA: ${Object.entries(byPuma).map(([k, v]) => `${k} ${v}`).join(', ')}`);
   if (skipped) console.log(`  ${skipped} skipped — no identity paragraph written yet`);
+  if (minors) console.log(`  ${minors} skipped — under 18, not part of the cast`);
 }
 
 main();
