@@ -1863,5 +1863,24 @@
     ],
     "tris": 18932,
     "loadRadius": 2500
+  },
+  {
+    "id": "501-third",
+    "file": "501-third.glb",
+    "anchor": [
+      -122.3954601,
+      37.7813246
+    ],
+    "targetHeightM": 16.4,
+    "cat": 3,
+    "name": "501 Third Street",
+    "estimated": false,
+    "dims": [
+      34.6966,
+      34.5376,
+      16.4
+    ],
+    "tris": 2732,
+    "loadRadius": 2500
   }
 ]
