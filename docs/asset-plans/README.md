@@ -154,6 +154,7 @@ route, and the park plans depend on it (§E8 of the parks README).
 | [Pier 15 (Exploratorium)](./pier-15.md) | `pier-15` | 16.4 m above water (bulkhead gable crest, photogrammetric; monitor ridge 13.9 m; water asset, deck 3.05 m) | new landmark |
 | [Pier 7 (Broadway public access pier)](./pier-7.md) | `pier-7` | 7.6 m (vertical extent above the waterline: deck +3.0 m, lamp tops +7.6 m; water asset) | new landmark |
 | [Hills Brothers Building (2 Harrison Street)](./hills-brothers-building.md) | `hills-brothers-building` | 53.2 m (tower finial, LiDAR maximum — see its 2.15 risk 1; main parapet 25.6 m derived) | new landmark |
+| [345 Spear Street (Hills Plaza)](./345-spear.md) | `345-spear` | 68.5 m (LiDAR max, read as the tower's mechanical crown; podium 24.2/28.4 m) | new landmark |
 
 - Style: `docs/styles/miniature-toy.md` (authoritative for artistic decisions)
 - Technical contract: `.agents/skills/sf-asset-check/SKILL.md` (authoritative for the GLB)
