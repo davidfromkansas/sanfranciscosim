@@ -6,9 +6,11 @@ import {
   AdditiveBlending,
   BoxGeometry,
   BufferAttribute,
+  BufferGeometry,
   CylinderGeometry,
   EdgesGeometry,
   LineBasicMaterial,
+  Line,
   LineSegments,
   Mesh,
   MeshBasicMaterial,
@@ -96,6 +98,19 @@ export function createFocusOverlay(scene) {
   beam.frustumCulled = false;
   scene.add(beam);
 
+  // Park outline: the real boundary, drawn as a closed line on the ground.
+  // Rebuilt only when a different park is selected — one buffer, grown in place
+  // if a bigger ring turns up.
+  const outline = new Line(
+    new BufferGeometry(),
+    new LineBasicMaterial({ color: HIGHLIGHT, transparent: true, opacity: 0.95, depthTest: false })
+  );
+  outline.name = 'focus-outline';
+  outline.renderOrder = 902;
+  outline.visible = false;
+  outline.frustumCulled = false;
+  scene.add(outline);
+
   let pulse = 0;
 
   function clear() {
@@ -103,11 +118,12 @@ export function createFocusOverlay(scene) {
     glow.visible = false;
     ring.visible = false;
     beam.visible = false;
+    outline.visible = false;
   }
 
   // `height` comes from the entity's pick box, so the overlay matches whichever
   // tier is on screen (the toy tier clamps building heights).
-  function show(entity, { toy = false, groundY = 0 } = {}) {
+  function show(entity, { toy = false, groundY = 0, groundSample = null } = {}) {
     clear();
     if (!entity) return;
     // Anything that knows its own extents draws a wire box on them. Landmarks
@@ -141,6 +157,34 @@ export function createFocusOverlay(scene) {
       }
       return;
     }
+    // A park is a shape, not a point: trace it. The rings are lon/lat-projected
+    // scene coordinates already, and the first ring is the outer boundary — the
+    // rest are holes, which a selection outline has no business drawing.
+    if (entity.kind === 'park' && entity.rings?.length) {
+      const ring = entity.rings[0];
+      if (ring && ring.length >= 6) {
+        const points = new Float32Array((ring.length / 2 + 1) * 3);
+        for (let i = 0; i < ring.length; i += 2) {
+          const x = ring[i];
+          const z = ring[i + 1];
+          const j = (i / 2) * 3;
+          points[j] = x;
+          // Ride the terrain rather than cutting through a hill; the line draws
+          // with depth testing off, so a metre of lift is enough to read.
+          points[j + 1] = (groundSample ? groundSample(x, z) : groundY) + 1.5;
+          points[j + 2] = z;
+        }
+        // Close the loop back to the first point.
+        points[points.length - 3] = points[0];
+        points[points.length - 2] = points[1];
+        points[points.length - 1] = points[2];
+        outline.geometry.dispose();
+        outline.geometry = new BufferGeometry();
+        outline.geometry.setAttribute('position', new BufferAttribute(points, 3));
+        outline.visible = true;
+        return;
+      }
+    }
     const radius =
       entity.kind === 'landmark' ? 90 : entity.kind === 'neighborhood' ? 420 : entity.kind === 'park' ? 160 : 30;
     ring.position.set(entity.x, groundY + 1.5, entity.z);
@@ -154,6 +198,7 @@ export function createFocusOverlay(scene) {
     glow.material.opacity = 0.08 + wave * 0.08;
     ring.material.opacity = 0.6 + wave * 0.3;
     beam.material.opacity = 0.62 + wave * 0.34;
+    outline.material.opacity = 0.7 + wave * 0.28;
   }
 
   return { show, clear, update };

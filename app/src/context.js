@@ -303,6 +303,9 @@ export async function createContext(data) {
         acres: park.acres,
         x: park.x,
         z: park.z,
+        // The real boundary, so the selection traces the park instead of
+        // dropping a fixed 160 m circle somewhere near it.
+        rings: park.rings || null,
         source: 'datasf',
         confidence: 3,
       };
@@ -372,9 +375,12 @@ export async function createContext(data) {
     // remain in search and available to the concierge — this is only about
     // clicking in the 3D scene. A click on a road now resolves to the
     // neighbourhood it is in.
+    // Neighbourhoods are no longer PICKED either: they are named continuously by
+    // the floating labels (signs.js), which say the same thing without a click
+    // and without a 420 m ring drawn round the answer. neighborhoodAt stays for
+    // the concierge and for building cards.
     return (
-      pickPark(groundPoint) ||
-      pickNeighborhood(groundPoint) || {
+      pickPark(groundPoint) || {
         kind: 'water',
         id: 'water:bay',
         title: 'San Francisco Bay',

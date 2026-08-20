@@ -275,7 +275,7 @@ async function boot() {
   // Real aircraft from /api/flights. Like the Muni layer this one simply stays
   // empty when the feed is away — nothing else in the city depends on it.
   const aircraft = createLiveAircraft(scene, data);
-  const signs = createSigns(scene, data);
+  const signs = createSigns(scene, data, context.neighborhoods);
   const post = createToyPost(renderer);
 
   const presets = [
@@ -770,7 +770,7 @@ async function boot() {
               : aircraft.aircraftEntity(selected.id);
     if (!fresh) return;
     focus.entity = fresh;
-    overlay.show(fresh, { toy: style === 'toy', groundY: 0 });
+    overlay.show(fresh, { toy: style === 'toy', groundY: 0, groundSample: data.sampleElevation });
     vesselCardAge += dt;
     if (vesselCardAge < 5) return;
     vesselCardAge = 0;
