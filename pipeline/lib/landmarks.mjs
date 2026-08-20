@@ -4291,6 +4291,32 @@ export const LANDMARKS = [
     // is the Ferry Building's handsome low neighbour, not a destination.
     camera: { distance: 260, yaw: 290, pitch: 22 },
   },
+  {
+    // Pier 17 — the 1912 cargo shed (third-oldest pier on the waterfront) on
+    // its own deck at the Embarcadero and Green St, Exploratorium campus. The
+    // GLB carries the pier deck itself (the bake draws no pier decks and the
+    // loader seats assets at water level over open water), so `height` is the
+    // flagpole tip above WATER: deck 2.0 + facade apex 14.9 + pole (LiDAR
+    // 1st-return peak 19.26 m above deck).
+    //
+    // EXCLUSION — measured from the shipped tiles (cell 22_8) against
+    // excluded()'s min(centroid, any-vertex) gate from this anchor: the baked
+    // pier is ONE merged DataSF trace (gate 74.5 m — its centroid; the trace
+    // includes a SE lobe toward Pier 15). Nearest keeper is Pier 19's trace
+    // at ~137 m, then Pier 15's shed at ~204 m. r=100 sits mid-window; it
+    // must NOT reach 137. Overture twin is caught by its own centroid.
+    id: 'pier-17',
+    name: 'Pier 17',
+    lon: -122.3981018,
+    lat: 37.8022149,
+    height: 21.3,
+    exclude: 100,
+    // Camera bearing = 180 - yaw; the bulkhead front faces 235 deg (SW onto
+    // the Embarcadero), so yaw -55 stands the eye over the water gap to the
+    // southwest, seeing the front gable + the Valley flank. 420 m because the
+    // shed is 232 m long and reads as a whole, not a facade.
+    camera: { distance: 420, yaw: -55, pitch: 30 },
+  },
 ];
 
 // Parks/green spaces the landcover bake must match at least one source polygon

@@ -178,6 +178,7 @@ route, and the park plans depend on it (§E8 of the parks README).
 | [132 The Embarcadero (Jewish Community Federation Building)](./132-embarcadero.md) | `132-embarcadero` | 29.57 m (LiDAR bulkhead crest; parapet 27.4 m measured) | new landmark |
 | [8 Mission Street (1 Hotel San Francisco / Hotel Vitale)](./8-mission.md) | `8-mission` | 28.66 m to the turret crown (LiDAR max; roof plateaus 25.10 / 19.64 / 14.18 m) | new landmark |
 | [Ferry Station Post Office Building (Agriculture Building)](./ferry-station-post-office.md) | `ferry-station-post-office` | 12.65 m (LiDAR tile-ridge; eave 10.8 m measured) | new landmark |
+| [Pier 17 (The Embarcadero at Green St)](./pier-17.md) | `pier-17` | 21.3 m (flagpole tip above water; facade gable apex 16.9 m, LiDAR-derived; the asset carries its own 2.0 m pier deck) | new landmark |
 
 - Style: `docs/styles/miniature-toy.md` (authoritative for artistic decisions)
 - Technical contract: `.agents/skills/sf-asset-check/SKILL.md` (authoritative for the GLB)

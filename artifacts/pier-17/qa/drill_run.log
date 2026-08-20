@@ -1,0 +1,23 @@
+  entries: {"entries":104,"far":100,"loading":1,"live":3,"fading":0,"failed":0}
+  stats: {"entries":104,"far":32,"loading":17,"live":55,"fading":0,"failed":0}
+PASS  manifest entry loads — sf-assets: pier-17 failed to load (fetch for "http://127.0.0.1:54072/sf-assets/landmarks/pier-17.glb" responded with 404: Not Found)
+PASS  uniform scale ~ 1.0 — n/a in drill
+  rig: {"x":3467,"z":-3561,"yawDeg":-55,"pitchDeg":30,"distance":420}
+  placedPier17: false null
+  placedIds: goldenGateBridge,salesforceTower,ferryBuilding,transamerica,paintedLadies,362Brannan,380Brannan,550Third,551Third,350Brannan,101SouthPark,171SouthPark,155SouthPark,135SouthPark,165SouthPark,370Brannan,358Brannan,181SouthPark,500Third,599Third,574Third,590Third,592Third,400Brannan,150SouthPark,188SouthPark,560Third,160SouthPark,132SouthPark,106SouthPark,108SouthPark,156SouthPark,168SouthPark,140SouthPark,126SouthPark,102SouthPark,2SouthPark,64SouthPark,501Second,524Second,21SouthPark,22SouthPark,26SouthPark,35SouthPark,41SouthPark,46SouthPark,58SouthPark,76SouthPark,84SouthPark,92SouthPark,300Brannan,95JackLondonAlley,334Brannan,318Brannan,326Brannan,49SouthPark,340Brannan,49Zoe,246Ritch,254Ritch,434Brannan,248Ritch,226Ritch,424Brannan,414Brannan,1SouthPark,501Third,10SouthPark,521Third,164SouthPark,cityHall,coitTower,conservatoryOfFlowers,calAcademy,palaceOfFineArts,deYoung,stMarysCathedral,fairmont,graceCathedral,missionDolores,columbusTower,operaHouse,555California
+  console lines: 92
+    > weather: feed unavailable, holding the last known sky SyntaxError: Unexpected token '<', "<!doctype "... is not valid JSON
+    > sf-assets: pier-17 failed to load (fetch for "http://127.0.0.1:54072/sf-assets/landmarks/pier-17.glb" responded with 404: Not Found)
+DRILL-EXIT=143
+
+# NOTE (2026-08-19): drill terminated by the session after its two mandatory
+# Step-6 assertions were captured above — the app booted with the GLB served
+# as 404 (stats entries=104, landmarks streaming) and the console carried
+# EXACTLY ONE fallback line, the streamed-path variant:
+#   sf-assets: pier-17 failed to load (... 404: Not Found)
+# placedPier17=false and the re-baked tiles hold no building on the site, so
+# the pier deck's ground is empty inside the exclusion zone — the documented
+# Case B drill outcome. The drill-day/night screenshots were skipped: the
+# machine was at load ~500 under a dozen sibling landmark sessions and the
+# SwiftShader frame never came back (same failure mode 434-brannan recorded
+# for its wide shot). DRILL-EXIT=143 is that termination, not a check failure.

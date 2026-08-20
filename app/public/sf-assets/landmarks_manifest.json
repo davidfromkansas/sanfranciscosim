@@ -2452,5 +2452,24 @@
     ],
     "tris": 11596,
     "loadRadius": 2500
+  },
+  {
+    "id": "pier-17",
+    "file": "pier-17.glb",
+    "anchor": [
+      -122.3981018,
+      37.8022149
+    ],
+    "targetHeightM": 21.3,
+    "cat": 20,
+    "name": "Pier 17",
+    "estimated": false,
+    "dims": [
+      233.9775,
+      21.3,
+      182.7369
+    ],
+    "tris": 1998,
+    "loadRadius": 2500
   }
 ]
