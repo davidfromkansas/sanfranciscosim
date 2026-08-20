@@ -353,26 +353,45 @@ function placeGeneric(box, entry, data) {
 // The meshopt pass reindexes every GLB, so merged landmark geometry arrives
 // indexed: the batch needs index space too (a zero maxIndexCount rejects the
 // very first indexed addGeometry).
-// Body reserve sized against the WHOLE manifest resident at once, not against
-// the worst camera: streaming keeps the live set below that, but the ceiling
-// then does not move when a batch lands in one district. An overflow is not a
-// crash: the addGeometry throw drops that landmark to its procedural stand-in,
-// so it reads as one arbitrary landmark quietly missing on each reload, and
-// nothing in the standard gates catches it.
+// The reserve CEILING is sized against the WHOLE manifest resident at once,
+// not against the worst camera, so it does not have to move when a batch of
+// landmarks lands in one district. An overflow is not a crash: the addGeometry
+// throw drops that landmark to its procedural stand-in, so it reads as one
+// arbitrary landmark quietly missing on each reload, and nothing in the
+// standard gates catches it.
 //   103 landmarks (before the Embarcadero batch)  1,434,764 body verts
 //   131 landmarks (after it)                      2,072,002 body verts
-// which is 129.5% of the previous 1,600,000 reserve, and its indices reached
-// 94.7% of 3,600,000 — both had to move. Measured from GLB accessor counts,
-// which survive meshopt: sum POSITION.count per primitive, split by material
-// (/_Glow$/ -> glow batch, everything else -> body); mergeGeometries(.., false)
-// concatenates without welding, so that sum is what addGeometry consumes.
-//   2,400,000 verts x 36 B (position+normal+color) = 86 MB, up 28 MB.
-// Post-batch occupancy, all-resident: body 86.3% verts / 65.6% indices,
-// glow 44.9% verts / 23.3% indices — so the glow reserve is untouched.
-const BODY_VERTS = 2_400_000;
-const BODY_INDICES = 5_200_000;
-const GLOW_VERTS = 250_000;
-const GLOW_INDICES = 750_000;
+// Measured from GLB accessor counts, which survive meshopt: sum POSITION.count
+// per primitive, split by material (/_Glow$/ -> glow batch, everything else ->
+// body); mergeGeometries(.., false) concatenates without welding, so that sum
+// is what addGeometry consumes. Occupancy at the ceiling, all-resident: body
+// 86.3% verts / 65.6% indices, glow 44.9% verts / 23.3% indices.
+//
+// What the reserve is at any moment, though, is ELASTIC, and on a phone that
+// is the difference between a running tab and a killed one. A BatchedMesh
+// allocates its whole reserve up front and keeps it on BOTH sides: the typed
+// arrays stay in JS memory and the same bytes are uploaded to the GPU. A fixed
+// 2.4M-vertex body reserve is therefore ~86 MB of heap plus ~86 MB of GPU
+// buffer, mostly zeroes, before a single landmark loads — measured as 102 MB of
+// the ~210 MB of scene attribute memory a phone-shaped tab held while only nine
+// ground groups were live. Streaming already keeps the LIVE set to the camera's
+// neighbourhood; the reserve was the last thing still sized for the whole city.
+//
+// So the batches start at the always-loaded skyline's size and grow (x1.6,
+// defragmenting first, since deleteGeometry leaves holes that are free space)
+// toward the ceiling, then shrink back once the camera leaves a dense district.
+// Behaviour at the ceiling is unchanged.
+const BODY_CEILING = { verts: 2_400_000, indices: 5_200_000 };
+const GLOW_CEILING = { verts: 250_000, indices: 750_000 };
+// Start: comfortably above the always-loaded skyline pieces, so booting and
+// sitting still never resizes at all.
+const BODY_START = { verts: 500_000, indices: 1_100_000 };
+const GLOW_START = { verts: 60_000, indices: 180_000 };
+const GROW_FACTOR = 1.6;
+// Shrink only when a lot of the reserve has gone unused, so a camera crossing
+// a district boundary cannot ping-pong between two resizes.
+const SHRINK_BELOW = 0.35;
+const SHRINK_HEADROOM = 1.6;
 const MAX_BATCHED = 512;
 const EXIT_FACTOR = 1.25;
 const SCAN_EVERY_S = 0.4;
@@ -391,6 +410,9 @@ export function createAssets(scene, data, { onPlaced, onUnloaded } = {}) {
   let glowMaterial = null;
   let scanCooldown = 0;
   const color = new Vector4();
+  // What each batch currently has reserved; three keeps this private.
+  const bodyReserve = { ...BODY_START };
+  const glowReserve = { ...GLOW_START };
 
   const warn = (message) => {
     if (warned) return;
@@ -401,7 +423,12 @@ export function createAssets(scene, data, { onPlaced, onUnloaded } = {}) {
   function batches() {
     if (bodyBatch) return true;
     try {
-      bodyBatch = new BatchedMesh(MAX_BATCHED, BODY_VERTS, BODY_INDICES, createBatchFadeLambert());
+      bodyBatch = new BatchedMesh(
+        MAX_BATCHED,
+        bodyReserve.verts,
+        bodyReserve.indices,
+        createBatchFadeLambert()
+      );
       bodyBatch.name = 'landmark-bodies';
       bodyBatch.castShadow = true;
       bodyBatch.receiveShadow = true;
@@ -413,7 +440,7 @@ export function createAssets(scene, data, { onPlaced, onUnloaded } = {}) {
       bodyBatch.frustumCulled = false;
       bodyBatch.perObjectFrustumCulled = false;
       glowMaterial = new MeshBasicMaterial({ vertexColors: true, transparent: true, opacity: 1 });
-      glowBatch = new BatchedMesh(MAX_BATCHED, GLOW_VERTS, GLOW_INDICES, glowMaterial);
+      glowBatch = new BatchedMesh(MAX_BATCHED, glowReserve.verts, glowReserve.indices, glowMaterial);
       glowBatch.name = 'landmark-glow';
       glowBatch.sortObjects = false;
       glowBatch.frustumCulled = false;
@@ -469,6 +496,52 @@ export function createAssets(scene, data, { onPlaced, onUnloaded } = {}) {
         state.status = 'failed';
         warn(`${state.entry.id} failed to load (${error.message})`);
       }
+    }
+  }
+
+  // Make room for a geometry about to be added: defragment, then grow toward
+  // the ceiling. Returns false only when the ceiling itself is not enough,
+  // which is the pre-existing overflow case and still ends in the procedural
+  // stand-in rather than a hole.
+  function fit(batch, reserve, ceiling, needVerts, needIndices) {
+    const room = () => batch.unusedVertexCount >= needVerts && batch.unusedIndexCount >= needIndices;
+    if (room()) return true;
+    batch.optimize();
+    if (room()) return true;
+    const usedVerts = reserve.verts - batch.unusedVertexCount;
+    const usedIndices = reserve.indices - batch.unusedIndexCount;
+    let verts = reserve.verts;
+    let indices = reserve.indices;
+    while (verts - usedVerts < needVerts && verts < ceiling.verts) {
+      verts = Math.min(ceiling.verts, Math.ceil(verts * GROW_FACTOR));
+    }
+    while (indices - usedIndices < needIndices && indices < ceiling.indices) {
+      indices = Math.min(ceiling.indices, Math.ceil(indices * GROW_FACTOR));
+    }
+    if (verts === reserve.verts && indices === reserve.indices) return false;
+    batch.setGeometrySize(verts, indices);
+    reserve.verts = verts;
+    reserve.indices = indices;
+    return room();
+  }
+
+  // Hand the reserve back once a district unloads, so a long flight settles at
+  // the size of wherever the camera is rather than at its high-water mark.
+  function relax(batch, reserve, start) {
+    const usedVerts = reserve.verts - batch.unusedVertexCount;
+    const usedIndices = reserve.indices - batch.unusedIndexCount;
+    if (usedVerts > reserve.verts * SHRINK_BELOW && usedIndices > reserve.indices * SHRINK_BELOW) return;
+    const verts = Math.max(start.verts, Math.ceil(usedVerts * SHRINK_HEADROOM));
+    const indices = Math.max(start.indices, Math.ceil(usedIndices * SHRINK_HEADROOM));
+    if (verts >= reserve.verts && indices >= reserve.indices) return;
+    try {
+      batch.setGeometrySize(verts, indices);
+      reserve.verts = verts;
+      reserve.indices = indices;
+    } catch (error) {
+      // Only reachable if a live range sits past the new end, which optimize()
+      // should have moved. Keeping the larger reserve is always safe.
+      console.warn(`sf-assets: batch shrink skipped (${error.message})`);
     }
   }
 
@@ -544,6 +617,24 @@ export function createAssets(scene, data, { onPlaced, onUnloaded } = {}) {
           yaw: Math.atan2(2 * quat.w * quat.y, 1 - 2 * quat.y * quat.y),
         };
       }
+      const bodyVerts = merged.bodyGeometry.attributes.position.count;
+      const bodyIndices = merged.bodyGeometry.index ? merged.bodyGeometry.index.count : 0;
+      if (!fit(bodyBatch, bodyReserve, BODY_CEILING, bodyVerts, bodyIndices)) {
+        merged.bodyGeometry.dispose();
+        merged.glowGeometry?.dispose();
+        throw new Error('landmark batch is full at its ceiling');
+      }
+      if (merged.glowGeometry) {
+        const glowVerts = merged.glowGeometry.attributes.position.count;
+        const glowIndices = merged.glowGeometry.index ? merged.glowGeometry.index.count : 0;
+        if (!fit(glowBatch, glowReserve, GLOW_CEILING, glowVerts, glowIndices)) {
+          // The body still fits; drop only the night glow rather than the
+          // landmark, which is the smaller of the two visible losses.
+          merged.glowGeometry.dispose();
+          merged.glowGeometry = null;
+          console.warn(`sf-assets: ${entry.id} night glow skipped, glow batch at its ceiling`);
+        }
+      }
       state.bodyGeomId = bodyBatch.addGeometry(merged.bodyGeometry);
       state.bodyInstId = bodyBatch.addInstance(state.bodyGeomId);
       bodyBatch.setMatrixAt(state.bodyInstId, placement.matrix);
@@ -616,6 +707,8 @@ export function createAssets(scene, data, { onPlaced, onUnloaded } = {}) {
     // and a session of streaming in and out eventually rejects every load.
     bodyBatch.optimize();
     glowBatch.optimize();
+    relax(bodyBatch, bodyReserve, BODY_START);
+    relax(glowBatch, glowReserve, GLOW_START);
     onUnloaded?.(state.landmarkId);
   }
 

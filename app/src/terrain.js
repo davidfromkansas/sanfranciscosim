@@ -6,7 +6,18 @@
 import { BufferAttribute, BufferGeometry, Mesh } from 'three';
 import { createTerrainMaterial, setParkGrassQuality } from './materials.js';
 
-const SEGMENTS = 512; // per quadrant -> 1024 across the city, ~15 m spacing
+// Per quadrant -> 1024 across the city, ~15 m spacing. The grid is the single
+// largest fixed allocation in the app: 513x513 vertices x 4 quadrants x 40 B of
+// attributes plus both index buffers is ~73 MB of heap AND the same again on the
+// GPU, standing whether the camera is over the Marin Headlands or inside the
+// Mission. Phones cannot afford that half of their tab budget, and they never
+// see it: medium and low already swap to the stride-2 index, so a phone renders
+// the 30 m grid at ALL times. HALF_SEGMENTS bakes that decision into the
+// vertices instead of the index — identical silhouette to what a phone renders
+// today, a quarter of the memory (~17 MB), and the boot-time sampling loop
+// (~1 M elevation samples on the main thread) shrinks with it.
+const SEGMENTS = 512;
+const HALF_SEGMENTS = 256;
 const MASK = 512; // bathymetry mask resolution over the whole extent
 const SEA_LEVEL = 1.2; // Terrarium reads ~0 m over the Bay and the Pacific
 const SEA_FLOOR = -7;
@@ -83,7 +94,8 @@ function waterMask(sampleElevation, extent) {
   };
 }
 
-export function createTerrain(data) {
+export function createTerrain(data, { coarseGrid = false } = {}) {
+  const segments = coarseGrid ? HALF_SEGMENTS : SEGMENTS;
   const { manifest, sampleElevation, sampleLanduse } = data;
   const { minX, maxX, minZ, maxZ } = manifest.extent;
   const isWater = waterMask(sampleElevation, manifest.extent);
@@ -97,9 +109,9 @@ export function createTerrain(data) {
     for (let qx = 0; qx < 2; qx++) {
       const ox = minX + qx * halfW;
       const oz = minZ + qz * halfD;
-      const stepX = halfW / SEGMENTS;
-      const stepZ = halfD / SEGMENTS;
-      const side = SEGMENTS + 1;
+      const stepX = halfW / segments;
+      const stepZ = halfD / segments;
+      const side = segments + 1;
       const count = side * side;
       const positions = new Float32Array(count * 3);
       const normals = new Float32Array(count * 3);
@@ -153,11 +165,11 @@ export function createTerrain(data) {
       // a stride-2 30 m grid. Dropping a tier swaps the index — a quarter of
       // the terrain triangles for the price of one setIndex, no rebake.
       function gridIndex(stride) {
-        const cells = SEGMENTS / stride;
+        const cells = segments / stride;
         const indices = new Uint32Array(cells * cells * 6);
         let k = 0;
-        for (let j = 0; j < SEGMENTS; j += stride) {
-          for (let i = 0; i < SEGMENTS; i += stride) {
+        for (let j = 0; j < segments; j += stride) {
+          for (let i = 0; i < segments; i += stride) {
             const a = j * side + i;
             indices[k++] = a;
             indices[k++] = a + side * stride;
@@ -170,8 +182,10 @@ export function createTerrain(data) {
         return new BufferAttribute(indices, 1);
       }
 
+      // On the coarse grid the vertices ARE the stride-2 grid, so the tier swap
+      // has nothing left to drop and both slots share one index buffer.
       const fullIndex = gridIndex(1);
-      const coarseIndex = gridIndex(2);
+      const coarseIndex = coarseGrid ? fullIndex : gridIndex(2);
 
       const geometry = new BufferGeometry();
       geometry.setAttribute('position', new BufferAttribute(positions, 3));
