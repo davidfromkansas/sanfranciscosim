@@ -1,0 +1,116 @@
+{
+ "input": {
+  "tris": 10692,
+  "verts": 19217,
+  "objects": 21,
+  "primitives": 26,
+  "materials": [
+   "Toy_bronze",
+   "Toy_cream",
+   "Toy_gold_Glow",
+   "Toy_ink",
+   "Toy_koiOrange",
+   "Toy_koiOrange_Glow",
+   "Toy_koiWhite",
+   "Toy_koiWhite_Glow",
+   "Toy_navy",
+   "Toy_roofd",
+   "Toy_seam",
+   "Toy_soil",
+   "Toy_steel",
+   "Toy_stone",
+   "Toy_tarmac",
+   "Toy_verdigris"
+  ],
+  "bbox_dims": [
+   128.49153,
+   67.62864,
+   13.19309
+  ],
+  "bbox_min": [
+   -64.24577,
+   -33.81432,
+   -1.5
+  ],
+  "center_xy": [
+   0.0,
+   0.0
+  ]
+ },
+ "output": {
+  "tris": 10692,
+  "verts": 18431,
+  "objects": 21,
+  "primitives": 26,
+  "materials": [
+   "Toy_bronze",
+   "Toy_cream",
+   "Toy_gold_Glow",
+   "Toy_ink",
+   "Toy_koiOrange",
+   "Toy_koiOrange_Glow",
+   "Toy_koiWhite",
+   "Toy_koiWhite_Glow",
+   "Toy_navy",
+   "Toy_roofd",
+   "Toy_seam",
+   "Toy_soil",
+   "Toy_steel",
+   "Toy_stone",
+   "Toy_tarmac",
+   "Toy_verdigris"
+  ],
+  "bbox_dims": [
+   128.49153,
+   67.62864,
+   13.19309
+  ],
+  "bbox_min": [
+   -64.24577,
+   -33.81432,
+   -1.5
+  ],
+  "center_xy": [
+   0.0,
+   0.0
+  ]
+ },
+ "output_signed_volumes": {
+  "apron": 30.550318,
+  "ashurbanipal": 6.223432,
+  "bed_east_kerb": 171.698187,
+  "bed_east_soil": 125.462705,
+  "bed_west_kerb": 170.863542,
+  "bed_west_soil": 124.138495,
+  "bollards": 2.865654,
+  "deck": 14171.264908,
+  "furniture": 6.097785,
+  "joints": 2.852093,
+  "koi": 4.070773,
+  "koi_glow": 1.297138,
+  "lamps": 3.987916,
+  "lamps_glow": 0.737391,
+  "monument": 153.414696,
+  "monument_glow": 8.253726,
+  "people": 13.187294,
+  "terrace_s": 441.007381,
+  "terrace_s_wall": 23.354095,
+  "trees": 868.371748,
+  "walk_n": 105.924912
+ },
+ "inverted_solids": [],
+ "ray_test_output": {
+  "rays": 22500,
+  "hits": 15029,
+  "flipped": 2,
+  "flipped_fraction": 0.000133
+ },
+ "gates": {
+  "G1_materials_identical": true,
+  "G2_bbox_ok": true,
+  "G2_origin_ok": true,
+  "G2_volumes_positive": true,
+  "G2_ray_flip_ok": true,
+  "G5_primitives_ok": true
+ }
+}
