@@ -165,10 +165,10 @@ async function boot() {
   // streets may still be streaming — and the panel says so rather than the
   // camera flying somewhere arbitrary.
   const feedPanel = createFeedPanel({
-    // "X simfranciscans are online" counts the residents actually walking the
-    // city, not the size of the cast — the panel and the diorama report the
-    // same population or the number means nothing.
-    onlineCount: () => population.onlineCount,
+    // "X simfranciscans live here" is the size of the cast the bake carries,
+    // not how many have been seated on a street yet — the header states what
+    // the simulation holds, and it must not fall as neighbourhoods unload.
+    castCount: () => population.castCount,
     // Take me to this resident. If they are already on a street this is
     // instant; if their neighbourhood has not streamed yet we go and GET them,
     // because the whole point of the button is to end up where they are.

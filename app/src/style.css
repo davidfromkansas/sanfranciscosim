@@ -746,9 +746,9 @@ button:hover {
   font-weight: 700;
 }
 
-/* The live population, counted from the diorama rather than the feed. A dot
-   that pulses, because the number it sits beside is genuinely moving. */
-.rs-online {
+/* The size of the cast, counted from the baked population. The dot keeps its
+   pulse: the residents it counts are walking even though the number holds. */
+.rs-census {
   display: flex;
   align-items: center;
   gap: 6px;
@@ -758,7 +758,7 @@ button:hover {
   color: #3f8f6b;
 }
 
-.rs-online::before {
+.rs-census::before {
   content: "";
   width: 7px;
   height: 7px;
@@ -779,7 +779,7 @@ button:hover {
 }
 
 @media (prefers-reduced-motion: reduce) {
-  .rs-online::before {
+  .rs-census::before {
     animation: none;
   }
 }
@@ -951,7 +951,7 @@ button:hover {
     padding-top: 9px;
     padding-bottom: 9px;
     /* The handle is out of flow here, so the bar has to leave room for it or a
-       long online count runs underneath it. */
+       long census count runs underneath it. */
     padding-right: calc(var(--rs-pad) + 44px);
     border-bottom: 0;
   }
@@ -964,7 +964,7 @@ button:hover {
     font-size: 16px;
   }
 
-  #feed:not(.rs-open) .rs-online {
+  #feed:not(.rs-open) .rs-census {
     margin-top: 1px;
     font-size: 11px;
   }

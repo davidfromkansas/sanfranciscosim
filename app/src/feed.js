@@ -630,7 +630,7 @@ export function createFeedPanel({
   // Resolves { ok } once the camera is on them, which can take seconds when
   // their neighbourhood has to stream in first.
   onVisit = async () => ({ ok: false, reason: "unknown" }),
-  onlineCount = () => 0,
+  castCount = () => 0,
 } = {}) {
   const root = document.getElementById("feed");
   if (!root) return { refresh() {} };
@@ -647,11 +647,11 @@ export function createFeedPanel({
   const icon = el("div", "rs-icon");
   const titles = el("div", "rs-titles");
   const title = el("h1", "rs-name", "r/simfrancisco");
-  // Counted from the city itself, not from the feed: these are the residents
-  // currently walking the streets behind the panel. It climbs from zero as
-  // their neighbourhoods stream in, which is why it ticks on its own rather
-  // than being written once.
-  const online = el("p", "rs-online", "");
+  // The size of the cast, counted from the baked population rather than the
+  // feed: every resident the simulation carries, whether or not their
+  // neighbourhood has streamed in yet. It only moves once, when the bake
+  // lands, which is why it ticks rather than being written at build time.
+  const census = el("p", "rs-census", "");
   const goal = el("p", "rs-goal", "");
   const rulesButton = el("button", "rs-rules-open", "Community rules");
   // The button rides the name's line, pushed to the far edge — it is a
@@ -659,16 +659,16 @@ export function createFeedPanel({
   // of the reading path rather than under the description.
   const nameRow = el("div", "rs-name-row");
   nameRow.append(title, rulesButton);
-  titles.append(nameRow, online, goal);
+  titles.append(nameRow, census, goal);
 
-  function refreshOnline() {
-    const n = onlineCount();
-    const text = `${n.toLocaleString()} simfranciscan${n === 1 ? "" : "s"} ${n === 1 ? "is" : "are"} online`;
-    if (online.textContent !== text) online.textContent = text;
+  function refreshCensus() {
+    const n = castCount();
+    const text = `${n.toLocaleString()} simfranciscan${n === 1 ? "" : "s"} live here`;
+    if (census.textContent !== text) census.textContent = text;
   }
-  refreshOnline();
-  // Fast while the city is loading, when the number moves every second.
-  setInterval(refreshOnline, 2000);
+  refreshCensus();
+  // The bake is fetched, so the count is zero for the first moments.
+  setInterval(refreshCensus, 2000);
 
   // Below the desktop breakpoint the panel is a bottom sheet, and this raises
   // and lowers it. CSS hides the button above that width; the class it toggles
