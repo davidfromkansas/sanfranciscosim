@@ -505,6 +505,13 @@ function votersOf(cast, thread, value) {
 // the city; on a negative or contested one it can only be someone who actually
 // voted, because their reply is an account of that vote.
 function pickResponder(cast, thread, mood) {
+  // An ignored thread has no voters to draw on, and a human's floor has to be
+  // fillable anyway — so the floor is served from the whole city, which is what
+  // "positive" already means here.
+  if (mood === "ignored") {
+    const persona = pickAnyone(cast, thread);
+    return persona ? { persona, stance: null } : null;
+  }
   if (mood === "negative") {
     // Not only the critics. A downvoted post on a real board draws two kinds
     // of reply — the objections, and people arguing the pile-on is unfair —
@@ -658,10 +665,20 @@ async function openThread(people, spendVote) {
 // truncated because it happened to be last in the loop.
 async function growThread(people, thread, spend, spendVote) {
   const mood = moodOf(thread);
-  // Nobody voted, so nobody cared. The post stands on its own and the thread is
-  // finished before it starts — which is most of what a real subreddit is, and
-  // costs nothing to render.
-  if (mood === "ignored") {
+  // A visitor is owed an answer. A resident's post going unread is the honest
+  // texture of a subreddit; a person from outside typing into one and hearing
+  // nothing back is just a dead end, and they have no second post to try
+  // again with. So a human thread has a floor and cannot be ignored.
+  //
+  // The floor is deliberately the only thing bought for them. Their VOTES are
+  // sampled exactly like anybody's, so the score still says what the room made
+  // of it, and everything above the floor still has to be earned by that score
+  // — a lukewarm post gets its two and stops, a good one runs to eight.
+  const floor = thread.human ? HUMAN.minReplies : 0;
+  if (mood === "ignored" && !floor) {
+    // Nobody voted, so nobody cared. The post stands on its own and the thread
+    // is finished before it starts — which is most of what a real subreddit is,
+    // and costs nothing to render.
     thread.done = true;
     return;
   }
@@ -677,7 +694,9 @@ async function growThread(people, thread, spend, spendVote) {
   );
   while (
     thread.replies.length < simulationConfig.maxReplies &&
-    Math.random() < energy
+    // Under the floor the roll is skipped entirely rather than weighted, so a
+    // visitor's first two answers are a promise and not a good streak.
+    (thread.replies.length < floor || Math.random() < energy)
   ) {
     if (!spend()) return;
     if (!(await addReply(people, thread, spendVote, mood))) break;
@@ -1133,6 +1152,10 @@ const HUMAN = {
   // Below this the post does not land. This is the whole product decision of
   // the feature, so it is stated once, here.
   passingScore: 70,
+  // Replies a visitor is guaranteed, written before the response comes back so
+  // they see the room react rather than an empty thread. Two, because one reads
+  // as a courtesy and three is a crowd nobody earned.
+  minReplies: 2,
 };
 
 export const humanLimits = () => ({ ...HUMAN.maxChars });
@@ -1150,9 +1173,13 @@ export function validateSubmission({ title, body } = {}) {
   if (!t) return { error: "Write a header before posting." };
   if (!b) return { error: "Write some body text before posting." };
   if (t.length > HUMAN.maxChars.title)
-    return { error: `The header must be ${HUMAN.maxChars.title} characters or fewer.` };
+    return {
+      error: `The header must be ${HUMAN.maxChars.title} characters or fewer.`,
+    };
   if (b.length > HUMAN.maxChars.body)
-    return { error: `The body must be ${HUMAN.maxChars.body} characters or fewer.` };
+    return {
+      error: `The body must be ${HUMAN.maxChars.body} characters or fewer.`,
+    };
   return { title: t, body: b };
 }
 
@@ -1232,16 +1259,46 @@ export async function submitHumanPost({ title, body }) {
     votes,
     replies: [],
     replyProbability: sampleReplyProbability(),
-    // Left open on purpose: the next tick's resume pass grows it exactly the
-    // way it grows a thread of its own that ran out of budget.
     done: false,
     startedAt: at,
     at,
   };
   live.push(thread);
+
+  // Answer them NOW rather than at the next tick. Left for the tick, a visitor
+  // watched their own post sit in silence for up to ten minutes and reasonably
+  // concluded the city had ignored them. This spends its own small allowance,
+  // separate from a tick's, so one post can never eat the budget a whole
+  // window is meant to cover.
+  // Exactly the floor, not a reply more. Everything above it is the tick's
+  // work, earned by the score — and every extra reply written here is another
+  // few seconds the person sits watching a spinner having already typed.
+  let replyBudget = HUMAN.minReplies;
+  try {
+    await growThread(
+      people,
+      thread,
+      () => (replyBudget > 0 ? (replyBudget--, true) : false),
+      // No voting on these two. It is three more model calls per reply and the
+      // person is waiting on every one of them — and a reply's score is display
+      // only: moods and who may speak are read from the POST's votes, never a
+      // reply's. They start unscored, exactly like any reply nobody voted on.
+      () => false,
+    );
+  } catch (error) {
+    // A failed reply must not cost them the post itself — it is written, it is
+    // theirs, and the next tick will grow it the way it grows any thread that
+    // ran out of budget.
+    thread.done = false;
+    console.warn(
+      `${SUBREDDIT.name}: human post replies failed — ${error.message}`,
+    );
+  }
+
   live.sort((a, b) => b.startedAt - a.startedAt);
   await persist();
 
+  const payload = shape(people, 0);
   return {
     status: 200,
     body: {
@@ -1250,10 +1307,17 @@ export async function submitHumanPost({ title, body }) {
       threshold: HUMAN.passingScore,
       reason,
       id: thread.id,
+      // The whole feed, with their post at the top of it and its first replies
+      // already under it. Sent back in the RESPONSE rather than left for the
+      // client to go and fetch, because /api/feed is served through a CDN with
+      // a thirty-second window and stale-while-revalidate behind it — a reader
+      // refreshing the instant they post is exactly who gets handed an edge
+      // copy from before their post existed. This cannot be stale: it is the
+      // object their own submission just produced.
+      feed: payload,
     },
-    // Handed back so the route can publish it into the registry: without this
-    // the visitor's own post would be invisible until the read TTL lapsed.
-    payload: shape(people, 0),
+    // Also published into the registry so this instance serves it too.
+    payload,
   };
 }
 
