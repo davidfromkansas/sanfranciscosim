@@ -25,6 +25,36 @@ import { createAssets } from './assets.js';
 import { createPiers } from './piers.js';
 import { createAgents } from './agents.js';
 import { createPopulation } from './population.js';
+
+// Wait for something the CITY has to produce — a resident being seated once
+// their neighbourhood's streets arrive. Polling rather than an event because
+// seating happens inside the population's own frame loop, and resolves to null
+// on timeout rather than rejecting: a resident who never turns up is an answer
+// the caller has to show, not an exception to swallow.
+function waitFor(test, { timeout = 15000, interval = 120, signal } = {}) {
+  return new Promise((resolve) => {
+    const started = performance.now();
+    const tick = () => {
+      if (signal?.aborted) return resolve(null);
+      const value = test();
+      if (value) return resolve(value);
+      if (performance.now() - started > timeout) return resolve(null);
+      setTimeout(tick, interval);
+    };
+    tick();
+  });
+}
+
+function sleep(ms, signal) {
+  return new Promise((resolve) => {
+    if (signal?.aborted) return resolve();
+    const id = setTimeout(resolve, ms);
+    signal?.addEventListener('abort', () => {
+      clearTimeout(id);
+      resolve();
+    }, { once: true });
+  });
+}
 import { createFeedPanel } from './feed.js';
 import { createLiveFerries } from './ferries.js';
 import { createLiveMuni } from './muni.js';
@@ -139,12 +169,45 @@ async function boot() {
     // city, not the size of the cast — the panel and the diorama report the
     // same population or the number means nothing.
     onlineCount: () => population.onlineCount,
-    onVisit(person) {
-      const at = population.locate(person.id);
-      if (!at) return false;
-      population.focus(person.id);
-      flyTo({ x: at.x, z: at.z, y: at.y, yaw: 210, pitch: 38, distance: 110 });
-      return true;
+    // Take me to this resident. If they are already on a street this is
+    // instant; if their neighbourhood has not streamed yet we go and GET them,
+    // because the whole point of the button is to end up where they are.
+    //
+    // Their own position is exactly what is not known yet, so the first hop
+    // aims at the middle of their neighbourhood — which the PUMA polygons give
+    // us whether or not a single street of it has loaded. Arriving is what
+    // pulls the tiles in; tile streaming follows the camera. Once the ground is
+    // there they get seated like anybody else, and the second hop lands on them.
+    async onVisit(person, { signal } = {}) {
+      const land = (at) => {
+        population.focus(person.id);
+        flyTo({ x: at.x, z: at.z, y: at.y, yaw: 210, pitch: 38, distance: 110 });
+      };
+      const here = population.locate(person.id);
+      if (here) {
+        land(here);
+        return { ok: true };
+      }
+      if (!population.knows(person.id)) return { ok: false, reason: 'unknown' };
+      const hood = population.neighbourhoodOf(person.id);
+      if (!hood) return { ok: false, reason: 'unknown' };
+
+      // Out over the neighbourhood, high enough to pull a wide spread of tiles.
+      flyTo({ x: hood.x, z: hood.z, y: 0, yaw: 210, pitch: 42, distance: 900 });
+
+      const found = await waitFor(() => population.locate(person.id), {
+        timeout: 20000,
+        signal,
+      });
+      if (signal?.aborted) return { ok: false, reason: 'cancelled' };
+      if (!found) return { ok: false, reason: 'timeout' };
+      // A resident seated on the first street to arrive can be moved again as
+      // more of their neighbourhood lands, so settle before landing on them —
+      // otherwise the camera arrives where they used to be.
+      await sleep(700, signal);
+      if (signal?.aborted) return { ok: false, reason: 'cancelled' };
+      land(population.locate(person.id) ?? found);
+      return { ok: true };
     },
   });
   // Real WETA vessels from /api/ferries; falls back to the procedural ferries.

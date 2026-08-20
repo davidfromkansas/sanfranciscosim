@@ -23,13 +23,15 @@ import {
   Group,
   InstancedMesh,
   MeshBasicMaterial,
+  Matrix4,
   MeshLambertMaterial,
   Object3D,
   PlaneGeometry,
-  SphereGeometry,
   SRGBColorSpace,
   Vector3,
 } from 'three';
+import { mergeGeometries } from 'three/addons/utils/BufferGeometryUtils.js';
+import { BoxGeometry } from 'three';
 import { shared } from './env.js';
 
 const DATA = `${import.meta.env.BASE_URL}sf-people/`;
@@ -48,8 +50,37 @@ const LOW_CAP = 400;
 // personas only ever adds people to the city.
 const HANDOVER_MIN = 50;
 
+// A spread-out index per resident per slot. The salt keeps skin, hair and
+// trousers from correlating — without it every resident with dark hair would
+// also be wearing the same trousers, and a crowd of four hundred would visibly
+// repeat.
+function pickIndex(i, salt, n) {
+  let h = Math.imul(i + salt, 2654435761) >>> 0;
+  h ^= h >>> 15;
+  h = Math.imul(h, 2246822519) >>> 0;
+  return (h >>> 13) % n;
+}
+
 const WALK_SPEED = 1.25; // m/s, an unhurried pace
-const BODY_RADIUS = 0.85;
+
+// Residents are voxel people from sf-avatar-studio rather than spheres. The rig
+// is baked to app/public/sf-people/avatar-rig.json — see pipeline/bake-avatars.mjs
+// for why none of that project's glTF reaches the browser.
+const RIG_URL = `${DATA}avatar-rig.json`;
+// The studio's model is 0.62 units tall and the city is in metres. This is not
+// a real person's height — it is deliberately half again over it, because a
+// resident scaled to life size disappears against a four-storey building in a
+// toy diorama. The buses and cars are exaggerated for the same reason.
+const PERSON_HEIGHT = 2.58;
+
+// The walk. Nothing in the studio is rigged, so the cycle is procedural: legs
+// hinge at the hip, arms at the shoulder, arms opposite the leg on their own
+// side. Phase advances with DISTANCE, not time, so stride matches speed and a
+// resident never moonwalks.
+const STRIDE = 1.55;        // radians of phase per metre walked
+const LEG_SWING = 0.62;     // radians
+const ARM_SWING = 0.42;
+const BOB = 0.035;          // metres, twice a step — the body rises on each stride
 
 // Badges follow the ZOOM, not a fixed distance in metres — the same reasoning
 // as the Muni route bubbles (see muni.js): this camera spends most of its life
@@ -60,7 +91,10 @@ const MAX_BADGES = 140;
 const LOW_BADGES = 45;
 const BADGE_W = 5.2;
 const BADGE_H = 5.2;
-const BADGE_Y = 4.4; // height of the QUAD CENTRE; the tail tip drops ~0.36 x H
+// Height of the QUAD CENTRE; the tail tip drops ~0.36 x H. Raised with the
+// residents when they grew: the tail is meant to just kiss the top of a head,
+// and left at 4.4 it hung inside their chest instead.
+const BADGE_Y = 5.77;
 const BADGE_RADIUS_MIN = 220;
 const BADGE_RADIUS_MAX = 33000;
 const BADGE_RADIUS_PER_M = 6.6;
@@ -227,6 +261,13 @@ export function createPopulation(scene, data, city) {
   let badgeRadius = BADGE_RADIUS_MAX;
   let eligibleLast = 0;
   let bodyScale = 1;
+  let rigScale = 1;
+  let rig = null;
+  let partMeshes = [];
+  // Reused every frame for every part, so the walk costs no allocation.
+  const bodyM = new Matrix4();
+  const limbM = new Matrix4();
+  const outM = new Matrix4();
   let focused = null; // resident id the viewer was sent to
   // Reused each frame: everyone inside the badge radius, before the nearest are
   // picked off it. Allocating this per frame would be 432 objects of garbage
@@ -297,17 +338,66 @@ export function createPopulation(scene, data, city) {
     return puma !== null && ownedPumas.has(puma);
   }
 
+  // One InstancedMesh per (garment colour x rigid body part). Ten of them, so
+  // the whole animated city is ten draw calls — two more than the spheres cost,
+  // for people with arms and legs. A part's boxes are merged into one geometry
+  // and shifted so the group's PIVOT is at the origin, which is what lets a
+  // limb be swung by writing a rotation into the instance matrix; without a
+  // skeleton there is nowhere else to put the joint.
+  function buildPart(part) {
+    const pivotY =
+      part.group === 'armL' || part.group === 'armR' ? rig.pivots.arm
+      : part.group === 'legL' || part.group === 'legR' ? rig.pivots.leg
+      : 0;
+    const geos = part.boxes.map((b) => {
+      const g = new BoxGeometry(b.size[0], b.size[1], b.size[2]);
+      g.translate(b.centre[0], b.centre[1] - pivotY, b.centre[2]);
+      return g;
+    });
+    const geo = geos.length === 1 ? geos[0] : mergeGeometries(geos, false);
+    const mesh = new InstancedMesh(geo, new MeshLambertMaterial({}), residents.length);
+    mesh.name = `pums-${part.id}`;
+    mesh.instanceMatrix.setUsage(DynamicDrawUsage);
+    mesh.frustumCulled = false;
+    mesh.count = 0;
+    mesh.userData.part = part;
+    mesh.userData.pivotY = pivotY;
+    group.add(mesh);
+    return mesh;
+  }
+
+  // Colours are cached as Color objects once, because setColorAt is called ten
+  // times per resident per frame and parsing a hex string there would be the
+  // most expensive thing in the loop.
+  let palette = null;
+  const shirtTint = new Color();
+  function cachePalette() {
+    palette = {};
+    for (const [role, list] of Object.entries(rig.palette)) {
+      palette[role] = list.map((hex) => new Color().setStyle(hex, SRGBColorSpace));
+    }
+  }
+
+  // What each part is painted. Skin, hair, trousers and face come from the
+  // studio's own palettes; the SHIRT carries the neighbourhood hue that the
+  // spheres used to carry on their whole body, so the eight PUMAs stay legible
+  // from the air — which was the point of colouring residents at all.
+  function paintFor(resident, role, puma, isFocused) {
+    if (role === 'shirt') return puma;
+    const list = palette[role];
+    if (!list || !list.length) return puma;
+    const c = shirtTint.copy(list[resident.look[role] % list.length]);
+    return isFocused ? c.offsetHSL(0, 0.15, 0.25) : c;
+  }
+
   function build() {
-    bodyMesh = new InstancedMesh(
-      new SphereGeometry(BODY_RADIUS, 10, 7),
-      new MeshLambertMaterial({}),
-      residents.length
-    );
-    bodyMesh.name = 'pums-residents';
-    bodyMesh.instanceMatrix.setUsage(DynamicDrawUsage);
-    bodyMesh.frustumCulled = false;
-    bodyMesh.count = 0;
-    group.add(bodyMesh);
+    cachePalette();
+    // The studio models a person 0.62 units tall; the city is in metres.
+    rigScale = PERSON_HEIGHT / rig.modelHeight;
+    partMeshes = rig.parts.map(buildPart);
+    // Kept as the anchor the rest of the loop counts against; the body group is
+    // the one part every resident always has.
+    bodyMesh = partMeshes[0];
 
     badgeMesh = new InstancedMesh(
       new PlaneGeometry(BADGE_W, BADGE_H),
@@ -326,9 +416,13 @@ export function createPopulation(scene, data, city) {
     let people;
     let pumas;
     try {
-      const [a, b] = await Promise.all([fetch(`${DATA}people.json`), fetch(`${DATA}pumas.json`)]);
-      if (!a.ok || !b.ok) throw new Error(`${a.status}/${b.status}`);
-      [people, pumas] = await Promise.all([a.json(), b.json()]);
+      const [a, b, c] = await Promise.all([
+        fetch(`${DATA}people.json`),
+        fetch(`${DATA}pumas.json`),
+        fetch(RIG_URL),
+      ]);
+      if (!a.ok || !b.ok || !c.ok) throw new Error(`${a.status}/${b.status}/${c.status}`);
+      [people, pumas, rig] = await Promise.all([a.json(), b.json(), c.json()]);
     } catch (error) {
       // No bake, no residents. The anonymous crowd keeps the city populated and
       // nothing downstream notices, which is the whole point of the fallback.
@@ -348,6 +442,16 @@ export function createPopulation(scene, data, city) {
       // A stable per-resident phase, so the bob is not in lockstep across a
       // block and does not change between reloads.
       phase: ((i * 2654435761) % 6283) / 1000,
+      // Which of the studio's colours this person wears. Deterministic from the
+      // index, so somebody you flew to yesterday looks the same today. The
+      // shirt is NOT in here — it carries the neighbourhood hue, which is what
+      // keeps eight PUMAs readable from the air.
+      look: {
+        skin: pickIndex(i, 11, rig.palette.skin.length),
+        hair: pickIndex(i, 23, rig.palette.hair.length),
+        pants: pickIndex(i, 37, rig.palette.pants.length),
+        face: pickIndex(i, 53, rig.palette.face.length),
+      },
       path: null,
       d: 0,
       dir: 1,
@@ -452,20 +556,49 @@ export function createPopulation(scene, data, city) {
       resident.z = position.z - tangent.x * out * resident.side;
       resident.heading = Math.atan2(tangent.x * resident.dir, tangent.z * resident.dir);
 
-      const bob = Math.abs(Math.sin(resident.phase + resident.d * 1.6)) * 0.12;
+      // Phase from distance walked, so the feet keep up with the body. The
+      // half-step offset per resident stops four hundred people marching.
+      const phase = resident.phase + resident.d * STRIDE;
+      const swing = Math.sin(phase);
+      // The body rises twice per stride, at the top of each step.
+      const bob = Math.abs(Math.cos(phase)) * BOB;
       const isFocused = focused === resident.id;
-      dummy.position.set(resident.x, resident.y + BODY_RADIUS + bob, resident.z);
+      const scale =
+        (isFocused ? bodyScale * (2.1 + Math.sin(shared.uTime.value * 3) * 0.25) : bodyScale) *
+        rigScale;
+
+      // The character's own frame: on the pavement, facing along the path.
+      dummy.position.set(resident.x, resident.y + bob, resident.z);
       dummy.rotation.set(0, resident.heading, 0);
-      // The person you asked for stands a head above the crowd and pulses, so
-      // "take me to them" ends somewhere you can actually see them.
-      dummy.scale.setScalar(
-        isFocused ? bodyScale * (2.1 + Math.sin(shared.uTime.value * 3) * 0.25) : bodyScale
-      );
+      dummy.scale.setScalar(scale);
       dummy.updateMatrix();
-      bodyMesh.setMatrixAt(bodies, dummy.matrix);
+      bodyM.copy(dummy.matrix);
+
       tint.set(PUMA_COLORS[resident.puma] ?? DEFAULT_COLOR);
       if (isFocused) tint.offsetHSL(0, 0.15, 0.25);
-      bodyMesh.setColorAt(bodies, tint);
+
+      for (let m = 0; m < partMeshes.length; m++) {
+        const mesh = partMeshes[m];
+        const { group: limb, role } = mesh.userData.part;
+        const pivotY = mesh.userData.pivotY;
+        if (limb === 'body') {
+          outM.copy(bodyM);
+        } else {
+          // Swing about the joint. A limb's geometry was baked with its pivot at
+          // the origin, so this is a bare rotation — then it is lifted back to
+          // where the joint actually sits before the body transform is applied.
+          const side = limb === 'armL' || limb === 'legL' ? 1 : -1;
+          // Arms lead the leg on the OTHER side, which is what makes a walk
+          // read as a walk rather than a shuffle.
+          const arm = limb === 'armL' || limb === 'armR';
+          const angle = swing * side * (arm ? -ARM_SWING : LEG_SWING);
+          limbM.makeRotationX(angle);
+          limbM.elements[13] = pivotY; // translate the joint back up
+          outM.multiplyMatrices(bodyM, limbM);
+        }
+        mesh.setMatrixAt(bodies, outM);
+        mesh.setColorAt(bodies, paintFor(resident, role, tint, isFocused));
+      }
       bodies++;
 
       const dist = Math.hypot(resident.x - camX, resident.z - camZ);
@@ -502,9 +635,15 @@ export function createPopulation(scene, data, city) {
     }
     shortlist.length = 0;
 
-    bodyMesh.count = bodies;
-    bodyMesh.instanceMatrix.needsUpdate = true;
-    if (bodyMesh.instanceColor) bodyMesh.instanceColor.needsUpdate = true;
+    // Every part, not just one: they are ten separate InstancedMeshes and each
+    // carries its own instance buffers. Flushing only the body left the arms
+    // and legs frozen wherever they were on the first frame.
+    for (let m = 0; m < partMeshes.length; m++) {
+      const mesh = partMeshes[m];
+      mesh.count = bodies;
+      mesh.instanceMatrix.needsUpdate = true;
+      if (mesh.instanceColor) mesh.instanceColor.needsUpdate = true;
+    }
     badgeMesh.count = badges;
     badgeMesh.instanceMatrix.needsUpdate = true;
     eligibleLast = eligible;
@@ -524,6 +663,43 @@ export function createPopulation(scene, data, city) {
       cap = low ? LOW_CAP : MAX_RESIDENTS;
       badgeCap = low ? LOW_BADGES : MAX_BADGES;
     },
+    // Whether this id is in the cast at all. Distinct from locate() returning
+    // null, which only means "not standing anywhere YET" — one is a dead end
+    // and the other is a wait, and the caller has to be able to tell them
+    // apart to say anything true about it.
+    knows(id) {
+      return residents.some((r) => r.id === id);
+    },
+
+    // The middle of a resident's neighbourhood, in world metres, whether or not
+    // a single street of it has streamed. This comes from the PUMA polygons,
+    // which are loaded up front with the cast — which is what makes fetching
+    // somebody possible: the city has to be told where to go BEFORE it can load
+    // the ground they are standing on, and their own position is exactly what
+    // is not known yet.
+    neighbourhoodOf(id) {
+      const resident = residents.find((r) => r.id === id);
+      if (!resident) return null;
+      const mine = areas.filter((a) => a.puma === resident.puma);
+      if (!mine.length) return null;
+      // Area centroids averaged, so a PUMA made of several neighbourhoods aims
+      // at the middle of the whole thing rather than at whichever one happens
+      // to be first.
+      let x = 0;
+      let z = 0;
+      let n = 0;
+      for (const area of mine) {
+        for (const ring of area.rings) {
+          for (let i = 0; i < ring.length; i += 2) {
+            x += ring[i];
+            z += ring[i + 1];
+            n++;
+          }
+        }
+      }
+      return n ? { x: x / n, z: z / n, puma: resident.puma, name: resident.name } : null;
+    },
+
     // Where a named resident is standing right now, for "take me to this
     // person". Returns null when they have not been seated — their PUMA's
     // streets may not have streamed in yet, or they may not be in the cast at
