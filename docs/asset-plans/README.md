@@ -157,6 +157,7 @@ route, and the park plans depend on it (§E8 of the parks README).
 | [345 Spear Street (Hills Plaza)](./345-spear.md) | `345-spear` | 68.5 m (LiDAR max, read as the tower's mechanical crown; podium 24.2/28.4 m) | new landmark |
 | [Pier 9](./pier-9.md) | `pier-9` | 17.6 m (vertical extent, deck-top origin: pile stubs −2.6 m to bulkhead attic crest +15.0 m; photogrammetric + dual-LiDAR corroborated) | new landmark |
 | [1 Market Street (Southern Pacific Building)](./1-market.md) | `1-market` | 48.7 m (rooftop plant crest, LiDAR modal; crowning cornice 46.1 m, measured two ways) | new landmark |
+| [One Market Plaza (Spear and Steuart Towers)](./one-market-plaza-towers.md) | `one-market-plaza-towers` | 177.6 m (Spear rooftop plant crest; Spear roof 172 m, Steuart roof 111 m, both published and LiDAR-checked) | new landmark |
 
 - Style: `docs/styles/miniature-toy.md` (authoritative for artistic decisions)
 - Technical contract: `.agents/skills/sf-asset-check/SKILL.md` (authoritative for the GLB)
