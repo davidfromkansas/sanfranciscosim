@@ -353,16 +353,22 @@ function placeGeneric(box, entry, data) {
 // very first indexed addGeometry).
 // Body reserve sized against the WHOLE manifest resident at once, not against
 // the worst camera: streaming keeps the live set below that, but the ceiling
-// then does not move when a batch lands in one district. 103 landmarks total
-// 1,434,764 body vertices; the SoMa worst case (89 live) is 1,241,294, which
-// overflowed the previous 1,200,000 reserve — measured while integrating the
-// thirteen Ritch/Brannan/South Park landmarks. An overflow is not a crash: the
-// addGeometry throw drops that landmark to its procedural stand-in, so it reads
-// as one arbitrary landmark quietly missing on each reload.
-//   1,600,000 verts x 36 B (position+normal+color) = 58 MB, up 14 MB.
-// Indices are untouched: all-resident needs 2,409,606 of the 3,600,000.
-const BODY_VERTS = 1_600_000;
-const BODY_INDICES = 3_600_000;
+// then does not move when a batch lands in one district. An overflow is not a
+// crash: the addGeometry throw drops that landmark to its procedural stand-in,
+// so it reads as one arbitrary landmark quietly missing on each reload, and
+// nothing in the standard gates catches it.
+//   103 landmarks (before the Embarcadero batch)  1,434,764 body verts
+//   131 landmarks (after it)                      2,072,002 body verts
+// which is 129.5% of the previous 1,600,000 reserve, and its indices reached
+// 94.7% of 3,600,000 — both had to move. Measured from GLB accessor counts,
+// which survive meshopt: sum POSITION.count per primitive, split by material
+// (/_Glow$/ -> glow batch, everything else -> body); mergeGeometries(.., false)
+// concatenates without welding, so that sum is what addGeometry consumes.
+//   2,400,000 verts x 36 B (position+normal+color) = 86 MB, up 28 MB.
+// Post-batch occupancy, all-resident: body 86.3% verts / 65.6% indices,
+// glow 44.9% verts / 23.3% indices — so the glow reserve is untouched.
+const BODY_VERTS = 2_400_000;
+const BODY_INDICES = 5_200_000;
 const GLOW_VERTS = 250_000;
 const GLOW_INDICES = 750_000;
 const MAX_BATCHED = 512;
