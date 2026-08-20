@@ -3634,6 +3634,49 @@ export const LANDMARKS = [
     // explicit that this building is not a skyline destination.
     camera: { distance: 400, yaw: 90.5, pitch: 22 },
   },
+  {
+    // Measured against the real bake input (DataSF ynuv-fyni footprints, plus
+    // the Overture/OSM ring for the same building), by area-weighted ring
+    // CENTROID and by nearest ring VERTEX -- excluded() in buildings.mjs fires
+    // on either:
+    //
+    //    0.00 m  this building's own Overture/OSM ring (way/256969674), via
+    //            centroid: the ring's centroid IS this anchor.
+    //    1.83 m  this building's own DataSF footprint (SF3715002, 625 m2), also
+    //            via centroid. Its own nearest vertex is 20.40 m out -- this is
+    //            a 41.9 x 13.9 m through-lot, so every corner is far away and
+    //            only the centroid test can reach it.
+    //   13.95 m  the Audiffred Building's Overture/OSM ring (way/193054136), via
+    //            centroid -- a PARTY-WALL neighbour sharing two of this
+    //            footprint's vertices, and the first thing at risk.
+    //   14.27 m  the seven-storey office to the south-east (SF3715003), via
+    //            centroid -- the other party wall.
+    //   14.55 m  the Audiffred's DataSF footprint (SF3715001), via centroid.
+    //   15.60 m  the south-east office's Overture/OSM ring (way/193054135).
+    //   28.35 m  the next lot south-east (SF3715025).
+    //
+    // Safe window (1.83, 13.95) m. 5 sits in it with 2.7x of margin below and
+    // 2.8x above, and is the largest radius this block can carry: both long
+    // sides are literal party walls, so reaching this footprint's own far
+    // corners (20.4 m) would delete both neighbours.
+    id: '110Embarcadero',
+    name: 'The Commonwealth Club (110 The Embarcadero)',
+    // The FOOTPRINT centroid, which is what the exclusion above is measured
+    // from. The manifest anchor is 0.09 m away because it is the model's XY
+    // bbox centre, and the roof fascia projects past the Embarcadero face.
+    lon: -122.3926624,
+    lat: 37.7932325,
+    height: 17.4,
+    exclude: 5,
+    // Camera offset is (sin yaw, ., cos yaw) with +z south, so camera bearing =
+    // 180 - yaw; yaw 135 stands the eye at bearing 45 -- north-east, out on The
+    // Embarcadero, looking back down the long axis over the glass front and
+    // across the roof terrace to the Steuart pediment beyond. That is the only
+    // view that carries both of this building's faces at once. 190 m suits a
+    // 17.4 m building (cf. 181SouthPark at 190 for 16.5 m). No `key`: this is
+    // block texture on the waterfront, not a destination.
+    camera: { distance: 190, yaw: 135, pitch: 26 },
+  },
 ];
 
 // Parks/green spaces the landcover bake must match at least one source polygon

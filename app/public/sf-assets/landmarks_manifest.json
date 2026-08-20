@@ -2168,5 +2168,24 @@
     ],
     "tris": 17064,
     "loadRadius": 2500
+  },
+  {
+    "id": "110-embarcadero",
+    "file": "110-embarcadero.glb",
+    "anchor": [
+      -122.3926614,
+      37.7932332
+    ],
+    "targetHeightM": 17.4,
+    "cat": 17,
+    "name": "The Commonwealth Club (110 The Embarcadero)",
+    "estimated": false,
+    "dims": [
+      40.4759,
+      40.1923,
+      17.4
+    ],
+    "tris": 4944,
+    "loadRadius": 2500
   }
 ]

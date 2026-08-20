@@ -163,6 +163,7 @@ route, and the park plans depend on it (§E8 of the parks README).
 | [Fulton Plaza (147 Fulton Street)](./fulton-plaza.md) | `fulton-plaza` | 13.19 m (vertical extent — the asset is a terrain-draped right-of-way; the Pioneer Monument crest is 11.69 m above local grade) | new landmark |
 | [Pier 3 (Hornblower Landing)](./pier-3.md) | `pier-3` | 18.5 m (photogrammetric, above water datum; deck 3.0 m) | new landmark |
 | [One Steuart Lane (1 Steuart Ln / 75 Howard St)](./one-steuart-lane.md) | `one-steuart-lane` | 67.06 m = 220 ft (architect-stated; CTBUH says 240 ft — see its §2.15 risk 1) | new landmark |
+| [110 The Embarcadero (The Commonwealth Club of California)](./110-embarcadero.md) | `110-embarcadero` | 17.4 m (Embarcadero roof fascia, photogrammetric; the Steuart end steps down to 11.6 m) | new landmark |
 
 - Style: `docs/styles/miniature-toy.md` (authoritative for artistic decisions)
 - Technical contract: `.agents/skills/sf-asset-check/SKILL.md` (authoritative for the GLB)
