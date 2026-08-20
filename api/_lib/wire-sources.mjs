@@ -160,6 +160,17 @@ async function weatherEvents() {
 // resident would genuinely notice: a cluster of eviction filings, a run of
 // business closures. High-volume feeds (311, police) need baselines to mean
 // anything and stay out until they earn their place.
+// DataSF is OFF for launch. Eviction clusters and closure runs qualify
+// CONTINUOUSLY — the same five filings stay newsworthy for ten days, unlike a
+// news item which is consumed once — so at priority 3.5 they outranked every
+// newsroom and the wire posted two eviction notices inside twenty minutes of
+// going live. Reporting is what this is meant to surface first.
+//
+// The gatherers below are kept whole and still tested. Before they come back
+// they need a rate rule of their own — at most one city-record post an hour —
+// because the priority system alone cannot express "important but repetitive".
+const DATASF = false;
+
 const SODA = "https://data.sfgov.org/resource";
 const iso = (ms) => new Date(ms).toISOString().slice(0, 10);
 const weekKey = () => {
@@ -269,8 +280,7 @@ export async function gatherWire() {
     quakes().catch(() => []),
     transitAlerts().catch(() => []),
     weatherEvents().catch(() => []),
-    evictionClusters().catch(() => []),
-    businessClosures().catch(() => []),
+    ...(DATASF ? [evictionClusters().catch(() => []), businessClosures().catch(() => [])] : []),
     redditTopics().catch(() => []),
   ]);
   return tiers.flat().sort((a, b) => a.priority - b.priority || b.published - a.published);
