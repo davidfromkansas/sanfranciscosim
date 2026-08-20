@@ -4148,6 +4148,56 @@ export const LANDMARKS = [
     // roof standing directly across the north-west site line. No `key`.
     camera: { distance: 420, yaw: 160, pitch: 28 },
   },
+  {
+    // The Jewish Community Federation Building, 132 The Embarcadero / 121
+    // Steuart Street (block 3715, lot 003). A 1984 seven-storey red-brick slab
+    // on one of four narrow deep lots that run the full 43 m block depth from
+    // Steuart Street through to the waterfront: 13.75 m of street frontage,
+    // 42.95 m deep, both long sides party walls. Roof deck 26.82 m (DataSF
+    // LiDAR median), parapet 27.40 m (photogrammetric, 40 samples, sigma
+    // 0.08 m), lift/stair bulkhead crest 29.57 m (LiDAR hgt_max — the one
+    // inferred number, see the plan's 2.15 risk 1).
+    //
+    // excluded() drops a footprint when its ring centroid OR any ring vertex
+    // falls inside the radius. Measured from this anchor against the actual
+    // bake input (DataSF footprints primary, Overture/OSM gap-fill):
+    //
+    //    0.17 m  this building's own OSM/Overture way 193054135, via centroid
+    //    1.42 m  this building's own DataSF footprint SF3715003, via centroid
+    //            -> the FLOOR: below this the procedural twin survives
+    //   13.74 m  OSM way 256969674 (110-116 The Embarcadero), centroid
+    //            -> the CEILING, and the binding constraint
+    //   13.92 m  OSM way 193054132 (Steuart Place, 131 Steuart), centroid
+    //   14.13 m  DataSF SF3715002 (110-116 The Embarcadero), centroid
+    //   14.62 m  DataSF SF3715025 (Steuart Place), centroid
+    //   20.70 m  DataSF SF3715002, nearest ring vertex
+    //   20.70 m  this building's own DataSF footprint, nearest ring vertex
+    //   21.17 m  DataSF SF3715025, nearest ring vertex
+    //   21.46 m  OSM way 256969674, nearest ring vertex
+    //
+    // Safe window (1.42, 13.74) m; 7 sits near the middle with 5.58 m of
+    // margin below and 6.74 m above. Note what the table says about vertices:
+    // this building's own nearest vertex is 20.70 m out and both party-wall
+    // neighbours' nearest vertices are 20.70 and 21.17 m out, so the VERTEX
+    // test is unusable here — a party-wall row shares its corners and no
+    // radius can catch ours without catching theirs. The centroid test is the
+    // only lever. Do not round up "for safety": 14 would delete 110-116 The
+    // Embarcadero from the bake and leave a hole against our northwest wall.
+    //
+    // camera.js apply() puts the eye at pivot + (sin yaw, sin pitch, cos yaw)
+    // *distance with +z south, so camera.yaw = 180 - the true bearing you want
+    // to look down. This building wants its Embarcadero elevation, outward
+    // normal 44.95 deg true, so 180 - 45 = 135. yaw 45 would stare at the
+    // Steuart entrance instead - the better-looking elevation, but not the
+    // address.
+    id: '132Embarcadero',
+    name: '132 The Embarcadero',
+    lon: -122.3925476,
+    lat: 37.7931482,
+    height: 29.57,
+    exclude: 7,
+    camera: { distance: 240, yaw: 135, pitch: 26 },
+  },
 ];
 
 // Parks/green spaces the landcover bake must match at least one source polygon

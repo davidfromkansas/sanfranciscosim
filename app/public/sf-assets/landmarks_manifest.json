@@ -2395,5 +2395,24 @@
     ],
     "tris": 13604,
     "loadRadius": 2500
+  },
+  {
+    "id": "132-embarcadero",
+    "file": "132-embarcadero.glb",
+    "anchor": [
+      -122.3925476,
+      37.7931482
+    ],
+    "targetHeightM": 29.57,
+    "cat": 3,
+    "name": "132 The Embarcadero (Jewish Community Federation Building)",
+    "estimated": true,
+    "dims": [
+      40.4371,
+      40.4731,
+      29.57
+    ],
+    "tris": 4960,
+    "loadRadius": 2500
   }
 ]
