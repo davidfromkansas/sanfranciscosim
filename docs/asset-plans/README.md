@@ -152,6 +152,7 @@ route, and the park plans depend on it (§E8 of the parks README).
 | [501 Third Street](./501-third.md) | `501-third` | 16.4 m (LiDAR-derived) | new landmark |
 | [10 South Park (South Park Lofts)](./10-south-park.md) | `10-south-park` | 14.67 m (roof bulkhead, LiDAR maximum; parapet crest 13.10 m photogrammetric) | new landmark |
 | [Pier 15 (Exploratorium)](./pier-15.md) | `pier-15` | 16.4 m above water (bulkhead gable crest, photogrammetric; monitor ridge 13.9 m; water asset, deck 3.05 m) | new landmark |
+| [Pier 7 (Broadway public access pier)](./pier-7.md) | `pier-7` | 7.6 m (vertical extent above the waterline: deck +3.0 m, lamp tops +7.6 m; water asset) | new landmark |
 
 - Style: `docs/styles/miniature-toy.md` (authoritative for artistic decisions)
 - Technical contract: `.agents/skills/sf-asset-check/SKILL.md` (authoritative for the GLB)

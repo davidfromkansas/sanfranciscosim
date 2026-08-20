@@ -1,0 +1,1046 @@
+{
+ "file_bytes": {
+  "raw": 957804,
+  "gzip9": 150206
+ },
+ "objects": 540,
+ "total_tris": 13860,
+ "total_verts": 26610,
+ "primitives_est": 540,
+ "top20": [
+  {
+   "name": "bullrail",
+   "tris": 1568,
+   "verts": 2744,
+   "dims": [
+    219.543,
+    165.933,
+    0.27
+   ],
+   "materials": [
+    "Toy_timber"
+   ]
+  },
+  {
+   "name": "deck_surface",
+   "tris": 952,
+   "verts": 1544,
+   "dims": [
+    219.569,
+    165.969,
+    0.08
+   ],
+   "materials": [
+    "Toy_timber"
+   ]
+  },
+  {
+   "name": "deck_slab",
+   "tris": 944,
+   "verts": 1538,
+   "dims": [
+    219.562,
+    165.96,
+    0.6
+   ],
+   "materials": [
+    "Toy_ink"
+   ]
+  },
+  {
+   "name": "rail_mid",
+   "tris": 380,
+   "verts": 576,
+   "dims": [
+    218.817,
+    165.09,
+    0.08
+   ],
+   "materials": [
+    "Toy_ink"
+   ]
+  },
+  {
+   "name": "rail_top",
+   "tris": 380,
+   "verts": 576,
+   "dims": [
+    218.834,
+    165.109,
+    0.08
+   ],
+   "materials": [
+    "Toy_ink"
+   ]
+  },
+  {
+   "name": "baybench0",
+   "tris": 108,
+   "verts": 216,
+   "dims": [
+    3.543,
+    3.543,
+    0.43
+   ],
+   "materials": [
+    "Toy_stone"
+   ]
+  },
+  {
+   "name": "baybench1",
+   "tris": 108,
+   "verts": 216,
+   "dims": [
+    3.543,
+    3.543,
+    0.43
+   ],
+   "materials": [
+    "Toy_stone"
+   ]
+  },
+  {
+   "name": "lampglobe0",
+   "tris": 64,
+   "verts": 144,
+   "dims": [
+    0.476,
+    0.476,
+    0.5
+   ],
+   "materials": [
+    "Toy_amber_Glow"
+   ]
+  },
+  {
+   "name": "lampglobe1",
+   "tris": 64,
+   "verts": 144,
+   "dims": [
+    0.476,
+    0.476,
+    0.5
+   ],
+   "materials": [
+    "Toy_amber_Glow"
+   ]
+  },
+  {
+   "name": "lampglobe2",
+   "tris": 64,
+   "verts": 144,
+   "dims": [
+    0.476,
+    0.476,
+    0.5
+   ],
+   "materials": [
+    "Toy_amber_Glow"
+   ]
+  },
+  {
+   "name": "lampglobe3",
+   "tris": 64,
+   "verts": 144,
+   "dims": [
+    0.476,
+    0.476,
+    0.5
+   ],
+   "materials": [
+    "Toy_amber_Glow"
+   ]
+  },
+  {
+   "name": "lampglobe4",
+   "tris": 64,
+   "verts": 144,
+   "dims": [
+    0.476,
+    0.476,
+    0.5
+   ],
+   "materials": [
+    "Toy_amber_Glow"
+   ]
+  },
+  {
+   "name": "lampglobe5",
+   "tris": 64,
+   "verts": 144,
+   "dims": [
+    0.476,
+    0.476,
+    0.5
+   ],
+   "materials": [
+    "Toy_amber_Glow"
+   ]
+  },
+  {
+   "name": "lampglobe6",
+   "tris": 64,
+   "verts": 144,
+   "dims": [
+    0.476,
+    0.476,
+    0.5
+   ],
+   "materials": [
+    "Toy_amber_Glow"
+   ]
+  },
+  {
+   "name": "lampglobe7",
+   "tris": 64,
+   "verts": 144,
+   "dims": [
+    0.476,
+    0.476,
+    0.5
+   ],
+   "materials": [
+    "Toy_amber_Glow"
+   ]
+  },
+  {
+   "name": "lampglobe8",
+   "tris": 64,
+   "verts": 144,
+   "dims": [
+    0.476,
+    0.476,
+    0.5
+   ],
+   "materials": [
+    "Toy_amber_Glow"
+   ]
+  },
+  {
+   "name": "lampglobe9",
+   "tris": 64,
+   "verts": 144,
+   "dims": [
+    0.476,
+    0.476,
+    0.5
+   ],
+   "materials": [
+    "Toy_amber_Glow"
+   ]
+  },
+  {
+   "name": "lampglobe10",
+   "tris": 64,
+   "verts": 144,
+   "dims": [
+    0.476,
+    0.476,
+    0.5
+   ],
+   "materials": [
+    "Toy_amber_Glow"
+   ]
+  },
+  {
+   "name": "lampglobe11",
+   "tris": 64,
+   "verts": 144,
+   "dims": [
+    0.476,
+    0.476,
+    0.5
+   ],
+   "materials": [
+    "Toy_amber_Glow"
+   ]
+  },
+  {
+   "name": "lampglobe12",
+   "tris": 64,
+   "verts": 144,
+   "dims": [
+    0.476,
+    0.476,
+    0.5
+   ],
+   "materials": [
+    "Toy_amber_Glow"
+   ]
+  }
+ ],
+ "vertex_attrs": [
+  "NORMAL"
+ ],
+ "materials": [
+  {
+   "name": "Toy_amber_Glow",
+   "glow": true,
+   "user_objects": 44
+  },
+  {
+   "name": "Toy_gold",
+   "glow": false,
+   "user_objects": 1
+  },
+  {
+   "name": "Toy_ink",
+   "glow": false,
+   "user_objects": 438
+  },
+  {
+   "name": "Toy_steel",
+   "glow": false,
+   "user_objects": 6
+  },
+  {
+   "name": "Toy_stone",
+   "glow": false,
+   "user_objects": 3
+  },
+  {
+   "name": "Toy_timber",
+   "glow": false,
+   "user_objects": 46
+  },
+  {
+   "name": "Toy_timberd",
+   "glow": false,
+   "user_objects": 2
+  }
+ ],
+ "textures": [],
+ "bbox": {
+  "dims": [
+   219.5688,
+   165.9949,
+   7.6
+  ],
+  "min": [
+   -110.3414,
+   -83.2858,
+   0.0
+  ],
+  "origin_offset_xy": [
+   -0.557,
+   -0.2883
+  ],
+  "base_z": 0.0
+ },
+ "duplicate_mesh_groups": [
+  {
+   "signature": {
+    "verts": 144,
+    "tris": 64,
+    "dims": [
+     0.4755,
+     0.4755,
+     0.5
+    ]
+   },
+   "objects": [
+    "lampglobe0",
+    "lampglobe1",
+    "lampglobe2",
+    "lampglobe3",
+    "lampglobe4",
+    "lampglobe5",
+    "lampglobe6",
+    "lampglobe7",
+    "lampglobe8",
+    "lampglobe9",
+    "lampglobe10",
+    "lampglobe11",
+    "lampglobe12",
+    "lampglobe13",
+    "lampglobe14",
+    "lampglobe15",
+    "lampglobe16",
+    "lampglobe17",
+    "lampglobe18",
+    "lampglobe19",
+    "lampglobe20",
+    "lampglobe21",
+    "lampglobe22",
+    "lampglobe23",
+    "lampglobe24",
+    "lampglobe25",
+    "lampglobe26",
+    "lampglobe27",
+    "lampglobe28",
+    "lampglobe29",
+    "lampglobe30",
+    "lampglobe31",
+    "lampglobe32",
+    "lampglobe33",
+    "lampglobe34",
+    "lampglobe35",
+    "lampglobe36",
+    "lampglobe37",
+    "lampglobe38",
+    "lampglobe39",
+    "lampglobe40",
+    "lampglobe41",
+    "lampglobe42",
+    "lampglobe43"
+   ]
+  },
+  {
+   "signature": {
+    "verts": 24,
+    "tris": 12,
+    "dims": [
+     0.1255,
+     0.1255,
+     1.04
+    ]
+   },
+   "objects": [
+    "railpost0",
+    "railpost1",
+    "railpost2",
+    "railpost3",
+    "railpost4",
+    "railpost5",
+    "railpost6",
+    "railpost7",
+    "railpost8",
+    "railpost9",
+    "railpost10",
+    "railpost11",
+    "railpost12",
+    "railpost13",
+    "railpost14",
+    "railpost15",
+    "railpost16",
+    "railpost17",
+    "railpost18",
+    "railpost19",
+    "railpost20",
+    "railpost21",
+    "railpost22",
+    "railpost23",
+    "railpost24",
+    "railpost25",
+    "railpost26",
+    "railpost27",
+    "railpost28",
+    "railpost29",
+    "railpost30",
+    "railpost31",
+    "railpost32",
+    "railpost33",
+    "railpost34",
+    "railpost35",
+    "railpost36",
+    "railpost37",
+    "railpost38",
+    "railpost39",
+    "railpost40",
+    "railpost41",
+    "railpost42",
+    "railpost43",
+    "railpost44",
+    "railpost45",
+    "railpost46",
+    "railpost47",
+    "railpost48",
+    "railpost49",
+    "railpost50",
+    "railpost51",
+    "railpost52",
+    "railpost53",
+    "railpost54",
+    "railpost55",
+    "railpost56",
+    "railpost57",
+    "railpost58",
+    "railpost59",
+    "railpost60",
+    "railpost61",
+    "railpost62",
+    "railpost63",
+    "railpost64",
+    "railpost65",
+    "railpost66",
+    "railpost67",
+    "railpost68",
+    "railpost69",
+    "railpost70",
+    "railpost71",
+    "railpost72",
+    "railpost73",
+    "railpost74",
+    "railpost75",
+    "railpost76",
+    "railpost77",
+    "railpost78",
+    "railpost79",
+    "railpost80",
+    "railpost81",
+    "railpost82",
+    "railpost83",
+    "railpost84",
+    "railpost85",
+    "railpost86",
+    "railpost87",
+    "railpost88",
+    "railpost89",
+    "railpost90",
+    "railpost91",
+    "railpost92",
+    "railpost93",
+    "railpost94",
+    "railpost95",
+    "railpost96",
+    "railpost97",
+    "railpost98",
+    "railpost99",
+    "railpost100",
+    "railpost101",
+    "railpost102",
+    "railpost103",
+    "railpost104",
+    "railpost105",
+    "railpost106",
+    "railpost107",
+    "railpost108",
+    "railpost109",
+    "railpost110",
+    "railpost111",
+    "railpost112",
+    "railpost113",
+    "railpost114",
+    "railpost115",
+    "railpost116",
+    "railpost117",
+    "railpost118",
+    "railpost119",
+    "railpost120",
+    "railpost121",
+    "railpost122",
+    "railpost123",
+    "railpost124",
+    "railpost125",
+    "railpost126",
+    "railpost127",
+    "railpost128",
+    "railpost129",
+    "railpost130",
+    "railpost131",
+    "railpost132",
+    "railpost133",
+    "railpost134",
+    "railpost135",
+    "railpost136",
+    "railpost137",
+    "railpost138",
+    "railpost139",
+    "railpost140",
+    "railpost141",
+    "railpost142",
+    "railpost143",
+    "railpost144",
+    "railpost145",
+    "railpost146",
+    "railpost147",
+    "railpost148",
+    "railpost149"
+   ]
+  },
+  {
+   "signature": {
+    "verts": 24,
+    "tris": 12,
+    "dims": [
+     0.6134,
+     0.6134,
+     2.4
+    ]
+   },
+   "objects": [
+    "pile0",
+    "pile1",
+    "pile2",
+    "pile3",
+    "pile4",
+    "pile5",
+    "pile6",
+    "pile7",
+    "pile8",
+    "pile9",
+    "pile10",
+    "pile11",
+    "pile12",
+    "pile13",
+    "pile14",
+    "pile15",
+    "pile16",
+    "pile17",
+    "pile18",
+    "pile19",
+    "pile20",
+    "pile21",
+    "pile22",
+    "pile23",
+    "pile24",
+    "pile25",
+    "pile26",
+    "pile27",
+    "pile28",
+    "pile29",
+    "pile30",
+    "pile31",
+    "pile32",
+    "pile33",
+    "pile34",
+    "pile35",
+    "pile36",
+    "pile37",
+    "pile38",
+    "pile39",
+    "pile40",
+    "pile41",
+    "pile42",
+    "pile43",
+    "pile44",
+    "pile45",
+    "pile46",
+    "pile47",
+    "pile49",
+    "pile50",
+    "pile51",
+    "pile52",
+    "pile53",
+    "pile54",
+    "pile55",
+    "pile56",
+    "pile57",
+    "pile58",
+    "pile59",
+    "pile60",
+    "pile61",
+    "pile62",
+    "pile63",
+    "pile64",
+    "pile65",
+    "pile66",
+    "pile67",
+    "pile68",
+    "pile69",
+    "pile70",
+    "pile71",
+    "pile72",
+    "pile73",
+    "pile74",
+    "pile75",
+    "pile76",
+    "pile77",
+    "pile78",
+    "pile79",
+    "pile80",
+    "pile81",
+    "pile82",
+    "pile83",
+    "pile84",
+    "pile85",
+    "pile86",
+    "pile87",
+    "pile88",
+    "pile89",
+    "pile90",
+    "pile91",
+    "pile92",
+    "pile93",
+    "pile94",
+    "pile95",
+    "pile96",
+    "pile97",
+    "pile98",
+    "pile99",
+    "pile100",
+    "pile101",
+    "pile102",
+    "pile103",
+    "pile104",
+    "pile105",
+    "pile106",
+    "pile107",
+    "pile108"
+   ]
+  },
+  {
+   "signature": {
+    "verts": 36,
+    "tris": 20,
+    "dims": [
+     0.2545,
+     0.2788,
+     0.18
+    ]
+   },
+   "objects": [
+    "lampcollar0",
+    "lampcollar1",
+    "lampcollar2",
+    "lampcollar3",
+    "lampcollar4",
+    "lampcollar5",
+    "lampcollar6",
+    "lampcollar7",
+    "lampcollar8",
+    "lampcollar9",
+    "lampcollar10",
+    "lampcollar11",
+    "lampcollar12",
+    "lampcollar13",
+    "lampcollar14",
+    "lampcollar15",
+    "lampcollar16",
+    "lampcollar17",
+    "lampcollar18",
+    "lampcollar19",
+    "lampcollar20",
+    "lampcollar21",
+    "lampcollar22",
+    "lampcollar23",
+    "lampcollar24",
+    "lampcollar25",
+    "lampcollar26",
+    "lampcollar27",
+    "lampcollar28",
+    "lampcollar29",
+    "lampcollar30",
+    "lampcollar31",
+    "lampcollar32",
+    "lampcollar33",
+    "lampcollar34",
+    "lampcollar35",
+    "lampcollar36",
+    "lampcollar37",
+    "lampcollar38",
+    "lampcollar39",
+    "lampcollar40",
+    "lampcollar41",
+    "lampcollar42",
+    "lampcollar43"
+   ]
+  },
+  {
+   "signature": {
+    "verts": 36,
+    "tris": 20,
+    "dims": [
+     0.1545,
+     0.1693,
+     3.4
+    ]
+   },
+   "objects": [
+    "lamppost0",
+    "lamppost1",
+    "lamppost2",
+    "lamppost3",
+    "lamppost4",
+    "lamppost5",
+    "lamppost6",
+    "lamppost7",
+    "lamppost8",
+    "lamppost9",
+    "lamppost10",
+    "lamppost11",
+    "lamppost12",
+    "lamppost13",
+    "lamppost14",
+    "lamppost15",
+    "lamppost16",
+    "lamppost17",
+    "lamppost18",
+    "lamppost19",
+    "lamppost20",
+    "lamppost21",
+    "lamppost22",
+    "lamppost23",
+    "lamppost24",
+    "lamppost25",
+    "lamppost26",
+    "lamppost27",
+    "lamppost28",
+    "lamppost29",
+    "lamppost30",
+    "lamppost31",
+    "lamppost32",
+    "lamppost33",
+    "lamppost34",
+    "lamppost35",
+    "lamppost36",
+    "lamppost37",
+    "lamppost38",
+    "lamppost39",
+    "lamppost40",
+    "lamppost41",
+    "lamppost42",
+    "lamppost43"
+   ]
+  },
+  {
+   "signature": {
+    "verts": 24,
+    "tris": 12,
+    "dims": [
+     0.3766,
+     0.4738,
+     0.38
+    ]
+   },
+   "objects": [
+    "benchleg0_False",
+    "benchleg0_True",
+    "benchleg1_False",
+    "benchleg1_True",
+    "benchleg2_False",
+    "benchleg2_True",
+    "benchleg3_False",
+    "benchleg3_True",
+    "benchleg4_False",
+    "benchleg4_True",
+    "benchleg5_False",
+    "benchleg5_True",
+    "benchleg6_False",
+    "benchleg6_True",
+    "benchleg7_False",
+    "benchleg7_True",
+    "benchleg8_False",
+    "benchleg8_True",
+    "benchleg9_False",
+    "benchleg9_True",
+    "benchleg10_False",
+    "benchleg10_True",
+    "benchleg11_False",
+    "benchleg11_True",
+    "benchleg12_False",
+    "benchleg12_True",
+    "benchleg13_False",
+    "benchleg13_True",
+    "benchleg14_False",
+    "benchleg14_True",
+    "benchleg15_False",
+    "benchleg15_True",
+    "benchleg16_False",
+    "benchleg16_True",
+    "benchleg17_False",
+    "benchleg17_True",
+    "benchleg18_False",
+    "benchleg18_True",
+    "benchleg19_False",
+    "benchleg19_True",
+    "benchleg20_False",
+    "benchleg20_True",
+    "benchleg21_False",
+    "benchleg21_True"
+   ]
+  },
+  {
+   "signature": {
+    "verts": 24,
+    "tris": 12,
+    "dims": [
+     0.4461,
+     0.4461,
+     0.32
+    ]
+   },
+   "objects": [
+    "lampbase0",
+    "lampbase1",
+    "lampbase2",
+    "lampbase4",
+    "lampbase5",
+    "lampbase6",
+    "lampbase7",
+    "lampbase8",
+    "lampbase9",
+    "lampbase10",
+    "lampbase11",
+    "lampbase12",
+    "lampbase13",
+    "lampbase14",
+    "lampbase15",
+    "lampbase16",
+    "lampbase17",
+    "lampbase18",
+    "lampbase19",
+    "lampbase20",
+    "lampbase21",
+    "lampbase22",
+    "lampbase23",
+    "lampbase24",
+    "lampbase25",
+    "lampbase26",
+    "lampbase27",
+    "lampbase28",
+    "lampbase29",
+    "lampbase30",
+    "lampbase31",
+    "lampbase32",
+    "lampbase33",
+    "lampbase34",
+    "lampbase35",
+    "lampbase36",
+    "lampbase37",
+    "lampbase38",
+    "lampbase39",
+    "lampbase40",
+    "lampbase41",
+    "lampbase42",
+    "lampbase43"
+   ]
+  },
+  {
+   "signature": {
+    "verts": 24,
+    "tris": 12,
+    "dims": [
+     1.526,
+     1.123,
+     0.49
+    ]
+   },
+   "objects": [
+    "benchback0",
+    "benchback1",
+    "benchback2",
+    "benchback3",
+    "benchback4",
+    "benchback5",
+    "benchback6",
+    "benchback7",
+    "benchback8",
+    "benchback9",
+    "benchback10",
+    "benchback11",
+    "benchback12",
+    "benchback13",
+    "benchback14",
+    "benchback15",
+    "benchback16",
+    "benchback17",
+    "benchback18",
+    "benchback19",
+    "benchback20",
+    "benchback21"
+   ]
+  },
+  {
+   "signature": {
+    "verts": 24,
+    "tris": 12,
+    "dims": [
+     1.7864,
+     1.49,
+     0.08
+    ]
+   },
+   "objects": [
+    "benchseat1",
+    "benchseat2",
+    "benchseat3",
+    "benchseat4",
+    "benchseat5",
+    "benchseat6",
+    "benchseat7",
+    "benchseat8",
+    "benchseat9",
+    "benchseat10",
+    "benchseat11",
+    "benchseat12",
+    "benchseat13",
+    "benchseat14",
+    "benchseat15",
+    "benchseat17",
+    "benchseat18",
+    "benchseat19",
+    "benchseat20",
+    "benchseat21"
+   ]
+  },
+  {
+   "signature": {
+    "verts": 216,
+    "tris": 108,
+    "dims": [
+     3.5433,
+     3.5433,
+     0.43
+    ]
+   },
+   "objects": [
+    "baybench0",
+    "baybench1"
+   ]
+  },
+  {
+   "signature": {
+    "verts": 24,
+    "tris": 12,
+    "dims": [
+     0.5029,
+     0.6404,
+     0.82
+    ]
+   },
+   "objects": [
+    "fishleg0_0.15",
+    "fishleg0_1.45",
+    "fishleg1_0.15",
+    "fishleg1_1.45"
+   ]
+  },
+  {
+   "signature": {
+    "verts": 24,
+    "tris": 12,
+    "dims": [
+     1.7863,
+     1.49,
+     0.08
+    ]
+   },
+   "objects": [
+    "benchseat0",
+    "benchseat16"
+   ]
+  },
+  {
+   "signature": {
+    "verts": 24,
+    "tris": 12,
+    "dims": [
+     1.8257,
+     1.6598,
+     0.1
+    ]
+   },
+   "objects": [
+    "fishtop0",
+    "fishtop1"
+   ]
+  }
+ ],
+ "dup_redundant_tris": 9212,
+ "join_candidates": {
+  "Toy_amber_Glow": 44,
+  "Toy_ink": 438,
+  "Toy_steel": 6,
+  "Toy_stone": 3,
+  "Toy_timber": 46,
+  "Toy_timberd": 2
+ },
+ "degenerate_tris": 0,
+ "coincident_vert_pairs": 18602,
+ "over_tess": {
+  "near_distance_m": 329.35,
+  "one_px_world_m": 0.222,
+  "note": "cylinders whose chord error < one_px_world_m can halve segments"
+ }
+}

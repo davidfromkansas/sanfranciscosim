@@ -1,0 +1,72 @@
+{
+ "input_materials": [
+  "Toy_amber_Glow",
+  "Toy_gold",
+  "Toy_ink",
+  "Toy_steel",
+  "Toy_stone",
+  "Toy_timber",
+  "Toy_timberd"
+ ],
+ "steps": [
+  {
+   "step": "weld+degenerate",
+   "tris": 13860,
+   "verts": 8008
+  },
+  {
+   "step": "interior-faces",
+   "tris": 13860,
+   "verts": 8008
+  },
+  {
+   "step": "limited-dissolve-skipped",
+   "tris": 13860,
+   "verts": 8008
+  },
+  {
+   "step": "join-per-material",
+   "tris": 13860,
+   "verts": 8008
+  }
+ ],
+ "input": {
+  "tris": 13860,
+  "verts": 26610,
+  "objects": 540
+ },
+ "interior_faces_removed": 0,
+ "joins": {
+  "grp_Toy_stone": 3,
+  "grp_Toy_timber": 46,
+  "grp_Toy_ink": 438,
+  "grp_Toy_steel": 6,
+  "grp_Toy_amber_Glow": 44,
+  "grp_Toy_timberd": 2
+ },
+ "inverted_solids": [],
+ "reimport": {
+  "objects": 7,
+  "materials": [
+   "Toy_amber_Glow",
+   "Toy_gold",
+   "Toy_ink",
+   "Toy_steel",
+   "Toy_stone",
+   "Toy_timber",
+   "Toy_timberd"
+  ],
+  "bbox_dims": [
+   219.5688,
+   165.9949,
+   7.6
+  ],
+  "bbox_min": [
+   -110.3414,
+   -83.2858,
+   0.0
+  ]
+ },
+ "bbox_ok": true,
+ "material_set_ok": true
+}

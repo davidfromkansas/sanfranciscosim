@@ -3211,6 +3211,37 @@ export const LANDMARKS = [
     // one frame. 460 m because the long axis is 245 m.
     camera: { distance: 460, yaw: 215, pitch: 20 },
   },
+  {
+    // Pier 7 — the Broadway public access pier (1990, ROMA Design Group +
+    // T.Y. Lin International; 1993 ASLA National Honor Award). A water asset:
+    // the anchor is over open bay, terrain samples 0.00 across the footprint,
+    // and the GLB carries its own deck (+3.0 m) and pile field down to the
+    // waterline. height 7.6 is the vertical extent to the lamp-globe tops.
+    //
+    // exclude 60, measured against the bake input (12 Aug vintage): the pier
+    // bakes from exactly ONE footprint, DataSF area_id 855 (min(centroid,
+    // vertex) 1.4 m from this anchor; hgt_max 4.96 m). The tiles' three toy
+    // roof bumps are toy-pass furniture on that slab and vanish with it. The
+    // binding neighbour is the San Francisco Belle (Overture w281243626, the
+    // moored riverboat off Pier 3) at 98.6 m — r=100 would delete a boat that
+    // is not ours; 60 spares it by 38.6 m. Next inputs: 116.3 m (Overture,
+    // 11 m), 126.1 m (DataSF 3757). Verified drops on the re-bake: buildings
+    // 23_9#16 and toy 23_9#7..#10, nothing else in either tier.
+    //
+    // The id keeps its hyphen on purpose: camelId() in app/src/assets.js is
+    // id.replace(/-([a-z])/g, upper) and a DIGIT does not start a segment, so
+    // 'pier-7' round-trips to 'pier-7', not 'pier7'. Get this wrong and the
+    // manifest entry never matches this row.
+    id: 'pier-7',
+    name: 'Pier 7',
+    lon: -122.3955159,
+    lat: 37.7994429,
+    height: 7.6,
+    exclude: 60,
+    // Southwest three-quarter over the Embarcadero: entry plaza in front, the
+    // two lamp rows running 257 m out into the bay.
+    camera: { distance: 420, yaw: 215, pitch: 20 },
+  },
 ];
 
 // Parks/green spaces the landcover bake must match at least one source polygon

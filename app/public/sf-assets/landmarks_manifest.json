@@ -1959,5 +1959,24 @@
     ],
     "tris": 10852,
     "loadRadius": 2500
+  },
+  {
+    "id": "pier-7",
+    "file": "pier-7.glb",
+    "anchor": [
+      -122.3955159,
+      37.7994429
+    ],
+    "targetHeightM": 7.6,
+    "cat": 0,
+    "name": "Pier 7",
+    "estimated": false,
+    "dims": [
+      219.5688,
+      165.9949,
+      7.6
+    ],
+    "tris": 13860,
+    "loadRadius": 2500
   }
 ]
