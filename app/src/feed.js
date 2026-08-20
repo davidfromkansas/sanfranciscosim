@@ -237,7 +237,9 @@ function createProfileCard({ onVisit }) {
       face.replaceChildren(avatar(person, 52));
       name.textContent = person.name;
       job.textContent = person.occupation || "No occupation recorded";
-      hood.textContent = PUMA_NAMES[person.puma] ?? "San Francisco";
+      hood.textContent = person.mood
+        ? `${PUMA_NAMES[person.puma] ?? "San Francisco"} · ${person.mood.toLowerCase()}`
+        : (PUMA_NAMES[person.puma] ?? "San Francisco");
       persona.textContent =
         person.persona || "No description written for this resident yet.";
       back.hidden = false;
