@@ -21,6 +21,7 @@ import { readFile } from "node:fs/promises";
 import path from "node:path";
 import { fileURLToPath } from "node:url";
 import { registerFeed } from "../feedcore.mjs";
+import { fetchNews } from "../sf-news.mjs";
 import { get, put, BlobPreconditionFailedError } from "@vercel/blob";
 
 const HERE = path.dirname(fileURLToPath(import.meta.url));
@@ -760,7 +761,9 @@ async function growThread(people, thread, spend, spendVote) {
   // sampled exactly like anybody's, so the score still says what the room made
   // of it, and everything above the floor still has to be earned by that score
   // — a lukewarm post gets its two and stops, a good one runs to eight.
-  const floor = thread.human ? HUMAN.minReplies : 0;
+  // The wire shares the floor: a story posted for discussion and met with
+  // silence is the feature failing, same as a visitor typing into a void.
+  const floor = thread.human || thread.event ? HUMAN.minReplies : 0;
   if (mood === "ignored" && !floor) {
     // Nobody voted, so nobody cared. The post stands on its own and the thread
     // is finished before it starts — which is most of what a real subreddit is,
@@ -984,6 +987,9 @@ async function readState() {
     // over one etag, and all but one threw the work away.
     if (Number.isInteger(saved.lastWindow) && saved.lastWindow > lastWindow)
       lastWindow = saved.lastWindow;
+    // Which stories have already run. Without this a cold instance reposts the
+    // whole front page.
+    if (Array.isArray(saved.seenLinks)) seenLinks = saved.seenLinks;
     // Only when the count moves. This runs on every read now, and a line a
     // minute per instance saying the same number is how a log stops being
     // somewhere you look.
@@ -1004,7 +1010,7 @@ async function persist() {
   try {
     const saved = await put(
       STATE_PATH,
-      JSON.stringify({ version: STATE_VERSION, lastWindow, threads: live }),
+      JSON.stringify({ version: STATE_VERSION, lastWindow, threads: live, seenLinks }),
       {
         access: "private",
         contentType: "application/json",
@@ -1038,7 +1044,7 @@ async function persist() {
       try {
         const again = await put(
           STATE_PATH,
-          JSON.stringify({ version: STATE_VERSION, lastWindow, threads: live }),
+          JSON.stringify({ version: STATE_VERSION, lastWindow, threads: live, seenLinks }),
           {
             access: "private",
             contentType: "application/json",
@@ -1194,6 +1200,27 @@ export async function advanceSubreddit() {
     if (now - live[i].startedAt > RETIRE_AFTER) live.splice(i, 1);
   }
 
+  // BEFORE the resume pass, which on a busy shelf can spend the whole
+  // allowance — on the first dry run it did exactly that, and the story landed
+  // with nobody under it. News that waits a window is stale; an unfinished
+  // conversation is not.
+  if (eventIsDue() && budget > HUMAN.minReplies) {
+    try {
+      const event = await openEventThread(people, spendVote);
+      if (event && spend()) {
+        live.push(event);
+        // Straight into the continuation loop, so the story arrives with the
+        // first reactions under it rather than sitting alone.
+        await growThread(people, event, spend, spendVote);
+      }
+    } catch (error) {
+      // A newsroom being down, or a summary that will not parse, must not stop
+      // the residents posting.
+      failures++;
+      console.warn(`${SUBREDDIT.name}: event failed — ${error.message}`);
+    }
+  }
+
   // Any thread the budget cut short last time resumes before anything new is
   // started: finishing a conversation beats beginning one.
   for (const thread of live.filter((t) => !t.done)) {
@@ -1216,6 +1243,11 @@ export async function advanceSubreddit() {
   // worse than no cap. It bounds SIZE now, not whether the city speaks.
   live.sort((a, b) => b.startedAt - a.startedAt);
   while (live.length >= MAX_THREADS) live.pop(); // oldest is last
+
+  // The wire, on its own quarter-hour clock, before the residents' own post.
+  // If the budget runs short the news is the thing that cannot wait: a
+  // resident's post is about nothing in particular and is just as good next
+  // window, while a story an hour old is not.
 
   const wanted = NEW_THREADS_PER_REFRESH;
   for (let i = 0; i < wanted && budget > 0; i++) {
@@ -1249,6 +1281,104 @@ export async function advanceSubreddit() {
   live.sort((a, b) => b.startedAt - a.startedAt);
   await persist();
   return shape(people, allowance - budget);
+}
+
+// --------------------------------------------------------------- news events
+//
+// Once in a while the city itself puts something on the board: a real story
+// from a real San Francisco newsroom, posted by nobody, for the residents to
+// argue about. Everything after the post is the machinery they already live
+// under — the same sampled voters, the same continuation loop, the same moods.
+//
+// An event thread is structurally a HUMAN post: a thread whose author is not in
+// the cast. That path already works, which is why this is mostly a fetch and a
+// schedule rather than a second simulation.
+
+const EVENT = {
+  id: "sf-wire",
+  name: "SF Wire",
+  // Deliberately not a moderator and not a resident. It reports; it holds no
+  // opinion and takes no side, and the panel labels it so nobody mistakes a
+  // wire story for somebody's view.
+  maxChars: { title: 120, body: 200 },
+};
+
+const EVENT_WINDOW_MS = 15 * 60_000;
+// Links already posted. A ceiling rather than a quota: if the newsrooms have
+// filed nothing new this quarter hour, the city stays quiet rather than
+// reaching for filler. Cross-outlet duplicates are NOT merged yet — three
+// papers on one story will read as three posts, which is a known trade.
+const SEEN_MAX = 400;
+let seenLinks = [];
+let lastEventWindow = -1;
+
+export function eventIsDue(now = Date.now()) {
+  const window = Math.floor(now / EVENT_WINDOW_MS);
+  if (window === lastEventWindow) return false;
+  // Its own jittered minute inside the window, from a different salt than the
+  // residents' own schedule, so the wire and the residents do not always post
+  // in the same breath.
+  const minute = Math.floor((now % EVENT_WINDOW_MS) / 60_000);
+  if (minute < dueMinuteFor(window + 7919) % 15) return false;
+  lastEventWindow = window;
+  return true;
+}
+
+// The story, in the panel's own dimensions. Told to COMPRESS and nothing else:
+// the headline is carried verbatim because it is the newsroom's own words and
+// not ours to reword, and the body may only shorten what they already wrote.
+async function summariseStory(item) {
+  const system =
+    `You condense a news item into one short line for a city discussion board.\n\n` +
+    `Rules:\n` +
+    `- Compress what is given. Add no fact that is not in it.\n` +
+    `- No opinion, no framing, no editorialising.\n` +
+    `- Plain declarative sentence. No headline style, no clickbait.\n` +
+    `- Do not mention the outlet; it is shown separately.`;
+  const user =
+    `HEADLINE\n${item.title}\n\nSTANDFIRST\n${item.description || "(none)"}\n\n` +
+    `Write ONE sentence under ${EVENT.maxChars.body} characters saying what happened.\n\n` +
+    `Return JSON:\n{ "body": "..." }`;
+  const { body } = parseJson(await complete(system, user, 160));
+  return String(body ?? "").trim();
+}
+
+// The freshest story nobody has posted yet, as a thread with its first votes
+// already cast — so the next pass can see what the room made of it.
+async function openEventThread(people, spendVote) {
+  const news = await fetchNews();
+  const seen = new Set(seenLinks);
+  const item = news.find((n) => !seen.has(n.link));
+  if (!item) return null;
+
+  const body = (await summariseStory(item)) || item.description.slice(0, EVENT.maxChars.body);
+  const at = Date.now();
+  const thread = {
+    id: `${EVENT.id}-${at}`,
+    authorId: EVENT.id,
+    author: { name: EVENT.name, occupation: null, puma: null },
+    event: true,
+    // Kept so the panel can credit the newsroom and link out. Restating a story
+    // without saying whose reporting it is would be the wrong thing to do.
+    source: { name: item.source, url: item.link, published: item.published },
+    title: item.title.slice(0, EVENT.maxChars.title),
+    body,
+    votes: await simulateVotes({
+      cast: people,
+      authorId: EVENT.id,
+      content: `${item.title}\n\n${body}`,
+      size: votingConfig.postVoterSampleSize,
+      spend: spendVote,
+    }),
+    replies: [],
+    replyProbability: sampleReplyProbability(),
+    done: false,
+    startedAt: at,
+    at,
+  };
+  seenLinks.push(item.link);
+  if (seenLinks.length > SEEN_MAX) seenLinks = seenLinks.slice(-SEEN_MAX);
+  return thread;
 }
 
 // ------------------------------------------------------ the human's own post

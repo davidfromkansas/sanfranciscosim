@@ -1211,3 +1211,44 @@ button:hover {
     border-radius: 0;
   }
 }
+
+/* ------------------------------------------------------------ wire stories */
+
+/* A reported story, not a resident speaking. The tint and the kicker are what
+   keep a newsroom's reporting from reading as somebody's opinion — the card
+   sits in the same column but does not pretend to be a neighbour. */
+.rs-event {
+  background: #f4f1e4;
+  border-color: #8a6d3b;
+}
+
+.rs-event-kicker {
+  display: flex;
+  align-items: baseline;
+  gap: 6px;
+  font-size: 11px;
+  color: #6b5a48;
+}
+
+.rs-event-tag {
+  font-size: 10px;
+  font-weight: 800;
+  letter-spacing: 1.2px;
+  color: #8a6d3b;
+}
+
+.rs-event-credit {
+  margin: 6px 0 0;
+  font-size: 10.5px;
+  color: #8a7860;
+}
+
+.rs-event-link {
+  color: #8a6d3b;
+  font-weight: 700;
+  text-decoration: none;
+}
+
+.rs-event-link:hover {
+  text-decoration: underline;
+}

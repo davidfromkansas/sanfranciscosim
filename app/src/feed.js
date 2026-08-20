@@ -498,11 +498,34 @@ function score(item) {
 
 function renderThread(thread, speakers, onOpen, onDetail) {
   const who = { ...thread.author, ...(speakers[thread.authorId] ?? {}) };
-  const card = el("article", "rs-post");
+  const card = el("article", thread.event ? "rs-post rs-event" : "rs-post");
 
-  card.append(byline(who, thread.at, onOpen, thread.human));
+  // A wire story is reported, not said: it gets a kicker naming what it is
+  // instead of a resident byline, and a credit that links to the newsroom.
+  // Restating somebody's reporting without saying whose would be the wrong
+  // thing to do.
+  if (thread.event) {
+    const kicker = el("div", "rs-event-kicker");
+    kicker.append(
+      el("span", "rs-event-tag", "SF WIRE"),
+      el("span", "rs-sep", "·"),
+      timeLabel(thread.at),
+    );
+    card.append(kicker);
+  } else {
+    card.append(byline(who, thread.at, onOpen, thread.human));
+  }
   card.append(el("h2", "rs-title", thread.title));
   card.append(el("p", "rs-body", thread.body));
+  if (thread.event && thread.source) {
+    const credit = el("p", "rs-event-credit");
+    const a = el("a", "rs-event-link", thread.source.name);
+    a.href = thread.source.url;
+    a.target = "_blank";
+    a.rel = "noopener noreferrer";
+    credit.append("Reporting: ", a);
+    card.append(credit);
+  }
 
   const count = thread.replies.length;
   const actions = el("div", "rs-actions");
@@ -569,10 +592,32 @@ function createDetailView({ onOpen }) {
   function draw(thread) {
     if (!thread) return close();
     const who = { ...thread.author, ...(speakers[thread.authorId] ?? {}) };
-    const post = el("article", "rs-post rs-post-full");
-    post.append(byline(who, thread.at, onOpen, thread.human));
+    const post = el(
+      "article",
+      thread.event ? "rs-post rs-post-full rs-event" : "rs-post rs-post-full",
+    );
+    if (thread.event) {
+      const kicker = el("div", "rs-event-kicker");
+      kicker.append(
+        el("span", "rs-event-tag", "SF WIRE"),
+        el("span", "rs-sep", "·"),
+        timeLabel(thread.at),
+      );
+      post.append(kicker);
+    } else {
+      post.append(byline(who, thread.at, onOpen, thread.human));
+    }
     post.append(el("h2", "rs-title", thread.title));
     post.append(el("p", "rs-body", thread.body));
+    if (thread.event && thread.source) {
+      const credit = el("p", "rs-event-credit");
+      const a = el("a", "rs-event-link", thread.source.name);
+      a.href = thread.source.url;
+      a.target = "_blank";
+      a.rel = "noopener noreferrer";
+      credit.append("Reporting: ", a);
+      post.append(credit);
+    }
     const actions = el("div", "rs-actions");
     actions.append(score(thread));
     const n = thread.replies.length;
