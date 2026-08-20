@@ -46,7 +46,7 @@ const MOON_SHORT = {
 
 // The record spins for as long as the track plays; the tonearm rides down onto
 // it. One CSS animation, paused rather than removed, so nothing re-lays out.
-const TRACK_URL = `${import.meta.env.BASE_URL}audio/controlla.mp3`;
+const TRACK_URL = `${import.meta.env.BASE_URL}audio/beats.mp3`;
 
 // The deck has no volume dial: play/pause is the whole of its control surface,
 // so the track plays at a fixed level chosen to sit under the city rather than
