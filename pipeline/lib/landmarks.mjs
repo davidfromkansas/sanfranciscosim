@@ -3160,6 +3160,57 @@ export const LANDMARKS = [
     // the canopy are the whole recognition.
     camera: { distance: 120, yaw: 85, pitch: 26 },
   },
+  {
+    // Pier 15 (the Exploratorium), The Embarcadero at Green St. Water asset:
+    // the anchor is the OSM pier polygon's area centroid, over open water, so
+    // placeGeneric seats the GLB at y = 0 like Pier 3 and the bridges.
+    //
+    // Exclusion sized against the real bake input (both passes:
+    // pipeline/data/buildings_datasf.geojson AND overture_buildings.geojsonseq),
+    // gate = min(centroid, any ring vertex) from the anchor after
+    // simplifyRing(0.6), measured 19 Aug 2026:
+    //   13.1 m  Overture "Pier 15" h 14.6 (centroid)      - must go
+    //   36.6 m  DataSF SF9900015 h 15.64 (centroid)       - must go. NOTE: this
+    //           is ONE merged polygon covering Piers 15 AND 17 (verified by
+    //           point-in-polygon on both sheds - they were joined into a quay
+    //           terminal in 1955), so excluding it un-bakes Pier 17 as well,
+    //           and Pier 17's own Overture ring does NOT gap-fill: its
+    //           diagonal bbox is 46% claimed in the bbox-based occupancy grid
+    //           (occupiedFraction 0.464 > 0.25, measured 19 Aug 2026), a
+    //           pre-existing coarseness of buildings.mjs. **Pier 17's site
+    //           therefore bakes EMPTY until a pier-17 asset lands.** No safe
+    //           radius avoids this: anything >= 36.6 kills the merged block,
+    //           anything less leaves a 15.6 m block through this GLB.
+    //   61.4 m  Overture 6x5 m kiosk (OSM w1323673815) on the courtyard-notch
+    //           deck - orphaned once the pier is bespoke, take it
+    //   84.9 m  Overture "Pier 17" h 16.4 (centroid)      - MUST STAY
+    //   87.4 m  OSM w738027034 - the Bay Observatory Gallery, ON THIS PIER's
+    //           north apron (2-level, PV roof). Outside the main radius but
+    //           inside the GLB, where it baked 23 m deep into the deck - taken
+    //           by the extraExclusion below instead of widening the main
+    //           radius past Pier 17's 84.9 ceiling.
+    //  120.5 m  Pier 9 (a sibling asset branch owns it)   - must stay
+    // Safe window (61.4, 84.9); 70 keeps 14.9 m of margin to Pier 17's gate.
+    // Never raise past 84.
+    //
+    // The extra circle sits on w738027034's centroid; gates from THAT centre:
+    // target centroid 0.4 m, Pier 17's nearest ring VERTEX 29.1 m (the gate
+    // fires on any vertex, so r must stay under 29). r = 12.
+    //
+    // camelId: a digit does not start a segment, so 'pier-15' round-trips to
+    // 'pier-15' - same rule as pier-3, do not "fix" it to pier15.
+    id: 'pier-15',
+    name: 'Pier 15 (Exploratorium)',
+    lon: -122.3974662,
+    lat: 37.8016046,
+    height: 16.4,
+    exclude: 70,
+    extraExclusions: [{ lon: -122.3968015, lat: 37.8023693, r: 12 }],
+    // Same rig as pier-3 one slip over: yaw 215 stands the eye over the
+    // Embarcadero to hold the bulkhead pavilion and the 250 m solar roof in
+    // one frame. 460 m because the long axis is 245 m.
+    camera: { distance: 460, yaw: 215, pitch: 20 },
+  },
 ];
 
 // Parks/green spaces the landcover bake must match at least one source polygon

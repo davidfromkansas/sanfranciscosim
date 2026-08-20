@@ -301,19 +301,37 @@ function deckTopY(position, box) {
 // Anything that is not a bridge: anchor lon/lat, uniform scale to the target
 // height, grounded on the baked terrain. Returned as a matrix so the batch can
 // place an instance without a Group in the graph.
+//
+// `seaLevel: true` in the manifest seats the asset on the water plane instead —
+// the same datum the bridges use. It exists for structures that STAND IN THE BAY,
+// where the Terrarium DEM is not ground truth and sampling it is actively wrong:
+// at 7.5 m per sample the raster carries spurious 2+ m bumps over open water
+// (moored vessels and the pier decks themselves bleed into the source), so at
+// Pier 3's anchor it returns 2.23 m while reading 0.00 m thirty metres either
+// side. Seating on that lifts a 213 m pier two metres clear of the water with
+// daylight under its piles. The alternative — sliding the anchor until the
+// raster happens to read zero — is forbidden (INTEGRATION-PROMPT "Do not": move
+// the real anchor to make the model fit) and would break again on the next
+// terrain bake. Declaring the datum is the honest fix, and it is the same kind
+// of per-asset, data-visible placement decision as `yawDeg` and `loadRadius`.
 const UP = new Vector3(0, 1, 0);
 function placeGeneric(box, entry, data) {
   const size = box.getSize(new Vector3());
   const scale = entry.targetHeightM / size.y;
   const [x, z] = data.project(entry.anchor[0], entry.anchor[1]);
-  const y = Math.max(0, data.sampleElevation(x, z));
+  const y = entry.seaLevel ? 0 : Math.max(0, data.sampleElevation(x, z));
   const yaw = entry.yawDeg !== undefined ? (entry.yawDeg * Math.PI) / 180 : 0;
   const matrix = new Matrix4().compose(
     new Vector3(x, y, z),
     new Quaternion().setFromAxisAngle(UP, yaw),
     new Vector3(scale, scale, scale)
   );
-  return { matrix, ends: [], log: `uniform x${scale.toFixed(4)} at ${x.toFixed(0)}, ${z.toFixed(0)}` };
+  const datum = entry.seaLevel ? ' on the water plane' : '';
+  return {
+    matrix,
+    ends: [],
+    log: `uniform x${scale.toFixed(4)} at ${x.toFixed(0)}, ${z.toFixed(0)}${datum}`,
+  };
 }
 
 // Streaming + batching (PERF-PLAN #3).
