@@ -714,6 +714,72 @@ export function createFeedPanel({
     rulesCard.show(community.name, community.rules),
   );
   let lastKey = "";
+  // Everything loaded so far, newest first, and where the next page starts.
+  // The poll refreshes the TOP of this and leaves the rest alone: a reader
+  // forty posts down must not have the ground move under them every thirty
+  // seconds.
+  let loaded = [];
+  let speakers = {};
+  let nextBefore = null;
+  let more = false;
+  let loadingPage = false;
+
+  // Renders whatever is loaded. Separate from fetching so a page arriving and a
+  // poll arriving go through exactly the same path.
+  function draw() {
+    list.replaceChildren(
+      ...loaded.map((t) =>
+        renderThread(t, speakers, profile.show, (id) => {
+          const thread = loaded.find((x) => x.id === id);
+          if (thread) detail.open(thread, speakers);
+        }),
+      ),
+    );
+    detail.sync(loaded, speakers);
+  }
+
+  // The next page, when the reader gets near the bottom. Guarded so a fast
+  // scroll cannot fire three requests for the same page.
+  async function loadMore() {
+    if (loadingPage || !more || !nextBefore) return;
+    loadingPage = true;
+    const cursor = nextBefore;
+    try {
+      const res = await fetch(`${ENDPOINT}?before=${cursor}&limit=20`);
+      const page = await res.json();
+      const have = new Set(loaded.map((t) => t.id));
+      const fresh = (page.threads ?? []).filter((t) => !have.has(t.id));
+      loaded = [...loaded, ...fresh].sort((a, b) => b.startedAt - a.startedAt);
+      speakers = { ...speakers, ...(page.speakers ?? {}) };
+      nextBefore = page.page?.nextBefore ?? null;
+      more = Boolean(page.page?.more);
+      if (fresh.length) {
+        draw();
+        fillViewport();
+      }
+    } catch {
+      // A page that will not load is not worth an error in the reader's face —
+      // they still have everything above it. The next scroll tries again.
+    } finally {
+      loadingPage = false;
+    }
+  }
+
+  // A page that does not fill the panel leaves nothing to scroll, and a feed
+  // whose only way to ask for more is a scroll event would stop dead there —
+  // on a tall screen, or a short first page. Keep pulling until there is
+  // something to scroll, or nothing left to pull.
+  function fillViewport() {
+    if (!more || loadingPage) return;
+    if (root.scrollHeight <= root.clientHeight + 200) loadMore();
+  }
+
+  // Near the bottom, not at it, so the next page is usually there before the
+  // reader arrives.
+  root.addEventListener("scroll", () => {
+    if (root.scrollTop + root.clientHeight > root.scrollHeight - 900)
+      loadMore();
+  });
 
   refresh = async function refresh({ feed = null, bust = false } = {}) {
     let payload = feed;
@@ -747,6 +813,12 @@ export function createFeedPanel({
       status.textContent =
         payload.live === false ? "Quiet right now." : "Nobody has posted yet.";
       list.replaceChildren();
+      // Reset the paging state too, or a feed that empties leaves a stale
+      // cursor behind and the next scroll asks for a page of a city that is
+      // no longer there.
+      loaded = [];
+      nextBefore = null;
+      more = false;
       lastKey = "";
       return;
     }
@@ -764,21 +836,31 @@ export function createFeedPanel({
     // the second number and then called it "comments and posts", so it counted
     // them twice and read as nonsense. "Last 24 hours" rather than "today"
     // because retirement is a rolling twenty-four hours, not a calendar day.
-    const comments = threads.reduce((n, t) => n + t.replies.length, 0);
+    // From the server's totals when it sends them: the feed serves a window of
+    // the most recent threads, so counting what arrived would under-report the
+    // day. Falls back to counting locally for an older payload.
+    const posts = payload.totals?.posts ?? threads.length;
+    const comments =
+      payload.totals?.comments ??
+      threads.reduce((n, t) => n + t.replies.length, 0);
     const plural = (n, word) => `${n} ${word}${n === 1 ? "" : "s"}`;
-    status.textContent = `${plural(threads.length, "post")} · ${plural(comments, "comment")} · last 24 hours`;
-    const speakers = payload.speakers ?? {};
-    list.replaceChildren(
-      ...threads.map((t) =>
-        renderThread(t, speakers, profile.show, (id) => {
-          const thread = threads.find((x) => x.id === id);
-          if (thread) detail.open(thread, speakers);
-        }),
-      ),
-    );
-    // If somebody is reading a thread, fold whatever just arrived into it
-    // rather than leaving them on a stale copy.
-    detail.sync(threads, speakers);
+    status.textContent = `${plural(posts, "post")} · ${plural(comments, "comment")} · last 24 hours`;
+    // Page one replaces the top of the list. Anything already loaded BELOW it
+    // is kept: a poll bringing one new post must not throw away the four pages
+    // somebody scrolled through to get where they are.
+    const arrived = new Map(threads.map((t) => [t.id, t]));
+    const below = loaded.filter((t) => !arrived.has(t.id));
+    loaded = [...threads, ...below].sort((a, b) => b.startedAt - a.startedAt);
+    speakers = { ...speakers, ...(payload.speakers ?? {}) };
+    if (payload.page && loaded.length <= threads.length) {
+      nextBefore = payload.page.nextBefore;
+      more = payload.page.more;
+    }
+    // draw() syncs the open thread against everything LOADED. Syncing against
+    // this page alone would tell a reader four pages down that the thread they
+    // are reading had been retired, and close it under them.
+    draw();
+    fillViewport();
   };
 
   refresh();

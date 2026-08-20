@@ -13,6 +13,7 @@ import "./_lib/feeds/index.mjs";
 import {
   advanceSubreddit,
   postIsDue,
+  readSubreddit,
   submitHumanPost,
 } from "./_lib/feeds/residents.mjs";
 
@@ -166,6 +167,34 @@ export default async function handler(req, res) {
   }
   const entry = getFeed(pathname.replace(/^\/api\//, ""));
   if (entry) {
+    // Page one is every visitor's first request and is identical for all of
+    // them, so it goes through the registry and the CDN like everything else.
+    // A request carrying a cursor is somebody scrolling — rarer, and a
+    // different payload per cursor, which the registry cannot cache because it
+    // holds ONE payload per feed. Those read straight through.
+    const before = Number(
+      new URL(req.url, "http://localhost").searchParams.get("before") || 0,
+    );
+    if (entry.name === "feed" && before > 0) {
+      const limit = Number(
+        new URL(req.url, "http://localhost").searchParams.get("limit") || 0,
+      );
+      try {
+        const page = await readSubreddit({ before, limit });
+        // Pages of the past do not change, so they cache hard — but only at the
+        // edge, and only a page that actually found something.
+        res.setHeader(
+          "Cache-Control",
+          page.threads.length
+            ? "public, max-age=0, s-maxage=300, stale-while-revalidate=600"
+            : "no-store",
+        );
+        res.status(200).json(page);
+      } catch (error) {
+        res.status(503).json({ error: String(error?.message || error) });
+      }
+      return;
+    }
     await serveFeed(res, entry);
     return;
   }
