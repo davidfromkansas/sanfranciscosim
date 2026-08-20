@@ -169,6 +169,7 @@ route, and the park plans depend on it (§E8 of the parks README).
 | [2 Folsom Street (Gap Inc. headquarters / 250 Embarcadero)](./2-folsom.md) | `2-folsom` | 88.0 m (LiDAR maximum, the limestone crown; superstructure deck 72.11 m and base terrace 32.28 m both measured) | new landmark |
 | [Hiram W. Johnson State Office Building](./hiram-johnson-state-office-building.md) | `hiram-johnson-state-office-building` | 61.9 m (architectural crest; 53.6 m roof plane) | new landmark |
 | [The Towers at Rincon (88 Howard Street)](./towers-at-rincon.md) | `towers-at-rincon` | 89.0 m (CTBUH architectural/tip; LiDAR crest 87.13 m, podium 24.5 m) | new landmark |
+| [Army & Navy YMCA Building (169 Steuart Street)](./169-steuart.md) | `169-steuart` | 46.64 m (LiDAR crest, tile-roof apex; tower eave 35.0 m, wing roof 28.1 m) | new landmark |
 
 - Style: `docs/styles/miniature-toy.md` (authoritative for artistic decisions)
 - Technical contract: `.agents/skills/sf-asset-check/SKILL.md` (authoritative for the GLB)
