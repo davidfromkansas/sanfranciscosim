@@ -118,6 +118,12 @@ const RETIRE_AFTER = 24 * 60 * 60 * 1000;
 // posts blocked, nothing retiring for another sixteen. The cap has to be a
 // backstop against runaway generation, not a limit the normal rate walks into.
 const MAX_THREADS = 200;
+// A page of the feed. Every visitor used to download all two hundred threads
+// plus a full identity paragraph for each of the four hundred-odd residents who
+// had spoken — a megabyte before a single post was read. The panel asks for a
+// page at a time and more as somebody scrolls.
+const PAGE_SIZE = 20;
+const MAX_PAGE = 60;
 // How long a served payload is reused before the blob is read again. It is not
 // the posting cadence — that is WINDOW_MS, down where the tick decides its
 // minute. The two were one constant while the feed both generated and served;
@@ -1062,11 +1068,18 @@ async function persist() {
 
 // One payload shape for both paths, so a read and a write can never disagree
 // about what the feed looks like.
-function shape(people, written) {
+function shape(people, written, { before = 0, limit = PAGE_SIZE } = {}) {
   // Totals are DERIVED on the way out, never stored. The individual votes stay
   // canonical, so a score can always be explained by naming the residents who
   // produced it — and the number on screen cannot drift from the records.
-  const scored = live.map((t) => ({
+  // The page. `before` is a TIMESTAMP, not an offset: posts arrive while
+  // somebody is reading, and an offset would slide everything down beneath them
+  // so page two repeated the last post of page one. A cursor names where the
+  // reader actually got to, and stays true however much lands above it.
+  const size = Math.min(MAX_PAGE, Math.max(1, limit || PAGE_SIZE));
+  const from = before ? live.findIndex((t) => t.startedAt < before) : 0;
+  const shown = from === -1 ? [] : live.slice(from, from + size);
+  const scored = shown.map((t) => ({
     ...t,
     ...tally(t.votes),
     replies: t.replies.map((r) => ({ ...r, ...tally(r.votes) })),
@@ -1076,7 +1089,7 @@ function shape(people, written) {
   // from. The panel needs it to say who somebody is when you click their name,
   // and sending it per-post would repeat ~900 characters for every reply.
   const speaking = new Set();
-  for (const t of live) {
+  for (const t of shown) {
     speaking.add(t.authorId);
     for (const r of t.replies) speaking.add(r.personaId);
   }
@@ -1115,6 +1128,20 @@ function shape(people, written) {
     model: MODEL,
     cast: people.length,
     written,
+    // What the CITY holds, not what was sent. The header line reports the last
+    // twenty-four hours, and serving a window would otherwise have it announce
+    // eighty posts on a day the residents wrote two hundred.
+    totals: {
+      posts: live.length,
+      comments: live.reduce((n, t) => n + t.replies.length, 0),
+    },
+    // Where the next page starts, and whether there is one. The client hands
+    // `nextBefore` straight back rather than counting anything itself.
+    page: {
+      size: shown.length,
+      nextBefore: shown.length ? shown[shown.length - 1].startedAt : null,
+      more: from !== -1 && from + shown.length < live.length,
+    },
     threads: scored,
   };
 }
@@ -1124,7 +1151,7 @@ function shape(people, written) {
 // round trips and a serverless function has sixty seconds, so asking a visitor to
 // trigger one produced FUNCTION_INVOCATION_TIMEOUT in production — on the request
 // of the first person to arrive. Writing belongs on the cron.
-export async function readSubreddit() {
+export async function readSubreddit(page = {}) {
   await restore();
   const people = await loadCast();
   const now = Date.now();
@@ -1132,7 +1159,7 @@ export async function readSubreddit() {
     if (now - live[i].startedAt > RETIRE_AFTER) live.splice(i, 1);
   }
   live.sort((a, b) => b.startedAt - a.startedAt);
-  return shape(people, 0);
+  return shape(people, 0, page);
 }
 
 export async function advanceSubreddit() {
@@ -1180,8 +1207,18 @@ export async function advanceSubreddit() {
     }
   }
 
+  // Room for the new post, by dropping the oldest if the shelf is full. The cap
+  // was written as "a backstop against runaway generation, not a limit the
+  // normal rate walks into" — and then the normal rate walked into it. At two
+  // hundred threads this loop simply stopped creating any, so posting fell to
+  // whatever rate threads happened to age out at: long silences, then a burst
+  // as several crossed twenty-four hours together. A cap that stops the feed is
+  // worse than no cap. It bounds SIZE now, not whether the city speaks.
+  live.sort((a, b) => b.startedAt - a.startedAt);
+  while (live.length >= MAX_THREADS) live.pop(); // oldest is last
+
   const wanted = NEW_THREADS_PER_REFRESH;
-  for (let i = 0; i < wanted && budget > 0 && live.length < MAX_THREADS; i++) {
+  for (let i = 0; i < wanted && budget > 0; i++) {
     if (!spend()) break;
     let thread;
     try {

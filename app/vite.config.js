@@ -137,10 +137,8 @@ function liveFeeds() {
       }, 60_000).unref?.();
 
       server.middlewares.use(async (req, res, next) => {
-        const pathname = new URL(req.url, "http://localhost").pathname.replace(
-          /\/+$/,
-          "",
-        );
+        const url = new URL(req.url, "http://localhost");
+        const pathname = url.pathname.replace(/\/+$/, "");
         if (!pathname.startsWith("/api/")) return next();
         try {
           const core = await loadFeeds(server);
@@ -159,7 +157,9 @@ function liveFeeds() {
           };
           if (pathname === "/api/compose") {
             if (req.method !== "POST") {
-              return void shim.status(405).json({ error: "method not allowed" });
+              return void shim
+                .status(405)
+                .json({ error: "method not allowed" });
             }
             const credential =
               process.env.AI_GATEWAY_API_KEY || process.env.VERCEL_OIDC_TOKEN;
@@ -168,9 +168,9 @@ function liveFeeds() {
                 .status(503)
                 .json({ error: "cannot review posts right now" });
             }
-            const ip = (req.headers["x-forwarded-for"] || "")
-              .split(",")[0]
-              .trim() || "local";
+            const ip =
+              (req.headers["x-forwarded-for"] || "").split(",")[0].trim() ||
+              "local";
             let body;
             try {
               body = await new Promise((resolve, reject) => {
@@ -230,11 +230,9 @@ function liveFeeds() {
               }
               return void shim.status(result.status).json(result.body);
             } catch (error) {
-              return void shim
-                .status(502)
-                .json({
-                  error: `post review failed: ${error?.message || error}`,
-                });
+              return void shim.status(502).json({
+                error: `post review failed: ${error?.message || error}`,
+              });
             }
           }
           if (pathname === "/api/live")
@@ -274,6 +272,21 @@ function liveFeeds() {
           }
           const entry = core.getFeed(pathname.replace(/^\/api\//, ""));
           if (!entry) return next();
+          // Same split as api/[...path].mjs: page one through the registry,
+          // a cursor read straight through. Without this the dev server
+          // answered every page with page one and pagination looked broken
+          // when it was not.
+          const before = Number(url.searchParams.get("before") || 0);
+          if (entry.name === "feed" && before > 0) {
+            const mod = await import(
+              /* @vite-ignore */
+              `${new URL("../api/_lib/feeds/", import.meta.url).href}residents.mjs`
+            );
+            const limit = Number(url.searchParams.get("limit") || 0);
+            return void shim
+              .status(200)
+              .json(await mod.readSubreddit({ before, limit }));
+          }
           await core.serveFeed(shim, entry);
         } catch (error) {
           server.config.logger.warn(
