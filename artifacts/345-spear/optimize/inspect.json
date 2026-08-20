@@ -1,0 +1,985 @@
+{
+ "file_bytes": {
+  "raw": 1061424,
+  "gzip9": 176295
+ },
+ "objects": 233,
+ "total_tris": 17428,
+ "total_verts": 34774,
+ "primitives_est": 236,
+ "top20": [
+  {
+   "name": "body",
+   "tris": 612,
+   "verts": 1188,
+   "dims": [
+    105.339,
+    118.208,
+    24.2
+   ],
+   "materials": [
+    "Toy_sand",
+    "Toy_stone"
+   ]
+  },
+  {
+   "name": "tree_crown_0",
+   "tris": 516,
+   "verts": 1040,
+   "dims": [
+    3.523,
+    3.674,
+    3.723
+   ],
+   "materials": [
+    "Toy_mint"
+   ]
+  },
+  {
+   "name": "tree_crown_1",
+   "tris": 516,
+   "verts": 1040,
+   "dims": [
+    3.523,
+    3.674,
+    3.723
+   ],
+   "materials": [
+    "Toy_mint"
+   ]
+  },
+  {
+   "name": "tree_crown_2",
+   "tris": 516,
+   "verts": 1040,
+   "dims": [
+    3.523,
+    3.674,
+    3.723
+   ],
+   "materials": [
+    "Toy_mint"
+   ]
+  },
+  {
+   "name": "tree_crown_3",
+   "tris": 516,
+   "verts": 1040,
+   "dims": [
+    3.523,
+    3.674,
+    3.723
+   ],
+   "materials": [
+    "Toy_mint"
+   ]
+  },
+  {
+   "name": "tree_crown_4",
+   "tris": 516,
+   "verts": 1040,
+   "dims": [
+    3.523,
+    3.674,
+    3.723
+   ],
+   "materials": [
+    "Toy_mint"
+   ]
+  },
+  {
+   "name": "garden_fountain",
+   "tris": 388,
+   "verts": 756,
+   "dims": [
+    6.63,
+    6.771,
+    0.7
+   ],
+   "materials": [
+    "Toy_trim"
+   ]
+  },
+  {
+   "name": "upper_bar",
+   "tris": 276,
+   "verts": 540,
+   "dims": [
+    68.64,
+    94.237,
+    5.2
+   ],
+   "materials": [
+    "Toy_sand",
+    "Toy_stone"
+   ]
+  },
+  {
+   "name": "se_wing",
+   "tris": 164,
+   "verts": 324,
+   "dims": [
+    35.618,
+    32.931,
+    2.8
+   ],
+   "materials": [
+    "Toy_sand",
+    "Toy_stone"
+   ]
+  },
+  {
+   "name": "arch_frame_7_0",
+   "tris": 152,
+   "verts": 312,
+   "dims": [
+    3.267,
+    3.267,
+    5.842
+   ],
+   "materials": [
+    "Toy_stone"
+   ]
+  },
+  {
+   "name": "arch_frame_7_1",
+   "tris": 152,
+   "verts": 312,
+   "dims": [
+    3.267,
+    3.267,
+    5.842
+   ],
+   "materials": [
+    "Toy_stone"
+   ]
+  },
+  {
+   "name": "arch_frame_7_2",
+   "tris": 152,
+   "verts": 312,
+   "dims": [
+    3.267,
+    3.267,
+    5.842
+   ],
+   "materials": [
+    "Toy_stone"
+   ]
+  },
+  {
+   "name": "arch_frame_7_3",
+   "tris": 152,
+   "verts": 312,
+   "dims": [
+    3.267,
+    3.267,
+    5.842
+   ],
+   "materials": [
+    "Toy_stone"
+   ]
+  },
+  {
+   "name": "arch_frame_7_4",
+   "tris": 152,
+   "verts": 312,
+   "dims": [
+    3.267,
+    3.267,
+    5.842
+   ],
+   "materials": [
+    "Toy_stone"
+   ]
+  },
+  {
+   "name": "arch_frame_8_0",
+   "tris": 152,
+   "verts": 312,
+   "dims": [
+    3.234,
+    3.301,
+    5.842
+   ],
+   "materials": [
+    "Toy_stone"
+   ]
+  },
+  {
+   "name": "arch_frame_10_0",
+   "tris": 152,
+   "verts": 312,
+   "dims": [
+    3.267,
+    3.267,
+    5.842
+   ],
+   "materials": [
+    "Toy_stone"
+   ]
+  },
+  {
+   "name": "arch_frame_12_0",
+   "tris": 152,
+   "verts": 312,
+   "dims": [
+    3.267,
+    3.267,
+    5.842
+   ],
+   "materials": [
+    "Toy_stone"
+   ]
+  },
+  {
+   "name": "arch_frame_14_0",
+   "tris": 152,
+   "verts": 312,
+   "dims": [
+    3.267,
+    3.267,
+    5.842
+   ],
+   "materials": [
+    "Toy_stone"
+   ]
+  },
+  {
+   "name": "arch_frame_16_0",
+   "tris": 152,
+   "verts": 312,
+   "dims": [
+    3.262,
+    3.272,
+    5.842
+   ],
+   "materials": [
+    "Toy_stone"
+   ]
+  },
+  {
+   "name": "arch_frame_16_1",
+   "tris": 152,
+   "verts": 312,
+   "dims": [
+    3.262,
+    3.272,
+    5.842
+   ],
+   "materials": [
+    "Toy_stone"
+   ]
+  }
+ ],
+ "vertex_attrs": [
+  "NORMAL",
+  "UV"
+ ],
+ "materials": [
+  {
+   "name": "Toy_brick",
+   "glow": false,
+   "user_objects": 1
+  },
+  {
+   "name": "Toy_glass",
+   "glow": false,
+   "user_objects": 72
+  },
+  {
+   "name": "Toy_glass_Glow",
+   "glow": true,
+   "user_objects": 6
+  },
+  {
+   "name": "Toy_glassl",
+   "glow": false,
+   "user_objects": 1
+  },
+  {
+   "name": "Toy_gold_Glow",
+   "glow": true,
+   "user_objects": 2
+  },
+  {
+   "name": "Toy_ink",
+   "glow": false,
+   "user_objects": 6
+  },
+  {
+   "name": "Toy_mint",
+   "glow": false,
+   "user_objects": 12
+  },
+  {
+   "name": "Toy_navy",
+   "glow": false,
+   "user_objects": 4
+  },
+  {
+   "name": "Toy_roofd",
+   "glow": false,
+   "user_objects": 6
+  },
+  {
+   "name": "Toy_sand",
+   "glow": false,
+   "user_objects": 44
+  },
+  {
+   "name": "Toy_steel",
+   "glow": false,
+   "user_objects": 4
+  },
+  {
+   "name": "Toy_stone",
+   "glow": false,
+   "user_objects": 25
+  },
+  {
+   "name": "Toy_trim",
+   "glow": false,
+   "user_objects": 21
+  },
+  {
+   "name": "Toy_white",
+   "glow": false,
+   "user_objects": 15
+  },
+  {
+   "name": "Toy_white_Glow",
+   "glow": true,
+   "user_objects": 17
+  }
+ ],
+ "textures": [],
+ "bbox": {
+  "dims": [
+   106.3305,
+   118.9857,
+   68.5
+  ],
+  "min": [
+   -53.1653,
+   -59.4928,
+   0.0
+  ],
+  "origin_offset_xy": [
+   0.0,
+   0.0
+  ],
+  "base_z": 0.0
+ },
+ "duplicate_mesh_groups": [
+  {
+   "signature": {
+    "verts": 1040,
+    "tris": 516,
+    "dims": [
+     3.5234,
+     3.6738,
+     3.7225
+    ]
+   },
+   "objects": [
+    "tree_crown_0",
+    "tree_crown_1",
+    "tree_crown_2",
+    "tree_crown_3",
+    "tree_crown_4"
+   ]
+  },
+  {
+   "signature": {
+    "verts": 312,
+    "tris": 152,
+    "dims": [
+     3.2668,
+     3.2668,
+     5.8422
+    ]
+   },
+   "objects": [
+    "arch_frame_7_0",
+    "arch_frame_7_1",
+    "arch_frame_7_2",
+    "arch_frame_7_3",
+    "arch_frame_7_4",
+    "arch_frame_10_0",
+    "arch_frame_12_0",
+    "arch_frame_14_0"
+   ]
+  },
+  {
+   "signature": {
+    "verts": 312,
+    "tris": 152,
+    "dims": [
+     3.262,
+     3.2719,
+     5.8422
+    ]
+   },
+   "objects": [
+    "arch_frame_16_0",
+    "arch_frame_16_1",
+    "arch_frame_16_2",
+    "arch_frame_16_3",
+    "arch_frame_16_4",
+    "arch_frame_16_5",
+    "arch_frame_16_6",
+    "arch_frame_16_7"
+   ]
+  },
+  {
+   "signature": {
+    "verts": 216,
+    "tris": 108,
+    "dims": [
+     23.0,
+     34.0,
+     1.15
+    ]
+   },
+   "objects": [
+    "twr_band_0",
+    "twr_band_1",
+    "twr_band_2",
+    "twr_band_3",
+    "twr_band_4",
+    "twr_band_5",
+    "twr_band_6",
+    "twr_band_7",
+    "twr_band_8",
+    "twr_band_9"
+   ]
+  },
+  {
+   "signature": {
+    "verts": 96,
+    "tris": 44,
+    "dims": [
+     0.8697,
+     0.8697,
+     17.1
+    ]
+   },
+   "objects": [
+    "pier_7_0",
+    "pier_7_1",
+    "pier_7_2",
+    "pier_7_3",
+    "pier_7_4",
+    "pier_10_0",
+    "pier_10_1",
+    "pier_12_0",
+    "pier_12_1",
+    "pier_14_0",
+    "pier_14_1"
+   ]
+  },
+  {
+   "signature": {
+    "verts": 216,
+    "tris": 108,
+    "dims": [
+     2.8,
+     2.8,
+     58.2
+    ]
+   },
+   "objects": [
+    "twr_pier_1_1",
+    "twr_pier_1_-1",
+    "twr_pier_-1_1",
+    "twr_pier_-1_-1"
+   ]
+  },
+  {
+   "signature": {
+    "verts": 78,
+    "tris": 48,
+    "dims": [
+     2.7577,
+     2.7577,
+     5.4
+    ]
+   },
+   "objects": [
+    "arch_fill_7_0",
+    "arch_fill_7_1",
+    "arch_fill_7_2",
+    "arch_fill_7_3",
+    "arch_fill_7_4",
+    "arch_fill_10_0",
+    "arch_fill_12_0",
+    "arch_fill_14_0"
+   ]
+  },
+  {
+   "signature": {
+    "verts": 78,
+    "tris": 48,
+    "dims": [
+     2.7539,
+     2.7615,
+     5.4
+    ]
+   },
+   "objects": [
+    "arch_fill_16_0",
+    "arch_fill_16_1",
+    "arch_fill_16_2",
+    "arch_fill_16_3",
+    "arch_fill_16_4",
+    "arch_fill_16_5",
+    "arch_fill_16_6",
+    "arch_fill_16_7"
+   ]
+  },
+  {
+   "signature": {
+    "verts": 78,
+    "tris": 48,
+    "dims": [
+     2.2486,
+     2.2486,
+     5.1
+    ]
+   },
+   "objects": [
+    "arch_glow_7_0",
+    "arch_glow_7_1",
+    "arch_glow_7_2",
+    "arch_glow_7_3",
+    "arch_glow_7_4",
+    "arch_glow_10_0",
+    "arch_glow_12_0",
+    "arch_glow_14_0"
+   ]
+  },
+  {
+   "signature": {
+    "verts": 78,
+    "tris": 48,
+    "dims": [
+     2.2451,
+     2.2521,
+     5.1
+    ]
+   },
+   "objects": [
+    "arch_glow_16_0",
+    "arch_glow_16_1",
+    "arch_glow_16_2",
+    "arch_glow_16_3",
+    "arch_glow_16_4",
+    "arch_glow_16_5",
+    "arch_glow_16_6",
+    "arch_glow_16_7"
+   ]
+  },
+  {
+   "signature": {
+    "verts": 96,
+    "tris": 44,
+    "dims": [
+     0.8687,
+     0.871,
+     17.1
+    ]
+   },
+   "objects": [
+    "pier_16_0",
+    "pier_16_1",
+    "pier_16_2",
+    "pier_16_3",
+    "pier_16_4",
+    "pier_16_5",
+    "pier_16_6",
+    "pier_16_7"
+   ]
+  },
+  {
+   "signature": {
+    "verts": 96,
+    "tris": 44,
+    "dims": [
+     0.8681,
+     0.8717,
+     23.9
+    ]
+   },
+   "objects": [
+    "pier_4_0",
+    "pier_4_1",
+    "pier_4_2",
+    "pier_4_3",
+    "pier_4_4"
+   ]
+  },
+  {
+   "signature": {
+    "verts": 96,
+    "tris": 44,
+    "dims": [
+     0.8717,
+     0.8681,
+     23.9
+    ]
+   },
+   "objects": [
+    "pier_17_0",
+    "pier_17_1",
+    "pier_17_2",
+    "pier_17_3",
+    "pier_17_4"
+   ]
+  },
+  {
+   "signature": {
+    "verts": 96,
+    "tris": 44,
+    "dims": [
+     0.6364,
+     0.6364,
+     1.4
+    ]
+   },
+   "objects": [
+    "tree_trunk_0",
+    "tree_trunk_1",
+    "tree_trunk_2",
+    "tree_trunk_3",
+    "tree_trunk_4"
+   ]
+  },
+  {
+   "signature": {
+    "verts": 216,
+    "tris": 108,
+    "dims": [
+     6.6617,
+     6.6617,
+     0.6
+    ]
+   },
+   "objects": [
+    "cornice_12",
+    "cornice_14"
+   ]
+  },
+  {
+   "signature": {
+    "verts": 216,
+    "tris": 108,
+    "dims": [
+     6.5557,
+     6.5557,
+     1.1
+    ]
+   },
+   "objects": [
+    "parapet_12",
+    "parapet_14"
+   ]
+  },
+  {
+   "signature": {
+    "verts": 96,
+    "tris": 44,
+    "dims": [
+     0.8655,
+     0.8749,
+     23.9
+    ]
+   },
+   "objects": [
+    "pier_0_0",
+    "pier_0_1",
+    "pier_0_2",
+    "pier_0_3"
+   ]
+  },
+  {
+   "signature": {
+    "verts": 96,
+    "tris": 44,
+    "dims": [
+     0.8697,
+     0.8697,
+     23.9
+    ]
+   },
+   "objects": [
+    "pier_21_0",
+    "pier_21_1",
+    "pier_21_2",
+    "pier_21_3"
+   ]
+  },
+  {
+   "signature": {
+    "verts": 96,
+    "tris": 44,
+    "dims": [
+     5.1619,
+     5.1619,
+     0.75
+    ]
+   },
+   "objects": [
+    "terrace_planter_0",
+    "terrace_planter_1",
+    "terrace_planter_2",
+    "terrace_planter_3"
+   ]
+  },
+  {
+   "signature": {
+    "verts": 96,
+    "tris": 44,
+    "dims": [
+     1.9092,
+     1.9092,
+     0.7
+    ]
+   },
+   "objects": [
+    "vent_0",
+    "vent_1",
+    "vent_2",
+    "vent_3"
+   ]
+  },
+  {
+   "signature": {
+    "verts": 24,
+    "tris": 12,
+    "dims": [
+     5.5649,
+     5.5649,
+     1.7
+    ]
+   },
+   "objects": [
+    "band_12_72",
+    "band_12_107",
+    "band_12_143",
+    "band_12_178",
+    "band_12_214",
+    "band_14_72",
+    "band_14_107",
+    "band_14_143",
+    "band_14_178",
+    "band_14_214"
+   ]
+  },
+  {
+   "signature": {
+    "verts": 96,
+    "tris": 44,
+    "dims": [
+     0.8629,
+     0.878,
+     17.1
+    ]
+   },
+   "objects": [
+    "pier_8_0",
+    "pier_8_1"
+   ]
+  },
+  {
+   "signature": {
+    "verts": 24,
+    "tris": 12,
+    "dims": [
+     19.5719,
+     19.8423,
+     1.7
+    ]
+   },
+   "objects": [
+    "band_0_72",
+    "band_0_107",
+    "band_0_143",
+    "band_0_178",
+    "band_0_214",
+    "band_0_249"
+   ]
+  },
+  {
+   "signature": {
+    "verts": 24,
+    "tris": 12,
+    "dims": [
+     26.2855,
+     26.4222,
+     1.7
+    ]
+   },
+   "objects": [
+    "band_4_72",
+    "band_4_107",
+    "band_4_143",
+    "band_4_178",
+    "band_4_214",
+    "band_4_249"
+   ]
+  },
+  {
+   "signature": {
+    "verts": 24,
+    "tris": 12,
+    "dims": [
+     25.9979,
+     25.8613,
+     1.7
+    ]
+   },
+   "objects": [
+    "band_17_72",
+    "band_17_107",
+    "band_17_143",
+    "band_17_178",
+    "band_17_214",
+    "band_17_249"
+   ]
+  },
+  {
+   "signature": {
+    "verts": 24,
+    "tris": 12,
+    "dims": [
+     19.3535,
+     19.3535,
+     1.7
+    ]
+   },
+   "objects": [
+    "band_21_72",
+    "band_21_107",
+    "band_21_143",
+    "band_21_178",
+    "band_21_214",
+    "band_21_249"
+   ]
+  },
+  {
+   "signature": {
+    "verts": 24,
+    "tris": 12,
+    "dims": [
+     3.6,
+     0.12,
+     1.05
+    ]
+   },
+   "objects": [
+    "twr_lit_0",
+    "twr_lit_1",
+    "twr_lit_2",
+    "twr_lit_3",
+    "twr_lit_4",
+    "twr_lit_5"
+   ]
+  },
+  {
+   "signature": {
+    "verts": 24,
+    "tris": 12,
+    "dims": [
+     25.7175,
+     25.7175,
+     1.7
+    ]
+   },
+   "objects": [
+    "band_7_72",
+    "band_7_107",
+    "band_7_143",
+    "band_7_178",
+    "band_7_214"
+   ]
+  },
+  {
+   "signature": {
+    "verts": 24,
+    "tris": 12,
+    "dims": [
+     5.5748,
+     5.6965,
+     1.7
+    ]
+   },
+   "objects": [
+    "band_8_72",
+    "band_8_107",
+    "band_8_143",
+    "band_8_178",
+    "band_8_214"
+   ]
+  },
+  {
+   "signature": {
+    "verts": 24,
+    "tris": 12,
+    "dims": [
+     5.7064,
+     5.7064,
+     1.7
+    ]
+   },
+   "objects": [
+    "band_10_72",
+    "band_10_107",
+    "band_10_143",
+    "band_10_178",
+    "band_10_214"
+   ]
+  },
+  {
+   "signature": {
+    "verts": 24,
+    "tris": 12,
+    "dims": [
+     42.1945,
+     42.333,
+     1.7
+    ]
+   },
+   "objects": [
+    "band_16_72",
+    "band_16_107",
+    "band_16_143",
+    "band_16_178",
+    "band_16_214"
+   ]
+  }
+ ],
+ "dup_redundant_tris": 9496,
+ "join_candidates": {
+  "Toy_glass": 72,
+  "Toy_glass_Glow": 6,
+  "Toy_gold_Glow": 2,
+  "Toy_ink": 6,
+  "Toy_mint": 12,
+  "Toy_navy": 4,
+  "Toy_roofd": 6,
+  "Toy_sand": 44,
+  "Toy_steel": 4,
+  "Toy_stone": 25,
+  "Toy_trim": 21,
+  "Toy_white": 15,
+  "Toy_white_Glow": 17
+ },
+ "degenerate_tris": 0,
+ "coincident_vert_pairs": 25594,
+ "over_tess": {
+  "near_distance_m": 178.48,
+  "one_px_world_m": 0.1203,
+  "note": "cylinders whose chord error < one_px_world_m can halve segments"
+ }
+}

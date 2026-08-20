@@ -1,0 +1,34 @@
+{
+ "variants": [
+  {
+   "variant": "packonly",
+   "raw": 848420,
+   "gzip9": 177137
+  },
+  {
+   "variant": "degen",
+   "raw": 894300,
+   "gzip9": 244760
+  },
+  {
+   "variant": "join",
+   "raw": 491932,
+   "gzip9": 204845
+  },
+  {
+   "variant": "weldjoin",
+   "raw": 477512,
+   "gzip9": 205156
+  },
+  {
+   "variant": "dissjoin",
+   "raw": 456944,
+   "gzip9": 213460
+  },
+  {
+   "variant": "all",
+   "raw": 439892,
+   "gzip9": 208285
+  }
+ ]
+}

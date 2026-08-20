@@ -1,0 +1,105 @@
+{
+ "input": {
+  "tris": 11820,
+  "verts": 23504,
+  "objects": 675,
+  "primitives": 680,
+  "materials": [
+   "Toy_amber_Glow",
+   "Toy_cream",
+   "Toy_glass",
+   "Toy_glass_Glow",
+   "Toy_glassl",
+   "Toy_glassl_Glow",
+   "Toy_ink",
+   "Toy_navy",
+   "Toy_roofd",
+   "Toy_rust",
+   "Toy_steel",
+   "Toy_stone",
+   "Toy_white"
+  ],
+  "bbox_dims": [
+   235.28163,
+   188.42453,
+   17.6
+  ],
+  "bbox_min": [
+   -117.64082,
+   -94.21227,
+   -2.6
+  ],
+  "center_xy": [
+   0.0,
+   0.0
+  ]
+ },
+ "output": {
+  "tris": 11788,
+  "verts": 23091,
+  "objects": 16,
+  "primitives": 19,
+  "materials": [
+   "Toy_amber_Glow",
+   "Toy_cream",
+   "Toy_glass",
+   "Toy_glass_Glow",
+   "Toy_glassl",
+   "Toy_glassl_Glow",
+   "Toy_ink",
+   "Toy_navy",
+   "Toy_roofd",
+   "Toy_rust",
+   "Toy_steel",
+   "Toy_stone",
+   "Toy_white"
+  ],
+  "bbox_dims": [
+   235.28163,
+   188.42453,
+   17.6
+  ],
+  "bbox_min": [
+   -117.64082,
+   -94.21227,
+   -2.6
+  ],
+  "center_xy": [
+   0.0,
+   0.0
+  ]
+ },
+ "output_signed_volumes": {
+  "arch_glow": 3715.97524,
+  "deck": 14842.888335,
+  "grp_Toy_amber_Glow": 2.120239,
+  "grp_Toy_cream": 199.57657,
+  "grp_Toy_cream_Toy_roofd": 6462.999036,
+  "grp_Toy_glass": 3857.305924,
+  "grp_Toy_glass_Glow": 1690.96911,
+  "grp_Toy_glassl": 61.533888,
+  "grp_Toy_ink": 101.31834,
+  "grp_Toy_navy": 75.872537,
+  "grp_Toy_roofd": 1316.59298,
+  "grp_Toy_roofd_Toy_stone": 62673.57444,
+  "grp_Toy_rust": 75.8727,
+  "grp_Toy_steel": 3940.937659,
+  "grp_Toy_stone": 7584.764937,
+  "grp_Toy_white": 303.053176
+ },
+ "inverted_solids": [],
+ "ray_test_output": {
+  "rays": 22500,
+  "hits": 7689,
+  "flipped": 1,
+  "flipped_fraction": 0.00013
+ },
+ "gates": {
+  "G1_materials_identical": true,
+  "G2_bbox_ok": true,
+  "G2_origin_ok": true,
+  "G2_volumes_positive": true,
+  "G2_ray_flip_ok": true,
+  "G5_primitives_ok": true
+ }
+}

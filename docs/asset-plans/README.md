@@ -143,14 +143,42 @@ route, and the park plans depend on it (§E8 of the parks README).
 | [246 Ritch Street](./246-ritch.md) | `246-ritch` | 18.76 m (LiDAR max, read as the roof stair/elevator penthouse — see its 2.15 risk 1; parapet 15.87 m) | new landmark |
 | [248–250 Ritch Street](./248-ritch.md) | `248-ritch` | 8.6 m (cornice crest; measured twice — LiDAR mixture 8.65 m, rectified panorama 8.50 m) | new landmark |
 | [1 South Park (One South Park)](./1-south-park.md) | `1-south-park` | 20.2 m (LiDAR `hgt_max`; penthouse roof 18.6 m, cornice crest 15.75 m) | new landmark |
+| [The Audiffred Building (1 Mission Street)](./audiffred-building.md) | `audiffred-building` | 17.5 m (estimated — barrel-vault crest, Overture + photogrammetric; LiDAR roof deck 15.4 m measured, `hgt_max` 19.18 m rejected as rooftop plant) | new landmark |
 
-## Shared contract (all 107)
+## Shared contract (all 135)
 | [252–254 Ritch Street](./254-ritch.md) | `254-ritch` | 8.8 m (LiDAR maximum, the roof flue; cornice crest 8.05 m estimated) | new landmark |
 | [434 Brannan Street (Art Deco loft, 1929)](./434-brannan.md) | `434-brannan` | 13.79 m (LiDAR maximum, read as the rooftop mechanical penthouse; roof deck 11.46 m measured, parapet crest ~12.4 m estimated) | new landmark |
 | [226 Ritch Street (226 Ritch Street Condominiums)](./226-ritch.md) | `226-ritch` | 18.1 m (roof crest, LiDAR-derived; 16.0 m parapet) | new landmark |
 | [414 Brannan Street (Epic Church)](./414-brannan.md) | `414-brannan` | 14.0 m (monitor crest; 10.4 m street parapet) | new landmark |
 | [501 Third Street](./501-third.md) | `501-third` | 16.4 m (LiDAR-derived) | new landmark |
 | [10 South Park (South Park Lofts)](./10-south-park.md) | `10-south-park` | 14.67 m (roof bulkhead, LiDAR maximum; parapet crest 13.10 m photogrammetric) | new landmark |
+| [Pier 15 (Exploratorium)](./pier-15.md) | `pier-15` | 16.4 m above water (bulkhead gable crest, photogrammetric; monitor ridge 13.9 m; water asset, deck 3.05 m) | new landmark |
+| [Pier 7 (Broadway public access pier)](./pier-7.md) | `pier-7` | 7.6 m (vertical extent above the waterline: deck +3.0 m, lamp tops +7.6 m; water asset) | new landmark |
+| [Hills Brothers Building (2 Harrison Street)](./hills-brothers-building.md) | `hills-brothers-building` | 53.2 m (tower finial, LiDAR maximum — see its 2.15 risk 1; main parapet 25.6 m derived) | new landmark |
+| [345 Spear Street (Hills Plaza)](./345-spear.md) | `345-spear` | 68.5 m (LiDAR max, read as the tower's mechanical crown; podium 24.2/28.4 m) | new landmark |
+| [Pier 9](./pier-9.md) | `pier-9` | 17.6 m (vertical extent, deck-top origin: pile stubs −2.6 m to bulkhead attic crest +15.0 m; photogrammetric + dual-LiDAR corroborated) | new landmark |
+| [1 Market Street (Southern Pacific Building)](./1-market.md) | `1-market` | 48.7 m (rooftop plant crest, LiDAR modal; crowning cornice 46.1 m, measured two ways) | new landmark |
+| [One Market Plaza (Spear and Steuart Towers)](./one-market-plaza-towers.md) | `one-market-plaza-towers` | 177.6 m (Spear rooftop plant crest; Spear roof 172 m, Steuart roof 111 m, both published and LiDAR-checked) | new landmark |
+| [Pier 19](./pier-19.md) | `pier-19` | 17.0 m (gabled-parapet crest above water; LiDAR max 19.5 m is the flagpole, excluded) | new landmark |
+| [Fulton Plaza (147 Fulton Street)](./fulton-plaza.md) | `fulton-plaza` | 13.19 m (vertical extent — the asset is a terrain-draped right-of-way; the Pioneer Monument crest is 11.69 m above local grade) | new landmark |
+| [Pier 3 (Hornblower Landing)](./pier-3.md) | `pier-3` | 18.5 m (photogrammetric, above water datum; deck 3.0 m) | new landmark |
+| [One Steuart Lane (1 Steuart Ln / 75 Howard St)](./one-steuart-lane.md) | `one-steuart-lane` | 67.06 m = 220 ft (architect-stated; CTBUH says 240 ft — see its §2.15 risk 1) | new landmark |
+| [110 The Embarcadero (The Commonwealth Club of California)](./110-embarcadero.md) | `110-embarcadero` | 17.4 m (Embarcadero roof fascia, photogrammetric; the Steuart end steps down to 11.6 m) | new landmark |
+| [Four Embarcadero Center (55 Clay Street)](./4-embarcadero-center.md) | `4-embarcadero-center` | 179.0 m (rooftop cooling-tower crest, LiDAR-derived; 173.7 m architectural parapet) | new landmark |
+| [131 Steuart Street (Steuart Place)](./131-steuart.md) | `131-steuart` | 27.7 m (penthouse barrel crown; brick cornice 21.8 m measured) | new landmark |
+| [2 Folsom Street (Gap Inc. headquarters / 250 Embarcadero)](./2-folsom.md) | `2-folsom` | 88.0 m (LiDAR maximum, the limestone crown; superstructure deck 72.11 m and base terrace 32.28 m both measured) | new landmark |
+| [Hiram W. Johnson State Office Building](./hiram-johnson-state-office-building.md) | `hiram-johnson-state-office-building` | 61.9 m (architectural crest; 53.6 m roof plane) | new landmark |
+| [The Towers at Rincon (88 Howard Street)](./towers-at-rincon.md) | `towers-at-rincon` | 89.0 m (CTBUH architectural/tip; LiDAR crest 87.13 m, podium 24.5 m) | new landmark |
+| [Army & Navy YMCA Building (169 Steuart Street)](./169-steuart.md) | `169-steuart` | 46.64 m (LiDAR crest, tile-roof apex; tower eave 35.0 m, wing roof 28.1 m) | new landmark |
+| [50 United Nations Plaza (Federal Office Building)](./50-united-nations-plaza.md) | `50-united-nations-plaza` | 33.0 m (metal-roof crest, derived; 29.0 m parapet, 24.7 m north wing) | new landmark |
+| [United Nations Plaza](./un-plaza.md) | `un-plaza` | 13.0 m (authored tree crest, estimated) | new landmark |
+| [Orpheum Theatre](./orpheum-theatre.md) | `orpheum-theatre` | 27.2 m (stage-house roof, LiDAR maximum; Market-block eave 23.3 m photogrammetric, blade-sign crown ~25.7 m) | new landmark |
+| [Pier 1](./pier-1.md) | `pier-1` | 15.4 m (vertical extent — the asset carries its own pier deck and pile stubs below the origin; the bulkhead pavilion crest is 12.8 m above the deck) | new landmark |
+| [Hyatt Regency San Francisco (5 Embarcadero Center)](./hyatt-regency.md) | `hyatt-regency` | 80.8 m (CTBUH architectural top; LiDAR max 80.64 m) | new landmark |
+| [132 The Embarcadero (Jewish Community Federation Building)](./132-embarcadero.md) | `132-embarcadero` | 29.57 m (LiDAR bulkhead crest; parapet 27.4 m measured) | new landmark |
+| [8 Mission Street (1 Hotel San Francisco / Hotel Vitale)](./8-mission.md) | `8-mission` | 28.66 m to the turret crown (LiDAR max; roof plateaus 25.10 / 19.64 / 14.18 m) | new landmark |
+| [Ferry Station Post Office Building (Agriculture Building)](./ferry-station-post-office.md) | `ferry-station-post-office` | 12.65 m (LiDAR tile-ridge; eave 10.8 m measured) | new landmark |
+| [Pier 17 (The Embarcadero at Green St)](./pier-17.md) | `pier-17` | 21.3 m (flagpole tip above water; facade gable apex 16.9 m, LiDAR-derived; the asset carries its own 2.0 m pier deck) | new landmark |
 
 - Style: `docs/styles/miniature-toy.md` (authoritative for artistic decisions)
 - Technical contract: `.agents/skills/sf-asset-check/SKILL.md` (authoritative for the GLB)

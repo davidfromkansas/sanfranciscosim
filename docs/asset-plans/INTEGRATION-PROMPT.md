@@ -270,12 +270,23 @@ acceptable; a hidden one is not.
   const scale = entry.targetHeightM / size.y;       // measured, never read from the file
   const [x, z] = data.project(entry.anchor[0], entry.anchor[1]);
   group.scale.setScalar(scale);
-  group.position.set(x, Math.max(0, data.sampleElevation(x, z)), z);
+  group.position.set(x, entry.seaLevel ? 0 : Math.max(0, data.sampleElevation(x, z)), z);
   ```
   Uniform scale from height, position from the real anchor and sampled terrain, and
   optional `yawDeg` rotation about the model's vertical axis through its placement
   origin. Assets must still be authored in true-world orientation; `yawDeg` is an
   explicit, data-visible override for an asset whose authored heading is wrong.
+- **`seaLevel: true`** seats the asset on the water plane instead of the terrain, and
+  is for structures that stand IN THE BAY — piers, wharves, anything whose authored
+  `Z = 0` is the waterline rather than the ground. It exists because the Terrarium DEM
+  is not ground truth out there: at 7.5 m per sample it carries spurious 2 m+ bumps
+  over open water (moored vessels and the pier decks bleed into the source), so
+  `sampleElevation` at Pier 3's anchor returns 2.23 m while reading 0.00 m thirty
+  metres either side, which lifts a 213 m pier clear of the bay with daylight under
+  its piles. Added with `pier-3`, the first over-water landmark that is not a bridge.
+  Do **not** reach for it to fix a land asset that sits badly, and do not solve the
+  same problem by sliding the anchor until the raster reads zero — that is forbidden
+  by the "Do not" list above and breaks again on the next terrain bake.
 - `camelId('<slug>')` (`id.replace(/-([a-z])/g, ...)`) produces the pipeline's
   landmark id; `onPlaced` then lets `app/src/landmarks.js` hide the procedural twin.
   Bridges take the separate `placeBridge()` path with `ends`/`southEnd`.

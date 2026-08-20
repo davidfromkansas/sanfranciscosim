@@ -1415,6 +1415,63 @@ export const LANDMARKS = [
     // explains what this place is.
     camera: { distance: 620, yaw: 90, pitch: 30 },
   },
+  {
+    // Fulton Plaza: the pedestrianised block of Fulton Street between Larkin and
+    // Hyde, one block east of civicCenterPlaza on the same civic spine and the
+    // same 8.85 deg grid. The third PLAZA entry, and the first whose subject is
+    // not even a block — it is a STREET that stopped being a street in spring
+    // 2020, so it has no parcel of its own and its polygon is the right-of-way
+    // between two parcel lines.
+    //
+    // `exclude: 25` has exactly ONE job and it is measured, not guessed. Counted
+    // over the 1,772 baked footprints in cells 18-20 x 12-14 of the committed
+    // bake, with the metric excluded() uses (ring centroid OR any vertex inside
+    // the radius, from this anchor):
+    //    1.85 m  buildings/19_13 #101 — a 17-vertex cruciform, 16.90 x 11.36 m,
+    //            47.2 m2, baked 17.3 -> 21.9 m. This IS the Pioneer Monument:
+    //            DataSF traces it as a building and the bake extrudes it into a
+    //            4.6 m block standing exactly where the GLB's monument goes.
+    //   86.19 m  nearest surviving neighbour vertex (20_13 #8, 61.9 m tall)
+    // So r <= 1.0 drops nothing and anything from ~1 to ~86 m drops that one
+    // footprint and nothing else. 25 m is chosen over the minimum because it
+    // also covers the plaza's full half-width (24.29 m), so a future data
+    // vintage that traces a kiosk or a market stall inside the roadway band is
+    // cleared too.
+    //
+    // Do NOT raise it on the theory that bigger is safer. The window only looks
+    // this generous because the Main Library and the Asian Art Museum — whose
+    // walls are 24 m either side — are already cleared by their own 40 m
+    // exclusions, and a radius that leans on someone else's exclusion is a trap
+    // for whoever edits those next.
+    //
+    // No clearTrees, and that is measured too: the landcover scatter drops ZERO
+    // trees inside the plaza quad and zero within 80 m of the anchor, in both
+    // landcover/19_13.bin (11 trees in the whole cell) and toyland/19_13.bin
+    // (41). Fulton Plaza is tagged as a street, not leisure=park, so the scatter
+    // never reaches it — unlike civicCenterPlaza and 64SouthPark, both of which
+    // needed the flag.
+    //
+    // `height` is the Pioneer Monument's crest above local grade — the tip of
+    // Eureka's spear — not the manifest's targetHeightM (13.1931 m). Those differ on purpose: the asset is
+    // terrain-draped, so the manifest carries its VERTICAL EXTENT — the same
+    // split 64SouthPark ships under.
+    //
+    // The lon/lat here is the right-of-way's own OBB centre; the manifest anchor
+    // sits 1.2 m from it, at the model's XY bbox centre. The exclusion wants the
+    // plaza's centre (the monument's ring centroid is 0.995 m from it); the
+    // loader wants the model's.
+    id: 'fultonPlaza',
+    name: 'Fulton Plaza',
+    lon: -122.4159189,
+    lat: 37.7796904,
+    height: 11.69,
+    exclude: 25,
+    // App yaw = 180 - true bearing, so yaw 99 stands the camera at bearing 81 —
+    // the Hyde (east) end, ON the plaza's own axis — looking west past the
+    // Pioneer Monument toward City Hall. Same reasoning as civicCenterPlaza's
+    // yaw 90, and verified by the -axis.png render rather than derived on paper.
+    camera: { distance: 340, yaw: 99, pitch: 26 },
+  },
   // A PARTY-WALL site, so this radius is far tighter than the usual
   // half-diagonal rule. The Earl Warren Building shares its block with the
   // 54 m Hiram W. Johnson State Office Building, whose wall is a few metres
@@ -2083,6 +2140,29 @@ export const LANDMARKS = [
     // the camera due WEST — the bisector of the Second Street elevation
     // (225.4 deg) and the Bryant Street elevation (315.4 deg).
     camera: { distance: 420, yaw: 270, pitch: 26 },
+  },
+  {
+    // Hills Brothers Building, 2 Harrison St (SF Landmark 157, Kelham 1926).
+    // Exclusion sized by the excluded() gate — min(centroid, vertex) distance
+    // from THIS anchor: the OSM/Overture ring centroid sits 1.62 m out and the
+    // DataSF LiDAR merged ring centroid 5.55 m, while the nearest own vertex is
+    // 20.52 m and the nearest FOREIGN geometry (the 1989 Hills Plaza complex
+    // beyond the mid-block plaza, and the waterfront pavilion across the
+    // promenade) is ~45+ m. 12 catches both centroids with 2x margin and
+    // reaches nothing else; it does not need to reach the ring corners at
+    // ~44 m (150 South Park rule). The DataSF ring merges two low plaza-side
+    // arcade strips into this building's trace, so they drop with it —
+    // unavoidable collateral, noted in the asset REPORT.
+    id: 'hillsBrothersBuilding',
+    name: 'Hills Brothers Building',
+    lon: -122.3892854,
+    lat: 37.7894167,
+    height: 53.2,
+    exclude: 12,
+    // Camera offset is (sin yaw, ., cos yaw) with +z south: yaw 45 stands the
+    // camera to the SOUTH-EAST, over the bay — the Embarcadero elevation, the
+    // rooftop sign and the campanile in one view.
+    camera: { distance: 480, yaw: 45, pitch: 24 },
   },
   {
     // 22-24 South Park, the Hotel Madrid: a 1915 residential hotel (built as the
@@ -3159,6 +3239,1083 @@ export const LANDMARKS = [
     // because at 5.4 m this is the shortest landmark on it and the ribbon and
     // the canopy are the whole recognition.
     camera: { distance: 120, yaw: 85, pitch: 26 },
+  },
+  {
+    // Pier 15 (the Exploratorium), The Embarcadero at Green St. Water asset:
+    // the anchor is the OSM pier polygon's area centroid, over open water, so
+    // placeGeneric seats the GLB at y = 0 like Pier 3 and the bridges.
+    //
+    // Exclusion sized against the real bake input (both passes:
+    // pipeline/data/buildings_datasf.geojson AND overture_buildings.geojsonseq),
+    // gate = min(centroid, any ring vertex) from the anchor after
+    // simplifyRing(0.6), measured 19 Aug 2026:
+    //   13.1 m  Overture "Pier 15" h 14.6 (centroid)      - must go
+    //   36.6 m  DataSF SF9900015 h 15.64 (centroid)       - must go. NOTE: this
+    //           is ONE merged polygon covering Piers 15 AND 17 (verified by
+    //           point-in-polygon on both sheds - they were joined into a quay
+    //           terminal in 1955), so excluding it un-bakes Pier 17 as well,
+    //           and Pier 17's own Overture ring does NOT gap-fill: its
+    //           diagonal bbox is 46% claimed in the bbox-based occupancy grid
+    //           (occupiedFraction 0.464 > 0.25, measured 19 Aug 2026), a
+    //           pre-existing coarseness of buildings.mjs. **Pier 17's site
+    //           therefore bakes EMPTY until a pier-17 asset lands.** No safe
+    //           radius avoids this: anything >= 36.6 kills the merged block,
+    //           anything less leaves a 15.6 m block through this GLB.
+    //   61.4 m  Overture 6x5 m kiosk (OSM w1323673815) on the courtyard-notch
+    //           deck - orphaned once the pier is bespoke, take it
+    //   84.9 m  Overture "Pier 17" h 16.4 (centroid)      - MUST STAY
+    //   87.4 m  OSM w738027034 - the Bay Observatory Gallery, ON THIS PIER's
+    //           north apron (2-level, PV roof). Outside the main radius but
+    //           inside the GLB, where it baked 23 m deep into the deck - taken
+    //           by the extraExclusion below instead of widening the main
+    //           radius past Pier 17's 84.9 ceiling.
+    //  120.5 m  Pier 9 (a sibling asset branch owns it)   - must stay
+    // Safe window (61.4, 84.9); 70 keeps 14.9 m of margin to Pier 17's gate.
+    // Never raise past 84.
+    //
+    // The extra circle sits on w738027034's centroid; gates from THAT centre:
+    // target centroid 0.4 m, Pier 17's nearest ring VERTEX 29.1 m (the gate
+    // fires on any vertex, so r must stay under 29). r = 12.
+    //
+    // camelId: a digit does not start a segment, so 'pier-15' round-trips to
+    // 'pier-15' - same rule as pier-3, do not "fix" it to pier15.
+    id: 'pier-15',
+    name: 'Pier 15 (Exploratorium)',
+    lon: -122.3974662,
+    lat: 37.8016046,
+    height: 16.4,
+    exclude: 70,
+    extraExclusions: [{ lon: -122.3968015, lat: 37.8023693, r: 12 }],
+    // Same rig as pier-3 one slip over: yaw 215 stands the eye over the
+    // Embarcadero to hold the bulkhead pavilion and the 250 m solar roof in
+    // one frame. 460 m because the long axis is 245 m.
+    camera: { distance: 460, yaw: 215, pitch: 20 },
+  },
+  {
+    // Pier 7 — the Broadway public access pier (1990, ROMA Design Group +
+    // T.Y. Lin International; 1993 ASLA National Honor Award). A water asset:
+    // the anchor is over open bay, terrain samples 0.00 across the footprint,
+    // and the GLB carries its own deck (+3.0 m) and pile field down to the
+    // waterline. height 7.6 is the vertical extent to the lamp-globe tops.
+    //
+    // exclude 60, measured against the bake input (12 Aug vintage): the pier
+    // bakes from exactly ONE footprint, DataSF area_id 855 (min(centroid,
+    // vertex) 1.4 m from this anchor; hgt_max 4.96 m). The tiles' three toy
+    // roof bumps are toy-pass furniture on that slab and vanish with it. The
+    // binding neighbour is the San Francisco Belle (Overture w281243626, the
+    // moored riverboat off Pier 3) at 98.6 m — r=100 would delete a boat that
+    // is not ours; 60 spares it by 38.6 m. Next inputs: 116.3 m (Overture,
+    // 11 m), 126.1 m (DataSF 3757). Verified drops on the re-bake: buildings
+    // 23_9#16 and toy 23_9#7..#10, nothing else in either tier.
+    //
+    // The id keeps its hyphen on purpose: camelId() in app/src/assets.js is
+    // id.replace(/-([a-z])/g, upper) and a DIGIT does not start a segment, so
+    // 'pier-7' round-trips to 'pier-7', not 'pier7'. Get this wrong and the
+    // manifest entry never matches this row.
+    id: 'pier-7',
+    name: 'Pier 7',
+    lon: -122.3955159,
+    lat: 37.7994429,
+    height: 7.6,
+    exclude: 60,
+    // Southwest three-quarter over the Embarcadero: entry plaza in front, the
+    // two lamp rows running 257 m out into the bay.
+    camera: { distance: 420, yaw: 215, pitch: 20 },
+  },
+  {
+    // 345 Spear Street — the 1989-91 Whisler-Patri half of Hills Plaza:
+    // buff-brick office podium (Google SF), the 18-storey One Hills Plaza
+    // condo tower rotated 45 deg off the grid to face the bay, terracotta hip
+    // pavilion on Spear, level-8 roof garden. The Hills Brothers Building
+    // (2 Harrison) is its own landmark on the same block — in flight on the
+    // pipeline/2-harrison branch; the two exclusions are independent.
+    //
+    // Exclusion sizing, measured against BOTH bake inputs from the registry
+    // anchor (the footprint OBB centre — the manifest anchor is the model's
+    // bbox centre 12.3 m away, they differ by design):
+    //    3.2 m  Overture 98232020 (h=17.2, the OSM levels=5 copy), centroid
+    //    5.6 m  DataSF 201006.0000159 (hgt_max 68.46), centroid
+    //           -> the FLOOR: both own rings caught by centroid at r > 5.6
+    //   15.8 m  own rings' nearest vertices (same building, harmless)
+    //   47.1 m  DataSF 201006.0000430 (Hills Brothers) nearest vertex
+    //           -> the CEILING: above 47.1 the re-bake deletes the sibling
+    //              landmark's baked stand-in
+    //   47.4 m+ everything else (Overture fragments on the Embarcadero apron,
+    //           360 Spear data center, The Infinity II)
+    // Safe window (5.6, 47.1); 25 sits mid-window with ~19 m margin below and
+    // ~22 m above. No other footprint's centroid falls inside 47 m and no ring
+    // covers the anchor except our own two (overlap-area check, 19 Aug 2026).
+    id: '345Spear',
+    name: 'Hills Plaza (345 Spear)',
+    lon: -122.3900655,
+    lat: 37.7900324,
+    height: 68.5,
+    exclude: 25,
+    // camera.js puts the eye at target + distance*(sin yaw, ., cos yaw) with
+    // +x east and +z south; yaw 115 stands the camera ENE over the Embarcadero
+    // — the identity view: the arch arcade, the terraced staircase and the
+    // bay-facing tower face-on, with the red pavilion behind.
+    camera: { distance: 450, yaw: 115, pitch: 26 },
+  },
+  {
+    id: 'pier9',
+    name: 'Pier 9',
+    lon: -122.3967994,
+    lat: 37.8006708,
+    height: 15.0,
+    // The bake carries Pier 9 as one full-pier ring per tier plus three toy
+    // rooftop-garnish blocks. One circle cannot take all five without taking
+    // Pier 15 (its nearest vertex, 111.6 m, is closer than the bulkhead
+    // garnish at 115.9 m), so two small zones sit on the garnish clusters.
+    // Solved and replay-verified in docs/asset-plans/pier-9.md 2.13.
+    exclude: 80,
+    extraExclusions: [
+      { lon: -122.3958844, lat: 37.8013416, r: 14 },
+      { lon: -122.3978390, lat: 37.8000253, r: 12 },
+    ],
+    // yaw 235 stands the eye south-west over the Embarcadero: the arched
+    // frontispiece head-on with the shed and its monitor running away NE.
+    camera: { distance: 450, yaw: 235, pitch: 20 },
+  },
+  {
+    // The Southern Pacific Building, 1916-17, Bliss & Faville. Eleven storeys
+    // of Roman brick in a U around a 55.5 x 35.9 m courtyard that opens
+    // south-east; the courtyard carries One Market Plaza's glazed atrium and
+    // the asset models it, because it cannot be spared (see the exclusion note).
+    //
+    // height 48.7 = the rooftop plant crest (DataSF LiDAR modal 48.69 m), which
+    // is the asset's bounding-box top. The architectural height - the crowning
+    // cornice - is 46.1 m, measured twice: LiDAR median 46.12 and a Street View
+    // photogrammetric solve at 46.03. Wikipedia's 65 m / 213 ft is wrong and so
+    // is OSM's 60.05; see docs/asset-plans/1-market.md 2.1.
+    //
+    // exclude 20 m, measured against the real bake input (both DataSF and the
+    // Overture gap-fill, after simplifyRing at 0.6 m, testing centroid AND
+    // vertices exactly as excluded() does). Gates, nearest first:
+    //     2.4 m  overture "Southern Pacific Building" h=60.05 - the OSM trace
+    //            of THIS building as a solid diamond with no court. It has to
+    //            go, or the gap-fill re-adds a 60 m block into the ground the
+    //            DataSF drop just freed.
+    //     7.4 m  datasf SF3713006 h=46.12 - this building
+    //    16.0 m  datasf SF3713007 h=39.71 - the atrium in the courtyard, on the
+    //            TOWER parcel. Unavoidable collateral: no radius takes the two
+    //            above and spares it, which is why the asset carries the atrium
+    //            roof rather than leaving a 55 x 36 m hole.
+    //    35.4 m  datasf SF3713007 h=172.41 - SPEAR TOWER, and h=27.75, the
+    //            podium. Both must survive.
+    // Safe window (16, 35.4), 19.4 m wide; 20 sits 4 m above the floor and
+    // 15.4 m below the ceiling, both far over the 0.6 m simplify tolerance.
+    // Do not widen: 35.4 deletes a 172 m tower.
+    //
+    // camera.js puts the eye at target + distance*(sin yaw, ., cos yaw), so
+    // camera bearing = 180 - yaw; yaw 200 stands it NNW on Market Street, 25 deg
+    // off the front's 315.2 deg normal, which gets the portal, the Steuart flank
+    // and the atrium apex over the Market wing in one frame.
+    id: '1Market',
+    name: '1 Market Street (Southern Pacific Building)',
+    lon: -122.3948075,
+    lat: 37.7938412,
+    height: 48.7,
+    exclude: 20,
+    camera: { distance: 330, yaw: 200, pitch: 24 },
+  },
+  {
+    // Welton Becket Associates, 1976. Spear Tower (43 storeys, 172 m) and
+    // Steuart Tower (27 storeys, 111 m) on the six-storey podium they share,
+    // filling the Mission Street half of the block at 1 Market Street. The 1916
+    // Southern Pacific Building on the same address is a SEPARATE landmark
+    // (`1Market`) built in the same batch; the two abut along the shared survey
+    // edge and neither asset contains the other's geometry.
+    //
+    // height 177.6 = Spear Tower's rooftop plant crest, DataSF LiDAR maximum on
+    // the shaft's own footprint (201006.0001309), whose median is 172.41 m
+    // against a published 172 m — the survey agrees with the sources to 0.4 m.
+    // Steuart has NO footprint of its own in the survey (it sits inside the
+    // podium polygon, whose median is the podium's 27.75 m and whose 163.58 m
+    // maximum is Spear spilling over the shared boundary, not Steuart). Its
+    // 111 m is published twice over and corroborated by the satellite lean:
+    // both towers lean the same way on the z20 tile, 26.7 m and 17.6 m, ratio
+    // 1.52 against the published 172/111 = 1.55.
+    //
+    // exclude 30 m, measured against the real bake input (DataSF + the Overture
+    // gap-fill, after simplifyRing, testing centroid AND vertices exactly as
+    // excluded() does). Gates, nearest first:
+    //     3.3 m  overture "One Market Plaza" h=28 — the podium envelope, caught
+    //            by its centroid rather than by any vertex
+    //    10.4 m  datasf SF3713007 h=27.75 — podium + Steuart shaft
+    //    10.4 m  datasf SF3713007 h=172.41 — the Spear shaft
+    //    51.8 m  datasf SF3713006 h=46.12 and SF3713007 h=39.71 — the Southern
+    //            Pacific Building and its atrium, which must survive here and
+    //            are dropped by `1Market`'s own exclusion instead.
+    // Safe window (10.4, 51.8), 41 m wide — the opposite of 1Market's, which is
+    // only 19 m. The two are complementary by construction: the anchors are
+    // 78.2 m apart, 1Market's 20 m stops 35.4 m short of these rings and this
+    // 30 m stops 51.8 m short of its.
+    //
+    // camera.js puts the eye at target + distance*(sin yaw, ., cos yaw), so
+    // camera bearing = 180 - yaw; yaw 58 stands it on Mission Street to the
+    // south-east, which is the one direction that shows the 172/111 m height
+    // contrast rather than one tower hiding the other.
+    id: 'oneMarketPlazaTowers',
+    name: 'One Market Plaza (Spear and Steuart Towers)',
+    lon: -122.3941803,
+    lat: 37.7933169,
+    height: 177.6,
+    exclude: 30,
+    camera: { distance: 700, yaw: 58, pitch: 20 },
+  },
+  {
+    // Pier 19, The Embarcadero at Green Street: a 1936-38 finger pier, near-
+    // identical twin of Pier 9 (153 ft x 800 ft), Contributing Resource of the
+    // Embarcadero Historic District. Classical stucco bulkhead building with a
+    // monumental arch, PIER 19 in raised letters and a gabled parapet; behind
+    // it a 195 m transit shed with a continuous roof monitor, on a pile deck.
+    // Port storage sheds today; Hornblower layberth on the south apron.
+    //
+    // ONE exclusion zone, r = 95, and the half-diagonal rule must NOT be used
+    // here (the model's half-diagonal is ~152 m and would flatten Pier 17).
+    // The bake carries this pier inside TWO merged rings that each trace the
+    // whole Pier 19 + Pier 23 + 1961-connector complex as one polygon:
+    //
+    //   DataSF 201006.0000010 (SF9900019H, 10.1 m median)  gate dist: vertex
+    //     73.8 m / centroid 94.8 m from this anchor
+    //   Overture 8fb7a212 (10.0 m)                         gate dist: vertex
+    //     73.7 m / centroid 86.1 m
+    //
+    // excluded() gates on min(centroid, any ring vertex), so r = 95 catches
+    // both with a +21 m margin. The nearest keeper is Overture 948c08a3 -
+    // named "Pier 17", 16.4 m - whose gate distance is 120.9 m (its VERTEX-MEAN
+    // centroid, which sits closer than any of its vertices at 147.2 m); the
+    // DataSF Pier 15/17 complex ring gates at 146.0 m. Margin -26 m. The
+    // window 73.8 < r < 120.9 is wide enough for one zone; Pier 1 needed two
+    // zones only because its window was 7.5 m.
+    //
+    // COLLATERAL, stated plainly: the merged rings ARE Pier 23's shed and the
+    // connector too, so dropping them empties the Pier 23 site until a pier-23
+    // landmark ships (same situation and same resolution as Pier 1/Pier 3 -
+    // there is no radius that clips one finger out of a merged polygon). Also
+    // note the Overture height-correction can re-target onto the nearest
+    // SURVIVOR after an exclusion; check Pier 17's bake height in audit.
+    //
+    // App yaw = 180 - true bearing: yaw 330 stands the eye at bearing 210 -
+    // over the Embarcadero off the facade's south shoulder, the only angle
+    // that reads the arch, the south flank and the full monitor run at once.
+    // 700 m suits a 262 m pier. No `key`: keys 0-9 are taken.
+    //
+    // `height` is the gable crest ABOVE THE DECK. The manifest targetHeightM
+    // (17.8) is a different quantity - the model's vertical extent, pile stubs
+    // to crest - because this asset stands in water and carries its own deck
+    // (the pier-1 origin convention; see artifacts/pier-19/REPORT.md).
+    id: 'pier19',
+    name: 'Pier 19',
+    lon: -122.3988181,
+    lat: 37.8030032,
+    height: 15.0,
+    exclude: 95,
+    camera: { distance: 700, yaw: 330, pitch: 22 },
+  },
+  {
+    // 1-21 Mission Street / 100 The Embarcadero, San Francisco Landmark No. 7
+    // (1968) and NRHP 79000528 (1979). Block 3715 Lot 001.
+    //
+    // height 17.5 is the 1983-84 barrel-vaulted penthouse crest, not the roof
+    // deck: DataSF LiDAR measures the deck at 15.36-15.44 m over 2,238 cells and
+    // its hgt_max of 19.18 m is rooftop plant (1.64 sd above the median on a
+    // 2.33 sd distribution, and visible as a mechanical unit and a tank in the
+    // reference photograph). Overture independently carries 17.4 m.
+    //
+    // exclude 7 measured against the REAL bake input - the DataSF ynuv-fyni
+    // footprints and the Overture ring for the same building - by nearest ring
+    // VERTEX and by centroid, because excluded() in buildings.mjs fires on
+    // either. From this anchor:
+    //
+    //   Overture "The Audiffred Building"   centroid  0.04 m   vertex 21.99 m
+    //   DataSF SF3715001                    centroid  1.95 m   vertex 19.99 m
+    //   DataSF SF3715002 (100 Embarcadero)  centroid 13.70 m   vertex 19.99 m
+    //   Overture equivalent of that neighbour centroid 13.92 m vertex 22.03 m
+    //   DataSF SF3715003                    centroid 28.16 m   vertex 28.47 m
+    //
+    // Both of this building's own rings are caught by CENTROID at under 2 m, so
+    // the safe window is (1.95, 13.70) and 7 sits near its middle with 3.6x
+    // margin below and 2.0x above. Note that the nearest vertex of this
+    // building and the nearest vertex of the neighbour are THE SAME TWO POINTS
+    // at 19.99 m - they share the party wall - so no radius can ever reach this
+    // footprint's vertices without eating the neighbour. It does not need to.
+    //
+    // Camera offset is (sin yaw, ., cos yaw) with +z south, so camera bearing =
+    // 180 - yaw and yaw 180 stands the eye due NORTH - the bisector of the
+    // Mission Street elevation (315.2 deg) and The Embarcadero end (44.8 deg),
+    // which is the only azimuth that reads the 41.8 m address elevation, the
+    // short waterfront end and the mansard-and-vault roof together. 230 m suits
+    // a 17.5 m building that is 42 m long (cf. 340Brannan at 240 for 17.79 m,
+    // 181SouthPark at 190 for 16.5 m). No `key`: this is a small landmark.
+    id: 'audiffredBuilding',
+    name: 'Audiffred Building (1 Mission Street)',
+    lon: -122.3927748,
+    lat: 37.7933216,
+    height: 17.5,
+    exclude: 7,
+    camera: { distance: 230, yaw: 180, pitch: 26 },
+  },
+  {
+    // Case B, and the exclusion window here is unusually wide because it was
+    // measured off the committed tiles rather than off the source rings.
+    // Minimum ring-VERTEX distance from this anchor, in the baked toy tier
+    // (excluded() fires on the centroid OR any vertex):
+    //
+    //    13.6 m  a 3.5 m shed ON the Pier 3 deck (ctr 3764.9, -3137.2)  -> must go
+    //    31.2 m  a 3.5 m shed ON the Pier 3 deck (ctr 3784.9, -3149.9)  -> must go
+    //    74.2 m  the Pier 1 1/2 bulkhead, 14.4 m tall                   -> must stay
+    //    78.8 m  a Pier 1 1/2 rooftop element                           -> must stay
+    //    83.9 m  the Pier 1 / 1 1/2 bulkhead, 10.7 m                    -> must stay
+    //   121.6 m  the Pier 1 transit shed                                -> must stay
+    //   123.9 m  the Pier 5 building                                    -> must stay
+    //
+    // Safe window (32, 74) m; 45 takes both deck sheds with 29 m of margin to
+    // the nearest keeper. There is NO baked building on the Pier 3 bulkhead
+    // site at all — the DataSF footprint that covers it does not survive into
+    // the bake — so the GLB adds a bulkhead where the city currently shows
+    // nothing, and the Case B fallback is empty water by design.
+    //
+    // Do NOT raise this past 74 m under any circumstances. The DataSF record
+    // covering these bulkheads (mblr CN9900003) is ONE merged polygon spanning
+    // Pier 3, Pier 1 1/2 and Pier 1; should it ever start baking, a 75 m radius
+    // would delete all three at once and put a hole in the Embarcadero.
+    //
+    // The id keeps its hyphen on purpose: camelId() in app/src/assets.js is
+    // id.replace(/-([a-z])/g, upper) and a DIGIT does not start a segment, so
+    // 'pier-3' round-trips to 'pier-3', not 'pier3'. Get this wrong and the
+    // manifest entry never matches this row.
+    id: 'pier-3',
+    name: 'Pier 3 (Hornblower Landing)',
+    lon: -122.3947017,
+    lat: 37.7982322,
+    height: 18.5,
+    exclude: 45,
+    // Camera offset is (sin yaw, ., cos yaw) with +z south, so bearing =
+    // 180 - yaw; yaw 215 stands the eye to the SOUTHWEST, out over the
+    // Embarcadero, which is the only angle that holds the arched portal and the
+    // 213 m run of the pier in one frame. 430 m for an asset whose long axis is
+    // 213 m. No `key`: at 18.5 m this is waterfront texture, not a destination.
+    camera: { distance: 430, yaw: 215, pitch: 20 },
+  },
+  {
+    id: 'oneSteuartLane',
+    name: 'One Steuart Lane',
+    lon: -122.3916888,
+    lat: 37.7915643,
+    height: 67.06,
+    // Sized by sweeping BOTH bake inputs against excluded()'s real test —
+    // a ring drops when its centroid OR any vertex is within r of THIS ANCHOR:
+    //
+    //   gate  source    ring
+    //   0.92  overture  "One Steuart Lane" itself (h=25.2, see below)   drop
+    //  11.41  datasf    SF3741031 — the demolished 75 Howard garage     drop
+    //  28.14  overture  "201 Spear"                                     keep
+    //  28.29  datasf    SF3741032 (72 m)                                keep
+    //
+    // Band 11.41 < r <= 28.14, 16.7 m wide; 20 is the middle of it.
+    //
+    // What this actually clears is the 2010 PARKING GARAGE, not a tower.
+    // Overture carries this building at h=25.16, which is wrong (it is 67 m),
+    // and 25.16 is not > 21.55 x 1.4, so buildings.mjs's height-correction
+    // branch declines to raise the garage and then `continue`s past the
+    // Overture ring entirely. The site therefore bakes today as a ~21.6 m
+    // block. Both rings still have to go: once the garage is excluded it never
+    // calls markOccupied(), so the Overture ring reaches addBuilding() on the
+    // gap-fill path and would re-add the building on top of the asset.
+    exclude: 20,
+    // Camera offset is (sin yaw, ., cos yaw) with +z south, so camera bearing =
+    // 180 - yaw. The subject is the STACK, which only reads on a corner, so the
+    // eye stands on the east corner — the bisector of the Steuart Lane normal
+    // (44.2 deg) and the south-east normal (134.8 deg), bearing 89.5, i.e.
+    // yaw 90.5. 400 m suits a 67 m tower (cf. columbusTower at 260 for 29 m,
+    // transamerica at 800 for 260 m). No `key`: 0-9 are taken, and SOM were
+    // explicit that this building is not a skyline destination.
+    camera: { distance: 400, yaw: 90.5, pitch: 22 },
+  },
+  {
+    // Measured against the real bake input (DataSF ynuv-fyni footprints, plus
+    // the Overture/OSM ring for the same building), by area-weighted ring
+    // CENTROID and by nearest ring VERTEX -- excluded() in buildings.mjs fires
+    // on either:
+    //
+    //    0.00 m  this building's own Overture/OSM ring (way/256969674), via
+    //            centroid: the ring's centroid IS this anchor.
+    //    1.83 m  this building's own DataSF footprint (SF3715002, 625 m2), also
+    //            via centroid. Its own nearest vertex is 20.40 m out -- this is
+    //            a 41.9 x 13.9 m through-lot, so every corner is far away and
+    //            only the centroid test can reach it.
+    //   13.95 m  the Audiffred Building's Overture/OSM ring (way/193054136), via
+    //            centroid -- a PARTY-WALL neighbour sharing two of this
+    //            footprint's vertices, and the first thing at risk.
+    //   14.27 m  the seven-storey office to the south-east (SF3715003), via
+    //            centroid -- the other party wall.
+    //   14.55 m  the Audiffred's DataSF footprint (SF3715001), via centroid.
+    //   15.60 m  the south-east office's Overture/OSM ring (way/193054135).
+    //   28.35 m  the next lot south-east (SF3715025).
+    //
+    // Safe window (1.83, 13.95) m. 5 sits in it with 2.7x of margin below and
+    // 2.8x above, and is the largest radius this block can carry: both long
+    // sides are literal party walls, so reaching this footprint's own far
+    // corners (20.4 m) would delete both neighbours.
+    id: '110Embarcadero',
+    name: 'The Commonwealth Club (110 The Embarcadero)',
+    // The FOOTPRINT centroid, which is what the exclusion above is measured
+    // from. The manifest anchor is 0.09 m away because it is the model's XY
+    // bbox centre, and the roof fascia projects past the Embarcadero face.
+    lon: -122.3926624,
+    lat: 37.7932325,
+    height: 17.4,
+    exclude: 5,
+    // Camera offset is (sin yaw, ., cos yaw) with +z south, so camera bearing =
+    // 180 - yaw; yaw 135 stands the eye at bearing 45 -- north-east, out on The
+    // Embarcadero, looking back down the long axis over the glass front and
+    // across the roof terrace to the Steuart pediment beyond. That is the only
+    // view that carries both of this building's faces at once. 190 m suits a
+    // 17.4 m building (cf. 181SouthPark at 190 for 16.5 m). No `key`: this is
+    // block texture on the waterfront, not a destination.
+    camera: { distance: 190, yaw: 135, pitch: 26 },
+  },
+  {
+    // Four Embarcadero Center (55 Clay St), John Portman, 1982. 45 storeys,
+    // 173.7 m to the parapet; 179 m is the DataSF LiDAR crest at the four
+    // rooftop cooling towers, which is what the asset's bbox is normalised to.
+    //
+    // exclude 20 is MEASURED against the real bake input, not guessed. Only two
+    // source rings overlap the tower's footprint and both are caught by their
+    // CENTROID: the Overture "Embarcadero Center 4" ring at 3.15 m and the
+    // larger DataSF ring 201006.0000633 (3,142 m2, it wraps the podium apron)
+    // at 12.61 m. The nearest ring that must SURVIVE is the low Clay/Drumm
+    // structure at 29.86 m. The tower's own footprint reaches 36.8 m from the
+    // anchor and the circle deliberately does not cover it — buildings.mjs
+    // gates on min(centroid, vertex), so a small circle at the anchor is
+    // enough and a big one is pure collateral.
+    //
+    // 20 rather than 12.7 because a SECOND consumer gates on the centroid
+    // alone and sees a different ring: planKit() rejects a toy-tier footprint
+    // only if its centroid falls inside this radius (landmarkExclusions() in
+    // kitzones.js), and toy.mjs re-derives its own simplified ring — on this
+    // cell the same building becomes a 9-vertex ring whose centroid sits at
+    // 18.76 m, not 12.61 m. The bake makes that moot (excluded() drops the
+    // footprint before out/footprints.json, which is toy.mjs's only input), but
+    // 20 keeps the kit's own guard covering the site if a bake is ever restored
+    // tier by tier. Verified free: no ring in either source has a gate value
+    // between 12.61 m and 29.86 m, so 16 and 20 drop exactly the same two.
+    // Do not raise it past ~29 without re-running that measurement.
+    id: '4EmbarcaderoCenter',
+    name: 'Four Embarcadero Center',
+    lon: -122.3961998,
+    lat: 37.7953001,
+    height: 179,
+    exclude: 20,
+    // camera bearing = 180 - yaw, so yaw 138 stands the eye to the NORTH-EAST,
+    // on the bisector of the blunt north cliff and the stepped east chevron —
+    // the one angle that shows both things this building is known for.
+    camera: { distance: 620, yaw: 138, pitch: 22 },
+  },
+  {
+    // Steuart Place, a 1907 brick through-lot running the full block depth from
+    // Steuart Street to The Embarcadero, with a set-back barrel-roofed penthouse
+    // at the Embarcadero end that is the crest and the only silhouette break on
+    // this row. Party walls on both long flanks: 121 Steuart northwest,
+    // 141 Steuart southeast, and 141 shares this PARCEL (3715-025 is recorded as
+    // "131-141 Steuart") but is a separate mass that stays procedural.
+    //
+    // Measured against the real bake input (DataSF ynuv-fyni footprints plus the
+    // Overture/OSM ring for the same building), by nearest ring VERTEX and by
+    // centroid -- excluded() in buildings.mjs fires on either:
+    //
+    //    0.08 m  this building's Overture/OSM ring (602 m2), via CENTROID
+    //    1.80 m  the SAME building's DataSF footprint (SF3715025, 610 m2), also
+    //            via centroid -- the two traces disagree by 1.8 m
+    //   13.59 m  121 Steuart (SF3715003) -- the first thing at risk
+    //   14.57 m  141 Steuart (SF3715025's second footprint, same parcel). It
+    //            must SURVIVE: it is a separate two-storey block with a glass
+    //            addition that this asset does not contain
+    //   19.54 m  this building's own nearest party-wall vertex
+    //
+    //   exclude  1 m     -> drops 1 (only the Overture ring; a DataSF block is
+    //                       left standing inside the asset)
+    //   exclude  2-13 m  -> drops 2 (correct: both rings of this building only)
+    //   exclude 14 m     -> drops 4 (eats 121 Steuart and its Overture twin)
+    //   exclude 16-25 m  -> drops 6 (also eats 141 Steuart)
+    //   exclude 30 m     -> drops 10 (a crater through the row)
+    //
+    // 8 m sits in the middle of the (1.80, 13.59) window with 6 m of margin
+    // above. Note it does NOT reach this footprint's own far corners at 19.5 m
+    // and does not need to -- on a party-walled slot the centroid test does all
+    // the work, and a radius that reached the corners would delete both
+    // neighbours.
+    id: '131Steuart',
+    name: 'Steuart Place (131 Steuart Street)',
+    lon: -122.3924386,
+    lat: 37.7930568,
+    height: 27.7,
+    exclude: 8,
+    // Camera offset is (sin yaw, ., cos yaw) with +z south, so camera bearing =
+    // 180 - yaw and yaw 135 stands the eye to the NORTHEAST, out over the
+    // Embarcadero. That is the only view that shows the barrel-roofed penthouse
+    // against the brick cornice behind it; from Steuart Street the penthouse is
+    // set back 32 m and invisible. 200 m suits a 27.7 m building (cf.
+    // 340Brannan at 240 for 17.79 m). No `key`: this is texture in the row, not
+    // a destination.
+    camera: { distance: 200, yaw: 135, pitch: 28 },
+  },
+  {
+    // 2 Folsom Street / 250 Embarcadero - Gap Inc.'s headquarters, Robert A.M.
+    // Stern with Gensler, 2001. A whole block: 84.31 x 77.14 m, 6,341 m2, with
+    // a base at 32.28 m, a brick superstructure deck at 72.11 m and a limestone
+    // crown at 87.95 m, all three measured from one DataSF LiDAR row over
+    // 25,463 cells.
+    //
+    // Exclusion, measured from the ANCHOR against the real bake inputs
+    // (pipeline/data/overture_buildings.geojsonseq and
+    // buildings_datasf.geojson), by ring VERTEX and by centroid, because
+    // excluded() in buildings.mjs fires on either:
+    //
+    //   TO DROP  datasf   201006.0000175  centroid 0.10 m, vertices 35.64-57.04 m
+    //   TO KEEP  nearest neighbour vertex  66.93 m  (overture 98232020, the
+    //            17.2 m block across Folsom, centroid 111.66 m)
+    //            then 69.53 m (MIRA, 129 m), 70.10 m, 71.23 m (201 Spear)
+    //
+    // Both sources trace this building - overture d31f359f sits at centroid
+    // 2.26 m with vertices 34.98-56.83 m - but only ONE ring is ever baked:
+    // buildings.mjs takes Overture as GAP-FILL, so a footprint DataSF already
+    // has is not added twice. Measured on the re-bake, origin/main -> here:
+    // 98 -> 97 footprints across cells 23_11 + 24_11, a delta of exactly one.
+    // Do not expect two here just because two sources list it.
+    //
+    // Safe window (0.10, 66.93). 60 sits 2.9 m outside the asset's own furthest
+    // corner (57.14 m half-diagonal) and 6.9 m inside the nearest neighbour
+    // vertex. Verified by decoding the baked tile rather than by counting it:
+    // 0 footprints keep a vertex inside r=60, and the nearest surviving vertex
+    // is at 67.86 m, so nothing is left under the asset and no neighbour was
+    // taken. The dropped block topped out at 94.5 m - SIX AND A HALF METRES
+    // TALLER than the 88.0 m asset - which is why this landmark cannot be
+    // judged without its re-bake applied: unexcluded, the procedural block
+    // swallows the GLB whole and the asset simply never appears.
+    id: '2Folsom',
+    name: '2 Folsom Street (Gap Inc. headquarters)',
+    lon: -122.390975,
+    lat: 37.790787,
+    height: 88.0,
+    exclude: 60,
+    // camera.js puts the eye at target + distance*(sin yaw, ., cos yaw) with +x
+    // east and +z south, so camera bearing = 180 - yaw. The Embarcadero
+    // elevation faces 45.2 deg and is the one the whole composition is aimed at
+    // ("at its boldest facing the harbor"), so yaw 135 stands the camera out
+    // over the waterfront onto it, with the Folsom front raking away. 300 m at
+    // 88 m tall keeps the base, the setback and the crown in one frame.
+    camera: { distance: 300, yaw: 135, pitch: 30 },
+  },
+  {
+    // SOM, 1998: the 14-storey state office slab filling the north half of the
+    // Earl Warren block. Case B, and the exclusion radius here is deliberately
+    // TIGHT — far tighter than the 68.0 m OBB half-diagonal most entries use.
+    //
+    // `excluded()` drops a footprint when its centroid OR any ring vertex falls
+    // inside the radius. Measured against the real bake input
+    // (`pipeline/data/overture_buildings.geojsonseq`) with that exact metric,
+    // over all 45 footprints within 160 m of this anchor:
+    //
+    //   r  3-26 m  -> drops 1  (this building; its centroid is 0.2 m out)
+    //   r >= 26.81 m -> drops 2  (also the Earl Warren Building)
+    //
+    // 26.81 m is the party-wall vertex the two footprints SHARE, so it is a
+    // hard ceiling, not a preference. 12 m is the middle of the safe band and
+    // the same value earlWarrenBuilding uses one entry above, for the same
+    // party wall seen from the other side.
+    id: 'hiramJohnsonStateOfficeBuilding',
+    name: 'Hiram W. Johnson State Office Building',
+    lon: -122.4179151,
+    lat: 37.7810345,
+    height: 61.9,
+    exclude: 12,
+    // Eye to the NNE (bearing 180 - yaw = 30), over Golden Gate Avenue: the
+    // curved entrance bay and the east drum in one frame, with the roof open.
+    camera: { distance: 470, yaw: 150, pitch: 22 },
+  },
+  {
+    // 88 Howard Street — the residential half of Rincon Center. Case B: no
+    // procedural builder, so the bake must be told to drop this block.
+    //
+    // exclude 32 m. Measured from THIS anchor, not from centroids: the
+    // building's own DataSF ring (201006.0000265) has its nearest vertex 4.2 m
+    // out and its centroid 1.4 m out, and the Overture ring that traces the same
+    // building (5d51e5b1-...) has its centroid 4.2 m out — both are killed by any
+    // radius over ~5 m, because `excluded()` drops a footprint whole as soon as
+    // one vertex or its centroid is inside. The binding constraint is the other
+    // way: the 1940 Rincon Annex post office shares this block's north-west
+    // party line and its nearest vertex is 34.8 m from this anchor, so the
+    // radius must stay under that. 32 leaves 2.8 m of margin and still reaches
+    // one of the two Overture slivers along the party line. A radius big enough
+    // to cover this footprint's own far corners (56.7 m) would eat the Annex.
+    id: 'towersAtRincon',
+    name: 'The Towers at Rincon',
+    lon: -122.3924907,
+    lat: 37.791991,
+    height: 89,
+    exclude: 32,
+    // Camera offset is (sin yaw, ., cos yaw) with +z south, so camera bearing =
+    // 180 - yaw; yaw 90 stands the eye due EAST — the bisector of the two hero
+    // elevations, Howard Street (facing 135) and Steuart Street (facing 45), and
+    // the side the east tower's bow faces. 620 m suits an 89 m building on a
+    // 112 m block (cf. ferryBuilding at 700 for 74.7 m on a 167 x 198 m block).
+    // No `key`: keys 0-9 are taken.
+    camera: { distance: 620, yaw: 90, pitch: 22 },
+  },
+  {
+    // Army & Navy YMCA Building, 1924 — the Embarcadero YMCA (169 Steuart) and
+    // the Harbor Court Hotel (161-165 Steuart) inside ONE structure on ONE
+    // parcel. DataSF condo lots 3715028 and 3715029 share a mapblklot and a
+    // polygon; OSM traces the same outline as three ways. Height 46.64 m is the
+    // LiDAR crest at the tile-roof apex (tower eave 35.0 m, wing roof 28.14 m).
+    //
+    // Exclusion: excluded() drops a footprint whose CENTROID OR ANY VERTEX is
+    // within r of this anchor, so r has to reach our own rings and miss every
+    // neighbour's vertex. Measured from the anchor:
+    //    2.05 m  our DataSF LiDAR ring, centroid
+    //    6.44 m  our OSM rings 32862485 / 193054138, nearest vertex
+    //    7.67 m  our DataSF LiDAR ring, nearest vertex
+    //    9.11 m  our OSM ring 193054131 (the YMCA gym), nearest vertex
+    //   21.44 m  Hotel Griffon (155 Steuart), nearest vertex  <- the ceiling
+    //   21.58 m  177 Steuart, DataSF SF3715013, nearest vertex
+    //   22.10 m  188 The Embarcadero, nearest vertex
+    //
+    // Safe window (9.11, 21.44) m. 15 sits near its centre: 5.9 m of margin over
+    // the worst of our own sub-rings and 6.4 m to the nearest neighbour vertex,
+    // which absorbs the usual ~1.25 m parcel-vs-footprint disagreement. The
+    // half-diagonal (29.8 m) would have deleted the Griffon and 177 Steuart.
+    id: '169Steuart',
+    name: 'Army & Navy YMCA Building (169 Steuart Street)',
+    lon: -122.3919821,
+    lat: 37.7926993,
+    height: 46.64,
+    exclude: 15,
+    // Camera offset is (sin yaw, ., cos yaw) with +z south, so camera bearing =
+    // 180 - yaw; yaw 125 stands the eye to the NORTHEAST, square on the
+    // Embarcadero entry front (45.1 deg) with the red tile hip against the sky.
+    // That is the only elevation worth flying to: the Steuart front is a
+    // three-storey street wall and both flanks are party edges. 450 m for a
+    // 46.6 m building sits between 501Second (420 at 37.7 m) and the wide
+    // museum complexes at 700. No `key`: keys 0-9 are taken.
+    camera: { distance: 450, yaw: 125, pitch: 24 },
+  },
+  {
+    // Arthur Brown Jr.'s 1936 Federal Office Building, the last piece of the
+    // Civic Center. A whole city block: 112.53 x 66.93 m on the grid, wrapped
+    // around an open courtyard.
+    //
+    // `exclude: 40` is MEASURED against the rings the bake actually consumes
+    // (DataSF and Overture, projected and simplifyRing'd at 0.6 m), from this
+    // anchor, using the metric `excluded()` applies - ring centroid OR any ring
+    // vertex:
+    //   DataSF SF0351035 (area_id 225), this building        centroid  1.64 m
+    //   Overture ...7285e5e8827e (height 29), this building  centroid  0.27 m
+    //   DataSF SF0348007 (area_id 2493), across McAllister   vertex   54.54 m
+    //   nearest Overture NEIGHBOUR vertex                             55.47 m
+    // So the window is (1.70, 54.54) m and 40 sits inside it with 14.5 m of
+    // headroom. BOTH datasets trace this block, so a correct exclusion drops
+    // TWO rings, not one; only the DataSF one is a baked building, but without
+    // dropping the Overture ring the gap-fill pass puts it straight back.
+    //
+    // Do NOT reach for the half-diagonal rule here: the OBB half-diagonal is
+    // 65.46 m, which is past the 54.54 m neighbour and would delete a building
+    // across McAllister.
+    //
+    // The courtyard ring never reaches the bake - outerRings() in
+    // lib/geojsonStream.mjs discards inner rings - so it needs no exclusion.
+    id: '50UnitedNationsPlaza',
+    name: '50 United Nations Plaza Federal Office Building',
+    lon: -122.4144853,
+    lat: 37.7804351,
+    height: 33.0,
+    exclude: 40,
+    // camera.js puts the eye at target + distance*(sin yaw, ., cos yaw) with +x
+    // east and +z south, so camera bearing = 180 - yaw. The hero front is the
+    // south colonnade facing United Nations Plaza, so yaw 0 stands the camera
+    // due south of the building looking north up the plaza - the view the
+    // building was composed for.
+    camera: { distance: 380, yaw: 0, pitch: 24 },
+  },
+  {
+    // An L-shaped wedge of brick, not a building, and the one site in this set
+    // with NO usable radius at its own anchor. The anchor is the model's XY
+    // bbox centre (contract: origin at base centre), and on an L that lands 4.76
+    // m off the Federal Building's baked footprint at 50 UN Plaza, while the
+    // farthest thing that has to be dropped is 57.51 m away. So `exclude` is
+    // omitted entirely and the work is done by one extra circle.
+    //
+    // What has to be dropped is the FOUNTAIN. DataSF's LiDAR read Halprin's
+    // granite slabs as nine buildings; with no `hgt_medcm` to work from the
+    // procedural builder extruded seven of them, inside the plaza, to 3.1-8.5 m.
+    // Measured against app/public/tiles/buildings/20_13.bin, gate distances from
+    // (-122.4133237, 37.7800778):
+    //
+    //   drop  20_13#170  10.09 m   20_13#171  11.61   20_13#169  20.21
+    //         20_13#182  22.70     20_13#172  24.64   20_13#180  25.76
+    //         20_13#181  25.77
+    //   keep  20_13#17   34.76 m  (1,171 m2, 43.1 m tall, NE across Leavenworth)
+    //         20_13#36   34.81 m
+    //
+    // Safe window (25.77, 34.76), 8.99 m wide. 30 sits near the middle: 4.23 m
+    // of margin over the last fountain block, 4.76 m under the first real
+    // neighbour. Do not widen without re-running that measurement.
+    //
+    // No clearTrees, and this one is worth stating because every other plaza in
+    // the set needed it: landcover.mjs scatters trees only on KIND.trees and
+    // KIND.grass. This plaza's outer polygon is highway=pedestrian + place=square,
+    // which maps to no landcover kind at all, and its inners are natural=sand and
+    // leisure=pitch. Nothing scatters here.
+    id: 'unPlaza',
+    name: 'United Nations Plaza',
+    lon: -122.41389,
+    lat: 37.7801415,
+    // The plaza's own height, i.e. the tree canopy — NOT the manifest's
+    // `targetHeightM` of 16.4028. Those two differ on purpose here: this is a
+    // terrain-draped ground asset, so the manifest number is the model's
+    // vertical EXTENT (the loader divides by the bbox height and must land on
+    // 1.0), while this one is what context.mjs publishes as the landmark's
+    // height to search and the concierge. A plaza is not 16 m tall.
+    height: 13.0,
+    extraExclusions: [{ lon: -122.4133237, lat: 37.7800778, r: 30 }],
+    // Looks WEST along the Fulton axis, the composition the plaza was built to
+    // create and the one the NRHP nomination describes: a clear view from
+    // Market Street to City Hall. yaw 90 is the same convention
+    // civicCenterPlaza uses for the same 260.94 deg bearing.
+    camera: { distance: 520, yaw: 90, pitch: 28 },
+  },
+  {
+    // Orpheum Theatre (B. Marcus Priteca, 1926, opened as the Pantages) —
+    // SF Designated Landmark #94, on the trapezoidal block where Market, Hyde
+    // and Grove meet. Height is 2010 city LiDAR `hgt_max` (the 1998 stage
+    // house); OSM tags this building `height=46 m`, which is DataSF's
+    // `p2010_zmaxn88ft` 150.96 ft — the roof's ABSOLUTE NAVD88 elevation —
+    // converted to metres and mistagged. Do not restore it.
+    //
+    // Exclusion measured against the real bake input (DataSF + Overture,
+    // projected, simplifyRing(0.6)) from this anchor. `excluded()` drops a
+    // footprint when its ring centroid OR ANY vertex falls inside:
+    //
+    //    6.11 m  this footprint's centroid, DataSF SF0351022 (2,883 m2)
+    //    7.28 m  this footprint's centroid, Overture 7ad3c2dc (2,967 m2)
+    //   24.55 m  nearest vertex, Civic Center Station strip, Overture 837db0e8
+    //   25.65 m  nearest vertex, City College 1170 Market, DataSF SF0351051
+    //   28.27 m  nearest vertex, City College, Overture e757eceb
+    //
+    // The window is (7.28, 24.55); 20 m sits in the middle with 12.7 m of
+    // margin on ours and 4.5 m on the neighbours'. Two rings drop, both ours —
+    // the usual DataSF + Overture double trace, not collateral. The station
+    // polygon is a strip along Market and does not overlap this footprint
+    // (point-in-polygon: zero shared interior).
+    //
+    // Residual, by design: a 29 m2 Overture sliver at 35 Fulton St
+    // (876a881a, nearest vertex 34.90 m) shares two vertices with the NE
+    // corner and survives. No radius removes it without eating City College.
+    // If it ever shows, add
+    //   extraExclusions: [{ lon: -122.4144084, lat: 37.7796474, r: 6 }]
+    // which catches that ring on its own centroid and reaches nothing else.
+    id: 'orpheumTheatre',
+    name: 'Orpheum Theatre',
+    lon: -122.4146087,
+    lat: 37.7793182,
+    height: 27.2,
+    exclude: 20,
+    // camera.js puts the eye at target + distance*(sin yaw, ., cos yaw) with
+    // +x east and +z south, so camera bearing = 180 - yaw. The ORPHEUM blade
+    // sign is the whole recognition and its faces point NE and SW, so the
+    // obvious yaw 44 (camera SE, square onto Market) shows it EDGE-ON. yaw 0
+    // stands the camera due south: the Market front is 44 deg off-normal and
+    // the sign's SW face 45.9 deg off-normal, and both read.
+    camera: { distance: 380, yaw: 0, pitch: 22 },
+  },
+  {
+    // Pier 1, the first finger pier north of the Ferry Building: a 12.5 m deep
+    // Neo-classical bulkhead building on the Embarcadero building line with a
+    // monumental round arch carved PORT OF SAN FRANCISCO, and a 213 m transit
+    // shed running north-east into the Bay behind it, all on a pile deck.
+    // Rehabilitated 2001 (SMWM) as the Port of San Francisco's headquarters and
+    // Prologis's. NRHP #98001551.
+    //
+    // TWO ZONES, and the usual half-diagonal rule must NOT be used here. The
+    // bake carries this pier as two overlapping footprints:
+    //
+    //   DataSF 146   (toy 23_9#5,  10.3 m)  the shed and the NW part of the
+    //                                       bulkhead
+    //   Overture     (toy 23_9#6,  14.4 m)  a COMB: the ~9 m deep Embarcadero
+    //                                       frontage strip from Pier 1 to
+    //                                       Pier 5, plus Pier 1's bulkhead SE
+    //                                       lobe, plus a 37 x 34 m tooth over
+    //                                       Pier 3's bulkhead
+    //
+    // The DataSF footprint alone is not enough: the front 9 m of the bulkhead —
+    // the Beaux-Arts facade itself — is covered ONLY by the Overture polygon, at
+    // 14.4 m, which is 5.8 m taller than the wings it would bury. Both have to
+    // go. But one radius around this anchor that reaches the Overture ring
+    // (71.6 m) is only 7.5 m short of reaching 23_9#14 (Pier 1 1/2 and Pier 3,
+    // 10.7 m) at 79.1 m — too tight a window to defend. So `exclude` stays small
+    // and an extra zone sits in the middle of Pier 1's own bulkhead, 1.37 m from
+    // both targets and 35.5 m from the nearest keeper.
+    //
+    // Verified by replaying excluded()'s exact test (centroid OR any ring
+    // vertex) against the committed tiles of BOTH tiers, over every footprint
+    // within 700 m:
+    //   buildings tier: drops 2 — 23_9#4 (16.0 m), 23_9#7 (13.7 m)
+    //   toy tier:       drops 2 — 23_9#6 (14.4 m), 23_9#5 (10.3 m)
+    // Nothing else, in either tier. Re-run that check after a re-bake; do not
+    // trust verify-rebake's per-cell COUNTS alone, which can call a working
+    // exclusion "dropped nothing".
+    //
+    // COLLATERAL, stated plainly: dropping the Overture polygon also removes
+    // Pier 3's bulkhead block (37 x 34 m, 14.4 m, ~110 m north-west) and the
+    // ~9 m deep frontage strip in front of Piers 1 1/2 to 5. The bulk behind it
+    // survives as 23_9#14/#15 and Pier 5 as #16, so the row keeps its mass but
+    // sits back ~9 m from the street. There is no radius that avoids this: one
+    // Overture ring traces Pier 1's facade and Pier 3's bulkhead together, and
+    // excluded() has no way to clip one. The alternative is a 14.4 m grey slab
+    // standing through the front third of a hand-built landmark. Shipping Pier 3
+    // as a landmark is the only real fix.
+    //
+    // App yaw = 180 - true bearing, so yaw 235 stands the eye at bearing 305 —
+    // over the Embarcadero off the facade's outboard shoulder, which is the only
+    // angle that reads the frontispiece, the SE flank running away, the taper
+    // and the whole roof at once. 700 m suits a 234 m pier. No `key`: keys 0-9
+    // are taken.
+    //
+    // `height` is the pavilion crest ABOVE THE PIER DECK. The manifest's
+    // targetHeightM (15.4) is a different quantity — the model's vertical
+    // extent, pile stubs to crest — because this asset stands in water and
+    // carries its own deck. See docs/asset-plans/pier-1.md 2.3.
+    id: 'pier1',
+    name: 'Pier 1',
+    lon: -122.3940736,
+    lat: 37.7974474,
+    height: 12.8,
+    exclude: 25,
+    extraExclusions: [{ lon: -122.3948198, lat: 37.7969113, r: 10 }],
+    camera: { distance: 700, yaw: 235, pitch: 22 },
+  },
+  // John Portman's 1973 stepped concrete wedge at the foot of Market Street.
+  // Measured against the real bake inputs (buildings_datasf.geojson +
+  // overture_buildings.geojsonseq) from this anchor. `excluded()` in
+  // pipeline/buildings.mjs drops a footprint when its ring centroid OR any ring
+  // vertex falls inside the circle:
+  //
+  //   TARGET rings - THREE, not one. Overture traces the whole building; DataSF
+  //   splits it into a Market half and a terraced half (which is also the
+  //   evidence for the section - see docs/asset-plans/hyatt-regency.md 2.3):
+  //     overture 2121409a  h 83    6672 m2  centroid  0.00  nearest vertex 31.21
+  //     datasf   ...0636   h 63.2  3211 m2  centroid 12.91  nearest vertex 19.62
+  //     datasf   ...0477   h 36.7  3730 m2  centroid 15.54  nearest vertex 19.62
+  //   nearest NEIGHBOUR (the Embarcadero Center 4 podium):
+  //     datasf   ...0734   h 10.0  3164 m2  centroid 65.30  nearest vertex 41.11
+  //     overture be43e192  h 17.0  3090 m2  centroid 61.72  nearest vertex 46.75
+  //
+  //   exclude 13 m    -> drops 2 rings  (misses the second DataSF half)
+  //   exclude 16-41 m -> drops 3        (correct)
+  //   exclude 42 m    -> drops 4        (eats the EC4 podium on its nearest vertex)
+  //
+  // Safe window 16-41 m. 28 is the middle: 12.4 m of headroom over the last
+  // target and 13.1 m under the neighbour. Do not raise past 41 without
+  // re-running the sweep.
+  //
+  // THE BAKE DROPS TWO, NOT THREE, AND THAT IS CORRECT. The sweep above counts
+  // rings in the raw INPUT files; buildings.mjs dedupes Overture against DataSF
+  // before excluding, so the Overture copy of this building was never baked as
+  // its own footprint. Settled from the tile rather than from the counts, which
+  // cell 23_13's unrelated churn would otherwise confuse: in origin/main's
+  // 23_10.bin three footprints reach within 60 m of this anchor (centroids
+  // 5.23 m / 29.33 m / 59.38 m); after the re-bake only the 59.38 m one
+  // survives, its nearest vertex 40.83 m out, i.e. 12.8 m clear of the radius.
+  // The two that went were 7.4 m and 6.1 m tall - the baked Hyatt was a podium
+  // block, not a tower, which is why the exclusion matters for the base and not
+  // for the crown. The 28 m circle does NOT reach the EC4 podium, so
+  // that neighbour keeps its procedural block and the join is a hard edge -
+  // accepted, see the plan's 2.15 risk 5.
+  {
+    id: 'hyattRegency',
+    name: 'Hyatt Regency San Francisco',
+    lon: -122.3958308,
+    lat: 37.7943469,
+    height: 80.8,
+    exclude: 28,
+    // Camera offset is (sin yaw, ., cos yaw) with +z south, so the eye sits at
+    // true bearing 180 - yaw. Bearing 20 (NNE) is the one quarter that shows
+    // both recognition cues at once: the Embarcadero Plaza prow (outward normal
+    // 45.8) and the terrace field on the north-west frontage (351.2). Pitch 28
+    // at 420 m puts the eye 197 m up, clear of Embarcadero Center 4's ~171 m
+    // roof standing directly across the north-west site line. No `key`.
+    camera: { distance: 420, yaw: 160, pitch: 28 },
+  },
+  {
+    // The Jewish Community Federation Building, 132 The Embarcadero / 121
+    // Steuart Street (block 3715, lot 003). A 1984 seven-storey red-brick slab
+    // on one of four narrow deep lots that run the full 43 m block depth from
+    // Steuart Street through to the waterfront: 13.75 m of street frontage,
+    // 42.95 m deep, both long sides party walls. Roof deck 26.82 m (DataSF
+    // LiDAR median), parapet 27.40 m (photogrammetric, 40 samples, sigma
+    // 0.08 m), lift/stair bulkhead crest 29.57 m (LiDAR hgt_max — the one
+    // inferred number, see the plan's 2.15 risk 1).
+    //
+    // excluded() drops a footprint when its ring centroid OR any ring vertex
+    // falls inside the radius. Measured from this anchor against the actual
+    // bake input (DataSF footprints primary, Overture/OSM gap-fill):
+    //
+    //    0.17 m  this building's own OSM/Overture way 193054135, via centroid
+    //    1.42 m  this building's own DataSF footprint SF3715003, via centroid
+    //            -> the FLOOR: below this the procedural twin survives
+    //   13.74 m  OSM way 256969674 (110-116 The Embarcadero), centroid
+    //            -> the CEILING, and the binding constraint
+    //   13.92 m  OSM way 193054132 (Steuart Place, 131 Steuart), centroid
+    //   14.13 m  DataSF SF3715002 (110-116 The Embarcadero), centroid
+    //   14.62 m  DataSF SF3715025 (Steuart Place), centroid
+    //   20.70 m  DataSF SF3715002, nearest ring vertex
+    //   20.70 m  this building's own DataSF footprint, nearest ring vertex
+    //   21.17 m  DataSF SF3715025, nearest ring vertex
+    //   21.46 m  OSM way 256969674, nearest ring vertex
+    //
+    // Safe window (1.42, 13.74) m; 7 sits near the middle with 5.58 m of
+    // margin below and 6.74 m above. Note what the table says about vertices:
+    // this building's own nearest vertex is 20.70 m out and both party-wall
+    // neighbours' nearest vertices are 20.70 and 21.17 m out, so the VERTEX
+    // test is unusable here — a party-wall row shares its corners and no
+    // radius can catch ours without catching theirs. The centroid test is the
+    // only lever. Do not round up "for safety": 14 would delete 110-116 The
+    // Embarcadero from the bake and leave a hole against our northwest wall.
+    //
+    // camera.js apply() puts the eye at pivot + (sin yaw, sin pitch, cos yaw)
+    // *distance with +z south, so camera.yaw = 180 - the true bearing you want
+    // to look down. This building wants its Embarcadero elevation, outward
+    // normal 44.95 deg true, so 180 - 45 = 135. yaw 45 would stare at the
+    // Steuart entrance instead - the better-looking elevation, but not the
+    // address.
+    id: '132Embarcadero',
+    name: '132 The Embarcadero',
+    lon: -122.3925476,
+    lat: 37.7931482,
+    height: 29.57,
+    exclude: 7,
+    camera: { distance: 240, yaw: 135, pitch: 26 },
+  },
+  {
+    // 1 Hotel San Francisco, formerly Hotel Vitale (Heller Manus, 2005): the
+    // whole block between Mission, Steuart, The Embarcadero and Don Chee Way,
+    // across the water side of the Embarcadero from the Ferry Building. Eight
+    // storeys on the Mission end (LiDAR mode 25.10 m) terracing down to six
+    // (median 19.64) and four (14.18) toward Harry Bridges Plaza; the crest is
+    // the circular turret's lantern crown at 28.66 m (LiDAR max, corroborated
+    // against Street View - one storey proud of the parapet, no party wall for
+    // it to bleed from).
+    //
+    // The exclusion is sized against `excluded()`'s real test - ring CENTROID
+    // inside the circle OR any ring vertex inside it - not against the
+    // footprint. Distances from this anchor:
+    //
+    //    2.29 m  our own centroid, OSM way 193054134   <- the lower bound
+    //    3.36 m  our own centroid, DataSF 201006.0001079
+    //   14.69 m  our own nearest vertex
+    //   21.07 m  the Muni vent pavilion's nearest vertex <- the upper bound
+    //   56.16 m  the Audiffred Building's nearest vertex
+    //
+    // Safe window (3.36, 21.07) m. 10 sits in it with 6.6 m of margin below and
+    // 11.1 m above. The half-diagonal (39.35 m) would delete the Muni subway
+    // vent shaft that shares this parcel and sits in the notch at the north
+    // corner - a real, standing structure that is deliberately NOT part of the
+    // asset and has to survive the re-bake.
+    id: '8Mission',
+    name: '1 Hotel San Francisco (8 Mission Street)',
+    lon: -122.3932861,
+    lat: 37.7936872,
+    height: 28.66,
+    exclude: 10,
+    // Camera offset is (sin yaw, ., cos yaw) with +z south, so camera bearing =
+    // 180 - yaw and yaw 90 stands the eye due EAST - the bisector of the Mission
+    // elevation (135.4 deg) and the Embarcadero elevation (45.4 deg), with the
+    // turret on the corner between them. Both are hero elevations and the turret
+    // only reads from that corner. 320 m suits a 28.66 m crest (cf. 181SouthPark
+    // 190 for 16.5 m, 49SouthPark 165 for 13 m). No `key`: the waterfront's
+    // numbered destination is the Ferry Building.
+    camera: { distance: 320, yaw: 90, pitch: 24 },
+  },
+  {
+    // Ferry Station Post Office Building (the Agriculture Building), 101 The
+    // Embarcadero at Mission, A. A. Pyle 1915. Case B: no procedural builder,
+    // so this registry row is what carves the baked footprint out from under
+    // the GLB, and it is also what gives the landmark its pick box, its
+    // search-index row and its context identity.
+    //
+    // exclude, measured from THIS anchor against the DataSF footprints the bake
+    // actually reads (`excluded()` in pipeline/buildings.mjs drops a footprint
+    // whose centroid OR any ring vertex falls inside the radius):
+    //   18.24 m  nearest vertex of this building's own DataSF ring (SF9900278)
+    //   37.34 m  its FARTHEST vertex — the radius must clear this or part of
+    //            the procedural block is left standing under the asset
+    //   41.45 m  nearest vertex of the next DataSF footprint, CN9900002, the
+    //            Downtown Ferry Terminal gangway kiosk, which must survive
+    //
+    // Safe window (37.34, 41.45) m. 39 sits in it with 1.7 m of margin below and
+    // 2.5 m above. Wider than the South Park rows because this is a 2,069 m2
+    // footprint on a 50.74 x 39.0 m rectangle, not a 25 m lot.
+    //
+    // Overture traces this building a SECOND time (the OSM ring, `commercial`,
+    // height 15, vertices 20.83-35.31 m), so 39 clears both source rings.
+    //
+    // Overture ALSO carries the two ferry-gangway canopies as `outbuilding`
+    // rings (OSM way/979811981 and way/979811987, heights 8.7 m and 6.9 m,
+    // nearest vertices 29.93 m and 32.87 m) — inside any radius that can clear
+    // this building, so on paper they looked like unavoidable collateral.
+    // MEASURED FROM THE BAKED TILE, they are not: neither ring survives the
+    // cross-source gap-fill into the baked city at all, before or after. In
+    // cell 23_10 origin/main's nearest footprint vertex after this building's
+    // own is 80.31 m away, and 24_10's nearest is the DataSF gangway kiosk at
+    // 41.45 m, which is unchanged by the exclusion.
+    //
+    // Net, verified against app/public/tiles/buildings/23_10.bin rather than
+    // against the source data: the exclusion drops EXACTLY ONE baked footprint,
+    // this building's own (12.2 m tall), and no collateral. Per-cell counts go
+    // 49 -> 48 in 23_10 and are unchanged everywhere else; rings penetrating
+    // the asset footprint go 1 -> 0.
+    id: 'ferryStationPostOffice',
+    name: 'Ferry Station Post Office Building',
+    lon: -122.3921505,
+    lat: 37.7941368,
+    height: 12.65,
+    exclude: 39,
+    // Camera offset is (sin yaw, ., cos yaw) with +z south, so camera bearing =
+    // 180 - yaw. yaw 290 stands the eye at bearing 250 deg — just off the
+    // Embarcadero frontage's outward normal (234 deg), so the three-pavilion
+    // front reads square-ish while the SE flank and the 1918 tiled wing rake
+    // away behind it. 260 m frames a 50.74 m frontage the way 165 m frames a
+    // 23 m South Park front. No `key`: keys 0-9 are taken, and at 12.65 m this
+    // is the Ferry Building's handsome low neighbour, not a destination.
+    camera: { distance: 260, yaw: 290, pitch: 22 },
+  },
+  {
+    // Pier 17 — the 1912 cargo shed (third-oldest pier on the waterfront) on
+    // its own deck at the Embarcadero and Green St, Exploratorium campus. The
+    // GLB carries the pier deck itself (the bake draws no pier decks and the
+    // loader seats assets at water level over open water), so `height` is the
+    // flagpole tip above WATER: deck 2.0 + facade apex 14.9 + pole (LiDAR
+    // 1st-return peak 19.26 m above deck).
+    //
+    // EXCLUSION — measured from the shipped tiles (cell 22_8) against
+    // excluded()'s min(centroid, any-vertex) gate from this anchor: the baked
+    // pier is ONE merged DataSF trace (gate 74.5 m — its centroid; the trace
+    // includes a SE lobe toward Pier 15). Nearest keeper is Pier 19's trace
+    // at ~137 m, then Pier 15's shed at ~204 m. r=100 sits mid-window; it
+    // must NOT reach 137. Overture twin is caught by its own centroid.
+    id: 'pier-17',
+    name: 'Pier 17',
+    lon: -122.3981018,
+    lat: 37.8022149,
+    height: 21.3,
+    exclude: 100,
+    // Camera bearing = 180 - yaw; the bulkhead front faces 235 deg (SW onto
+    // the Embarcadero), so yaw -55 stands the eye over the water gap to the
+    // southwest, seeing the front gable + the Valley flank. 420 m because the
+    // shed is 232 m long and reads as a whole, not a facade.
+    camera: { distance: 420, yaw: -55, pitch: 30 },
   },
 ];
 
