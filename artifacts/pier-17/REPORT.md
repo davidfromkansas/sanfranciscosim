@@ -72,3 +72,40 @@ verts; dissolve no-op; join 90 objects→13 meshes) + gltfpack 0.24
 gates G1–G8 PASS (G4 max mean pixel delta 0.084%). The packed file re-passed
 the full stage-2 contract validator (0 invalid normals). Shipping swap done;
 pre-optimize original archived at `optimize/input/pier-17.glb`.
+
+## Stage 5 — integrate (batch mode, Case B)
+
+Production URL: **not deployed** — batch mode ends at a source-only branch;
+`docs/asset-pipeline/BATCH-INTEGRATE.md` bakes the city once for the whole
+piers batch and opens the single PR.
+
+| check | result |
+|---|---|
+| re-validation of shipped GLB (fresh scene) | PASS (all checks, 1,998 tris) |
+| GLB intake compression | PASS (already meshopt from stage 4; compress-assets skips it) |
+| manifest entry (text-append, JSON valid) | PASS — 104 entries |
+| id mapping camelId('pier-17') = 'pier-17' | PASS (digit hyphen untouched; registry id matches) |
+| registry entry + exclusion | PASS — `exclude: 100`, window (74.5, 142.2) measured |
+| re-bake (QA only, then discarded) | PASS — chain exit 0, zero-churn vs vintage dataset |
+| audit 1.6 (no footprint in zone) | PASS — 114 zones over 110 landmarks clear |
+| verify-rebake | PASS — only cell 22_8 changed (21→20); nearest survivor 142.2 m vs r=100 |
+| tile decode proof | PASS — merged Pier 17 trace gone; Pier 19 top 13.8 m and Pier 15 top 14.3 m unchanged (no Overture height retarget) |
+| single building / no twin / no z-fight | PASS (day + wide screenshots, artifacts/pier-17/qa/) |
+| merge line + scale | PASS — `pier-17 merged 13 objects / 10 materials -> batched (1092 tris body); uniform x1.0000 at 3467, -3561` |
+| orientation | PASS — front SW onto the Embarcadero, shed NE into the bay (wide.png) |
+| terrain seating | PASS — seats at water level, own 2.0 m deck carries it (by design over water) |
+| night glow | PASS — ridge skylight hero + sign/transom/3 bays only (night.png) |
+| draw calls | PASS — avg 83/frame at the landmark (< 300) |
+| fallback drill | PASS — app boots with the GLB served 404; exactly one streamed-path warning (`pier-17 failed to load (... 404)`); site is empty pier ground inside the zone (Case B, expected). Drill screenshots skipped under load ~500; see qa/drill_run.log note |
+| lint / build / tests | PASS — eslint clean; `npm run build` (incl. muni-motion + asset-loading tests) exit 0 |
+| streaming lifecycle check | DEFERRED to BATCH-INTEGRATE — `landmark-streaming-check.mjs` needs a served build and is specified per batch, not per landmark |
+| batch sanity: no generated files vs origin/main | PASS — rebased onto f4f5f99f5; `git diff --name-only origin/main` lists nothing under app/public/tiles/ or api/_data/ |
+| deployed QA | n/a until the batch PR ships |
+
+Pre-existing audit FAILs observed (dataset-wide, unrelated to this landmark,
+present in a clean bake of the vintage dataset): 1.2b p95 height, 1.3c
+Telegraph Hill DEM, 1.7b one offshore sampled tree.
+
+Leak checklist (batch-source-only): intake compression's in-place rewrite of
+`vehicles/passenger-airplane.glb` was caught and reverted; `pipeline/data`
+symlink and logs left untracked; author email is the GitHub noreply.

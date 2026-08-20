@@ -1,0 +1,18 @@
+  entries: {"entries":104,"far":94,"loading":1,"live":9,"fading":0,"failed":0}
+  stats: {"entries":104,"far":20,"loading":0,"live":84,"fading":0,"failed":0}
+PASS  manifest entry loads — sf-assets: pier-17 merged 13 objects / 10 materials -> batched (1092 tris body); uniform x1.0000 at 3467, -3561
+PASS  uniform scale ~ 1.0 — x1
+  rig: {"x":3467,"z":-3561,"yawDeg":-55,"pitchDeg":42,"distance":420}
+  placedPier17: true {"log":"uniform x1.0000 at 3467, -3561"}
+  placedIds: goldenGateBridge,salesforceTower,ferryBuilding,transamerica,paintedLadies,cityHall,coitTower,conservatoryOfFlowers,calAcademy,palaceOfFineArts,deYoung,stMarysCathedral,fairmont,graceCathedral,missionDolores,columbusTower,operaHouse,555California,362Brannan,550Third,350Brannan,171SouthPark,380Brannan,551Third,101SouthPark,155SouthPark,135SouthPark,370Brannan,165SouthPark,358Brannan,181SouthPark,500Third,599Third,574Third,590Third,592Third,400Brannan,188SouthPark,150SouthPark,560Third,160SouthPark,106SouthPark,132SouthPark,108SouthPark,156SouthPark,140SouthPark,168SouthPark,126SouthPark,102SouthPark,2SouthPark,64SouthPark,524Second,21SouthPark,501Second,22SouthPark,26SouthPark,41SouthPark,35SouthPark,46SouthPark,84SouthPark,76SouthPark,58SouthPark,92SouthPark,95JackLondonAlley,318Brannan,300Brannan,334Brannan,340Brannan,326Brannan,49SouthPark,49Zoe,246Ritch,434Brannan,254Ritch,248Ritch,424Brannan,226Ritch,1SouthPark,414Brannan,10SouthPark,501Third,521Third,164SouthPark,pier-17
+  console lines: 92
+    > weather: feed unavailable, holding the last known sky SyntaxError: Unexpected token '<', "<!doctype "... is not valid JSON
+    > sf-assets: pier-17 merged 13 objects / 10 materials -> batched (1092 tris body); uniform x1.0000 at 3467, -3561
+PASS  draw calls under 300 at the landmark — avg 83/frame
+PASS  no asset warnings — (none)
+
+PASS manifest entry loads
+PASS uniform scale ~ 1.0
+PASS draw calls under 300 at the landmark
+PASS no asset warnings
+QA-EXIT=0
