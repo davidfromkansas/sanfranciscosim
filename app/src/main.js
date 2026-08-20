@@ -114,11 +114,17 @@ canvas.addEventListener('webglcontextrestored', () => {
 const scene = new Scene();
 const camera = new PerspectiveCamera(52, window.innerWidth / window.innerHeight, 4, 80000);
 
+// Phone-class device: a high-DPI screen or a narrow viewport. Read once, at
+// boot, because the two things it decides — the starting quality tier and the
+// terrain grid — are both taken before the first frame, and the terrain grid
+// cannot be re-taken later without rebuilding a million vertices mid-flight.
+const SMALL_DEVICE = window.devicePixelRatio > 1.9 || window.innerWidth < 900;
+
 async function boot() {
   const data = await loadCore((p) => bootScreen.core(p * 0.82));
 
   const env = createEnvironment(scene);
-  const terrain = createTerrain(data);
+  const terrain = createTerrain(data, { coarseGrid: SMALL_DEVICE });
   for (const mesh of terrain.meshes) scene.add(mesh);
   bootScreen.core(0.9);
   const water = createWater(scene, data.manifest.extent);
@@ -304,7 +310,7 @@ async function boot() {
   let qualityKey = 'high';
   // Small screens and integrated GPUs start a tier down; the governor takes it
   // from there, measuring the frame rather than guessing at the hardware.
-  if (window.devicePixelRatio > 1.9 || window.innerWidth < 900) {
+  if (SMALL_DEVICE) {
     qualityKey = 'medium';
     quality = QUALITY.medium;
   }
