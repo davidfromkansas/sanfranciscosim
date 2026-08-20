@@ -783,15 +783,28 @@ async function boot() {
   // ("landmark:coitTower") rather than the manifest's ("coit-tower"), so the
   // two are matched by name — and when there is no context entry at all, which
   // is true of 15 shipped landmarks, the manifest still names it.
+  // The two lists name the same building differently: an EN DASH against a
+  // hyphen ("248–250 Ritch Street"), a parenthetical the other lacks ("Herbst
+  // Theatre (War Memorial Veterans Building)"), a "San Francisco" prefix on one
+  // side ("San Francisco City Hall"). Exact matching lost 15 of 131 landmarks,
+  // and a lost match costs that landmark its CAMERA PRESET, so flying to it
+  // lands somewhere generic. Normalising recovers all 131.
+  const normalizeName = (name) =>
+    String(name || '')
+      .toLowerCase()
+      .replace(/\(.*?\)/g, '')
+      .replace(/[\u2013\u2014]/g, '-')
+      .replace(/^(?:san francisco|sf)\s+/, '')
+      .replace(/[^a-z0-9]+/g, ' ')
+      .trim();
+
   let contextByName = null;
   function landmarkEntity(hit) {
     if (!contextByName) {
-      contextByName = new Map(
-        (context.landmarks || []).map((l) => [String(l.name || '').toLowerCase(), l])
-      );
+      contextByName = new Map((context.landmarks || []).map((l) => [normalizeName(l.name), l]));
     }
     const name = hit.entry?.name || hit.landmarkId;
-    const known = contextByName.get(String(name).toLowerCase());
+    const known = contextByName.get(normalizeName(name));
     return {
       kind: 'landmark',
       id: known?.id || `landmark:${hit.landmarkId}`,
@@ -801,6 +814,9 @@ async function boot() {
       z: known?.z ?? hit.point.z,
       height: known?.height ?? hit.entry?.targetHeightM ?? 60,
       camera: known?.camera,
+      // Real extents, so the selection draws a wire box on the model's border
+      // instead of a fixed-radius ring.
+      bounds: hit.bounds,
       distance: hit.distance,
       source: 'osm',
       confidence: 3,

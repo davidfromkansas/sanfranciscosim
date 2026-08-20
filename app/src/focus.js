@@ -65,14 +65,29 @@ export function createFocusOverlay(scene) {
   function show(entity, { toy = false, groundY = 0 } = {}) {
     clear();
     if (!entity) return;
+    // Anything that knows its own extents draws a wire box on them. Landmarks
+    // used to get a fixed 90 m ground ring regardless of size, which put a
+    // 180 m circle around an 18 m tower.
+    if (entity.bounds) {
+      const b = entity.bounds;
+      for (const object of [box, glow]) {
+        object.position.set(b.x, b.y, b.z);
+        object.rotation.y = b.yaw || 0;
+        object.scale.set(Math.max(1, b.w), Math.max(1, b.h), Math.max(1, b.d));
+        object.visible = true;
+      }
+      return;
+    }
     if (entity.kind === 'building') {
       const height = Math.max(4, toy ? entity.toyHeight : entity.height);
-      const w = Math.max(3, entity.w * 2) + 1.2;
-      const d = Math.max(3, entity.d * 2) + 1.2;
+      // No padding: the wire sits ON the border. It draws with depthTest off,
+      // so a coincident edge still reads clearly.
+      const w = Math.max(3, entity.w * 2);
+      const d = Math.max(3, entity.d * 2);
       for (const object of [box, glow]) {
         object.position.set(entity.x, entity.baseY + height / 2, entity.z);
         object.rotation.y = -entity.r;
-        object.scale.set(w, height + 1.2, d);
+        object.scale.set(w, height, d);
         object.visible = true;
       }
       return;

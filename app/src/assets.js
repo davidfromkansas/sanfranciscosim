@@ -23,6 +23,7 @@ import {
   Vector3,
   Vector4,
   Raycaster,
+  Box3,
 } from 'three';
 import { createGLTFLoader } from './gltf.js';
 import { MeshoptDecoder } from 'three/addons/libs/meshopt_decoder.module.js';
@@ -513,9 +514,36 @@ export function createAssets(scene, data, { onPlaced, onUnloaded } = {}) {
       state.model = model;
       // So a raycast hit anywhere in the bridge can be traced back to it.
       model.userData.landmarkId = state.landmarkId;
+      // Bridges are placed as their own group; take the world box directly.
+      // Axis-aligned is right here — a bridge is not a rotated slab.
+      const world = new Box3().setFromObject(model);
+      const bsize = world.getSize(new Vector3());
+      const bmid = world.getCenter(new Vector3());
+      state.bounds = { x: bmid.x, y: bmid.y, z: bmid.z, w: bsize.x, h: bsize.y, d: bsize.z, yaw: 0 };
       draws = `${model.children.length}`;
     } else if (batches()) {
       placement = placeGeneric(box, entry, data);
+      // The selection box is drawn from these: the model's real extents under
+      // its real placement, so the wire hugs the landmark rather than a guess.
+      // Kept as centre + half-free size + yaw rather than an axis-aligned world
+      // box, so a rotated landmark gets a rotated box instead of a looser one.
+      {
+        const pos = new Vector3();
+        const quat = new Quaternion();
+        const scl = new Vector3();
+        placement.matrix.decompose(pos, quat, scl);
+        const size = box.getSize(new Vector3()).multiplyScalar(scl.x);
+        const mid = box.getCenter(new Vector3()).multiplyScalar(scl.x).applyQuaternion(quat).add(pos);
+        state.bounds = {
+          x: mid.x,
+          y: mid.y,
+          z: mid.z,
+          w: size.x,
+          h: size.y,
+          d: size.z,
+          yaw: Math.atan2(2 * quat.w * quat.y, 1 - 2 * quat.y * quat.y),
+        };
+      }
       state.bodyGeomId = bodyBatch.addGeometry(merged.bodyGeometry);
       state.bodyInstId = bodyBatch.addInstance(state.bodyGeomId);
       bodyBatch.setMatrixAt(state.bodyInstId, placement.matrix);
@@ -543,6 +571,12 @@ export function createAssets(scene, data, { onPlaced, onUnloaded } = {}) {
       state.model = model;
       // So a raycast hit anywhere in the bridge can be traced back to it.
       model.userData.landmarkId = state.landmarkId;
+      // Bridges are placed as their own group; take the world box directly.
+      // Axis-aligned is right here — a bridge is not a rotated slab.
+      const world = new Box3().setFromObject(model);
+      const bsize = world.getSize(new Vector3());
+      const bmid = world.getCenter(new Vector3());
+      state.bounds = { x: bmid.x, y: bmid.y, z: bmid.z, w: bsize.x, h: bsize.y, d: bsize.z, yaw: 0 };
       state.resident = true;
       draws = `${model.children.length}`;
     }
@@ -668,6 +702,7 @@ export function createAssets(scene, data, { onPlaced, onUnloaded } = {}) {
         // silently produced cards titled "ferryBuilding".
         landmarkId: state.landmarkId,
         entry: state.entry || null,
+        bounds: state.bounds || null,
         distance: hit.distance,
         point: hit.point,
       };
