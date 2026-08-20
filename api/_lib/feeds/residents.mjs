@@ -1304,7 +1304,12 @@ const EVENT = {
   maxChars: { title: 120, body: 200 },
 };
 
-const EVENT_WINDOW_MS = 15 * 60_000;
+// Ten minutes to match the residents' own cadence — up to six wire posts an
+// hour, each on a randomised minute inside its window. Chosen for the demo to
+// feel live rather than for sustainability, and said so out loud: at this rate
+// the wire roughly doubles the feed's model spend, and the dial back to a
+// calmer cadence is this one number.
+const EVENT_WINDOW_MS = 10 * 60_000;
 // Links already posted. A ceiling rather than a quota: if the newsrooms have
 // filed nothing new this quarter hour, the city stays quiet rather than
 // reaching for filler. Cross-outlet duplicates are NOT merged yet — three
@@ -1320,7 +1325,7 @@ export function eventIsDue(now = Date.now()) {
   // residents' own schedule, so the wire and the residents do not always post
   // in the same breath.
   const minute = Math.floor((now % EVENT_WINDOW_MS) / 60_000);
-  if (minute < dueMinuteFor(window + 7919) % 15) return false;
+  if (minute < dueMinuteFor(window + 7919)) return false;
   lastEventWindow = window;
   return true;
 }
