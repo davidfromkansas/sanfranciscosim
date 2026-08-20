@@ -360,8 +360,8 @@ export async function createContext(data) {
     return best;
   }
 
-  // The cascade: a click always resolves to something, even over bare ground or
-  // open water.
+  // The cascade: a click resolves to the thing under it, or to NOTHING. It is
+  // allowed to answer "nothing here" — see the water note at the bottom.
   async function pick(origin, direction, groundPoint, { toy = false } = {}) {
     await Promise.all(cellsAlongRay(origin, direction).slice(0, 12).map(loadCell));
     const landmark = pickLandmark(origin, direction);
@@ -379,18 +379,17 @@ export async function createContext(data) {
     // the floating labels (signs.js), which say the same thing without a click
     // and without a 420 m ring drawn round the answer. neighborhoodAt stays for
     // the concierge and for building cards.
-    return (
-      pickPark(groundPoint) || {
-        kind: 'water',
-        id: 'water:bay',
-        title: 'San Francisco Bay',
-        name: 'San Francisco Bay',
-        x: groundPoint.x,
-        z: groundPoint.z,
-        source: 'osm',
-        confidence: 3,
-      }
-    );
+    // Open water is NOT the answer to a click that hit nothing. It used to be
+    // the final fallback, so every stray click anywhere in the city — over a
+    // pavement, a rooftop gap, a park path — opened a card announcing "San
+    // Francisco Bay · Open water", which is both wrong and the loudest possible
+    // way to say nothing was there. Same reasoning that already removed streets
+    // and neighbourhoods from this cascade: a click that lands on nothing should
+    // resolve to nothing, and the card simply stays as it was.
+    //
+    // The Bay keeps its entry in search and remains available to the concierge;
+    // this is only about clicking in the 3D scene.
+    return pickPark(groundPoint);
   }
 
   // The search index is only needed once the user actually searches.

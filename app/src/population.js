@@ -17,18 +17,25 @@
 // out of the persona project. No key, no endpoint, no cold start.
 
 import {
+  AmbientLight,
+  Box3,
   CanvasTexture,
   Color,
+  DirectionalLight,
   DynamicDrawUsage,
   Group,
   InstancedMesh,
+  Mesh,
   MeshBasicMaterial,
   Matrix4,
   MeshLambertMaterial,
   Object3D,
+  PerspectiveCamera,
   PlaneGeometry,
+  Scene,
   SRGBColorSpace,
   Vector3,
+  WebGLRenderTarget,
 } from 'three';
 import { mergeGeometries } from 'three/addons/utils/BufferGeometryUtils.js';
 import { BoxGeometry } from 'three';
@@ -101,6 +108,12 @@ const BADGE_H = 7.2;
 // actually has to be right, since the tail is what points at them. The quad's
 // centre is worked out from this and the texture's own tail geometry.
 const BADGE_TIP_Y = 3.9;
+// The tip must clear the top of a resident's HEAD at every zoom. The scale
+// bottoms out at BADGE_SCALE_MIN, which puts the tip at 0.85 x 3.9 = 3.3 m —
+// below the 3.5 m a toy resident actually stands — so the bubble landed on the
+// face of the person it points at, exactly when the camera is close enough to
+// read it. Far away the scaled tip is metres higher and this floor never binds.
+const BADGE_CLEAR = 0.7;
 const BADGE_RADIUS_MIN = 220;
 const BADGE_RADIUS_MAX = 33000;
 const BADGE_RADIUS_PER_M = 6.6;
@@ -293,7 +306,7 @@ function buildBadgeTexture(emoji) {
 
 // --------------------------------------------------------------------- layer
 
-export function createPopulation(scene, data, city) {
+export function createPopulation(scene, data, city, renderer = null) {
   const group = new Group();
   group.name = 'population';
   scene.add(group);
@@ -312,7 +325,11 @@ export function createPopulation(scene, data, city) {
   let bodyMesh = null;
   let badgeMeshes = [];
   let badgeCapacity = 0;
-  let badgeCentreY = 0;
+  // How far the quad's centre sits above its tail tip, in units of BADGE_H.
+  // The centre is DERIVED from the tip (see badgeCentreAt) rather than stored,
+  // because the tip is the thing that has to be right: it is what points at the
+  // resident, and what must not land on their head.
+  let badgeTailBelowCentre = 0;
   const badgeFill = new Array(MOOD_BADGES.length).fill(0);
   let cap = MAX_RESIDENTS;
   let badgeCap = MAX_BADGES;
@@ -468,7 +485,7 @@ export function createPopulation(scene, data, city) {
       // emoji in buildBadgeTexture, so it is not square and a square quad
       // would squash every face.
       const { aspect, tailBelowCentre } = map.userData;
-      badgeCentreY = BADGE_TIP_Y + tailBelowCentre * BADGE_H;
+      badgeTailBelowCentre = tailBelowCentre;
       const mesh = new InstancedMesh(
         new PlaneGeometry(BADGE_H * aspect, BADGE_H),
         new MeshBasicMaterial({
@@ -517,6 +534,10 @@ export function createPopulation(scene, data, city) {
     const list = (people.people ?? []).slice(0, MAX_RESIDENTS);
     residents = list.map((person, i) => ({
       ...person,
+      // The baked record untouched, so a click can hand the profile card the
+      // same person the feed shows without having to guess which of the fields
+      // below are the writer's and which are this module's simulation state.
+      raw: person,
       // A stable per-resident phase, so the bob is not in lockstep across a
       // block and does not change between reloads.
       phase: ((i * 2654435761) % 6283) / 1000,
@@ -710,12 +731,8 @@ export function createPopulation(scene, data, city) {
       const dist = resident.dist;
       const fade = dist < near ? 1 : Math.max(0, 1 - (dist - near) / Math.max(1, badgeRadius - near));
       // Proportional to THIS resident's distance => constant size on screen.
-      const scaleAt = Math.max(BADGE_SCALE_MIN, Math.min(BADGE_SCALE_MAX, dist / BADGE_REF_DIST));
-      dummy.position.set(
-        resident.x,
-        resident.y + badgeCentreY * scaleAt,
-        resident.z
-      );
+      const scaleAt = badgeScaleAt(dist);
+      dummy.position.set(resident.x, resident.y + badgeCentreAt(dist), resident.z);
       dummy.quaternion.copy(cameraQuaternion);
       dummy.scale.setScalar(scaleAt * fade);
       dummy.updateMatrix();
@@ -742,6 +759,252 @@ export function createPopulation(scene, data, city) {
       badgeMeshes[m].instanceMatrix.needsUpdate = true;
     }
     eligibleLast = eligible;
+  }
+
+  // ------------------------------------------------------------------ picking
+  // A resident is 1.7 m of person under a name tag drawn at a CONSTANT screen
+  // size, which is the whole difficulty: a fixed metre radius is pixel-hunting
+  // from the air and a fixed pixel radius is meaningless in world space. The
+  // tolerance therefore grows with range — constant angular size, matching what
+  // the tag actually does — with a floor so a street-level click stays forgiving.
+  const PICK_ANGLE = 0.022; // ~2.2 m of slack at 100 m out
+  const PICK_RADIUS_MIN = 1.4; // metres
+  const PICK_MAX_DISTANCE = 4000; // metres; past this nobody is legible anyway
+  // Chest height as a FRACTION of the drawn person, not a metre value: the
+  // avatars are authored at PERSON_HEIGHT (2.58 m, toy-exaggerated) and scaled
+  // again by bodyScale, so a fixed metre offset floats above their heads —
+  // multiplying one by rigScale, which converts model units to metres, put the
+  // aim point 5 m up and made the body test probe empty air.
+  const BODY_CENTRE_FRACTION = 0.55;
+  const bodyCentre = () => PERSON_HEIGHT * bodyScale * BODY_CENTRE_FRACTION;
+
+  // Only residents the bake actually wrote. `residents` IS the written cast —
+  // the anonymous crowd lives in agents.js and is deliberately not clickable,
+  // because an empty card is a worse answer than no card.
+  function entityFor(resident, distance) {
+    return {
+      ...resident.raw,
+      kind: 'person',
+      id: resident.id,
+      title: resident.name,
+      x: resident.x,
+      y: resident.y,
+      z: resident.z,
+      // Where the camera should sit to watch them, measured to the head rather
+      // than the feet so a follow does not stare at the pavement.
+      focusY: resident.y + bodyCentre(),
+      moodIdx: resident.moodIdx,
+      distance,
+    };
+  }
+
+  // Body OR name tag: the tag floats well above the head and is usually the
+  // bigger target, so both are tested and the nearer hit along the ray wins.
+  function pickPerson(origin, direction) {
+    if (!ready) return null;
+    let best = null;
+    for (const resident of residents) {
+      if (!resident.placed || !resident.name) continue;
+      const px = resident.x - origin.x;
+      const pz = resident.z - origin.z;
+      const flat = Math.hypot(px, pz);
+      if (flat > PICK_MAX_DISTANCE) continue;
+
+      const radius = Math.max(PICK_RADIUS_MIN, flat * PICK_ANGLE);
+      // The tag rides at the same height the badge loop draws it, so clicking
+      // what you see hits what you clicked.
+      const heights = [resident.y + bodyCentre(), resident.y + badgeCentreAt(flat)];
+
+      for (const hy of heights) {
+        const py = hy - origin.y;
+        const t = px * direction.x + py * direction.y + pz * direction.z;
+        if (t <= 0 || t > PICK_MAX_DISTANCE) continue;
+        const away = Math.hypot(
+          px - direction.x * t,
+          py - direction.y * t,
+          pz - direction.z * t
+        );
+        if (away > radius || (best && t >= best.distance)) continue;
+        best = entityFor(resident, t);
+      }
+    }
+    return best;
+  }
+
+  // ------------------------------------------------------------ persona text
+  // The boot bake carries names and occupations but NO paragraphs: 745 KB of
+  // prose for 829 residents, downloaded by every visitor, to show the one they
+  // click. So the paragraphs are fetched per neighbourhood on demand, and the
+  // first resident opened in a PUMA pays for all ~100 of their neighbours.
+  //
+  // Keyed by PUMA and cached as the PROMISE, not the result, so two quick
+  // clicks in one neighbourhood share a single request instead of racing.
+  const personaShards = new Map();
+
+  function loadPersona(id) {
+    const resident = residents.find((r) => r.id === id);
+    if (!resident) return Promise.resolve(null);
+    const puma = resident.puma;
+    if (!personaShards.has(puma)) {
+      personaShards.set(
+        puma,
+        fetch(`${DATA}personas/${puma}.json`)
+          .then((r) => (r.ok ? r.json() : {}))
+          // A missing shard is a card that keeps its fallback line, never a
+          // crash and never a retry storm — the empty object is cached too.
+          .catch((error) => {
+            console.warn(`sf-people: no persona shard for PUMA ${puma}`, error);
+            return {};
+          })
+      );
+    }
+    return personaShards.get(puma).then((shard) => shard[id] ?? null);
+  }
+
+  // A seated resident by id, so an open selection can follow them as they walk.
+  // Null while they are unseated — their PUMA may not have streamed yet — which
+  // the follow reads as "hold position", not as "they are gone".
+  function personEntity(id) {
+    const resident = residents.find((r) => r.id === id);
+    return resident && resident.placed ? entityFor(resident, 0) : null;
+  }
+
+  // ---------------------------------------------------------------- portraits
+  // The face on a resident's card is THEIR avatar — the same voxel figure
+  // walking the street, in their own skin, hair, trousers and neighbourhood
+  // shirt — rather than the stock silhouette everyone shared.
+  //
+  // Rendered with the city's OWN renderer into a small offscreen target, once
+  // per resident, then cached as an image. A second WebGLRenderer would be a
+  // second GL context for a 96 px thumbnail; reusing this one costs a single
+  // extra draw the first time a card opens and nothing on any frame after.
+  // The WHOLE figure, not a cropped head: the point is to show what this person
+  // looks like walking around — their build, their clothes, the neighbourhood
+  // shirt — which a circular face crop threw away. Portrait aspect, 2x the
+  // card's display size so it stays sharp.
+  const PORTRAIT_W = 224;
+  const PORTRAIT_H = 384;
+  const portraits = new Map(); // id -> data URL
+  let portraitScene = null;
+  let portraitCam = null;
+  let portraitTarget = null;
+  let portraitParts = null;
+  let portraitCanvas = null;
+
+  function buildPortraitRig() {
+    portraitScene = new Scene();
+    // Lit flatter and softer than the city: this is a portrait, and the diorama
+    // key light rakes across a face at an angle that reads as a scowl.
+    portraitScene.add(new AmbientLight(0xffffff, 0.85));
+    const key = new DirectionalLight(0xffffff, 1.15);
+    key.position.set(0.5, 1.2, 1);
+    portraitScene.add(key);
+    const fill = new DirectionalLight(0xffffff, 0.35);
+    fill.position.set(-0.8, 0.2, 0.6);
+    portraitScene.add(fill);
+
+    // One static mesh per part, standing still. The limb geometries were baked
+    // with their pivot at the origin (see buildPart), so each is lifted back to
+    // where its joint actually sits — the same correction the walk cycle makes,
+    // minus the swing.
+    portraitParts = rig.parts.map((part) => {
+      const pivotY =
+        part.group === 'armL' || part.group === 'armR' ? rig.pivots.arm
+        : part.group === 'legL' || part.group === 'legR' ? rig.pivots.leg
+        : 0;
+      const geos = part.boxes.map((b) => {
+        const g = new BoxGeometry(b.size[0], b.size[1], b.size[2]);
+        g.translate(b.centre[0], b.centre[1] - pivotY, b.centre[2]);
+        return g;
+      });
+      const geo = geos.length === 1 ? geos[0] : mergeGeometries(geos, false);
+      const mesh = new Mesh(geo, new MeshLambertMaterial({}));
+      mesh.position.y = pivotY;
+      mesh.userData.role = part.role;
+      portraitScene.add(mesh);
+      return mesh;
+    });
+
+    // Frame from the figure's OWN bounds rather than hard-coded heights, so a
+    // change to the rig cannot silently crop it — head to feet, with air around.
+    const box = new Box3();
+    for (const mesh of portraitParts) box.expandByObject(mesh);
+    const height = box.max.y - box.min.y;
+    const centreY = (box.max.y + box.min.y) / 2;
+
+    const FOV = 30;
+    portraitCam = new PerspectiveCamera(FOV, PORTRAIT_W / PORTRAIT_H, 0.01, 100);
+    // Slightly off-axis and a touch above eye level: a dead-on elevation of a
+    // voxel figure reads as a police line-up, and three-quarters is how the city
+    // sees them anyway. PAD leaves margin so nothing touches the frame edge.
+    const PAD = 1.18;
+    const dist = (height * PAD) / (2 * Math.tan((FOV * Math.PI) / 360));
+    portraitCam.position.set(dist * 0.26, centreY + height * 0.06, dist * 1.0);
+    portraitCam.lookAt(0, centreY, 0);
+
+    portraitTarget = new WebGLRenderTarget(PORTRAIT_W, PORTRAIT_H);
+    portraitCanvas = document.createElement('canvas');
+    portraitCanvas.width = PORTRAIT_W;
+    portraitCanvas.height = PORTRAIT_H;
+  }
+
+  // A resident's face as a data URL, or null when portraits are unavailable —
+  // no renderer, no rig, unknown id. The card falls back to its silhouette on
+  // null, which is rule 3 applied to a thumbnail.
+  function portrait(id) {
+    if (!renderer || !ready || !rig) return null;
+    if (portraits.has(id)) return portraits.get(id);
+    const resident = residents.find((r) => r.id === id);
+    if (!resident) return null;
+    if (!portraitScene) buildPortraitRig();
+
+    const puma = shirtTint.constructor === Color ? new Color() : null;
+    const tint = (puma ?? new Color()).set(PUMA_COLORS[resident.puma] ?? DEFAULT_COLOR);
+    for (const mesh of portraitParts) {
+      mesh.material.color.copy(paintFor(resident, mesh.userData.role, tint, false));
+    }
+
+    // Save and restore everything touched: this borrows the city's renderer
+    // mid-life, and leaving its target or clear colour changed would tint or
+    // blank the next frame of the actual city.
+    const prevTarget = renderer.getRenderTarget();
+    const prevAlpha = renderer.getClearAlpha();
+    renderer.setRenderTarget(portraitTarget);
+    renderer.setClearAlpha(0); // transparent, so the card's cream shows through
+    renderer.clear();
+    renderer.render(portraitScene, portraitCam);
+    const pixels = new Uint8Array(PORTRAIT_W * PORTRAIT_H * 4);
+    renderer.readRenderTargetPixels(portraitTarget, 0, 0, PORTRAIT_W, PORTRAIT_H, pixels);
+    renderer.setRenderTarget(prevTarget);
+    renderer.setClearAlpha(prevAlpha);
+
+    // GL reads bottom-up; canvases are top-down.
+    const ctx = portraitCanvas.getContext('2d');
+    const image = ctx.createImageData(PORTRAIT_W, PORTRAIT_H);
+    const stride = PORTRAIT_W * 4;
+    for (let row = 0; row < PORTRAIT_H; row++) {
+      const from = (PORTRAIT_H - 1 - row) * stride;
+      image.data.set(pixels.subarray(from, from + stride), row * stride);
+    }
+    ctx.clearRect(0, 0, PORTRAIT_W, PORTRAIT_H);
+    ctx.putImageData(image, 0, 0);
+    const url = portraitCanvas.toDataURL();
+    portraits.set(id, url);
+    return url;
+  }
+
+  // Where a resident's name bubble floats, above their feet, at a given camera
+  // range. ONE definition, used by the badge loop that draws it and by the pick
+  // that has to hit it — two copies of this drift, and then the tag you can see
+  // is not the tag you can click.
+  function badgeScaleAt(dist) {
+    return Math.max(BADGE_SCALE_MIN, Math.min(BADGE_SCALE_MAX, dist / BADGE_REF_DIST));
+  }
+
+  function badgeCentreAt(dist) {
+    const scaleAt = badgeScaleAt(dist);
+    const tipY = Math.max(BADGE_TIP_Y * scaleAt, PERSON_HEIGHT * bodyScale + BADGE_CLEAR);
+    return tipY + badgeTailBelowCentre * BADGE_H * scaleAt;
   }
 
   load();
@@ -794,6 +1057,11 @@ export function createPopulation(scene, data, city) {
       }
       return n ? { x: x / n, z: z / n, puma: resident.puma, name: resident.name } : null;
     },
+
+    pickPerson,
+    personEntity,
+    loadPersona,
+    portrait,
 
     // Where a named resident is standing right now, for "take me to this
     // person". Returns null when they have not been seated — their PUMA's

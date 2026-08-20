@@ -1434,6 +1434,14 @@ export function createLiveAircraft(scene, data) {
       const away = Math.hypot(px - direction.x * t, py - direction.y * t, pz - direction.z * t);
       // The pick radius grows with the airframe's drawn scale, so an aircraft
       // that looks big from the hero camera is as easy to hit as it looks.
+      //
+      // Deliberately ONE test point, at the airframe. The callsign bubble is NOT
+      // added as a second target the way the bus and ferry tags are: aircraft are
+      // picked FIRST in main.js's cascade and this radius is already 90 m scaled
+      // by draw size, so a second point overhead turns every plane into a tall
+      // capture column that swallows clicks meant for the buses beneath it — and
+      // for empty sky, which is how a follow is dismissed. Measured: it stole a
+      // bus click outright and left a plane followed after a click on nothing.
       const radius = PICK_RADIUS * Math.max(1, state.drawScale / AIR_SCALE);
       if (away > radius || (best && t >= best.distance)) continue;
       best = { ...entityFor(state), distance: t };

@@ -176,6 +176,10 @@ const PORTAL_MAX_OFF_M = 220;
 const PORTAL_RAMP_M = 45;
 
 const PICK_RADIUS = 16;
+// Angular slack on top of PICK_RADIUS: ~2.2 m per 100 m of range, so a tag holds
+// a roughly constant click target on screen the same way it holds a constant
+// drawn size. Shared value with the resident tags in population.js.
+const PICK_ANGLE = 0.022;
 const MAX_PICK_DISTANCE = 9000;
 
 // Route glow: a vertical wall of light tracing each active route's shape,
@@ -1496,6 +1500,12 @@ export function createLiveMuni(scene, data) {
     };
   }
 
+  // The ROUTE BUBBLE is clickable, not just the vehicle under it — and the
+  // tolerance grows with range. A fixed 16 m radius is most of a bus at street
+  // level and less than a pixel from the air, while the bubble overhead is drawn
+  // at a constant size ON SCREEN. So from the altitude this camera actually
+  // lives at, the one thing plainly visible and worth aiming at was the one
+  // thing the pick ignored, and clicking it selected whatever was behind it.
   function pickBus(origin, direction) {
     if (!ready) return null;
     let best = null;
@@ -1503,13 +1513,21 @@ export function createLiveMuni(scene, data) {
     for (const state of buses.values()) {
       if (state.index < 0 || now - state.lastFixAt > STALE_MS) continue;
       const px = state.x - origin.x;
-      const py = 4 - origin.y;
       const pz = state.z - origin.z;
-      const t = px * direction.x + py * direction.y + pz * direction.z;
-      if (t <= 0 || t > MAX_PICK_DISTANCE) continue;
-      const away = Math.hypot(px - direction.x * t, py - direction.y * t, pz - direction.z * t);
-      if (away > PICK_RADIUS || (best && t >= best.distance)) continue;
-      best = { ...entityFor(state), distance: t };
+      const flat = Math.hypot(px, pz);
+      const radius = Math.max(PICK_RADIUS, flat * PICK_ANGLE);
+      const ground = data.sampleElevation ? data.sampleElevation(state.x, state.z) : 0;
+      const scaleAt = Math.max(BADGE_SCALE_MIN, Math.min(BADGE_SCALE_MAX, flat / BADGE_REF_DIST));
+      // The same two numbers the badge loop draws with, so the bubble you can
+      // see is the bubble you can hit.
+      for (const hy of [4, ground + BADGE_TIP_Y + BADGE_TAIL_DROP * scaleAt]) {
+        const py = hy - origin.y;
+        const t = px * direction.x + py * direction.y + pz * direction.z;
+        if (t <= 0 || t > MAX_PICK_DISTANCE) continue;
+        const away = Math.hypot(px - direction.x * t, py - direction.y * t, pz - direction.z * t);
+        if (away > radius || (best && t >= best.distance)) continue;
+        best = { ...entityFor(state), distance: t };
+      }
     }
     return best;
   }
