@@ -2338,5 +2338,24 @@
     ],
     "tris": 16390,
     "loadRadius": 2500
+  },
+  {
+    "id": "orpheum-theatre",
+    "file": "orpheum-theatre.glb",
+    "anchor": [
+      -122.4146087,
+      37.7793182
+    ],
+    "targetHeightM": 27.2,
+    "cat": 17,
+    "name": "Orpheum Theatre",
+    "estimated": false,
+    "dims": [
+      67.6506,
+      77.6234,
+      27.2
+    ],
+    "tris": 7193,
+    "loadRadius": 2500
   }
 ]

@@ -172,6 +172,7 @@ route, and the park plans depend on it (§E8 of the parks README).
 | [Army & Navy YMCA Building (169 Steuart Street)](./169-steuart.md) | `169-steuart` | 46.64 m (LiDAR crest, tile-roof apex; tower eave 35.0 m, wing roof 28.1 m) | new landmark |
 | [50 United Nations Plaza (Federal Office Building)](./50-united-nations-plaza.md) | `50-united-nations-plaza` | 33.0 m (metal-roof crest, derived; 29.0 m parapet, 24.7 m north wing) | new landmark |
 | [United Nations Plaza](./un-plaza.md) | `un-plaza` | 13.0 m (authored tree crest, estimated) | new landmark |
+| [Orpheum Theatre](./orpheum-theatre.md) | `orpheum-theatre` | 27.2 m (stage-house roof, LiDAR maximum; Market-block eave 23.3 m photogrammetric, blade-sign crown ~25.7 m) | new landmark |
 
 - Style: `docs/styles/miniature-toy.md` (authoritative for artistic decisions)
 - Technical contract: `.agents/skills/sf-asset-check/SKILL.md` (authoritative for the GLB)
