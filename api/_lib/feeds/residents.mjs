@@ -22,6 +22,7 @@ import path from "node:path";
 import { fileURLToPath } from "node:url";
 import { registerFeed } from "../feedcore.mjs";
 import { fetchNews } from "../sf-news.mjs";
+import { gatherWire } from "../wire-sources.mjs";
 import { get, put, BlobPreconditionFailedError } from "@vercel/blob";
 
 const HERE = path.dirname(fileURLToPath(import.meta.url));
@@ -1346,12 +1347,30 @@ async function summariseStory(item) {
 // The freshest story nobody has posted yet, as a thread with its first votes
 // already cast — so the next pass can see what the room made of it.
 async function openEventThread(people, spendVote) {
-  const news = await fetchNews();
+  // Two pools: the structured tiers (quakes, transit, weather, city records,
+  // reddit) and the newsrooms. Priorities interleave them — a quake beats
+  // everything, city records beat a feature piece, and reddit trails the lot.
+  // Both pools can fail independently; the wire posts whatever survived.
+  const [wire, news] = await Promise.all([
+    gatherWire().catch(() => []),
+    fetchNews().catch(() => []),
+  ]);
+  // Slotted between the city-record clusters (3.5) and routine transit
+  // notices (4.5): a quake or a weather turn beats a newsroom, a newsroom
+  // beats a stop closure, and reddit trails everything.
+  const NEWS_PRIORITY = 4;
+  const pool = [...wire, ...news.map((n) => ({ ...n, priority: NEWS_PRIORITY }))]
+    .sort((a, b) => a.priority - b.priority || b.published - a.published);
   const seen = new Set(seenLinks);
-  const item = news.find((n) => !seen.has(n.link));
+  const item = pool.find((n) => !seen.has(n.link));
   if (!item) return null;
 
-  const body = (await summariseStory(item)) || item.description.slice(0, EVENT.maxChars.body);
+  // A structured tier arrives with its body already written — assembled from a
+  // dataset, it must not pass through a model that could embellish it. Only
+  // prose from newsrooms and reddit is compressed.
+  const body =
+    item.body ??
+    ((await summariseStory(item)) || (item.description ?? "").slice(0, EVENT.maxChars.body));
   const at = Date.now();
   const thread = {
     id: `${EVENT.id}-${at}`,
