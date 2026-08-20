@@ -4238,6 +4238,59 @@ export const LANDMARKS = [
     // numbered destination is the Ferry Building.
     camera: { distance: 320, yaw: 90, pitch: 24 },
   },
+  {
+    // Ferry Station Post Office Building (the Agriculture Building), 101 The
+    // Embarcadero at Mission, A. A. Pyle 1915. Case B: no procedural builder,
+    // so this registry row is what carves the baked footprint out from under
+    // the GLB, and it is also what gives the landmark its pick box, its
+    // search-index row and its context identity.
+    //
+    // exclude, measured from THIS anchor against the DataSF footprints the bake
+    // actually reads (`excluded()` in pipeline/buildings.mjs drops a footprint
+    // whose centroid OR any ring vertex falls inside the radius):
+    //   18.24 m  nearest vertex of this building's own DataSF ring (SF9900278)
+    //   37.34 m  its FARTHEST vertex — the radius must clear this or part of
+    //            the procedural block is left standing under the asset
+    //   41.45 m  nearest vertex of the next DataSF footprint, CN9900002, the
+    //            Downtown Ferry Terminal gangway kiosk, which must survive
+    //
+    // Safe window (37.34, 41.45) m. 39 sits in it with 1.7 m of margin below and
+    // 2.5 m above. Wider than the South Park rows because this is a 2,069 m2
+    // footprint on a 50.74 x 39.0 m rectangle, not a 25 m lot.
+    //
+    // Overture traces this building a SECOND time (the OSM ring, `commercial`,
+    // height 15, vertices 20.83-35.31 m), so 39 clears both source rings.
+    //
+    // Overture ALSO carries the two ferry-gangway canopies as `outbuilding`
+    // rings (OSM way/979811981 and way/979811987, heights 8.7 m and 6.9 m,
+    // nearest vertices 29.93 m and 32.87 m) — inside any radius that can clear
+    // this building, so on paper they looked like unavoidable collateral.
+    // MEASURED FROM THE BAKED TILE, they are not: neither ring survives the
+    // cross-source gap-fill into the baked city at all, before or after. In
+    // cell 23_10 origin/main's nearest footprint vertex after this building's
+    // own is 80.31 m away, and 24_10's nearest is the DataSF gangway kiosk at
+    // 41.45 m, which is unchanged by the exclusion.
+    //
+    // Net, verified against app/public/tiles/buildings/23_10.bin rather than
+    // against the source data: the exclusion drops EXACTLY ONE baked footprint,
+    // this building's own (12.2 m tall), and no collateral. Per-cell counts go
+    // 49 -> 48 in 23_10 and are unchanged everywhere else; rings penetrating
+    // the asset footprint go 1 -> 0.
+    id: 'ferryStationPostOffice',
+    name: 'Ferry Station Post Office Building',
+    lon: -122.3921505,
+    lat: 37.7941368,
+    height: 12.65,
+    exclude: 39,
+    // Camera offset is (sin yaw, ., cos yaw) with +z south, so camera bearing =
+    // 180 - yaw. yaw 290 stands the eye at bearing 250 deg — just off the
+    // Embarcadero frontage's outward normal (234 deg), so the three-pavilion
+    // front reads square-ish while the SE flank and the 1918 tiled wing rake
+    // away behind it. 260 m frames a 50.74 m frontage the way 165 m frames a
+    // 23 m South Park front. No `key`: keys 0-9 are taken, and at 12.65 m this
+    // is the Ferry Building's handsome low neighbour, not a destination.
+    camera: { distance: 260, yaw: 290, pitch: 22 },
+  },
 ];
 
 // Parks/green spaces the landcover bake must match at least one source polygon
