@@ -2085,6 +2085,29 @@ export const LANDMARKS = [
     camera: { distance: 420, yaw: 270, pitch: 26 },
   },
   {
+    // Hills Brothers Building, 2 Harrison St (SF Landmark 157, Kelham 1926).
+    // Exclusion sized by the excluded() gate — min(centroid, vertex) distance
+    // from THIS anchor: the OSM/Overture ring centroid sits 1.62 m out and the
+    // DataSF LiDAR merged ring centroid 5.55 m, while the nearest own vertex is
+    // 20.52 m and the nearest FOREIGN geometry (the 1989 Hills Plaza complex
+    // beyond the mid-block plaza, and the waterfront pavilion across the
+    // promenade) is ~45+ m. 12 catches both centroids with 2x margin and
+    // reaches nothing else; it does not need to reach the ring corners at
+    // ~44 m (150 South Park rule). The DataSF ring merges two low plaza-side
+    // arcade strips into this building's trace, so they drop with it —
+    // unavoidable collateral, noted in the asset REPORT.
+    id: 'hillsBrothersBuilding',
+    name: 'Hills Brothers Building',
+    lon: -122.3892854,
+    lat: 37.7894167,
+    height: 53.2,
+    exclude: 12,
+    // Camera offset is (sin yaw, ., cos yaw) with +z south: yaw 45 stands the
+    // camera to the SOUTH-EAST, over the bay — the Embarcadero elevation, the
+    // rooftop sign and the campanile in one view.
+    camera: { distance: 480, yaw: 45, pitch: 24 },
+  },
+  {
     // 22-24 South Park, the Hotel Madrid: a 1915 residential hotel (built as the
     // Eimoto Hotel) run by Mission Housing since 1987, and the third building in
     // the South Park Scattered Sites rehabilitation with 102SouthPark and
