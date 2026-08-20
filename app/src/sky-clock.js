@@ -174,8 +174,16 @@ function formatTime(ms) {
   return { clock: clock.trim(), period };
 }
 
-const formatDate = (ms) =>
-  `${WEEKDAY.format(new Date(ms))} · ${MONTH_DAY.format(new Date(ms))}`.toUpperCase();
+const formatWeekday = (ms) => WEEKDAY.format(new Date(ms)).toUpperCase();
+const formatMonthDay = (ms) => MONTH_DAY.format(new Date(ms)).toUpperCase();
+
+// The pale-green pip the LCD uses between two readings instead of a middle dot.
+function pip() {
+  const dot = document.createElement('span');
+  dot.className = 'clock-dot';
+  dot.setAttribute('aria-hidden', 'true');
+  return dot;
+}
 
 // The turntable: a looping record with a play/pause centre, a tonearm that
 // rides down while it plays, and a volume knob. Autoplay is blocked until the
@@ -208,6 +216,9 @@ function createPlayer() {
   const wedge = svg('path', { d: 'M3.6 2.2 9.6 6l-6 3.8Z', fill: 'currentColor' });
   icon.append(barLeft, barRight, wedge);
   button.appendChild(icon);
+
+  const pivot = document.createElement('div');
+  pivot.className = 'player-pivot';
 
   const arm = document.createElement('div');
   arm.className = 'player-arm';
@@ -243,7 +254,7 @@ function createPlayer() {
   knob.appendChild(slider);
   volume.append(volumeLabel, knob);
 
-  module.append(label, platter, arm, deckFoot, volume);
+  module.append(label, platter, pivot, arm, deckFoot, volume);
 
   const audio = new Audio(TRACK_URL);
   audio.loop = true;
@@ -343,6 +354,9 @@ export function createSkyClock({ read, readWeather = () => null }) {
 
   const dateNode = document.createElement('div');
   dateNode.className = 'clock-date';
+  const weekdayNode = document.createElement('span');
+  const monthDayNode = document.createElement('span');
+  dateNode.append(weekdayNode, pip(), monthDayNode);
 
   const skyRow = document.createElement('div');
   skyRow.className = 'clock-row clock-sky';
@@ -360,8 +374,9 @@ export function createSkyClock({ read, readWeather = () => null }) {
   weatherRow.hidden = true;
   let weatherKind = null;
   let weatherIcon = null;
-  const weatherText = document.createElement('span');
-  weatherRow.append(weatherText);
+  const tempNode = document.createElement('span');
+  const conditionNode = document.createElement('span');
+  weatherRow.append(tempNode, pip(), conditionNode);
 
   // The wind is its own row so the narrow-screen drop is a CSS media query,
   // not a per-second read of window.innerWidth (a layout read, and one that
@@ -421,8 +436,9 @@ export function createSkyClock({ read, readWeather = () => null }) {
       weatherIcon = next;
     }
 
-    const line = `${Math.round(summary.temp)}° · ${summary.label}`;
-    if (weatherText.textContent !== line) weatherText.textContent = line;
+    const temp = `${Math.round(summary.temp)}°`;
+    if (tempNode.textContent !== temp) tempNode.textContent = temp;
+    if (conditionNode.textContent !== summary.label) conditionNode.textContent = summary.label;
 
     // Below 480 px CSS drops this row, not the temperature.
     const gust = summary.windSpeed >= 1 ? `${Math.round(summary.windSpeed)} mph ${compass(summary.windDir)}` : '';
@@ -453,8 +469,10 @@ export function createSkyClock({ read, readWeather = () => null }) {
     if (clockNode.textContent !== clock) clockNode.textContent = clock;
     if (periodNode.textContent !== period) periodNode.textContent = period;
 
-    const date = formatDate(ms);
-    if (dateNode.textContent !== date) dateNode.textContent = date;
+    const weekday = formatWeekday(ms);
+    if (weekdayNode.textContent !== weekday) weekdayNode.textContent = weekday;
+    const monthDay = formatMonthDay(ms);
+    if (monthDayNode.textContent !== monthDay) monthDayNode.textContent = monthDay;
 
     renderWeather();
 
