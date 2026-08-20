@@ -130,6 +130,76 @@ const READ_TTL_MS = 30 * 1000;
 // a thread the previous tick cut short. The average tick spends about three.
 const MAX_MESSAGES_PER_REFRESH = 10;
 
+// --------------------------------------------------------------------- mood
+//
+// Every resident carries a mood, after RollerCoaster Tycoon's guest happiness.
+// The point of stealing it from a theme park rather than from Social Simulacra
+// is what the trait attaches to. Simulacra makes "is a troll" part of the
+// PERSONA — and their own paper refuses demographic personas for exactly the
+// reason that would bite us here: ours are built from real Census records, so
+// a troll flag would land on somebody with a specific birthplace, income and
+// language, and the simulation would be saying that kind of person is like
+// that. A mood is a state somebody is IN. Nobody is their mood.
+//
+// A NUMBER, not a word, because in RCT happiness moves — riding a ride lifts
+// it, queuing drops it, and it decays if nothing good happens. None of that is
+// wired up yet: this demo assigns a mood and leaves it there. Storing the
+// number anyway is what makes the moving version a small change rather than a
+// migration.
+const MOODS = [
+  { at: -2, key: "grumpy", label: "Grumpy", emoji: "\u{1F621}" },
+  { at: -1, key: "sad", label: "Sad", emoji: "\u{1F614}" },
+  { at: 0, key: "neutral", label: "Neutral", emoji: "\u{1F610}" },
+  { at: 2, key: "cheerful", label: "Cheerful", emoji: "\u{1F929}" },
+];
+
+// Four, not the seven RCT shows, because the intensity tiers were the weak
+// ones: "grumpy" and "very grumpy" are nearly the same instruction to write
+// from and identical on a badge the size of a thumbnail. What earns its place
+// is the POSTURE — combative, withdrawn, ordinary, generous — and grumpy and
+// sad are not two points on one line. One picks fights and the other goes
+// quiet, which produces genuinely different posts.
+//
+// Roughly one resident in five is difficult, which is what makes the contested
+// threads fire at all.
+const MOOD_WEIGHTS = [180, 120, 400, 300];
+
+// How each mood writes. Deliberately about MANNER, not opinion: the identity
+// paragraph decides what somebody thinks, and the mood decides what kind of
+// day they are having while they say it. A grumpy resident is not a different
+// person with different politics; they are the same person, shorter with you.
+const MOOD_VOICE = {
+  grumpy:
+    "You are in a foul mood and past being diplomatic about it. Say the blunt thing. You are short with people, quicker to point out what is wrong than what is fine, and willing to be the one who says what everybody is thinking. Do not be cruel about anyone's identity — you are fed up, not hateful.",
+  sad: "You are low today. You are quieter than usual, more resigned than angry, and inclined to notice what has been lost rather than what might be fixed.",
+  neutral:
+    "You are in an ordinary mood. Nothing is colouring how you say this either way.",
+  cheerful:
+    "You are in a good mood and it shows. You are warm, generous with people, quick to give something the benefit of the doubt, and glad to be useful — the kind of day where you offer something rather than only comment on it.",
+};
+
+// Deterministic from the resident's own id, so a person you met yesterday is in
+// the same mood today and a reload does not reshuffle the city's temper.
+export function moodFor(id) {
+  let h = 2166136261;
+  for (let i = 0; i < id.length; i++) {
+    h ^= id.charCodeAt(i);
+    h = Math.imul(h, 16777619) >>> 0;
+  }
+  const total = MOOD_WEIGHTS.reduce((a, b) => a + b, 0);
+  let roll = (h >>> 8) % total;
+  for (let i = 0; i < MOOD_WEIGHTS.length; i++) {
+    roll -= MOOD_WEIGHTS[i];
+    if (roll < 0) return MOODS[i];
+  }
+  return MOODS[2]; // neutral
+}
+
+const moodBlock = (persona) => {
+  const mood = moodFor(persona.id);
+  return `\n\nMOOD\n${MOOD_VOICE[mood.key]}`;
+};
+
 // ------------------------------------------------------------------- prompts
 
 const rulesBlock = () =>
@@ -275,8 +345,9 @@ export async function generatePost({ persona, subreddit }) {
   const system =
     `You are simulating a person posting in a subreddit.\n\n` +
     `PERSONA\n${persona.persona}\n` +
-    `${livesIn(persona)}\n\n` +
-    `SUBREDDIT GOAL\n${subreddit.goal}\n\n` +
+    `${livesIn(persona)}` +
+    moodBlock(persona) +
+    `\n\nSUBREDDIT GOAL\n${subreddit.goal}\n\n` +
     `SUBREDDIT RULES\n${rulesBlock()}`;
   const user =
     `Generate one top-level Reddit post that this person would realistically choose to make in this subreddit.\n\n` +
@@ -319,8 +390,9 @@ export async function generateReply({
   const system =
     `You are simulating a person participating in a Reddit discussion.\n\n` +
     `PERSONA\n${persona.persona}\n` +
-    `${livesIn(persona)}\n\n` +
-    `SUBREDDIT GOAL\n${subreddit.goal}\n\n` +
+    `${livesIn(persona)}` +
+    moodBlock(persona) +
+    `\n\nSUBREDDIT GOAL\n${subreddit.goal}\n\n` +
     `SUBREDDIT RULES\n${rulesBlock()}`;
   const formatted = replies.length
     ? replies.map((r) => `${r.name}: ${r.body}`).join("\n\n")
@@ -386,8 +458,15 @@ export async function generateVoteDecision({ persona, subreddit, content }) {
   const system =
     `You are simulating a person browsing a subreddit.\n\n` +
     `PERSONA\n${persona.persona}\n` +
-    `${livesIn(persona)}\n\n` +
-    `SUBREDDIT GOAL\n${subreddit.goal}\n\n` +
+    `${livesIn(persona)}` +
+    // Voting is where a mood is VISIBLE. A shift in how somebody phrases a post
+    // is subtle; a grumpy resident downvoting is a score, and a score is what
+    // brings the negative and contested branches to life — the two sides
+    // arguing, the defenders pushing back on a pile-on. That machinery has been
+    // built and almost never fires, because a room of even-tempered people
+    // agrees with everything.
+    moodBlock(persona) +
+    `\n\nSUBREDDIT GOAL\n${subreddit.goal}\n\n` +
     `SUBREDDIT RULES\n${rulesBlock()}`;
   const user =
     `CONTENT\n${content}\n\n` +
@@ -399,6 +478,7 @@ export async function generateVoteDecision({ persona, subreddit, content }) {
     `Consider both how well it fits the subreddit, and this person's own interests, opinions and values.\n\n` +
     `Important:\n` +
     `- It is normal to choose "none" — but vote when this person would actually feel something.\n` +
+    `- Let the mood weigh on this. Somebody in a foul mood is readier to downvote and stingier with upvotes; somebody in a good mood is the reverse.\n` +
     `- Do not assume every relevant post deserves an upvote.\n` +
     `- Do not assume disagreement alone deserves a downvote.\n` +
     `- Stay consistent with the persona.\n` +
@@ -1010,6 +1090,10 @@ function shape(people, written) {
       puma: person.puma,
       neighbourhood: person.neighbourhood,
       persona: person.persona,
+      // What kind of day they are having. Sent so the profile card can say it —
+      // otherwise the feature is real but invisible, and a mood you cannot see
+      // is indistinguishable from the model being inconsistent.
+      mood: moodFor(person.id).label,
     };
   }
 
