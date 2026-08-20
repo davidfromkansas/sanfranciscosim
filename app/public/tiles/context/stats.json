@@ -1,13 +1,13 @@
 {
- "generated": "2026-08-19T04:32:31.177Z",
- "buildings": 174683,
+ "generated": "2026-08-20T00:24:53.964Z",
+ "buildings": 174647,
  "cells": 596,
  "categories": [
   {
    "cat": 0,
    "id": "misc",
    "label": "Building",
-   "count": 10531,
+   "count": 10526,
    "night": 3
   },
   {
@@ -28,7 +28,7 @@
    "cat": 3,
    "id": "office",
    "label": "Office",
-   "count": 2730,
+   "count": 2721,
    "night": 3
   },
   {
@@ -42,7 +42,7 @@
    "cat": 5,
    "id": "restaurant_cafe",
    "label": "Restaurant / Café",
-   "count": 2839,
+   "count": 2835,
    "night": 1
   },
   {
@@ -56,7 +56,7 @@
    "cat": 7,
    "id": "hotel",
    "label": "Hotel",
-   "count": 1459,
+   "count": 1454,
    "night": 0
   },
   {
@@ -91,7 +91,7 @@
    "cat": 12,
    "id": "clinic",
    "label": "Clinic",
-   "count": 1386,
+   "count": 1387,
    "night": 2
   },
   {
@@ -140,7 +140,7 @@
    "cat": 19,
    "id": "industrial",
    "label": "Industrial",
-   "count": 2028,
+   "count": 2027,
    "night": 3
   },
   {
@@ -168,7 +168,7 @@
    "cat": 23,
    "id": "parking_garage",
    "label": "Parking garage",
-   "count": 1843,
+   "count": 1836,
    "night": 3
   },
   {
@@ -182,7 +182,7 @@
    "cat": 25,
    "id": "transit_station",
    "label": "Transit station",
-   "count": 314,
+   "count": 308,
    "night": 2
   }
  ],
@@ -195,32 +195,32 @@
   {
    "sub": "shop",
    "label": "Shop",
-   "count": 2152
+   "count": 2151
   },
   {
    "sub": "office",
    "label": "Office",
-   "count": 1880
+   "count": 1875
   },
   {
    "sub": "restaurant",
    "label": "Restaurant",
-   "count": 1824
+   "count": 1821
   },
   {
    "sub": "hotel",
    "label": "Hotel",
-   "count": 1306
+   "count": 1302
   },
   {
    "sub": "salon",
    "label": "Salon",
-   "count": 1027
+   "count": 1028
   },
   {
    "sub": "clinic",
    "label": "Clinic",
-   "count": 959
+   "count": 960
   },
   {
    "sub": "house",
@@ -230,12 +230,12 @@
   {
    "sub": "parking_garage",
    "label": "Parking garage",
-   "count": 896
+   "count": 890
   },
   {
    "sub": "community_center",
    "label": "Community center",
-   "count": 701
+   "count": 700
   },
   {
    "sub": "factory",
@@ -250,7 +250,7 @@
   {
    "sub": "cafe",
    "label": "Café",
-   "count": 525
+   "count": 524
   },
   {
    "sub": "preschool",
@@ -325,7 +325,7 @@
   {
    "sub": "bank",
    "label": "Bank",
-   "count": 186
+   "count": 187
   },
   {
    "sub": "taqueria",
@@ -345,7 +345,7 @@
   {
    "sub": "utility",
    "label": "Utility building",
-   "count": 148
+   "count": 147
   },
   {
    "sub": "pet_store",
@@ -380,7 +380,7 @@
   {
    "sub": "florist",
    "label": "Florist",
-   "count": 107
+   "count": 106
   },
   {
    "sub": "pharmacy",
@@ -443,11 +443,6 @@
    "count": 56
   },
   {
-   "sub": "ferry_terminal",
-   "label": "Ferry terminal",
-   "count": 53
-  },
-  {
    "sub": "post_office",
    "label": "Post office",
    "count": 52
@@ -478,6 +473,11 @@
    "count": 47
   },
   {
+   "sub": "ferry_terminal",
+   "label": "Ferry terminal",
+   "count": 47
+  },
+  {
    "sub": "workshop",
    "label": "Workshop",
    "count": 47
@@ -493,6 +493,11 @@
    "count": 43
   },
   {
+   "sub": "event_venue",
+   "label": "Event venue",
+   "count": 41
+  },
+  {
    "sub": "warehouse",
    "label": "Warehouse",
    "count": 40
@@ -500,11 +505,6 @@
   {
    "sub": "temple",
    "label": "Temple",
-   "count": 40
-  },
-  {
-   "sub": "event_venue",
-   "label": "Event venue",
    "count": 40
   },
   {
@@ -570,7 +570,7 @@
   {
    "sub": "coworking",
    "label": "Coworking space",
-   "count": 17
+   "count": 16
   },
   {
    "sub": "ev_charging",
@@ -654,18 +654,18 @@
   }
  ],
  "sources": {
-  "landuse": 140663,
+  "landuse": 140658,
   "business": 10201,
-  "heuristic": 7280,
-  "osm": 8608,
-  "overture": 6646,
-  "datasf": 1285
+  "heuristic": 7275,
+  "osm": 8591,
+  "overture": 6643,
+  "datasf": 1279
  },
  "confidence": [
-  147943,
-  15305,
-  4486,
-  6949
+  147933,
+  15303,
+  4471,
+  6940
  ],
  "streets": {
   "named": 2509,
