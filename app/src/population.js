@@ -67,9 +67,11 @@ const WALK_SPEED = 1.25; // m/s, an unhurried pace
 // is baked to app/public/sf-people/avatar-rig.json — see pipeline/bake-avatars.mjs
 // for why none of that project's glTF reaches the browser.
 const RIG_URL = `${DATA}avatar-rig.json`;
-// The studio's model is 0.62 units tall and the city is in metres, so this is
-// what makes a resident read as a person next to a bus rather than a doll.
-const PERSON_HEIGHT = 1.72;
+// The studio's model is 0.62 units tall and the city is in metres. This is not
+// a real person's height — it is deliberately half again over it, because a
+// resident scaled to life size disappears against a four-storey building in a
+// toy diorama. The buses and cars are exaggerated for the same reason.
+const PERSON_HEIGHT = 2.58;
 
 // The walk. Nothing in the studio is rigged, so the cycle is procedural: legs
 // hinge at the hip, arms at the shoulder, arms opposite the leg on their own
@@ -89,7 +91,10 @@ const MAX_BADGES = 140;
 const LOW_BADGES = 45;
 const BADGE_W = 5.2;
 const BADGE_H = 5.2;
-const BADGE_Y = 4.4; // height of the QUAD CENTRE; the tail tip drops ~0.36 x H
+// Height of the QUAD CENTRE; the tail tip drops ~0.36 x H. Raised with the
+// residents when they grew: the tail is meant to just kiss the top of a head,
+// and left at 4.4 it hung inside their chest instead.
+const BADGE_Y = 5.77;
 const BADGE_RADIUS_MIN = 220;
 const BADGE_RADIUS_MAX = 33000;
 const BADGE_RADIUS_PER_M = 6.6;
