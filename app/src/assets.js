@@ -22,6 +22,8 @@ import {
   Quaternion,
   Vector3,
   Vector4,
+  Raycaster,
+  Box3,
 } from 'three';
 import { createGLTFLoader } from './gltf.js';
 import { MeshoptDecoder } from 'three/addons/libs/meshopt_decoder.module.js';
@@ -510,9 +512,38 @@ export function createAssets(scene, data, { onPlaced, onUnloaded } = {}) {
       placement = placeBridge(model, box, entry, data.manifest.bridges[state.landmarkId], data);
       group.add(model);
       state.model = model;
+      // So a raycast hit anywhere in the bridge can be traced back to it.
+      model.userData.landmarkId = state.landmarkId;
+      // Bridges are placed as their own group; take the world box directly.
+      // Axis-aligned is right here — a bridge is not a rotated slab.
+      const world = new Box3().setFromObject(model);
+      const bsize = world.getSize(new Vector3());
+      const bmid = world.getCenter(new Vector3());
+      state.bounds = { x: bmid.x, y: bmid.y, z: bmid.z, w: bsize.x, h: bsize.y, d: bsize.z, yaw: 0 };
       draws = `${model.children.length}`;
     } else if (batches()) {
       placement = placeGeneric(box, entry, data);
+      // The selection box is drawn from these: the model's real extents under
+      // its real placement, so the wire hugs the landmark rather than a guess.
+      // Kept as centre + half-free size + yaw rather than an axis-aligned world
+      // box, so a rotated landmark gets a rotated box instead of a looser one.
+      {
+        const pos = new Vector3();
+        const quat = new Quaternion();
+        const scl = new Vector3();
+        placement.matrix.decompose(pos, quat, scl);
+        const size = box.getSize(new Vector3()).multiplyScalar(scl.x);
+        const mid = box.getCenter(new Vector3()).multiplyScalar(scl.x).applyQuaternion(quat).add(pos);
+        state.bounds = {
+          x: mid.x,
+          y: mid.y,
+          z: mid.z,
+          w: size.x,
+          h: size.y,
+          d: size.z,
+          yaw: Math.atan2(2 * quat.w * quat.y, 1 - 2 * quat.y * quat.y),
+        };
+      }
       state.bodyGeomId = bodyBatch.addGeometry(merged.bodyGeometry);
       state.bodyInstId = bodyBatch.addInstance(state.bodyGeomId);
       bodyBatch.setMatrixAt(state.bodyInstId, placement.matrix);
@@ -538,6 +569,14 @@ export function createAssets(scene, data, { onPlaced, onUnloaded } = {}) {
       placement = generic;
       group.add(model);
       state.model = model;
+      // So a raycast hit anywhere in the bridge can be traced back to it.
+      model.userData.landmarkId = state.landmarkId;
+      // Bridges are placed as their own group; take the world box directly.
+      // Axis-aligned is right here — a bridge is not a rotated slab.
+      const world = new Box3().setFromObject(model);
+      const bsize = world.getSize(new Vector3());
+      const bmid = world.getCenter(new Vector3());
+      state.bounds = { x: bmid.x, y: bmid.y, z: bmid.z, w: bsize.x, h: bsize.y, d: bsize.z, yaw: 0 };
       state.resident = true;
       draws = `${model.children.length}`;
     }
@@ -606,10 +645,76 @@ export function createAssets(scene, data, { onPlaced, onUnloaded } = {}) {
     }
   }
 
+  // ---------------------------------------------------------------- picking
+  //
+  // WHY THIS EXISTS. Landmarks were only pickable through context.js's
+  // pickLandmark, which tests the ray against a SPHERE at the landmark's
+  // mid-height with radius max(60, height/2). That is a poor stand-in for a
+  // real shape: the Ferry Building is 197 m long and gets a 60 m radius, so its
+  // ends are not clickable; the Golden Gate Bridge is 2.4 km long and almost
+  // all of it misses. It also only covers landmarks that exist in the baked
+  // context list, which 15 of the shipped GLBs do not.
+  //
+  // So the pick now tests the geometry actually on screen. Any part of the
+  // model is a hit, which is what a tap on a phone needs, and it is synchronous
+  // — context.pick has to await up to 12 cell sidecars first, which is what
+  // made the first click on a district feel like it had not registered.
+  const pickRay = new Raycaster();
+  // Far enough for the skyline from the hero view without testing the world.
+  const PICK_FAR = 20000;
+
+  function stateForHit(hit) {
+    // Generic landmarks live in the shared BatchedMesh; three reports which
+    // instance was hit, and instances map back through the state table.
+    if (hit.object === bodyBatch) {
+      const instId = hit.batchId;
+      if (instId == null) return null;
+      for (const state of states.values()) if (state.bodyInstId === instId) return state;
+      return null;
+    }
+    // Bridges keep their own meshes, tagged on placement.
+    for (let node = hit.object; node; node = node.parent) {
+      const id = node.userData?.landmarkId;
+      if (!id) continue;
+      for (const state of states.values()) if (state.landmarkId === id) return state;
+    }
+    return null;
+  }
+
+  // The nearest landmark under the ray, or null. Returns the manifest entry so
+  // the caller can name it without a second lookup.
+  function pickLandmark(origin, direction) {
+    const targets = [];
+    if (bodyBatch) targets.push(bodyBatch);
+    for (const state of states.values()) if (state.model) targets.push(state.model);
+    if (!targets.length) return null;
+    pickRay.set(origin, direction);
+    pickRay.far = PICK_FAR;
+    // The glow batch is a night overlay, never a surface anyone aims at, and it
+    // is not in `targets` for that reason.
+    for (const hit of pickRay.intersectObjects(targets, true)) {
+      const state = stateForHit(hit);
+      if (!state) continue;
+      return {
+        // The state's own id and the manifest entry travel together: the
+        // registry id is camelCase ("ferryBuilding") while the manifest is
+        // kebab ("ferry-building"), so looking the entry up by the wrong one
+        // silently produced cards titled "ferryBuilding".
+        landmarkId: state.landmarkId,
+        entry: state.entry || null,
+        bounds: state.bounds || null,
+        distance: hit.distance,
+        point: hit.point,
+      };
+    }
+    return null;
+  }
+
   return {
     group,
     placed,
     load,
+    pickLandmark,
     // For the harness and QA: how many entries sit in each lifecycle state.
     stats() {
       const out = { entries: states.size, far: 0, loading: 0, live: 0, fading: 0, failed: 0 };

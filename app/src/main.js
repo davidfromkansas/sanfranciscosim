@@ -275,7 +275,7 @@ async function boot() {
   // Real aircraft from /api/flights. Like the Muni layer this one simply stays
   // empty when the feed is away — nothing else in the city depends on it.
   const aircraft = createLiveAircraft(scene, data);
-  const signs = createSigns(scene, data);
+  const signs = createSigns(scene, data, context.neighborhoods);
   const post = createToyPost(renderer);
 
   const presets = [
@@ -770,11 +770,57 @@ async function boot() {
               : aircraft.aircraftEntity(selected.id);
     if (!fresh) return;
     focus.entity = fresh;
-    overlay.show(fresh, { toy: style === 'toy', groundY: 0 });
+    overlay.show(fresh, { toy: style === 'toy', groundY: 0, groundSample: data.sampleElevation });
     vesselCardAge += dt;
     if (vesselCardAge < 5) return;
     vesselCardAge = 0;
     if (card.entity?.id === fresh.id) card.show(fresh, { recent: focus.history.slice(1) });
+  }
+
+  // A hit on a landmark's own geometry, dressed as the entity the card and the
+  // fly-to already understand. The baked context list is still the best source
+  // of a camera preset and a proper name, but it is keyed by its own ids
+  // ("landmark:coitTower") rather than the manifest's ("coit-tower"), so the
+  // two are matched by name — and when there is no context entry at all, which
+  // is true of 15 shipped landmarks, the manifest still names it.
+  // The two lists name the same building differently: an EN DASH against a
+  // hyphen ("248–250 Ritch Street"), a parenthetical the other lacks ("Herbst
+  // Theatre (War Memorial Veterans Building)"), a "San Francisco" prefix on one
+  // side ("San Francisco City Hall"). Exact matching lost 15 of 131 landmarks,
+  // and a lost match costs that landmark its CAMERA PRESET, so flying to it
+  // lands somewhere generic. Normalising recovers all 131.
+  const normalizeName = (name) =>
+    String(name || '')
+      .toLowerCase()
+      .replace(/\(.*?\)/g, '')
+      .replace(/[\u2013\u2014]/g, '-')
+      .replace(/^(?:san francisco|sf)\s+/, '')
+      .replace(/[^a-z0-9]+/g, ' ')
+      .trim();
+
+  let contextByName = null;
+  function landmarkEntity(hit) {
+    if (!contextByName) {
+      contextByName = new Map((context.landmarks || []).map((l) => [normalizeName(l.name), l]));
+    }
+    const name = hit.entry?.name || hit.landmarkId;
+    const known = contextByName.get(normalizeName(name));
+    return {
+      kind: 'landmark',
+      id: known?.id || `landmark:${hit.landmarkId}`,
+      title: known?.name || name,
+      name: known?.name || name,
+      x: known?.x ?? hit.point.x,
+      z: known?.z ?? hit.point.z,
+      height: known?.height ?? hit.entry?.targetHeightM ?? 60,
+      camera: known?.camera,
+      // Real extents, so the selection draws a wire box on the model's border
+      // instead of a fixed-radius ring.
+      bounds: hit.bounds,
+      distance: hit.distance,
+      source: 'osm',
+      confidence: 3,
+    };
   }
 
   // Live ferries win over the city behind them: they are small, they move, and
@@ -797,6 +843,11 @@ async function boot() {
     if (stop) return stop;
     const berth = ferryTerminals.pickTerminal(pickRay.ray.origin, pickRay.ray.direction);
     if (berth) return berth;
+    // After the small overlay markers, which sit on top of everything, and
+    // before the city pick, which is async: a landmark you can see is a landmark
+    // you should be able to tap, with no wait for cell sidecars.
+    const asset = assets.pickLandmark(pickRay.ray.origin, pickRay.ray.direction);
+    if (asset) return landmarkEntity(asset);
     return context.pick(pickRay.ray.origin, pickRay.ray.direction, hasGround ? groundPoint : null, {
       toy: style === 'toy',
     });
@@ -835,7 +886,13 @@ async function boot() {
       ferryScheduled.pickVessel(origin, direction) ||
       muni.pickBus(origin, direction) ||
       muniStops.pickStop(origin, direction) ||
-      ferryTerminals.pickTerminal(origin, direction);
+      ferryTerminals.pickTerminal(origin, direction) ||
+      // Landmarks join the marker layers in claiming the cursor. The rule this
+      // bends is "everything is a building, so a hand cursor over the whole map
+      // says nothing" — a landmark is exactly the exception: there are 131 of
+      // them, they are the things worth clicking, and until now nothing on
+      // screen said so.
+      assets.pickLandmark(origin, direction);
     canvas.style.cursor = over ? 'pointer' : 'default';
   });
 

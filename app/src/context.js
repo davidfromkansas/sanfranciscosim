@@ -303,6 +303,9 @@ export async function createContext(data) {
         acres: park.acres,
         x: park.x,
         z: park.z,
+        // The real boundary, so the selection traces the park instead of
+        // dropping a fixed 160 m circle somewhere near it.
+        rings: park.rings || null,
         source: 'datasf',
         confidence: 3,
       };
@@ -366,10 +369,18 @@ export async function createContext(data) {
     if (landmark && (!building || landmark.distance < building.distance + 40)) return landmark;
     if (building) return building;
     if (!groundPoint) return null;
+    // Streets are deliberately NOT picked. Every click over open ground used to
+    // land on whichever road was nearest, which is noise: a road is not what
+    // anyone is pointing at, and the card churned on every stray click. They
+    // remain in search and available to the concierge — this is only about
+    // clicking in the 3D scene. A click on a road now resolves to the
+    // neighbourhood it is in.
+    // Neighbourhoods are no longer PICKED either: they are named continuously by
+    // the floating labels (signs.js), which say the same thing without a click
+    // and without a 420 m ring drawn round the answer. neighborhoodAt stays for
+    // the concierge and for building cards.
     return (
-      pickStreet(groundPoint) ||
-      pickPark(groundPoint) ||
-      pickNeighborhood(groundPoint) || {
+      pickPark(groundPoint) || {
         kind: 'water',
         id: 'water:bay',
         title: 'San Francisco Bay',
@@ -432,6 +443,9 @@ export async function createContext(data) {
     parks,
     streets,
     neighborhoodAt: (x, z) => pickNeighborhood({ x, z }),
+    // Streets left the CLICK cascade (they were noise on every stray click) but
+    // the lookup stays: search and the concierge still answer about them.
+    streetAt: (x, z) => pickStreet({ x, z }),
     parkAt: (x, z) => pickPark({ x, z }),
   };
 }
