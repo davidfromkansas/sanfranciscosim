@@ -35,6 +35,10 @@ body {
    window the panel appears in; the ceiling stops it eating a 5K display. */
 :root {
   --feed-w: 0px;
+  /* Right edge of the deck: its 14px inset plus its 249px width. The search
+     bar centres in the gap AFTER this, so keep it in step with #sky-clock's
+     width. Below 640px the bar collapses and this stops being consulted. */
+  --deck-right: 263px;
 }
 
 @media (min-width: 900px) {
