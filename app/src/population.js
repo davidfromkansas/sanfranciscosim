@@ -89,12 +89,18 @@ const BOB = 0.035;          // metres, twice a step — the body rises on each s
 // Clutter is bounded by MAX_BADGES, not by the radius.
 const MAX_BADGES = 140;
 const LOW_BADGES = 45;
-const BADGE_W = 5.2;
-const BADGE_H = 5.2;
+// How tall the whole badge stands in the world. Width and the height it floats
+// at are DERIVED from the texture (see build()), because the bubble's shape is
+// decided in buildBadgeTexture and a second copy of those proportions here is
+// a copy that goes stale.
+const BADGE_H = 7.2;
 // Height of the QUAD CENTRE; the tail tip drops ~0.36 x H. Raised with the
 // residents when they grew: the tail is meant to just kiss the top of a head,
 // and left at 4.4 it hung inside their chest instead.
-const BADGE_Y = 5.77;
+// Where the tail TIP should sit above a resident's feet — the thing that
+// actually has to be right, since the tail is what points at them. The quad's
+// centre is worked out from this and the texture's own tail geometry.
+const BADGE_TIP_Y = 3.9;
 const BADGE_RADIUS_MIN = 220;
 const BADGE_RADIUS_MAX = 33000;
 const BADGE_RADIUS_PER_M = 6.6;
@@ -218,20 +224,28 @@ function moodIndexFor(id) {
 
 function buildBadgeTexture(emoji) {
   const canvas = document.createElement('canvas');
-  canvas.width = 256;
-  canvas.height = 256;
+  // Everything below is derived from ONE number — the emoji's size — because
+  // the bubble exists to hold it. The previous version had the two set
+  // independently, so raising the emoji to 156 left it in a 164px bubble with
+  // eight pixels to spare and the face spilled out over the outline.
+  const EMOJI = 156;
+  const PAD = 40; // clear space around the glyph on every side
+  const bw = EMOJI + PAD * 3.2; // wider than tall, the way a speech bubble is
+  const bh = EMOJI + PAD * 2;
+  const tail = 78;
+  const margin = 16;
+  canvas.width = Math.round(bw + margin * 2);
+  canvas.height = Math.round(bh + tail + margin * 2);
   const ctx = canvas.getContext('2d');
 
   // Bubble body and tail as ONE path so the outline runs around the joint.
-  const bx = 14;
-  const by = 12;
-  const bw = canvas.width - 28;
-  const bh = 164;
+  const bx = margin;
+  const by = margin;
   const r = 40;
-  const tailL = 96;
-  const tailR = 160;
-  const tipX = 112;
-  const tipY = 236;
+  const tipX = bx + bw * 0.34;
+  const tipY = by + bh + tail;
+  const tailL = bx + bw * 0.28;
+  const tailR = bx + bw * 0.5;
   ctx.beginPath();
   ctx.moveTo(bx + r, by);
   ctx.lineTo(bx + bw - r, by);
@@ -258,16 +272,22 @@ function buildBadgeTexture(emoji) {
   ctx.strokeStyle = '#3a3530';
   ctx.stroke();
 
-  // Half again over the 104 the standing figure used. A mood only works if it
-  // can be read, and these are drawn a few dozen pixels across on screen — at
-  // 104 the difference between a scowl and a flat line was gone.
-  ctx.font = '156px "Apple Color Emoji", "Segoe UI Emoji", "Noto Color Emoji", sans-serif';
+  ctx.font = `${EMOJI}px "Apple Color Emoji", "Segoe UI Emoji", "Noto Color Emoji", sans-serif`;
   ctx.textAlign = 'center';
   ctx.textBaseline = 'middle';
-  ctx.fillText(emoji, bx + bw / 2, by + bh / 2 + 6);
+  ctx.fillText(emoji, bx + bw / 2, by + bh / 2);
 
   const texture = new CanvasTexture(canvas);
   texture.colorSpace = SRGBColorSpace;
+  // What the quad has to know: how tall the whole thing is against the emoji,
+  // and how far the tail hangs below centre. Both change whenever the layout
+  // above does, and both used to be constants somebody had to remember to
+  // update — which is how BADGE_Y ended up pointing at the wrong place.
+  texture.userData = {
+    aspect: canvas.width / canvas.height,
+    emojiFraction: EMOJI / canvas.height,
+    tailBelowCentre: (tipY - canvas.height / 2) / canvas.height,
+  };
   return texture;
 }
 
@@ -292,6 +312,7 @@ export function createPopulation(scene, data, city) {
   let bodyMesh = null;
   let badgeMeshes = [];
   let badgeCapacity = 0;
+  let badgeCentreY = 0;
   const badgeFill = new Array(MOOD_BADGES.length).fill(0);
   let cap = MAX_RESIDENTS;
   let badgeCap = MAX_BADGES;
@@ -442,10 +463,16 @@ export function createPopulation(scene, data, city) {
     // Each is sized for the worst case of every visible badge being one mood.
     const room = Math.min(residents.length, MAX_BADGES);
     badgeMeshes = MOOD_BADGES.map(({ key, emoji }) => {
+      const map = buildBadgeTexture(emoji);
+      // The quad takes the TEXTURE's shape. The bubble is sized around the
+      // emoji in buildBadgeTexture, so it is not square and a square quad
+      // would squash every face.
+      const { aspect, tailBelowCentre } = map.userData;
+      badgeCentreY = BADGE_TIP_Y + tailBelowCentre * BADGE_H;
       const mesh = new InstancedMesh(
-        new PlaneGeometry(BADGE_W, BADGE_H),
+        new PlaneGeometry(BADGE_H * aspect, BADGE_H),
         new MeshBasicMaterial({
-          map: buildBadgeTexture(emoji),
+          map,
           transparent: true,
           depthWrite: false,
           alphaTest: 0.02,
@@ -684,7 +711,11 @@ export function createPopulation(scene, data, city) {
       const fade = dist < near ? 1 : Math.max(0, 1 - (dist - near) / Math.max(1, badgeRadius - near));
       // Proportional to THIS resident's distance => constant size on screen.
       const scaleAt = Math.max(BADGE_SCALE_MIN, Math.min(BADGE_SCALE_MAX, dist / BADGE_REF_DIST));
-      dummy.position.set(resident.x, resident.y + BADGE_Y * scaleAt, resident.z);
+      dummy.position.set(
+        resident.x,
+        resident.y + badgeCentreY * scaleAt,
+        resident.z
+      );
       dummy.quaternion.copy(cameraQuaternion);
       dummy.scale.setScalar(scaleAt * fade);
       dummy.updateMatrix();
