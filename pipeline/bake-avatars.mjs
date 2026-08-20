@@ -36,9 +36,13 @@ const PARTS = path.join(SRC, 'public/resident-parts');
 // city's headings are the usual atan2(dx, dz), which assumes a model facing
 // +Z, so the whole rig is rotated a quarter turn here rather than every
 // instance paying for a correction every frame.
+// A QUARTER TURN THE OTHER WAY. x' = z, z' = -x is +90 degrees, which sends
+// the studio's +X front round to -Z and had every resident walking backwards
+// with the back of their head leading. -90 degrees is x' = -z, z' = x, which
+// is the one that puts the face on +Z where the headings expect it.
 const faceZ = ({ size, centre }) => ({
   size: [size[2], size[1], size[0]],
-  centre: [centre[2], centre[1], -centre[0]],
+  centre: [-centre[2], centre[1], centre[0]],
 });
 
 async function readBoxes(file) {
