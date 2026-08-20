@@ -176,6 +176,7 @@ route, and the park plans depend on it (§E8 of the parks README).
 | [Pier 1](./pier-1.md) | `pier-1` | 15.4 m (vertical extent — the asset carries its own pier deck and pile stubs below the origin; the bulkhead pavilion crest is 12.8 m above the deck) | new landmark |
 | [Hyatt Regency San Francisco (5 Embarcadero Center)](./hyatt-regency.md) | `hyatt-regency` | 80.8 m (CTBUH architectural top; LiDAR max 80.64 m) | new landmark |
 | [132 The Embarcadero (Jewish Community Federation Building)](./132-embarcadero.md) | `132-embarcadero` | 29.57 m (LiDAR bulkhead crest; parapet 27.4 m measured) | new landmark |
+| [8 Mission Street (1 Hotel San Francisco / Hotel Vitale)](./8-mission.md) | `8-mission` | 28.66 m to the turret crown (LiDAR max; roof plateaus 25.10 / 19.64 / 14.18 m) | new landmark |
 
 - Style: `docs/styles/miniature-toy.md` (authoritative for artistic decisions)
 - Technical contract: `.agents/skills/sf-asset-check/SKILL.md` (authoritative for the GLB)
