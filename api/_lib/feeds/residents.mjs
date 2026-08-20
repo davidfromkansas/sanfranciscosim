@@ -147,33 +147,35 @@ const MAX_MESSAGES_PER_REFRESH = 10;
 // number anyway is what makes the moving version a small change rather than a
 // migration.
 const MOODS = [
-  { at: -3, key: "very-grumpy", label: "Very grumpy" },
-  { at: -2, key: "grumpy", label: "Grumpy" },
-  { at: -1, key: "sad", label: "Sad" },
-  { at: 0, key: "neutral", label: "Neutral" },
-  { at: 1, key: "happy", label: "Happy" },
-  { at: 2, key: "really-happy", label: "Really happy" },
-  { at: 3, key: "very-happy", label: "Very happy" },
+  { at: -2, key: "grumpy", label: "Grumpy", emoji: "\u{1F621}" },
+  { at: -1, key: "sad", label: "Sad", emoji: "\u{1F614}" },
+  { at: 0, key: "neutral", label: "Neutral", emoji: "\u{1F610}" },
+  { at: 2, key: "cheerful", label: "Cheerful", emoji: "\u{1F929}" },
 ];
 
-// Weighted to the middle, the way RCT starts most guests "happy, neutral or
-// sad" rather than spread evenly across the scale. A city where one resident
-// in seven is furious is a different city. Out of 1000: 60 very grumpy, 110
-// grumpy, 150 sad, 320 neutral, 190 happy, 110 really happy, 60 very happy.
-const MOOD_WEIGHTS = [60, 110, 150, 320, 190, 110, 60];
+// Four, not the seven RCT shows, because the intensity tiers were the weak
+// ones: "grumpy" and "very grumpy" are nearly the same instruction to write
+// from and identical on a badge the size of a thumbnail. What earns its place
+// is the POSTURE — combative, withdrawn, ordinary, generous — and grumpy and
+// sad are not two points on one line. One picks fights and the other goes
+// quiet, which produces genuinely different posts.
+//
+// Roughly one resident in five is difficult, which is what makes the contested
+// threads fire at all.
+const MOOD_WEIGHTS = [180, 120, 400, 300];
 
 // How each mood writes. Deliberately about MANNER, not opinion: the identity
 // paragraph decides what somebody thinks, and the mood decides what kind of
 // day they are having while they say it. A grumpy resident is not a different
 // person with different politics; they are the same person, shorter with you.
 const MOOD_VOICE = {
-  "very-grumpy": "You are in a foul mood and past being diplomatic about it. Say the blunt thing. You are short with people, you do not soften your point, and you are willing to be the one who says what everybody is thinking. Do not be cruel about anyone's identity — you are fed up, not hateful.",
-  grumpy: "You are irritable today. You are less patient than usual, quicker to point out what is wrong than what is fine, and you are not in the mood to hedge.",
+  grumpy:
+    "You are in a foul mood and past being diplomatic about it. Say the blunt thing. You are short with people, quicker to point out what is wrong than what is fine, and willing to be the one who says what everybody is thinking. Do not be cruel about anyone's identity — you are fed up, not hateful.",
   sad: "You are low today. You are quieter than usual, more resigned than angry, and inclined to notice what has been lost rather than what might be fixed.",
-  neutral: "You are in an ordinary mood. Nothing is colouring how you say this either way.",
-  happy: "You are in a decent mood. You are generous with people, willing to give something the benefit of the doubt, and happy to be useful.",
-  "really-happy": "You are in a good mood and it shows. You are warm, encouraging, and quick to find what is worth liking about something.",
-  "very-happy": "You are in a great mood. You are enthusiastic, generous, and want other people to enjoy the thing you are enjoying.",
+  neutral:
+    "You are in an ordinary mood. Nothing is colouring how you say this either way.",
+  cheerful:
+    "You are in a good mood and it shows. You are warm, generous with people, quick to give something the benefit of the doubt, and glad to be useful — the kind of day where you offer something rather than only comment on it.",
 };
 
 // Deterministic from the resident's own id, so a person you met yesterday is in
@@ -190,7 +192,7 @@ export function moodFor(id) {
     roll -= MOOD_WEIGHTS[i];
     if (roll < 0) return MOODS[i];
   }
-  return MOODS[3];
+  return MOODS[2]; // neutral
 }
 
 const moodBlock = (persona) => {

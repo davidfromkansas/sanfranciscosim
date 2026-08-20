@@ -184,7 +184,39 @@ function boxOf(rings) {
 // one 256 px texture rather than the lazily-grown atlas the route pills need —
 // every resident says the same thing today. When the tags start carrying names
 // and posts this becomes an atlas; the quad layer above it does not change.
-function buildBadgeTexture() {
+// The four moods, mirrored from api/_lib/feeds/residents.mjs. Duplicated on
+// purpose: the browser never talks to that module, and a fetch to learn four
+// emoji would put a network dependency in front of the diorama for nothing.
+// The KEYS have to match; the check below fails loudly if they drift.
+const MOOD_BADGES = [
+  { key: 'grumpy', emoji: '\u{1F621}' },
+  { key: 'sad', emoji: '\u{1F614}' },
+  { key: 'neutral', emoji: '\u{1F610}' },
+  { key: 'cheerful', emoji: '\u{1F929}' },
+];
+
+// Same weights as the writer uses, so the crowd overhead and the crowd in the
+// feed are the same city. Grumpy 18, sad 12, neutral 40, cheerful 30.
+const MOOD_BADGE_WEIGHTS = [180, 120, 400, 300];
+
+// Which mood a resident is in, from their id alone — the same hash the feed
+// runs, so the face over somebody's head matches the voice in their posts.
+function moodIndexFor(id) {
+  let h = 2166136261;
+  for (let i = 0; i < id.length; i++) {
+    h ^= id.charCodeAt(i);
+    h = Math.imul(h, 16777619) >>> 0;
+  }
+  const total = MOOD_BADGE_WEIGHTS.reduce((a, b) => a + b, 0);
+  let roll = (h >>> 8) % total;
+  for (let i = 0; i < MOOD_BADGE_WEIGHTS.length; i++) {
+    roll -= MOOD_BADGE_WEIGHTS[i];
+    if (roll < 0) return i;
+  }
+  return 2;
+}
+
+function buildBadgeTexture(emoji) {
   const canvas = document.createElement('canvas');
   canvas.width = 256;
   canvas.height = 256;
@@ -226,10 +258,13 @@ function buildBadgeTexture() {
   ctx.strokeStyle = '#3a3530';
   ctx.stroke();
 
-  ctx.font = '104px "Apple Color Emoji", "Segoe UI Emoji", "Noto Color Emoji", sans-serif';
+  // Half again over the 104 the standing figure used. A mood only works if it
+  // can be read, and these are drawn a few dozen pixels across on screen — at
+  // 104 the difference between a scowl and a flat line was gone.
+  ctx.font = '156px "Apple Color Emoji", "Segoe UI Emoji", "Noto Color Emoji", sans-serif';
   ctx.textAlign = 'center';
   ctx.textBaseline = 'middle';
-  ctx.fillText('🧍', bx + bw / 2, by + bh / 2 + 4);
+  ctx.fillText(emoji, bx + bw / 2, by + bh / 2 + 6);
 
   const texture = new CanvasTexture(canvas);
   texture.colorSpace = SRGBColorSpace;
@@ -255,7 +290,9 @@ export function createPopulation(scene, data, city) {
   let ready = false;
 
   let bodyMesh = null;
-  let badgeMesh = null;
+  let badgeMeshes = [];
+  let badgeCapacity = 0;
+  const badgeFill = new Array(MOOD_BADGES.length).fill(0);
   let cap = MAX_RESIDENTS;
   let badgeCap = MAX_BADGES;
   let badgeRadius = BADGE_RADIUS_MAX;
@@ -399,17 +436,31 @@ export function createPopulation(scene, data, city) {
     // the one part every resident always has.
     bodyMesh = partMeshes[0];
 
-    badgeMesh = new InstancedMesh(
-      new PlaneGeometry(BADGE_W, BADGE_H),
-      new MeshBasicMaterial({ map: buildBadgeTexture(), transparent: true, depthWrite: false, alphaTest: 0.02 }),
-      Math.min(residents.length, MAX_BADGES)
-    );
-    badgeMesh.name = 'pums-resident-badges';
-    badgeMesh.instanceMatrix.setUsage(DynamicDrawUsage);
-    badgeMesh.frustumCulled = false;
-    badgeMesh.renderOrder = 4;
-    badgeMesh.count = 0;
-    group.add(badgeMesh);
+    // One mesh per mood, because an InstancedMesh carries ONE texture and the
+    // whole point is that the faces differ. Four draw calls where there was
+    // one; the alternative is an atlas and a custom shader for no visible gain.
+    // Each is sized for the worst case of every visible badge being one mood.
+    const room = Math.min(residents.length, MAX_BADGES);
+    badgeMeshes = MOOD_BADGES.map(({ key, emoji }) => {
+      const mesh = new InstancedMesh(
+        new PlaneGeometry(BADGE_W, BADGE_H),
+        new MeshBasicMaterial({
+          map: buildBadgeTexture(emoji),
+          transparent: true,
+          depthWrite: false,
+          alphaTest: 0.02,
+        }),
+        room
+      );
+      mesh.name = `pums-resident-badges-${key}`;
+      mesh.instanceMatrix.setUsage(DynamicDrawUsage);
+      mesh.frustumCulled = false;
+      mesh.renderOrder = 4;
+      mesh.count = 0;
+      group.add(mesh);
+      return mesh;
+    });
+    badgeCapacity = room;
   }
 
   async function load() {
@@ -446,6 +497,9 @@ export function createPopulation(scene, data, city) {
       // index, so somebody you flew to yesterday looks the same today. The
       // shirt is NOT in here — it carries the neighbourhood hue, which is what
       // keeps eight PUMAs readable from the air.
+      // Which face floats over them. Same hash the feed's writer uses, so the
+      // badge and the voice in their posts are the same person's mood.
+      moodIdx: moodIndexFor(person.id),
       look: {
         skin: pickIndex(i, 11, rig.palette.skin.length),
         hair: pickIndex(i, 23, rig.palette.hair.length),
@@ -529,6 +583,8 @@ export function createPopulation(scene, data, city) {
 
     let bodies = 0;
     let badges = 0;
+    // Per-mood write cursors, reset every frame alongside the shared counter.
+    badgeFill.fill(0);
     let eligible = 0;
     const limit = Math.min(cap, residents.length);
 
@@ -621,7 +677,9 @@ export function createPopulation(scene, data, city) {
     const near = badgeRadius * 0.72; // fade over the outer quarter of the ring
     for (let i = 0; i < shortlist.length; i += stride) {
       const resident = shortlist[i];
-      if (badges >= badgeMesh.instanceMatrix.count) break;
+      // The cap is on the TOTAL across all four meshes, not per mood — each is
+      // allocated for the worst case of every visible badge being the same one.
+      if (badges >= badgeCapacity) break;
       const dist = resident.dist;
       const fade = dist < near ? 1 : Math.max(0, 1 - (dist - near) / Math.max(1, badgeRadius - near));
       // Proportional to THIS resident's distance => constant size on screen.
@@ -630,7 +688,11 @@ export function createPopulation(scene, data, city) {
       dummy.quaternion.copy(cameraQuaternion);
       dummy.scale.setScalar(scaleAt * fade);
       dummy.updateMatrix();
-      badgeMesh.setMatrixAt(badges, dummy.matrix);
+      // Into the mesh for THIS resident's mood. `badges` still counts the total
+      // so the cap and the eligibility maths are unchanged; each mesh keeps its
+      // own running index.
+      const moodIdx = resident.moodIdx;
+      badgeMeshes[moodIdx].setMatrixAt(badgeFill[moodIdx]++, dummy.matrix);
       badges++;
     }
     shortlist.length = 0;
@@ -644,8 +706,10 @@ export function createPopulation(scene, data, city) {
       mesh.instanceMatrix.needsUpdate = true;
       if (mesh.instanceColor) mesh.instanceColor.needsUpdate = true;
     }
-    badgeMesh.count = badges;
-    badgeMesh.instanceMatrix.needsUpdate = true;
+    for (let m = 0; m < badgeMeshes.length; m++) {
+      badgeMeshes[m].count = badgeFill[m];
+      badgeMeshes[m].instanceMatrix.needsUpdate = true;
+    }
     eligibleLast = eligible;
   }
 
@@ -751,7 +815,10 @@ export function createPopulation(scene, data, city) {
         streets,
         badgeRadius: Math.round(badgeRadius),
         inBadgeRange: eligibleLast,
-        badgesDrawn: badgeMesh ? badgeMesh.count : 0,
+        badgesDrawn: badgeMeshes.reduce((n, m) => n + m.count, 0),
+        badgesByMood: Object.fromEntries(
+          badgeMeshes.map((m, i) => [MOOD_BADGES[i].key, m.count])
+        ),
       };
     },
   };
