@@ -23,6 +23,21 @@ const SOURCES = [
   { url: "https://www.sfgate.com/rss/feed/Bay-Area-News-429.php", name: "SFGate" },
   { url: "https://abc7news.com/feed/", name: "ABC7" },
   { url: "https://patch.com/feeds/california/san-francisco", name: "Patch SF" },
+  // Neighbourhood press, added after probing two dozen candidates — most of
+  // the city's small papers are dead, RSS-less, or behind bot walls. These
+  // four are alive and parse. NOT added: sfrichmondreview.com, which is the
+  // same paper as the Richmond Review above under a second domain (identical
+  // items, different links — link-dedupe would post every story twice), and
+  // Bernalwood / Richmond District Blog, which last published years ago.
+  // The city-scoped path, NOT /rss/ — Hoodline went national and its main
+  // feed is Denver and Orlando; every item was (correctly) rejected by the
+  // relevance filter before this was caught.
+  { url: "https://hoodline.com/news/san-francisco/rss", name: "Hoodline SF" },
+  { url: "https://glenparkassociation.org/feed/", name: "Glen Park Association" },
+  { url: "https://potreroview.net/feed/", name: "Potrero View" },
+  // Monthly, so it clears the 48-hour freshness gate only just after an issue
+  // lands — a story or two a month, from a neighbourhood nothing else covers.
+  { url: "https://www.marinatimes.com/feed", name: "Marina Times" },
 ];
 
 // Nothing older than this is worth posting as news.
