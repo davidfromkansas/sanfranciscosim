@@ -165,6 +165,7 @@ route, and the park plans depend on it (§E8 of the parks README).
 | [One Steuart Lane (1 Steuart Ln / 75 Howard St)](./one-steuart-lane.md) | `one-steuart-lane` | 67.06 m = 220 ft (architect-stated; CTBUH says 240 ft — see its §2.15 risk 1) | new landmark |
 | [110 The Embarcadero (The Commonwealth Club of California)](./110-embarcadero.md) | `110-embarcadero` | 17.4 m (Embarcadero roof fascia, photogrammetric; the Steuart end steps down to 11.6 m) | new landmark |
 | [Four Embarcadero Center (55 Clay Street)](./4-embarcadero-center.md) | `4-embarcadero-center` | 179.0 m (rooftop cooling-tower crest, LiDAR-derived; 173.7 m architectural parapet) | new landmark |
+| [131 Steuart Street (Steuart Place)](./131-steuart.md) | `131-steuart` | 27.7 m (penthouse barrel crown; brick cornice 21.8 m measured) | new landmark |
 
 - Style: `docs/styles/miniature-toy.md` (authoritative for artistic decisions)
 - Technical contract: `.agents/skills/sf-asset-check/SKILL.md` (authoritative for the GLB)
