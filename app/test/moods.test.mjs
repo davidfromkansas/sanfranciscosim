@@ -1,4 +1,4 @@
-// The mood table lives twice: once in the writer (api/_lib/feeds/residents.mjs)
+// The mood table lives twice: once in the writer (api/_lib/feeds/moods.mjs)
 // and once in the diorama (app/src/population.js). The browser never talks to
 // the writer, so duplicating four emoji beats putting a network fetch in front
 // of the city — but duplicated tables drift, and the failure would be silent
@@ -9,7 +9,7 @@ import assert from 'node:assert/strict';
 import { readFile } from 'node:fs/promises';
 
 const root = new URL('../../', import.meta.url);
-const writerSrc = await readFile(new URL('api/_lib/feeds/residents.mjs', root), 'utf8');
+const writerSrc = await readFile(new URL('api/_lib/feeds/moods.mjs', root), 'utf8');
 const cityStr = await readFile(new URL('app/src/population.js', root), 'utf8');
 
 const keys = (src, re) => [...src.matchAll(re)].map((m) => m[1]);
@@ -33,7 +33,7 @@ test('both files weight the moods identically', () => {
 });
 
 test('the two hashes put the same resident in the same mood', async () => {
-  const { moodFor } = await import(new URL('api/_lib/feeds/residents.mjs', root).href);
+  const { moodFor } = await import(new URL('api/_lib/feeds/moods.mjs', root).href);
   // Re-implement the city's lookup from its own source so a change there fails
   // here rather than being quietly compensated for.
   const weights = nums(cityStr, /const MOOD_BADGE_WEIGHTS = \[([^\]]+)\]/);
