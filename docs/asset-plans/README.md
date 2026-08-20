@@ -161,6 +161,7 @@ route, and the park plans depend on it (§E8 of the parks README).
 | [One Market Plaza (Spear and Steuart Towers)](./one-market-plaza-towers.md) | `one-market-plaza-towers` | 177.6 m (Spear rooftop plant crest; Spear roof 172 m, Steuart roof 111 m, both published and LiDAR-checked) | new landmark |
 | [Pier 19](./pier-19.md) | `pier-19` | 17.0 m (gabled-parapet crest above water; LiDAR max 19.5 m is the flagpole, excluded) | new landmark |
 | [Fulton Plaza (147 Fulton Street)](./fulton-plaza.md) | `fulton-plaza` | 13.19 m (vertical extent — the asset is a terrain-draped right-of-way; the Pioneer Monument crest is 11.69 m above local grade) | new landmark |
+| [Pier 3 (Hornblower Landing)](./pier-3.md) | `pier-3` | 18.5 m (photogrammetric, above water datum; deck 3.0 m) | new landmark |
 
 - Style: `docs/styles/miniature-toy.md` (authoritative for artistic decisions)
 - Technical contract: `.agents/skills/sf-asset-check/SKILL.md` (authoritative for the GLB)

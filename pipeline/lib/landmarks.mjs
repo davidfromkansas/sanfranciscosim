@@ -3557,6 +3557,48 @@ export const LANDMARKS = [
     exclude: 7,
     camera: { distance: 230, yaw: 180, pitch: 26 },
   },
+  {
+    // Case B, and the exclusion window here is unusually wide because it was
+    // measured off the committed tiles rather than off the source rings.
+    // Minimum ring-VERTEX distance from this anchor, in the baked toy tier
+    // (excluded() fires on the centroid OR any vertex):
+    //
+    //    13.6 m  a 3.5 m shed ON the Pier 3 deck (ctr 3764.9, -3137.2)  -> must go
+    //    31.2 m  a 3.5 m shed ON the Pier 3 deck (ctr 3784.9, -3149.9)  -> must go
+    //    74.2 m  the Pier 1 1/2 bulkhead, 14.4 m tall                   -> must stay
+    //    78.8 m  a Pier 1 1/2 rooftop element                           -> must stay
+    //    83.9 m  the Pier 1 / 1 1/2 bulkhead, 10.7 m                    -> must stay
+    //   121.6 m  the Pier 1 transit shed                                -> must stay
+    //   123.9 m  the Pier 5 building                                    -> must stay
+    //
+    // Safe window (32, 74) m; 45 takes both deck sheds with 29 m of margin to
+    // the nearest keeper. There is NO baked building on the Pier 3 bulkhead
+    // site at all — the DataSF footprint that covers it does not survive into
+    // the bake — so the GLB adds a bulkhead where the city currently shows
+    // nothing, and the Case B fallback is empty water by design.
+    //
+    // Do NOT raise this past 74 m under any circumstances. The DataSF record
+    // covering these bulkheads (mblr CN9900003) is ONE merged polygon spanning
+    // Pier 3, Pier 1 1/2 and Pier 1; should it ever start baking, a 75 m radius
+    // would delete all three at once and put a hole in the Embarcadero.
+    //
+    // The id keeps its hyphen on purpose: camelId() in app/src/assets.js is
+    // id.replace(/-([a-z])/g, upper) and a DIGIT does not start a segment, so
+    // 'pier-3' round-trips to 'pier-3', not 'pier3'. Get this wrong and the
+    // manifest entry never matches this row.
+    id: 'pier-3',
+    name: 'Pier 3 (Hornblower Landing)',
+    lon: -122.3947017,
+    lat: 37.7982322,
+    height: 18.5,
+    exclude: 45,
+    // Camera offset is (sin yaw, ., cos yaw) with +z south, so bearing =
+    // 180 - yaw; yaw 215 stands the eye to the SOUTHWEST, out over the
+    // Embarcadero, which is the only angle that holds the arched portal and the
+    // 213 m run of the pier in one frame. 430 m for an asset whose long axis is
+    // 213 m. No `key`: at 18.5 m this is waterfront texture, not a destination.
+    camera: { distance: 430, yaw: 215, pitch: 20 },
+  },
 ];
 
 // Parks/green spaces the landcover bake must match at least one source polygon
