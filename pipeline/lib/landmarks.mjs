@@ -3599,6 +3599,41 @@ export const LANDMARKS = [
     // 213 m. No `key`: at 18.5 m this is waterfront texture, not a destination.
     camera: { distance: 430, yaw: 215, pitch: 20 },
   },
+  {
+    id: 'oneSteuartLane',
+    name: 'One Steuart Lane',
+    lon: -122.3916888,
+    lat: 37.7915643,
+    height: 67.06,
+    // Sized by sweeping BOTH bake inputs against excluded()'s real test —
+    // a ring drops when its centroid OR any vertex is within r of THIS ANCHOR:
+    //
+    //   gate  source    ring
+    //   0.92  overture  "One Steuart Lane" itself (h=25.2, see below)   drop
+    //  11.41  datasf    SF3741031 — the demolished 75 Howard garage     drop
+    //  28.14  overture  "201 Spear"                                     keep
+    //  28.29  datasf    SF3741032 (72 m)                                keep
+    //
+    // Band 11.41 < r <= 28.14, 16.7 m wide; 20 is the middle of it.
+    //
+    // What this actually clears is the 2010 PARKING GARAGE, not a tower.
+    // Overture carries this building at h=25.16, which is wrong (it is 67 m),
+    // and 25.16 is not > 21.55 x 1.4, so buildings.mjs's height-correction
+    // branch declines to raise the garage and then `continue`s past the
+    // Overture ring entirely. The site therefore bakes today as a ~21.6 m
+    // block. Both rings still have to go: once the garage is excluded it never
+    // calls markOccupied(), so the Overture ring reaches addBuilding() on the
+    // gap-fill path and would re-add the building on top of the asset.
+    exclude: 20,
+    // Camera offset is (sin yaw, ., cos yaw) with +z south, so camera bearing =
+    // 180 - yaw. The subject is the STACK, which only reads on a corner, so the
+    // eye stands on the east corner — the bisector of the Steuart Lane normal
+    // (44.2 deg) and the south-east normal (134.8 deg), bearing 89.5, i.e.
+    // yaw 90.5. 400 m suits a 67 m tower (cf. columbusTower at 260 for 29 m,
+    // transamerica at 800 for 260 m). No `key`: 0-9 are taken, and SOM were
+    // explicit that this building is not a skyline destination.
+    camera: { distance: 400, yaw: 90.5, pitch: 22 },
+  },
 ];
 
 // Parks/green spaces the landcover bake must match at least one source polygon
