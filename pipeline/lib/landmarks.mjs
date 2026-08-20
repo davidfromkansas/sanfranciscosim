@@ -3677,6 +3677,43 @@ export const LANDMARKS = [
     // block texture on the waterfront, not a destination.
     camera: { distance: 190, yaw: 135, pitch: 26 },
   },
+  {
+    // Four Embarcadero Center (55 Clay St), John Portman, 1982. 45 storeys,
+    // 173.7 m to the parapet; 179 m is the DataSF LiDAR crest at the four
+    // rooftop cooling towers, which is what the asset's bbox is normalised to.
+    //
+    // exclude 20 is MEASURED against the real bake input, not guessed. Only two
+    // source rings overlap the tower's footprint and both are caught by their
+    // CENTROID: the Overture "Embarcadero Center 4" ring at 3.15 m and the
+    // larger DataSF ring 201006.0000633 (3,142 m2, it wraps the podium apron)
+    // at 12.61 m. The nearest ring that must SURVIVE is the low Clay/Drumm
+    // structure at 29.86 m. The tower's own footprint reaches 36.8 m from the
+    // anchor and the circle deliberately does not cover it — buildings.mjs
+    // gates on min(centroid, vertex), so a small circle at the anchor is
+    // enough and a big one is pure collateral.
+    //
+    // 20 rather than 12.7 because a SECOND consumer gates on the centroid
+    // alone and sees a different ring: planKit() rejects a toy-tier footprint
+    // only if its centroid falls inside this radius (landmarkExclusions() in
+    // kitzones.js), and toy.mjs re-derives its own simplified ring — on this
+    // cell the same building becomes a 9-vertex ring whose centroid sits at
+    // 18.76 m, not 12.61 m. The bake makes that moot (excluded() drops the
+    // footprint before out/footprints.json, which is toy.mjs's only input), but
+    // 20 keeps the kit's own guard covering the site if a bake is ever restored
+    // tier by tier. Verified free: no ring in either source has a gate value
+    // between 12.61 m and 29.86 m, so 16 and 20 drop exactly the same two.
+    // Do not raise it past ~29 without re-running that measurement.
+    id: '4EmbarcaderoCenter',
+    name: 'Four Embarcadero Center',
+    lon: -122.3961998,
+    lat: 37.7953001,
+    height: 179,
+    exclude: 20,
+    // camera bearing = 180 - yaw, so yaw 138 stands the eye to the NORTH-EAST,
+    // on the bisector of the blunt north cliff and the stepped east chevron —
+    // the one angle that shows both things this building is known for.
+    camera: { distance: 620, yaw: 138, pitch: 22 },
+  },
 ];
 
 // Parks/green spaces the landcover bake must match at least one source polygon

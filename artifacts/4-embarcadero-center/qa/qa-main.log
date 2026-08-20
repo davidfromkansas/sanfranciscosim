@@ -1,0 +1,56 @@
+dev server on 59026
+manifest served: 104 entries; 4-embarcadero-center present: true
+  entry: {"id":"4-embarcadero-center","file":"4-embarcadero-center.glb","anchor":[-122.3961998,37.7953001],"targetHeightM":179,"cat":3,"name":"Four Embarcadero Center","estimated":false,"dims":[73.0216,51.9818,179],"tris":17904}
+SF present: true
+rAF frames in 3s: 200
+placed: true
+stats: {"entries":104,"far":19,"loading":0,"live":85,"fading":0,"failed":0}
+log line: uniform x1.0000 at 3634, -2797
+rig: {"yaw":42,"pitch":42,"dist":1500,"pivot":{"x":3634.2428357960307,"y":3.5576395000067467,"z":-2796.673053999502}}
+settled stats: {"entries":104,"far":19,"loading":0,"live":85,"fading":0,"failed":0}
+shot day /private/tmp/claude-501/-Users-david-lietjauw/aee516db-5640-4dad-aca4-39701f036ec1/scratchpad/ec4/qa-day.png
+shot day-sunlit /private/tmp/claude-501/-Users-david-lietjauw/aee516db-5640-4dad-aca4-39701f036ec1/scratchpad/ec4/qa-day-sunlit.png
+shot night /private/tmp/claude-501/-Users-david-lietjauw/aee516db-5640-4dad-aca4-39701f036ec1/scratchpad/ec4/qa-night.png
+shot wide
+max draw calls: 128
+--- console (filtered) ---
+  sf-muni: /api/muni unavailable (api 404) — no live buses
+  sf-assets: goldenGateBridge south approach — deck joint 0.00 m horizontal / -1.12 m vertical, road joint 0.00 m / 0.00 m, ramp 121 m from 67.2 m deck to 68.3 m abutment
+  sf-assets: goldenGateBridge north approach — deck joint 0.00 m horizontal / -2.20 m vertical, road joint 0.00 m / 0.00 m, ramp 225 m from 67.2 m deck to 69.5 m abutment
+  sf-assets: golden-gate-bridge merged 1150 objects / 6 materials -> 2 (15832 tris body); span x0.9906 (uniform x0.9693), yaw -84.46°, towers 10.52 m off the OSM pair, tower top 226.0 m, deck top 67.2 m
+  sf-assets: 362-brannan merged 15 objects / 11 materials -> batched (3023 tris body); uniform x1.0000 at 3850, -1199
+  sf-assets: 550-third merged 14 objects / 13 materials -> batched (3286 tris body); uniform x1.0000 at 3710, -1154
+  sf-assets: 380-brannan merged 13 objects / 11 materials -> batched (4496 tris body); uniform x1.0000 at 3826, -1175
+  sf-assets: 551-third merged 14 objects / 14 materials -> batched (5238 tris body); uniform x1.0000 at 3771, -1179
+  sf-assets: chase-center merged 14 objects / 10 materials -> batched (5649 tris body); uniform x1.0000 at 4409, 235
+  sf-assets: 350-brannan merged 12 objects / 10 materials -> batched (4139 tris body); uniform x1.0000 at 3870, -1218
+  sf-assets: 171-south-park merged 12 objects / 12 materials -> batched (3085 tris body); uniform x1.0000 at 3782, -1205
+  sf-assets: 101-south-park merged 12 objects / 11 materials -> batched (3686 tris body); uniform x1.0000 at 3849, -1245
+  sf-assets: 155-south-park merged 17 objects / 13 materials -> batched (2156 tris body); uniform x1.0000 at 3808, -1205
+  sf-assets: 165-south-park merged 9 objects / 8 materials -> batched (1017 tris body); uniform x1.0000 at 3795, -1200
+  sf-assets: 370-brannan merged 12 objects / 10 materials -> batched (809 tris body); uniform x1.0000 at 3840, -1189
+  sf-assets: 135-south-park merged 11 objects / 9 materials -> batched (2113 tris body); uniform x1.0000 at 3826, -1227
+  sf-assets: 358-brannan merged 13 objects / 11 materials -> batched (2118 tris body); uniform x1.0000 at 3860, -1208
+  sf-assets: 181-south-park merged 9 objects / 9 materials -> batched (3109 tris body); uniform x1.0000 at 3783, -1189
+  sf-assets: 500-third merged 14 objects / 13 materials -> batched (10355 tris body); uniform x0.9999 at 3667, -1197
+  sf-assets: 599-third merged 12 objects / 12 materials -> batched (5254 tris body); uniform x1.0000 at 3804, -1155
+  sf-assets: 400-brannan merged 11 objects / 9 materials -> batched (2287 tris body); uniform x1.0000 at 3768, -1116
+  sf-assets: 574-third merged 12 objects / 10 materials -> batched (6148 tris body); uniform x1.0000 at 3735, -1127
+  sf-assets: 592-third merged 11 objects / 9 materials -> batched (2145 tris body); uniform x1.0000 at 3768, -1115
+  sf-assets: 590-third merged 14 objects / 11 materials -> batched (2962 tris body); uniform x1.0000 at 3768, -1115
+  sf-assets: 188-south-park merged 9 objects / 9 materials -> batched (2557 tris body); uniform x1.0000 at 3733, -1217
+  sf-assets: 160-south-park merged 10 objects / 8 materials -> batched (2121 tris body); uniform x1.0000 at 3752, -1247
+  sf-assets: 560-third merged 8 objects / 8 materials -> batched (1343 tris body); uniform x1.0000 at 3729, -1151
+  sf-assets: 150-south-park merged 11 objects / 9 materials -> batched (1847 tris body); uniform x1.0000 at 3760, -1258
+  sf-assets: 132-south-park merged 13 objects / 10 materials -> batched (2720 tris body); uniform x1.0000 at 3773, -1276
+  sf-assets: 106-south-park merged 13 objects / 10 materials -> batched (2181 tris body); uniform x1.0000 at 3792, -1296
+  sf-assets: 108-south-park merged 13 objects / 10 materials -> batched (1865 tris body); uniform x1.0000 at 3785, -1291
+  sf-assets: 156-south-park merged 9 objects / 7 materials -> batched (2532 tris body); uniform x1.0000 at 3751, -1255
+  sf-assets: 168-south-park merged 9 objects / 8 materials -> batched (2071 tris body); uniform x1.0000 at 3741, -1231
+  sf-assets: 126-south-park merged 10 objects / 9 materials -> batched (2600 tris body); uniform x1.0000 at 3776, -1282
+  sf-assets: 140-south-park merged 12 objects / 10 materials -> batched (1758 tris body); uniform x1.0000 at 3763, -1267
+  sf-assets: 2-south-park merged 8 objects / 8 materials -> batched (3226 tris body); uniform x1.0000 at 3895, -1373
+  sf-assets: 102-south-park merged 11 objects / 11 materials -> batched (4786 tris body); uniform x1.0000 at 3795, -1301
+  sf-assets: 524-second merged 11 objects / 10 materials -> batched (3368 tris body); uniform x1.0000 at 3878, -1390
+  sf-assets: 64-south-park merged 15 objects / 13 materials -> batched (8069 tris body); uniform x1.0000 at 3830, -1281
+  sf-assets: 21-south-park merged 9 objects / 9 materials -> batched (5050 tris body); uniform x1.0000 at 3906, -1301
