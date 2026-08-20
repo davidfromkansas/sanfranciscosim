@@ -1,0 +1,607 @@
+{
+ "file_bytes": {
+  "raw": 206832,
+  "gzip9": 34240
+ },
+ "objects": 91,
+ "total_tris": 3140,
+ "total_verts": 6108,
+ "primitives_est": 92,
+ "top20": [
+  {
+   "name": "body",
+   "tris": 332,
+   "verts": 648,
+   "dims": [
+    15.336,
+    15.328,
+    7.95
+   ],
+   "materials": [
+    "Toy_slate",
+    "Toy_stone"
+   ]
+  },
+  {
+   "name": "bay",
+   "tris": 164,
+   "verts": 324,
+   "dims": [
+    2.771,
+    2.775,
+    6.35
+   ],
+   "materials": [
+    "Toy_slate"
+   ]
+  },
+  {
+   "name": "bay_cornice",
+   "tris": 108,
+   "verts": 208,
+   "dims": [
+    2.701,
+    2.704,
+    0.25
+   ],
+   "materials": [
+    "Toy_slate"
+   ]
+  },
+  {
+   "name": "bay_skirt",
+   "tris": 108,
+   "verts": 208,
+   "dims": [
+    2.691,
+    2.694,
+    0.45
+   ],
+   "materials": [
+    "Toy_slate"
+   ]
+  },
+  {
+   "name": "door0",
+   "tris": 108,
+   "verts": 216,
+   "dims": [
+    0.737,
+    0.738,
+    2.15
+   ],
+   "materials": [
+    "Toy_slate"
+   ]
+  },
+  {
+   "name": "door1",
+   "tris": 108,
+   "verts": 216,
+   "dims": [
+    0.737,
+    0.738,
+    2.15
+   ],
+   "materials": [
+    "Toy_slate"
+   ]
+  },
+  {
+   "name": "entry_hood",
+   "tris": 108,
+   "verts": 216,
+   "dims": [
+    1.889,
+    1.891,
+    0.35
+   ],
+   "materials": [
+    "Toy_slate"
+   ]
+  },
+  {
+   "name": "entry_recess",
+   "tris": 108,
+   "verts": 216,
+   "dims": [
+    1.744,
+    1.746,
+    2.6
+   ],
+   "materials": [
+    "Toy_ink"
+   ]
+  },
+  {
+   "name": "well_a_liner",
+   "tris": 108,
+   "verts": 216,
+   "dims": [
+    2.01,
+    2.011,
+    2.7
+   ],
+   "materials": [
+    "Toy_ink"
+   ]
+  },
+  {
+   "name": "well_a_plug",
+   "tris": 108,
+   "verts": 216,
+   "dims": [
+    2.003,
+    2.004,
+    4.7
+   ],
+   "materials": [
+    "Toy_slate"
+   ]
+  },
+  {
+   "name": "well_a_screen",
+   "tris": 108,
+   "verts": 216,
+   "dims": [
+    0.872,
+    0.871,
+    7.95
+   ],
+   "materials": [
+    "Toy_slate"
+   ]
+  },
+  {
+   "name": "well_b_liner",
+   "tris": 108,
+   "verts": 216,
+   "dims": [
+    3.284,
+    3.282,
+    2.7
+   ],
+   "materials": [
+    "Toy_ink"
+   ]
+  },
+  {
+   "name": "well_b_plug",
+   "tris": 108,
+   "verts": 216,
+   "dims": [
+    3.277,
+    3.274,
+    4.7
+   ],
+   "materials": [
+    "Toy_slate"
+   ]
+  },
+  {
+   "name": "well_b_screen",
+   "tris": 108,
+   "verts": 216,
+   "dims": [
+    2.642,
+    2.637,
+    7.95
+   ],
+   "materials": [
+    "Toy_slate"
+   ]
+  },
+  {
+   "name": "rear_door",
+   "tris": 84,
+   "verts": 168,
+   "dims": [
+    0.748,
+    0.749,
+    2.15
+   ],
+   "materials": [
+    "Toy_ink"
+   ]
+  },
+  {
+   "name": "cornice0",
+   "tris": 76,
+   "verts": 120,
+   "dims": [
+    6.352,
+    6.362,
+    0.23
+   ],
+   "materials": [
+    "Toy_slate"
+   ]
+  },
+  {
+   "name": "cornice1",
+   "tris": 76,
+   "verts": 120,
+   "dims": [
+    6.593,
+    6.603,
+    0.23
+   ],
+   "materials": [
+    "Toy_slate"
+   ]
+  },
+  {
+   "name": "cornice2",
+   "tris": 76,
+   "verts": 120,
+   "dims": [
+    6.814,
+    6.824,
+    0.2
+   ],
+   "materials": [
+    "Toy_slate"
+   ]
+  },
+  {
+   "name": "base_flank",
+   "tris": 44,
+   "verts": 96,
+   "dims": [
+    10.057,
+    10.039,
+    1.35
+   ],
+   "materials": [
+    "Toy_slate"
+   ]
+  },
+  {
+   "name": "base_front",
+   "tris": 44,
+   "verts": 96,
+   "dims": [
+    5.376,
+    5.386,
+    1.35
+   ],
+   "materials": [
+    "Toy_slate"
+   ]
+  }
+ ],
+ "vertex_attrs": [
+  "NORMAL"
+ ],
+ "materials": [
+  {
+   "name": "Toy_glass",
+   "glow": false,
+   "user_objects": 11
+  },
+  {
+   "name": "Toy_gold_Glow",
+   "glow": true,
+   "user_objects": 3
+  },
+  {
+   "name": "Toy_ink",
+   "glow": false,
+   "user_objects": 6
+  },
+  {
+   "name": "Toy_slate",
+   "glow": false,
+   "user_objects": 62
+  },
+  {
+   "name": "Toy_steel",
+   "glow": false,
+   "user_objects": 6
+  },
+  {
+   "name": "Toy_stone",
+   "glow": false,
+   "user_objects": 3
+  },
+  {
+   "name": "Toy_trim_Glow",
+   "glow": true,
+   "user_objects": 1
+  }
+ ],
+ "textures": [],
+ "bbox": {
+  "dims": [
+   16.1425,
+   16.2013,
+   8.8
+  ],
+  "min": [
+   -8.0712,
+   -8.1006,
+   0.0
+  ],
+  "origin_offset_xy": [
+   0.0,
+   0.0
+  ],
+  "base_z": 0.0
+ },
+ "duplicate_mesh_groups": [
+  {
+   "signature": {
+    "verts": 216,
+    "tris": 108,
+    "dims": [
+     0.737,
+     0.7378,
+     2.15
+    ]
+   },
+   "objects": [
+    "door0",
+    "door1"
+   ]
+  },
+  {
+   "signature": {
+    "verts": 96,
+    "tris": 44,
+    "dims": [
+     5.3765,
+     5.3858,
+     1.35
+    ]
+   },
+   "objects": [
+    "base_front",
+    "base_rear"
+   ]
+  },
+  {
+   "signature": {
+    "verts": 24,
+    "tris": 12,
+    "dims": [
+     0.1315,
+     0.1315,
+     1.7
+    ]
+   },
+   "objects": [
+    "baywin01_jamb0",
+    "baywin01_jamb1",
+    "baywin11_jamb0",
+    "baywin11_jamb1",
+    "upwin_jamb0",
+    "upwin_jamb1"
+   ]
+  },
+  {
+   "signature": {
+    "verts": 24,
+    "tris": 12,
+    "dims": [
+     0.7501,
+     0.1107,
+     0.1
+    ]
+   },
+   "objects": [
+    "baywin00_head",
+    "baywin00_sill",
+    "baywin10_head",
+    "baywin10_sill"
+   ]
+  },
+  {
+   "signature": {
+    "verts": 24,
+    "tris": 12,
+    "dims": [
+     0.1001,
+     0.0861,
+     1.7
+    ]
+   },
+   "objects": [
+    "baywin00_jamb0",
+    "baywin00_jamb1",
+    "baywin10_jamb0",
+    "baywin10_jamb1"
+   ]
+  },
+  {
+   "signature": {
+    "verts": 24,
+    "tris": 12,
+    "dims": [
+     1.2082,
+     1.2101,
+     0.1
+    ]
+   },
+   "objects": [
+    "baywin01_head",
+    "baywin01_sill",
+    "baywin11_head",
+    "baywin11_sill"
+   ]
+  },
+  {
+   "signature": {
+    "verts": 24,
+    "tris": 12,
+    "dims": [
+     0.1107,
+     0.7501,
+     0.1
+    ]
+   },
+   "objects": [
+    "baywin02_head",
+    "baywin02_sill",
+    "baywin12_head",
+    "baywin12_sill"
+   ]
+  },
+  {
+   "signature": {
+    "verts": 24,
+    "tris": 12,
+    "dims": [
+     0.0861,
+     0.1001,
+     1.7
+    ]
+   },
+   "objects": [
+    "baywin02_jamb0",
+    "baywin02_jamb1",
+    "baywin12_jamb0",
+    "baywin12_jamb1"
+   ]
+  },
+  {
+   "signature": {
+    "verts": 24,
+    "tris": 12,
+    "dims": [
+     0.855,
+     0.8562,
+     0.1
+    ]
+   },
+   "objects": [
+    "rearwin0_head",
+    "rearwin0_sill",
+    "rearwin1_head",
+    "rearwin1_sill"
+   ]
+  },
+  {
+   "signature": {
+    "verts": 24,
+    "tris": 12,
+    "dims": [
+     0.1315,
+     0.1315,
+     1.5
+    ]
+   },
+   "objects": [
+    "rearwin0_jamb0",
+    "rearwin0_jamb1",
+    "rearwin1_jamb0",
+    "rearwin1_jamb1"
+   ]
+  },
+  {
+   "signature": {
+    "verts": 24,
+    "tris": 12,
+    "dims": [
+     0.5501,
+     0.1405,
+     1.7
+    ]
+   },
+   "objects": [
+    "baywin00_fill",
+    "baywin10_fill"
+   ]
+  },
+  {
+   "signature": {
+    "verts": 24,
+    "tris": 12,
+    "dims": [
+     1.0882,
+     1.0897,
+     1.7
+    ]
+   },
+   "objects": [
+    "baywin01_fill",
+    "baywin11_fill"
+   ]
+  },
+  {
+   "signature": {
+    "verts": 24,
+    "tris": 12,
+    "dims": [
+     0.1405,
+     0.5501,
+     1.7
+    ]
+   },
+   "objects": [
+    "baywin02_fill",
+    "baywin12_fill"
+   ]
+  },
+  {
+   "signature": {
+    "verts": 24,
+    "tris": 12,
+    "dims": [
+     0.3781,
+     0.3785,
+     0.75
+    ]
+   },
+   "objects": [
+    "door0_light",
+    "door1_light"
+   ]
+  },
+  {
+   "signature": {
+    "verts": 24,
+    "tris": 12,
+    "dims": [
+     0.7349,
+     0.7359,
+     1.5
+    ]
+   },
+   "objects": [
+    "rearwin0_fill",
+    "rearwin1_fill"
+   ]
+  },
+  {
+   "signature": {
+    "verts": 24,
+    "tris": 12,
+    "dims": [
+     0.9963,
+     0.9978,
+     0.1
+    ]
+   },
+   "objects": [
+    "upwin_head",
+    "upwin_sill"
+   ]
+  }
+ ],
+ "dup_redundant_tris": 536,
+ "join_candidates": {
+  "Toy_glass": 11,
+  "Toy_gold_Glow": 3,
+  "Toy_ink": 6,
+  "Toy_slate": 62,
+  "Toy_steel": 6,
+  "Toy_stone": 3
+ },
+ "degenerate_tris": 0,
+ "coincident_vert_pairs": 4356,
+ "over_tess": {
+  "near_distance_m": 24.3,
+  "one_px_world_m": 0.0164,
+  "note": "cylinders whose chord error < one_px_world_m can halve segments"
+ }
+}

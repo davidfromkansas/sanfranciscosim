@@ -1,0 +1,1381 @@
+{
+ "file_bytes": {
+  "raw": 939600,
+  "gzip9": 148055
+ },
+ "objects": 548,
+ "total_tris": 13624,
+ "total_verts": 26292,
+ "primitives_est": 548,
+ "top20": [
+  {
+   "name": "balus_south",
+   "tris": 556,
+   "verts": 1080,
+   "dims": [
+    114.208,
+    35.337,
+    1.4
+   ],
+   "materials": [
+    "Toy_trim"
+   ]
+  },
+  {
+   "name": "belt_south",
+   "tris": 556,
+   "verts": 1080,
+   "dims": [
+    113.871,
+    35.125,
+    0.7
+   ],
+   "materials": [
+    "Toy_trim"
+   ]
+  },
+  {
+   "name": "cornice_south",
+   "tris": 556,
+   "verts": 1080,
+   "dims": [
+    114.874,
+    35.754,
+    1.1
+   ],
+   "materials": [
+    "Toy_trim"
+   ]
+  },
+  {
+   "name": "plinth_south",
+   "tris": 556,
+   "verts": 1080,
+   "dims": [
+    113.533,
+    34.911,
+    0.9
+   ],
+   "materials": [
+    "Toy_stone"
+   ]
+  },
+  {
+   "name": "topcorn_south",
+   "tris": 556,
+   "verts": 1080,
+   "dims": [
+    111.233,
+    33.44,
+    1.4
+   ],
+   "materials": [
+    "Toy_trim"
+   ]
+  },
+  {
+   "name": "balus_east",
+   "tris": 136,
+   "verts": 270,
+   "dims": [
+    22.874,
+    29.201,
+    1.4
+   ],
+   "materials": [
+    "Toy_trim"
+   ]
+  },
+  {
+   "name": "balus_west",
+   "tris": 136,
+   "verts": 270,
+   "dims": [
+    26.121,
+    30.306,
+    1.4
+   ],
+   "materials": [
+    "Toy_trim"
+   ]
+  },
+  {
+   "name": "belt_east",
+   "tris": 136,
+   "verts": 270,
+   "dims": [
+    22.726,
+    29.177,
+    0.7
+   ],
+   "materials": [
+    "Toy_trim"
+   ]
+  },
+  {
+   "name": "belt_west",
+   "tris": 136,
+   "verts": 270,
+   "dims": [
+    25.973,
+    30.282,
+    0.7
+   ],
+   "materials": [
+    "Toy_trim"
+   ]
+  },
+  {
+   "name": "cornice_east",
+   "tris": 136,
+   "verts": 270,
+   "dims": [
+    23.17,
+    29.248,
+    1.1
+   ],
+   "materials": [
+    "Toy_trim"
+   ]
+  },
+  {
+   "name": "cornice_west",
+   "tris": 136,
+   "verts": 270,
+   "dims": [
+    26.417,
+    30.353,
+    1.1
+   ],
+   "materials": [
+    "Toy_trim"
+   ]
+  },
+  {
+   "name": "plinth_east",
+   "tris": 136,
+   "verts": 270,
+   "dims": [
+    22.578,
+    29.154,
+    0.9
+   ],
+   "materials": [
+    "Toy_stone"
+   ]
+  },
+  {
+   "name": "plinth_west",
+   "tris": 136,
+   "verts": 270,
+   "dims": [
+    25.825,
+    30.258,
+    0.9
+   ],
+   "materials": [
+    "Toy_stone"
+   ]
+  },
+  {
+   "name": "topcorn_east",
+   "tris": 136,
+   "verts": 270,
+   "dims": [
+    21.59,
+    28.996,
+    1.4
+   ],
+   "materials": [
+    "Toy_trim"
+   ]
+  },
+  {
+   "name": "topcorn_west",
+   "tris": 136,
+   "verts": 270,
+   "dims": [
+    24.837,
+    30.101,
+    1.4
+   ],
+   "materials": [
+    "Toy_trim"
+   ]
+  },
+  {
+   "name": "balus_pav_e",
+   "tris": 108,
+   "verts": 216,
+   "dims": [
+    29.039,
+    26.135,
+    1.4
+   ],
+   "materials": [
+    "Toy_trim"
+   ]
+  },
+  {
+   "name": "balus_pav_w",
+   "tris": 108,
+   "verts": 216,
+   "dims": [
+    29.039,
+    26.135,
+    1.4
+   ],
+   "materials": [
+    "Toy_trim"
+   ]
+  },
+  {
+   "name": "belt_north",
+   "tris": 108,
+   "verts": 216,
+   "dims": [
+    115.483,
+    39.806,
+    0.7
+   ],
+   "materials": [
+    "Toy_trim"
+   ]
+  },
+  {
+   "name": "cornice_north",
+   "tris": 108,
+   "verts": 216,
+   "dims": [
+    116.443,
+    40.392,
+    1.1
+   ],
+   "materials": [
+    "Toy_trim"
+   ]
+  },
+  {
+   "name": "court_bulkhead",
+   "tris": 108,
+   "verts": 216,
+   "dims": [
+    6.682,
+    5.853,
+    26.0
+   ],
+   "materials": [
+    "Toy_stone"
+   ]
+  }
+ ],
+ "vertex_attrs": [
+  "NORMAL"
+ ],
+ "materials": [
+  {
+   "name": "Toy_cream",
+   "glow": false,
+   "user_objects": 9
+  },
+  {
+   "name": "Toy_glass",
+   "glow": false,
+   "user_objects": 324
+  },
+  {
+   "name": "Toy_gold_Glow",
+   "glow": true,
+   "user_objects": 6
+  },
+  {
+   "name": "Toy_mint",
+   "glow": false,
+   "user_objects": 11
+  },
+  {
+   "name": "Toy_navy",
+   "glow": false,
+   "user_objects": 2
+  },
+  {
+   "name": "Toy_sand",
+   "glow": false,
+   "user_objects": 6
+  },
+  {
+   "name": "Toy_steel",
+   "glow": false,
+   "user_objects": 19
+  },
+  {
+   "name": "Toy_stone",
+   "glow": false,
+   "user_objects": 35
+  },
+  {
+   "name": "Toy_trim",
+   "glow": false,
+   "user_objects": 85
+  },
+  {
+   "name": "Toy_white",
+   "glow": false,
+   "user_objects": 3
+  },
+  {
+   "name": "Toy_white_Glow",
+   "glow": true,
+   "user_objects": 48
+  }
+ ],
+ "textures": [],
+ "bbox": {
+  "dims": [
+   122.7264,
+   84.8953,
+   33.0
+  ],
+  "min": [
+   -61.3632,
+   -42.4476,
+   0.0
+  ],
+  "origin_offset_xy": [
+   0.0,
+   0.0
+  ],
+  "base_z": 0.0
+ },
+ "duplicate_mesh_groups": [
+  {
+   "signature": {
+    "verts": 24,
+    "tris": 12,
+    "dims": [
+     2.7198,
+     0.7618,
+     3.4
+    ]
+   },
+   "objects": [
+    "win_n_up_0_0",
+    "win_n_up_1_0",
+    "win_n_up_2_0",
+    "win_n_up_3_0",
+    "win_n_up_4_0",
+    "win_n_up_5_0",
+    "win_n_up_6_0",
+    "win_n_up_7_0",
+    "win_n_up_8_0",
+    "win_n_up_9_0",
+    "win_n_up_10_0",
+    "win_n_up_11_0",
+    "win_n_up_12_0",
+    "win_n_up_13_0",
+    "win_n_up_14_0",
+    "win_n_up_15_0",
+    "win_n_up_16_0",
+    "win_n_up_17_0",
+    "win_n_up_18_0",
+    "win_n_up_19_0",
+    "win_s_up_0_0",
+    "win_s_up_1_0",
+    "win_s_up_2_0",
+    "win_s_up_3_0",
+    "win_s_up_4_0",
+    "win_s_up_5_0",
+    "win_s_up_6_0",
+    "win_s_up_7_0",
+    "win_s_up_8_0",
+    "win_s_up_9_0",
+    "win_s_up_10_0",
+    "win_s_up_11_0",
+    "win_s_up_12_0",
+    "win_s_up_13_0",
+    "win_s_up_14_0",
+    "win_s_up_15_0",
+    "win_s_up_16_0",
+    "win_s_up_17_0"
+   ]
+  },
+  {
+   "signature": {
+    "verts": 24,
+    "tris": 12,
+    "dims": [
+     2.7198,
+     0.7618,
+     3.2
+    ]
+   },
+   "objects": [
+    "win_n_up_0_1",
+    "win_n_up_1_1",
+    "win_n_up_2_1",
+    "win_n_up_3_1",
+    "win_n_up_4_1",
+    "win_n_up_5_1",
+    "win_n_up_6_1",
+    "win_n_up_7_1",
+    "win_n_up_8_1",
+    "win_n_up_9_1",
+    "win_n_up_10_1",
+    "win_n_up_11_1",
+    "win_n_up_12_1",
+    "win_n_up_13_1",
+    "win_n_up_14_1",
+    "win_n_up_15_1",
+    "win_n_up_16_1",
+    "win_n_up_17_1",
+    "win_n_up_18_1",
+    "win_n_up_19_1",
+    "win_s_up_0_1",
+    "win_s_up_1_1",
+    "win_s_up_2_1",
+    "win_s_up_3_1",
+    "win_s_up_4_1",
+    "win_s_up_5_1",
+    "win_s_up_6_1",
+    "win_s_up_7_1",
+    "win_s_up_8_1",
+    "win_s_up_9_1",
+    "win_s_up_10_1",
+    "win_s_up_11_1",
+    "win_s_up_12_1",
+    "win_s_up_13_1",
+    "win_s_up_14_1",
+    "win_s_up_15_1",
+    "win_s_up_16_1",
+    "win_s_up_17_1"
+   ]
+  },
+  {
+   "signature": {
+    "verts": 24,
+    "tris": 12,
+    "dims": [
+     2.7198,
+     0.7618,
+     2.6
+    ]
+   },
+   "objects": [
+    "win_n_low_0_0",
+    "win_n_low_1_0",
+    "win_n_low_2_0",
+    "win_n_low_3_0",
+    "win_n_low_4_0",
+    "win_n_low_5_0",
+    "win_n_low_6_0",
+    "win_n_low_7_0",
+    "win_n_low_8_0",
+    "win_n_low_9_0",
+    "win_n_low_10_0",
+    "win_n_low_11_0",
+    "win_n_low_12_0",
+    "win_n_low_13_0",
+    "win_n_low_14_0",
+    "win_n_low_15_0",
+    "win_n_low_16_0",
+    "win_n_low_17_0",
+    "win_n_low_18_0",
+    "win_s_low_0_0",
+    "win_s_low_1_0",
+    "win_s_low_2_0",
+    "win_s_low_3_0",
+    "win_s_low_4_0",
+    "win_s_low_5_0",
+    "win_s_low_6_0",
+    "win_s_low_7_0",
+    "win_s_low_8_0",
+    "win_s_low_9_0",
+    "win_s_low_10_0",
+    "win_s_low_11_0",
+    "win_s_low_12_0",
+    "win_s_low_13_0",
+    "win_s_low_14_0",
+    "win_s_low_15_0"
+   ]
+  },
+  {
+   "signature": {
+    "verts": 24,
+    "tris": 12,
+    "dims": [
+     2.7198,
+     0.7618,
+     3.3
+    ]
+   },
+   "objects": [
+    "win_n_low_0_1",
+    "win_n_low_1_1",
+    "win_n_low_2_1",
+    "win_n_low_3_1",
+    "win_n_low_4_1",
+    "win_n_low_5_1",
+    "win_n_low_6_1",
+    "win_n_low_7_1",
+    "win_n_low_8_1",
+    "win_n_low_9_1",
+    "win_n_low_10_1",
+    "win_n_low_11_1",
+    "win_n_low_12_1",
+    "win_n_low_13_1",
+    "win_n_low_14_1",
+    "win_n_low_15_1",
+    "win_n_low_16_1",
+    "win_n_low_17_1",
+    "win_n_low_18_1",
+    "win_s_low_0_1",
+    "win_s_low_1_1",
+    "win_s_low_2_1",
+    "win_s_low_3_1",
+    "win_s_low_4_1",
+    "win_s_low_5_1",
+    "win_s_low_6_1",
+    "win_s_low_7_1",
+    "win_s_low_8_1",
+    "win_s_low_9_1",
+    "win_s_low_10_1",
+    "win_s_low_11_1",
+    "win_s_low_12_1",
+    "win_s_low_13_1",
+    "win_s_low_14_1",
+    "win_s_low_15_1"
+   ]
+  },
+  {
+   "signature": {
+    "verts": 60,
+    "tris": 36,
+    "dims": [
+     1.58,
+     1.5807,
+     8.9
+    ]
+   },
+   "objects": [
+    "column_1",
+    "column_2",
+    "column_4",
+    "column_5",
+    "column_6",
+    "column_7",
+    "column_8",
+    "column_9",
+    "column_10",
+    "column_13"
+   ]
+  },
+  {
+   "signature": {
+    "verts": 24,
+    "tris": 12,
+    "dims": [
+     1.0253,
+     0.3948,
+     16.6
+    ]
+   },
+   "objects": [
+    "court_slot_n_0",
+    "court_slot_n_1",
+    "court_slot_n_2",
+    "court_slot_n_3",
+    "court_slot_n_4",
+    "court_slot_n_5",
+    "court_slot_n_6",
+    "court_slot_n_7",
+    "court_slot_n_8",
+    "court_slot_n_9",
+    "court_slot_n_10",
+    "court_slot_n_11",
+    "court_slot_n_12",
+    "court_slot_n_13",
+    "court_slot_s_0",
+    "court_slot_s_1",
+    "court_slot_s_2",
+    "court_slot_s_3",
+    "court_slot_s_4",
+    "court_slot_s_5",
+    "court_slot_s_6",
+    "court_slot_s_7",
+    "court_slot_s_8",
+    "court_slot_s_9",
+    "court_slot_s_10",
+    "court_slot_s_11",
+    "court_slot_s_12",
+    "court_slot_s_13"
+   ]
+  },
+  {
+   "signature": {
+    "verts": 216,
+    "tris": 108,
+    "dims": [
+     4.5324,
+     3.205,
+     1.8
+    ]
+   },
+   "objects": [
+    "mech_nc_0",
+    "mech_nc_1",
+    "mech_nc_2"
+   ]
+  },
+  {
+   "signature": {
+    "verts": 24,
+    "tris": 12,
+    "dims": [
+     2.7198,
+     0.7618,
+     2.3
+    ]
+   },
+   "objects": [
+    "win_n_up_a_0",
+    "win_n_up_a_1",
+    "win_n_up_a_2",
+    "win_n_up_a_3",
+    "win_n_up_a_4",
+    "win_n_up_a_5",
+    "win_n_up_a_6",
+    "win_n_up_a_7",
+    "win_s_up_a_0",
+    "win_s_up_a_1",
+    "win_s_up_a_2",
+    "win_s_up_a_3",
+    "win_s_up_a_4",
+    "win_s_up_a_5",
+    "win_s_up_a_6",
+    "win_s_up_a_7",
+    "win_s_up_a_8",
+    "win_s_up_a_9",
+    "win_s_up_a_10",
+    "win_s_up_a_11",
+    "win_s_up_a_12",
+    "win_s_up_a_13",
+    "win_s_up_a_14",
+    "win_s_up_a_15",
+    "win_s_up_a_16",
+    "win_s_up_a_17"
+   ]
+  },
+  {
+   "signature": {
+    "verts": 24,
+    "tris": 12,
+    "dims": [
+     2.4355,
+     0.4277,
+     2.06
+    ]
+   },
+   "objects": [
+    "win_n_up_a_0_g",
+    "win_n_up_a_1_g",
+    "win_n_up_a_2_g",
+    "win_n_up_a_3_g",
+    "win_n_up_a_4_g",
+    "win_n_up_a_5_g",
+    "win_n_up_a_6_g",
+    "win_n_up_a_7_g",
+    "win_s_up_a_0_g",
+    "win_s_up_a_1_g",
+    "win_s_up_a_2_g",
+    "win_s_up_a_3_g",
+    "win_s_up_a_4_g",
+    "win_s_up_a_5_g",
+    "win_s_up_a_6_g",
+    "win_s_up_a_7_g",
+    "win_s_up_a_8_g",
+    "win_s_up_a_9_g",
+    "win_s_up_a_10_g",
+    "win_s_up_a_11_g",
+    "win_s_up_a_12_g",
+    "win_s_up_a_13_g",
+    "win_s_up_a_14_g",
+    "win_s_up_a_15_g",
+    "win_s_up_a_16_g",
+    "win_s_up_a_17_g"
+   ]
+  },
+  {
+   "signature": {
+    "verts": 24,
+    "tris": 12,
+    "dims": [
+     0.6989,
+     1.3626,
+     10.4
+    ]
+   },
+   "objects": [
+    "pil_e_0",
+    "pil_e_1",
+    "pil_e_2",
+    "pil_e_3",
+    "pil_e_4",
+    "pil_e_5",
+    "pil_e_6",
+    "pil_e_7",
+    "pil_e_8",
+    "pil_e_9",
+    "pil_e_10",
+    "pil_w_0",
+    "pil_w_1",
+    "pil_w_2",
+    "pil_w_3",
+    "pil_w_4",
+    "pil_w_5",
+    "pil_w_6",
+    "pil_w_7",
+    "pil_w_8",
+    "pil_w_9",
+    "pil_w_10"
+   ]
+  },
+  {
+   "signature": {
+    "verts": 24,
+    "tris": 12,
+    "dims": [
+     0.7618,
+     2.7198,
+     2.6
+    ]
+   },
+   "objects": [
+    "win_e_0_0",
+    "win_e_1_0",
+    "win_e_2_0",
+    "win_e_3_0",
+    "win_e_4_0",
+    "win_e_5_0",
+    "win_e_6_0",
+    "win_e_7_0",
+    "win_e_8_0",
+    "win_e_9_0",
+    "win_e_10_0",
+    "win_w_0_0",
+    "win_w_1_0",
+    "win_w_2_0",
+    "win_w_3_0",
+    "win_w_4_0",
+    "win_w_5_0",
+    "win_w_6_0",
+    "win_w_7_0",
+    "win_w_8_0",
+    "win_w_9_0",
+    "win_w_10_0"
+   ]
+  },
+  {
+   "signature": {
+    "verts": 24,
+    "tris": 12,
+    "dims": [
+     0.7618,
+     2.7198,
+     3.3
+    ]
+   },
+   "objects": [
+    "win_e_0_1",
+    "win_e_1_1",
+    "win_e_2_1",
+    "win_e_3_1",
+    "win_e_4_1",
+    "win_e_5_1",
+    "win_e_6_1",
+    "win_e_7_1",
+    "win_e_8_1",
+    "win_e_9_1",
+    "win_e_10_1",
+    "win_w_0_1",
+    "win_w_1_1",
+    "win_w_2_1",
+    "win_w_3_1",
+    "win_w_4_1",
+    "win_w_5_1",
+    "win_w_6_1",
+    "win_w_7_1",
+    "win_w_8_1",
+    "win_w_9_1",
+    "win_w_10_1"
+   ]
+  },
+  {
+   "signature": {
+    "verts": 24,
+    "tris": 12,
+    "dims": [
+     0.7618,
+     2.7198,
+     3.4
+    ]
+   },
+   "objects": [
+    "win_e_0_2",
+    "win_e_1_2",
+    "win_e_2_2",
+    "win_e_3_2",
+    "win_e_4_2",
+    "win_e_5_2",
+    "win_e_6_2",
+    "win_e_7_2",
+    "win_e_8_2",
+    "win_e_9_2",
+    "win_e_10_2",
+    "win_w_0_2",
+    "win_w_1_2",
+    "win_w_2_2",
+    "win_w_3_2",
+    "win_w_4_2",
+    "win_w_5_2",
+    "win_w_6_2",
+    "win_w_7_2",
+    "win_w_8_2",
+    "win_w_9_2",
+    "win_w_10_2"
+   ]
+  },
+  {
+   "signature": {
+    "verts": 24,
+    "tris": 12,
+    "dims": [
+     0.7618,
+     2.7198,
+     3.2
+    ]
+   },
+   "objects": [
+    "win_e_0_3",
+    "win_e_1_3",
+    "win_e_2_3",
+    "win_e_3_3",
+    "win_e_4_3",
+    "win_e_5_3",
+    "win_e_6_3",
+    "win_e_7_3",
+    "win_e_8_3",
+    "win_e_9_3",
+    "win_e_10_3",
+    "win_w_0_3",
+    "win_w_1_3",
+    "win_w_2_3",
+    "win_w_3_3",
+    "win_w_4_3",
+    "win_w_5_3",
+    "win_w_6_3",
+    "win_w_7_3",
+    "win_w_8_3",
+    "win_w_9_3",
+    "win_w_10_3"
+   ]
+  },
+  {
+   "signature": {
+    "verts": 24,
+    "tris": 12,
+    "dims": [
+     0.7618,
+     2.7198,
+     2.3
+    ]
+   },
+   "objects": [
+    "win_e_a_0",
+    "win_e_a_1",
+    "win_e_a_2",
+    "win_e_a_3",
+    "win_e_a_4",
+    "win_e_a_5",
+    "win_e_a_6",
+    "win_e_a_7",
+    "win_e_a_8",
+    "win_e_a_9",
+    "win_e_a_10",
+    "win_w_a_0",
+    "win_w_a_1",
+    "win_w_a_2",
+    "win_w_a_3",
+    "win_w_a_4",
+    "win_w_a_5",
+    "win_w_a_6",
+    "win_w_a_7",
+    "win_w_a_8",
+    "win_w_a_9",
+    "win_w_a_10"
+   ]
+  },
+  {
+   "signature": {
+    "verts": 24,
+    "tris": 12,
+    "dims": [
+     0.4277,
+     2.4355,
+     2.06
+    ]
+   },
+   "objects": [
+    "win_e_a_0_g",
+    "win_e_a_1_g",
+    "win_e_a_2_g",
+    "win_e_a_3_g",
+    "win_e_a_4_g",
+    "win_e_a_5_g",
+    "win_e_a_6_g",
+    "win_e_a_7_g",
+    "win_e_a_8_g",
+    "win_e_a_9_g",
+    "win_e_a_10_g",
+    "win_w_a_0_g",
+    "win_w_a_1_g",
+    "win_w_a_2_g",
+    "win_w_a_3_g",
+    "win_w_a_4_g",
+    "win_w_a_5_g",
+    "win_w_a_6_g",
+    "win_w_a_7_g",
+    "win_w_a_8_g",
+    "win_w_a_9_g",
+    "win_w_a_10_g"
+   ]
+  },
+  {
+   "signature": {
+    "verts": 24,
+    "tris": 12,
+    "dims": [
+     1.3626,
+     0.6989,
+     10.4
+    ]
+   },
+   "objects": [
+    "pil_n_0",
+    "pil_n_1",
+    "pil_n_2",
+    "pil_n_3",
+    "pil_n_4",
+    "pil_n_5",
+    "pil_n_6",
+    "pil_n_7",
+    "pil_n_8",
+    "pil_n_9",
+    "pil_n_10",
+    "pil_n_11",
+    "pil_n_12",
+    "pil_n_13",
+    "pil_n_14",
+    "pil_n_15",
+    "pil_n_16",
+    "pil_n_17",
+    "pil_n_18",
+    "pil_n_19"
+   ]
+  },
+  {
+   "signature": {
+    "verts": 48,
+    "tris": 28,
+    "dims": [
+     4.3449,
+     4.3449,
+     4.85
+    ]
+   },
+   "objects": [
+    "court_tree_0",
+    "court_tree_1",
+    "court_tree_2",
+    "court_tree_3",
+    "court_tree_4",
+    "court_tree_5",
+    "court_tree_6",
+    "court_tree_7"
+   ]
+  },
+  {
+   "signature": {
+    "verts": 216,
+    "tris": 108,
+    "dims": [
+     29.0388,
+     26.135,
+     1.4
+    ]
+   },
+   "objects": [
+    "balus_pav_e",
+    "balus_pav_w"
+   ]
+  },
+  {
+   "signature": {
+    "verts": 216,
+    "tris": 108,
+    "dims": [
+     26.6255,
+     23.7217,
+     3.86
+    ]
+   },
+   "objects": [
+    "roof_ne",
+    "roof_nw"
+   ]
+  },
+  {
+   "signature": {
+    "verts": 216,
+    "tris": 108,
+    "dims": [
+     27.55,
+     24.6462,
+     1.4
+    ]
+   },
+   "objects": [
+    "topcorn_pav_e",
+    "topcorn_pav_w"
+   ]
+  },
+  {
+   "signature": {
+    "verts": 66,
+    "tris": 40,
+    "dims": [
+     3.5896,
+     0.7854,
+     7.4
+    ]
+   },
+   "objects": [
+    "arch_n",
+    "arch_s_0",
+    "arch_s_1",
+    "arch_s_2"
+   ]
+  },
+  {
+   "signature": {
+    "verts": 66,
+    "tris": 40,
+    "dims": [
+     3.1267,
+     0.5382,
+     6.96
+    ]
+   },
+   "objects": [
+    "arch_n_g",
+    "arch_s_0_g",
+    "arch_s_1_g",
+    "arch_s_2_g"
+   ]
+  },
+  {
+   "signature": {
+    "verts": 120,
+    "tris": 76,
+    "dims": [
+     112.9961,
+     34.5812,
+     0.3
+    ]
+   },
+   "objects": [
+    "base_rev_south_0",
+    "base_rev_south_2"
+   ]
+  },
+  {
+   "signature": {
+    "verts": 120,
+    "tris": 76,
+    "dims": [
+     113.4513,
+     34.8704,
+     2.25
+    ]
+   },
+   "objects": [
+    "base_south_1",
+    "base_south_2"
+   ]
+  },
+  {
+   "signature": {
+    "verts": 60,
+    "tris": 36,
+    "dims": [
+     1.58,
+     1.5806,
+     8.9
+    ]
+   },
+   "objects": [
+    "column_0",
+    "column_3",
+    "column_11",
+    "column_12"
+   ]
+  },
+  {
+   "signature": {
+    "verts": 60,
+    "tris": 36,
+    "dims": [
+     1.5799,
+     1.5806,
+     8.9
+    ]
+   },
+   "objects": [
+    "column_14",
+    "column_16",
+    "column_17"
+   ]
+  },
+  {
+   "signature": {
+    "verts": 24,
+    "tris": 12,
+    "dims": [
+     0.3948,
+     1.0253,
+     16.6
+    ]
+   },
+   "objects": [
+    "court_slot_e_0",
+    "court_slot_e_1",
+    "court_slot_e_2",
+    "court_slot_e_3",
+    "court_slot_w_0",
+    "court_slot_w_1",
+    "court_slot_w_2",
+    "court_slot_w_3"
+   ]
+  },
+  {
+   "signature": {
+    "verts": 24,
+    "tris": 12,
+    "dims": [
+     2.5827,
+     2.9146,
+     1.5
+    ]
+   },
+   "objects": [
+    "dormer_e_0",
+    "dormer_e_1",
+    "dormer_e_2",
+    "dormer_e_3",
+    "dormer_w_0",
+    "dormer_w_1",
+    "dormer_w_2",
+    "dormer_w_3"
+   ]
+  },
+  {
+   "signature": {
+    "verts": 24,
+    "tris": 12,
+    "dims": [
+     2.9146,
+     2.5827,
+     1.5
+    ]
+   },
+   "objects": [
+    "dormer_s_0",
+    "dormer_s_1",
+    "dormer_s_2",
+    "dormer_s_3",
+    "dormer_s_4",
+    "dormer_s_5"
+   ]
+  },
+  {
+   "signature": {
+    "verts": 30,
+    "tris": 16,
+    "dims": [
+     22.5597,
+     29.1773,
+     2.25
+    ]
+   },
+   "objects": [
+    "base_east_1",
+    "base_east_2"
+   ]
+  },
+  {
+   "signature": {
+    "verts": 30,
+    "tris": 16,
+    "dims": [
+     22.3622,
+     29.1458,
+     0.3
+    ]
+   },
+   "objects": [
+    "base_rev_east_0",
+    "base_rev_east_2"
+   ]
+  },
+  {
+   "signature": {
+    "verts": 30,
+    "tris": 16,
+    "dims": [
+     25.6096,
+     30.2505,
+     0.3
+    ]
+   },
+   "objects": [
+    "base_rev_west_0",
+    "base_rev_west_2"
+   ]
+  },
+  {
+   "signature": {
+    "verts": 30,
+    "tris": 16,
+    "dims": [
+     25.8071,
+     30.282,
+     2.25
+    ]
+   },
+   "objects": [
+    "base_west_1",
+    "base_west_2"
+   ]
+  },
+  {
+   "signature": {
+    "verts": 24,
+    "tris": 12,
+    "dims": [
+     9.0796,
+     53.4413,
+     1.2
+    ]
+   },
+   "objects": [
+    "balband_e",
+    "balband_w"
+   ]
+  },
+  {
+   "signature": {
+    "verts": 24,
+    "tris": 12,
+    "dims": [
+     115.0879,
+     39.5768,
+     2.25
+    ]
+   },
+   "objects": [
+    "base_north_1",
+    "base_north_2"
+   ]
+  },
+  {
+   "signature": {
+    "verts": 24,
+    "tris": 12,
+    "dims": [
+     114.6613,
+     39.3162,
+     0.3
+    ]
+   },
+   "objects": [
+    "base_rev_north_0",
+    "base_rev_north_2"
+   ]
+  },
+  {
+   "signature": {
+    "verts": 24,
+    "tris": 12,
+    "dims": [
+     61.9887,
+     13.3709,
+     0.35
+    ]
+   },
+   "objects": [
+    "court_bed_0",
+    "court_bed_1"
+   ]
+  },
+  {
+   "signature": {
+    "verts": 24,
+    "tris": 12,
+    "dims": [
+     3.9495,
+     23.6289,
+     22.2
+    ]
+   },
+   "objects": [
+    "court_liner_e",
+    "court_liner_w"
+   ]
+  },
+  {
+   "signature": {
+    "verts": 24,
+    "tris": 12,
+    "dims": [
+     61.3335,
+     10.4757,
+     1.5
+    ]
+   },
+   "objects": [
+    "parapet_nc_n",
+    "parapet_nc_s"
+   ]
+  }
+ ],
+ "dup_redundant_tris": 6616,
+ "join_candidates": {
+  "Toy_cream": 9,
+  "Toy_glass": 324,
+  "Toy_gold_Glow": 6,
+  "Toy_mint": 11,
+  "Toy_navy": 2,
+  "Toy_sand": 6,
+  "Toy_steel": 19,
+  "Toy_stone": 35,
+  "Toy_trim": 85,
+  "Toy_white": 3,
+  "Toy_white_Glow": 48
+ },
+ "degenerate_tris": 0,
+ "coincident_vert_pairs": 18384,
+ "over_tess": {
+  "near_distance_m": 184.09,
+  "one_px_world_m": 0.1241,
+  "note": "cylinders whose chord error < one_px_world_m can halve segments"
+ }
+}

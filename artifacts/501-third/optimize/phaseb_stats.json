@@ -1,0 +1,75 @@
+{
+ "input_materials": [
+  "Toy_glass",
+  "Toy_ink",
+  "Toy_roofd",
+  "Toy_sand",
+  "Toy_steel",
+  "Toy_trim",
+  "Toy_white_Glow"
+ ],
+ "steps": [
+  {
+   "step": "weld+degenerate",
+   "tris": 2732,
+   "verts": 1544
+  },
+  {
+   "step": "interior-faces",
+   "tris": 2732,
+   "verts": 1544
+  },
+  {
+   "step": "dissolve-skipped",
+   "tris": 2732,
+   "verts": 1544
+  },
+  {
+   "step": "join-per-material",
+   "tris": 2732,
+   "verts": 1544
+  }
+ ],
+ "input": {
+  "tris": 2780,
+  "verts": 5464,
+  "objects": 90
+ },
+ "welded": true,
+ "interior_faces_removed": 0,
+ "dissolved": false,
+ "joins": {
+  "grp_Toy_roofd": 2,
+  "grp_Toy_glass": 29,
+  "grp_Toy_trim": 26,
+  "grp_Toy_white_Glow": 9,
+  "grp_Toy_sand": 3,
+  "grp_Toy_ink": 18,
+  "grp_Toy_steel": 3
+ },
+ "inverted_solids": [],
+ "reimport": {
+  "objects": 7,
+  "materials": [
+   "Toy_glass",
+   "Toy_ink",
+   "Toy_roofd",
+   "Toy_sand",
+   "Toy_steel",
+   "Toy_trim",
+   "Toy_white_Glow"
+  ],
+  "bbox_dims": [
+   34.6966,
+   34.5376,
+   16.4
+  ],
+  "bbox_min": [
+   -17.3327,
+   -17.2713,
+   0.0
+  ]
+ },
+ "bbox_ok": true,
+ "material_set_ok": true
+}

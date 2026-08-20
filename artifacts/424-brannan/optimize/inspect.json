@@ -1,0 +1,413 @@
+{
+ "file_bytes": {
+  "raw": 514628,
+  "gzip9": 139423
+ },
+ "objects": 37,
+ "total_tris": 8944,
+ "total_verts": 18072,
+ "primitives_est": 38,
+ "top20": [
+  {
+   "name": "plate",
+   "tris": 1236,
+   "verts": 2472,
+   "dims": [
+    88.716,
+    59.585,
+    1.899
+   ],
+   "materials": [
+    "Toy_ink",
+    "Toy_stone"
+   ]
+  },
+  {
+   "name": "fence_posts",
+   "tris": 1116,
+   "verts": 2232,
+   "dims": [
+    88.843,
+    59.713,
+    3.731
+   ],
+   "materials": [
+    "Toy_steel"
+   ]
+  },
+  {
+   "name": "striping",
+   "tris": 1056,
+   "verts": 2112,
+   "dims": [
+    86.604,
+    59.176,
+    1.546
+   ],
+   "materials": [
+    "Toy_mustard"
+   ]
+  },
+  {
+   "name": "car_cabins",
+   "tris": 792,
+   "verts": 1728,
+   "dims": [
+    73.348,
+    42.576,
+    2.225
+   ],
+   "materials": [
+    "Toy_glass"
+   ]
+  },
+  {
+   "name": "wheel_stops",
+   "tris": 528,
+   "verts": 1056,
+   "dims": [
+    84.716,
+    46.448,
+    1.636
+   ],
+   "materials": [
+    "Toy_ink"
+   ]
+  },
+  {
+   "name": "cars_white",
+   "tris": 432,
+   "verts": 864,
+   "dims": [
+    56.101,
+    44.74,
+    1.928
+   ],
+   "materials": [
+    "Toy_white"
+   ]
+  },
+  {
+   "name": "crowns",
+   "tris": 384,
+   "verts": 720,
+   "dims": [
+    66.987,
+    45.851,
+    3.811
+   ],
+   "materials": [
+    "Toy_verdigris"
+   ]
+  },
+  {
+   "name": "cars_ink",
+   "tris": 324,
+   "verts": 648,
+   "dims": [
+    28.436,
+    36.892,
+    1.472
+   ],
+   "materials": [
+    "Toy_ink"
+   ]
+  },
+  {
+   "name": "cars_steel",
+   "tris": 324,
+   "verts": 648,
+   "dims": [
+    49.083,
+    25.774,
+    1.807
+   ],
+   "materials": [
+    "Toy_steel"
+   ]
+  },
+  {
+   "name": "fence_rail",
+   "tris": 288,
+   "verts": 576,
+   "dims": [
+    88.772,
+    59.642,
+    2.28
+   ],
+   "materials": [
+    "Toy_steel"
+   ]
+  },
+  {
+   "name": "cars_navy",
+   "tris": 216,
+   "verts": 432,
+   "dims": [
+    45.851,
+    7.575,
+    1.713
+   ],
+   "materials": [
+    "Toy_navy"
+   ]
+  },
+  {
+   "name": "cars_stone",
+   "tris": 216,
+   "verts": 432,
+   "dims": [
+    46.581,
+    19.792,
+    1.755
+   ],
+   "materials": [
+    "Toy_stone"
+   ]
+  },
+  {
+   "name": "kerb",
+   "tris": 176,
+   "verts": 384,
+   "dims": [
+    83.693,
+    59.515,
+    1.652
+   ],
+   "materials": [
+    "Toy_trim"
+   ]
+  },
+  {
+   "name": "fence_barb",
+   "tris": 144,
+   "verts": 288,
+   "dims": [
+    88.744,
+    59.614,
+    1.53
+   ],
+   "materials": [
+    "Toy_ink"
+   ]
+  },
+  {
+   "name": "fence_mesh",
+   "tris": 144,
+   "verts": 288,
+   "dims": [
+    88.744,
+    59.614,
+    2.35
+   ],
+   "materials": [
+    "Toy_steel"
+   ]
+  },
+  {
+   "name": "lamp_heads",
+   "tris": 132,
+   "verts": 288,
+   "dims": [
+    66.882,
+    33.559,
+    1.497
+   ],
+   "materials": [
+    "Toy_ink"
+   ]
+  },
+  {
+   "name": "lamp_poles",
+   "tris": 132,
+   "verts": 288,
+   "dims": [
+    66.117,
+    32.796,
+    6.414
+   ],
+   "materials": [
+    "Toy_steel"
+   ]
+  },
+  {
+   "name": "booth",
+   "tris": 108,
+   "verts": 216,
+   "dims": [
+    3.734,
+    3.737,
+    2.414
+   ],
+   "materials": [
+    "Toy_cream"
+   ]
+  },
+  {
+   "name": "booth_roof",
+   "tris": 108,
+   "verts": 216,
+   "dims": [
+    4.458,
+    4.461,
+    0.398
+   ],
+   "materials": [
+    "Toy_ink"
+   ]
+  },
+  {
+   "name": "cars_coral",
+   "tris": 108,
+   "verts": 216,
+   "dims": [
+    4.276,
+    4.238,
+    0.827
+   ],
+   "materials": [
+    "Toy_coral"
+   ]
+  }
+ ],
+ "vertex_attrs": [
+  "NORMAL"
+ ],
+ "materials": [
+  {
+   "name": "Toy_coral",
+   "glow": false,
+   "user_objects": 1
+  },
+  {
+   "name": "Toy_cream",
+   "glow": false,
+   "user_objects": 1
+  },
+  {
+   "name": "Toy_glass",
+   "glow": false,
+   "user_objects": 2
+  },
+  {
+   "name": "Toy_gold_Glow",
+   "glow": true,
+   "user_objects": 1
+  },
+  {
+   "name": "Toy_ink",
+   "glow": false,
+   "user_objects": 8
+  },
+  {
+   "name": "Toy_mustard",
+   "glow": false,
+   "user_objects": 1
+  },
+  {
+   "name": "Toy_navy",
+   "glow": false,
+   "user_objects": 1
+  },
+  {
+   "name": "Toy_red",
+   "glow": false,
+   "user_objects": 2
+  },
+  {
+   "name": "Toy_red_Glow",
+   "glow": true,
+   "user_objects": 1
+  },
+  {
+   "name": "Toy_rust",
+   "glow": false,
+   "user_objects": 1
+  },
+  {
+   "name": "Toy_sand",
+   "glow": false,
+   "user_objects": 1
+  },
+  {
+   "name": "Toy_sky",
+   "glow": false,
+   "user_objects": 1
+  },
+  {
+   "name": "Toy_steel",
+   "glow": false,
+   "user_objects": 7
+  },
+  {
+   "name": "Toy_stone",
+   "glow": false,
+   "user_objects": 2
+  },
+  {
+   "name": "Toy_teal",
+   "glow": false,
+   "user_objects": 1
+  },
+  {
+   "name": "Toy_trim",
+   "glow": false,
+   "user_objects": 1
+  },
+  {
+   "name": "Toy_trim_Glow",
+   "glow": true,
+   "user_objects": 1
+  },
+  {
+   "name": "Toy_verdigris",
+   "glow": false,
+   "user_objects": 1
+  },
+  {
+   "name": "Toy_white",
+   "glow": false,
+   "user_objects": 3
+  },
+  {
+   "name": "Toy_white_Glow",
+   "glow": true,
+   "user_objects": 1
+  }
+ ],
+ "textures": [],
+ "bbox": {
+  "dims": [
+   88.8432,
+   59.934,
+   8.5649
+  ],
+  "min": [
+   -44.4217,
+   -29.856,
+   -1.0844
+  ],
+  "origin_offset_xy": [
+   -0.0002,
+   0.111
+  ],
+  "base_z": -1.0844
+ },
+ "duplicate_mesh_groups": [],
+ "dup_redundant_tris": 0,
+ "join_candidates": {
+  "Toy_glass": 2,
+  "Toy_ink": 8,
+  "Toy_red": 2,
+  "Toy_steel": 7,
+  "Toy_stone": 2,
+  "Toy_white": 3
+ },
+ "degenerate_tris": 0,
+ "coincident_vert_pairs": 13292,
+ "over_tess": {
+  "near_distance_m": 133.26,
+  "one_px_world_m": 0.0898,
+  "note": "cylinders whose chord error < one_px_world_m can halve segments"
+ }
+}

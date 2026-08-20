@@ -1,0 +1,21 @@
+  entries: {"entries":104,"far":99,"loading":1,"live":4,"fading":0,"failed":0}
+  stats: {"entries":104,"far":26,"loading":0,"live":78,"fading":0,"failed":0}
+PASS  manifest entry loads — sf-assets: pier-9 merged 19 objects / 13 materials -> batched (7171 tris body); uniform x1.0000 at 3581, -3390
+PASS  uniform scale ~ 1.0 — x1
+  rig: {"x":3581,"z":-3390,"yawDeg":235,"pitchDeg":42,"distance":450}
+  placedPier9: true {"log":"uniform x1.0000 at 3581, -3390"}
+  placedIds: goldenGateBridge,salesforceTower,ferryBuilding,transamerica,paintedLadies,cityHall,coitTower,conservatoryOfFlowers,calAcademy,palaceOfFineArts,deYoung,stMarysCathedral,fairmont,362Brannan,380Brannan,550Third,350Brannan,551Third,171SouthPark,155SouthPark,101SouthPark,135SouthPark,165SouthPark,370Brannan,358Brannan,500Third,181SouthPark,599Third,574Third,188SouthPark,150SouthPark,560Third,160SouthPark,132SouthPark,106SouthPark,108SouthPark,156SouthPark,126SouthPark,168SouthPark,140SouthPark,2SouthPark,102SouthPark,501Second,524Second,64SouthPark,21SouthPark,22SouthPark,26SouthPark,35SouthPark,41SouthPark,46SouthPark,58SouthPark,76SouthPark,84SouthPark,92SouthPark,95JackLondonAlley,300Brannan,326Brannan,318Brannan,334Brannan,340Brannan,49SouthPark,49Zoe,254Ritch,246Ritch,248Ritch,226Ritch,1SouthPark,501Third,10SouthPark,521Third,164SouthPark,pier-9,graceCathedral,missionDolores,columbusTower,operaHouse,555California
+  console lines: 85
+    > weather: feed unavailable, holding the last known sky SyntaxError: Unexpected token '<', "<!doctype "... is not valid JSON
+    > sf-assets: 58-south-park merged 13 objects / 10 materials -> batched (3610 tris body); uniform x1.0000 at 3838, -1340
+    > sf-assets: 340-brannan merged 14 objects / 13 materials -> batched (5393 tris body); uniform x1.0000 at 3895, -1247
+PASS  draw calls under 300 at the landmark — avg 88/frame
+  seat: {"x":3581.48,"y":2.492,"z":-3390.35,"scale":1}
+PASS  seated on the DEM deck ridge (y ~ 2.5) — y=2.492 scale=1
+PASS  no asset warnings — (none)
+
+PASS manifest entry loads
+PASS uniform scale ~ 1.0
+PASS draw calls under 300 at the landmark
+PASS seated on the DEM deck ridge (y ~ 2.5)
+PASS no asset warnings

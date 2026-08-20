@@ -1,0 +1,33 @@
+{
+ "ok": true,
+ "meshes": 26,
+ "tris": 10692,
+ "materials": [
+  "Toy_bronze",
+  "Toy_cream",
+  "Toy_gold_Glow",
+  "Toy_ink",
+  "Toy_koiOrange",
+  "Toy_koiOrange_Glow",
+  "Toy_koiWhite",
+  "Toy_koiWhite_Glow",
+  "Toy_navy",
+  "Toy_roofd",
+  "Toy_seam",
+  "Toy_soil",
+  "Toy_steel",
+  "Toy_stone",
+  "Toy_tarmac",
+  "Toy_verdigris"
+ ],
+ "bbox_dims": [
+  128.4915,
+  13.1931,
+  67.6286
+ ],
+ "bbox_min": [
+  -64.2458,
+  -1.5,
+  -33.8143
+ ]
+}

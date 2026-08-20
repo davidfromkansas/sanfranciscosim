@@ -9,10 +9,11 @@
   },
   "scripts": {
     "dev": "vite",
-    "build": "npm test && vite build && node scripts/compress-tiles.mjs",
+    "build": "npm run lint && npm run lint:api && npm test && vite build && node scripts/compress-tiles.mjs",
     "preview": "vite preview",
     "lint": "eslint src test",
-    "test": "node --test test/muni-motion.test.mjs test/ferry-motion.test.mjs test/ferry-palette.test.mjs test/asset-loading.test.mjs"
+    "test": "node --test test/muni-motion.test.mjs test/ferry-motion.test.mjs test/ferry-palette.test.mjs test/asset-loading.test.mjs",
+    "lint:api": "cd .. && ./app/node_modules/.bin/eslint api"
   },
   "dependencies": {
     "three": "0.185.1"

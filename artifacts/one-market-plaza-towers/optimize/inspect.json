@@ -1,0 +1,985 @@
+{
+ "file_bytes": {
+  "raw": 644944,
+  "gzip9": 118948
+ },
+ "objects": 329,
+ "total_tris": 9428,
+ "total_verts": 18244,
+ "primitives_est": 332,
+ "top20": [
+  {
+   "name": "pod_par",
+   "tris": 864,
+   "verts": 1576,
+   "dims": [
+    123.023,
+    128.81,
+    1.0
+   ],
+   "materials": [
+    "Toy_white"
+   ]
+  },
+  {
+   "name": "garden_kerb",
+   "tris": 576,
+   "verts": 1008,
+   "dims": [
+    19.485,
+    19.23,
+    0.72
+   ],
+   "materials": [
+    "Toy_stone"
+   ]
+  },
+  {
+   "name": "spear_par",
+   "tris": 576,
+   "verts": 1080,
+   "dims": [
+    59.422,
+    59.505,
+    1.2
+   ],
+   "materials": [
+    "Toy_white"
+   ]
+  },
+  {
+   "name": "steuart_par",
+   "tris": 576,
+   "verts": 1056,
+   "dims": [
+    51.521,
+    51.568,
+    1.2
+   ],
+   "materials": [
+    "Toy_white"
+   ]
+  },
+  {
+   "name": "pod_retail",
+   "tris": 384,
+   "verts": 672,
+   "dims": [
+    121.613,
+    127.408,
+    5.7
+   ],
+   "materials": [
+    "Toy_glassl"
+   ]
+  },
+  {
+   "name": "podium",
+   "tris": 332,
+   "verts": 640,
+   "dims": [
+    120.516,
+    126.317,
+    27.8
+   ],
+   "materials": [
+    "Toy_glass",
+    "Toy_sand"
+   ]
+  },
+  {
+   "name": "canopy0",
+   "tris": 260,
+   "verts": 520,
+   "dims": [
+    6.21,
+    10.235,
+    3.95
+   ],
+   "materials": [
+    "Toy_glassl"
+   ]
+  },
+  {
+   "name": "canopy1",
+   "tris": 260,
+   "verts": 520,
+   "dims": [
+    6.21,
+    10.235,
+    3.95
+   ],
+   "materials": [
+    "Toy_glassl"
+   ]
+  },
+  {
+   "name": "canopy2",
+   "tris": 260,
+   "verts": 520,
+   "dims": [
+    6.21,
+    10.235,
+    3.95
+   ],
+   "materials": [
+    "Toy_glassl"
+   ]
+  },
+  {
+   "name": "canopy3",
+   "tris": 260,
+   "verts": 520,
+   "dims": [
+    6.21,
+    10.235,
+    3.95
+   ],
+   "materials": [
+    "Toy_glassl"
+   ]
+  },
+  {
+   "name": "canopy4",
+   "tris": 260,
+   "verts": 520,
+   "dims": [
+    6.21,
+    10.235,
+    3.95
+   ],
+   "materials": [
+    "Toy_glassl"
+   ]
+  },
+  {
+   "name": "spear_shaft",
+   "tris": 220,
+   "verts": 432,
+   "dims": [
+    57.74,
+    57.823,
+    145.4
+   ],
+   "materials": [
+    "Toy_glass",
+    "Toy_slate"
+   ]
+  },
+  {
+   "name": "steuart_shaft",
+   "tris": 220,
+   "verts": 432,
+   "dims": [
+    49.838,
+    49.885,
+    84.4
+   ],
+   "materials": [
+    "Toy_glass",
+    "Toy_slate"
+   ]
+  },
+  {
+   "name": "pod_retail_glow",
+   "tris": 96,
+   "verts": 144,
+   "dims": [
+    121.983,
+    127.776,
+    4.5
+   ],
+   "materials": [
+    "Toy_gold_Glow"
+   ]
+  },
+  {
+   "name": "spear_plant",
+   "tris": 92,
+   "verts": 192,
+   "dims": [
+    20.01,
+    20.031,
+    3.9
+   ],
+   "materials": [
+    "Toy_slate"
+   ]
+  },
+  {
+   "name": "spear_plant_cap",
+   "tris": 92,
+   "verts": 192,
+   "dims": [
+    21.425,
+    21.446,
+    0.5
+   ],
+   "materials": [
+    "Toy_steel"
+   ]
+  },
+  {
+   "name": "steuart_plant",
+   "tris": 92,
+   "verts": 192,
+   "dims": [
+    17.267,
+    17.276,
+    2.8
+   ],
+   "materials": [
+    "Toy_slate"
+   ]
+  },
+  {
+   "name": "steuart_plant_cap",
+   "tris": 92,
+   "verts": 192,
+   "dims": [
+    18.682,
+    18.691,
+    0.5
+   ],
+   "materials": [
+    "Toy_steel"
+   ]
+  },
+  {
+   "name": "garden",
+   "tris": 68,
+   "verts": 108,
+   "dims": [
+    17.8,
+    17.53,
+    0.58
+   ],
+   "materials": [
+    "Toy_mint"
+   ]
+  },
+  {
+   "name": "planter0",
+   "tris": 44,
+   "verts": 96,
+   "dims": [
+    9.0,
+    5.0,
+    0.8
+   ],
+   "materials": [
+    "Toy_stone"
+   ]
+  }
+ ],
+ "vertex_attrs": [
+  "NORMAL"
+ ],
+ "materials": [
+  {
+   "name": "Toy_glass",
+   "glow": false,
+   "user_objects": 3
+  },
+  {
+   "name": "Toy_glassl",
+   "glow": false,
+   "user_objects": 6
+  },
+  {
+   "name": "Toy_glassl_Glow",
+   "glow": true,
+   "user_objects": 136
+  },
+  {
+   "name": "Toy_gold_Glow",
+   "glow": true,
+   "user_objects": 1
+  },
+  {
+   "name": "Toy_mint",
+   "glow": false,
+   "user_objects": 5
+  },
+  {
+   "name": "Toy_sand",
+   "glow": false,
+   "user_objects": 1
+  },
+  {
+   "name": "Toy_slate",
+   "glow": false,
+   "user_objects": 4
+  },
+  {
+   "name": "Toy_steel",
+   "glow": false,
+   "user_objects": 2
+  },
+  {
+   "name": "Toy_stone",
+   "glow": false,
+   "user_objects": 7
+  },
+  {
+   "name": "Toy_white",
+   "glow": false,
+   "user_objects": 167
+  }
+ ],
+ "textures": [],
+ "bbox": {
+  "dims": [
+   123.0233,
+   128.8103,
+   177.6
+  ],
+  "min": [
+   -61.5133,
+   -64.4001,
+   0.0
+  ],
+  "origin_offset_xy": [
+   -0.0017,
+   0.0051
+  ],
+  "base_z": 0.0
+ },
+ "duplicate_mesh_groups": [
+  {
+   "signature": {
+    "verts": 520,
+    "tris": 260,
+    "dims": [
+     6.2099,
+     10.2348,
+     3.95
+    ]
+   },
+   "objects": [
+    "canopy0",
+    "canopy1",
+    "canopy2",
+    "canopy3",
+    "canopy4"
+   ]
+  },
+  {
+   "signature": {
+    "verts": 24,
+    "tris": 12,
+    "dims": [
+     1.6003,
+     0.0856,
+     2.4
+    ]
+   },
+   "objects": [
+    "spear_lit0_0",
+    "spear_lit0_2",
+    "spear_lit0_4",
+    "spear_lit1_1",
+    "spear_lit1_3",
+    "spear_lit2_0",
+    "spear_lit2_2",
+    "spear_lit2_4",
+    "spear_lit3_1",
+    "spear_lit3_3",
+    "spear_lit4_0",
+    "spear_lit4_2",
+    "spear_lit5_0",
+    "spear_lit5_2",
+    "spear_lit6_0",
+    "spear_lit6_2",
+    "spear_lit7_0",
+    "spear_lit7_2",
+    "spear_lit8_0",
+    "spear_lit8_2",
+    "spear_lit9_0",
+    "spear_lit9_2",
+    "spear_lit10_0",
+    "spear_lit10_2",
+    "spear_lit11_0",
+    "spear_lit11_2",
+    "spear_lit12_0",
+    "spear_lit12_2",
+    "spear_lit13_1",
+    "spear_lit14_0",
+    "spear_lit14_2",
+    "spear_lit15_1",
+    "spear_lit16_0",
+    "spear_lit16_2",
+    "spear_lit17_1",
+    "spear_lit18_0",
+    "spear_lit18_2",
+    "spear_lit19_1",
+    "spear_lit20_0",
+    "spear_lit21_0",
+    "spear_lit22_0",
+    "spear_lit23_0",
+    "spear_lit24_0",
+    "spear_lit25_0",
+    "steuart_lit0_0",
+    "steuart_lit0_2",
+    "steuart_lit1_0",
+    "steuart_lit1_2",
+    "steuart_lit2_0",
+    "steuart_lit2_2",
+    "steuart_lit3_0",
+    "steuart_lit3_2",
+    "steuart_lit4_1",
+    "steuart_lit5_0",
+    "steuart_lit5_2",
+    "steuart_lit6_1",
+    "steuart_lit7_0",
+    "steuart_lit7_2",
+    "steuart_lit8_1",
+    "steuart_lit9_0",
+    "steuart_lit10_0",
+    "steuart_lit11_0",
+    "steuart_lit12_0",
+    "steuart_lit13_0",
+    "steuart_lit14_0",
+    "steuart_lit15_0"
+   ]
+  },
+  {
+   "signature": {
+    "verts": 24,
+    "tris": 12,
+    "dims": [
+     0.0856,
+     1.6003,
+     2.4
+    ]
+   },
+   "objects": [
+    "spear_lit0_1",
+    "spear_lit0_3",
+    "spear_lit1_0",
+    "spear_lit1_2",
+    "spear_lit1_4",
+    "spear_lit2_1",
+    "spear_lit2_3",
+    "spear_lit3_0",
+    "spear_lit3_2",
+    "spear_lit3_4",
+    "spear_lit4_1",
+    "spear_lit4_3",
+    "spear_lit5_1",
+    "spear_lit5_3",
+    "spear_lit6_1",
+    "spear_lit6_3",
+    "spear_lit7_1",
+    "spear_lit7_3",
+    "spear_lit8_1",
+    "spear_lit8_3",
+    "spear_lit9_1",
+    "spear_lit9_3",
+    "spear_lit10_1",
+    "spear_lit10_3",
+    "spear_lit11_1",
+    "spear_lit11_3",
+    "spear_lit12_1",
+    "spear_lit13_0",
+    "spear_lit13_2",
+    "spear_lit14_1",
+    "spear_lit15_0",
+    "spear_lit15_2",
+    "spear_lit16_1",
+    "spear_lit17_0",
+    "spear_lit17_2",
+    "spear_lit18_1",
+    "spear_lit19_0",
+    "spear_lit19_2",
+    "spear_lit20_1",
+    "spear_lit21_1",
+    "spear_lit22_1",
+    "spear_lit23_1",
+    "spear_lit24_1",
+    "spear_lit25_1",
+    "steuart_lit0_1",
+    "steuart_lit0_3",
+    "steuart_lit1_1",
+    "steuart_lit1_3",
+    "steuart_lit2_1",
+    "steuart_lit2_3",
+    "steuart_lit3_1",
+    "steuart_lit4_0",
+    "steuart_lit4_2",
+    "steuart_lit5_1",
+    "steuart_lit6_0",
+    "steuart_lit6_2",
+    "steuart_lit7_1",
+    "steuart_lit8_0",
+    "steuart_lit8_2",
+    "steuart_lit9_1",
+    "steuart_lit10_1",
+    "steuart_lit11_1",
+    "steuart_lit12_1",
+    "steuart_lit13_1",
+    "steuart_lit14_1"
+   ]
+  },
+  {
+   "signature": {
+    "verts": 24,
+    "tris": 12,
+    "dims": [
+     1.7792,
+     1.7846,
+     145.4
+    ]
+   },
+   "objects": [
+    "spear_p3_0",
+    "spear_p3_1",
+    "spear_p3_2",
+    "spear_p3_3",
+    "spear_p3_4",
+    "spear_p3_5",
+    "spear_p3_6",
+    "spear_p3_7",
+    "spear_p3_8",
+    "spear_p3_9",
+    "spear_p3_10",
+    "spear_p3_11",
+    "spear_p3_12",
+    "spear_p3_13",
+    "spear_p7_0",
+    "spear_p7_1",
+    "spear_p7_2",
+    "spear_p7_3",
+    "spear_p7_4",
+    "spear_p7_5",
+    "spear_p7_6",
+    "spear_p7_7",
+    "spear_p7_8",
+    "spear_p7_9",
+    "spear_p7_10",
+    "spear_p7_11",
+    "spear_p7_12",
+    "spear_p7_13"
+   ]
+  },
+  {
+   "signature": {
+    "verts": 24,
+    "tris": 12,
+    "dims": [
+     1.7792,
+     1.7846,
+     84.4
+    ]
+   },
+   "objects": [
+    "steuart_p3_0",
+    "steuart_p3_1",
+    "steuart_p3_2",
+    "steuart_p3_3",
+    "steuart_p3_4",
+    "steuart_p3_5",
+    "steuart_p3_6",
+    "steuart_p3_7",
+    "steuart_p3_8",
+    "steuart_p3_9",
+    "steuart_p3_10",
+    "steuart_p7_0",
+    "steuart_p7_1",
+    "steuart_p7_2",
+    "steuart_p7_3",
+    "steuart_p7_4",
+    "steuart_p7_5",
+    "steuart_p7_6",
+    "steuart_p7_7",
+    "steuart_p7_8",
+    "steuart_p7_9",
+    "steuart_p7_10"
+   ]
+  },
+  {
+   "signature": {
+    "verts": 24,
+    "tris": 12,
+    "dims": [
+     1.7846,
+     1.7792,
+     145.4
+    ]
+   },
+   "objects": [
+    "spear_p1_0",
+    "spear_p1_1",
+    "spear_p1_2",
+    "spear_p1_3",
+    "spear_p1_4",
+    "spear_p1_5",
+    "spear_p1_6",
+    "spear_p1_7",
+    "spear_p1_8",
+    "spear_p5_0",
+    "spear_p5_1",
+    "spear_p5_2",
+    "spear_p5_3",
+    "spear_p5_4",
+    "spear_p5_5",
+    "spear_p5_6",
+    "spear_p5_7",
+    "spear_p5_8"
+   ]
+  },
+  {
+   "signature": {
+    "verts": 24,
+    "tris": 12,
+    "dims": [
+     1.7846,
+     1.7792,
+     84.4
+    ]
+   },
+   "objects": [
+    "steuart_p1_0",
+    "steuart_p1_1",
+    "steuart_p1_2",
+    "steuart_p1_3",
+    "steuart_p1_4",
+    "steuart_p1_5",
+    "steuart_p1_6",
+    "steuart_p1_7",
+    "steuart_p5_0",
+    "steuart_p5_1",
+    "steuart_p5_2",
+    "steuart_p5_3",
+    "steuart_p5_4",
+    "steuart_p5_5",
+    "steuart_p5_6",
+    "steuart_p5_7"
+   ]
+  },
+  {
+   "signature": {
+    "verts": 24,
+    "tris": 12,
+    "dims": [
+     2.4517,
+     2.4271,
+     27.8
+    ]
+   },
+   "objects": [
+    "pod_p1_0",
+    "pod_p1_1",
+    "pod_p1_2",
+    "pod_p1_3",
+    "pod_p1_4",
+    "pod_p1_5",
+    "pod_p1_6",
+    "pod_p1_7",
+    "pod_p1_8"
+   ]
+  },
+  {
+   "signature": {
+    "verts": 24,
+    "tris": 12,
+    "dims": [
+     2.4563,
+     2.4224,
+     27.8
+    ]
+   },
+   "objects": [
+    "pod_p8_0",
+    "pod_p8_1",
+    "pod_p8_2",
+    "pod_p8_3",
+    "pod_p8_4",
+    "pod_p8_5",
+    "pod_p8_6",
+    "pod_p8_7"
+   ]
+  },
+  {
+   "signature": {
+    "verts": 24,
+    "tris": 12,
+    "dims": [
+     2.4214,
+     2.4573,
+     27.8
+    ]
+   },
+   "objects": [
+    "pod_p10_0",
+    "pod_p10_1",
+    "pod_p10_2",
+    "pod_p10_3",
+    "pod_p10_4",
+    "pod_p10_5",
+    "pod_p10_6",
+    "pod_p10_7"
+   ]
+  },
+  {
+   "signature": {
+    "verts": 24,
+    "tris": 12,
+    "dims": [
+     2.437,
+     2.442,
+     27.8
+    ]
+   },
+   "objects": [
+    "pod_p9_0",
+    "pod_p9_1",
+    "pod_p9_2",
+    "pod_p9_3",
+    "pod_p9_4",
+    "pod_p9_5",
+    "pod_p9_6"
+   ]
+  },
+  {
+   "signature": {
+    "verts": 24,
+    "tris": 12,
+    "dims": [
+     2.4334,
+     2.4456,
+     27.8
+    ]
+   },
+   "objects": [
+    "pod_p3_0",
+    "pod_p3_1",
+    "pod_p3_2",
+    "pod_p3_3",
+    "pod_p3_4",
+    "pod_p3_5"
+   ]
+  },
+  {
+   "signature": {
+    "verts": 24,
+    "tris": 12,
+    "dims": [
+     2.4516,
+     2.4273,
+     27.8
+    ]
+   },
+   "objects": [
+    "pod_p4_0",
+    "pod_p4_1",
+    "pod_p4_2",
+    "pod_p4_3",
+    "pod_p4_4",
+    "pod_p4_5"
+   ]
+  },
+  {
+   "signature": {
+    "verts": 24,
+    "tris": 12,
+    "dims": [
+     2.4425,
+     2.4365,
+     27.8
+    ]
+   },
+   "objects": [
+    "pod_p7_0",
+    "pod_p7_1",
+    "pod_p7_2",
+    "pod_p7_3",
+    "pod_p7_4",
+    "pod_p7_5"
+   ]
+  },
+  {
+   "signature": {
+    "verts": 24,
+    "tris": 12,
+    "dims": [
+     5.1203,
+     8.0182,
+     0.21
+    ]
+   },
+   "objects": [
+    "canopy_glow0",
+    "canopy_glow1",
+    "canopy_glow2",
+    "canopy_glow3",
+    "canopy_glow4"
+   ]
+  },
+  {
+   "signature": {
+    "verts": 24,
+    "tris": 12,
+    "dims": [
+     2.4632,
+     2.4152,
+     27.8
+    ]
+   },
+   "objects": [
+    "pod_p11_0",
+    "pod_p11_1",
+    "pod_p11_2",
+    "pod_p11_3"
+   ]
+  },
+  {
+   "signature": {
+    "verts": 24,
+    "tris": 12,
+    "dims": [
+     1.8025,
+     0.7263,
+     145.4
+    ]
+   },
+   "objects": [
+    "spear_p0_0",
+    "spear_p0_1",
+    "spear_p4_0",
+    "spear_p4_1"
+   ]
+  },
+  {
+   "signature": {
+    "verts": 24,
+    "tris": 12,
+    "dims": [
+     0.7263,
+     1.8025,
+     145.4
+    ]
+   },
+   "objects": [
+    "spear_p2_0",
+    "spear_p2_1",
+    "spear_p6_0",
+    "spear_p6_1"
+   ]
+  },
+  {
+   "signature": {
+    "verts": 24,
+    "tris": 12,
+    "dims": [
+     1.8025,
+     0.7263,
+     84.4
+    ]
+   },
+   "objects": [
+    "steuart_p0_0",
+    "steuart_p0_1",
+    "steuart_p4_0",
+    "steuart_p4_1"
+   ]
+  },
+  {
+   "signature": {
+    "verts": 24,
+    "tris": 12,
+    "dims": [
+     0.7263,
+     1.8025,
+     84.4
+    ]
+   },
+   "objects": [
+    "steuart_p2_0",
+    "steuart_p2_1",
+    "steuart_p6_0",
+    "steuart_p6_1"
+   ]
+  },
+  {
+   "signature": {
+    "verts": 24,
+    "tris": 12,
+    "dims": [
+     2.4556,
+     2.4232,
+     27.8
+    ]
+   },
+   "objects": [
+    "pod_p0_0",
+    "pod_p0_1",
+    "pod_p0_2"
+   ]
+  },
+  {
+   "signature": {
+    "verts": 24,
+    "tris": 12,
+    "dims": [
+     2.4716,
+     2.4063,
+     27.8
+    ]
+   },
+   "objects": [
+    "pod_p6_0",
+    "pod_p6_1",
+    "pod_p6_2"
+   ]
+  },
+  {
+   "signature": {
+    "verts": 24,
+    "tris": 12,
+    "dims": [
+     2.2567,
+     2.5925,
+     27.8
+    ]
+   },
+   "objects": [
+    "pod_p2_0",
+    "pod_p2_1"
+   ]
+  },
+  {
+   "signature": {
+    "verts": 24,
+    "tris": 12,
+    "dims": [
+     2.4271,
+     2.4518,
+     27.8
+    ]
+   },
+   "objects": [
+    "pod_p5_0",
+    "pod_p5_1"
+   ]
+  }
+ ],
+ "dup_redundant_tris": 4364,
+ "join_candidates": {
+  "Toy_glass": 3,
+  "Toy_glassl": 6,
+  "Toy_glassl_Glow": 136,
+  "Toy_mint": 5,
+  "Toy_slate": 4,
+  "Toy_steel": 2,
+  "Toy_stone": 7,
+  "Toy_white": 167
+ },
+ "degenerate_tris": 0,
+ "coincident_vert_pairs": 12884,
+ "over_tess": {
+  "near_distance_m": 266.4,
+  "one_px_world_m": 0.1796,
+  "note": "cylinders whose chord error < one_px_world_m can halve segments"
+ }
+}

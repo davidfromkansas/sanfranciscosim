@@ -1,0 +1,1648 @@
+{
+ "file_bytes": {
+  "raw": 1337932,
+  "gzip9": 169281
+ },
+ "objects": 869,
+ "total_tris": 17904,
+ "total_verts": 34813,
+ "primitives_est": 882,
+ "top20": [
+  {
+   "name": "trim_base",
+   "tris": 768,
+   "verts": 1344,
+   "dims": [
+    65.026,
+    46.046,
+    0.6
+   ],
+   "materials": [
+    "Toy_trim"
+   ]
+  },
+  {
+   "name": "base",
+   "tris": 668,
+   "verts": 1296,
+   "dims": [
+    64.374,
+    45.393,
+    10.0
+   ],
+   "materials": [
+    "Toy_cream"
+   ]
+  },
+  {
+   "name": "parapet",
+   "tris": 448,
+   "verts": 612,
+   "dims": [
+    48.622,
+    43.541,
+    1.2
+   ],
+   "materials": [
+    "Toy_cream"
+   ]
+  },
+  {
+   "name": "cooler0",
+   "tris": 388,
+   "verts": 756,
+   "dims": [
+    5.123,
+    5.162,
+    4.95
+   ],
+   "materials": [
+    "Toy_steel"
+   ]
+  },
+  {
+   "name": "cooler1",
+   "tris": 388,
+   "verts": 756,
+   "dims": [
+    5.123,
+    5.162,
+    4.95
+   ],
+   "materials": [
+    "Toy_steel"
+   ]
+  },
+  {
+   "name": "cooler2",
+   "tris": 388,
+   "verts": 756,
+   "dims": [
+    5.123,
+    5.162,
+    4.95
+   ],
+   "materials": [
+    "Toy_steel"
+   ]
+  },
+  {
+   "name": "cooler3",
+   "tris": 388,
+   "verts": 756,
+   "dims": [
+    5.123,
+    5.162,
+    4.95
+   ],
+   "materials": [
+    "Toy_steel"
+   ]
+  },
+  {
+   "name": "core",
+   "tris": 388,
+   "verts": 687,
+   "dims": [
+    48.61,
+    43.528,
+    160.5
+   ],
+   "materials": [
+    "Toy_sand",
+    "Toy_steel"
+   ]
+  },
+  {
+   "name": "coolergrille0",
+   "tris": 164,
+   "verts": 336,
+   "dims": [
+    4.241,
+    4.274,
+    0.35
+   ],
+   "materials": [
+    "Toy_ink"
+   ]
+  },
+  {
+   "name": "coolergrille1",
+   "tris": 164,
+   "verts": 336,
+   "dims": [
+    4.241,
+    4.274,
+    0.35
+   ],
+   "materials": [
+    "Toy_ink"
+   ]
+  },
+  {
+   "name": "coolergrille2",
+   "tris": 164,
+   "verts": 336,
+   "dims": [
+    4.241,
+    4.274,
+    0.35
+   ],
+   "materials": [
+    "Toy_ink"
+   ]
+  },
+  {
+   "name": "coolergrille3",
+   "tris": 164,
+   "verts": 336,
+   "dims": [
+    4.241,
+    4.274,
+    0.35
+   ],
+   "materials": [
+    "Toy_ink"
+   ]
+  },
+  {
+   "name": "plinth",
+   "tris": 136,
+   "verts": 270,
+   "dims": [
+    73.022,
+    51.982,
+    2.0
+   ],
+   "materials": [
+    "Toy_stone"
+   ]
+  },
+  {
+   "name": "fincap_e0",
+   "tris": 128,
+   "verts": 232,
+   "dims": [
+    5.877,
+    6.06,
+    1.2
+   ],
+   "materials": [
+    "Toy_cream"
+   ]
+  },
+  {
+   "name": "fincap_e1",
+   "tris": 128,
+   "verts": 224,
+   "dims": [
+    7.918,
+    7.951,
+    1.2
+   ],
+   "materials": [
+    "Toy_cream"
+   ]
+  },
+  {
+   "name": "fincap_e2",
+   "tris": 128,
+   "verts": 228,
+   "dims": [
+    8.278,
+    6.379,
+    1.2
+   ],
+   "materials": [
+    "Toy_cream"
+   ]
+  },
+  {
+   "name": "fincap_e3",
+   "tris": 128,
+   "verts": 228,
+   "dims": [
+    10.79,
+    7.341,
+    1.2
+   ],
+   "materials": [
+    "Toy_cream"
+   ]
+  },
+  {
+   "name": "fincap_e4",
+   "tris": 128,
+   "verts": 224,
+   "dims": [
+    8.138,
+    7.33,
+    1.2
+   ],
+   "materials": [
+    "Toy_cream"
+   ]
+  },
+  {
+   "name": "fincap_e5",
+   "tris": 128,
+   "verts": 224,
+   "dims": [
+    5.885,
+    8.076,
+    1.2
+   ],
+   "materials": [
+    "Toy_cream"
+   ]
+  },
+  {
+   "name": "fincap_w0",
+   "tris": 128,
+   "verts": 224,
+   "dims": [
+    3.526,
+    5.692,
+    1.2
+   ],
+   "materials": [
+    "Toy_cream"
+   ]
+  }
+ ],
+ "vertex_attrs": [
+  "NORMAL"
+ ],
+ "materials": [
+  {
+   "name": "Toy_cream",
+   "glow": false,
+   "user_objects": 14
+  },
+  {
+   "name": "Toy_glass",
+   "glow": false,
+   "user_objects": 673
+  },
+  {
+   "name": "Toy_glassl_Glow",
+   "glow": true,
+   "user_objects": 155
+  },
+  {
+   "name": "Toy_ink",
+   "glow": false,
+   "user_objects": 5
+  },
+  {
+   "name": "Toy_red_Glow",
+   "glow": true,
+   "user_objects": 1
+  },
+  {
+   "name": "Toy_sand",
+   "glow": false,
+   "user_objects": 13
+  },
+  {
+   "name": "Toy_steel",
+   "glow": false,
+   "user_objects": 19
+  },
+  {
+   "name": "Toy_stone",
+   "glow": false,
+   "user_objects": 1
+  },
+  {
+   "name": "Toy_trim",
+   "glow": false,
+   "user_objects": 1
+  }
+ ],
+ "textures": [],
+ "bbox": {
+  "dims": [
+   73.0216,
+   51.9818,
+   179.0
+  ],
+  "min": [
+   -36.201,
+   -25.9909,
+   0.0
+  ],
+  "origin_offset_xy": [
+   0.3098,
+   0.0
+  ],
+  "base_z": 0.0
+ },
+ "duplicate_mesh_groups": [
+  {
+   "signature": {
+    "verts": 24,
+    "tris": 12,
+    "dims": [
+     1.1303,
+     0.2736,
+     21.8714
+    ]
+   },
+   "objects": [
+    "win_n1_0",
+    "win_n1_1",
+    "win_n1_2",
+    "win_n1_3",
+    "win_n1_4",
+    "win_n1_5",
+    "win_n1_6",
+    "win_n2_0",
+    "win_n2_1",
+    "win_n2_2",
+    "win_n2_3",
+    "win_n2_4",
+    "win_n2_5",
+    "win_n2_6",
+    "win_n3_0",
+    "win_n3_1",
+    "win_n3_2",
+    "win_n3_3",
+    "win_n3_4",
+    "win_n3_5",
+    "win_n3_6",
+    "win_n4_0",
+    "win_n4_1",
+    "win_n4_2",
+    "win_n4_3",
+    "win_n4_4",
+    "win_n4_5",
+    "win_n4_6",
+    "win_n5_0",
+    "win_n5_1",
+    "win_n5_2",
+    "win_n5_3",
+    "win_n5_4",
+    "win_n5_5",
+    "win_n5_6",
+    "win_n6_0",
+    "win_n6_1",
+    "win_n6_2",
+    "win_n6_3",
+    "win_n6_4",
+    "win_n6_5",
+    "win_n6_6",
+    "win_n7_0",
+    "win_n7_1",
+    "win_n7_2",
+    "win_n7_3",
+    "win_n7_4",
+    "win_n7_5",
+    "win_n7_6",
+    "win_n8_0",
+    "win_n8_1",
+    "win_n8_2",
+    "win_n8_3",
+    "win_n8_4",
+    "win_n8_5",
+    "win_n8_6",
+    "win_n9_0",
+    "win_n9_1",
+    "win_n9_2",
+    "win_n9_3",
+    "win_n9_4",
+    "win_n9_5",
+    "win_n9_6",
+    "win_n10_0",
+    "win_n10_1",
+    "win_n10_2",
+    "win_n10_3",
+    "win_n10_4",
+    "win_n10_5",
+    "win_n10_6",
+    "win_n11_0",
+    "win_n11_1",
+    "win_n11_2",
+    "win_n11_3",
+    "win_n11_4",
+    "win_n11_5",
+    "win_n11_6",
+    "win_n12_0",
+    "win_n12_1",
+    "win_n12_2",
+    "win_n12_3",
+    "win_n12_4",
+    "win_n12_5",
+    "win_n12_6",
+    "win_n13_0",
+    "win_n13_1",
+    "win_n13_2",
+    "win_n13_3",
+    "win_n13_4",
+    "win_n13_5",
+    "win_n13_6",
+    "win_n14_0",
+    "win_n14_1",
+    "win_n14_2",
+    "win_n14_3",
+    "win_n14_4",
+    "win_n14_5",
+    "win_n14_6",
+    "win_n15_0",
+    "win_n15_1",
+    "win_n15_2",
+    "win_n15_3",
+    "win_n15_4",
+    "win_n15_5",
+    "win_n15_6",
+    "win_n16_0",
+    "win_n16_1",
+    "win_n16_2",
+    "win_n16_3",
+    "win_n16_4",
+    "win_n16_5",
+    "win_n16_6",
+    "win_n17_0",
+    "win_n17_1",
+    "win_n17_2",
+    "win_n17_3",
+    "win_n17_4",
+    "win_n17_5",
+    "win_n17_6",
+    "win_n18_0",
+    "win_n18_1",
+    "win_n18_2",
+    "win_n18_3",
+    "win_n18_4",
+    "win_n18_5",
+    "win_n18_6",
+    "win_n19_0",
+    "win_n19_1",
+    "win_n19_2",
+    "win_n19_3",
+    "win_n19_4",
+    "win_n19_5",
+    "win_n19_6",
+    "win_n20_0",
+    "win_n20_1",
+    "win_n20_2",
+    "win_n20_3",
+    "win_n20_4",
+    "win_n20_5",
+    "win_n20_6",
+    "win_s3_0",
+    "win_s3_1",
+    "win_s3_2",
+    "win_s3_3",
+    "win_s3_4",
+    "win_s3_5",
+    "win_s3_6",
+    "win_s4_0",
+    "win_s4_1",
+    "win_s4_2",
+    "win_s4_3",
+    "win_s4_4",
+    "win_s4_5",
+    "win_s4_6",
+    "win_s5_0",
+    "win_s5_1",
+    "win_s5_2",
+    "win_s5_3",
+    "win_s5_4",
+    "win_s5_5",
+    "win_s5_6",
+    "win_s6_0",
+    "win_s6_1",
+    "win_s6_2",
+    "win_s6_3",
+    "win_s6_4",
+    "win_s6_5",
+    "win_s6_6",
+    "win_s7_0",
+    "win_s7_1",
+    "win_s7_2",
+    "win_s7_3",
+    "win_s7_4",
+    "win_s7_5",
+    "win_s7_6",
+    "win_s8_0",
+    "win_s8_1",
+    "win_s8_2",
+    "win_s8_3",
+    "win_s8_4",
+    "win_s8_5",
+    "win_s8_6",
+    "win_s9_0",
+    "win_s9_1",
+    "win_s9_2",
+    "win_s9_3",
+    "win_s9_4",
+    "win_s9_5",
+    "win_s9_6",
+    "win_s10_0",
+    "win_s10_1",
+    "win_s10_2",
+    "win_s10_3",
+    "win_s10_4",
+    "win_s10_5",
+    "win_s10_6",
+    "win_s11_0",
+    "win_s11_1",
+    "win_s11_2",
+    "win_s11_3",
+    "win_s11_4",
+    "win_s11_5",
+    "win_s11_6",
+    "win_s12_0",
+    "win_s12_1",
+    "win_s12_2",
+    "win_s12_3",
+    "win_s12_4",
+    "win_s12_5",
+    "win_s12_6",
+    "win_s13_0",
+    "win_s13_1",
+    "win_s13_2",
+    "win_s13_3",
+    "win_s13_4",
+    "win_s13_5",
+    "win_s13_6",
+    "win_s14_0",
+    "win_s14_1",
+    "win_s14_2",
+    "win_s14_3",
+    "win_s14_4",
+    "win_s14_5",
+    "win_s14_6",
+    "win_s15_0",
+    "win_s15_1",
+    "win_s15_2",
+    "win_s15_3",
+    "win_s15_4",
+    "win_s15_5",
+    "win_s15_6",
+    "win_s16_0",
+    "win_s16_1",
+    "win_s16_2",
+    "win_s16_3",
+    "win_s16_4",
+    "win_s16_5",
+    "win_s16_6",
+    "win_s17_0",
+    "win_s17_1",
+    "win_s17_2",
+    "win_s17_3",
+    "win_s17_4",
+    "win_s17_5",
+    "win_s17_6",
+    "win_s18_0",
+    "win_s18_1",
+    "win_s18_2",
+    "win_s18_3",
+    "win_s18_4",
+    "win_s18_5",
+    "win_s18_6",
+    "win_s19_0",
+    "win_s19_1",
+    "win_s19_2",
+    "win_s19_3",
+    "win_s19_4",
+    "win_s19_5",
+    "win_s19_6",
+    "win_s20_0",
+    "win_s20_1",
+    "win_s20_2",
+    "win_s20_3",
+    "win_s20_4",
+    "win_s20_5",
+    "win_s20_6",
+    "win_s21_0",
+    "win_s21_1",
+    "win_s21_2",
+    "win_s21_3",
+    "win_s21_4",
+    "win_s21_5",
+    "win_s21_6",
+    "win_s22_0",
+    "win_s22_1",
+    "win_s22_2",
+    "win_s22_3",
+    "win_s22_4",
+    "win_s22_5",
+    "win_s22_6"
+   ]
+  },
+  {
+   "signature": {
+    "verts": 756,
+    "tris": 388,
+    "dims": [
+     5.1235,
+     5.1617,
+     4.95
+    ]
+   },
+   "objects": [
+    "cooler0",
+    "cooler1",
+    "cooler2",
+    "cooler3"
+   ]
+  },
+  {
+   "signature": {
+    "verts": 24,
+    "tris": 12,
+    "dims": [
+     1.1303,
+     0.2736,
+     16.3571
+    ]
+   },
+   "objects": [
+    "win_n0_0",
+    "win_n0_1",
+    "win_n0_2",
+    "win_n0_3",
+    "win_n0_4",
+    "win_n0_5",
+    "win_n0_6",
+    "win_n21_0",
+    "win_n21_1",
+    "win_n21_2",
+    "win_n21_3",
+    "win_n21_4",
+    "win_n21_5",
+    "win_n21_6",
+    "win_n22_0",
+    "win_n22_1",
+    "win_n22_2",
+    "win_n22_3",
+    "win_n22_4",
+    "win_n22_5",
+    "win_n22_6",
+    "win_s0_0",
+    "win_s0_1",
+    "win_s0_2",
+    "win_s0_3",
+    "win_s0_4",
+    "win_s0_5",
+    "win_s0_6",
+    "win_s1_0",
+    "win_s1_1",
+    "win_s1_2",
+    "win_s1_3",
+    "win_s1_4",
+    "win_s1_5",
+    "win_s1_6",
+    "win_s2_0",
+    "win_s2_1",
+    "win_s2_2",
+    "win_s2_3",
+    "win_s2_4",
+    "win_s2_5",
+    "win_s2_6",
+    "win_s23_0",
+    "win_s23_1",
+    "win_s23_2",
+    "win_s23_3",
+    "win_s23_4",
+    "win_s23_5",
+    "win_s23_6",
+    "win_s24_0",
+    "win_s24_1",
+    "win_s24_2",
+    "win_s24_3",
+    "win_s24_4",
+    "win_s24_5",
+    "win_s24_6"
+   ]
+  },
+  {
+   "signature": {
+    "verts": 336,
+    "tris": 164,
+    "dims": [
+     4.2412,
+     4.2743,
+     0.35
+    ]
+   },
+   "objects": [
+    "coolergrille0",
+    "coolergrille1",
+    "coolergrille2",
+    "coolergrille3"
+   ]
+  },
+  {
+   "signature": {
+    "verts": 24,
+    "tris": 12,
+    "dims": [
+     0.2864,
+     1.2125,
+     1.5
+    ]
+   },
+   "objects": [
+    "win_ce1_0_0",
+    "win_ce1_0_1",
+    "win_ce1_0_2",
+    "win_ce1_0_3",
+    "win_ce1_0_4",
+    "win_ce1_0_5",
+    "win_ce1_0_6",
+    "win_ce1_1_0",
+    "win_ce1_1_1",
+    "win_ce1_1_2",
+    "win_ce1_1_3",
+    "win_ce1_1_4",
+    "win_ce1_1_5",
+    "win_ce1_1_6",
+    "win_ce1_2_0",
+    "win_ce1_2_1",
+    "win_ce1_2_2",
+    "win_ce1_2_3",
+    "win_ce1_2_4",
+    "win_ce1_2_5",
+    "win_ce1_2_6",
+    "win_cw1_0_0",
+    "win_cw1_0_1",
+    "win_cw1_0_2",
+    "win_cw1_0_3",
+    "win_cw1_0_4",
+    "win_cw1_0_5",
+    "win_cw1_0_6",
+    "win_cw1_1_0",
+    "win_cw1_1_1",
+    "win_cw1_1_2",
+    "win_cw1_1_3",
+    "win_cw1_1_4",
+    "win_cw1_1_5",
+    "win_cw1_1_6",
+    "win_cw1_2_0",
+    "win_cw1_2_1",
+    "win_cw1_2_2",
+    "win_cw1_2_3",
+    "win_cw1_2_4",
+    "win_cw1_2_5",
+    "win_cw1_2_6"
+   ]
+  },
+  {
+   "signature": {
+    "verts": 24,
+    "tris": 12,
+    "dims": [
+     0.2988,
+     1.2912,
+     4.2571
+    ]
+   },
+   "objects": [
+    "win_ce5_0_0",
+    "win_ce5_0_1",
+    "win_ce5_0_2",
+    "win_ce5_0_3",
+    "win_ce5_0_4",
+    "win_ce5_0_5",
+    "win_ce5_0_6",
+    "win_ce5_1_0",
+    "win_ce5_1_1",
+    "win_ce5_1_2",
+    "win_ce5_1_3",
+    "win_ce5_1_4",
+    "win_ce5_1_5",
+    "win_ce5_1_6",
+    "win_ce5_2_0",
+    "win_ce5_2_1",
+    "win_ce5_2_2",
+    "win_ce5_2_3",
+    "win_ce5_2_4",
+    "win_ce5_2_5",
+    "win_ce5_2_6",
+    "win_cw5_0_0",
+    "win_cw5_0_1",
+    "win_cw5_0_2",
+    "win_cw5_0_3",
+    "win_cw5_0_4",
+    "win_cw5_0_5",
+    "win_cw5_0_6",
+    "win_cw5_1_0",
+    "win_cw5_1_1",
+    "win_cw5_1_2",
+    "win_cw5_1_3",
+    "win_cw5_1_4",
+    "win_cw5_1_5",
+    "win_cw5_1_6",
+    "win_cw5_2_0",
+    "win_cw5_2_1",
+    "win_cw5_2_2",
+    "win_cw5_2_3",
+    "win_cw5_2_4",
+    "win_cw5_2_5",
+    "win_cw5_2_6"
+   ]
+  },
+  {
+   "signature": {
+    "verts": 24,
+    "tris": 12,
+    "dims": [
+     0.2864,
+     1.2125,
+     19.1143
+    ]
+   },
+   "objects": [
+    "win_e1_0_0",
+    "win_e1_0_1",
+    "win_e1_0_2",
+    "win_e1_0_3",
+    "win_e1_0_4",
+    "win_e1_0_5",
+    "win_e1_0_6",
+    "win_e1_1_0",
+    "win_e1_1_1",
+    "win_e1_1_2",
+    "win_e1_1_3",
+    "win_e1_1_4",
+    "win_e1_1_5",
+    "win_e1_1_6",
+    "win_e1_2_0",
+    "win_e1_2_1",
+    "win_e1_2_2",
+    "win_e1_2_3",
+    "win_e1_2_4",
+    "win_e1_2_5",
+    "win_e1_2_6",
+    "win_w1_0_0",
+    "win_w1_0_1",
+    "win_w1_0_2",
+    "win_w1_0_3",
+    "win_w1_0_4",
+    "win_w1_0_5",
+    "win_w1_0_6",
+    "win_w1_1_0",
+    "win_w1_1_1",
+    "win_w1_1_2",
+    "win_w1_1_3",
+    "win_w1_1_4",
+    "win_w1_1_5",
+    "win_w1_1_6",
+    "win_w1_2_0",
+    "win_w1_2_1",
+    "win_w1_2_2",
+    "win_w1_2_3",
+    "win_w1_2_4",
+    "win_w1_2_5",
+    "win_w1_2_6"
+   ]
+  },
+  {
+   "signature": {
+    "verts": 24,
+    "tris": 12,
+    "dims": [
+     0.2988,
+     1.2912,
+     16.3571
+    ]
+   },
+   "objects": [
+    "win_e5_0_0",
+    "win_e5_0_1",
+    "win_e5_0_2",
+    "win_e5_0_3",
+    "win_e5_0_4",
+    "win_e5_0_5",
+    "win_e5_0_6",
+    "win_e5_1_0",
+    "win_e5_1_1",
+    "win_e5_1_2",
+    "win_e5_1_3",
+    "win_e5_1_4",
+    "win_e5_1_5",
+    "win_e5_1_6",
+    "win_e5_2_0",
+    "win_e5_2_1",
+    "win_e5_2_2",
+    "win_e5_2_3",
+    "win_e5_2_4",
+    "win_e5_2_5",
+    "win_e5_2_6",
+    "win_w5_0_0",
+    "win_w5_0_1",
+    "win_w5_0_2",
+    "win_w5_0_3",
+    "win_w5_0_4",
+    "win_w5_0_5",
+    "win_w5_0_6",
+    "win_w5_1_0",
+    "win_w5_1_1",
+    "win_w5_1_2",
+    "win_w5_1_3",
+    "win_w5_1_4",
+    "win_w5_1_5",
+    "win_w5_1_6",
+    "win_w5_2_0",
+    "win_w5_2_1",
+    "win_w5_2_2",
+    "win_w5_2_3",
+    "win_w5_2_4",
+    "win_w5_2_5",
+    "win_w5_2_6"
+   ]
+  },
+  {
+   "signature": {
+    "verts": 24,
+    "tris": 12,
+    "dims": [
+     0.6894,
+     0.1659,
+     8.5686
+    ]
+   },
+   "objects": [
+    "winglow_n1_6",
+    "winglow_n2_6",
+    "winglow_n3_6",
+    "winglow_n4_6",
+    "winglow_n5_6",
+    "winglow_n6_6",
+    "winglow_n7_6",
+    "winglow_n8_6",
+    "winglow_n9_6",
+    "winglow_n10_6",
+    "winglow_n11_6",
+    "winglow_n12_6",
+    "winglow_n13_6",
+    "winglow_n14_6",
+    "winglow_n15_6",
+    "winglow_n16_6",
+    "winglow_n17_6",
+    "winglow_n18_6",
+    "winglow_n19_6",
+    "winglow_n20_6",
+    "winglow_s3_6",
+    "winglow_s4_6",
+    "winglow_s5_6",
+    "winglow_s6_6",
+    "winglow_s7_6",
+    "winglow_s8_6",
+    "winglow_s9_6",
+    "winglow_s10_6",
+    "winglow_s11_6",
+    "winglow_s12_6",
+    "winglow_s13_6",
+    "winglow_s14_6",
+    "winglow_s15_6",
+    "winglow_s16_6",
+    "winglow_s17_6",
+    "winglow_s18_6",
+    "winglow_s19_6",
+    "winglow_s20_6",
+    "winglow_s21_6",
+    "winglow_s22_6"
+   ]
+  },
+  {
+   "signature": {
+    "verts": 24,
+    "tris": 12,
+    "dims": [
+     0.3146,
+     1.3923,
+     4.2571
+    ]
+   },
+   "objects": [
+    "win_ce0_0_0",
+    "win_ce0_0_1",
+    "win_ce0_0_2",
+    "win_ce0_0_3",
+    "win_ce0_0_4",
+    "win_ce0_0_5",
+    "win_ce0_0_6",
+    "win_ce0_1_0",
+    "win_ce0_1_1",
+    "win_ce0_1_2",
+    "win_ce0_1_3",
+    "win_ce0_1_4",
+    "win_ce0_1_5",
+    "win_ce0_1_6",
+    "win_cw0_0_0",
+    "win_cw0_0_1",
+    "win_cw0_0_2",
+    "win_cw0_0_3",
+    "win_cw0_0_4",
+    "win_cw0_0_5",
+    "win_cw0_0_6",
+    "win_cw0_1_0",
+    "win_cw0_1_1",
+    "win_cw0_1_2",
+    "win_cw0_1_3",
+    "win_cw0_1_4",
+    "win_cw0_1_5",
+    "win_cw0_1_6"
+   ]
+  },
+  {
+   "signature": {
+    "verts": 24,
+    "tris": 12,
+    "dims": [
+     0.3529,
+     1.6363,
+     1.5
+    ]
+   },
+   "objects": [
+    "win_ce4_0_0",
+    "win_ce4_0_1",
+    "win_ce4_0_2",
+    "win_ce4_0_3",
+    "win_ce4_0_4",
+    "win_ce4_0_5",
+    "win_ce4_0_6",
+    "win_ce4_1_0",
+    "win_ce4_1_1",
+    "win_ce4_1_2",
+    "win_ce4_1_3",
+    "win_ce4_1_4",
+    "win_ce4_1_5",
+    "win_ce4_1_6",
+    "win_cw4_0_0",
+    "win_cw4_0_1",
+    "win_cw4_0_2",
+    "win_cw4_0_3",
+    "win_cw4_0_4",
+    "win_cw4_0_5",
+    "win_cw4_0_6",
+    "win_cw4_1_0",
+    "win_cw4_1_1",
+    "win_cw4_1_2",
+    "win_cw4_1_3",
+    "win_cw4_1_4",
+    "win_cw4_1_5",
+    "win_cw4_1_6"
+   ]
+  },
+  {
+   "signature": {
+    "verts": 24,
+    "tris": 12,
+    "dims": [
+     0.3146,
+     1.3923,
+     16.3571
+    ]
+   },
+   "objects": [
+    "win_e0_0_0",
+    "win_e0_0_1",
+    "win_e0_0_2",
+    "win_e0_0_3",
+    "win_e0_0_4",
+    "win_e0_0_5",
+    "win_e0_0_6",
+    "win_e0_1_0",
+    "win_e0_1_1",
+    "win_e0_1_2",
+    "win_e0_1_3",
+    "win_e0_1_4",
+    "win_e0_1_5",
+    "win_e0_1_6",
+    "win_w0_0_0",
+    "win_w0_0_1",
+    "win_w0_0_2",
+    "win_w0_0_3",
+    "win_w0_0_4",
+    "win_w0_0_5",
+    "win_w0_0_6",
+    "win_w0_1_0",
+    "win_w0_1_1",
+    "win_w0_1_2",
+    "win_w0_1_3",
+    "win_w0_1_4",
+    "win_w0_1_5",
+    "win_w0_1_6"
+   ]
+  },
+  {
+   "signature": {
+    "verts": 24,
+    "tris": 12,
+    "dims": [
+     0.3122,
+     1.3769,
+     21.8714
+    ]
+   },
+   "objects": [
+    "win_e2_0_0",
+    "win_e2_0_1",
+    "win_e2_0_2",
+    "win_e2_0_3",
+    "win_e2_0_4",
+    "win_e2_0_5",
+    "win_e2_0_6",
+    "win_e2_1_0",
+    "win_e2_1_1",
+    "win_e2_1_2",
+    "win_e2_1_3",
+    "win_e2_1_4",
+    "win_e2_1_5",
+    "win_e2_1_6",
+    "win_w2_0_0",
+    "win_w2_0_1",
+    "win_w2_0_2",
+    "win_w2_0_3",
+    "win_w2_0_4",
+    "win_w2_0_5",
+    "win_w2_0_6",
+    "win_w2_1_0",
+    "win_w2_1_1",
+    "win_w2_1_2",
+    "win_w2_1_3",
+    "win_w2_1_4",
+    "win_w2_1_5",
+    "win_w2_1_6"
+   ]
+  },
+  {
+   "signature": {
+    "verts": 24,
+    "tris": 12,
+    "dims": [
+     0.336,
+     1.5284,
+     21.8714
+    ]
+   },
+   "objects": [
+    "win_e3_0_0",
+    "win_e3_0_1",
+    "win_e3_0_2",
+    "win_e3_0_3",
+    "win_e3_0_4",
+    "win_e3_0_5",
+    "win_e3_0_6",
+    "win_e3_1_0",
+    "win_e3_1_1",
+    "win_e3_1_2",
+    "win_e3_1_3",
+    "win_e3_1_4",
+    "win_e3_1_5",
+    "win_e3_1_6",
+    "win_w3_0_0",
+    "win_w3_0_1",
+    "win_w3_0_2",
+    "win_w3_0_3",
+    "win_w3_0_4",
+    "win_w3_0_5",
+    "win_w3_0_6",
+    "win_w3_1_0",
+    "win_w3_1_1",
+    "win_w3_1_2",
+    "win_w3_1_3",
+    "win_w3_1_4",
+    "win_w3_1_5",
+    "win_w3_1_6"
+   ]
+  },
+  {
+   "signature": {
+    "verts": 24,
+    "tris": 12,
+    "dims": [
+     0.3529,
+     1.6363,
+     19.1143
+    ]
+   },
+   "objects": [
+    "win_e4_0_0",
+    "win_e4_0_1",
+    "win_e4_0_2",
+    "win_e4_0_3",
+    "win_e4_0_4",
+    "win_e4_0_5",
+    "win_e4_0_6",
+    "win_e4_1_0",
+    "win_e4_1_1",
+    "win_e4_1_2",
+    "win_e4_1_3",
+    "win_e4_1_4",
+    "win_e4_1_5",
+    "win_e4_1_6",
+    "win_w4_0_0",
+    "win_w4_0_1",
+    "win_w4_0_2",
+    "win_w4_0_3",
+    "win_w4_0_4",
+    "win_w4_0_5",
+    "win_w4_0_6",
+    "win_w4_1_0",
+    "win_w4_1_1",
+    "win_w4_1_2",
+    "win_w4_1_3",
+    "win_w4_1_4",
+    "win_w4_1_5",
+    "win_w4_1_6"
+   ]
+  },
+  {
+   "signature": {
+    "verts": 24,
+    "tris": 12,
+    "dims": [
+     0.6894,
+     0.1659,
+     21.5114
+    ]
+   },
+   "objects": [
+    "winglow_n2_1",
+    "winglow_n2_4",
+    "winglow_n11_1",
+    "winglow_n11_3",
+    "winglow_n13_1",
+    "winglow_n13_3",
+    "winglow_n15_5",
+    "winglow_n18_1",
+    "winglow_n18_3",
+    "winglow_n18_5",
+    "winglow_n20_1",
+    "winglow_n20_3",
+    "winglow_n20_5",
+    "winglow_s8_2",
+    "winglow_s8_4",
+    "winglow_s10_1",
+    "winglow_s10_2",
+    "winglow_s10_4",
+    "winglow_s17_1",
+    "winglow_s17_3",
+    "winglow_s17_4",
+    "winglow_s19_1",
+    "winglow_s19_3",
+    "winglow_s22_0",
+    "winglow_s22_2",
+    "winglow_s22_4"
+   ]
+  },
+  {
+   "signature": {
+    "verts": 24,
+    "tris": 12,
+    "dims": [
+     0.6894,
+     0.1659,
+     6.3629
+    ]
+   },
+   "objects": [
+    "winglow_n0_6",
+    "winglow_n21_6",
+    "winglow_n22_6",
+    "winglow_s0_6",
+    "winglow_s1_6",
+    "winglow_s2_6",
+    "winglow_s23_6",
+    "winglow_s24_6"
+   ]
+  },
+  {
+   "signature": {
+    "verts": 24,
+    "tris": 12,
+    "dims": [
+     0.2283,
+     1.0875,
+     21.5114
+    ]
+   },
+   "objects": [
+    "winglow_e3_0_0",
+    "winglow_e3_0_2",
+    "winglow_e3_0_4",
+    "winglow_w3_1_0",
+    "winglow_w3_1_2",
+    "winglow_w3_1_3",
+    "winglow_w3_1_5"
+   ]
+  },
+  {
+   "signature": {
+    "verts": 24,
+    "tris": 12,
+    "dims": [
+     0.1788,
+     0.7716,
+     0.42
+    ]
+   },
+   "objects": [
+    "winglow_ce1_0_6",
+    "winglow_ce1_1_6",
+    "winglow_ce1_2_6",
+    "winglow_cw1_0_6",
+    "winglow_cw1_1_6",
+    "winglow_cw1_2_6"
+   ]
+  },
+  {
+   "signature": {
+    "verts": 24,
+    "tris": 12,
+    "dims": [
+     0.1911,
+     0.8504,
+     1.5229
+    ]
+   },
+   "objects": [
+    "winglow_ce5_0_6",
+    "winglow_ce5_1_6",
+    "winglow_ce5_2_6",
+    "winglow_cw5_0_6",
+    "winglow_cw5_1_6",
+    "winglow_cw5_2_6"
+   ]
+  },
+  {
+   "signature": {
+    "verts": 24,
+    "tris": 12,
+    "dims": [
+     0.1788,
+     0.7716,
+     7.4657
+    ]
+   },
+   "objects": [
+    "winglow_e1_0_6",
+    "winglow_e1_1_6",
+    "winglow_e1_2_6",
+    "winglow_w1_0_6",
+    "winglow_w1_1_6",
+    "winglow_w1_2_6"
+   ]
+  },
+  {
+   "signature": {
+    "verts": 24,
+    "tris": 12,
+    "dims": [
+     0.1911,
+     0.8504,
+     6.3629
+    ]
+   },
+   "objects": [
+    "winglow_e5_0_6",
+    "winglow_e5_1_6",
+    "winglow_e5_2_6",
+    "winglow_w5_0_6",
+    "winglow_w5_1_6",
+    "winglow_w5_2_6"
+   ]
+  },
+  {
+   "signature": {
+    "verts": 24,
+    "tris": 12,
+    "dims": [
+     0.2452,
+     1.1954,
+     1.14
+    ]
+   },
+   "objects": [
+    "winglow_ce4_1_1",
+    "winglow_ce4_1_3",
+    "winglow_ce4_1_5",
+    "winglow_cw4_1_3",
+    "winglow_cw4_1_5"
+   ]
+  },
+  {
+   "signature": {
+    "verts": 24,
+    "tris": 12,
+    "dims": [
+     0.2046,
+     0.936,
+     21.5114
+    ]
+   },
+   "objects": [
+    "winglow_e2_0_0",
+    "winglow_e2_0_1",
+    "winglow_e2_0_3",
+    "winglow_e2_0_5",
+    "winglow_w2_0_0"
+   ]
+  },
+  {
+   "signature": {
+    "verts": 24,
+    "tris": 12,
+    "dims": [
+     0.207,
+     0.9514,
+     1.5229
+    ]
+   },
+   "objects": [
+    "winglow_ce0_0_6",
+    "winglow_ce0_1_6",
+    "winglow_cw0_0_6",
+    "winglow_cw0_1_6"
+   ]
+  },
+  {
+   "signature": {
+    "verts": 24,
+    "tris": 12,
+    "dims": [
+     0.2452,
+     1.1954,
+     0.42
+    ]
+   },
+   "objects": [
+    "winglow_ce4_0_6",
+    "winglow_ce4_1_6",
+    "winglow_cw4_0_6",
+    "winglow_cw4_1_6"
+   ]
+  },
+  {
+   "signature": {
+    "verts": 24,
+    "tris": 12,
+    "dims": [
+     0.207,
+     0.9514,
+     6.3629
+    ]
+   },
+   "objects": [
+    "winglow_e0_0_6",
+    "winglow_e0_1_6",
+    "winglow_w0_0_6",
+    "winglow_w0_1_6"
+   ]
+  },
+  {
+   "signature": {
+    "verts": 24,
+    "tris": 12,
+    "dims": [
+     0.2046,
+     0.936,
+     8.5686
+    ]
+   },
+   "objects": [
+    "winglow_e2_0_6",
+    "winglow_e2_1_6",
+    "winglow_w2_0_6",
+    "winglow_w2_1_6"
+   ]
+  },
+  {
+   "signature": {
+    "verts": 24,
+    "tris": 12,
+    "dims": [
+     0.2283,
+     1.0875,
+     8.5686
+    ]
+   },
+   "objects": [
+    "winglow_e3_0_6",
+    "winglow_e3_1_6",
+    "winglow_w3_0_6",
+    "winglow_w3_1_6"
+   ]
+  },
+  {
+   "signature": {
+    "verts": 24,
+    "tris": 12,
+    "dims": [
+     0.2452,
+     1.1954,
+     7.4657
+    ]
+   },
+   "objects": [
+    "winglow_e4_0_6",
+    "winglow_e4_1_6",
+    "winglow_w4_0_6",
+    "winglow_w4_1_6"
+   ]
+  },
+  {
+   "signature": {
+    "verts": 24,
+    "tris": 12,
+    "dims": [
+     0.1911,
+     0.8504,
+     15.9971
+    ]
+   },
+   "objects": [
+    "winglow_w5_1_0",
+    "winglow_w5_1_2",
+    "winglow_w5_1_4",
+    "winglow_w5_1_5"
+   ]
+  },
+  {
+   "signature": {
+    "verts": 24,
+    "tris": 12,
+    "dims": [
+     0.1911,
+     0.8504,
+     3.8971
+    ]
+   },
+   "objects": [
+    "winglow_ce5_2_1",
+    "winglow_cw5_1_3",
+    "winglow_cw5_1_5"
+   ]
+  },
+  {
+   "signature": {
+    "verts": 24,
+    "tris": 12,
+    "dims": [
+     0.207,
+     0.9514,
+     15.9971
+    ]
+   },
+   "objects": [
+    "winglow_e0_1_1",
+    "winglow_e0_1_3",
+    "winglow_e0_1_5"
+   ]
+  },
+  {
+   "signature": {
+    "verts": 24,
+    "tris": 12,
+    "dims": [
+     0.2452,
+     1.1954,
+     18.7543
+    ]
+   },
+   "objects": [
+    "winglow_e4_1_0",
+    "winglow_e4_1_2",
+    "winglow_w4_1_4"
+   ]
+  },
+  {
+   "signature": {
+    "verts": 24,
+    "tris": 12,
+    "dims": [
+     0.6894,
+     0.1659,
+     15.9971
+    ]
+   },
+   "objects": [
+    "winglow_n0_0",
+    "winglow_n0_2"
+   ]
+  }
+ ],
+ "dup_redundant_tris": 11172,
+ "join_candidates": {
+  "Toy_cream": 14,
+  "Toy_glass": 673,
+  "Toy_glassl_Glow": 155,
+  "Toy_ink": 5,
+  "Toy_sand": 13,
+  "Toy_steel": 19
+ },
+ "degenerate_tris": 2,
+ "coincident_vert_pairs": 24151,
+ "over_tess": {
+  "near_distance_m": 268.5,
+  "one_px_world_m": 0.181,
+  "note": "cylinders whose chord error < one_px_world_m can halve segments"
+ }
+}

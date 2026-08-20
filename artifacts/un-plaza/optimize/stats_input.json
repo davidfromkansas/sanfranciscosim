@@ -1,0 +1,477 @@
+{
+ "file_bytes": {
+  "raw": 894996,
+  "gzip9": 229998
+ },
+ "objects": 57,
+ "total_tris": 16548,
+ "total_verts": 31702,
+ "primitives_est": 62,
+ "top20": [
+  {
+   "name": "trees",
+   "tris": 2448,
+   "verts": 4284,
+   "dims": [
+    172.583,
+    128.042,
+    9.995
+   ],
+   "materials": [
+    "Toy_steel"
+   ]
+  },
+  {
+   "name": "crowns",
+   "tris": 2244,
+   "verts": 4080,
+   "dims": [
+    173.077,
+    128.536,
+    8.84
+   ],
+   "materials": [
+    "Toy_verdigris"
+   ]
+  },
+  {
+   "name": "plate",
+   "tris": 1060,
+   "verts": 2036,
+   "dims": [
+    215.206,
+    157.922,
+    4.363
+   ],
+   "materials": [
+    "Toy_brick",
+    "Toy_stone"
+   ]
+  },
+  {
+   "name": "columns",
+   "tris": 1024,
+   "verts": 1920,
+   "dims": [
+    88.318,
+    26.043,
+    6.479
+   ],
+   "materials": [
+    "Toy_stone"
+   ]
+  },
+  {
+   "name": "people",
+   "tris": 920,
+   "verts": 1656,
+   "dims": [
+    105.258,
+    53.893,
+    3.45
+   ],
+   "materials": [
+    "Toy_roofd"
+   ]
+  },
+  {
+   "name": "fount_slabs",
+   "tris": 792,
+   "verts": 1728,
+   "dims": [
+    33.521,
+    18.324,
+    4.261
+   ],
+   "materials": [
+    "Toy_stone"
+   ]
+  },
+  {
+   "name": "furniture",
+   "tris": 768,
+   "verts": 1536,
+   "dims": [
+    93.119,
+    29.347,
+    2.425
+   ],
+   "materials": [
+    "Toy_roofd"
+   ]
+  },
+  {
+   "name": "globes_glow",
+   "tris": 704,
+   "verts": 1280,
+   "dims": [
+    87.911,
+    25.636,
+    2.111
+   ],
+   "materials": [
+    "Toy_white_Glow"
+   ]
+  },
+  {
+   "name": "skate_ledges",
+   "tris": 440,
+   "verts": 960,
+   "dims": [
+    43.898,
+    25.117,
+    1.298
+   ],
+   "materials": [
+    "Toy_cream"
+   ]
+  },
+  {
+   "name": "festoon_glow",
+   "tris": 432,
+   "verts": 864,
+   "dims": [
+    83.305,
+    13.39,
+    1.518
+   ],
+   "materials": [
+    "Toy_cream_Glow"
+   ]
+  },
+  {
+   "name": "joint_grid",
+   "tris": 336,
+   "verts": 672,
+   "dims": [
+    200.678,
+    104.207,
+    3.394
+   ],
+   "materials": [
+    "Toy_rust"
+   ]
+  },
+  {
+   "name": "terrace_steps",
+   "tris": 324,
+   "verts": 648,
+   "dims": [
+    38.212,
+    10.489,
+    1.498
+   ],
+   "materials": [
+    "Toy_stone"
+   ]
+  },
+  {
+   "name": "plinth_flagpole_un",
+   "tris": 276,
+   "verts": 540,
+   "dims": [
+    2.933,
+    2.933,
+    0.317
+   ],
+   "materials": [
+    "Toy_stone"
+   ]
+  },
+  {
+   "name": "plinth_flagpole_us",
+   "tris": 276,
+   "verts": 540,
+   "dims": [
+    2.933,
+    2.933,
+    0.317
+   ],
+   "materials": [
+    "Toy_stone"
+   ]
+  },
+  {
+   "name": "fount_bench",
+   "tris": 256,
+   "verts": 448,
+   "dims": [
+    43.692,
+    27.091,
+    1.488
+   ],
+   "materials": [
+    "Toy_stone"
+   ]
+  },
+  {
+   "name": "fount_kerb",
+   "tris": 256,
+   "verts": 448,
+   "dims": [
+    48.272,
+    31.671,
+    2.377
+   ],
+   "materials": [
+    "Toy_stone"
+   ]
+  },
+  {
+   "name": "fount_floor",
+   "tris": 220,
+   "verts": 432,
+   "dims": [
+    40.48,
+    23.879,
+    1.007
+   ],
+   "materials": [
+    "Toy_ink",
+    "Toy_roofd"
+   ]
+  },
+  {
+   "name": "bolivar_bronze",
+   "tris": 216,
+   "verts": 432,
+   "dims": [
+    3.161,
+    1.916,
+    3.832
+   ],
+   "materials": [
+    "Toy_verdigris"
+   ]
+  },
+  {
+   "name": "pole_flagpole_un",
+   "tris": 204,
+   "verts": 416,
+   "dims": [
+    0.32,
+    0.32,
+    11.45
+   ],
+   "materials": [
+    "Toy_steel"
+   ]
+  },
+  {
+   "name": "pole_flagpole_us",
+   "tris": 204,
+   "verts": 416,
+   "dims": [
+    0.32,
+    0.32,
+    11.45
+   ],
+   "materials": [
+    "Toy_steel"
+   ]
+  }
+ ],
+ "vertex_attrs": [
+  "NORMAL"
+ ],
+ "materials": [
+  {
+   "name": "Toy_brick",
+   "glow": false,
+   "user_objects": 2
+  },
+  {
+   "name": "Toy_coral",
+   "glow": false,
+   "user_objects": 1
+  },
+  {
+   "name": "Toy_cream",
+   "glow": false,
+   "user_objects": 2
+  },
+  {
+   "name": "Toy_cream_Glow",
+   "glow": true,
+   "user_objects": 5
+  },
+  {
+   "name": "Toy_ink",
+   "glow": false,
+   "user_objects": 2
+  },
+  {
+   "name": "Toy_mint",
+   "glow": false,
+   "user_objects": 1
+  },
+  {
+   "name": "Toy_mustard",
+   "glow": false,
+   "user_objects": 1
+  },
+  {
+   "name": "Toy_navy",
+   "glow": false,
+   "user_objects": 1
+  },
+  {
+   "name": "Toy_red",
+   "glow": false,
+   "user_objects": 1
+  },
+  {
+   "name": "Toy_roofd",
+   "glow": false,
+   "user_objects": 7
+  },
+  {
+   "name": "Toy_rust",
+   "glow": false,
+   "user_objects": 4
+  },
+  {
+   "name": "Toy_sand",
+   "glow": false,
+   "user_objects": 4
+  },
+  {
+   "name": "Toy_steel",
+   "glow": false,
+   "user_objects": 6
+  },
+  {
+   "name": "Toy_stone",
+   "glow": false,
+   "user_objects": 18
+  },
+  {
+   "name": "Toy_teal",
+   "glow": false,
+   "user_objects": 2
+  },
+  {
+   "name": "Toy_teal_Glow",
+   "glow": true,
+   "user_objects": 1
+  },
+  {
+   "name": "Toy_verdigris",
+   "glow": false,
+   "user_objects": 2
+  },
+  {
+   "name": "Toy_white",
+   "glow": false,
+   "user_objects": 1
+  },
+  {
+   "name": "Toy_white_Glow",
+   "glow": true,
+   "user_objects": 1
+  }
+ ],
+ "textures": [],
+ "bbox": {
+  "dims": [
+   215.2063,
+   157.9219,
+   16.4028
+  ],
+  "min": [
+   -107.6031,
+   -78.9609,
+   -2.5095
+  ],
+  "origin_offset_xy": [
+   0.0,
+   0.0
+  ],
+  "base_z": -2.5095
+ },
+ "duplicate_mesh_groups": [
+  {
+   "signature": {
+    "verts": 540,
+    "tris": 276,
+    "dims": [
+     2.9327,
+     2.9333,
+     0.3167
+    ]
+   },
+   "objects": [
+    "plinth_flagpole_un",
+    "plinth_flagpole_us"
+   ]
+  },
+  {
+   "signature": {
+    "verts": 416,
+    "tris": 204,
+    "dims": [
+     0.32,
+     0.32,
+     11.45
+    ]
+   },
+   "objects": [
+    "pole_flagpole_un",
+    "pole_flagpole_us"
+   ]
+  },
+  {
+   "signature": {
+    "verts": 168,
+    "tris": 84,
+    "dims": [
+     3.0613,
+     0.5878,
+     1.9497
+    ]
+   },
+   "objects": [
+    "flag_flagpole_un",
+    "flag_flagpole_us"
+   ]
+  },
+  {
+   "signature": {
+    "verts": 48,
+    "tris": 28,
+    "dims": [
+     2.9626,
+     2.9626,
+     0.0621
+    ]
+   },
+   "objects": [
+    "skate_glow_0",
+    "skate_glow_1",
+    "skate_glow_2",
+    "skate_glow_3"
+   ]
+  }
+ ],
+ "dup_redundant_tris": 648,
+ "join_candidates": {
+  "Toy_brick": 2,
+  "Toy_cream": 2,
+  "Toy_cream_Glow": 5,
+  "Toy_ink": 2,
+  "Toy_roofd": 7,
+  "Toy_rust": 4,
+  "Toy_sand": 4,
+  "Toy_steel": 6,
+  "Toy_stone": 18,
+  "Toy_teal": 2,
+  "Toy_verdigris": 2
+ },
+ "degenerate_tris": 0,
+ "coincident_vert_pairs": 22660,
+ "over_tess": {
+  "near_distance_m": 322.81,
+  "one_px_world_m": 0.2176,
+  "note": "cylinders whose chord error < one_px_world_m can halve segments"
+ }
+}

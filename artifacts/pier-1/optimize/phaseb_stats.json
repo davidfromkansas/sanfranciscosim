@@ -1,0 +1,83 @@
+{
+ "input_materials": [
+  "Toy_cream",
+  "Toy_glass",
+  "Toy_glass_Glow",
+  "Toy_glassl",
+  "Toy_glassl_Glow",
+  "Toy_ink",
+  "Toy_navy",
+  "Toy_steel",
+  "Toy_stone",
+  "Toy_white"
+ ],
+ "steps": [
+  {
+   "step": "weld+degenerate",
+   "tris": 13330,
+   "verts": 8290
+  },
+  {
+   "step": "interior-faces",
+   "tris": 13330,
+   "verts": 8290
+  },
+  {
+   "step": "limited-dissolve-SKIPPED",
+   "tris": 13330,
+   "verts": 8290
+  },
+  {
+   "step": "join-per-material",
+   "tris": 13330,
+   "verts": 8290
+  }
+ ],
+ "input": {
+  "tris": 13330,
+  "verts": 26430,
+  "objects": 792
+ },
+ "interior_faces_removed": 0,
+ "joins": {
+  "grp_Toy_navy": 133,
+  "grp_Toy_glass": 151,
+  "grp_Toy_glassl_Glow": 9,
+  "grp_Toy_glassl": 154,
+  "grp_Toy_ink": 104,
+  "grp_Toy_cream_Toy_stone": 4,
+  "grp_Toy_white": 11,
+  "grp_Toy_stone": 60,
+  "grp_Toy_steel": 10,
+  "grp_Toy_glass_Glow": 28,
+  "grp_Toy_cream": 126
+ },
+ "inverted_solids": [],
+ "reimport": {
+  "objects": 13,
+  "materials": [
+   "Toy_cream",
+   "Toy_glass",
+   "Toy_glass_Glow",
+   "Toy_glassl",
+   "Toy_glassl_Glow",
+   "Toy_ink",
+   "Toy_navy",
+   "Toy_steel",
+   "Toy_stone",
+   "Toy_white"
+  ],
+  "bbox_dims": [
+   215.4308,
+   185.429,
+   15.4
+  ],
+  "bbox_min": [
+   -107.7154,
+   -92.7145,
+   -2.6
+  ]
+ },
+ "bbox_ok": true,
+ "material_set_ok": true
+}

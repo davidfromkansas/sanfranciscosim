@@ -1,0 +1,82 @@
+{
+ "input_materials": [
+  "Toy_ash",
+  "Toy_bark",
+  "Toy_glass",
+  "Toy_glass_Glow",
+  "Toy_ink",
+  "Toy_ioorange",
+  "Toy_roofd",
+  "Toy_sage",
+  "Toy_steel",
+  "Toy_terra",
+  "Toy_trim",
+  "Toy_warm",
+  "Toy_white",
+  "Toy_white_Glow"
+ ],
+ "steps": [
+  {
+   "step": "weld+degenerate",
+   "tris": 5144,
+   "verts": 2864
+  },
+  {
+   "step": "interior-faces",
+   "tris": 5144,
+   "verts": 2864
+  },
+  {
+   "step": "join-per-material",
+   "tris": 5144,
+   "verts": 2864
+  }
+ ],
+ "input": {
+  "tris": 5144,
+  "verts": 10960,
+  "objects": 149
+ },
+ "interior_faces_removed": 0,
+ "dissolve_skipped": "ring bands present (parapet, floor_band, pent_railing)",
+ "joins": {
+  "grp_Toy_trim": 11,
+  "grp_Toy_steel": 16,
+  "grp_Toy_ink": 5,
+  "grp_Toy_glass": 34,
+  "grp_Toy_white": 72,
+  "grp_Toy_glass_Glow": 4
+ },
+ "inverted_solids": [],
+ "reimport": {
+  "objects": 13,
+  "materials": [
+   "Toy_ash",
+   "Toy_bark",
+   "Toy_glass",
+   "Toy_glass_Glow",
+   "Toy_ink",
+   "Toy_ioorange",
+   "Toy_roofd",
+   "Toy_sage",
+   "Toy_steel",
+   "Toy_terra",
+   "Toy_trim",
+   "Toy_warm",
+   "Toy_white",
+   "Toy_white_Glow"
+  ],
+  "bbox_dims": [
+   25.0824,
+   24.9244,
+   18.1
+  ],
+  "bbox_min": [
+   -12.5412,
+   -12.4622,
+   0.0
+  ]
+ },
+ "bbox_ok": true,
+ "material_set_ok": true
+}

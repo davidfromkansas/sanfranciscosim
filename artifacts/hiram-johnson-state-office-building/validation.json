@@ -1,0 +1,343 @@
+{
+  "asset": "hiram-johnson-state-office-building.glb",
+  "validator": "Blender 5.2.0 LTS",
+  "fresh_isolated_scene": true,
+  "reimported_final_glb": true,
+  "object_count": 9,
+  "mesh_object_count": 9,
+  "triangle_count": 16908,
+  "triangle_budget": 26000,
+  "dimensions_m": [
+    130.6549,
+    67.1789,
+    61.9
+  ],
+  "bbox_min_m": [
+    -65.3274,
+    -33.5895,
+    0.0
+  ],
+  "bbox_max_m": [
+    65.3274,
+    33.5895,
+    61.9
+  ],
+  "min_z_m": 0.0,
+  "max_z_m": 61.9,
+  "target_height_m": 61.9,
+  "loader_scale_factor": 1.0,
+  "xy_center_offset_m": [
+    0.0,
+    0.0
+  ],
+  "xy_origin_note": "The origin is the XY centre of the surveyed envelope's oriented bounding box, which is the manifest anchor and what placeGeneric positions. Offset is exactly (0, 0): the Larkin colonnade and steps project west, the Hyde glazed bay projects east, and the cornice wraps evenly, so the projections balance.",
+  "materials": [
+    "Toy_cream",
+    "Toy_glass",
+    "Toy_glassl_Glow",
+    "Toy_gold_Glow",
+    "Toy_roofd",
+    "Toy_steel",
+    "Toy_stone",
+    "Toy_teal",
+    "Toy_trim"
+  ],
+  "material_details": [
+    {
+      "name": "Toy_cream",
+      "image_texture_nodes": [],
+      "alpha": 1.0,
+      "roughness": 0.85,
+      "glow": false
+    },
+    {
+      "name": "Toy_glass",
+      "image_texture_nodes": [],
+      "alpha": 1.0,
+      "roughness": 0.85,
+      "glow": false
+    },
+    {
+      "name": "Toy_glassl_Glow",
+      "image_texture_nodes": [],
+      "alpha": 1.0,
+      "roughness": 0.85,
+      "glow": true
+    },
+    {
+      "name": "Toy_gold_Glow",
+      "image_texture_nodes": [],
+      "alpha": 1.0,
+      "roughness": 0.85,
+      "glow": true
+    },
+    {
+      "name": "Toy_roofd",
+      "image_texture_nodes": [],
+      "alpha": 1.0,
+      "roughness": 0.85,
+      "glow": false
+    },
+    {
+      "name": "Toy_steel",
+      "image_texture_nodes": [],
+      "alpha": 1.0,
+      "roughness": 0.85,
+      "glow": false
+    },
+    {
+      "name": "Toy_stone",
+      "image_texture_nodes": [],
+      "alpha": 1.0,
+      "roughness": 0.85,
+      "glow": false
+    },
+    {
+      "name": "Toy_teal",
+      "image_texture_nodes": [],
+      "alpha": 1.0,
+      "roughness": 0.85,
+      "glow": false
+    },
+    {
+      "name": "Toy_trim",
+      "image_texture_nodes": [],
+      "alpha": 1.0,
+      "roughness": 0.85,
+      "glow": false
+    }
+  ],
+  "image_texture_count": 0,
+  "textured_materials": [],
+  "transparent_materials": [],
+  "glow_materials": [
+    "Toy_glassl_Glow",
+    "Toy_gold_Glow"
+  ],
+  "camera_count": 0,
+  "light_count": 0,
+  "animation_fcurve_count": 0,
+  "armature_count": 0,
+  "constraint_count": 0,
+  "transforms_applied": true,
+  "transform_form": "identity",
+  "node_scale": [
+    1.0,
+    1.0,
+    1.0
+  ],
+  "empty_parent_nodes": [],
+  "negative_scales": false,
+  "degenerate_triangle_count": 0,
+  "invalid_or_nonunit_loop_normal_count": 0,
+  "non_manifold_objects": [],
+  "closed_solids_expected": false,
+  "inverted_solid_objects": [],
+  "normal_ray_cast_first_hits": 22497,
+  "normal_ray_cast_flipped_visible_faces": 4,
+  "normal_ray_cast_residual": 0.000178,
+  "normal_orientation_status": "PASS",
+  "normal_orientation_method": "Per-object signed volume is authoritative for this union of closed solids: every object must be manifold (each edge used twice) and enclose positive volume. 22,500 deterministic visibility rays run as a secondary check with a 0.15% residual tolerance.",
+  "unexpected_geometry_or_objects": [],
+  "material_contract_violations": [],
+  "object_details": [
+    {
+      "name": "deck",
+      "triangles": 252,
+      "signed_volume_m3": 2741.204,
+      "location": [
+        0.0,
+        0.0,
+        0.0
+      ],
+      "rotation_euler": [
+        0.0,
+        0.0,
+        0.0
+      ],
+      "scale": [
+        1.0,
+        1.0,
+        1.0
+      ]
+    },
+    {
+      "name": "entry_bay",
+      "triangles": 64,
+      "signed_volume_m3": 2370.879,
+      "location": [
+        0.0,
+        0.0,
+        0.0
+      ],
+      "rotation_euler": [
+        0.0,
+        0.0,
+        0.0
+      ],
+      "scale": [
+        1.0,
+        1.0,
+        1.0
+      ]
+    },
+    {
+      "name": "grp_Toy_cream",
+      "triangles": 8924,
+      "signed_volume_m3": 278009.686,
+      "location": [
+        0.0,
+        0.0,
+        0.0
+      ],
+      "rotation_euler": [
+        0.0,
+        0.0,
+        0.0
+      ],
+      "scale": [
+        1.0,
+        1.0,
+        1.0
+      ]
+    },
+    {
+      "name": "grp_Toy_glass",
+      "triangles": 300,
+      "signed_volume_m3": 1689.564,
+      "location": [
+        0.0,
+        0.0,
+        0.0
+      ],
+      "rotation_euler": [
+        0.0,
+        0.0,
+        0.0
+      ],
+      "scale": [
+        1.0,
+        1.0,
+        1.0
+      ]
+    },
+    {
+      "name": "grp_Toy_gold_Glow",
+      "triangles": 76,
+      "signed_volume_m3": 244.05,
+      "location": [
+        0.0,
+        0.0,
+        0.0
+      ],
+      "rotation_euler": [
+        0.0,
+        0.0,
+        0.0
+      ],
+      "scale": [
+        1.0,
+        1.0,
+        1.0
+      ]
+    },
+    {
+      "name": "grp_Toy_roofd",
+      "triangles": 636,
+      "signed_volume_m3": 2881.947,
+      "location": [
+        0.0,
+        0.0,
+        0.0
+      ],
+      "rotation_euler": [
+        0.0,
+        0.0,
+        0.0
+      ],
+      "scale": [
+        1.0,
+        1.0,
+        1.0
+      ]
+    },
+    {
+      "name": "grp_Toy_stone",
+      "triangles": 2220,
+      "signed_volume_m3": 35067.997,
+      "location": [
+        0.0,
+        0.0,
+        0.0
+      ],
+      "rotation_euler": [
+        0.0,
+        0.0,
+        0.0
+      ],
+      "scale": [
+        1.0,
+        1.0,
+        1.0
+      ]
+    },
+    {
+      "name": "grp_Toy_teal",
+      "triangles": 448,
+      "signed_volume_m3": 822.978,
+      "location": [
+        0.0,
+        0.0,
+        0.0
+      ],
+      "rotation_euler": [
+        0.0,
+        0.0,
+        0.0
+      ],
+      "scale": [
+        1.0,
+        1.0,
+        1.0
+      ]
+    },
+    {
+      "name": "grp_Toy_trim",
+      "triangles": 3988,
+      "signed_volume_m3": 3613.488,
+      "location": [
+        0.0,
+        0.0,
+        0.0
+      ],
+      "rotation_euler": [
+        0.0,
+        0.0,
+        0.0
+      ],
+      "scale": [
+        1.0,
+        1.0,
+        1.0
+      ]
+    }
+  ],
+  "checks": {
+    "meters_and_plausible_dimensions": true,
+    "base_at_z_zero": true,
+    "bbox_top_is_target_height": true,
+    "loader_scale_is_unity": true,
+    "under_triangle_budget": true,
+    "no_image_textures": true,
+    "no_transparency": true,
+    "materials_follow_contract": true,
+    "no_cameras_or_lights": true,
+    "no_animation_skin_or_constraints": true,
+    "transforms_applied": true,
+    "no_negative_scales": true,
+    "normals_outward": true,
+    "no_degenerate_geometry": true,
+    "no_unexpected_objects": true
+  },
+  "overall": "PASS"
+}

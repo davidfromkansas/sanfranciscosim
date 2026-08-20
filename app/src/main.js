@@ -24,6 +24,38 @@ import { createLandmarks } from './landmarks.js';
 import { createAssets } from './assets.js';
 import { createPiers } from './piers.js';
 import { createAgents } from './agents.js';
+import { createPopulation } from './population.js';
+
+// Wait for something the CITY has to produce — a resident being seated once
+// their neighbourhood's streets arrive. Polling rather than an event because
+// seating happens inside the population's own frame loop, and resolves to null
+// on timeout rather than rejecting: a resident who never turns up is an answer
+// the caller has to show, not an exception to swallow.
+function waitFor(test, { timeout = 15000, interval = 120, signal } = {}) {
+  return new Promise((resolve) => {
+    const started = performance.now();
+    const tick = () => {
+      if (signal?.aborted) return resolve(null);
+      const value = test();
+      if (value) return resolve(value);
+      if (performance.now() - started > timeout) return resolve(null);
+      setTimeout(tick, interval);
+    };
+    tick();
+  });
+}
+
+function sleep(ms, signal) {
+  return new Promise((resolve) => {
+    if (signal?.aborted) return resolve();
+    const id = setTimeout(resolve, ms);
+    signal?.addEventListener('abort', () => {
+      clearTimeout(id);
+      resolve();
+    }, { once: true });
+  });
+}
+import { createFeedPanel } from './feed.js';
 import { createLiveFerries } from './ferries.js';
 import { createLiveMuni } from './muni.js';
 import { createMuniStopLayer } from './munistoplayer.js';
@@ -122,6 +154,65 @@ async function boot() {
     },
   });
   const agents = createAgents(scene, data, city);
+  // The residents: one sphere per adult sampled from the 2024 ACS PUMS
+  // microdata, walking the PUMA the Census actually recorded them in. Where
+  // they walk, the anonymous pedestrians stand down.
+  const population = createPopulation(scene, data, city);
+  agents.setPedExclusion(population.containsResidents);
+  // The column on the right: the same residents, talking. Independent of the
+  // renderer — if the writer is offline the panel says so and the city is
+  // exactly as it was.
+  // Clicking a name in the feed flies the camera to that person standing on
+  // their own street and rings them, so the column and the diorama are one
+  // thing. Returns false when they have not been seated yet — their PUMA's
+  // streets may still be streaming — and the panel says so rather than the
+  // camera flying somewhere arbitrary.
+  const feedPanel = createFeedPanel({
+    // "X simfranciscans live here" is the size of the cast the bake carries,
+    // not how many have been seated on a street yet — the header states what
+    // the simulation holds, and it must not fall as neighbourhoods unload.
+    castCount: () => population.castCount,
+    // Take me to this resident. If they are already on a street this is
+    // instant; if their neighbourhood has not streamed yet we go and GET them,
+    // because the whole point of the button is to end up where they are.
+    //
+    // Their own position is exactly what is not known yet, so the first hop
+    // aims at the middle of their neighbourhood — which the PUMA polygons give
+    // us whether or not a single street of it has loaded. Arriving is what
+    // pulls the tiles in; tile streaming follows the camera. Once the ground is
+    // there they get seated like anybody else, and the second hop lands on them.
+    async onVisit(person, { signal } = {}) {
+      const land = (at) => {
+        population.focus(person.id);
+        flyTo({ x: at.x, z: at.z, y: at.y, yaw: 210, pitch: 38, distance: 110 });
+      };
+      const here = population.locate(person.id);
+      if (here) {
+        land(here);
+        return { ok: true };
+      }
+      if (!population.knows(person.id)) return { ok: false, reason: 'unknown' };
+      const hood = population.neighbourhoodOf(person.id);
+      if (!hood) return { ok: false, reason: 'unknown' };
+
+      // Out over the neighbourhood, high enough to pull a wide spread of tiles.
+      flyTo({ x: hood.x, z: hood.z, y: 0, yaw: 210, pitch: 42, distance: 900 });
+
+      const found = await waitFor(() => population.locate(person.id), {
+        timeout: 20000,
+        signal,
+      });
+      if (signal?.aborted) return { ok: false, reason: 'cancelled' };
+      if (!found) return { ok: false, reason: 'timeout' };
+      // A resident seated on the first street to arrive can be moved again as
+      // more of their neighbourhood lands, so settle before landing on them —
+      // otherwise the camera arrives where they used to be.
+      await sleep(700, signal);
+      if (signal?.aborted) return { ok: false, reason: 'cancelled' };
+      land(population.locate(person.id) ?? found);
+      return { ok: true };
+    },
+  });
   // Real WETA vessels from /api/ferries; falls back to the procedural ferries.
   const ferries = createLiveFerries(scene, data, agents);
   // The live weather field. Created before the clock so the card can read it
@@ -234,6 +325,7 @@ async function boot() {
     water.setGlitter(key === 'low' ? 0.6 : 1);
     water.setQuality(key);
     agents.setQuality(key, quality);
+    population.setQuality(key);
     terrain.setQuality(key);
     clouds.setQuality(key);
     rain.setQuality(key);
@@ -280,6 +372,7 @@ async function boot() {
     rig.setDiorama(toy);
     env.setToy(toy);
     agents.setToy(toy);
+    population.setToy(toy);
     signs.setVisible(toy);
     post.setEnabled(toy);
     await city.setTier(toy ? 'toy' : 'base');
@@ -781,6 +874,8 @@ async function boot() {
     rig,
     city,
     agents,
+    population,
+    feedPanel,
     ferries,
     clouds,
     rain,
@@ -948,6 +1043,7 @@ async function boot() {
     overlay.update(dt);
     city.update(dt, pivotWorld, camera.position, quality);
     agents.update(dt, pivotWorld, camera.position);
+    population.update(dt, camera.position, camera.quaternion);
     ferries.update(dt);
     // Weather eases on wall time for the same reason the clouds do: the
     // simulation clamp would stall the transition below 20 fps.
@@ -1008,6 +1104,7 @@ async function boot() {
           `far groups ${city.stats.farGroups}  near ${city.stats.nearChunks}`,
           `trees      ${city.stats.trees}  lamps ${city.stats.lamps}`,
           `cars       ${agents.carCount}`,
+          `residents  ${population.residentCount}`,
           `ferries    ${ferries.count}${ferries.live ? ' live' : ' procedural'}`,
           `muni       ${muni.count}${muni.live ? ` live (${muni.onShapeCount} on-route${muni.degraded ? ', degraded' : ''})` : ' off'}`,
           `stops      ${muniStops.count} shown / ${muniStops.total}`,

@@ -1692,5 +1692,784 @@
     ],
     "tris": 9262,
     "loadRadius": 2500
+  },
+  {
+    "id": "49-zoe",
+    "file": "49-zoe.glb",
+    "anchor": [
+      -122.3960338,
+      37.7800764
+    ],
+    "targetHeightM": 17.0,
+    "cat": 2,
+    "name": "49 Zoe Street",
+    "estimated": false,
+    "dims": [
+      34.1084,
+      34.6128,
+      17.0
+    ],
+    "tris": 7688,
+    "loadRadius": 2500
+  },
+  {
+    "id": "246-ritch",
+    "file": "246-ritch.glb",
+    "anchor": [
+      -122.3958481,
+      37.7802253
+    ],
+    "targetHeightM": 18.76,
+    "cat": 2,
+    "name": "246 Ritch Street",
+    "estimated": false,
+    "dims": [
+      28.3678,
+      28.1556,
+      18.76
+    ],
+    "tris": 8492,
+    "loadRadius": 2500
+  },
+  {
+    "id": "254-ritch",
+    "file": "254-ritch.glb",
+    "anchor": [
+      -122.3956322,
+      37.7801278
+    ],
+    "targetHeightM": 8.8,
+    "cat": 1,
+    "name": "252\u2013254 Ritch Street",
+    "estimated": false,
+    "dims": [
+      16.1425,
+      16.2013,
+      8.8
+    ],
+    "tris": 3140,
+    "loadRadius": 2500
+  },
+  {
+    "id": "434-brannan",
+    "file": "434-brannan.glb",
+    "anchor": [
+      -122.3954103,
+      37.7796003
+    ],
+    "targetHeightM": 13.79,
+    "cat": 3,
+    "name": "434 Brannan Street",
+    "estimated": true,
+    "dims": [
+      40.1962,
+      40.6682,
+      13.79
+    ],
+    "tris": 5872,
+    "loadRadius": 2500
+  },
+  {
+    "id": "248-ritch",
+    "file": "248-ritch.glb",
+    "anchor": [
+      -122.3956749,
+      37.7801751
+    ],
+    "targetHeightM": 8.6,
+    "cat": 2,
+    "name": "248\u2013250 Ritch Street",
+    "estimated": false,
+    "dims": [
+      15.8158,
+      15.8177,
+      8.6
+    ],
+    "tris": 3572,
+    "loadRadius": 2500
+  },
+  {
+    "id": "424-brannan",
+    "file": "424-brannan.glb",
+    "anchor": [
+      -122.3954857,
+      37.7798744
+    ],
+    "targetHeightM": 8.5649,
+    "cat": 23,
+    "name": "424 Brannan Street Parking",
+    "estimated": false,
+    "dims": [
+      88.8432,
+      59.934,
+      8.5649
+    ],
+    "tris": 8940,
+    "loadRadius": 2500
+  },
+  {
+    "id": "226-ritch",
+    "file": "226-ritch.glb",
+    "anchor": [
+      -122.3960899,
+      37.7804376
+    ],
+    "targetHeightM": 18.1,
+    "cat": 2,
+    "name": "226 Ritch Street",
+    "estimated": false,
+    "dims": [
+      25.0824,
+      24.9244,
+      18.1
+    ],
+    "tris": 5144,
+    "loadRadius": 2500
+  },
+  {
+    "id": "414-brannan",
+    "file": "414-brannan.glb",
+    "anchor": [
+      -122.3948685,
+      37.7799308
+    ],
+    "targetHeightM": 14.0,
+    "cat": 8,
+    "name": "414 Brannan Street (Epic Church)",
+    "estimated": false,
+    "dims": [
+      33.1626,
+      33.0725,
+      14.0
+    ],
+    "tris": 8312,
+    "loadRadius": 2500
+  },
+  {
+    "id": "1-south-park",
+    "file": "1-south-park.glb",
+    "anchor": [
+      -122.3928634,
+      37.782048
+    ],
+    "targetHeightM": 20.2,
+    "cat": 2,
+    "name": "One South Park (1 South Park)",
+    "estimated": false,
+    "dims": [
+      58.9236,
+      54.9059,
+      20.2
+    ],
+    "tris": 18932,
+    "loadRadius": 2500
+  },
+  {
+    "id": "501-third",
+    "file": "501-third.glb",
+    "anchor": [
+      -122.3954601,
+      37.7813246
+    ],
+    "targetHeightM": 16.4,
+    "cat": 3,
+    "name": "501 Third Street",
+    "estimated": false,
+    "dims": [
+      34.6966,
+      34.5376,
+      16.4
+    ],
+    "tris": 2732,
+    "loadRadius": 2500
+  },
+  {
+    "id": "10-south-park",
+    "file": "10-south-park.glb",
+    "anchor": [
+      -122.3935162,
+      37.7823704
+    ],
+    "targetHeightM": 14.67,
+    "cat": 2,
+    "name": "10 South Park (South Park Lofts)",
+    "estimated": false,
+    "dims": [
+      39.9401,
+      35.9952,
+      14.67
+    ],
+    "tris": 11976,
+    "loadRadius": 2500
+  },
+  {
+    "id": "521-third",
+    "file": "521-third.glb",
+    "anchor": [
+      -122.3952384,
+      37.7811509
+    ],
+    "targetHeightM": 11.4,
+    "cat": 2,
+    "name": "521 Third Street",
+    "estimated": true,
+    "dims": [
+      27.3615,
+      27.1014,
+      11.4
+    ],
+    "tris": 8848,
+    "loadRadius": 2500
+  },
+  {
+    "id": "164-south-park",
+    "file": "164-south-park.glb",
+    "anchor": [
+      -122.3949366,
+      37.7812097
+    ],
+    "targetHeightM": 5.4,
+    "cat": 3,
+    "name": "164 South Park",
+    "estimated": true,
+    "dims": [
+      37.2385,
+      36.4711,
+      5.4
+    ],
+    "tris": 3366,
+    "loadRadius": 2500
+  },
+  {
+    "id": "pier-15",
+    "file": "pier-15.glb",
+    "anchor": [
+      -122.3974662,
+      37.8016046
+    ],
+    "targetHeightM": 16.4,
+    "cat": 25,
+    "name": "Pier 15 (Exploratorium)",
+    "estimated": false,
+    "seaLevel": true,
+    "dims": [
+      249.25,
+      221.09,
+      16.4
+    ],
+    "tris": 10852,
+    "loadRadius": 2500
+  },
+  {
+    "id": "pier-7",
+    "file": "pier-7.glb",
+    "anchor": [
+      -122.3955159,
+      37.7994429
+    ],
+    "targetHeightM": 7.6,
+    "cat": 0,
+    "name": "Pier 7",
+    "estimated": false,
+    "dims": [
+      219.5688,
+      165.9949,
+      7.6
+    ],
+    "tris": 13860,
+    "loadRadius": 2500
+  },
+  {
+    "id": "hills-brothers-building",
+    "file": "hills-brothers-building.glb",
+    "anchor": [
+      -122.3892854,
+      37.7894167
+    ],
+    "targetHeightM": 53.2,
+    "cat": 3,
+    "name": "Hills Brothers Building",
+    "estimated": false,
+    "dims": [
+      84.8528,
+      84.8528,
+      53.2
+    ],
+    "tris": 10242,
+    "loadRadius": 2500
+  },
+  {
+    "id": "345-spear",
+    "file": "345-spear.glb",
+    "anchor": [
+      -122.3901941,
+      37.7900769
+    ],
+    "targetHeightM": 68.5,
+    "cat": 3,
+    "name": "Hills Plaza (345 Spear)",
+    "estimated": false,
+    "dims": [
+      106.3305,
+      118.9857,
+      68.5
+    ],
+    "tris": 17054,
+    "loadRadius": 2500
+  },
+  {
+    "id": "pier-9",
+    "file": "pier-9.glb",
+    "anchor": [
+      -122.3967994,
+      37.8006708
+    ],
+    "targetHeightM": 17.6,
+    "cat": 3,
+    "name": "Pier 9",
+    "estimated": false,
+    "dims": [
+      235.2816,
+      188.4245,
+      17.6
+    ],
+    "tris": 11788,
+    "loadRadius": 2500
+  },
+  {
+    "id": "1-market",
+    "file": "1-market.glb",
+    "anchor": [
+      -122.3948075,
+      37.7938412
+    ],
+    "targetHeightM": 48.7,
+    "cat": 3,
+    "name": "1 Market Street (Southern Pacific Building)",
+    "estimated": false,
+    "dims": [
+      112.2081,
+      112.0981,
+      48.7
+    ],
+    "tris": 18508,
+    "loadRadius": 2500
+  },
+  {
+    "id": "one-market-plaza-towers",
+    "file": "one-market-plaza-towers.glb",
+    "anchor": [
+      -122.3941803,
+      37.7933169
+    ],
+    "targetHeightM": 177.6,
+    "cat": 3,
+    "name": "One Market Plaza (Spear and Steuart Towers)",
+    "estimated": false,
+    "dims": [
+      123.0233,
+      128.8103,
+      177.6
+    ],
+    "tris": 8917
+  },
+  {
+    "id": "pier-19",
+    "file": "pier-19.glb",
+    "anchor": [
+      -122.3988181,
+      37.8030032
+    ],
+    "targetHeightM": 17.8,
+    "cat": 25,
+    "name": "Pier 19",
+    "estimated": false,
+    "dims": [
+      243.387,
+      191.892,
+      17.8
+    ],
+    "tris": 7782,
+    "loadRadius": 2500
+  },
+  {
+    "id": "audiffred-building",
+    "file": "audiffred-building.glb",
+    "anchor": [
+      -122.3927766,
+      37.7933230
+    ],
+    "targetHeightM": 17.5,
+    "cat": 3,
+    "name": "Audiffred Building (1 Mission Street)",
+    "estimated": true,
+    "dims": [
+      40.4244,
+      40.2848,
+      17.5
+    ],
+    "tris": 9256,
+    "loadRadius": 2500
+  },
+  {
+    "id": "fulton-plaza",
+    "file": "fulton-plaza.glb",
+    "anchor": [
+      -122.4159308,
+      37.7796961
+    ],
+    "targetHeightM": 13.1931,
+    "cat": 0,
+    "name": "Fulton Plaza",
+    "estimated": false,
+    "dims": [
+      128.4915,
+      67.6286,
+      13.1931
+    ],
+    "tris": 10692,
+    "loadRadius": 2500
+  },
+  {
+    "id": "pier-3",
+    "file": "pier-3.glb",
+    "anchor": [
+      -122.3947017,
+      37.7982322
+    ],
+    "targetHeightM": 18.5,
+    "cat": 25,
+    "name": "Pier 3 (Hornblower Landing)",
+    "estimated": true,
+    "seaLevel": true,
+    "dims": [
+      195.8228,
+      161.2056,
+      18.5
+    ],
+    "tris": 12152,
+    "loadRadius": 2500
+  },
+  {
+    "id": "one-steuart-lane",
+    "file": "one-steuart-lane.glb",
+    "anchor": [
+      -122.3916888,
+      37.7915643
+    ],
+    "targetHeightM": 67.06,
+    "cat": 2,
+    "name": "One Steuart Lane",
+    "estimated": false,
+    "dims": [
+      62.95,
+      62.493,
+      67.06
+    ],
+    "tris": 17064,
+    "loadRadius": 2500
+  },
+  {
+    "id": "110-embarcadero",
+    "file": "110-embarcadero.glb",
+    "anchor": [
+      -122.3926614,
+      37.7932332
+    ],
+    "targetHeightM": 17.4,
+    "cat": 17,
+    "name": "The Commonwealth Club (110 The Embarcadero)",
+    "estimated": false,
+    "dims": [
+      40.4759,
+      40.1923,
+      17.4
+    ],
+    "tris": 4944,
+    "loadRadius": 2500
+  },
+  {
+    "id": "4-embarcadero-center",
+    "file": "4-embarcadero-center.glb",
+    "anchor": [
+      -122.3961998,
+      37.7953001
+    ],
+    "targetHeightM": 179.0,
+    "cat": 3,
+    "name": "Four Embarcadero Center",
+    "estimated": false,
+    "dims": [
+      73.0216,
+      51.9818,
+      179.0
+    ],
+    "tris": 17904
+  },
+  {
+    "id": "131-steuart",
+    "file": "131-steuart.glb",
+    "anchor": [
+      -122.3924386,
+      37.7930568
+    ],
+    "targetHeightM": 27.7,
+    "cat": 3,
+    "name": "Steuart Place (131 Steuart Street)",
+    "estimated": false,
+    "dims": [
+      41.2209,
+      41.3458,
+      27.7
+    ],
+    "tris": 6842,
+    "loadRadius": 2500
+  },
+  {
+    "id": "2-folsom",
+    "file": "2-folsom.glb",
+    "anchor": [
+      -122.390975,
+      37.790787
+    ],
+    "targetHeightM": 88.0,
+    "cat": 3,
+    "name": "2 Folsom Street (Gap Inc. headquarters)",
+    "estimated": false,
+    "dims": [
+      113.9196,
+      113.9579,
+      88.0
+    ],
+    "tris": 16996,
+    "loadRadius": 2640
+  },
+  {
+    "id": "hiram-johnson-state-office-building",
+    "file": "hiram-johnson-state-office-building.glb",
+    "anchor": [
+      -122.4179151,
+      37.7810345
+    ],
+    "targetHeightM": 61.9,
+    "cat": 18,
+    "name": "Hiram W. Johnson State Office Building",
+    "estimated": false,
+    "dims": [
+      130.6549,
+      67.1789,
+      61.9
+    ],
+    "tris": 16908,
+    "loadRadius": 2500
+  },
+  {
+    "id": "towers-at-rincon",
+    "file": "towers-at-rincon.glb",
+    "anchor": [
+      -122.3924907,
+      37.791991
+    ],
+    "targetHeightM": 89.0,
+    "cat": 2,
+    "name": "The Towers at Rincon (88 Howard Street)",
+    "estimated": false,
+    "dims": [
+      108.6596,
+      108.6701,
+      89.0
+    ],
+    "tris": 17035,
+    "loadRadius": 2670
+  },
+  {
+    "id": "169-steuart",
+    "file": "169-steuart.glb",
+    "anchor": [
+      -122.3919821,
+      37.7926993
+    ],
+    "targetHeightM": 46.64,
+    "cat": 7,
+    "name": "Army & Navy YMCA Building (169 Steuart Street)",
+    "estimated": false,
+    "dims": [
+      60.1394,
+      60.2778,
+      46.64
+    ],
+    "tris": 19908,
+    "loadRadius": 2500
+  },
+  {
+    "id": "50-united-nations-plaza",
+    "file": "50-united-nations-plaza.glb",
+    "anchor": [
+      -122.4144853,
+      37.7804351
+    ],
+    "targetHeightM": 33.0,
+    "cat": 18,
+    "name": "50 United Nations Plaza Federal Office Building",
+    "estimated": false,
+    "dims": [
+      122.7264,
+      84.8953,
+      33.0
+    ],
+    "tris": 13615,
+    "loadRadius": 2500
+  },
+  {
+    "id": "un-plaza",
+    "file": "un-plaza.glb",
+    "anchor": [
+      -122.41389,
+      37.7801415
+    ],
+    "targetHeightM": 16.4028,
+    "cat": 0,
+    "name": "United Nations Plaza",
+    "estimated": true,
+    "dims": [
+      215.2063,
+      157.9219,
+      16.4028
+    ],
+    "tris": 16390,
+    "loadRadius": 2500
+  },
+  {
+    "id": "orpheum-theatre",
+    "file": "orpheum-theatre.glb",
+    "anchor": [
+      -122.4146087,
+      37.7793182
+    ],
+    "targetHeightM": 27.2,
+    "cat": 17,
+    "name": "Orpheum Theatre",
+    "estimated": false,
+    "dims": [
+      67.6506,
+      77.6234,
+      27.2
+    ],
+    "tris": 7193,
+    "loadRadius": 2500
+  },
+  {
+    "id": "pier-1",
+    "file": "pier-1.glb",
+    "anchor": [
+      -122.3941164,
+      37.7974191
+    ],
+    "targetHeightM": 15.4,
+    "cat": 3,
+    "name": "Pier 1",
+    "estimated": false,
+    "dims": [
+      215.4308,
+      185.429,
+      15.4
+    ],
+    "tris": 13330,
+    "loadRadius": 3000
+  },
+  {
+    "id": "hyatt-regency",
+    "file": "hyatt-regency.glb",
+    "anchor": [
+      -122.3957275,
+      37.7942899
+    ],
+    "targetHeightM": 80.8,
+    "cat": 7,
+    "name": "Hyatt Regency San Francisco",
+    "estimated": false,
+    "dims": [
+      121.1997,
+      98.796,
+      80.8
+    ],
+    "tris": 13604,
+    "loadRadius": 2500
+  },
+  {
+    "id": "132-embarcadero",
+    "file": "132-embarcadero.glb",
+    "anchor": [
+      -122.3925476,
+      37.7931482
+    ],
+    "targetHeightM": 29.57,
+    "cat": 3,
+    "name": "132 The Embarcadero (Jewish Community Federation Building)",
+    "estimated": true,
+    "dims": [
+      40.4371,
+      40.4731,
+      29.57
+    ],
+    "tris": 4960,
+    "loadRadius": 2500
+  },
+  {
+    "id": "8-mission",
+    "file": "8-mission.glb",
+    "anchor": [
+      -122.3932861,
+      37.7936872
+    ],
+    "targetHeightM": 28.66,
+    "cat": 7,
+    "name": "1 Hotel San Francisco (8 Mission Street)",
+    "estimated": false,
+    "dims": [
+      74.1381,
+      56.5484,
+      28.66
+    ],
+    "tris": 19082,
+    "loadRadius": 2500
+  },
+  {
+    "id": "ferry-station-post-office",
+    "file": "ferry-station-post-office.glb",
+    "anchor": [
+      -122.3921505,
+      37.7941368
+    ],
+    "targetHeightM": 12.65,
+    "cat": 18,
+    "name": "Ferry Station Post Office Building (Agriculture Building)",
+    "estimated": false,
+    "dims": [
+      69.8386,
+      65.2024,
+      12.65
+    ],
+    "tris": 11596,
+    "loadRadius": 2500
+  },
+  {
+    "id": "pier-17",
+    "file": "pier-17.glb",
+    "anchor": [
+      -122.3981018,
+      37.8022149
+    ],
+    "targetHeightM": 21.3,
+    "cat": 20,
+    "name": "Pier 17",
+    "estimated": false,
+    "dims": [
+      233.9775,
+      21.3,
+      182.7369
+    ],
+    "tris": 1998,
+    "loadRadius": 2500
   }
 ]

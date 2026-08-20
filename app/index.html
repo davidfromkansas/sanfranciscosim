@@ -2,9 +2,52 @@
 <html lang="en">
   <head>
     <meta charset="utf-8" />
-    <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no" />
-    <title>San Francisco — data-accurate 3D city</title>
-    <link rel="icon" href="/favicon.svg" type="image/svg+xml" />
+    <meta
+      name="viewport"
+      content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no"
+    />
+    <title>Simulate San Francisco. Explore SF's digital twin and meet the residents!</title>
+    <!-- Link previews (iMessage, Slack, Discord, X, LinkedIn). Absolute URLs
+         throughout: scrapers resolve nothing relative, and most never run
+         JavaScript, which is why this lives here in the static HTML and not in
+         anything Vite mounts. og.jpg is the feed banner cut to the 1200x630
+         card size every one of these apps agrees on. -->
+    <meta property="og:type" content="website" />
+    <meta property="og:site_name" content="SF Sim" />
+    <meta
+      property="og:title"
+      content="Simulate San Francisco. Explore SF's digital twin and meet the residents!"
+    />
+    <meta
+      property="og:description"
+      content="Simulate San Francisco. Explore SF's digital twin and meet the residents!"
+    />
+    <meta property="og:url" content="https://www.sfsim.net/" />
+    <meta property="og:image" content="https://www.sfsim.net/og.jpg" />
+    <meta property="og:image:width" content="1200" />
+    <meta property="og:image:height" content="630" />
+    <meta
+      property="og:image:alt"
+      content="Illustrated San Francisco skyline: the Golden Gate Bridge, Coit Tower, Alcatraz and painted Victorians along the bay."
+    />
+    <meta name="twitter:card" content="summary_large_image" />
+    <meta
+      name="twitter:title"
+      content="Simulate San Francisco. Explore SF's digital twin and meet the residents!"
+    />
+    <meta
+      name="twitter:description"
+      content="Simulate San Francisco. Explore SF's digital twin and meet the residents!"
+    />
+    <meta name="twitter:image" content="https://www.sfsim.net/og.jpg" />
+    <meta
+      name="description"
+      content="Simulate San Francisco. Explore SF's digital twin and meet the residents!"
+    />
+    <!-- The r/simfrancisco cloud, cut to a circle so it reads as a round mark on
+         a tab of any colour. 32 for the tab, 180 for an iOS home screen. -->
+    <link rel="icon" href="/favicon-32.png" type="image/png" sizes="32x32" />
+    <link rel="apple-touch-icon" href="/favicon-180.png" />
     <link rel="stylesheet" href="/src/style.css" />
     <link rel="stylesheet" href="/src/ui-theme.css" />
     <link rel="stylesheet" href="/src/boot.css" />
@@ -43,9 +86,10 @@
       </div>
       <div class="boot-scanlines"></div>
     </div>
-    <div id="attribution">
-      © OpenStreetMap contributors, Overture Maps Foundation, City &amp; County of San Francisco, USGS
-    </div>
+    <!-- The residents' feed. Empty for now, and covering the right quarter of
+         the city rather than squeezing it — the canvas keeps the full window
+         and carries on behind. Desktop only. -->
+    <aside id="feed" aria-label="Neighbourhood feed"></aside>
     <div id="debug" hidden></div>
     <script type="module" src="/src/main.js"></script>
   </body>

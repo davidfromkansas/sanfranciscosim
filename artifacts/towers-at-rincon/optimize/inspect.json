@@ -1,0 +1,887 @@
+{
+ "file_bytes": {
+  "raw": 913488,
+  "gzip9": 171352
+ },
+ "objects": 253,
+ "total_tris": 17036,
+ "total_verts": 29942,
+ "primitives_est": 253,
+ "top20": [
+  {
+   "name": "podium_parapet",
+   "tris": 464,
+   "verts": 696,
+   "dims": [
+    108.429,
+    108.67,
+    1.3
+   ],
+   "materials": [
+    "Toy_trim"
+   ]
+  },
+  {
+   "name": "east_cornice",
+   "tris": 416,
+   "verts": 810,
+   "dims": [
+    25.213,
+    46.286,
+    1.1
+   ],
+   "materials": [
+    "Toy_trim"
+   ]
+  },
+  {
+   "name": "west_cornice",
+   "tris": 416,
+   "verts": 810,
+   "dims": [
+    49.292,
+    24.719,
+    1.1
+   ],
+   "materials": [
+    "Toy_trim"
+   ]
+  },
+  {
+   "name": "court_plaza",
+   "tris": 388,
+   "verts": 756,
+   "dims": [
+    14.969,
+    14.624,
+    0.4
+   ],
+   "materials": [
+    "Toy_stone"
+   ]
+  },
+  {
+   "name": "east_arch",
+   "tris": 360,
+   "verts": 702,
+   "dims": [
+    10.397,
+    14.859,
+    2.098
+   ],
+   "materials": [
+    "Toy_trim"
+   ]
+  },
+  {
+   "name": "west_arch",
+   "tris": 360,
+   "verts": 702,
+   "dims": [
+    14.907,
+    10.471,
+    2.098
+   ],
+   "materials": [
+    "Toy_trim"
+   ]
+  },
+  {
+   "name": "entrance_arch",
+   "tris": 304,
+   "verts": 594,
+   "dims": [
+    8.773,
+    8.773,
+    13.486
+   ],
+   "materials": [
+    "Toy_glass"
+   ]
+  },
+  {
+   "name": "court_plaza_eye",
+   "tris": 276,
+   "verts": 540,
+   "dims": [
+    5.567,
+    5.326,
+    0.3
+   ],
+   "materials": [
+    "Toy_trim"
+   ]
+  },
+  {
+   "name": "east_bay_band_0",
+   "tris": 248,
+   "verts": 486,
+   "dims": [
+    23.072,
+    20.325,
+    2.1
+   ],
+   "materials": [
+    "Toy_sand"
+   ]
+  },
+  {
+   "name": "east_bay_band_1",
+   "tris": 248,
+   "verts": 486,
+   "dims": [
+    23.072,
+    20.325,
+    2.1
+   ],
+   "materials": [
+    "Toy_sand"
+   ]
+  },
+  {
+   "name": "east_bay_cornice",
+   "tris": 248,
+   "verts": 486,
+   "dims": [
+    24.013,
+    19.894,
+    1.15
+   ],
+   "materials": [
+    "Toy_trim"
+   ]
+  },
+  {
+   "name": "east_bay_top",
+   "tris": 248,
+   "verts": 486,
+   "dims": [
+    23.092,
+    20.347,
+    0.05
+   ],
+   "materials": [
+    "Toy_sand"
+   ]
+  },
+  {
+   "name": "west_bay_band_0",
+   "tris": 248,
+   "verts": 486,
+   "dims": [
+    20.361,
+    22.59,
+    2.1
+   ],
+   "materials": [
+    "Toy_sand"
+   ]
+  },
+  {
+   "name": "west_bay_band_1",
+   "tris": 248,
+   "verts": 486,
+   "dims": [
+    20.361,
+    22.59,
+    2.1
+   ],
+   "materials": [
+    "Toy_sand"
+   ]
+  },
+  {
+   "name": "west_bay_cornice",
+   "tris": 248,
+   "verts": 486,
+   "dims": [
+    20.148,
+    23.004,
+    1.15
+   ],
+   "materials": [
+    "Toy_trim"
+   ]
+  },
+  {
+   "name": "west_bay_top",
+   "tris": 248,
+   "verts": 486,
+   "dims": [
+    20.386,
+    22.616,
+    0.05
+   ],
+   "materials": [
+    "Toy_sand"
+   ]
+  },
+  {
+   "name": "podium_band_0",
+   "tris": 228,
+   "verts": 348,
+   "dims": [
+    108.429,
+    108.67,
+    2.5
+   ],
+   "materials": [
+    "Toy_sand"
+   ]
+  },
+  {
+   "name": "podium_band_1",
+   "tris": 228,
+   "verts": 348,
+   "dims": [
+    108.429,
+    108.67,
+    2.5
+   ],
+   "materials": [
+    "Toy_sand"
+   ]
+  },
+  {
+   "name": "podium_band_2",
+   "tris": 228,
+   "verts": 348,
+   "dims": [
+    108.429,
+    108.67,
+    2.5
+   ],
+   "materials": [
+    "Toy_sand"
+   ]
+  },
+  {
+   "name": "podium_band_3",
+   "tris": 228,
+   "verts": 348,
+   "dims": [
+    108.429,
+    108.67,
+    2.5
+   ],
+   "materials": [
+    "Toy_sand"
+   ]
+  }
+ ],
+ "vertex_attrs": [
+  "NORMAL"
+ ],
+ "materials": [
+  {
+   "name": "Toy_cream_Glow",
+   "glow": true,
+   "user_objects": 38
+  },
+  {
+   "name": "Toy_glass",
+   "glow": false,
+   "user_objects": 44
+  },
+  {
+   "name": "Toy_glassl",
+   "glow": false,
+   "user_objects": 4
+  },
+  {
+   "name": "Toy_gold_Glow",
+   "glow": true,
+   "user_objects": 5
+  },
+  {
+   "name": "Toy_ink",
+   "glow": false,
+   "user_objects": 3
+  },
+  {
+   "name": "Toy_mint",
+   "glow": false,
+   "user_objects": 6
+  },
+  {
+   "name": "Toy_sand",
+   "glow": false,
+   "user_objects": 51
+  },
+  {
+   "name": "Toy_steel",
+   "glow": false,
+   "user_objects": 7
+  },
+  {
+   "name": "Toy_stone",
+   "glow": false,
+   "user_objects": 44
+  },
+  {
+   "name": "Toy_trim",
+   "glow": false,
+   "user_objects": 51
+  }
+ ],
+ "textures": [],
+ "bbox": {
+  "dims": [
+   108.6596,
+   108.6701,
+   89.0
+  ],
+  "min": [
+   -54.3298,
+   -54.3351,
+   0.0
+  ],
+  "origin_offset_xy": [
+   0.0,
+   0.0
+  ],
+  "base_z": 0.0
+ },
+ "duplicate_mesh_groups": [
+  {
+   "signature": {
+    "verts": 348,
+    "tris": 228,
+    "dims": [
+     108.4294,
+     108.6701,
+     2.5
+    ]
+   },
+   "objects": [
+    "podium_band_0",
+    "podium_band_1",
+    "podium_band_2",
+    "podium_band_3",
+    "podium_band_4"
+   ]
+  },
+  {
+   "signature": {
+    "verts": 348,
+    "tris": 228,
+    "dims": [
+     107.7164,
+     107.9588,
+     1.48
+    ]
+   },
+   "objects": [
+    "podium_glass_0",
+    "podium_glass_1",
+    "podium_glass_2",
+    "podium_glass_3",
+    "podium_glass_4"
+   ]
+  },
+  {
+   "signature": {
+    "verts": 90,
+    "tris": 56,
+    "dims": [
+     25.9044,
+     48.2,
+     2.1
+    ]
+   },
+   "objects": [
+    "east_band_0",
+    "east_band_1",
+    "east_band_2",
+    "east_band_3",
+    "east_band_4",
+    "east_band_5",
+    "east_band_6",
+    "east_band_7",
+    "east_band_8",
+    "east_band_9",
+    "east_band_10",
+    "east_band_11",
+    "east_band_12",
+    "east_band_13",
+    "east_band_14",
+    "east_band_15"
+   ]
+  },
+  {
+   "signature": {
+    "verts": 90,
+    "tris": 56,
+    "dims": [
+     25.2029,
+     47.3992,
+     1.18
+    ]
+   },
+   "objects": [
+    "east_glass_0",
+    "east_glass_1",
+    "east_glass_2",
+    "east_glass_3",
+    "east_glass_4",
+    "east_glass_5",
+    "east_glass_6",
+    "east_glass_7",
+    "east_glass_8",
+    "east_glass_9",
+    "east_glass_10",
+    "east_glass_11",
+    "east_glass_12",
+    "east_glass_13",
+    "east_glass_14",
+    "east_glass_15"
+   ]
+  },
+  {
+   "signature": {
+    "verts": 90,
+    "tris": 56,
+    "dims": [
+     51.76,
+     25.9387,
+     2.1
+    ]
+   },
+   "objects": [
+    "west_band_0",
+    "west_band_1",
+    "west_band_2",
+    "west_band_3",
+    "west_band_4",
+    "west_band_5",
+    "west_band_6",
+    "west_band_7",
+    "west_band_8",
+    "west_band_9",
+    "west_band_10",
+    "west_band_11",
+    "west_band_12",
+    "west_band_13",
+    "west_band_14",
+    "west_band_15"
+   ]
+  },
+  {
+   "signature": {
+    "verts": 90,
+    "tris": 56,
+    "dims": [
+     50.929,
+     25.2369,
+     1.18
+    ]
+   },
+   "objects": [
+    "west_glass_0",
+    "west_glass_1",
+    "west_glass_2",
+    "west_glass_3",
+    "west_glass_4",
+    "west_glass_5",
+    "west_glass_6",
+    "west_glass_7",
+    "west_glass_8",
+    "west_glass_9",
+    "west_glass_10",
+    "west_glass_11",
+    "west_glass_12",
+    "west_glass_13",
+    "west_glass_14",
+    "west_glass_15"
+   ]
+  },
+  {
+   "signature": {
+    "verts": 60,
+    "tris": 36,
+    "dims": [
+     4.2594,
+     23.2331,
+     0.32
+    ]
+   },
+   "objects": [
+    "east_balc_0",
+    "east_balc_1",
+    "east_balc_2",
+    "east_balc_3",
+    "east_balc_4",
+    "east_balc_5",
+    "east_balc_6",
+    "east_balc_7",
+    "east_balc_8",
+    "east_balc_9",
+    "east_balc_10",
+    "east_balc_11",
+    "east_balc_12",
+    "east_balc_13",
+    "east_balc_14",
+    "east_balc_15"
+   ]
+  },
+  {
+   "signature": {
+    "verts": 60,
+    "tris": 36,
+    "dims": [
+     24.3763,
+     3.9344,
+     0.32
+    ]
+   },
+   "objects": [
+    "west_balc_0",
+    "west_balc_1",
+    "west_balc_2",
+    "west_balc_3",
+    "west_balc_4",
+    "west_balc_5",
+    "west_balc_6",
+    "west_balc_7",
+    "west_balc_8",
+    "west_balc_9",
+    "west_balc_10",
+    "west_balc_11",
+    "west_balc_12",
+    "west_balc_13",
+    "west_balc_14",
+    "west_balc_15"
+   ]
+  },
+  {
+   "signature": {
+    "verts": 486,
+    "tris": 248,
+    "dims": [
+     23.0722,
+     20.3254,
+     2.1
+    ]
+   },
+   "objects": [
+    "east_bay_band_0",
+    "east_bay_band_1"
+   ]
+  },
+  {
+   "signature": {
+    "verts": 486,
+    "tris": 248,
+    "dims": [
+     20.3612,
+     22.5899,
+     2.1
+    ]
+   },
+   "objects": [
+    "west_bay_band_0",
+    "west_bay_band_1"
+   ]
+  },
+  {
+   "signature": {
+    "verts": 216,
+    "tris": 108,
+    "dims": [
+     5.1974,
+     7.6278,
+     2.4
+    ]
+   },
+   "objects": [
+    "east_mech_1",
+    "east_mech_-1"
+   ]
+  },
+  {
+   "signature": {
+    "verts": 216,
+    "tris": 108,
+    "dims": [
+     1.3148,
+     1.3148,
+     4.1
+    ]
+   },
+   "objects": [
+    "entrance_pier_a",
+    "entrance_pier_b"
+   ]
+  },
+  {
+   "signature": {
+    "verts": 216,
+    "tris": 108,
+    "dims": [
+     7.6515,
+     5.2345,
+     2.4
+    ]
+   },
+   "objects": [
+    "west_mech_1",
+    "west_mech_-1"
+   ]
+  },
+  {
+   "signature": {
+    "verts": 192,
+    "tris": 92,
+    "dims": [
+     0.7917,
+     0.7917,
+     2.7
+    ]
+   },
+   "objects": [
+    "east_mast",
+    "west_mast"
+   ]
+  },
+  {
+   "signature": {
+    "verts": 24,
+    "tris": 12,
+    "dims": [
+     1.6263,
+     1.6263,
+     5.0
+    ]
+   },
+   "objects": [
+    "pier_1",
+    "pier_2",
+    "pier_3",
+    "pier_4",
+    "pier_5",
+    "pier_6",
+    "pier_7",
+    "pier_8",
+    "pier_16",
+    "pier_17",
+    "pier_18",
+    "pier_19",
+    "pier_20",
+    "pier_21"
+   ]
+  },
+  {
+   "signature": {
+    "verts": 54,
+    "tris": 32,
+    "dims": [
+     22.4564,
+     19.7411,
+     1.18
+    ]
+   },
+   "objects": [
+    "east_bay_glass_0",
+    "east_bay_glass_1"
+   ]
+  },
+  {
+   "signature": {
+    "verts": 54,
+    "tris": 32,
+    "dims": [
+     19.777,
+     21.9584,
+     1.18
+    ]
+   },
+   "objects": [
+    "west_bay_glass_0",
+    "west_bay_glass_1"
+   ]
+  },
+  {
+   "signature": {
+    "verts": 12,
+    "tris": 6,
+    "dims": [
+     1.8301,
+     17.0619,
+     0.86
+    ]
+   },
+   "objects": [
+    "east_glow_lit_0_1",
+    "east_glow_lit_3_1",
+    "east_glow_lit_4_1",
+    "east_glow_lit_7_1",
+    "east_glow_lit_8_1",
+    "east_glow_lit_11_1",
+    "east_glow_lit_14_1"
+   ]
+  },
+  {
+   "signature": {
+    "verts": 8,
+    "tris": 4,
+    "dims": [
+     12.0351,
+     0.6466,
+     0.86
+    ]
+   },
+   "objects": [
+    "west_glow_lit_1_1",
+    "west_glow_lit_2_1",
+    "west_glow_lit_5_1",
+    "west_glow_lit_6_1",
+    "west_glow_lit_9_1",
+    "west_glow_lit_12_1",
+    "west_glow_lit_13_1",
+    "west_glow_lit_15_1"
+   ]
+  },
+  {
+   "signature": {
+    "verts": 24,
+    "tris": 12,
+    "dims": [
+     1.6259,
+     1.6259,
+     5.0
+    ]
+   },
+   "objects": [
+    "pier_13",
+    "pier_14"
+   ]
+  },
+  {
+   "signature": {
+    "verts": 24,
+    "tris": 12,
+    "dims": [
+     1.6262,
+     1.6262,
+     5.0
+    ]
+   },
+   "objects": [
+    "pier_25",
+    "pier_26"
+   ]
+  },
+  {
+   "signature": {
+    "verts": 4,
+    "tris": 2,
+    "dims": [
+     4.8139,
+     3.5995,
+     0.86
+    ]
+   },
+   "objects": [
+    "west_glow_lit_1_0",
+    "west_glow_lit_2_0",
+    "west_glow_lit_5_0",
+    "west_glow_lit_6_0",
+    "west_glow_lit_9_0",
+    "west_glow_lit_12_0",
+    "west_glow_lit_13_0",
+    "west_glow_lit_15_0"
+   ]
+  },
+  {
+   "signature": {
+    "verts": 4,
+    "tris": 2,
+    "dims": [
+     4.7119,
+     3.732,
+     0.86
+    ]
+   },
+   "objects": [
+    "west_glow_lit_1_2",
+    "west_glow_lit_2_2",
+    "west_glow_lit_5_2",
+    "west_glow_lit_6_2",
+    "west_glow_lit_9_2",
+    "west_glow_lit_12_2",
+    "west_glow_lit_13_2",
+    "west_glow_lit_15_2"
+   ]
+  },
+  {
+   "signature": {
+    "verts": 4,
+    "tris": 2,
+    "dims": [
+     3.8656,
+     4.2244,
+     0.86
+    ]
+   },
+   "objects": [
+    "east_glow_lit_0_0",
+    "east_glow_lit_3_0",
+    "east_glow_lit_4_0",
+    "east_glow_lit_7_0",
+    "east_glow_lit_8_0",
+    "east_glow_lit_11_0",
+    "east_glow_lit_14_0"
+   ]
+  },
+  {
+   "signature": {
+    "verts": 4,
+    "tris": 2,
+    "dims": [
+     0.3349,
+     12.1954,
+     0.9
+    ]
+   },
+   "objects": [
+    "east_glow_crown_1",
+    "east_glow_crown_-1"
+   ]
+  },
+  {
+   "signature": {
+    "verts": 4,
+    "tris": 2,
+    "dims": [
+     12.1935,
+     0.3986,
+     0.9
+    ]
+   },
+   "objects": [
+    "west_glow_crown_1",
+    "west_glow_crown_-1"
+   ]
+  }
+ ],
+ "dup_redundant_tris": 7528,
+ "join_candidates": {
+  "Toy_cream_Glow": 38,
+  "Toy_glass": 44,
+  "Toy_glassl": 4,
+  "Toy_gold_Glow": 5,
+  "Toy_ink": 3,
+  "Toy_mint": 6,
+  "Toy_sand": 51,
+  "Toy_steel": 7,
+  "Toy_stone": 44,
+  "Toy_trim": 51
+ },
+ "degenerate_tris": 0,
+ "coincident_vert_pairs": 20819,
+ "over_tess": {
+  "near_distance_m": 163.01,
+  "one_px_world_m": 0.1099,
+  "note": "cylinders whose chord error < one_px_world_m can halve segments"
+ }
+}

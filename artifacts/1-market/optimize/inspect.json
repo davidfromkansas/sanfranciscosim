@@ -1,0 +1,1816 @@
+{
+ "file_bytes": {
+  "raw": 1408128,
+  "gzip9": 207279
+ },
+ "objects": 733,
+ "total_tris": 21292,
+ "total_verts": 41458,
+ "primitives_est": 734,
+ "top20": [
+  {
+   "name": "balus",
+   "tris": 576,
+   "verts": 1056,
+   "dims": [
+    109.005,
+    108.895,
+    0.34
+   ],
+   "materials": [
+    "Toy_cream"
+   ]
+  },
+  {
+   "name": "base",
+   "tris": 576,
+   "verts": 1056,
+   "dims": [
+    107.954,
+    107.844,
+    12.45
+   ],
+   "materials": [
+    "Toy_cream"
+   ]
+  },
+  {
+   "name": "belt",
+   "tris": 576,
+   "verts": 1056,
+   "dims": [
+    109.594,
+    109.484,
+    0.55
+   ],
+   "materials": [
+    "Toy_cream"
+   ]
+  },
+  {
+   "name": "corn_arch",
+   "tris": 576,
+   "verts": 1066,
+   "dims": [
+    108.697,
+    108.587,
+    0.5
+   ],
+   "materials": [
+    "Toy_cream"
+   ]
+  },
+  {
+   "name": "corn_cap",
+   "tris": 576,
+   "verts": 1056,
+   "dims": [
+    111.376,
+    111.266,
+    0.55
+   ],
+   "materials": [
+    "Toy_sand"
+   ]
+  },
+  {
+   "name": "corn_corona",
+   "tris": 576,
+   "verts": 1056,
+   "dims": [
+    112.208,
+    112.098,
+    0.95
+   ],
+   "materials": [
+    "Toy_cream"
+   ]
+  },
+  {
+   "name": "frieze",
+   "tris": 576,
+   "verts": 1056,
+   "dims": [
+    108.431,
+    108.321,
+    0.66
+   ],
+   "materials": [
+    "Toy_sand"
+   ]
+  },
+  {
+   "name": "plinth",
+   "tris": 576,
+   "verts": 1056,
+   "dims": [
+    108.197,
+    108.087,
+    0.55
+   ],
+   "materials": [
+    "Toy_stone"
+   ]
+  },
+  {
+   "name": "market_portal_sur",
+   "tris": 304,
+   "verts": 594,
+   "dims": [
+    6.629,
+    6.584,
+    11.843
+   ],
+   "materials": [
+    "Toy_cream"
+   ]
+  },
+  {
+   "name": "fan0_0",
+   "tris": 276,
+   "verts": 540,
+   "dims": [
+    3.041,
+    3.039,
+    0.3
+   ],
+   "materials": [
+    "Toy_steel"
+   ]
+  },
+  {
+   "name": "fan0_1",
+   "tris": 276,
+   "verts": 540,
+   "dims": [
+    3.041,
+    3.039,
+    0.3
+   ],
+   "materials": [
+    "Toy_steel"
+   ]
+  },
+  {
+   "name": "fan0_2",
+   "tris": 276,
+   "verts": 540,
+   "dims": [
+    3.041,
+    3.039,
+    0.3
+   ],
+   "materials": [
+    "Toy_steel"
+   ]
+  },
+  {
+   "name": "fan1_0",
+   "tris": 276,
+   "verts": 540,
+   "dims": [
+    3.041,
+    3.039,
+    0.3
+   ],
+   "materials": [
+    "Toy_steel"
+   ]
+  },
+  {
+   "name": "fan1_1",
+   "tris": 276,
+   "verts": 540,
+   "dims": [
+    3.041,
+    3.039,
+    0.3
+   ],
+   "materials": [
+    "Toy_steel"
+   ]
+  },
+  {
+   "name": "fan1_2",
+   "tris": 276,
+   "verts": 540,
+   "dims": [
+    3.041,
+    3.039,
+    0.3
+   ],
+   "materials": [
+    "Toy_steel"
+   ]
+  },
+  {
+   "name": "body",
+   "tris": 220,
+   "verts": 432,
+   "dims": [
+    106.926,
+    106.816,
+    44.1
+   ],
+   "materials": [
+    "Toy_brick",
+    "Toy_slate"
+   ]
+  },
+  {
+   "name": "atrium_eave",
+   "tris": 108,
+   "verts": 216,
+   "dims": [
+    64.391,
+    64.279,
+    0.67
+   ],
+   "materials": [
+    "Toy_cream"
+   ]
+  },
+  {
+   "name": "atrium_ridge",
+   "tris": 108,
+   "verts": 216,
+   "dims": [
+    14.623,
+    14.517,
+    0.44
+   ],
+   "materials": [
+    "Toy_cream"
+   ]
+  },
+  {
+   "name": "balc_brk0",
+   "tris": 108,
+   "verts": 216,
+   "dims": [
+    1.366,
+    1.367,
+    1.3
+   ],
+   "materials": [
+    "Toy_cream"
+   ]
+  },
+  {
+   "name": "balc_brk1",
+   "tris": 108,
+   "verts": 216,
+   "dims": [
+    1.366,
+    1.367,
+    1.3
+   ],
+   "materials": [
+    "Toy_cream"
+   ]
+  }
+ ],
+ "vertex_attrs": [
+  "NORMAL"
+ ],
+ "materials": [
+  {
+   "name": "Toy_brick",
+   "glow": false,
+   "user_objects": 246
+  },
+  {
+   "name": "Toy_cream",
+   "glow": false,
+   "user_objects": 206
+  },
+  {
+   "name": "Toy_glass",
+   "glow": false,
+   "user_objects": 124
+  },
+  {
+   "name": "Toy_glassl",
+   "glow": false,
+   "user_objects": 1
+  },
+  {
+   "name": "Toy_glassl_Glow",
+   "glow": true,
+   "user_objects": 31
+  },
+  {
+   "name": "Toy_gold_Glow",
+   "glow": true,
+   "user_objects": 53
+  },
+  {
+   "name": "Toy_ink",
+   "glow": false,
+   "user_objects": 1
+  },
+  {
+   "name": "Toy_roofd",
+   "glow": false,
+   "user_objects": 8
+  },
+  {
+   "name": "Toy_sand",
+   "glow": false,
+   "user_objects": 42
+  },
+  {
+   "name": "Toy_slate",
+   "glow": false,
+   "user_objects": 5
+  },
+  {
+   "name": "Toy_steel",
+   "glow": false,
+   "user_objects": 12
+  },
+  {
+   "name": "Toy_stone",
+   "glow": false,
+   "user_objects": 5
+  }
+ ],
+ "textures": [],
+ "bbox": {
+  "dims": [
+   112.2081,
+   112.0981,
+   48.7
+  ],
+  "min": [
+   -56.1046,
+   -56.0495,
+   0.0
+  ],
+  "origin_offset_xy": [
+   -0.0005,
+   -0.0005
+  ],
+  "base_z": 0.0
+ },
+ "duplicate_mesh_groups": [
+  {
+   "signature": {
+    "verts": 540,
+    "tris": 276,
+    "dims": [
+     3.0413,
+     3.0385,
+     0.3
+    ]
+   },
+   "objects": [
+    "fan0_0",
+    "fan0_1",
+    "fan0_2",
+    "fan1_0",
+    "fan1_1",
+    "fan1_2"
+   ]
+  },
+  {
+   "signature": {
+    "verts": 96,
+    "tris": 44,
+    "dims": [
+     1.4118,
+     1.4176,
+     10.8
+    ]
+   },
+   "objects": [
+    "spear_pier0",
+    "spear_pier1",
+    "spear_pier2",
+    "spear_pier3",
+    "spear_pier4",
+    "spear_pier5",
+    "spear_pier6",
+    "spear_pier7",
+    "spear_pier8",
+    "spear_pier9",
+    "spear_pier10",
+    "spear_pier11",
+    "spear_pier12",
+    "spear_pier13",
+    "spear_pier14",
+    "steuart_pier0",
+    "steuart_pier1",
+    "steuart_pier2",
+    "steuart_pier3",
+    "steuart_pier4",
+    "steuart_pier5",
+    "steuart_pier6",
+    "steuart_pier7",
+    "steuart_pier8",
+    "steuart_pier9",
+    "steuart_pier10",
+    "steuart_pier11",
+    "steuart_pier12",
+    "steuart_pier13",
+    "steuart_pier14"
+   ]
+  },
+  {
+   "signature": {
+    "verts": 96,
+    "tris": 44,
+    "dims": [
+     1.4176,
+     1.4118,
+     10.8
+    ]
+   },
+   "objects": [
+    "market_pier0",
+    "market_pier1",
+    "market_pier2",
+    "market_pier3",
+    "market_pier4",
+    "market_pier5",
+    "market_pier6",
+    "market_pier7",
+    "market_pier8",
+    "market_pier9",
+    "market_pier10",
+    "market_pier11",
+    "market_pier12",
+    "market_pier13",
+    "market_pier14",
+    "market_pier15",
+    "market_pier16",
+    "market_pier17",
+    "market_pier18",
+    "market_pier19",
+    "missn_pier0",
+    "missn_pier1",
+    "missn_pier2",
+    "missn_pier3"
+   ]
+  },
+  {
+   "signature": {
+    "verts": 66,
+    "tris": 40,
+    "dims": [
+     2.1147,
+     2.0997,
+     9.1
+    ]
+   },
+   "objects": [
+    "market_arc0",
+    "market_arc1",
+    "market_arc2",
+    "market_arc3",
+    "market_arc4",
+    "market_arc5",
+    "market_arc6",
+    "market_arc7",
+    "market_arc8",
+    "market_arc10",
+    "market_arc11",
+    "market_arc12",
+    "market_arc13",
+    "market_arc14",
+    "market_arc15",
+    "market_arc16",
+    "market_arc17",
+    "market_arc18"
+   ]
+  },
+  {
+   "signature": {
+    "verts": 24,
+    "tris": 12,
+    "dims": [
+     0.8128,
+     0.8135,
+     2.3
+    ]
+   },
+   "objects": [
+    "spear_col0",
+    "spear_col1",
+    "spear_col2",
+    "spear_col3",
+    "spear_col4",
+    "spear_col5",
+    "spear_col6",
+    "spear_col7",
+    "spear_col8",
+    "spear_col9",
+    "spear_col10",
+    "spear_col11",
+    "spear_col12",
+    "spear_col13",
+    "spear_col14",
+    "spear_col15",
+    "spear_col16",
+    "spear_col17",
+    "spear_col18",
+    "spear_col19",
+    "spear_col20",
+    "spear_col21",
+    "spear_col22",
+    "spear_col23",
+    "spear_col24",
+    "spear_col25",
+    "spear_col26",
+    "spear_col27",
+    "spear_col28",
+    "spear_col29",
+    "steuart_col0",
+    "steuart_col1",
+    "steuart_col2",
+    "steuart_col3",
+    "steuart_col4",
+    "steuart_col5",
+    "steuart_col6",
+    "steuart_col7",
+    "steuart_col8",
+    "steuart_col9",
+    "steuart_col10",
+    "steuart_col11",
+    "steuart_col12",
+    "steuart_col13",
+    "steuart_col14",
+    "steuart_col15",
+    "steuart_col16",
+    "steuart_col17",
+    "steuart_col18",
+    "steuart_col19",
+    "steuart_col20",
+    "steuart_col21",
+    "steuart_col22",
+    "steuart_col23",
+    "steuart_col24",
+    "steuart_col25",
+    "steuart_col26",
+    "steuart_col27",
+    "steuart_col28",
+    "steuart_col29"
+   ]
+  },
+  {
+   "signature": {
+    "verts": 24,
+    "tris": 12,
+    "dims": [
+     0.8891,
+     0.8928,
+     26.8
+    ]
+   },
+   "objects": [
+    "spear_mul0",
+    "spear_mul1",
+    "spear_mul2",
+    "spear_mul3",
+    "spear_mul4",
+    "spear_mul5",
+    "spear_mul6",
+    "spear_mul7",
+    "spear_mul8",
+    "spear_mul9",
+    "spear_mul10",
+    "spear_mul11",
+    "spear_mul12",
+    "spear_mul13",
+    "spear_mul14",
+    "spear_mul15",
+    "spear_mul16",
+    "spear_mul17",
+    "spear_mul18",
+    "spear_mul19",
+    "spear_mul20",
+    "spear_mul21",
+    "spear_mul22",
+    "spear_mul23",
+    "spear_mul24",
+    "spear_mul25",
+    "spear_mul26",
+    "spear_mul27",
+    "spear_mul28",
+    "spear_mul29",
+    "steuart_mul0",
+    "steuart_mul1",
+    "steuart_mul2",
+    "steuart_mul3",
+    "steuart_mul4",
+    "steuart_mul5",
+    "steuart_mul6",
+    "steuart_mul7",
+    "steuart_mul8",
+    "steuart_mul9",
+    "steuart_mul10",
+    "steuart_mul11",
+    "steuart_mul12",
+    "steuart_mul13",
+    "steuart_mul14",
+    "steuart_mul15",
+    "steuart_mul16",
+    "steuart_mul17",
+    "steuart_mul18",
+    "steuart_mul19",
+    "steuart_mul20",
+    "steuart_mul21",
+    "steuart_mul22",
+    "steuart_mul23",
+    "steuart_mul24",
+    "steuart_mul25",
+    "steuart_mul26",
+    "steuart_mul27",
+    "steuart_mul28",
+    "steuart_mul29"
+   ]
+  },
+  {
+   "signature": {
+    "verts": 66,
+    "tris": 40,
+    "dims": [
+     2.248,
+     2.2642,
+     9.1
+    ]
+   },
+   "objects": [
+    "spear_arc3",
+    "spear_arc4",
+    "spear_arc5",
+    "spear_arc6",
+    "spear_arc8",
+    "spear_arc9",
+    "spear_arc12",
+    "steuart_arc0",
+    "steuart_arc1",
+    "steuart_arc2",
+    "steuart_arc3",
+    "steuart_arc4",
+    "steuart_arc5",
+    "steuart_arc6",
+    "steuart_arc8",
+    "steuart_arc11",
+    "steuart_arc12"
+   ]
+  },
+  {
+   "signature": {
+    "verts": 24,
+    "tris": 12,
+    "dims": [
+     0.8135,
+     0.8128,
+     2.3
+    ]
+   },
+   "objects": [
+    "market_col0",
+    "market_col1",
+    "market_col2",
+    "market_col3",
+    "market_col4",
+    "market_col5",
+    "market_col6",
+    "market_col7",
+    "market_col8",
+    "market_col9",
+    "market_col10",
+    "market_col11",
+    "market_col12",
+    "market_col13",
+    "market_col14",
+    "market_col15",
+    "market_col16",
+    "market_col17",
+    "market_col18",
+    "market_col19",
+    "market_col20",
+    "market_col21",
+    "market_col22",
+    "market_col23",
+    "market_col24",
+    "market_col25",
+    "market_col26",
+    "market_col27",
+    "market_col28",
+    "market_col29",
+    "market_col30",
+    "market_col31",
+    "market_col32",
+    "market_col33",
+    "market_col34",
+    "market_col35",
+    "market_col36",
+    "market_col37",
+    "market_col38",
+    "missn_col0",
+    "missn_col1",
+    "missn_col2",
+    "missn_col3",
+    "missn_col4",
+    "missn_col5",
+    "missn_col6",
+    "missn_col7",
+    "misss_col0",
+    "misss_col1",
+    "misss_col2",
+    "misss_col3",
+    "misss_col4",
+    "misss_col5",
+    "misss_col6"
+   ]
+  },
+  {
+   "signature": {
+    "verts": 24,
+    "tris": 12,
+    "dims": [
+     0.8928,
+     0.8891,
+     26.8
+    ]
+   },
+   "objects": [
+    "market_mul0",
+    "market_mul1",
+    "market_mul2",
+    "market_mul3",
+    "market_mul4",
+    "market_mul5",
+    "market_mul6",
+    "market_mul7",
+    "market_mul8",
+    "market_mul9",
+    "market_mul10",
+    "market_mul11",
+    "market_mul12",
+    "market_mul13",
+    "market_mul14",
+    "market_mul15",
+    "market_mul16",
+    "market_mul17",
+    "market_mul18",
+    "market_mul19",
+    "market_mul20",
+    "market_mul21",
+    "market_mul22",
+    "market_mul23",
+    "market_mul24",
+    "market_mul25",
+    "market_mul26",
+    "market_mul27",
+    "market_mul28",
+    "market_mul29",
+    "market_mul30",
+    "market_mul31",
+    "market_mul32",
+    "market_mul33",
+    "market_mul34",
+    "market_mul35",
+    "market_mul36",
+    "market_mul37",
+    "market_mul38",
+    "missn_mul0",
+    "missn_mul1",
+    "missn_mul2",
+    "missn_mul3",
+    "missn_mul4",
+    "missn_mul5",
+    "missn_mul6",
+    "missn_mul7",
+    "misss_mul0",
+    "misss_mul1",
+    "misss_mul2",
+    "misss_mul3",
+    "misss_mul4",
+    "misss_mul5",
+    "misss_mul6"
+   ]
+  },
+  {
+   "signature": {
+    "verts": 66,
+    "tris": 40,
+    "dims": [
+     2.248,
+     2.2643,
+     9.1
+    ]
+   },
+   "objects": [
+    "spear_arc0",
+    "spear_arc1",
+    "spear_arc2",
+    "spear_arc7",
+    "spear_arc10",
+    "spear_arc11",
+    "spear_arc13",
+    "steuart_arc7",
+    "steuart_arc9",
+    "steuart_arc10",
+    "steuart_arc13"
+   ]
+  },
+  {
+   "signature": {
+    "verts": 24,
+    "tris": 12,
+    "dims": [
+     0.8153,
+     0.8195,
+     26.8
+    ]
+   },
+   "objects": [
+    "crtne_mul0",
+    "crtne_mul1",
+    "crtne_mul2",
+    "crtne_mul3",
+    "crtne_mul4",
+    "crtne_mul5",
+    "crtne_mul6",
+    "crtne_mul7",
+    "crtne_mul8",
+    "crtne_mul9",
+    "crtne_mul10",
+    "crtne_mul11",
+    "crtne_mul12",
+    "crtne_mul13",
+    "crtne_mul14",
+    "crtne_mul15",
+    "crtne_mul16",
+    "crtsw_mul0",
+    "crtsw_mul1",
+    "crtsw_mul2",
+    "crtsw_mul3",
+    "crtsw_mul4",
+    "crtsw_mul5",
+    "crtsw_mul6",
+    "crtsw_mul7",
+    "crtsw_mul8",
+    "crtsw_mul9",
+    "crtsw_mul10",
+    "crtsw_mul11",
+    "crtsw_mul12",
+    "crtsw_mul13",
+    "crtsw_mul14",
+    "crtsw_mul15",
+    "crtsw_mul16"
+   ]
+  },
+  {
+   "signature": {
+    "verts": 24,
+    "tris": 12,
+    "dims": [
+     1.374,
+     1.3847,
+     1.15
+    ]
+   },
+   "objects": [
+    "spear_arcglow0",
+    "spear_arcglow1",
+    "spear_arcglow2",
+    "spear_arcglow3",
+    "spear_arcglow4",
+    "spear_arcglow5",
+    "spear_arcglow6",
+    "spear_arcglow7",
+    "spear_arcglow8",
+    "spear_arcglow9",
+    "spear_arcglow10",
+    "spear_arcglow11",
+    "spear_arcglow12",
+    "spear_arcglow13",
+    "steuart_arcglow0",
+    "steuart_arcglow1",
+    "steuart_arcglow2",
+    "steuart_arcglow3",
+    "steuart_arcglow4",
+    "steuart_arcglow5",
+    "steuart_arcglow6",
+    "steuart_arcglow7",
+    "steuart_arcglow8",
+    "steuart_arcglow9",
+    "steuart_arcglow10",
+    "steuart_arcglow11",
+    "steuart_arcglow12",
+    "steuart_arcglow13"
+   ]
+  },
+  {
+   "signature": {
+    "verts": 216,
+    "tris": 108,
+    "dims": [
+     1.366,
+     1.3674,
+     1.3
+    ]
+   },
+   "objects": [
+    "balc_brk0",
+    "balc_brk1",
+    "balc_brk2"
+   ]
+  },
+  {
+   "signature": {
+    "verts": 24,
+    "tris": 12,
+    "dims": [
+     0.8195,
+     0.8153,
+     26.8
+    ]
+   },
+   "objects": [
+    "crtnw_mul0",
+    "crtnw_mul1",
+    "crtnw_mul2",
+    "crtnw_mul3",
+    "crtnw_mul4",
+    "crtnw_mul5",
+    "crtnw_mul6",
+    "crtnw_mul7",
+    "crtnw_mul8",
+    "crtnw_mul9",
+    "crtnw_mul10",
+    "crtnw_mul11",
+    "crtnw_mul12",
+    "crtnw_mul13",
+    "crtnw_mul14",
+    "crtnw_mul15",
+    "crtnw_mul16",
+    "crtnw_mul17",
+    "crtnw_mul18",
+    "crtnw_mul19",
+    "crtnw_mul20",
+    "crtnw_mul21",
+    "crtnw_mul22",
+    "crtnw_mul23",
+    "crtnw_mul24"
+   ]
+  },
+  {
+   "signature": {
+    "verts": 216,
+    "tris": 108,
+    "dims": [
+     7.1147,
+     7.0693,
+     0.6
+    ]
+   },
+   "objects": [
+    "duct1",
+    "duct2"
+   ]
+  },
+  {
+   "signature": {
+    "verts": 24,
+    "tris": 12,
+    "dims": [
+     1.2351,
+     1.2256,
+     1.15
+    ]
+   },
+   "objects": [
+    "market_arcglow0",
+    "market_arcglow1",
+    "market_arcglow2",
+    "market_arcglow3",
+    "market_arcglow4",
+    "market_arcglow5",
+    "market_arcglow6",
+    "market_arcglow7",
+    "market_arcglow8",
+    "market_arcglow10",
+    "market_arcglow11",
+    "market_arcglow12",
+    "market_arcglow13",
+    "market_arcglow14",
+    "market_arcglow15",
+    "market_arcglow16",
+    "market_arcglow17",
+    "market_arcglow18"
+   ]
+  },
+  {
+   "signature": {
+    "verts": 216,
+    "tris": 108,
+    "dims": [
+     13.5927,
+     13.5778,
+     3.7
+    ]
+   },
+   "objects": [
+    "plant0",
+    "plant1"
+   ]
+  },
+  {
+   "signature": {
+    "verts": 216,
+    "tris": 108,
+    "dims": [
+     14.4909,
+     14.476,
+     0.3
+    ]
+   },
+   "objects": [
+    "plant_cap0",
+    "plant_cap1"
+   ]
+  },
+  {
+   "signature": {
+    "verts": 216,
+    "tris": 108,
+    "dims": [
+     5.0366,
+     5.0297,
+     1.3
+    ]
+   },
+   "objects": [
+    "vent0",
+    "vent2"
+   ]
+  },
+  {
+   "signature": {
+    "verts": 216,
+    "tris": 108,
+    "dims": [
+     4.7503,
+     4.7503,
+     0.95
+    ]
+   },
+   "objects": [
+    "vent1",
+    "vent3"
+   ]
+  },
+  {
+   "signature": {
+    "verts": 216,
+    "tris": 108,
+    "dims": [
+     3.7621,
+     3.7586,
+     0.9
+    ]
+   },
+   "objects": [
+    "vent4",
+    "vent5"
+   ]
+  },
+  {
+   "signature": {
+    "verts": 24,
+    "tris": 12,
+    "dims": [
+     24.6911,
+     24.891,
+     1.82
+    ]
+   },
+   "objects": [
+    "crtne_gl0",
+    "crtne_gl1",
+    "crtne_gl2",
+    "crtne_gl3",
+    "crtne_gl4",
+    "crtne_gl5",
+    "crtne_gl6",
+    "crtne_gl7",
+    "crtsw_gl0",
+    "crtsw_gl1",
+    "crtsw_gl2",
+    "crtsw_gl3",
+    "crtsw_gl4",
+    "crtsw_gl5",
+    "crtsw_gl6",
+    "crtsw_gl7"
+   ]
+  },
+  {
+   "signature": {
+    "verts": 24,
+    "tris": 12,
+    "dims": [
+     45.9941,
+     46.367,
+     1.82
+    ]
+   },
+   "objects": [
+    "spear_gl0",
+    "spear_gl1",
+    "spear_gl2",
+    "spear_gl3",
+    "spear_gl4",
+    "spear_gl5",
+    "spear_gl6",
+    "spear_gl7",
+    "steuart_gl0",
+    "steuart_gl1",
+    "steuart_gl2",
+    "steuart_gl3",
+    "steuart_gl4",
+    "steuart_gl5",
+    "steuart_gl6",
+    "steuart_gl7"
+   ]
+  },
+  {
+   "signature": {
+    "verts": 24,
+    "tris": 12,
+    "dims": [
+     46.4956,
+     46.8696,
+     0.16
+    ]
+   },
+   "objects": [
+    "spear_sill0",
+    "spear_sill1",
+    "spear_sill2",
+    "spear_sill3",
+    "spear_sill4",
+    "spear_sill5",
+    "spear_sill6",
+    "spear_sill7",
+    "steuart_sill0",
+    "steuart_sill1",
+    "steuart_sill2",
+    "steuart_sill3",
+    "steuart_sill4",
+    "steuart_sill5",
+    "steuart_sill6",
+    "steuart_sill7"
+   ]
+  },
+  {
+   "signature": {
+    "verts": 96,
+    "tris": 44,
+    "dims": [
+     1.4177,
+     1.4118,
+     10.8
+    ]
+   },
+   "objects": [
+    "misss_pier0",
+    "misss_pier1",
+    "misss_pier2",
+    "misss_pier3"
+   ]
+  },
+  {
+   "signature": {
+    "verts": 24,
+    "tris": 12,
+    "dims": [
+     25.4283,
+     25.6331,
+     1.53
+    ]
+   },
+   "objects": [
+    "crtne_span2",
+    "crtne_span4",
+    "crtne_span6",
+    "crtne_span8",
+    "crtne_span10",
+    "crtne_span12",
+    "crtne_span14",
+    "crtsw_span2",
+    "crtsw_span4",
+    "crtsw_span6",
+    "crtsw_span8",
+    "crtsw_span10",
+    "crtsw_span12",
+    "crtsw_span14"
+   ]
+  },
+  {
+   "signature": {
+    "verts": 24,
+    "tris": 12,
+    "dims": [
+     46.8051,
+     47.1823,
+     1.53
+    ]
+   },
+   "objects": [
+    "spear_span2",
+    "spear_span4",
+    "spear_span6",
+    "spear_span8",
+    "spear_span10",
+    "spear_span12",
+    "spear_span14",
+    "steuart_span2",
+    "steuart_span4",
+    "steuart_span6",
+    "steuart_span8",
+    "steuart_span10",
+    "steuart_span12",
+    "steuart_span14"
+   ]
+  },
+  {
+   "signature": {
+    "verts": 24,
+    "tris": 12,
+    "dims": [
+     0.6792,
+     0.6743,
+     1.54
+    ]
+   },
+   "objects": [
+    "market_lit0_3",
+    "market_lit1_11",
+    "market_lit1_26",
+    "market_lit2_6",
+    "market_lit2_19",
+    "market_lit3_31",
+    "market_lit4_1",
+    "market_lit4_14",
+    "market_lit5_23",
+    "market_lit5_35",
+    "market_lit6_9",
+    "market_lit7_17",
+    "market_lit7_29"
+   ]
+  },
+  {
+   "signature": {
+    "verts": 24,
+    "tris": 12,
+    "dims": [
+     0.6963,
+     0.7013,
+     1.54
+    ]
+   },
+   "objects": [
+    "spear_lit1_8",
+    "spear_lit2_22",
+    "spear_lit4_4",
+    "spear_lit5_15",
+    "spear_lit7_25",
+    "steuart_lit0_21",
+    "steuart_lit1_5",
+    "steuart_lit2_13",
+    "steuart_lit3_25",
+    "steuart_lit4_2",
+    "steuart_lit5_17",
+    "steuart_lit6_9",
+    "steuart_lit7_27"
+   ]
+  },
+  {
+   "signature": {
+    "verts": 66,
+    "tris": 40,
+    "dims": [
+     2.2402,
+     2.2241,
+     9.1
+    ]
+   },
+   "objects": [
+    "missn_arc0",
+    "missn_arc1",
+    "missn_arc2"
+   ]
+  },
+  {
+   "signature": {
+    "verts": 66,
+    "tris": 40,
+    "dims": [
+     2.0155,
+     2.0011,
+     9.1
+    ]
+   },
+   "objects": [
+    "misss_arc0",
+    "misss_arc1",
+    "misss_arc2"
+   ]
+  },
+  {
+   "signature": {
+    "verts": 24,
+    "tris": 12,
+    "dims": [
+     38.799,
+     38.4871,
+     1.82
+    ]
+   },
+   "objects": [
+    "crtnw_gl0",
+    "crtnw_gl1",
+    "crtnw_gl2",
+    "crtnw_gl3",
+    "crtnw_gl4",
+    "crtnw_gl5",
+    "crtnw_gl6",
+    "crtnw_gl7"
+   ]
+  },
+  {
+   "signature": {
+    "verts": 24,
+    "tris": 12,
+    "dims": [
+     59.893,
+     59.4101,
+     1.82
+    ]
+   },
+   "objects": [
+    "market_gl0",
+    "market_gl1",
+    "market_gl2",
+    "market_gl3",
+    "market_gl4",
+    "market_gl5",
+    "market_gl6",
+    "market_gl7"
+   ]
+  },
+  {
+   "signature": {
+    "verts": 24,
+    "tris": 12,
+    "dims": [
+     60.3956,
+     59.9116,
+     0.16
+    ]
+   },
+   "objects": [
+    "market_sill0",
+    "market_sill1",
+    "market_sill2",
+    "market_sill3",
+    "market_sill4",
+    "market_sill5",
+    "market_sill6",
+    "market_sill7"
+   ]
+  },
+  {
+   "signature": {
+    "verts": 24,
+    "tris": 12,
+    "dims": [
+     10.287,
+     10.2051,
+     1.82
+    ]
+   },
+   "objects": [
+    "missn_gl0",
+    "missn_gl1",
+    "missn_gl2",
+    "missn_gl3",
+    "missn_gl4",
+    "missn_gl5",
+    "missn_gl6",
+    "missn_gl7"
+   ]
+  },
+  {
+   "signature": {
+    "verts": 24,
+    "tris": 12,
+    "dims": [
+     10.7896,
+     10.7066,
+     0.16
+    ]
+   },
+   "objects": [
+    "missn_sill0",
+    "missn_sill1",
+    "missn_sill2",
+    "missn_sill3",
+    "missn_sill4",
+    "missn_sill5",
+    "missn_sill6",
+    "missn_sill7"
+   ]
+  },
+  {
+   "signature": {
+    "verts": 24,
+    "tris": 12,
+    "dims": [
+     9.613,
+     9.5361,
+     1.82
+    ]
+   },
+   "objects": [
+    "misss_gl0",
+    "misss_gl1",
+    "misss_gl2",
+    "misss_gl3",
+    "misss_gl4",
+    "misss_gl5",
+    "misss_gl6",
+    "misss_gl7"
+   ]
+  },
+  {
+   "signature": {
+    "verts": 24,
+    "tris": 12,
+    "dims": [
+     10.1156,
+     10.0376,
+     0.16
+    ]
+   },
+   "objects": [
+    "misss_sill0",
+    "misss_sill1",
+    "misss_sill2",
+    "misss_sill3",
+    "misss_sill4",
+    "misss_sill5",
+    "misss_sill6",
+    "misss_sill7"
+   ]
+  },
+  {
+   "signature": {
+    "verts": 24,
+    "tris": 12,
+    "dims": [
+     39.5411,
+     39.2243,
+     1.53
+    ]
+   },
+   "objects": [
+    "crtnw_span2",
+    "crtnw_span4",
+    "crtnw_span6",
+    "crtnw_span8",
+    "crtnw_span10",
+    "crtnw_span12",
+    "crtnw_span14"
+   ]
+  },
+  {
+   "signature": {
+    "verts": 24,
+    "tris": 12,
+    "dims": [
+     60.7083,
+     60.2211,
+     1.53
+    ]
+   },
+   "objects": [
+    "market_span2",
+    "market_span4",
+    "market_span6",
+    "market_span8",
+    "market_span10",
+    "market_span12",
+    "market_span14"
+   ]
+  },
+  {
+   "signature": {
+    "verts": 24,
+    "tris": 12,
+    "dims": [
+     11.1023,
+     11.0161,
+     1.53
+    ]
+   },
+   "objects": [
+    "missn_span2",
+    "missn_span4",
+    "missn_span6",
+    "missn_span8",
+    "missn_span10",
+    "missn_span12",
+    "missn_span14"
+   ]
+  },
+  {
+   "signature": {
+    "verts": 24,
+    "tris": 12,
+    "dims": [
+     10.4283,
+     10.3471,
+     1.53
+    ]
+   },
+   "objects": [
+    "misss_span2",
+    "misss_span4",
+    "misss_span6",
+    "misss_span8",
+    "misss_span10",
+    "misss_span12",
+    "misss_span14"
+   ]
+  },
+  {
+   "signature": {
+    "verts": 24,
+    "tris": 12,
+    "dims": [
+     1.3606,
+     1.3501,
+     1.15
+    ]
+   },
+   "objects": [
+    "missn_arcglow0",
+    "missn_arcglow1",
+    "missn_arcglow2"
+   ]
+  },
+  {
+   "signature": {
+    "verts": 24,
+    "tris": 12,
+    "dims": [
+     1.1359,
+     1.1271,
+     1.15
+    ]
+   },
+   "objects": [
+    "misss_arcglow0",
+    "misss_arcglow1",
+    "misss_arcglow2"
+   ]
+  },
+  {
+   "signature": {
+    "verts": 24,
+    "tris": 12,
+    "dims": [
+     25.1559,
+     25.3595,
+     2.3
+    ]
+   },
+   "objects": [
+    "crtne_att",
+    "crtsw_att"
+   ]
+  },
+  {
+   "signature": {
+    "verts": 24,
+    "tris": 12,
+    "dims": [
+     25.4612,
+     25.6623,
+     0.45
+    ]
+   },
+   "objects": [
+    "crtne_attlint",
+    "crtsw_attlint"
+   ]
+  },
+  {
+   "signature": {
+    "verts": 24,
+    "tris": 12,
+    "dims": [
+     25.4612,
+     25.6623,
+     0.55
+    ]
+   },
+   "objects": [
+    "crtne_attsill",
+    "crtsw_attsill"
+   ]
+  },
+  {
+   "signature": {
+    "verts": 24,
+    "tris": 12,
+    "dims": [
+     25.4283,
+     25.6331,
+     0.8
+    ]
+   },
+   "objects": [
+    "crtne_span0",
+    "crtsw_span0"
+   ]
+  },
+  {
+   "signature": {
+    "verts": 24,
+    "tris": 12,
+    "dims": [
+     25.4283,
+     25.6331,
+     0.73
+    ]
+   },
+   "objects": [
+    "crtne_span16",
+    "crtsw_span16"
+   ]
+  },
+  {
+   "signature": {
+    "verts": 24,
+    "tris": 12,
+    "dims": [
+     0.5637,
+     0.5597,
+     1.54
+    ]
+   },
+   "objects": [
+    "missn_lit2_3",
+    "missn_lit5_1"
+   ]
+  },
+  {
+   "signature": {
+    "verts": 24,
+    "tris": 12,
+    "dims": [
+     0.6944,
+     0.6893,
+     1.54
+    ]
+   },
+   "objects": [
+    "misss_lit3_2",
+    "misss_lit6_4"
+   ]
+  },
+  {
+   "signature": {
+    "verts": 24,
+    "tris": 12,
+    "dims": [
+     46.4589,
+     46.8355,
+     2.3
+    ]
+   },
+   "objects": [
+    "spear_att",
+    "steuart_att"
+   ]
+  },
+  {
+   "signature": {
+    "verts": 24,
+    "tris": 12,
+    "dims": [
+     46.7642,
+     47.1383,
+     0.45
+    ]
+   },
+   "objects": [
+    "spear_attlint",
+    "steuart_attlint"
+   ]
+  },
+  {
+   "signature": {
+    "verts": 24,
+    "tris": 12,
+    "dims": [
+     46.7642,
+     47.1383,
+     0.55
+    ]
+   },
+   "objects": [
+    "spear_attsill",
+    "steuart_attsill"
+   ]
+  },
+  {
+   "signature": {
+    "verts": 24,
+    "tris": 12,
+    "dims": [
+     46.8051,
+     47.1823,
+     0.8
+    ]
+   },
+   "objects": [
+    "spear_span0",
+    "steuart_span0"
+   ]
+  },
+  {
+   "signature": {
+    "verts": 24,
+    "tris": 12,
+    "dims": [
+     46.8051,
+     47.1823,
+     0.73
+    ]
+   },
+   "objects": [
+    "spear_span16",
+    "steuart_span16"
+   ]
+  },
+  {
+   "signature": {
+    "verts": 24,
+    "tris": 12,
+    "dims": [
+     46.6873,
+     47.0597,
+     0.32
+    ]
+   },
+   "objects": [
+    "spear_string",
+    "steuart_string"
+   ]
+  },
+  {
+   "signature": {
+    "verts": 24,
+    "tris": 12,
+    "dims": [
+     20.4399,
+     20.5719,
+     0.07
+    ]
+   },
+   "objects": [
+    "walk_b",
+    "walk_c"
+   ]
+  }
+ ],
+ "dup_redundant_tris": 12676,
+ "join_candidates": {
+  "Toy_brick": 246,
+  "Toy_cream": 206,
+  "Toy_glass": 124,
+  "Toy_glassl_Glow": 31,
+  "Toy_gold_Glow": 53,
+  "Toy_roofd": 8,
+  "Toy_sand": 42,
+  "Toy_slate": 5,
+  "Toy_steel": 12,
+  "Toy_stone": 5
+ },
+ "degenerate_tris": 0,
+ "coincident_vert_pairs": 29362,
+ "over_tess": {
+  "near_distance_m": 168.31,
+  "one_px_world_m": 0.1134,
+  "note": "cylinders whose chord error < one_px_world_m can halve segments"
+ }
+}

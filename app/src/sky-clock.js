@@ -1,7 +1,7 @@
-// The clock in the top-left corner: San Francisco's real wall time, today's
-// date, and one line about whichever body is currently in the sky. Cream card
-// stock, 2 px ink border, hard offset shadow — the tokens in ui-theme.css and
-// nothing else.
+// The deck in the top-left corner: San Francisco's real wall time, today's
+// date, one line about whichever body is currently in the sky, the weather, and
+// a turntable spinning the city's record. Brushed-metal chassis, pale green LCD
+// on the left, metallic blue player on the right, dot-matrix logo bar below.
 //
 // The DOM is built once and only textContent is written afterwards, so a 1 Hz
 // tick costs nothing and never thrashes layout.
@@ -13,6 +13,10 @@ const WEEKDAY = new Intl.DateTimeFormat('en-US', { timeZone: TZ, weekday: 'short
 const MONTH_DAY = new Intl.DateTimeFormat('en-US', { timeZone: TZ, month: 'short', day: 'numeric' });
 
 const SVG_NS = 'http://www.w3.org/2000/svg';
+
+// The record spins for as long as the track plays; the tonearm rides down onto
+// it. One CSS animation, paused rather than removed, so nothing re-lays out.
+const TRACK_URL = `${import.meta.env.BASE_URL}audio/controlla.mp3`;
 
 function svg(name, attributes) {
   const node = document.createElementNS(SVG_NS, name);
@@ -65,6 +69,23 @@ function cloudPath(fill) {
     'stroke-width': 2,
     'stroke-linejoin': 'round',
   });
+}
+
+// Three drifting strokes: the wind row's own glyph, so the reading never has to
+// borrow the cloud that already means "overcast".
+function windGlyph() {
+  const root = svg('svg', { class: 'sky-glyph', viewBox: '0 0 20 20', 'aria-hidden': 'true' });
+  const strokes = [
+    'M2.6 7.2h9.2a2.4 2.4 0 1 0-2.4-2.4',
+    'M2.6 11h12.6a2.4 2.4 0 1 1-2.4 2.4',
+    'M4.4 14.8h6.2',
+  ];
+  for (const d of strokes) {
+    root.appendChild(
+      svg('path', { d, fill: 'none', stroke: 'var(--teal)', 'stroke-width': 2, 'stroke-linecap': 'round' })
+    );
+  }
+  return root;
 }
 
 function weatherGlyph(kind) {
@@ -153,28 +174,192 @@ function formatTime(ms) {
   return { clock: clock.trim(), period };
 }
 
-const formatDate = (ms) =>
-  `${WEEKDAY.format(new Date(ms))} · ${MONTH_DAY.format(new Date(ms))}`.toUpperCase();
+const formatWeekday = (ms) => WEEKDAY.format(new Date(ms)).toUpperCase();
+const formatMonthDay = (ms) => MONTH_DAY.format(new Date(ms)).toUpperCase();
+
+// The pale-green pip the LCD uses between two readings instead of a middle dot.
+function pip() {
+  const dot = document.createElement('span');
+  dot.className = 'clock-dot';
+  dot.setAttribute('aria-hidden', 'true');
+  return dot;
+}
+
+// The turntable: a looping record with a play/pause centre, a tonearm that
+// rides down while it plays, and a volume knob. Autoplay is blocked until the
+// visitor has interacted with the page, so the deck arms itself on the first
+// gesture anywhere and only gives up if playback is refused outright.
+function createPlayer() {
+  const module = document.createElement('div');
+  module.className = 'deck-module deck-player';
+
+  const label = document.createElement('div');
+  label.className = 'player-label';
+  const cue = svg('svg', { class: 'player-cue', viewBox: '0 0 10 10', 'aria-hidden': 'true' });
+  cue.appendChild(svg('path', { d: 'M2 1.4 8.4 5 2 8.6Z', fill: 'var(--neon)' }));
+  const labelText = document.createElement('span');
+  labelText.textContent = 'now playing';
+  label.append(cue, labelText);
+
+  const platter = document.createElement('div');
+  platter.className = 'player-platter';
+
+  const disc = document.createElement('div');
+  disc.className = 'player-disc';
+
+  const button = document.createElement('button');
+  button.type = 'button';
+  button.className = 'player-button';
+  const icon = svg('svg', { class: 'player-icon', viewBox: '0 0 12 12', 'aria-hidden': 'true' });
+  const barLeft = svg('rect', { x: 3, y: 2.2, width: 2.2, height: 7.6, rx: 0.6, fill: 'currentColor' });
+  const barRight = svg('rect', { x: 6.8, y: 2.2, width: 2.2, height: 7.6, rx: 0.6, fill: 'currentColor' });
+  const wedge = svg('path', { d: 'M3.6 2.2 9.6 6l-6 3.8Z', fill: 'currentColor' });
+  icon.append(barLeft, barRight, wedge);
+  button.appendChild(icon);
+
+  const pivot = document.createElement('div');
+  pivot.className = 'player-pivot';
+
+  const arm = document.createElement('div');
+  arm.className = 'player-arm';
+  const armHead = document.createElement('div');
+  armHead.className = 'player-arm-head';
+  arm.appendChild(armHead);
+
+  platter.append(disc, button);
+
+  const deckFoot = document.createElement('div');
+  deckFoot.className = 'player-foot';
+  const led = document.createElement('span');
+  led.className = 'player-led';
+  const holes = document.createElement('span');
+  holes.className = 'player-holes';
+  deckFoot.append(led, holes);
+
+  const volume = document.createElement('div');
+  volume.className = 'player-volume';
+  const volumeLabel = document.createElement('span');
+  volumeLabel.className = 'player-volume-label';
+  volumeLabel.textContent = 'VOL';
+  const knob = document.createElement('div');
+  knob.className = 'player-knob';
+  const slider = document.createElement('input');
+  slider.type = 'range';
+  slider.min = '0';
+  slider.max = '100';
+  slider.step = '1';
+  slider.value = '55';
+  slider.className = 'player-knob-input';
+  slider.setAttribute('aria-label', 'Volume');
+  knob.appendChild(slider);
+  volume.append(volumeLabel, knob);
+
+  module.append(label, platter, pivot, arm, deckFoot, volume);
+
+  const audio = new Audio(TRACK_URL);
+  audio.loop = true;
+  audio.preload = 'auto';
+  audio.volume = Number(slider.value) / 100;
+
+  // The record is only ever asked to spin or hold: the animation stays attached
+  // so the groove keeps its angle across a pause.
+  function paint() {
+    const playing = !audio.paused;
+    module.classList.toggle('is-playing', playing);
+    button.setAttribute('aria-label', playing ? 'Pause the record' : 'Play the record');
+    button.setAttribute('aria-pressed', String(playing));
+  }
+
+  // One shared arming path: an explicit click and the page's first gesture both
+  // land here, and a refusal simply leaves the deck stopped.
+  let armed = false;
+  function tryPlay() {
+    const attempt = audio.play();
+    if (attempt && typeof attempt.catch === 'function') attempt.catch(() => paint());
+  }
+
+  // A pointerdown on the button itself must NOT arm the deck: pointerdown runs
+  // before click, so arming here would start the record and the click that
+  // follows would read it as playing and stop it again.
+  function armOnGesture(event) {
+    if (armed) return;
+    if (event.target instanceof Node && button.contains(event.target)) return;
+    armed = true;
+    window.removeEventListener('pointerdown', armOnGesture);
+    window.removeEventListener('keydown', armOnGesture);
+    tryPlay();
+  }
+
+  button.addEventListener('click', () => {
+    armed = true;
+    window.removeEventListener('pointerdown', armOnGesture);
+    window.removeEventListener('keydown', armOnGesture);
+    if (audio.paused) tryPlay();
+    else audio.pause();
+  });
+
+  slider.addEventListener('input', () => {
+    audio.volume = Number(slider.value) / 100;
+    knob.style.setProperty('--turn', `${Number(slider.value) * 2.7 - 135}deg`);
+  });
+
+  audio.addEventListener('play', paint);
+  audio.addEventListener('pause', paint);
+
+  window.addEventListener('pointerdown', armOnGesture);
+  window.addEventListener('keydown', armOnGesture);
+  // Some browsers allow a muted-adjacent start; asking once costs nothing and
+  // saves the visitor a click when the policy permits it.
+  tryPlay();
+  knob.style.setProperty('--turn', `${Number(slider.value) * 2.7 - 135}deg`);
+  paint();
+
+  return {
+    element: module,
+    dispose() {
+      window.removeEventListener('pointerdown', armOnGesture);
+      window.removeEventListener('keydown', armOnGesture);
+      audio.pause();
+      audio.src = '';
+    },
+  };
+}
 
 export function createSkyClock({ read, readWeather = () => null }) {
   const panel = document.createElement('div');
   panel.id = 'sky-clock';
-  panel.className = 'toy-panel';
+  panel.className = 'sfsim-deck';
+  panel.setAttribute('aria-label', 'SFSIM status widget');
+
+  const row = document.createElement('div');
+  row.className = 'deck-row';
+
+  const info = document.createElement('div');
+  info.className = 'deck-module deck-info';
+  const strip = document.createElement('div');
+  strip.className = 'info-strip';
+  strip.textContent = 'SFSIM OS';
+  strip.setAttribute('aria-hidden', 'true');
+  const body = document.createElement('div');
+  body.className = 'info-body';
+  info.append(strip, body);
 
   const timeRow = document.createElement('div');
   timeRow.className = 'clock-time';
   const clockNode = document.createElement('span');
   clockNode.className = 'clock-hm';
   const periodNode = document.createElement('span');
-  periodNode.className = 'chip clock-period';
-  periodNode.dataset.tone = 'mustard';
+  periodNode.className = 'clock-period';
   timeRow.append(clockNode, periodNode);
 
   const dateNode = document.createElement('div');
   dateNode.className = 'clock-date';
+  const weekdayNode = document.createElement('span');
+  const monthDayNode = document.createElement('span');
+  dateNode.append(weekdayNode, pip(), monthDayNode);
 
   const skyRow = document.createElement('div');
-  skyRow.className = 'clock-sky';
+  skyRow.className = 'clock-row clock-sky';
   const sun = sunGlyph();
   const moon = moonGlyph();
   // SVG elements do not honour the [hidden] attribute the way HTML ones do.
@@ -182,25 +367,53 @@ export function createSkyClock({ read, readWeather = () => null }) {
   const skyText = document.createElement('span');
   skyRow.append(sun, moon, skyText);
 
-  // The weather line. Built once like everything else here; when the feed is
-  // not live the whole row is simply hidden — a diorama has no error states.
+  // The weather rows. Built once like everything else here; when the feed is
+  // not live they are simply hidden — a diorama has no error states.
   const weatherRow = document.createElement('div');
-  weatherRow.className = 'clock-weather';
+  weatherRow.className = 'clock-row clock-weather';
   weatherRow.hidden = true;
   let weatherKind = null;
   let weatherIcon = null;
-  const weatherText = document.createElement('span');
-  // The wind is its own node so the narrow-screen drop is a CSS media query,
+  const tempNode = document.createElement('span');
+  const conditionNode = document.createElement('span');
+  weatherRow.append(tempNode, pip(), conditionNode);
+
+  // The wind is its own row so the narrow-screen drop is a CSS media query,
   // not a per-second read of window.innerWidth (a layout read, and one that
   // reports 0 in a backgrounded tab).
+  const windRow = document.createElement('div');
+  windRow.className = 'clock-row clock-wind';
+  windRow.hidden = true;
   const windText = document.createElement('span');
-  windText.className = 'clock-wind';
-  const aqiChip = document.createElement('span');
-  aqiChip.className = 'chip clock-aqi';
-  aqiChip.hidden = true;
-  weatherRow.append(weatherText, windText, aqiChip);
+  windRow.append(windGlyph(), windText);
 
-  panel.append(timeRow, dateNode, skyRow, weatherRow);
+  const aqiChip = document.createElement('span');
+  aqiChip.className = 'clock-aqi';
+  aqiChip.hidden = true;
+
+  body.append(timeRow, dateNode, skyRow, weatherRow, windRow, aqiChip);
+
+  const player = createPlayer();
+  row.append(info, player.element);
+
+  const logo = document.createElement('div');
+  logo.className = 'deck-logo';
+  const grillLeft = document.createElement('span');
+  grillLeft.className = 'logo-grill';
+  const chevronLeft = document.createElement('span');
+  chevronLeft.className = 'logo-chevron';
+  chevronLeft.textContent = '>>>';
+  const logoText = document.createElement('span');
+  logoText.className = 'logo-text';
+  logoText.textContent = 'WWW.SFSIM.NET';
+  const chevronRight = document.createElement('span');
+  chevronRight.className = 'logo-chevron';
+  chevronRight.textContent = '<<<';
+  const grillRight = document.createElement('span');
+  grillRight.className = 'logo-grill';
+  logo.append(grillLeft, chevronLeft, logoText, chevronRight, grillRight);
+
+  panel.append(row, logo);
   document.body.appendChild(panel);
 
   function renderWeather() {
@@ -208,6 +421,8 @@ export function createSkyClock({ read, readWeather = () => null }) {
     const summary = weather?.live ? weather.summary : null;
     if (!summary) {
       weatherRow.hidden = true;
+      windRow.hidden = true;
+      aqiChip.hidden = true;
       return;
     }
     weatherRow.hidden = false;
@@ -221,11 +436,13 @@ export function createSkyClock({ read, readWeather = () => null }) {
       weatherIcon = next;
     }
 
-    const line = `${Math.round(summary.temp)}° · ${summary.label}`;
-    if (weatherText.textContent !== line) weatherText.textContent = line;
+    const temp = `${Math.round(summary.temp)}°`;
+    if (tempNode.textContent !== temp) tempNode.textContent = temp;
+    if (conditionNode.textContent !== summary.label) conditionNode.textContent = summary.label;
 
-    // Below 480 px CSS drops this line, not the temperature.
-    const gust = summary.windSpeed >= 1 ? ` · ${Math.round(summary.windSpeed)} mph ${compass(summary.windDir)}` : '';
+    // Below 480 px CSS drops this row, not the temperature.
+    const gust = summary.windSpeed >= 1 ? `${Math.round(summary.windSpeed)} mph ${compass(summary.windDir)}` : '';
+    windRow.hidden = gust === '';
     if (windText.textContent !== gust) windText.textContent = gust;
 
     // Always shown whenever there is a reading, not only when the air is bad:
@@ -251,10 +468,11 @@ export function createSkyClock({ read, readWeather = () => null }) {
     const { clock, period } = formatTime(ms);
     if (clockNode.textContent !== clock) clockNode.textContent = clock;
     if (periodNode.textContent !== period) periodNode.textContent = period;
-    periodNode.dataset.tone = !sky || sky.isDay ? 'mustard' : 'navy';
 
-    const date = formatDate(ms);
-    if (dateNode.textContent !== date) dateNode.textContent = date;
+    const weekday = formatWeekday(ms);
+    if (weekdayNode.textContent !== weekday) weekdayNode.textContent = weekday;
+    const monthDay = formatMonthDay(ms);
+    if (monthDayNode.textContent !== monthDay) monthDayNode.textContent = monthDay;
 
     renderWeather();
 
@@ -284,6 +502,7 @@ export function createSkyClock({ read, readWeather = () => null }) {
     update: render,
     dispose() {
       clearInterval(timer);
+      player.dispose();
       panel.remove();
     },
   };

@@ -1,0 +1,99 @@
+{
+ "input_materials": [
+  "Toy_coral",
+  "Toy_cream",
+  "Toy_glass",
+  "Toy_gold_Glow",
+  "Toy_ink",
+  "Toy_mustard",
+  "Toy_navy",
+  "Toy_red",
+  "Toy_red_Glow",
+  "Toy_rust",
+  "Toy_sand",
+  "Toy_sky",
+  "Toy_steel",
+  "Toy_stone",
+  "Toy_teal",
+  "Toy_trim",
+  "Toy_trim_Glow",
+  "Toy_verdigris",
+  "Toy_white",
+  "Toy_white_Glow"
+ ],
+ "steps": [
+  {
+   "step": "degenerate-only (weld disabled)",
+   "tris": 8940,
+   "verts": 18072
+  },
+  {
+   "step": "interior-faces",
+   "tris": 8940,
+   "verts": 18072
+  },
+  {
+   "step": "limited-dissolve-SKIPPED",
+   "tris": 8940,
+   "verts": 18072
+  },
+  {
+   "step": "join-per-material",
+   "tris": 8940,
+   "verts": 18072
+  }
+ ],
+ "input": {
+  "tris": 8944,
+  "verts": 18072,
+  "objects": 37
+ },
+ "weld": "disabled: this asset is entirely flat-shaded, and bmesh's remove_doubles fuses the vertices the custom split normals hang off, so the mesh silently falls back to smooth. Measured on 64-south-park at 256 bytes (0.06%) for that risk; the shade_flat() guard stays behind it so re-enabling cannot quietly reintroduce it",
+ "interior_faces_removed": 0,
+ "limited_dissolve": "skipped: this asset is nothing BUT large coplanar bands \u2014 103 abutting plate cells, the kerb runs, the fence runs, 67 stripe lines. GLB-OPTIMIZE-PROMPT s.3 step 3 names exactly this case (350-brannan, 13 Aug 2026: 7 slivers up to 24.35 m long, 0.24 mm wide)",
+ "joins": {
+  "grp_Toy_ink": 7,
+  "grp_Toy_glass": 2,
+  "grp_Toy_red": 2,
+  "grp_Toy_steel": 7,
+  "grp_Toy_white": 3
+ },
+ "inverted_solids": [],
+ "reimport": {
+  "objects": 21,
+  "materials": [
+   "Toy_coral",
+   "Toy_cream",
+   "Toy_glass",
+   "Toy_gold_Glow",
+   "Toy_ink",
+   "Toy_mustard",
+   "Toy_navy",
+   "Toy_red",
+   "Toy_red_Glow",
+   "Toy_rust",
+   "Toy_sand",
+   "Toy_sky",
+   "Toy_steel",
+   "Toy_stone",
+   "Toy_teal",
+   "Toy_trim",
+   "Toy_trim_Glow",
+   "Toy_verdigris",
+   "Toy_white",
+   "Toy_white_Glow"
+  ],
+  "bbox_dims": [
+   88.8432,
+   59.934,
+   8.5649
+  ],
+  "bbox_min": [
+   -44.4217,
+   -29.856,
+   -1.0844
+  ]
+ },
+ "bbox_ok": true,
+ "material_set_ok": true
+}

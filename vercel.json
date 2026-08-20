@@ -3,25 +3,55 @@
   "buildCommand": "cd app && npm install && npm run build",
   "outputDirectory": "app/dist",
   "installCommand": "echo skip",
-  "rewrites": [{ "source": "/favicon.ico", "destination": "/favicon.svg" }],
+  "rewrites": [
+    {
+      "source": "/favicon.ico",
+      "destination": "/favicon-32.png"
+    }
+  ],
   "functions": {
     "api/agent.mjs": {
       "includeFiles": "api/_data/**",
       "maxDuration": 60
+    },
+    "api/[...path].mjs": {
+      "includeFiles": "api/_data/personas.json",
+      "maxDuration": 120
     }
   },
   "headers": [
     {
       "source": "/tiles/(.*).bin",
-      "headers": [{ "key": "Cache-Control", "value": "public, max-age=31536000, immutable" }]
+      "headers": [
+        {
+          "key": "Cache-Control",
+          "value": "public, max-age=31536000, immutable"
+        }
+      ]
     },
     {
       "source": "/tiles/(.*).json",
-      "headers": [{ "key": "Cache-Control", "value": "public, max-age=0, must-revalidate" }]
+      "headers": [
+        {
+          "key": "Cache-Control",
+          "value": "public, max-age=0, must-revalidate"
+        }
+      ]
     },
     {
       "source": "/assets/(.*)",
-      "headers": [{ "key": "Cache-Control", "value": "public, max-age=31536000, immutable" }]
+      "headers": [
+        {
+          "key": "Cache-Control",
+          "value": "public, max-age=31536000, immutable"
+        }
+      ]
+    }
+  ],
+  "crons": [
+    {
+      "path": "/api/tick",
+      "schedule": "* * * * *"
     }
   ]
 }
