@@ -34,6 +34,14 @@ export const shared = {
   uSunColor: { value: new Color(1.0, 0.78, 0.5) },
   uSkyColor: { value: new Color(0.42, 0.56, 0.72) },
   uNight: { value: 0 },
+  // How far every building's lit-window share is pushed toward "all on" after
+  // dark. 0 keeps the published behaviour (homes 62%, shops 34%, civic 86%,
+  // offices 6%); 1 lights every window in the city.
+  //
+  // This is a SHOWCASE dial, not a realism one, and it is deliberately a
+  // uniform rather than a constant so the look can be judged live against the
+  // real thing (SF.setNightLights) instead of through a rebuild.
+  uLitBoost: { value: 1 },
   // Drifting cloud shadows. Cover now comes from the live weather field (see
   // weather.js); this is only the scroll offset of the shadow noise, advanced
   // every frame by the real wind.

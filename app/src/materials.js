@@ -329,7 +329,13 @@ const FLAG_DECODE = /* glsl */ `
 
 export function createToyBuildingMaterial() {
   const material = new MeshLambertMaterial({ vertexColors: true, dithering: true });
-  material.uniformsHolder = { uFade: { value: 1 }, uFloor: { value: 3.5 }, uNight: shared.uNight, ...CLOUD_UNIFORMS() };
+  material.uniformsHolder = {
+    uFade: { value: 1 },
+    uFloor: { value: 3.5 },
+    uNight: shared.uNight,
+    uLitBoost: shared.uLitBoost,
+    ...CLOUD_UNIFORMS(),
+  };
 
   material.onBeforeCompile = function patchToy(shader) {
     Object.assign(shader.uniforms, this.uniformsHolder);
@@ -360,6 +366,7 @@ export function createToyBuildingMaterial() {
         uniform float uFade;
         uniform float uFloor;
         uniform float uNight;
+        uniform float uLitBoost;
         varying vec3 vToyPos;
         varying vec3 vToyNormal;
         varying float vToyWall;
@@ -388,10 +395,14 @@ export function createToyBuildingMaterial() {
           // what the building is. Homes glow warm and mostly-on, shops go bright
           // but thin out, hospitals and stations stay on, offices go dark.
           if (uNight > 0.001) {
+            // Published behaviour: homes glow warm and mostly-on, shops thin
+            // out, civic stays on, offices go nearly dark. uLitBoost pushes all
+            // four toward "every window lit" for the night showcase.
             float share = profile < 0.5 ? 0.62
                         : profile < 1.5 ? 0.34
                         : profile < 2.5 ? 0.86
                         : 0.06;
+            share = mix(share, 1.0, uLitBoost);
             vec3 tint = profile < 0.5 ? vec3(1.0, 0.76, 0.46)
                       : profile < 1.5 ? vec3(1.0, 0.84, 0.58)
                       : profile < 2.5 ? vec3(0.94, 0.96, 1.0)

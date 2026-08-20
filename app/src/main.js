@@ -908,6 +908,15 @@ async function boot() {
     landmarks,
     piers,
     presets,
+    // How far every building's lit-window share is pushed toward "all on"
+    // after dark: 0 is the published mix (offices nearly dark), 1 lights the
+    // whole city. A showcase dial, not a realism one — it exists so the two
+    // can be compared live rather than through a rebuild.
+    setNightLights(amount = 1) {
+      const value = Math.max(0, Math.min(1, Number(amount)));
+      shared.uLitBoost.value = value;
+      return value;
+    },
     goTo(lon, lat, distance = 900, yaw = 210, pitch = 24) {
       const [x, z] = data.project(lon, lat);
       rig.set({ x, z, distance, yaw, pitch });
