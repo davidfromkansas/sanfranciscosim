@@ -62,6 +62,7 @@ import { createMuniStopLayer } from './munistoplayer.js';
 import { createFerryTerminals } from './ferryterminals.js';
 import { createFerryRoutes } from './ferryroutes.js';
 import { createFerryBadges } from './ferrybadges.js';
+import { createScheduledFerries } from './ferryscheduled.js';
 import { createLiveAircraft } from './aircraft.js';
 import { createCameraRig } from './camera.js';
 import { createSigns } from './signs.js';
@@ -267,6 +268,10 @@ async function boot() {
   const ferryRoutes = createFerryRoutes(scene);
   // Route pills over the live hulls, in the same livery as the walls below them.
   const ferryBadges = createFerryBadges(scene, ferries);
+  // Golden Gate, Angel Island and Treasure Island broadcast no positions, so
+  // their boats are placed from the published timetable and labelled as
+  // scheduled rather than live.
+  const ferryScheduled = createScheduledFerries(scene);
   // Real aircraft from /api/flights. Like the Muni layer this one simply stays
   // empty when the feed is away — nothing else in the city depends on it.
   const aircraft = createLiveAircraft(scene, data);
@@ -333,6 +338,7 @@ async function boot() {
     ferryTerminals.setQuality(key);
     ferryRoutes.setQuality(key);
     ferryBadges.setQuality(key);
+    ferryScheduled.setQuality(key);
     post.setSamples(quality.samples);
     renderer.setSize(window.innerWidth, window.innerHeight, false);
     post.setSize();
@@ -783,6 +789,8 @@ async function boot() {
     if (plane) return plane;
     const vessel = ferries.pickVessel(pickRay.ray.origin, pickRay.ray.direction);
     if (vessel) return vessel;
+    const scheduled = ferryScheduled.pickVessel(pickRay.ray.origin, pickRay.ray.direction);
+    if (scheduled) return scheduled;
     const bus = muni.pickBus(pickRay.ray.origin, pickRay.ray.direction);
     if (bus) return bus;
     const stop = muniStops.pickStop(pickRay.ray.origin, pickRay.ray.direction);
@@ -824,6 +832,7 @@ async function boot() {
     const over =
       aircraft.pickAircraft(origin, direction) ||
       ferries.pickVessel(origin, direction) ||
+      ferryScheduled.pickVessel(origin, direction) ||
       muni.pickBus(origin, direction) ||
       muniStops.pickStop(origin, direction) ||
       ferryTerminals.pickTerminal(origin, direction);
@@ -885,6 +894,7 @@ async function boot() {
     ferryTerminals,
     ferryRoutes,
     ferryBadges,
+    ferryScheduled,
     aircraft,
     // Which aircraft the camera is locked to, or null. Exposed because the
     // follow is otherwise unobservable from outside and QA has to be able to
@@ -1057,6 +1067,7 @@ async function boot() {
     ferryTerminals.update(dt, camera, pivotWorld);
     ferryRoutes.update();
     ferryBadges.update(dt, camera);
+    ferryScheduled.update(dt, camera, clockOverride === null ? Date.now() : clockOverride);
     aircraft.update(dt, camera);
     trackVessel(dt);
     landmarks.update();
@@ -1110,6 +1121,7 @@ async function boot() {
           `stops      ${muniStops.count} shown / ${muniStops.total}`,
           `berths     ${ferryTerminals.count} shown / ${ferryTerminals.total}`,
           `ferry rts  ${ferryRoutes.routes}${ferryRoutes.visible ? '' : ' (hidden)'}`,
+          `ferry sched ${ferryScheduled.count} on timetable`,
           `aircraft   ${aircraft.count}${aircraft.live ? ` live (${aircraft.source})` : ' off'}`,
           `altitude   ${(camera.position.y - rig.state.pivot.y).toFixed(0)} m`,
           `zoom       ${rig.state.distance.toFixed(0)} m`,

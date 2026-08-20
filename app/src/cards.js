@@ -33,6 +33,7 @@ const KIND_GLYPH = {
   transit: 'transit',
   'transit-stop': 'transit',
   'ferry-terminal': 'vessel',
+  'ferry-scheduled': 'vessel',
   aircraft: 'aircraft',
 };
 
@@ -267,6 +268,18 @@ export function createContextCard({ onFly, onAsk, onSelectHistory, onClose }) {
       } else {
         fact('Live vessels', 'None reporting on these routes right now');
       }
+    } else if (entity.kind === 'ferry-scheduled') {
+      // NEVER presented as live. This operator broadcasts no positions at all,
+      // so the boat is drawn where the published timetable says it should be —
+      // the same honesty the aircraft card keeps when its altitude is
+      // compressed for display.
+      subtitle.textContent = entity.operator || 'Scheduled sailing';
+      chips.append(chip('Scheduled', 'mustard', 'vessel'));
+      chips.append(chip(entity.routeName, 'coral'));
+      fact('Where this comes from', 'The published timetable, not a live position — this operator does not broadcast one.');
+      if (entity.from && entity.to) fact('Sailing', `${entity.from} to ${entity.to}`);
+      fact('Departs', entity.departs);
+      fact('Due', entity.arrives);
     } else if (entity.kind === 'aircraft') {
       // Every number here is the TRUE reading from the transponder. Only the
       // height the aircraft is DRAWN at is compressed (see aircraft.js dispY),

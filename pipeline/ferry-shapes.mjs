@@ -141,6 +141,38 @@ const hex = (value) => {
   return /^[0-9a-fA-F]{6}$/.test(v) ? `#${v.toLowerCase()}` : null;
 };
 
+// GTFS clock times may exceed 24:00 for trips that run past midnight
+// ("25:30:00" is 1:30 the next morning), so this is seconds since the service
+// day's local midnight, not a time of day.
+function toSeconds(hhmmss) {
+  const parts = String(hhmmss || '').trim().split(':');
+  if (parts.length < 2) return null;
+  const h = Number(parts[0]);
+  const m = Number(parts[1]);
+  const sec = Number(parts[2] || 0);
+  if (!Number.isFinite(h) || !Number.isFinite(m)) return null;
+  return h * 3600 + m * 60 + sec;
+}
+
+// Where along a shape a stop sits, in metres of arc. GF and TF leave
+// shape_dist_traveled blank, so the stop is matched to the nearest point on its
+// own trip's shape instead — exact enough for a berth that is by definition on
+// the line.
+function arcAtPoint(floats, shape, x, z) {
+  let best = 0;
+  let bestD2 = Infinity;
+  const base = shape.vertexOffset * 3;
+  for (let k = 0; k < shape.vertexCount; k++) {
+    const o = base + k * 3;
+    const d2 = (floats[o] - x) ** 2 + (floats[o + 1] - z) ** 2;
+    if (d2 < bestD2) {
+      bestD2 = d2;
+      best = floats[o + 2];
+    }
+  }
+  return best;
+}
+
 // ------------------------------------------------------------------ bake
 
 async function main() {
@@ -172,6 +204,10 @@ async function main() {
   const shapeMeta = [];
   const floats = [];
   const terminals = [];
+  // Timetable playback for the operators with no live feed.
+  const scheduleTrips = [];
+  const scheduleServices = {};
+  const bakeYmd = new Date().toISOString().slice(0, 10).replace(/-/g, '');
 
   for (const op of OPERATORS) {
     extract(op.id);
@@ -194,7 +230,7 @@ async function main() {
       const tripId = cols[h.trip_id];
       const shapeId = cols[h.shape_id];
       if (!routes.has(routeId) || !tripId) return;
-      trips.set(tripId, { routeId, shapeId: shapeId || null });
+      trips.set(tripId, { routeId, shapeId: shapeId || null, serviceId: `${op.id}:${cols[h.service_id]}` });
       if (shapeId) shapeUse.set(shapeId, routeId);
     });
 
@@ -307,6 +343,86 @@ async function main() {
         routes: [...(stopRoutes.get(id) || [])].sort(),
       });
     });
+    // ---- schedule, for the operators that publish no live positions -------
+    //
+    // Golden Gate, Angel Island and Treasure Island register their timetables
+    // with 511 but broadcast no vehicle positions at all — measured in BOTH of
+    // 511's live formats, SIRI and GTFS-Realtime, which return an empty feed
+    // (15 bytes, header only) while Muni returns 626 vehicles on the same call.
+    // So their crossings can only be shown from the timetable: where a boat is
+    // SUPPOSED to be. That is a simulation and the app labels it as one.
+    if (!op.live) {
+      const services = {};
+      await eachRow(op.id, 'calendar.txt', (cols, h) => {
+        const end = Number(cols[h.end_date]);
+        // Drop timetables that have already expired — this feed carries service
+        // windows from two years ago, and they can never match a runtime date.
+        if (Number.isFinite(end) && end < Number(bakeYmd)) return;
+        services[cols[h.service_id]] = {
+          days: [
+            cols[h.monday], cols[h.tuesday], cols[h.wednesday], cols[h.thursday],
+            cols[h.friday], cols[h.saturday], cols[h.sunday],
+          ].map((d) => (d === '1' ? 1 : 0)),
+          start: Number(cols[h.start_date]),
+          end,
+        };
+      });
+      await eachRow(op.id, 'calendar_dates.txt', (cols, h) => {
+        const svc = services[cols[h.service_id]];
+        if (!svc) return;
+        const key = cols[h.exception_type] === '1' ? 'added' : 'removed';
+        (svc[key] || (svc[key] = [])).push(Number(cols[h.date]));
+      });
+
+      // stop_times, grouped per trip and ordered by sequence.
+      const byTrip = new Map();
+      await eachRow(op.id, 'stop_times.txt', (cols, h) => {
+        const tripId = cols[h.trip_id];
+        if (!trips.has(tripId)) return;
+        const at = toSeconds(cols[h.departure_time]) ?? toSeconds(cols[h.arrival_time]);
+        if (at == null) return;
+        const stop = terminals.find((t) => t.id === `${op.id}:${cols[h.stop_id]}`);
+        if (!stop) return; // a stop we dropped (unserved) cannot anchor a leg
+        let legStops = byTrip.get(tripId);
+        if (!legStops) byTrip.set(tripId, (legStops = []));
+        legStops.push({
+          seq: Number(cols[h.stop_sequence]),
+          at,
+          x: stop.x,
+          z: stop.z,
+          name: stop.name,
+        });
+      });
+
+      for (const [tripId, stops] of byTrip) {
+        const trip = trips.get(tripId);
+        const shapeIdx = shapeIndex.get(trip.shapeId);
+        const shape = shapeMeta[shapeIdx];
+        if (shape == null || stops.length < 2) continue;
+        stops.sort((a, b) => a.seq - b.seq);
+        // Each stop becomes a (time, distance-along-shape) pair; the client
+        // interpolates between consecutive pairs. This is what lets a
+        // three-stop run like the Triangle be placed correctly instead of
+        // assumed to be halfway at the halfway time.
+        const legs = stops.map((st) => [st.at, Math.round(arcAtPoint(floats, shape, st.x, st.z))]);
+        scheduleTrips.push({
+          route: `${op.id}:${trip.routeId}`,
+          service: trip.serviceId,
+          shape: shapeIdx,
+          legs,
+          from: stops[0].name,
+          to: stops[stops.length - 1].name,
+        });
+      }
+      Object.assign(scheduleServices, Object.fromEntries(
+        Object.entries(services).map(([id, v]) => [`${op.id}:${id}`, v]),
+      ));
+      console.log(
+        `[ferry-shapes] ${op.id}: ${Object.keys(services).length} live timetable service(s), ` +
+          `${scheduleTrips.filter((t) => t.route.startsWith(`${op.id}:`)).length} scheduled trips`,
+      );
+    }
+
     const opRoutes = Object.keys(routesOut).filter((k) => k.startsWith(`${op.id}:`)).length;
     console.log(
       `[ferry-shapes] ${op.id} ${op.name}: ${opRoutes} routes, ` +
@@ -336,6 +452,7 @@ async function main() {
       routes: routesOut,
       shapes: shapeMeta,
       terminals,
+      schedule: { services: scheduleServices, trips: scheduleTrips },
     }),
   );
   // Pad to a 4-byte boundary: the client builds a Float32Array VIEW at

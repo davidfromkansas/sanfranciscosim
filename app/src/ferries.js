@@ -10,7 +10,6 @@
 // wake, so the whole live fleet costs at most three.
 
 import {
-  BufferAttribute,
   DynamicDrawUsage,
   InstancedMesh,
   MeshBasicMaterial,
@@ -19,9 +18,8 @@ import {
   PlaneGeometry,
   Vector2,
 } from 'three';
-import { createGLTFLoader } from './gltf.js';
 import { loadFerryNetwork } from './ferrynetwork.js';
-import { mergeGeometries } from 'three/addons/utils/BufferGeometryUtils.js';
+import { loadFerryHull } from './ferryhull.js';
 // Motion, freshness and scene-tenure rules live in one tested module — see its
 // header before changing anything about whether a vessel moves or stays.
 import {
@@ -36,9 +34,6 @@ import {
   targetSpeedFor,
   usableBearing,
 } from './ferry-motion.js';
-
-const ASSET = `${import.meta.env.BASE_URL}sf-assets/vehicles/SF_Bay_Ferry.glb`;
-const MANIFEST = `${import.meta.env.BASE_URL}sf-assets/vehicles_manifest.json`;
 
 const CAPACITY = 24;
 const POLL_MS = 60 * 1000;
@@ -61,48 +56,6 @@ function shortestAngle(from, to) {
   if (d > Math.PI) d -= Math.PI * 2;
   if (d < -Math.PI) d += Math.PI * 2;
   return d;
-}
-
-// Merge the GLB into one geometry per surface class, baking material colour
-// (times any authored vertex colour) into COLOR_0 — the same idiom the landmark
-// and vehicle loaders use, so the fleet renders with one Lambert material.
-function mergeFerry(root) {
-  root.updateMatrixWorld(true);
-  const body = [];
-  const glow = [];
-  root.traverse((object) => {
-    if (!object.isMesh) return;
-    const material = object.material;
-    const geometry = object.geometry.clone();
-    geometry.applyMatrix4(object.matrixWorld);
-    geometry.deleteAttribute('uv');
-    geometry.deleteAttribute('uv1');
-    geometry.deleteAttribute('tangent');
-    if (!geometry.attributes.normal) geometry.computeVertexNormals();
-
-    const count = geometry.attributes.position.count;
-    const source = geometry.attributes.color;
-    const colors = new Float32Array(count * 3);
-    const base = material?.color;
-    for (let i = 0; i < count; i++) {
-      const r = base ? base.r : 1;
-      const g = base ? base.g : 1;
-      const b = base ? base.b : 1;
-      colors[i * 3] = source ? source.getX(i) * r : r;
-      colors[i * 3 + 1] = source ? source.getY(i) * g : g;
-      colors[i * 3 + 2] = source ? source.getZ(i) * b : b;
-    }
-    geometry.setAttribute('color', new BufferAttribute(colors, 3));
-    (material?.name?.endsWith('_Glow') ? glow : body).push(geometry);
-  });
-
-  const join = (parts) => {
-    if (!parts.length) return null;
-    const merged = mergeGeometries(parts, false);
-    for (const part of parts) part.dispose();
-    return merged;
-  };
-  return { body: join(body), glow: join(glow) };
 }
 
 // Three synthetic vessels for ?ferries=demo, each sailing a REAL route shape
@@ -208,34 +161,13 @@ export function createLiveFerries(scene, data, agents) {
   }
 
   async function load() {
-    let entry = null;
-    try {
-      const res = await fetch(MANIFEST);
-      if (res.ok) {
-        entry = ((await res.json()).vehicles || []).find((v) => v.kind === 'ferry') || null;
-      }
-    } catch {
-      entry = null;
-    }
-
-    let merged;
-    try {
-      const gltf = await createGLTFLoader().loadAsync(entry ? `${import.meta.env.BASE_URL}sf-assets/${entry.file}` : ASSET);
-      merged = mergeFerry(gltf.scene);
-    } catch (error) {
-      console.warn(`sf-ferries: ferry model failed to load (${error.message}) — keeping procedural ferries`);
+    const hull = await loadFerryHull();
+    if (!hull) {
+      console.warn('sf-ferries: no ferry model — keeping procedural ferries');
       return;
     }
-    if (!merged.body) {
-      console.warn('sf-ferries: ferry model had no geometry — keeping procedural ferries');
-      return;
-    }
-
-    // Never trust the file's own scale: measure and scale to the manifest length.
-    merged.body.computeBoundingBox();
-    const measured = merged.body.boundingBox.max.z - merged.body.boundingBox.min.z;
-    const target = entry?.targetLengthM ?? entry?.dims?.[2] ?? measured;
-    scale = measured > 0 ? target / measured : 1;
+    const merged = { body: hull.body, glow: hull.glow };
+    scale = hull.scale;
 
     bodyMesh = new InstancedMesh(merged.body, new MeshLambertMaterial({ vertexColors: true }), CAPACITY);
     bodyMesh.name = 'live-ferry-fleet';

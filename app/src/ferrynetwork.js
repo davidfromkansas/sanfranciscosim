@@ -122,7 +122,11 @@ function parse(buf) {
   });
   berths.sort((a, b) => a.name.localeCompare(b.name));
 
-  return { routes, shapes, verts, terminals, berths, operators };
+  // Timetable playback data for the operators with no live feed; absent when
+  // every operator publishes positions.
+  const schedule = meta.schedule || { services: {}, trips: [] };
+
+  return { routes, shapes, verts, terminals, berths, operators, schedule };
 }
 
 // What to call a cluster of stops, and which stop lends it its id.
