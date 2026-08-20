@@ -145,7 +145,7 @@ route, and the park plans depend on it (§E8 of the parks README).
 | [1 South Park (One South Park)](./1-south-park.md) | `1-south-park` | 20.2 m (LiDAR `hgt_max`; penthouse roof 18.6 m, cornice crest 15.75 m) | new landmark |
 | [The Audiffred Building (1 Mission Street)](./audiffred-building.md) | `audiffred-building` | 17.5 m (estimated — barrel-vault crest, Overture + photogrammetric; LiDAR roof deck 15.4 m measured, `hgt_max` 19.18 m rejected as rooftop plant) | new landmark |
 
-## Shared contract (all 107)
+## Shared contract (all 135)
 | [252–254 Ritch Street](./254-ritch.md) | `254-ritch` | 8.8 m (LiDAR maximum, the roof flue; cornice crest 8.05 m estimated) | new landmark |
 | [434 Brannan Street (Art Deco loft, 1929)](./434-brannan.md) | `434-brannan` | 13.79 m (LiDAR maximum, read as the rooftop mechanical penthouse; roof deck 11.46 m measured, parapet crest ~12.4 m estimated) | new landmark |
 | [226 Ritch Street (226 Ritch Street Condominiums)](./226-ritch.md) | `226-ritch` | 18.1 m (roof crest, LiDAR-derived; 16.0 m parapet) | new landmark |
