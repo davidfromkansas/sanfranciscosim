@@ -387,8 +387,12 @@ export async function createContext(data) {
     // and neighbourhoods from this cascade: a click that lands on nothing should
     // resolve to nothing, and the card simply stays as it was.
     //
-    // The Bay keeps its entry in search and remains available to the concierge;
-    // this is only about clicking in the 3D scene.
+    // Note this removes the ONLY way to select the Bay: nothing else in the app
+    // produces a `water` entity, and the search index has no row for it either.
+    // That is the intended trade — a label nobody asked for on every stray click
+    // is worse than no label — but it does leave the `water` branches in
+    // cards.js and main.js's focusTarget unreachable until something picks water
+    // deliberately, which is where they are waiting.
     return pickPark(groundPoint);
   }
 
