@@ -3939,6 +3939,53 @@ export const LANDMARKS = [
     // building was composed for.
     camera: { distance: 380, yaw: 0, pitch: 24 },
   },
+  {
+    // An L-shaped wedge of brick, not a building, and the one site in this set
+    // with NO usable radius at its own anchor. The anchor is the model's XY
+    // bbox centre (contract: origin at base centre), and on an L that lands 4.76
+    // m off the Federal Building's baked footprint at 50 UN Plaza, while the
+    // farthest thing that has to be dropped is 57.51 m away. So `exclude` is
+    // omitted entirely and the work is done by one extra circle.
+    //
+    // What has to be dropped is the FOUNTAIN. DataSF's LiDAR read Halprin's
+    // granite slabs as nine buildings; with no `hgt_medcm` to work from the
+    // procedural builder extruded seven of them, inside the plaza, to 3.1-8.5 m.
+    // Measured against app/public/tiles/buildings/20_13.bin, gate distances from
+    // (-122.4133237, 37.7800778):
+    //
+    //   drop  20_13#170  10.09 m   20_13#171  11.61   20_13#169  20.21
+    //         20_13#182  22.70     20_13#172  24.64   20_13#180  25.76
+    //         20_13#181  25.77
+    //   keep  20_13#17   34.76 m  (1,171 m2, 43.1 m tall, NE across Leavenworth)
+    //         20_13#36   34.81 m
+    //
+    // Safe window (25.77, 34.76), 8.99 m wide. 30 sits near the middle: 4.23 m
+    // of margin over the last fountain block, 4.76 m under the first real
+    // neighbour. Do not widen without re-running that measurement.
+    //
+    // No clearTrees, and this one is worth stating because every other plaza in
+    // the set needed it: landcover.mjs scatters trees only on KIND.trees and
+    // KIND.grass. This plaza's outer polygon is highway=pedestrian + place=square,
+    // which maps to no landcover kind at all, and its inners are natural=sand and
+    // leisure=pitch. Nothing scatters here.
+    id: 'unPlaza',
+    name: 'United Nations Plaza',
+    lon: -122.41389,
+    lat: 37.7801415,
+    // The plaza's own height, i.e. the tree canopy — NOT the manifest's
+    // `targetHeightM` of 16.4028. Those two differ on purpose here: this is a
+    // terrain-draped ground asset, so the manifest number is the model's
+    // vertical EXTENT (the loader divides by the bbox height and must land on
+    // 1.0), while this one is what context.mjs publishes as the landmark's
+    // height to search and the concierge. A plaza is not 16 m tall.
+    height: 13.0,
+    extraExclusions: [{ lon: -122.4133237, lat: 37.7800778, r: 30 }],
+    // Looks WEST along the Fulton axis, the composition the plaza was built to
+    // create and the one the NRHP nomination describes: a clear view from
+    // Market Street to City Hall. yaw 90 is the same convention
+    // civicCenterPlaza uses for the same 260.94 deg bearing.
+    camera: { distance: 520, yaw: 90, pitch: 28 },
+  },
 ];
 
 // Parks/green spaces the landcover bake must match at least one source polygon
