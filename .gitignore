@@ -11,6 +11,12 @@ pipeline/out/
 .vercel
 .env*
 
+# Asset renders, contact sheets and QA screenshots. 2.7 GB of them made the
+# Vercel builder time out cloning the repo before the build could start; the
+# render scripts under each artifacts/<id>/ regenerate them locally.
+artifacts/**/*.png
+artifacts/**/*.jpg
+
 # Blender/Python build litter from artifacts/
 __pycache__/
 *.blend1
