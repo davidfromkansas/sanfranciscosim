@@ -30,6 +30,7 @@ import { loadFerryHull } from './ferryhull.js';
 import { inScene, loadFerryNetwork } from './ferrynetwork.js';
 import { sailingsAt } from './ferryschedule.js';
 import { localDayStart } from '../../api/_lib/astro.mjs';
+import { badgeHeightAt } from './ferrybadges.js';
 
 // Ninety-odd sailings run across a whole day, but only a handful overlap at any
 // instant. The cap is headroom, not a target.
@@ -226,14 +227,21 @@ export function createScheduledFerries(scene) {
     let best = null;
     for (const boat of drawn) {
       const px = boat.x - origin.x;
-      const py = -origin.y;
       const pz = boat.z - origin.z;
-      const t = px * direction.x + py * direction.y + pz * direction.z;
-      if (t <= 0 || t > 9000) continue;
-      const away = Math.hypot(px - direction.x * t, py - direction.y * t, pz - direction.z * t);
-      if (away > 34) continue;
-      if (best && t >= best.distance) continue;
-      best = { ...entityFor(boat), distance: t };
+      const flat = Math.hypot(px, pz);
+      // Hull or route badge, tolerance growing with range — the same rule the
+      // live fleet uses, so a timetable boat is no harder to click than a live
+      // one sailing beside it.
+      const radius = Math.max(34, flat * 0.022);
+      const camDist = Math.hypot(px, pz, origin.y);
+      for (const hy of [0, badgeHeightAt(camDist)]) {
+        const py = hy - origin.y;
+        const t = px * direction.x + py * direction.y + pz * direction.z;
+        if (t <= 0 || t > 9000) continue;
+        const away = Math.hypot(px - direction.x * t, py - direction.y * t, pz - direction.z * t);
+        if (away > radius || (best && t >= best.distance)) continue;
+        best = { ...entityFor(boat), distance: t };
+      }
     }
     return best;
   }
@@ -249,6 +257,14 @@ export function createScheduledFerries(scene) {
     // Timetable boats as entities, for the badge layer and automated checks.
     entities() {
       return drawn.map(entityFor);
+    },
+
+    // A drawn timetable boat by id, so an open selection can follow it the same
+    // way a live vessel is followed. Null once it is no longer on the water —
+    // the timetable moves it out of scene, and the follow lets go.
+    vesselEntity(id) {
+      const boat = drawn.find((b) => `ferry-scheduled:${b.id}` === id);
+      return boat ? entityFor(boat) : null;
     },
   };
 }

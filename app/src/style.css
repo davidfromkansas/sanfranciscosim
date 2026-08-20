@@ -294,6 +294,49 @@ button:hover {
   border-radius: 50%;
 }
 
+/* The resident at full height, standing on a panel tinted with their
+   neighbourhood colour. A transparent figure dropped straight onto the card's
+   cream reads as a cut-out with nothing holding it, so the panel gives it a
+   ground — the toy theme's flat fill and warm-ink border, no gradient. */
+.rs-figure {
+  flex: none;
+  width: 104px;
+  height: 178px;
+  display: flex;
+  align-items: flex-end;
+  justify-content: center;
+  border: 2px solid #2b2118;
+  border-radius: 12px;
+  box-sizing: border-box;
+  overflow: hidden;
+  /* A wash of the neighbourhood hue rather than the hue itself: at full
+     strength it fought the shirt, which is the same colour by design. */
+  background: color-mix(in srgb, var(--rs-avatar-ring, #6b7280) 16%, #f2efe7);
+  box-shadow: 3px 3px 0 #2b2118;
+}
+
+.rs-figure-img {
+  display: block;
+  width: 100%;
+  height: 100%;
+  /* contain, never cover: cropping is exactly what this replaced. */
+  object-fit: contain;
+}
+
+/* With a standing figure the head row is tall, so the text column starts at the
+   top beside it rather than floating centred against a 178 px person. */
+.rs-modal-head:has(.rs-modal-avatar.is-figure) {
+  align-items: flex-start;
+}
+
+.rs-modal-avatar.is-figure + .rs-modal-names {
+  padding-top: 4px;
+}
+
+.rs-modal-avatar.is-figure + .rs-modal-names .rs-modal-hood {
+  margin-top: 10px;
+}
+
 /* The author is a button because it does something. It has to look like text
    until you approach it, or every byline turns into a row of controls. */
 .rs-author {

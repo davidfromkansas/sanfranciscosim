@@ -50,6 +50,15 @@ const REF_DIST = 420;
 const SCALE_MIN = 0.85;
 const SCALE_MAX = 26;
 
+// Where a vessel's route badge floats, given how far the camera is from it.
+// Exported because the PICK has to hit the badge a viewer can see, and the two
+// must not be separate copies of these numbers — a badge drawn at one height and
+// picked at another is a tag that ignores the click that plainly landed on it.
+export function badgeHeightAt(camDist) {
+  const scale = Math.max(SCALE_MIN, Math.min(SCALE_MAX, camDist / REF_DIST));
+  return BADGE_TIP_Y + TAIL_DROP * scale;
+}
+
 // Rule 2. Never zero: a badge layer that vanishes on low is indistinguishable
 // from one that broke. Low simply labels fewer boats — the nearest ones.
 const QUALITY_CAP = { high: CAPACITY, medium: CAPACITY, low: 6 };
@@ -214,7 +223,7 @@ export function createFerryBadges(scene, ferries) {
       const scale = Math.max(SCALE_MIN, Math.min(SCALE_MAX, camDist / REF_DIST));
       // The tip stays a fixed height over the water while the card above it
       // grows, so a badge never drifts off its own hull as you zoom out.
-      dummy.position.set(vessel.x, BADGE_TIP_Y + TAIL_DROP * scale, vessel.z);
+      dummy.position.set(vessel.x, badgeHeightAt(camDist), vessel.z);
       dummy.quaternion.copy(camera.quaternion);
       dummy.scale.setScalar(scale);
       dummy.updateMatrix();

@@ -158,7 +158,9 @@ async function boot() {
   // The residents: one sphere per adult sampled from the 2024 ACS PUMS
   // microdata, walking the PUMA the Census actually recorded them in. Where
   // they walk, the anonymous pedestrians stand down.
-  const population = createPopulation(scene, data, city);
+  // The renderer is handed over so a resident's card can show THEIR avatar,
+  // rendered offscreen with the city's own GL context rather than a second one.
+  const population = createPopulation(scene, data, city, renderer);
   agents.setPedExclusion(population.containsResidents);
   // The column on the right: the same residents, talking. Independent of the
   // renderer — if the writer is offline the panel says so and the city is
@@ -173,6 +175,8 @@ async function boot() {
     // not how many have been seated on a street yet — the header states what
     // the simulation holds, and it must not fall as neighbourhoods unload.
     castCount: () => population.castCount,
+    // Their own avatar on their own card, rendered by the city that draws them.
+    portraitFor: (id) => population.portrait(id),
     // Take me to this resident. If they are already on a street this is
     // instant; if their neighbourhood has not streamed yet we go and GET them,
     // because the whole point of the button is to end up where they are.
@@ -516,6 +520,18 @@ async function boot() {
     if (entity.kind === 'vessel') {
       return { x: entity.x, z: entity.z, y: 20, yaw: 210, pitch: style === 'toy' ? 30 : 22, distance: 300 };
     }
+    if (entity.kind === 'person') {
+      // Down among them: a resident framed like a building is a dot. Aimed at
+      // the head, not the pavement, so the fly-in lands where the follow holds.
+      return {
+        x: entity.x,
+        z: entity.z,
+        y: entity.focusY ?? entity.y,
+        yaw: 210,
+        pitch: style === 'toy' ? 38 : 30,
+        distance: 70,
+      };
+    }
     const distance =
       entity.kind === 'neighborhood' ? 2200 : entity.kind === 'park' ? 900 : entity.kind === 'water' ? 3000 : 500;
     return { x: entity.x, z: entity.z, yaw: 210, pitch: style === 'toy' ? 42 : 34, distance };
@@ -532,15 +548,39 @@ async function boot() {
   // seconds, so "take me to that plane" is meaningless without this. The rig
   // keeps its downward diorama pitch throughout: the point is to watch it from
   // above the city, not to sit in its wake.
-  const FOLLOW_DISTANCE = 400;
-  const FOLLOW_PITCH = 40 * (Math.PI / 180);
-  let following = null; // aircraft id
+  // Framing per kind, because "close enough to watch" is a different number for
+  // a 1.7 m pedestrian than for a 40 m airliner. Pitch stays downward-diorama
+  // throughout: the point is to watch from above the city, not to sit in a wake.
+  const FOLLOW = {
+    aircraft: { distance: 400, pitch: 40 },
+    person: { distance: 70, pitch: 38 },
+    transit: { distance: 150, pitch: 40 },
+    vessel: { distance: 300, pitch: 34 },
+    'ferry-scheduled': { distance: 300, pitch: 34 },
+  };
+  const DEG = Math.PI / 180;
+
+  // Which moving thing the camera is locked to, as { kind, id }, or null. One
+  // resolver per kind, each returning a FRESH entity or null once the thing is
+  // gone from the scene — that null is what ends the follow.
+  const FOLLOW_SOURCE = {
+    aircraft: (id) => aircraft.aircraftEntity(id),
+    person: (id) => population.personEntity(id),
+    transit: (id) => muni.busEntity(id),
+    vessel: (id) => ferries.vesselEntity(id),
+    'ferry-scheduled': (id) => ferryScheduled.vesselEntity(id),
+  };
+  let following = null;
 
   function stopFollowing() {
     // Only when actually following: releaseHold would otherwise also release a
     // landmark or building focus, which is a different feature that is fine as
     // it is.
     if (!following) return;
+    // Stop ringing a resident once the camera lets go of them: the halo means
+    // "this is the one you are watching", so leaving it on marks somebody the
+    // camera is no longer following.
+    if (following.kind === 'person') population.focus(null);
     following = null;
     // Re-anchor to the ground without moving the camera. Skipping this is what
     // made letting go of a plane yank the view down by the aircraft's altitude.
@@ -558,38 +598,69 @@ async function boot() {
 
   function updateFollow(dt) {
     if (!following) return;
-    const fresh = aircraft.aircraftEntity(following);
+    const fresh = FOLLOW_SOURCE[following.kind]?.(following.id);
     if (!fresh) {
+      // A resident whose neighbourhood has not streamed yet is not gone, they
+      // are merely unseated — dropping the follow there would let go of somebody
+      // the camera is still flying towards. Everything else disappearing from
+      // its feed genuinely means gone.
+      if (following.kind === 'person' && population.knows(following.id)) return;
       stopFollowing();
       return;
     }
     // While the initial fly-in is running the rig owns the camera; tracking
     // takes over when it lands, and eases so the hand-off is not a jump.
     if (rig.flying) return;
+    const frame = FOLLOW[following.kind] ?? FOLLOW.aircraft;
     const k = 1 - Math.exp(-Math.min(dt, 0.25) * 3.2);
+    // Aircraft are drawn at compressed altitude, so they are followed at the
+    // height they are DRAWN; everything else is followed at its own focus point.
+    const targetY = fresh.displayY ?? fresh.focusY ?? fresh.y ?? 0;
     rig.state.holdY = true;
     rig.state.pivot.x += (fresh.x - rig.state.pivot.x) * k;
-    rig.state.pivot.y += (fresh.displayY - rig.state.pivot.y) * k;
+    rig.state.pivot.y += (targetY - rig.state.pivot.y) * k;
     rig.state.pivot.z += (fresh.z - rig.state.pivot.z) * k;
-    rig.state.distance += (FOLLOW_DISTANCE - rig.state.distance) * k;
-    rig.state.pitch += (FOLLOW_PITCH - rig.state.pitch) * k;
+    rig.state.distance += (frame.distance - rig.state.distance) * k;
+    rig.state.pitch += (frame.pitch * DEG - rig.state.pitch) * k;
   }
 
   function selectEntity(entity, { fly = false } = {}) {
     if (!entity) return;
-    // Selecting anything else releases a follow; selecting an aircraft starts
-    // one, whether it came from a click, the A key or the concierge.
-    following = entity.kind === 'aircraft' ? entity.id : null;
+    // Selecting something that MOVES starts a follow; selecting anything else
+    // releases one, whether it came from a click, the A key or the concierge.
+    following = FOLLOW_SOURCE[entity.kind] ? { kind: entity.kind, id: entity.id } : null;
     focus.entity = entity;
     focus.history = [entity, ...focus.history.filter((e) => e.id !== entity.id)].slice(0, 3);
     overlay.show(entity, {
       toy: style === 'toy',
       groundY: Math.max(0, data.sampleElevation(entity.x, entity.z)),
     });
-    card.show(entity, {
-      neighborhood: context.neighborhoodAt(entity.x, entity.z),
-      recent: focus.history.slice(1),
-    });
+    // A resident gets the feed's own profile card — same person, same card,
+    // whether they were clicked in a thread or on the pavement. Everything else
+    // gets the context card.
+    if (entity.kind === 'person') {
+      population.focus(entity.id); // ring them, so they are findable in the crowd
+      feedPanel.showProfile(entity);
+      // Their paragraph is not in the boot bake — it arrives on demand. Open the
+      // card first and fill the prose in when it lands, rather than holding the
+      // card back on a fetch: the name and job are already known, and a card
+      // that appears instantly and then gains a paragraph beats a click that
+      // does nothing for a beat. Re-showing is how the card takes new content.
+      population
+        .loadPersona(entity.id)
+        .then((persona) => {
+          // They may have clicked somebody else while this was in flight; the
+          // last person picked is the one whose card should be on screen.
+          if (!persona || focus.entity?.id !== entity.id) return;
+          feedPanel.showProfile({ ...entity, persona });
+        })
+        .catch(() => {}); // the card keeps its written-yet fallback
+    } else {
+      card.show(entity, {
+        neighborhood: context.neighborhoodAt(entity.x, entity.z),
+        recent: focus.history.slice(1),
+      });
+    }
     if (fly) flyTo(focusTarget(entity));
   }
 
@@ -754,7 +825,10 @@ async function boot() {
   let vesselCardAge = 0;
   function trackVessel(dt) {
     const selected = focus.entity;
-    const LIVE_KINDS = ['vessel', 'transit', 'aircraft', 'transit-stop', 'ferry-terminal'];
+    const LIVE_KINDS = ['vessel', 'transit', 'aircraft', 'transit-stop', 'ferry-terminal',
+      // People walk and timetable boats sail, so their beam has to travel with
+      // them too — otherwise the column stays on the pavement they left.
+      'person', 'ferry-scheduled'];
     if (!LIVE_KINDS.includes(selected?.kind)) return;
     // A stop does not move, but what is coming to it does — refreshing it keeps
     // the arrival times on an open card honest.
@@ -767,7 +841,11 @@ async function boot() {
             ? muniStops.stopEntity(selected.id)
             : selected.kind === 'ferry-terminal'
               ? ferryTerminals.terminalEntity(selected.id)
-              : aircraft.aircraftEntity(selected.id);
+              : selected.kind === 'person'
+                ? population.personEntity(selected.id)
+                : selected.kind === 'ferry-scheduled'
+                  ? ferryScheduled.vesselEntity(selected.id)
+                  : aircraft.aircraftEntity(selected.id);
     if (!fresh) return;
     focus.entity = fresh;
     overlay.show(fresh, { toy: style === 'toy', groundY: 0, groundSample: data.sampleElevation });
@@ -843,6 +921,11 @@ async function boot() {
     if (stop) return stop;
     const berth = ferryTerminals.pickTerminal(pickRay.ray.origin, pickRay.ray.direction);
     if (berth) return berth;
+    // People before landmarks and the city: a resident is metres wide standing
+    // in front of things that are hundreds, so whatever is behind them is never
+    // the more interesting answer — the same reasoning aircraft get above.
+    const person = population.pickPerson(pickRay.ray.origin, pickRay.ray.direction);
+    if (person) return person;
     // After the small overlay markers, which sit on top of everything, and
     // before the city pick, which is async: a landmark you can see is a landmark
     // you should be able to tap, with no wait for cell sidecars.
@@ -887,6 +970,9 @@ async function boot() {
       muni.pickBus(origin, direction) ||
       muniStops.pickStop(origin, direction) ||
       ferryTerminals.pickTerminal(origin, direction) ||
+      // Residents carry name tags, which are drawn as UI like the other markers
+      // — so they claim the cursor for the same reason those do.
+      population.pickPerson(origin, direction) ||
       // Landmarks join the marker layers in claiming the cursor. The rule this
       // bends is "everything is a building, so a hand cursor over the whole map
       // says nothing" — a landmark is exactly the exception: there are 131 of
@@ -922,11 +1008,11 @@ async function boot() {
     pickRay.setFromCamera(pickPointer, camera);
     const hasGround = rig.screenToGround(pickPointer.x, pickPointer.y, groundPoint);
     const entity = await pickAt(pickPointer.x, pickPointer.y, hasGround);
-    // Clicking an aircraft TRAVELS to it — everything else in the city stays
-    // put when you click it, but a plane you have not flown to is a speck that
-    // leaves frame before you can read the card. The follow takes over when
-    // the fly-in lands.
-    if (entity) selectEntity(entity, { fly: entity.kind === 'aircraft' });
+    // Clicking something that MOVES travels to it; the static city stays put
+    // when you click it. A plane, a bus, a boat or a person you have not flown
+    // to is a speck that leaves frame before you can read the card, so the
+    // fly-in is the point — and the follow takes over when it lands.
+    if (entity) selectEntity(entity, { fly: Boolean(FOLLOW_SOURCE[entity.kind]) });
   });
 
   city.preload(rig.state.pivot.clone());

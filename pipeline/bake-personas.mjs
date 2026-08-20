@@ -14,6 +14,7 @@
 //   node pipeline/bake-personas.mjs --personas ~/some/other/repo
 //
 // Output (committed): api/_data/personas.json
+//                     app/public/sf-people/personas/<puma>.json
 
 import { promises as fs } from 'node:fs';
 import path from 'node:path';
@@ -22,6 +23,8 @@ import { fileURLToPath } from 'node:url';
 
 const HERE = path.dirname(fileURLToPath(import.meta.url));
 const OUT = path.resolve(HERE, '../api/_data/personas.json');
+// Per-PUMA paragraph shards the app fetches when a resident is clicked.
+const SHARDS = path.resolve(HERE, '../app/public/sf-people/personas');
 
 // Where each PUMA is, in the words a resident would use. The writer is told
 // this because the paragraphs mostly do not say: 79% of them never name a
@@ -99,9 +102,34 @@ async function main() {
     })
   );
 
+  // The same paragraphs, sharded for the CITY to read on demand. The boot bake
+  // (bake-population.mjs) deliberately carries no prose: 856 KB of paragraphs
+  // for 829 residents, on every visit, to show the one a viewer clicks. So the
+  // paragraphs ship separately, one file per PUMA, fetched only when somebody
+  // opens a resident — and the first click in a neighbourhood pays for every
+  // other resident in it.
+  //
+  // Sharded by PUMA rather than one file per person because a resident is
+  // reached by walking a neighbourhood: 8 files of ~100 KB beats 829 of 1 KB
+  // for exactly the access pattern the city has.
+  await fs.mkdir(SHARDS, { recursive: true });
+  const shards = new Map();
+  for (const p of people) {
+    if (!shards.has(p.puma)) shards.set(p.puma, {});
+    shards.get(p.puma)[p.id] = p.persona;
+  }
+  for (const [puma, entries] of shards) {
+    await fs.writeFile(path.join(SHARDS, `${puma}.json`), JSON.stringify(entries));
+  }
+
   const byPuma = {};
   for (const p of people) byPuma[p.puma] = (byPuma[p.puma] ?? 0) + 1;
   const size = Math.round((await fs.stat(OUT)).size / 1024);
+  const shardKB = Math.round(
+    (await Promise.all([...shards.keys()].map(async (puma) =>
+      (await fs.stat(path.join(SHARDS, `${puma}.json`))).size))).reduce((a, b) => a + b, 0) / 1024
+  );
+  console.log(`${shards.size} persona shards for the city · ${shardKB} KB total`);
   console.log(`${people.length} people with a paragraph · ${size} KB`);
   console.log(`  by PUMA: ${Object.entries(byPuma).map(([k, v]) => `${k} ${v}`).join(', ')}`);
   if (skipped) console.log(`  ${skipped} skipped — no identity paragraph written yet`);

@@ -18,7 +18,7 @@ export const LANDMARKS = [
     lat: 37.8199,
     height: 227,
     exclude: 900,
-    key: '1',
+    key: '7',
     camera: { distance: 2600, yaw: 150, pitch: 22 },
   },
   {
@@ -27,7 +27,7 @@ export const LANDMARKS = [
     lon: -122.3771,
     lat: 37.7988,
     exclude: 700,
-    key: '2',
+    key: '8',
     camera: { distance: 2400, yaw: 250, pitch: 22 },
   },
   {
@@ -37,7 +37,7 @@ export const LANDMARKS = [
     lat: 37.7897,
     height: 326,
     exclude: 90,
-    key: '3',
+    key: '9',
     camera: { distance: 900, yaw: 40, pitch: 18 },
   },
   {
@@ -47,7 +47,6 @@ export const LANDMARKS = [
     lat: 37.7952,
     height: 260,
     exclude: 70,
-    key: '4',
     camera: { distance: 800, yaw: 60, pitch: 20 },
   },
   {
@@ -93,7 +92,7 @@ export const LANDMARKS = [
     lon: -122.3936,
     lat: 37.7955,
     exclude: 120,
-    key: '7',
+    key: '2',
     camera: { distance: 700, yaw: 100, pitch: 16 },
   },
   {
@@ -103,7 +102,7 @@ export const LANDMARKS = [
     lat: 37.8029,
     exclude: 170,
     clearTrees: true, // the rotunda grounds are hand-modelled; scatter conflicts
-    key: '8',
+    key: '4',
     camera: { distance: 700, yaw: 330, pitch: 16 },
   },
   {
@@ -112,7 +111,7 @@ export const LANDMARKS = [
     lon: -122.4193,
     lat: 37.7793,
     exclude: 110,
-    key: '9',
+    key: '1',
     camera: { distance: 700, yaw: 90, pitch: 18 },
   },
   {
@@ -4402,5 +4401,17 @@ export const VIEW_PRESETS = [
     lon: -122.468,
     lat: 37.8035,
     camera: { distance: 4600, yaw: 45, pitch: 24 },
+  },
+  // South Park is an AREA, not a building: the oval and the ~33 hand-modelled
+  // addresses ringing it. Centre is the centroid of those landmark anchors
+  // (max radius 123 m), not a hand-picked point, so it stays true if the ring
+  // grows. 520 m frames the whole oval with its facades legible.
+  {
+    id: 'southPark',
+    name: 'South Park',
+    lon: -122.39414,
+    lat: 37.78159,
+    camera: { distance: 520, yaw: 200, pitch: 20 },
+    key: '3',
   },
 ];

@@ -19,6 +19,25 @@ import {
 
 const HIGHLIGHT = 0xffcf5a;
 
+// Column size per kind: slender enough not to swallow what it marks, tall
+// enough to spot from the hero view. Radius is roughly the thing's own width,
+// height is what makes it findable from the air.
+// Kept NARROWER than the thing it marks. The column's base is its hottest part
+// (near-white under additive blending), so a radius matching the object washes
+// straight over the roof of what you just selected — at 150 m, a follow camera's
+// distance, that is most of the vehicle.
+const BEAMS = {
+  person: { radius: 0.7, height: 90 },
+  transit: { radius: 1.6, height: 150 },
+  vessel: { radius: 2.8, height: 200 },
+  'ferry-scheduled': { radius: 2.8, height: 200 },
+  'transit-stop': { radius: 1.2, height: 110 },
+  'ferry-terminal': { radius: 3, height: 200 },
+  aircraft: { radius: 2.5, height: 260 },
+  landmark: { radius: 8, height: 260 },
+};
+const DEFAULT_BEAM = { radius: 4, height: 140 };
+
 // The selection beam: a column of light standing on the thing you picked.
 //
 // Built as an open cylinder whose vertex colours fade to black upward. Under
@@ -185,11 +204,30 @@ export function createFocusOverlay(scene) {
         return;
       }
     }
-    const radius =
-      entity.kind === 'landmark' ? 90 : entity.kind === 'neighborhood' ? 420 : entity.kind === 'park' ? 160 : 30;
-    ring.position.set(entity.x, groundY + 1.5, entity.z);
-    ring.scale.setScalar(radius);
-    ring.visible = true;
+    // An AREA keeps the ground ring — a neighbourhood or a park is a region, and
+    // a column of light in the middle of one says nothing about its extent.
+    if (entity.kind === 'neighborhood' || entity.kind === 'park') {
+      ring.position.set(entity.x, groundY + 1.5, entity.z);
+      ring.scale.setScalar(entity.kind === 'neighborhood' ? 420 : 160);
+      ring.visible = true;
+      return;
+    }
+
+    // Everything else is a THING at a point — a person, a bus, a boat, a plane,
+    // a stop — and gets the same column of light a landmark gets. A ring drawn
+    // round a moving object reads as a target reticle rather than as "this one",
+    // and at 30 m radius it dwarfed the 3.5 m person standing in it.
+    const beamFor = BEAMS[entity.kind] ?? DEFAULT_BEAM;
+    const base = Math.max(0, groundSample ? groundSample(entity.x, entity.z) : groundY);
+    // An aircraft is drawn hundreds of metres up, so its column has to REACH it
+    // rather than stop short at a height that suits a bus.
+    const height =
+      entity.kind === 'aircraft'
+        ? Math.max(beamFor.height, (entity.displayY ?? entity.y ?? 0) - base + 90)
+        : beamFor.height;
+    beam.position.set(entity.x, base + height / 2, entity.z);
+    beam.scale.set(beamFor.radius, height, beamFor.radius);
+    beam.visible = true;
   }
 
   function update(dt) {

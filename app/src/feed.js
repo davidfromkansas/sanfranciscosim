@@ -147,7 +147,7 @@ function createRulesCard() {
 
 // One modal, built once and reused. Rebuilding it per click would drop focus
 // and lose the escape handler.
-function createProfileCard({ onVisit }) {
+function createProfileCard({ onVisit, portraitFor = () => null }) {
   const back = el("div", "rs-modal-back");
   back.hidden = true;
   const card = el("div", "rs-modal");
@@ -158,13 +158,16 @@ function createProfileCard({ onVisit }) {
   const names = el("div", "rs-modal-names");
   const name = el("h2", "rs-modal-name", "");
   const job = el("p", "rs-modal-job", "");
-  names.append(name, job);
-  head.append(face, names);
   const hood = el("p", "rs-modal-hood", "");
+  // Name, job and neighbourhood all sit in the column BESIDE the figure. With a
+  // full-body avatar the head row is tall, and leaving the neighbourhood below
+  // it left a long empty gutter down the side of a standing person.
+  names.append(name, job, hood);
+  head.append(face, names);
   const persona = el("p", "rs-modal-persona", "");
   const visit = el("button", "rs-modal-visit", "Find them in the city");
   const note = el("p", "rs-modal-note", "");
-  card.append(close, head, hood, persona, visit, note);
+  card.append(close, head, persona, visit, note);
   back.append(card);
   document.body.append(back);
 
@@ -234,7 +237,19 @@ function createProfileCard({ onVisit }) {
       abandon();
       current = person;
       note.textContent = "";
-      face.replaceChildren(avatar(person, 52));
+      // Their actual voxel avatar — same skin, hair, trousers and neighbourhood
+      // shirt as the figure walking the street — falling back to the drawn
+      // silhouette when portraits are unavailable (no GL, or not in the cast).
+      const rendered = portraitFor(person.id);
+      face.replaceChildren(
+        rendered
+          ? portraitImage(rendered, PUMA_COLORS[person.puma] ?? "#6b7280")
+          : avatar(person, 52),
+      );
+      // A full-body figure is tall, so the card leans on it: the text column
+      // beside it carries the neighbourhood too, instead of one line of job
+      // floating next to a 150 px person.
+      face.classList.toggle("is-figure", Boolean(rendered));
       name.textContent = person.name;
       job.textContent = person.occupation || "No occupation recorded";
       hood.textContent = person.mood
@@ -419,6 +434,23 @@ function createComposer({ onPosted }) {
 // between a name here and their sphere out in the city, and losing it would cut
 // the two halves of the product apart.
 const SVG_NS = "http://www.w3.org/2000/svg";
+
+// A rendered avatar, sized like the silhouette it stands in for. Square source,
+// clipped to the same circle by the stylesheet.
+// The resident, head to feet, standing on a panel tinted with their
+// neighbourhood colour — the same colour the silhouette used for its ring, so
+// swapping one for the other does not change what the card says about where
+// they live.
+function portraitImage(src, ring) {
+  const figure = el("div", "rs-figure");
+  figure.style.setProperty("--rs-avatar-ring", ring);
+  const img = document.createElement("img");
+  img.className = "rs-figure-img";
+  img.alt = "";
+  img.src = src;
+  figure.append(img);
+  return figure;
+}
 
 function avatar(who, size) {
   const svg = document.createElementNS(SVG_NS, "svg");
@@ -678,9 +710,12 @@ export function createFeedPanel({
   // their neighbourhood has to stream in first.
   onVisit = async () => ({ ok: false, reason: "unknown" }),
   castCount = () => 0,
+  // A resident's rendered avatar by id, or null. Supplied by the city, because
+  // the figure is drawn with the city's renderer and its rig.
+  portraitFor = () => null,
 } = {}) {
   const root = document.getElementById("feed");
-  if (!root) return { refresh() {} };
+  if (!root) return { refresh() {}, showProfile() {} };
   root.classList.add("rs");
 
   // The subreddit header, in Reddit's arrangement: a banner, then the icon
@@ -742,7 +777,7 @@ export function createFeedPanel({
   const status = el("p", "rs-status", "Loading…");
   head.append(bar, status);
   const list = el("div", "rs-list");
-  const profile = createProfileCard({ onVisit });
+  const profile = createProfileCard({ onVisit, portraitFor });
   // Inside the panel, so it covers exactly the panel and nothing else — the
   // right-hand column on a desktop, the sheet on a phone, without either
   // measurement being repeated here.
@@ -914,5 +949,12 @@ export function createFeedPanel({
   // actually said, so without this a post written five minutes ago still reads
   // "5m ago" an hour later. One pass over a few dozen spans, once a minute.
   setInterval(refreshStamps, 60 * 1000);
-  return { refresh };
+  return {
+    refresh,
+    // The same profile the feed opens, for a resident clicked in the CITY
+    // rather than in a thread. One card, one place it is written — a second
+    // person card in cards.js would drift from this one the first time the
+    // bake gained a field.
+    showProfile: profile.show,
+  };
 }

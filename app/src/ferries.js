@@ -20,6 +20,9 @@ import {
 } from 'three';
 import { loadFerryNetwork } from './ferrynetwork.js';
 import { loadFerryHull } from './ferryhull.js';
+// The badge layer owns where a route bubble floats; the pick has to agree with
+// it, so the height comes from there rather than from a second copy here.
+import { badgeHeightAt } from './ferrybadges.js';
 // Motion, freshness and scene-tenure rules live in one tested module — see its
 // header before changing anything about whether a vessel moves or stays.
 import {
@@ -121,6 +124,10 @@ const scratch = new Vector2();
 // Pick radius around a hull's centre, in metres: a little wider than the boat so
 // a click near it from the aerial camera still lands.
 const PICK_RADIUS = 34;
+// Angular slack, matching muni.js and population.js: ~2.2 m per 100 m of range,
+// so a tag keeps a roughly constant click target the way it keeps a constant
+// drawn size.
+const PICK_ANGLE = 0.022;
 const MAX_PICK_DISTANCE = 9000;
 
 export function createLiveFerries(scene, data, agents) {
@@ -551,6 +558,10 @@ export function createLiveFerries(scene, data, agents) {
   // Nearest drawn hull whose centre lies within PICK_RADIUS of the ray. Sphere
   // tests against at most CAPACITY boats, so a click costs nothing measurable
   // and the fleet keeps its single instanced draw call.
+  // Hull OR route badge, with tolerance that grows with range — see the note on
+  // pickBus in muni.js. From the air a 34 m boat is a speck while its badge is
+  // drawn at a constant size on screen, so the badge is what a viewer actually
+  // aims at and it has to be what answers.
   function pickVessel(origin, direction) {
     if (!ready) return null;
     let best = null;
@@ -558,13 +569,21 @@ export function createLiveFerries(scene, data, agents) {
     for (const state of vessels.values()) {
       if (state.index < 0 || !renderable(state, now)) continue;
       const px = state.x - origin.x;
-      const py = 6 - origin.y; // roughly the deckhouse, not the waterline
       const pz = state.z - origin.z;
-      const t = px * direction.x + py * direction.y + pz * direction.z;
-      if (t <= 0 || t > MAX_PICK_DISTANCE) continue;
-      const away = Math.hypot(px - direction.x * t, py - direction.y * t, pz - direction.z * t);
-      if (away > PICK_RADIUS || (best && t >= best.distance)) continue;
-      best = { ...entityFor(state), distance: t };
+      const flat = Math.hypot(px, pz);
+      const radius = Math.max(PICK_RADIUS, flat * PICK_ANGLE);
+      // The badge layer measures its distance from the camera in 3D, including
+      // altitude, so this has to match or the badge is picked at a height it is
+      // not drawn at.
+      const camDist = Math.hypot(px, pz, origin.y);
+      for (const hy of [6 /* deckhouse, not waterline */, badgeHeightAt(camDist)]) {
+        const py = hy - origin.y;
+        const t = px * direction.x + py * direction.y + pz * direction.z;
+        if (t <= 0 || t > MAX_PICK_DISTANCE) continue;
+        const away = Math.hypot(px - direction.x * t, py - direction.y * t, pz - direction.z * t);
+        if (away > radius || (best && t >= best.distance)) continue;
+        best = { ...entityFor(state), distance: t };
+      }
     }
     return best;
   }
