@@ -89,12 +89,18 @@ const BOB = 0.035;          // metres, twice a step — the body rises on each s
 // Clutter is bounded by MAX_BADGES, not by the radius.
 const MAX_BADGES = 140;
 const LOW_BADGES = 45;
-const BADGE_W = 5.2;
-const BADGE_H = 5.2;
+// How tall the whole badge stands in the world. Width and the height it floats
+// at are DERIVED from the texture (see build()), because the bubble's shape is
+// decided in buildBadgeTexture and a second copy of those proportions here is
+// a copy that goes stale.
+const BADGE_H = 7.2;
 // Height of the QUAD CENTRE; the tail tip drops ~0.36 x H. Raised with the
 // residents when they grew: the tail is meant to just kiss the top of a head,
 // and left at 4.4 it hung inside their chest instead.
-const BADGE_Y = 5.77;
+// Where the tail TIP should sit above a resident's feet — the thing that
+// actually has to be right, since the tail is what points at them. The quad's
+// centre is worked out from this and the texture's own tail geometry.
+const BADGE_TIP_Y = 3.9;
 const BADGE_RADIUS_MIN = 220;
 const BADGE_RADIUS_MAX = 33000;
 const BADGE_RADIUS_PER_M = 6.6;
@@ -184,22 +190,62 @@ function boxOf(rings) {
 // one 256 px texture rather than the lazily-grown atlas the route pills need —
 // every resident says the same thing today. When the tags start carrying names
 // and posts this becomes an atlas; the quad layer above it does not change.
-function buildBadgeTexture() {
+// The four moods, mirrored from api/_lib/feeds/residents.mjs. Duplicated on
+// purpose: the browser never talks to that module, and a fetch to learn four
+// emoji would put a network dependency in front of the diorama for nothing.
+// The KEYS have to match; the check below fails loudly if they drift.
+const MOOD_BADGES = [
+  { key: 'grumpy', emoji: '\u{1F621}' },
+  { key: 'sad', emoji: '\u{1F614}' },
+  { key: 'neutral', emoji: '\u{1F610}' },
+  { key: 'cheerful', emoji: '\u{1F929}' },
+];
+
+// Same weights as the writer uses, so the crowd overhead and the crowd in the
+// feed are the same city. Grumpy 18, sad 12, neutral 40, cheerful 30.
+const MOOD_BADGE_WEIGHTS = [180, 120, 400, 300];
+
+// Which mood a resident is in, from their id alone — the same hash the feed
+// runs, so the face over somebody's head matches the voice in their posts.
+function moodIndexFor(id) {
+  let h = 2166136261;
+  for (let i = 0; i < id.length; i++) {
+    h ^= id.charCodeAt(i);
+    h = Math.imul(h, 16777619) >>> 0;
+  }
+  const total = MOOD_BADGE_WEIGHTS.reduce((a, b) => a + b, 0);
+  let roll = (h >>> 8) % total;
+  for (let i = 0; i < MOOD_BADGE_WEIGHTS.length; i++) {
+    roll -= MOOD_BADGE_WEIGHTS[i];
+    if (roll < 0) return i;
+  }
+  return 2;
+}
+
+function buildBadgeTexture(emoji) {
   const canvas = document.createElement('canvas');
-  canvas.width = 256;
-  canvas.height = 256;
+  // Everything below is derived from ONE number — the emoji's size — because
+  // the bubble exists to hold it. The previous version had the two set
+  // independently, so raising the emoji to 156 left it in a 164px bubble with
+  // eight pixels to spare and the face spilled out over the outline.
+  const EMOJI = 156;
+  const PAD = 40; // clear space around the glyph on every side
+  const bw = EMOJI + PAD * 3.2; // wider than tall, the way a speech bubble is
+  const bh = EMOJI + PAD * 2;
+  const tail = 78;
+  const margin = 16;
+  canvas.width = Math.round(bw + margin * 2);
+  canvas.height = Math.round(bh + tail + margin * 2);
   const ctx = canvas.getContext('2d');
 
   // Bubble body and tail as ONE path so the outline runs around the joint.
-  const bx = 14;
-  const by = 12;
-  const bw = canvas.width - 28;
-  const bh = 164;
+  const bx = margin;
+  const by = margin;
   const r = 40;
-  const tailL = 96;
-  const tailR = 160;
-  const tipX = 112;
-  const tipY = 236;
+  const tipX = bx + bw * 0.34;
+  const tipY = by + bh + tail;
+  const tailL = bx + bw * 0.28;
+  const tailR = bx + bw * 0.5;
   ctx.beginPath();
   ctx.moveTo(bx + r, by);
   ctx.lineTo(bx + bw - r, by);
@@ -226,13 +272,22 @@ function buildBadgeTexture() {
   ctx.strokeStyle = '#3a3530';
   ctx.stroke();
 
-  ctx.font = '104px "Apple Color Emoji", "Segoe UI Emoji", "Noto Color Emoji", sans-serif';
+  ctx.font = `${EMOJI}px "Apple Color Emoji", "Segoe UI Emoji", "Noto Color Emoji", sans-serif`;
   ctx.textAlign = 'center';
   ctx.textBaseline = 'middle';
-  ctx.fillText('🧍', bx + bw / 2, by + bh / 2 + 4);
+  ctx.fillText(emoji, bx + bw / 2, by + bh / 2);
 
   const texture = new CanvasTexture(canvas);
   texture.colorSpace = SRGBColorSpace;
+  // What the quad has to know: how tall the whole thing is against the emoji,
+  // and how far the tail hangs below centre. Both change whenever the layout
+  // above does, and both used to be constants somebody had to remember to
+  // update — which is how BADGE_Y ended up pointing at the wrong place.
+  texture.userData = {
+    aspect: canvas.width / canvas.height,
+    emojiFraction: EMOJI / canvas.height,
+    tailBelowCentre: (tipY - canvas.height / 2) / canvas.height,
+  };
   return texture;
 }
 
@@ -255,7 +310,10 @@ export function createPopulation(scene, data, city) {
   let ready = false;
 
   let bodyMesh = null;
-  let badgeMesh = null;
+  let badgeMeshes = [];
+  let badgeCapacity = 0;
+  let badgeCentreY = 0;
+  const badgeFill = new Array(MOOD_BADGES.length).fill(0);
   let cap = MAX_RESIDENTS;
   let badgeCap = MAX_BADGES;
   let badgeRadius = BADGE_RADIUS_MAX;
@@ -399,17 +457,37 @@ export function createPopulation(scene, data, city) {
     // the one part every resident always has.
     bodyMesh = partMeshes[0];
 
-    badgeMesh = new InstancedMesh(
-      new PlaneGeometry(BADGE_W, BADGE_H),
-      new MeshBasicMaterial({ map: buildBadgeTexture(), transparent: true, depthWrite: false, alphaTest: 0.02 }),
-      Math.min(residents.length, MAX_BADGES)
-    );
-    badgeMesh.name = 'pums-resident-badges';
-    badgeMesh.instanceMatrix.setUsage(DynamicDrawUsage);
-    badgeMesh.frustumCulled = false;
-    badgeMesh.renderOrder = 4;
-    badgeMesh.count = 0;
-    group.add(badgeMesh);
+    // One mesh per mood, because an InstancedMesh carries ONE texture and the
+    // whole point is that the faces differ. Four draw calls where there was
+    // one; the alternative is an atlas and a custom shader for no visible gain.
+    // Each is sized for the worst case of every visible badge being one mood.
+    const room = Math.min(residents.length, MAX_BADGES);
+    badgeMeshes = MOOD_BADGES.map(({ key, emoji }) => {
+      const map = buildBadgeTexture(emoji);
+      // The quad takes the TEXTURE's shape. The bubble is sized around the
+      // emoji in buildBadgeTexture, so it is not square and a square quad
+      // would squash every face.
+      const { aspect, tailBelowCentre } = map.userData;
+      badgeCentreY = BADGE_TIP_Y + tailBelowCentre * BADGE_H;
+      const mesh = new InstancedMesh(
+        new PlaneGeometry(BADGE_H * aspect, BADGE_H),
+        new MeshBasicMaterial({
+          map,
+          transparent: true,
+          depthWrite: false,
+          alphaTest: 0.02,
+        }),
+        room
+      );
+      mesh.name = `pums-resident-badges-${key}`;
+      mesh.instanceMatrix.setUsage(DynamicDrawUsage);
+      mesh.frustumCulled = false;
+      mesh.renderOrder = 4;
+      mesh.count = 0;
+      group.add(mesh);
+      return mesh;
+    });
+    badgeCapacity = room;
   }
 
   async function load() {
@@ -446,6 +524,9 @@ export function createPopulation(scene, data, city) {
       // index, so somebody you flew to yesterday looks the same today. The
       // shirt is NOT in here — it carries the neighbourhood hue, which is what
       // keeps eight PUMAs readable from the air.
+      // Which face floats over them. Same hash the feed's writer uses, so the
+      // badge and the voice in their posts are the same person's mood.
+      moodIdx: moodIndexFor(person.id),
       look: {
         skin: pickIndex(i, 11, rig.palette.skin.length),
         hair: pickIndex(i, 23, rig.palette.hair.length),
@@ -529,6 +610,8 @@ export function createPopulation(scene, data, city) {
 
     let bodies = 0;
     let badges = 0;
+    // Per-mood write cursors, reset every frame alongside the shared counter.
+    badgeFill.fill(0);
     let eligible = 0;
     const limit = Math.min(cap, residents.length);
 
@@ -621,16 +704,26 @@ export function createPopulation(scene, data, city) {
     const near = badgeRadius * 0.72; // fade over the outer quarter of the ring
     for (let i = 0; i < shortlist.length; i += stride) {
       const resident = shortlist[i];
-      if (badges >= badgeMesh.instanceMatrix.count) break;
+      // The cap is on the TOTAL across all four meshes, not per mood — each is
+      // allocated for the worst case of every visible badge being the same one.
+      if (badges >= badgeCapacity) break;
       const dist = resident.dist;
       const fade = dist < near ? 1 : Math.max(0, 1 - (dist - near) / Math.max(1, badgeRadius - near));
       // Proportional to THIS resident's distance => constant size on screen.
       const scaleAt = Math.max(BADGE_SCALE_MIN, Math.min(BADGE_SCALE_MAX, dist / BADGE_REF_DIST));
-      dummy.position.set(resident.x, resident.y + BADGE_Y * scaleAt, resident.z);
+      dummy.position.set(
+        resident.x,
+        resident.y + badgeCentreY * scaleAt,
+        resident.z
+      );
       dummy.quaternion.copy(cameraQuaternion);
       dummy.scale.setScalar(scaleAt * fade);
       dummy.updateMatrix();
-      badgeMesh.setMatrixAt(badges, dummy.matrix);
+      // Into the mesh for THIS resident's mood. `badges` still counts the total
+      // so the cap and the eligibility maths are unchanged; each mesh keeps its
+      // own running index.
+      const moodIdx = resident.moodIdx;
+      badgeMeshes[moodIdx].setMatrixAt(badgeFill[moodIdx]++, dummy.matrix);
       badges++;
     }
     shortlist.length = 0;
@@ -644,8 +737,10 @@ export function createPopulation(scene, data, city) {
       mesh.instanceMatrix.needsUpdate = true;
       if (mesh.instanceColor) mesh.instanceColor.needsUpdate = true;
     }
-    badgeMesh.count = badges;
-    badgeMesh.instanceMatrix.needsUpdate = true;
+    for (let m = 0; m < badgeMeshes.length; m++) {
+      badgeMeshes[m].count = badgeFill[m];
+      badgeMeshes[m].instanceMatrix.needsUpdate = true;
+    }
     eligibleLast = eligible;
   }
 
@@ -751,7 +846,10 @@ export function createPopulation(scene, data, city) {
         streets,
         badgeRadius: Math.round(badgeRadius),
         inBadgeRange: eligibleLast,
-        badgesDrawn: badgeMesh ? badgeMesh.count : 0,
+        badgesDrawn: badgeMeshes.reduce((n, m) => n + m.count, 0),
+        badgesByMood: Object.fromEntries(
+          badgeMeshes.map((m, i) => [MOOD_BADGES[i].key, m.count])
+        ),
       };
     },
   };
