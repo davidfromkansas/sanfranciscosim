@@ -228,8 +228,13 @@
   left: 14px;
   top: 14px;
   z-index: 6;
-  width: min(372px, calc(100vw - 28px));
-  min-width: 280px;
+  /* 249 = LCD 109 + gap 8 + player 116 + padding 12 + border 4. The LCD is
+     sized to its widest possible row, which since the clock went 24-hour is
+     the daytime sky line ("sets 20:38", 89 + 18 of padding) rather than the
+     clock. At this width the logo bar below is exactly on its floor, so the
+     panel cannot get narrower without shrinking the wordmark. */
+  width: min(249px, calc(100vw - 28px));
+  min-width: 157px;
   padding: 6px;
   display: flex;
   flex-direction: column;
@@ -270,24 +275,6 @@
   color: var(--lcd-ink);
 }
 
-.info-strip {
-  flex: none;
-  width: 18px;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  border-right: 1px solid #b7c97a;
-  background:
-    repeating-linear-gradient(#00000012 0 1px, transparent 1px 3px),
-    linear-gradient(#c7ff6a, #a6d500);
-  writing-mode: vertical-rl;
-  transform: rotate(180deg);
-  font-size: 6.5px;
-  font-weight: 700;
-  letter-spacing: 2.4px;
-  color: #33450a;
-}
-
 .info-body {
   flex: 1;
   min-width: 0;
@@ -309,18 +296,6 @@
   line-height: 1;
   letter-spacing: 1px;
   font-variant-numeric: tabular-nums;
-}
-
-.clock-period {
-  flex: none;
-  padding: 2px 7px;
-  border: 1px solid #7fa600;
-  border-radius: 999px;
-  background: #c7ff6a;
-  font-size: 8px;
-  font-weight: 700;
-  letter-spacing: 0.6px;
-  color: var(--lcd-ink);
 }
 
 .clock-date {
@@ -418,6 +393,18 @@
 
 .deck-player {
   position: relative;
+  /* Sized to its contents rather than sharing the row evenly: the record plus
+     the tonearm column is the whole module now that the volume dial is gone.
+     The panel width below gives back exactly this difference, so the LCD keeps
+     the width it had.
+
+     116px is the floor for an 88px record: the pivot housing tucks into the
+     EMPTY TOP-RIGHT CORNER of the platter's square bounding box, so what sets
+     the width is the diagonal from the record's rim to that corner, not the
+     two boxes side by side. Narrower than this and the housing crosses the
+     vinyl — shrink the record first, not the module. */
+  flex: none;
+  width: 116px;
   /* Brushed metal: fine vertical striations over the blue gradient. */
   background:
     repeating-linear-gradient(90deg, #ffffff0a 0 1px, transparent 1px 3px),
@@ -566,13 +553,16 @@
   background: linear-gradient(90deg, #fbfbfb, #b4b4b4 55%, #808080);
   box-shadow: 0 1px 3px #00000073;
   transform-origin: 50% 2px;
-  transform: rotate(28deg);
+  /* Steeper than a wider deck would need: the base sits close to the record
+     now, so these angles are what keep the stylus in the outer groove instead
+     of over the label. Retune them with the width, never independently. */
+  transform: rotate(16deg);
   transition: transform 500ms ease;
 }
 
 /* The arm rides further in over the groove once the record turns. */
 .deck-player.is-playing .player-arm {
-  transform: rotate(36deg);
+  transform: rotate(22deg);
 }
 
 /* The counterweight collar just below the pivot. */
@@ -634,94 +624,20 @@
   box-shadow: 0 0 5px #a6ff00cc;
 }
 
-.player-holes {
-  width: 40px;
-  height: 13px;
-  background-image: radial-gradient(#000 0 40%, transparent 42%);
-  background-size: 5px 5px;
-  box-shadow: inset 0 1px 2px #00000059;
-  opacity: 0.75;
-}
-
-.player-volume {
-  position: absolute;
-  right: 8px;
-  bottom: 8px;
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  gap: 4px;
-  pointer-events: auto;
-}
-
-.player-volume-label {
-  font-size: 7px;
-  font-weight: 700;
-  letter-spacing: 1.4px;
-  color: #c8d6ff;
-}
-
-.player-knob {
-  position: relative;
-  width: 28px;
-  height: 28px;
-  border-radius: 50%;
-  background: radial-gradient(circle at 34% 28%, #f4f4f4, #a0a0a0 66%, #757575);
-  box-shadow:
-    0 0 0 2px #46587a,
-    0 1px 3px #00000080;
-}
-
-/* The pointer line, turned by the slider's value. Decoration only: without
-   pointer-events:none the pseudo-elements paint above the range input and
-   swallow every click and drag aimed at the knob. */
-.player-knob::before {
-  content: '';
-  position: absolute;
-  pointer-events: none;
-  inset: 0;
-  border-radius: 50%;
-  background: linear-gradient(#2b2b2b, #2b2b2b) no-repeat center top / 2px 9px;
-  transform: rotate(var(--turn, 0deg));
-}
-
-/* The tick ring around it: a dashed cone masked down to a thin band. */
-.player-knob::after {
-  content: '';
-  position: absolute;
-  pointer-events: none;
-  inset: -6px;
-  border-radius: 50%;
-  background: repeating-conic-gradient(from 210deg, var(--neon) 0 2deg, transparent 2deg 24deg);
-  -webkit-mask: radial-gradient(circle, transparent 0 62%, #000 64%);
-  mask: radial-gradient(circle, transparent 0 62%, #000 64%);
-}
-
-.player-knob:has(.player-knob-input:focus-visible) {
-  outline: 2px solid var(--neon);
-  outline-offset: 4px;
-}
-
-/* The native range keeps the keyboard and drag behaviour; the knob above is
-   the whole of its appearance. */
-.player-knob-input {
-  position: absolute;
-  z-index: 2;
-  inset: -4px;
-  width: auto;
-  height: auto;
-  margin: 0;
-  opacity: 0;
-  cursor: pointer;
-}
-
 /* ------------------------------------------------------------- logo bar --- */
 
 .deck-logo {
   display: flex;
   align-items: center;
-  gap: 8px;
-  height: 18px;
+  /* The type here is sized to spend the bar's own slack, not the panel's
+     width. At 269px the bar gets 253: 12 of padding, 20 of gaps, and the two
+     grills at their floor leave 203 for the wordmark, which needs 183 at
+     20px. Grow the font past that and the grills hit min-width and the
+     wordmark clips — measure before changing any of these numbers. The
+     height follows the type: 20px sets a 25px line box, and the bar's
+     overflow:hidden crops anything taller than it. */
+  gap: 5px;
+  height: 26px;
   padding: 0 6px;
   border-radius: 12px;
   overflow: hidden;
@@ -734,19 +650,19 @@
 .logo-grill {
   flex: 1;
   height: 7px;
-  min-width: 18px;
+  /* The grills are the slack: they absorb whatever the wordmark leaves and
+     compress to this floor before anything else in the bar gives. The floor is
+     deliberately low. At 249 the wordmark's measured width leaves the grills
+     ~14px each, and that measurement is SF Mono — off macOS this stack falls
+     back to Consolas or DejaVu Sans Mono, which are wider. The extra
+     compression room is the tolerance that keeps the wordmark from clipping
+     on those platforms; it is not there to be reclaimed. */
+  min-width: 8px;
   background: repeating-linear-gradient(#0000005c 0 1px, transparent 1px 3px);
 }
 
-.logo-chevron {
-  font-size: 9px;
-  font-weight: 700;
-  letter-spacing: 1px;
-  color: var(--neon);
-}
-
 .logo-text {
-  font-size: 11px;
+  font-size: 20px;
   font-weight: 700;
   letter-spacing: 2px;
   color: #c8e6ff;
@@ -766,7 +682,11 @@
 /* Below 480 px the deck keeps every reading and simply tightens up. */
 @media (max-width: 480px) {
   #sky-clock {
-    width: min(320px, calc(100vw - 24px));
+    /* Same sum at the narrow fonts: LCD 105 + 8 + player 104 + 16. With the
+       clock on 24-hour the widest row here is no longer the time but the DATE
+       ("WED · AUG 19", 85) — the sky line needs 83. The logo bar's floor at
+       this font is 221, so the LCD is still what sets the width. */
+    width: min(233px, calc(100vw - 24px));
     left: 10px;
     top: 10px;
   }
@@ -777,12 +697,35 @@
   .clock-date {
     font-size: 10px;
   }
+  .deck-player {
+    width: 104px;
+  }
+  /* The record is 78px here, not 88px, so the desktop angles drop the stylus
+     onto the centre button. Measured against the smaller disc: 28.5 parked,
+     24.3 playing, against a 39px rim and a 17px button. */
+  .player-arm {
+    transform: rotate(14deg);
+  }
+  .deck-player.is-playing .player-arm {
+    transform: rotate(18deg);
+  }
   .player-platter {
     width: 78px;
     height: 78px;
   }
-  .player-holes {
-    width: 28px;
+  /* At 104px the label ran 3px under the pivot housing. The tracking is what
+     gives, not the wording — "now playing" is the module's only label. */
+  .player-label {
+    letter-spacing: 0.5px;
+  }
+  /* The bar gets 235 here rather than 253, leaving 185 for the wordmark. 20px
+     needs 183 of that and would strand the grills on their min-width; one step
+     down keeps them reading as grills. */
+  .logo-text {
+    font-size: 18px;
+  }
+  .deck-logo {
+    height: 24px;
   }
 }
 

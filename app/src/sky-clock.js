@@ -5,18 +5,53 @@
 //
 // The DOM is built once and only textContent is written afterwards, so a 1 Hz
 // tick costs nothing and never thrashes layout.
+//
+// The deck is kept as narrow as its contents allow: it sits over the city in
+// the top-left corner, and every column it does not need is width the city
+// gets back. Both modules are sized to their contents, not split evenly.
 
 import { TZ } from '../../api/_lib/astro.mjs';
 
-const TIME_PARTS = new Intl.DateTimeFormat('en-US', { timeZone: TZ, hour: 'numeric', minute: '2-digit' });
+// 24-hour, and zero-padded so the digits never change width. This is the
+// deck's own formatter: astro.mjs still formats sunset/moonset as 12-hour
+// because the concierge answers in prose and "8:38 PM" is what a person says.
+// hourCycle rather than hour12:false — the latter renders midnight as 24:00
+// under some ICU builds.
+const TIME_PARTS = new Intl.DateTimeFormat('en-US', {
+  timeZone: TZ,
+  hour: '2-digit',
+  minute: '2-digit',
+  hourCycle: 'h23',
+});
 const WEEKDAY = new Intl.DateTimeFormat('en-US', { timeZone: TZ, weekday: 'short' });
 const MONTH_DAY = new Intl.DateTimeFormat('en-US', { timeZone: TZ, month: 'short', day: 'numeric' });
 
 const SVG_NS = 'http://www.w3.org/2000/svg';
 
+// The deck writes the phase short; the almanac spelling from astro.mjs stays
+// as it is because the concierge answers in prose and wants the long form.
+// The quarters go to fractions, and the glyph beside the text already draws
+// the shape, so the words only have to carry waxing vs waning. An unknown
+// name falls through to whatever astro sent rather than rendering blank.
+const MOON_SHORT = {
+  'new moon': 'new',
+  'waxing crescent': 'wax cres',
+  'first quarter': '1/4',
+  'waxing gibbous': 'wax gib',
+  'full moon': 'full',
+  'waning gibbous': 'wan gib',
+  'last quarter': '3/4',
+  'waning crescent': 'wan cres',
+};
+
 // The record spins for as long as the track plays; the tonearm rides down onto
 // it. One CSS animation, paused rather than removed, so nothing re-lays out.
 const TRACK_URL = `${import.meta.env.BASE_URL}audio/controlla.mp3`;
+
+// The deck has no volume dial: play/pause is the whole of its control surface,
+// so the track plays at a fixed level chosen to sit under the city rather than
+// over it. This was the knob's default position.
+const TRACK_VOLUME = 0.55;
 
 function svg(name, attributes) {
   const node = document.createElementNS(SVG_NS, name);
@@ -164,14 +199,7 @@ const COMPASS = ['N', 'NE', 'E', 'SE', 'S', 'SW', 'W', 'NW'];
 const compass = (deg) => COMPASS[Math.round(((deg % 360) + 360) % 360 / 45) % 8];
 
 function formatTime(ms) {
-  const parts = TIME_PARTS.formatToParts(new Date(ms));
-  let clock = '';
-  let period = '';
-  for (const part of parts) {
-    if (part.type === 'dayPeriod') period = part.value.toUpperCase();
-    else if (part.type !== 'literal' || clock) clock += part.value;
-  }
-  return { clock: clock.trim(), period };
+  return TIME_PARTS.format(new Date(ms)).trim();
 }
 
 const formatWeekday = (ms) => WEEKDAY.format(new Date(ms)).toUpperCase();
@@ -185,10 +213,10 @@ function pip() {
   return dot;
 }
 
-// The turntable: a looping record with a play/pause centre, a tonearm that
-// rides down while it plays, and a volume knob. Autoplay is blocked until the
-// visitor has interacted with the page, so the deck arms itself on the first
-// gesture anywhere and only gives up if playback is refused outright.
+// The turntable: a looping record with a play/pause centre and a tonearm that
+// rides down while it plays. Autoplay is blocked until the visitor has
+// interacted with the page, so the deck arms itself on the first gesture
+// anywhere and only gives up if playback is refused outright.
 function createPlayer() {
   const module = document.createElement('div');
   module.className = 'deck-module deck-player';
@@ -232,34 +260,14 @@ function createPlayer() {
   deckFoot.className = 'player-foot';
   const led = document.createElement('span');
   led.className = 'player-led';
-  const holes = document.createElement('span');
-  holes.className = 'player-holes';
-  deckFoot.append(led, holes);
+  deckFoot.appendChild(led);
 
-  const volume = document.createElement('div');
-  volume.className = 'player-volume';
-  const volumeLabel = document.createElement('span');
-  volumeLabel.className = 'player-volume-label';
-  volumeLabel.textContent = 'VOL';
-  const knob = document.createElement('div');
-  knob.className = 'player-knob';
-  const slider = document.createElement('input');
-  slider.type = 'range';
-  slider.min = '0';
-  slider.max = '100';
-  slider.step = '1';
-  slider.value = '55';
-  slider.className = 'player-knob-input';
-  slider.setAttribute('aria-label', 'Volume');
-  knob.appendChild(slider);
-  volume.append(volumeLabel, knob);
-
-  module.append(label, platter, pivot, arm, deckFoot, volume);
+  module.append(label, platter, pivot, arm, deckFoot);
 
   const audio = new Audio(TRACK_URL);
   audio.loop = true;
   audio.preload = 'auto';
-  audio.volume = Number(slider.value) / 100;
+  audio.volume = TRACK_VOLUME;
 
   // The record is only ever asked to spin or hold: the animation stays attached
   // so the groove keeps its angle across a pause.
@@ -298,11 +306,6 @@ function createPlayer() {
     else audio.pause();
   });
 
-  slider.addEventListener('input', () => {
-    audio.volume = Number(slider.value) / 100;
-    knob.style.setProperty('--turn', `${Number(slider.value) * 2.7 - 135}deg`);
-  });
-
   audio.addEventListener('play', paint);
   audio.addEventListener('pause', paint);
 
@@ -311,7 +314,6 @@ function createPlayer() {
   // Some browsers allow a muted-adjacent start; asking once costs nothing and
   // saves the visitor a click when the policy permits it.
   tryPlay();
-  knob.style.setProperty('--turn', `${Number(slider.value) * 2.7 - 135}deg`);
   paint();
 
   return {
@@ -336,21 +338,15 @@ export function createSkyClock({ read, readWeather = () => null }) {
 
   const info = document.createElement('div');
   info.className = 'deck-module deck-info';
-  const strip = document.createElement('div');
-  strip.className = 'info-strip';
-  strip.textContent = 'SFSIM OS';
-  strip.setAttribute('aria-hidden', 'true');
   const body = document.createElement('div');
   body.className = 'info-body';
-  info.append(strip, body);
+  info.appendChild(body);
 
   const timeRow = document.createElement('div');
   timeRow.className = 'clock-time';
   const clockNode = document.createElement('span');
   clockNode.className = 'clock-hm';
-  const periodNode = document.createElement('span');
-  periodNode.className = 'clock-period';
-  timeRow.append(clockNode, periodNode);
+  timeRow.appendChild(clockNode);
 
   const dateNode = document.createElement('div');
   dateNode.className = 'clock-date';
@@ -400,18 +396,14 @@ export function createSkyClock({ read, readWeather = () => null }) {
   logo.className = 'deck-logo';
   const grillLeft = document.createElement('span');
   grillLeft.className = 'logo-grill';
-  const chevronLeft = document.createElement('span');
-  chevronLeft.className = 'logo-chevron';
-  chevronLeft.textContent = '>>>';
   const logoText = document.createElement('span');
   logoText.className = 'logo-text';
   logoText.textContent = 'WWW.SFSIM.NET';
-  const chevronRight = document.createElement('span');
-  chevronRight.className = 'logo-chevron';
-  chevronRight.textContent = '<<<';
   const grillRight = document.createElement('span');
   grillRight.className = 'logo-grill';
-  logo.append(grillLeft, chevronLeft, logoText, chevronRight, grillRight);
+  // No chevrons: the >>> <<< pair cost ~46px that the wordmark now spends on
+  // type size instead. The grills still carry the hi-fi faceplate read.
+  logo.append(grillLeft, logoText, grillRight);
 
   panel.append(row, logo);
   document.body.appendChild(panel);
@@ -465,9 +457,8 @@ export function createSkyClock({ read, readWeather = () => null }) {
     // unavailable the panel keeps telling San Francisco's time and simply drops
     // the sun/moon line.
     const ms = sky ? sky.epochMs : Date.now();
-    const { clock, period } = formatTime(ms);
+    const clock = formatTime(ms);
     if (clockNode.textContent !== clock) clockNode.textContent = clock;
-    if (periodNode.textContent !== period) periodNode.textContent = period;
 
     const weekday = formatWeekday(ms);
     if (weekdayNode.textContent !== weekday) weekdayNode.textContent = weekday;
@@ -485,10 +476,13 @@ export function createSkyClock({ read, readWeather = () => null }) {
 
     sun.style.display = sky.isDay ? '' : 'none';
     moon.style.display = sky.isDay ? 'none' : '';
+    // The moon line is the phase and nothing else: its rise/set time was the
+    // longest string on the LCD and had been silently truncated at every width
+    // this deck has ever shipped at. The sun keeps its set time — that one
+    // fits, and it is the reading people actually look for by day.
     const line = sky.isDay
-      ? `sets ${sky.sun.sunset || '—'}`
-      : [sky.moon.phaseName, sky.moon.isUp ? `sets ${sky.moon.moonset || '—'}` : `rises ${sky.moon.moonrise || '—'}`]
-          .join(' · ');
+      ? `sets ${sky.sunsetMs ? formatTime(sky.sunsetMs) : '—'}`
+      : MOON_SHORT[sky.moon.phaseName] || sky.moon.phaseName;
     if (skyText.textContent !== line) skyText.textContent = line;
   }
 
