@@ -169,7 +169,20 @@ function createProfileCard({ onVisit }) {
   document.body.append(back);
 
   let current = null;
+  // An in-flight visit. Fetching somebody can take seconds — their
+  // neighbourhood has to stream first — and in that time the reader can close
+  // the card or open somebody else's. Whoever they picked LAST is the one the
+  // camera should end up on, so any earlier visit is abandoned rather than
+  // left to land on top of it.
+  let trip = null;
+  const abandon = () => {
+    trip?.abort();
+    trip = null;
+    visit.disabled = false;
+    visit.textContent = "Find them in the city";
+  };
   const hide = () => {
+    abandon();
     back.hidden = true;
     current = null;
   };
@@ -182,17 +195,43 @@ function createProfileCard({ onVisit }) {
   document.addEventListener("keydown", (e) => {
     if (e.key === "Escape" && !back.hidden) hide();
   });
-  visit.addEventListener("click", () => {
+  visit.addEventListener("click", async () => {
     if (!current) return;
-    const found = onVisit(current);
-    if (found) hide();
-    else
-      note.textContent =
-        "They are not out on the street yet — the city is still loading their neighbourhood.";
+    abandon();
+    const person = current;
+    const controller = new AbortController();
+    trip = controller;
+    visit.disabled = true;
+    visit.textContent = "Finding them…";
+    const where = PUMA_NAMES[person.puma];
+    note.textContent = where
+      ? `Flying to ${where} and loading the streets.`
+      : "Flying to their neighbourhood and loading the streets.";
+
+    let result;
+    try {
+      result = await onVisit(person, { signal: controller.signal });
+    } catch (error) {
+      result = { ok: false, reason: "error", error };
+    }
+    // Somebody else's card is open, or this one was closed — the reader has
+    // moved on and this answer is no longer about anything on screen.
+    if (controller.signal.aborted || trip !== controller) return;
+    trip = null;
+    visit.disabled = false;
+    visit.textContent = "Find them in the city";
+    if (result?.ok) return hide();
+    note.textContent =
+      result?.reason === "unknown"
+        ? "They are not among the residents walking the city."
+        : result?.reason === "timeout"
+          ? "Their neighbourhood is taking a long time to load. Try again in a moment."
+          : "Something went wrong getting to them.";
   });
 
   return {
     show(person) {
+      abandon();
       current = person;
       note.textContent = "";
       face.replaceChildren(avatar(person, 52));
@@ -583,7 +622,9 @@ function createDetailView({ onOpen }) {
 }
 
 export function createFeedPanel({
-  onVisit = () => false,
+  // Resolves { ok } once the camera is on them, which can take seconds when
+  // their neighbourhood has to stream in first.
+  onVisit = async () => ({ ok: false, reason: "unknown" }),
   onlineCount = () => 0,
 } = {}) {
   const root = document.getElementById("feed");

@@ -663,6 +663,43 @@ export function createPopulation(scene, data, city) {
       cap = low ? LOW_CAP : MAX_RESIDENTS;
       badgeCap = low ? LOW_BADGES : MAX_BADGES;
     },
+    // Whether this id is in the cast at all. Distinct from locate() returning
+    // null, which only means "not standing anywhere YET" — one is a dead end
+    // and the other is a wait, and the caller has to be able to tell them
+    // apart to say anything true about it.
+    knows(id) {
+      return residents.some((r) => r.id === id);
+    },
+
+    // The middle of a resident's neighbourhood, in world metres, whether or not
+    // a single street of it has streamed. This comes from the PUMA polygons,
+    // which are loaded up front with the cast — which is what makes fetching
+    // somebody possible: the city has to be told where to go BEFORE it can load
+    // the ground they are standing on, and their own position is exactly what
+    // is not known yet.
+    neighbourhoodOf(id) {
+      const resident = residents.find((r) => r.id === id);
+      if (!resident) return null;
+      const mine = areas.filter((a) => a.puma === resident.puma);
+      if (!mine.length) return null;
+      // Area centroids averaged, so a PUMA made of several neighbourhoods aims
+      // at the middle of the whole thing rather than at whichever one happens
+      // to be first.
+      let x = 0;
+      let z = 0;
+      let n = 0;
+      for (const area of mine) {
+        for (const ring of area.rings) {
+          for (let i = 0; i < ring.length; i += 2) {
+            x += ring[i];
+            z += ring[i + 1];
+            n++;
+          }
+        }
+      }
+      return n ? { x: x / n, z: z / n, puma: resident.puma, name: resident.name } : null;
+    },
+
     // Where a named resident is standing right now, for "take me to this
     // person". Returns null when they have not been seated — their PUMA's
     // streets may not have streamed in yet, or they may not be in the cast at
