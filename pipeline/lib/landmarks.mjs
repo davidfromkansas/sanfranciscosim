@@ -3836,6 +3836,35 @@ export const LANDMARKS = [
     // curved entrance bay and the east drum in one frame, with the roof open.
     camera: { distance: 470, yaw: 150, pitch: 22 },
   },
+  {
+    // 88 Howard Street — the residential half of Rincon Center. Case B: no
+    // procedural builder, so the bake must be told to drop this block.
+    //
+    // exclude 32 m. Measured from THIS anchor, not from centroids: the
+    // building's own DataSF ring (201006.0000265) has its nearest vertex 4.2 m
+    // out and its centroid 1.4 m out, and the Overture ring that traces the same
+    // building (5d51e5b1-...) has its centroid 4.2 m out — both are killed by any
+    // radius over ~5 m, because `excluded()` drops a footprint whole as soon as
+    // one vertex or its centroid is inside. The binding constraint is the other
+    // way: the 1940 Rincon Annex post office shares this block's north-west
+    // party line and its nearest vertex is 34.8 m from this anchor, so the
+    // radius must stay under that. 32 leaves 2.8 m of margin and still reaches
+    // one of the two Overture slivers along the party line. A radius big enough
+    // to cover this footprint's own far corners (56.7 m) would eat the Annex.
+    id: 'towersAtRincon',
+    name: 'The Towers at Rincon',
+    lon: -122.3924907,
+    lat: 37.791991,
+    height: 89,
+    exclude: 32,
+    // Camera offset is (sin yaw, ., cos yaw) with +z south, so camera bearing =
+    // 180 - yaw; yaw 90 stands the eye due EAST — the bisector of the two hero
+    // elevations, Howard Street (facing 135) and Steuart Street (facing 45), and
+    // the side the east tower's bow faces. 620 m suits an 89 m building on a
+    // 112 m block (cf. ferryBuilding at 700 for 74.7 m on a 167 x 198 m block).
+    // No `key`: keys 0-9 are taken.
+    camera: { distance: 620, yaw: 90, pitch: 22 },
+  },
 ];
 
 // Parks/green spaces the landcover bake must match at least one source polygon

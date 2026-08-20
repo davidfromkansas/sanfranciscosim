@@ -2262,5 +2262,24 @@
     ],
     "tris": 16908,
     "loadRadius": 2500
+  },
+  {
+    "id": "towers-at-rincon",
+    "file": "towers-at-rincon.glb",
+    "anchor": [
+      -122.3924907,
+      37.791991
+    ],
+    "targetHeightM": 89.0,
+    "cat": 2,
+    "name": "The Towers at Rincon (88 Howard Street)",
+    "estimated": false,
+    "dims": [
+      108.6596,
+      108.6701,
+      89.0
+    ],
+    "tris": 17035,
+    "loadRadius": 2670
   }
 ]
