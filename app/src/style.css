@@ -74,17 +74,6 @@ body {
   --rs-pad: clamp(11px, 3.6cqi, 16px);
 }
 
-#attribution {
-  position: fixed;
-  left: 10px;
-  bottom: 8px;
-  font-size: 10px;
-  letter-spacing: 0.2px;
-  color: rgba(255, 255, 255, 0.62);
-  text-shadow: 0 1px 2px rgba(0, 0, 0, 0.6);
-  pointer-events: none;
-}
-
 /* `.panel` outlived the HUD it was written for: the only thing still wearing it
    is the fatal-load message in main.js, which is centred on the screen rather
    than stacked in a corner. */
@@ -880,11 +869,9 @@ button:hover {
    is a wider container than a laptop's column, so it lands at full size. */
 @media (max-width: 899px) {
   :root {
-    /* Both heights live here because the map credit has to clear them, and a
-       sheet that moves without the credit moving is how the OSM attribution
-       ends up underneath a panel. Collapsed is not measured at runtime — the
-       bar's height is set entirely by type sizes in this file, so it is a
-       number we already know rather than one to observe. */
+    /* Collapsed is not measured at runtime — the bar's height is set entirely
+       by type sizes in this file, so it is a number we already know rather
+       than one to observe. */
     --rs-sheet-open: 100svh;
     --rs-sheet-shut: 62px;
   }
@@ -967,23 +954,6 @@ button:hover {
   #feed:not(.rs-open) .rs-census {
     margin-top: 1px;
     font-size: 11px;
-  }
-
-  /* The attribution sits at the bottom-left of the window, which is now under
-     the sheet. Ride above it, and keep riding it when the sheet opens — this
-     is a licence credit for a map that is still on screen, so it does not get
-     to be covered. #attribution is the next sibling of #feed, which is what
-     makes the open state reachable without a line of JavaScript. */
-  #attribution {
-    bottom: calc(var(--rs-sheet-shut) + 9px);
-    max-width: calc(100vw - 20px);
-  }
-
-  /* Open, the feed covers the map completely. There is no map on screen to
-     credit, so the credit goes with it — and comes back the moment the sheet
-     is lowered. */
-  #feed.rs-open ~ #attribution {
-    display: none;
   }
 
   /* A modal in a phone-width window wants the screen, not a card floating in
