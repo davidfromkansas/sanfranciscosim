@@ -2072,5 +2072,24 @@
       177.6
     ],
     "tris": 8917
+  },
+  {
+    "id": "pier-19",
+    "file": "pier-19.glb",
+    "anchor": [
+      -122.3988181,
+      37.8030032
+    ],
+    "targetHeightM": 17.8,
+    "cat": 25,
+    "name": "Pier 19",
+    "estimated": false,
+    "dims": [
+      243.387,
+      191.892,
+      17.8
+    ],
+    "tris": 7782,
+    "loadRadius": 2500
   }
 ]
