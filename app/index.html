@@ -23,7 +23,12 @@
       content="Simulate San Francisco. Explore SF's digital twin and meet the residents!"
     />
     <meta property="og:url" content="https://www.sfsim.net/" />
+    <!-- og.jpg stays under 300 KB: WhatsApp drops the WHOLE card (title
+         included, not just the thumbnail) when it cannot build a preview
+         image, and its ceiling is well below what the other apps accept. -->
     <meta property="og:image" content="https://www.sfsim.net/og.jpg" />
+    <meta property="og:image:secure_url" content="https://www.sfsim.net/og.jpg" />
+    <meta property="og:image:type" content="image/jpeg" />
     <meta property="og:image:width" content="1200" />
     <meta property="og:image:height" content="630" />
     <meta
