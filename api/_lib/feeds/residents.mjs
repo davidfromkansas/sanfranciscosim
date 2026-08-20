@@ -22,6 +22,7 @@ import path from "node:path";
 import { fileURLToPath } from "node:url";
 import { registerFeed } from "../feedcore.mjs";
 import { fetchNews } from "../sf-news.mjs";
+import { gatherWire } from "../wire-sources.mjs";
 import { get, put, BlobPreconditionFailedError } from "@vercel/blob";
 
 const HERE = path.dirname(fileURLToPath(import.meta.url));
@@ -1303,7 +1304,12 @@ const EVENT = {
   maxChars: { title: 120, body: 200 },
 };
 
-const EVENT_WINDOW_MS = 15 * 60_000;
+// Ten minutes to match the residents' own cadence — up to six wire posts an
+// hour, each on a randomised minute inside its window. Chosen for the demo to
+// feel live rather than for sustainability, and said so out loud: at this rate
+// the wire roughly doubles the feed's model spend, and the dial back to a
+// calmer cadence is this one number.
+const EVENT_WINDOW_MS = 10 * 60_000;
 // Links already posted. A ceiling rather than a quota: if the newsrooms have
 // filed nothing new this quarter hour, the city stays quiet rather than
 // reaching for filler. Cross-outlet duplicates are NOT merged yet — three
@@ -1319,7 +1325,7 @@ export function eventIsDue(now = Date.now()) {
   // residents' own schedule, so the wire and the residents do not always post
   // in the same breath.
   const minute = Math.floor((now % EVENT_WINDOW_MS) / 60_000);
-  if (minute < dueMinuteFor(window + 7919) % 15) return false;
+  if (minute < dueMinuteFor(window + 7919)) return false;
   lastEventWindow = window;
   return true;
 }
@@ -1346,12 +1352,30 @@ async function summariseStory(item) {
 // The freshest story nobody has posted yet, as a thread with its first votes
 // already cast — so the next pass can see what the room made of it.
 async function openEventThread(people, spendVote) {
-  const news = await fetchNews();
+  // Two pools: the structured tiers (quakes, transit, weather, city records,
+  // reddit) and the newsrooms. Priorities interleave them — a quake beats
+  // everything, city records beat a feature piece, and reddit trails the lot.
+  // Both pools can fail independently; the wire posts whatever survived.
+  const [wire, news] = await Promise.all([
+    gatherWire().catch(() => []),
+    fetchNews().catch(() => []),
+  ]);
+  // Slotted between the city-record clusters (3.5) and routine transit
+  // notices (4.5): a quake or a weather turn beats a newsroom, a newsroom
+  // beats a stop closure, and reddit trails everything.
+  const NEWS_PRIORITY = 4;
+  const pool = [...wire, ...news.map((n) => ({ ...n, priority: NEWS_PRIORITY }))]
+    .sort((a, b) => a.priority - b.priority || b.published - a.published);
   const seen = new Set(seenLinks);
-  const item = news.find((n) => !seen.has(n.link));
+  const item = pool.find((n) => !seen.has(n.link));
   if (!item) return null;
 
-  const body = (await summariseStory(item)) || item.description.slice(0, EVENT.maxChars.body);
+  // A structured tier arrives with its body already written — assembled from a
+  // dataset, it must not pass through a model that could embellish it. Only
+  // prose from newsrooms and reddit is compressed.
+  const body =
+    item.body ??
+    ((await summariseStory(item)) || (item.description ?? "").slice(0, EVENT.maxChars.body));
   const at = Date.now();
   const thread = {
     id: `${EVENT.id}-${at}`,
