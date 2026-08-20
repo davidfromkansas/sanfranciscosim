@@ -212,15 +212,88 @@
   color: var(--ink);
 }
 
-/* ----------------------------------------------------------- sky clock --- */
+/* ------------------------------------------------------- the SFSIM deck --- */
+
+/* The status deck breaks the paper-toy rules on purpose: it is a piece of
+   hardware sitting on the diorama's edge — brushed metal chassis, pale green
+   LCD, metallic blue turntable, dot-matrix marquee. Its palette is local to
+   this block so nothing else in the UI inherits the metal. */
 
 #sky-clock {
+  --lcd-ink: #1a1a1a;
+  --lcd-rule: #eaddc6;
+  --neon: #a6ff00;
+  --chrome: #d6d6d6;
   position: fixed;
   left: 14px;
   top: 14px;
-  padding: 8px 12px 9px;
   z-index: 6;
+  width: min(372px, calc(100vw - 28px));
+  min-width: 280px;
+  padding: 6px;
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+  border: 2px solid #2b2b2b;
+  border-radius: 16px;
+  background: linear-gradient(155deg, #d0d0d0, #9a9a9a);
+  box-shadow:
+    inset 1px 1px 0 #ffffff33,
+    inset -1px -1px 0 #00000033,
+    4px 4px 0 #00000040;
+  font: 12px/1.25 ui-monospace, 'SFMono-Regular', Menlo, Consolas, 'DejaVu Sans Mono', monospace;
+  /* The deck floats over the city: only its controls take the pointer. */
   pointer-events: none;
+}
+
+.deck-row {
+  display: flex;
+  gap: 8px;
+}
+
+.deck-module {
+  flex: 1;
+  min-width: 0;
+  height: 100px;
+  border-radius: 12px;
+  overflow: hidden;
+  box-shadow:
+    inset 1px 1px 0 #ffffff59,
+    inset -1px -1px 0 #00000040;
+}
+
+/* ------------------------------------------------------------- info LCD --- */
+
+.deck-info {
+  display: flex;
+  background: linear-gradient(160deg, #f4ffe5, #e6efc6);
+  color: var(--lcd-ink);
+}
+
+.info-strip {
+  flex: none;
+  width: 18px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border-right: 1px solid #b7c97a;
+  background:
+    repeating-linear-gradient(#00000012 0 1px, transparent 1px 3px),
+    linear-gradient(#c7ff6a, #a6d500);
+  writing-mode: vertical-rl;
+  transform: rotate(180deg);
+  font-size: 7px;
+  font-weight: 700;
+  letter-spacing: 2.4px;
+  color: #33450a;
+}
+
+.info-body {
+  flex: 1;
+  min-width: 0;
+  padding: 4px 8px 5px;
+  display: flex;
+  flex-direction: column;
 }
 
 .clock-time {
@@ -230,54 +303,82 @@
 }
 
 .clock-hm {
-  font-size: 26px;
-  font-weight: 800;
-  line-height: 1.05;
-  letter-spacing: -0.5px;
+  font-size: 25px;
+  font-weight: 700;
+  line-height: 1;
+  letter-spacing: 1px;
   font-variant-numeric: tabular-nums;
 }
 
 .clock-period {
-  padding: 1px 7px;
-  font-size: 10px;
-  letter-spacing: 0.4px;
+  padding: 1px 6px;
+  border: 1px solid #7fa600;
+  border-radius: 999px;
+  background: #c7ff6a;
+  font-size: 8px;
+  font-weight: 700;
+  letter-spacing: 0.6px;
+  color: var(--lcd-ink);
 }
 
 .clock-date {
-  margin-top: 3px;
+  margin-top: 2px;
+  padding-bottom: 3px;
+  border-bottom: 1px dotted #b7c97a;
   font-size: 10px;
-  font-weight: 800;
-  letter-spacing: 0.8px;
-  color: var(--ink-soft);
+  font-weight: 700;
+  letter-spacing: 1.4px;
+  color: #3c3c3c;
 }
 
-.clock-sky {
+/* The sky, weather and wind readings: one row each, ruled like a receipt. */
+.clock-row {
   display: flex;
   align-items: center;
   gap: 6px;
-  margin-top: 6px;
-  font-size: 11.5px;
+  padding: 2px 0;
+  border-bottom: 1px solid var(--lcd-rule);
+  font-size: 11px;
   font-weight: 700;
+  line-height: 1.15;
+  white-space: nowrap;
+  overflow: hidden;
 }
 
-/* The weather line, on the same rhythm as .clock-sky above it. */
-.clock-weather {
-  display: flex;
-  align-items: center;
-  gap: 6px;
-  margin-top: 4px;
-  font-size: 11.5px;
-  font-weight: 700;
-}
-
-.clock-weather[hidden] {
+.clock-row[hidden] {
   display: none;
 }
 
 .clock-aqi {
-  padding: 1px 7px;
+  align-self: flex-start;
+  margin-top: 3px;
+  padding: 1px 6px;
+  border: 1px solid #7fa600;
+  border-radius: 6px;
+  background: #d6ff6a;
   font-size: 9.5px;
-  letter-spacing: 0.3px;
+  font-weight: 700;
+  letter-spacing: 0.4px;
+  color: var(--lcd-ink);
+}
+
+.clock-aqi[hidden] {
+  display: none;
+}
+
+.clock-aqi[data-tone='mustard'] {
+  background: var(--mustard);
+  border-color: #a37200;
+}
+.clock-aqi[data-tone='coral'] {
+  background: var(--coral);
+  border-color: #a63329;
+  color: #2b0f0c;
+}
+.clock-aqi[data-tone='plum'] {
+  background: var(--plum);
+  border-color: #40224b;
+  color: #f7ecff;
 }
 
 /* .chip sets display:inline-flex, which wins over the [hidden] attribute's
@@ -286,28 +387,327 @@
   display: none;
 }
 
-/* On a narrow screen the wind goes and the temperature stays. */
-@media (max-width: 479px) {
-  .clock-wind {
-    display: none;
-  }
+.sky-glyph {
+  width: 15px;
+  height: 15px;
+  flex: none;
+  /* The glyphs are drawn against the LCD, not the cream card: their toy tokens
+     are remapped here rather than duplicated as a second set of glyphs. */
+  --ink: #1a1a1a;
+  --paper-2: #d0d0e6;
+  --mustard: #ffd400;
+  --teal: #8dbfae;
 }
 
-.sky-glyph {
-  width: 16px;
-  height: 16px;
+/* ---------------------------------------------------------- record deck --- */
+
+.deck-player {
+  position: relative;
+  background: linear-gradient(150deg, #5b6f8a, #2f3e52);
+}
+
+.player-label {
+  position: absolute;
+  left: 7px;
+  top: 5px;
+  display: flex;
+  align-items: center;
+  gap: 4px;
+  font-size: 7.5px;
+  letter-spacing: 1.2px;
+  color: #c8ff9b;
+}
+
+.player-cue {
+  width: 7px;
+  height: 7px;
   flex: none;
 }
 
+.player-platter {
+  position: absolute;
+  left: 50%;
+  top: 7px;
+  width: 84px;
+  height: 84px;
+  transform: translateX(-40%);
+}
+
+.player-disc {
+  position: absolute;
+  inset: 0;
+  border-radius: 50%;
+  background:
+    radial-gradient(circle at 50% 50%, #1b1b1e 0 21%, transparent 21%),
+    repeating-radial-gradient(circle at 50% 50%, #101013 0 1.5px, #24242a 1.5px 3px);
+  box-shadow:
+    inset 0 0 0 2px #0b0b0d,
+    0 2px 5px #00000073;
+  animation: deck-spin 1.8s linear infinite;
+  animation-play-state: paused;
+}
+
+.deck-player.is-playing .player-disc {
+  animation-play-state: running;
+}
+
+@keyframes deck-spin {
+  to {
+    transform: rotate(1turn);
+  }
+}
+
+.player-button {
+  position: absolute;
+  left: 50%;
+  top: 50%;
+  width: 30px;
+  height: 30px;
+  transform: translate(-50%, -50%);
+  padding: 0;
+  display: grid;
+  place-items: center;
+  border: 0;
+  border-radius: 50%;
+  background: radial-gradient(circle at 34% 28%, #fafafa, #b6b6b6 62%, #8b8b8b);
+  box-shadow:
+    0 0 0 2px var(--neon),
+    0 1px 3px #00000080;
+  color: #3a3a3a;
+  cursor: pointer;
+  pointer-events: auto;
+}
+
+.player-button:focus-visible {
+  outline: 2px solid var(--neon);
+  outline-offset: 3px;
+}
+
+.player-icon {
+  width: 13px;
+  height: 13px;
+}
+
+/* Two bars while the record turns, one wedge while it waits. */
+.player-icon rect {
+  display: none;
+}
+
+.deck-player.is-playing .player-icon rect {
+  display: block;
+}
+
+.deck-player.is-playing .player-icon path {
+  display: none;
+}
+
+.player-arm {
+  position: absolute;
+  right: 15px;
+  top: 6px;
+  width: 7px;
+  height: 54px;
+  border-radius: 4px;
+  background: linear-gradient(90deg, #f0f0f0, #9d9d9d 60%, #7c7c7c);
+  box-shadow: 0 1px 3px #00000073;
+  transform-origin: 50% 5px;
+  transform: rotate(22deg);
+  transition: transform 500ms ease;
+}
+
+/* The arm rides further in over the groove once the record turns. */
+.deck-player.is-playing .player-arm {
+  transform: rotate(34deg);
+}
+
+.player-arm::before {
+  content: '';
+  position: absolute;
+  left: -4px;
+  top: -8px;
+  width: 15px;
+  height: 15px;
+  border-radius: 50%;
+  background: radial-gradient(circle at 34% 30%, #ededed, #8c8c8c 70%, #5f5f5f);
+  box-shadow: 0 1px 3px #00000080;
+}
+
+.player-arm-head {
+  position: absolute;
+  left: -1px;
+  bottom: 0;
+  width: 9px;
+  height: 11px;
+  border-radius: 2px;
+  background: linear-gradient(#2a2a2e, #14141a);
+}
+
+.player-foot {
+  position: absolute;
+  left: 7px;
+  bottom: 7px;
+  display: flex;
+  align-items: center;
+  gap: 6px;
+}
+
+.player-led {
+  width: 6px;
+  height: 6px;
+  border-radius: 50%;
+  background: #3d5a1c;
+  box-shadow: inset 0 0 0 1px #00000059;
+}
+
+.deck-player.is-playing .player-led {
+  background: var(--neon);
+  box-shadow: 0 0 5px #a6ff00cc;
+}
+
+.player-holes {
+  width: 42px;
+  height: 14px;
+  background-image: radial-gradient(#000 0 40%, transparent 42%);
+  background-size: 5px 5px;
+  box-shadow: inset 0 1px 2px #00000059;
+  opacity: 0.75;
+}
+
+.player-volume {
+  position: absolute;
+  right: 8px;
+  bottom: 8px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 4px;
+  pointer-events: auto;
+}
+
+.player-volume-label {
+  font-size: 7px;
+  font-weight: 700;
+  letter-spacing: 1.4px;
+  color: #c8d6ff;
+}
+
+.player-knob {
+  position: relative;
+  width: 26px;
+  height: 26px;
+  border-radius: 50%;
+  background: radial-gradient(circle at 34% 28%, #f4f4f4, #a0a0a0 66%, #757575);
+  box-shadow:
+    0 0 0 2px #46587a,
+    0 1px 3px #00000080;
+}
+
+/* The pointer line, turned by the slider's value. */
+.player-knob::before {
+  content: '';
+  position: absolute;
+  inset: 0;
+  border-radius: 50%;
+  background: linear-gradient(#2b2b2b, #2b2b2b) no-repeat center top / 2px 9px;
+  transform: rotate(var(--turn, 0deg));
+}
+
+/* The tick ring around it: a dashed cone masked down to a thin band. */
+.player-knob::after {
+  content: '';
+  position: absolute;
+  inset: -6px;
+  border-radius: 50%;
+  background: repeating-conic-gradient(from 210deg, var(--neon) 0 2deg, transparent 2deg 24deg);
+  -webkit-mask: radial-gradient(circle, transparent 0 62%, #000 64%);
+  mask: radial-gradient(circle, transparent 0 62%, #000 64%);
+}
+
+.player-knob:has(.player-knob-input:focus-visible) {
+  outline: 2px solid var(--neon);
+  outline-offset: 4px;
+}
+
+/* The native range keeps the keyboard and drag behaviour; the knob above is
+   the whole of its appearance. */
+.player-knob-input {
+  position: absolute;
+  inset: -4px;
+  width: auto;
+  height: auto;
+  margin: 0;
+  opacity: 0;
+  cursor: pointer;
+}
+
+/* ------------------------------------------------------------- logo bar --- */
+
+.deck-logo {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  height: 18px;
+  padding: 0 6px;
+  border-radius: 12px;
+  overflow: hidden;
+  background: linear-gradient(#475d78, #2a3a4f);
+  box-shadow:
+    inset 1px 1px 0 #ffffff33,
+    inset -1px -1px 0 #00000040;
+}
+
+.logo-grill {
+  flex: 1;
+  height: 7px;
+  min-width: 18px;
+  background: repeating-linear-gradient(#0000005c 0 1px, transparent 1px 3px);
+}
+
+.logo-chevron {
+  font-size: 9px;
+  font-weight: 700;
+  letter-spacing: 1px;
+  color: var(--neon);
+}
+
+.logo-text {
+  font-size: 11px;
+  font-weight: 700;
+  letter-spacing: 2px;
+  color: #c8e6ff;
+  text-shadow: 0 0 5px #7fc8ff8c;
+  white-space: nowrap;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .player-disc {
+    animation: none;
+  }
+  .player-arm {
+    transition: none;
+  }
+}
+
+/* Below 480 px the deck keeps every reading and simply tightens up. */
 @media (max-width: 480px) {
   #sky-clock {
-    padding: 6px 10px 7px;
-  }
-  .clock-date {
-    display: none;
+    width: min(320px, calc(100vw - 24px));
+    left: 10px;
+    top: 10px;
   }
   .clock-hm {
     font-size: 21px;
+  }
+  .clock-row,
+  .clock-date {
+    font-size: 10px;
+  }
+  .player-platter {
+    width: 74px;
+    height: 74px;
+  }
+  .player-holes {
+    width: 28px;
   }
 }
 
