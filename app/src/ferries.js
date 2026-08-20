@@ -10,7 +10,6 @@
 // wake, so the whole live fleet costs at most three.
 
 import {
-  BufferAttribute,
   DynamicDrawUsage,
   InstancedMesh,
   MeshBasicMaterial,
@@ -19,28 +18,31 @@ import {
   PlaneGeometry,
   Vector2,
 } from 'three';
-import { createGLTFLoader } from './gltf.js';
-import { mergeGeometries } from 'three/addons/utils/BufferGeometryUtils.js';
-
-const ASSET = `${import.meta.env.BASE_URL}sf-assets/vehicles/SF_Bay_Ferry.glb`;
-const MANIFEST = `${import.meta.env.BASE_URL}sf-assets/vehicles_manifest.json`;
+import { loadFerryNetwork } from './ferrynetwork.js';
+import { loadFerryHull } from './ferryhull.js';
+// Motion, freshness and scene-tenure rules live in one tested module — see its
+// header before changing anything about whether a vessel moves or stays.
+import {
+  MAX_SPEED,
+  bearingToYaw,
+  deadReckonRun,
+  deadReckonSeconds,
+  headingFor,
+  isFreshFix,
+  shouldDrop,
+  shouldRender,
+  targetSpeedFor,
+  usableBearing,
+} from './ferry-motion.js';
 
 const CAPACITY = 24;
 const POLL_MS = 60 * 1000;
 const POLL_JITTER_MS = 5 * 1000;
 const DEMO_POLL_MS = 20 * 1000;
-// Cap on how far a stale fix may be extrapolated forward.
-const DEAD_RECKON_MAX_S = 90;
-const STALE_MS = 10 * 60 * 1000;
-// Two misses in a row is enough to call a vessel gone without flickering it out
-// on a single truncated response.
-const MISSES_TO_DROP = 2;
-const MAX_SPEED = 13; // m/s — a Gemini-class boat tops out around 25 kn.
 const EASE_S = 2.5; // seconds to absorb a position correction
 const HEADING_EASE = 1.6; // rad/s cap on turn rate
-const MOVING_M = 100; // movement between polls that counts as "underway"
-const IDLE_SPEED = 0.4; // m/s below which heading is held instead of derived
 const FALLBACK_AFTER_MS = 5 * 60 * 1000; // empty-but-live grace before falling back
+// Dwell, speed, dead-reckon and staleness thresholds live in ferry-motion.js.
 
 // The Bay is modelled by a single 30 km x 30 km water plane centred on the
 // projection origin (app/src/water.js), i.e. x/z in [-15000, +15000]; the baked
@@ -49,30 +51,6 @@ const FALLBACK_AFTER_MS = 5 * 60 * 1000; // empty-but-live grace before falling 
 // over void. A 500 m inset keeps a hull from straddling the water edge.
 const SCENE_HALF_EXTENT = 15000 - 500;
 
-// Compass bearing (deg clockwise from true north) to scene yaw. The asset's
-// front is -Z and the scene has -z = north, +x = east, so a boat's yaw is just
-// the negated bearing:
-//   bearing   0 (north) -> yaw  0    -> front points -z  ✔
-//   bearing  90 (east)  -> yaw -pi/2 -> front points +x  ✔
-//   bearing 180 (south) -> yaw  pi   -> front points +z  ✔
-//   bearing 270 (west)  -> yaw  pi/2 -> front points -x  ✔
-function bearingToYaw(bearingDeg) {
-  return -(bearingDeg * Math.PI) / 180;
-}
-
-// The SB feed sends Bearing 0 for every vessel it has no heading for — docked
-// boats and, at times, boats under way — so an exact 0 is treated as unknown
-// and the heading is derived from movement instead. A genuinely north-bound
-// boat loses nothing: its motion vector points north too.
-function usableBearing(bearingDeg) {
-  return bearingDeg != null && bearingDeg !== 0;
-}
-
-// Heading from a movement vector in scene space, same convention as above.
-function motionToYaw(dx, dz) {
-  return Math.atan2(-dx, -dz);
-}
-
 function shortestAngle(from, to) {
   let d = (to - from) % (Math.PI * 2);
   if (d > Math.PI) d -= Math.PI * 2;
@@ -80,97 +58,63 @@ function shortestAngle(from, to) {
   return d;
 }
 
-// Merge the GLB into one geometry per surface class, baking material colour
-// (times any authored vertex colour) into COLOR_0 — the same idiom the landmark
-// and vehicle loaders use, so the fleet renders with one Lambert material.
-function mergeFerry(root) {
-  root.updateMatrixWorld(true);
-  const body = [];
-  const glow = [];
-  root.traverse((object) => {
-    if (!object.isMesh) return;
-    const material = object.material;
-    const geometry = object.geometry.clone();
-    geometry.applyMatrix4(object.matrixWorld);
-    geometry.deleteAttribute('uv');
-    geometry.deleteAttribute('uv1');
-    geometry.deleteAttribute('tangent');
-    if (!geometry.attributes.normal) geometry.computeVertexNormals();
-
-    const count = geometry.attributes.position.count;
-    const source = geometry.attributes.color;
-    const colors = new Float32Array(count * 3);
-    const base = material?.color;
-    for (let i = 0; i < count; i++) {
-      const r = base ? base.r : 1;
-      const g = base ? base.g : 1;
-      const b = base ? base.b : 1;
-      colors[i * 3] = source ? source.getX(i) * r : r;
-      colors[i * 3 + 1] = source ? source.getY(i) * g : g;
-      colors[i * 3 + 2] = source ? source.getZ(i) * b : b;
-    }
-    geometry.setAttribute('color', new BufferAttribute(colors, 3));
-    (material?.name?.endsWith('_Glow') ? glow : body).push(geometry);
-  });
-
-  const join = (parts) => {
-    if (!parts.length) return null;
-    const merged = mergeGeometries(parts, false);
-    for (const part of parts) part.dispose();
-    return merged;
-  };
-  return { body: join(body), glow: join(glow) };
-}
-
-// Three synthetic vessels for ?ferries=demo: a normal Oakland loop, an Alameda
-// loop that stops reporting (exercising stale removal) and a Vallejo run that
-// reports no bearing and sails north off-scene (heading derivation + culling).
-const DEMO_ROUTES = [
+// Three synthetic vessels for ?ferries=demo, each sailing a REAL route shape
+// from the bake rather than invented waypoints.
+//
+// The first version of this listed hand-typed legs — the Oakland boat ran along
+// a constant latitude, a dead-straight line across the Bay — which was fine when
+// nothing else was drawn on the water. Now that the route walls trace the
+// published alignments, a demo boat on an invented path visibly ignores them,
+// which makes the preview misleading exactly where it is used to judge the work.
+//
+// Each spec still exercises what it was written to exercise: a published
+// bearing versus one derived from motion, a vessel that stops reporting (stale
+// removal), and one that sails off the edge of the water plane (culling).
+const DEMO_SPECS = [
   {
     id: 'DEMO:Oakland',
     label: 'Hydrus (demo)',
-    routeName: 'Oakland',
+    route: 'SB:OA',
+    routeName: 'Oakland & Alameda',
     originName: 'Oakland Ferry Terminal',
-    destination: 'San Francisco Ferry Building Gate B',
+    destination: 'San Francisco Ferry Building',
     bearings: true,
     stopsAfterMs: Infinity,
-    legs: [
-      [-122.3931, 37.7955],
-      [-122.3505, 37.7955],
-      [-122.3341, 37.7955],
-    ],
+    startFrac: 0.1,
   },
   {
-    id: 'DEMO:Alameda',
+    id: 'DEMO:Seaplane',
     label: 'Pyxis (demo)',
+    route: 'SB:SEA',
     routeName: 'Alameda Seaplane',
-    originName: 'San Francisco Ferry Building Gate F',
-    destination: 'Alameda Seaplane Lagoon',
+    originName: 'San Francisco Ferry Building',
+    destination: 'Alameda Seaplane Lagoon Ferry Terminal',
     bearings: true,
+    // Stops reporting, so stale removal is exercised.
     stopsAfterMs: 100 * 1000,
-    legs: [
-      [-122.3931, 37.7948],
-      [-122.3720, 37.7855],
-      [-122.3416, 37.7823],
-    ],
+    startFrac: 0.35,
   },
   {
     id: 'DEMO:Vallejo',
     label: 'Vela (demo)',
+    route: 'SB:VJO',
     routeName: 'Vallejo',
     originName: null, // exercises the "unknown origin" card copy
     destination: 'Vallejo Ferry Terminal',
     bearings: false, // heading must be derived from movement
     stopsAfterMs: Infinity,
-    legs: [
-      [-122.3931, 37.7960],
-      [-122.3700, 37.8300],
-      [-122.3200, 37.9200],
-      [-122.2600, 38.1000], // off-scene: culled, not floated over void
-    ],
+    // Measured against the bake, not guessed: this shape runs Vallejo -> SF and
+    // only its last 12 km (arc 34.6 km of 46.8 km) is inside the 30 km water
+    // plane. 0.62 put the boat 5 km outside it, invisible for the first several
+    // minutes. 0.78 starts it just inside, sailing in — and the return leg
+    // still takes it back out, which is the culling path this spec exists for.
+    startFrac: 0.78,
   },
 ];
 
+// Realistic hull speed for the stand-ins, so they read like the real fleet
+// rather than skating across the Bay.
+const DEMO_SPEED_MS = 12;
 // Module-scope scratch: the update loop and the picker must not allocate.
 const dummy = new Object3D();
 const scratch = new Vector2();
@@ -200,6 +144,8 @@ export function createLiveFerries(scene, data, agents) {
   let polling = false;
   let warnedFetch = false;
   let demoStart = 0;
+  // The baked route shapes the demo vessels sail along (demo mode only).
+  let demoNetwork = null;
 
   function setFallback(fallback) {
     if (live === !fallback) return;
@@ -207,35 +153,21 @@ export function createLiveFerries(scene, data, agents) {
     agents?.setProceduralFerriesVisible?.(fallback);
   }
 
+  if (demo) {
+    loadFerryNetwork().then((n) => {
+      demoNetwork = n;
+      if (!n) console.warn('sf-ferries: ?ferries=demo needs the route bake — no shapes, no demo boats');
+    });
+  }
+
   async function load() {
-    let entry = null;
-    try {
-      const res = await fetch(MANIFEST);
-      if (res.ok) {
-        entry = ((await res.json()).vehicles || []).find((v) => v.kind === 'ferry') || null;
-      }
-    } catch {
-      entry = null;
-    }
-
-    let merged;
-    try {
-      const gltf = await createGLTFLoader().loadAsync(entry ? `${import.meta.env.BASE_URL}sf-assets/${entry.file}` : ASSET);
-      merged = mergeFerry(gltf.scene);
-    } catch (error) {
-      console.warn(`sf-ferries: ferry model failed to load (${error.message}) — keeping procedural ferries`);
+    const hull = await loadFerryHull();
+    if (!hull) {
+      console.warn('sf-ferries: no ferry model — keeping procedural ferries');
       return;
     }
-    if (!merged.body) {
-      console.warn('sf-ferries: ferry model had no geometry — keeping procedural ferries');
-      return;
-    }
-
-    // Never trust the file's own scale: measure and scale to the manifest length.
-    merged.body.computeBoundingBox();
-    const measured = merged.body.boundingBox.max.z - merged.body.boundingBox.min.z;
-    const target = entry?.targetLengthM ?? entry?.dims?.[2] ?? measured;
-    scale = measured > 0 ? target / measured : 1;
+    const merged = { body: hull.body, glow: hull.glow };
+    scale = hull.scale;
 
     bodyMesh = new InstancedMesh(merged.body, new MeshLambertMaterial({ vertexColors: true }), CAPACITY);
     bodyMesh.name = 'live-ferry-fleet';
@@ -274,7 +206,12 @@ export function createLiveFerries(scene, data, agents) {
     for (const state of vessels.values()) state.seen = false;
 
     for (const vessel of list) {
-      const [x, z] = data.project(vessel.lon, vessel.lat);
+      // Demo fixes arrive already in scene space (they are read straight off
+      // the baked shapes); live ones arrive as lon/lat and are projected here.
+      const [x, z] =
+        vessel.x != null && vessel.z != null
+          ? [vessel.x, vessel.z]
+          : data.project(vessel.lon, vessel.lat);
       let state = vessels.get(vessel.id);
       if (!state) {
         // WETA runs ~15 boats; the table is capped anyway so a runaway feed
@@ -293,7 +230,10 @@ export function createLiveFerries(scene, data, agents) {
           targetYaw: usableBearing(vessel.bearingDeg) ? bearingToYaw(vessel.bearingDeg) : 0,
           speed: 0,
           bob: Math.random() * 6.28,
+          // Two clocks, deliberately (invariant 4): lastFixAt = "still exists",
+          // lastFreshFixAt = "was last actually located".
           lastFixAt: now,
+          lastFreshFixAt: now,
           fixGap: POLL_MS / 1000,
           moved: 0,
           inService: vessel.inService,
@@ -309,34 +249,41 @@ export function createLiveFerries(scene, data, agents) {
         continue;
       }
 
-      const dx = x - state.targetX;
-      const dz = z - state.targetZ;
-      const step = Math.hypot(dx, dz);
-      const gap = Math.max(1, (now - state.lastFixAt) / 1000);
-      state.prevX = state.targetX;
-      state.prevZ = state.targetZ;
-      state.targetX = x;
-      state.targetZ = z;
-      state.moved = step;
-      state.fixGap = gap;
-      state.speed = Math.min(MAX_SPEED, Math.max(0, step / gap));
+      // A repeated payload proves the vessel still exists but carries no new
+      // position (invariant 4). Bump liveness and refresh the card metadata,
+      // then leave position, speed, heading and the dead-reckon clock alone:
+      // reading a repeat as "it did not move" is what froze the fleet mid-Bay.
+      const fresh = isFreshFix(state.recordedAt, vessel.recordedAt);
       state.lastFixAt = now;
+      state.seen = true;
       state.inService = vessel.inService;
       state.label = vessel.label;
       state.routeName = vessel.routeName ?? null;
       state.destination = vessel.destination ?? null;
       state.origin = vessel.origin ?? null;
       state.next = vessel.next ?? null;
-      state.recordedAt = vessel.recordedAt ?? now;
-      state.seen = true;
+      if (!fresh) continue;
 
-      if (usableBearing(vessel.bearingDeg)) {
-        state.targetYaw = bearingToYaw(vessel.bearingDeg);
-      } else if (state.speed > IDLE_SPEED) {
-        state.targetYaw = motionToYaw(dx, dz);
-      }
-      // else: a docked boat with no bearing keeps the heading it had, so it
-      // never spins on the spot.
+      const dx = x - state.targetX;
+      const dz = z - state.targetZ;
+      const step = Math.hypot(dx, dz);
+      // Measured fresh-fix to fresh-fix (invariant 2): timing this from the
+      // last poll instead would shrink the gap on every repeat and inflate the
+      // speed of a boat that had simply been waiting for real data.
+      const gap = Math.max(1, (now - state.lastFreshFixAt) / 1000);
+      state.prevX = state.targetX;
+      state.prevZ = state.targetZ;
+      state.targetX = x;
+      state.targetZ = z;
+      state.moved = step;
+      state.fixGap = gap;
+      state.speed = targetSpeedFor({ fixStep: step, gapSeconds: gap });
+      state.lastFreshFixAt = now;
+      state.recordedAt = vessel.recordedAt ?? now;
+
+      // null = keep the heading it had, so a docked boat never spins on the spot.
+      const yaw = headingFor({ bearingDeg: vessel.bearingDeg, speed: state.speed, dx, dz });
+      if (yaw != null) state.targetYaw = yaw;
     }
 
     for (const [id, state] of vessels) {
@@ -345,59 +292,100 @@ export function createLiveFerries(scene, data, agents) {
         continue;
       }
       state.misses = (state.misses || 0) + 1;
-      if (state.misses >= MISSES_TO_DROP || now - state.lastFixAt > STALE_MS) {
-        vessels.delete(id);
-      }
+      if (shouldDrop(state, now)) vessels.delete(id);
     }
   }
 
   function renderable(state, now) {
-    if (now - state.lastFixAt > STALE_MS) return false;
-    if (!inScene(state.x, state.z) && !inScene(state.targetX, state.targetZ)) return false;
-    // Out-of-service boats only count if they are actually going somewhere.
-    return state.inService || state.moved > MOVING_M;
+    return shouldRender(
+      {
+        lastFixAt: state.lastFixAt,
+        inService: state.inService,
+        moved: state.moved,
+        inScene: inScene(state.x, state.z) || inScene(state.targetX, state.targetZ),
+      },
+      now
+    );
+  }
+
+  // Position along a baked shape at a given arc length, in SCENE coordinates.
+  // Returns the point and the direction of travel there.
+  function alongShape(shape, metres) {
+    const F = demoNetwork.verts;
+    const base = shape.vertexOffset * 3;
+    const last = shape.vertexCount - 1;
+    const target = Math.max(0, Math.min(shape.lengthM, metres));
+    for (let i = 0; i < last; i++) {
+      const o = base + i * 3;
+      const q = o + 3;
+      const s0 = F[o + 2];
+      const s1 = F[q + 2];
+      if (target > s1 && i < last - 1) continue;
+      const span = Math.max(1e-6, s1 - s0);
+      const t = Math.max(0, Math.min(1, (target - s0) / span));
+      const x = F[o] + (F[q] - F[o]) * t;
+      const z = F[o + 1] + (F[q + 1] - F[o + 1]) * t;
+      return { x, z, dx: F[q] - F[o], dz: F[q + 1] - F[o + 1] };
+    }
+    return { x: F[base], z: F[base + 1], dx: 1, dz: 0 };
+  }
+
+  // Compass bearing (deg cw from north) for a scene-space direction. The
+  // inverse of motionToYaw's convention in ferry-motion.js: -z is north.
+  function directionToBearing(dx, dz) {
+    return ((Math.atan2(dx, -dz) * 180) / Math.PI + 360) % 360;
   }
 
   function demoFixes(now) {
+    if (!demoNetwork) return []; // shapes not in yet; boats appear a beat later
     const elapsed = now - demoStart;
     const list = [];
-    for (const route of DEMO_ROUTES) {
-      if (elapsed > route.stopsAfterMs) continue;
-      // 260 s out, 260 s back, so a full leg is walked in either direction.
-      const cycle = 520 * 1000;
-      const t = (elapsed % cycle) / cycle;
-      const along = t < 0.5 ? t * 2 : (1 - t) * 2;
-      const span = route.legs.length - 1;
-      const seg = Math.min(span - 1, Math.floor(along * span));
-      const local = along * span - seg;
-      const a = route.legs[seg];
-      const b = route.legs[seg + 1];
-      const lon = a[0] + (b[0] - a[0]) * local;
-      const lat = a[1] + (b[1] - a[1]) * local;
-      let bearingDeg = null;
-      if (route.bearings) {
-        const dir = t < 0.5 ? 1 : -1;
-        const east = (b[0] - a[0]) * dir;
-        const north = (b[1] - a[1]) * dir;
-        bearingDeg = ((Math.atan2(east, north) * 180) / Math.PI + 360) % 360;
+    for (const spec of DEMO_SPECS) {
+      if (elapsed > spec.stopsAfterMs) continue;
+      const route = demoNetwork.routes.get(spec.route);
+      if (!route) continue;
+      // Longest shape, the same one the wall for this route is drawn from, so
+      // the boat and its lane cannot disagree.
+      let shapeIdx = null;
+      for (const idx of route.shapes) {
+        const shape = demoNetwork.shapes[idx];
+        if (!shape) continue;
+        if (shapeIdx === null || shape.lengthM > demoNetwork.shapes[shapeIdx].lengthM) shapeIdx = idx;
       }
+      const shape = demoNetwork.shapes[shapeIdx];
+      if (!shape || !shape.lengthM) continue;
+
+      // Ping-pong along the route at a constant speed, so a leg is walked in
+      // both directions and the heading logic sees a reversal.
+      const run = shape.lengthM;
+      const travelled = spec.startFrac * run + (elapsed / 1000) * DEMO_SPEED_MS;
+      const cycle = travelled % (run * 2);
+      const outbound = cycle <= run;
+      const metres = outbound ? cycle : run * 2 - cycle;
+      const point = alongShape(shape, metres);
+      const dx = outbound ? point.dx : -point.dx;
+      const dz = outbound ? point.dz : -point.dz;
+
       list.push({
-        id: route.id,
-        label: route.label,
-        lat,
-        lon,
-        bearingDeg,
-        routeName: route.routeName,
-        destination: route.destination,
+        id: spec.id,
+        label: spec.label,
+        // Scene coordinates straight from the bake — no projection needed, and
+        // deliberately no INVERSE projection invented (AGENTS: one projection
+        // function, never re-derived).
+        x: point.x,
+        z: point.z,
+        bearingDeg: spec.bearings ? directionToBearing(dx, dz) : null,
+        routeName: spec.routeName,
+        destination: spec.destination,
         inService: true,
         recordedAt: now,
         origin: {
           ref: null,
-          name: route.originName,
-          departedAt: route.originName ? now - 11 * 60 * 1000 : null,
+          name: spec.originName,
+          departedAt: spec.originName ? now - 11 * 60 * 1000 : null,
         },
         next: {
-          name: route.destination,
+          name: spec.destination,
           arrivalAt: now + 7 * 60 * 1000,
           scheduledArrivalAt: now + 6 * 60 * 1000,
           departureAt: null,
@@ -478,8 +466,11 @@ export function createLiveFerries(scene, data, agents) {
       // Dead-reckon the last fix forward along its course, then ease the drawn
       // position towards that estimate: corrections are absorbed over a couple
       // of seconds, so a boat never teleports when a new fix lands.
-      const since = Math.min(DEAD_RECKON_MAX_S, (now - state.lastFixAt) / 1000);
-      const run = state.speed > IDLE_SPEED ? state.speed * since : 0;
+      // Extrapolate from the last FRESH fix, never the last poll: bumping this
+      // clock on a repeat made the boat under-run its own course, because a fix
+      // that was already 90 s old got treated as brand new.
+      const since = deadReckonSeconds({ now, lastFreshFixAt: state.lastFreshFixAt });
+      const run = deadReckonRun({ speed: state.speed, sinceFreshS: since });
       const predictedX = state.targetX - Math.sin(state.targetYaw) * run;
       const predictedZ = state.targetZ - Math.cos(state.targetYaw) * run;
       const catchUp = Math.min(1, dt / EASE_S);
@@ -548,6 +539,9 @@ export function createLiveFerries(scene, data, agents) {
       speedKn: state.speed * 1.94384,
       inService: state.inService,
       recordedAt: state.recordedAt ?? state.lastFixAt,
+      // Whether this vessel has an instance on screen right now, so the badge
+      // layer labels only hulls that are actually drawn.
+      drawn: state.index >= 0,
       demo,
       source: demo ? 'demo' : '511',
       confidence: 3,
@@ -594,6 +588,12 @@ export function createLiveFerries(scene, data, agents) {
     },
     get count() {
       return bodyMesh ? bodyMesh.count : 0;
+    },
+    // Live vessels in the same entity shape a pick produces. The terminal
+    // markers need route, origin and next-call to say "there is a boat inbound",
+    // which the debug `vessels` view below deliberately omits.
+    liveEntities() {
+      return [...vessels.values()].map(entityFor);
     },
     // Vessel table for debugging / automated checks.
     get vessels() {

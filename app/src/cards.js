@@ -32,6 +32,8 @@ const KIND_GLYPH = {
   vessel: 'vessel',
   transit: 'transit',
   'transit-stop': 'transit',
+  'ferry-terminal': 'vessel',
+  'ferry-scheduled': 'vessel',
   aircraft: 'aircraft',
 };
 
@@ -245,6 +247,39 @@ export function createContextCard({ onFly, onAsk, onSelectHistory, onClose }) {
       } else {
         fact('Coming soon', 'Nothing predicted in the next few minutes');
       }
+    } else if (entity.kind === 'ferry-terminal') {
+      subtitle.textContent = entity.operatorNames?.length
+        ? entity.operatorNames.join(' \u00b7 ')
+        : 'Ferry terminal';
+      chips.append(chip('Ferry terminal', 'teal', 'vessel'));
+      for (const route of entity.routes.slice(0, 6)) chips.append(chip(route.name, 'coral'));
+      if (entity.routes.length > 6) chips.append(chip(`+${entity.routes.length - 6}`, 'navy'));
+      fact('Routes calling here', entity.routes.map((r) => r.name).join(' \u00b7 '));
+      if (entity.stops > 1) fact('Berths', `${entity.stops} gates or docks grouped here`);
+      // Only WETA publishes live positions, so only its terminals can ever show
+      // an inbound boat. Saying nothing would read as "no boats due".
+      if (entity.vessels?.length) {
+        for (const vessel of entity.vessels.slice(0, 4)) {
+          const eta = vessel.arrivingAt
+            ? `${Math.max(0, Math.round((vessel.arrivingAt - Date.now()) / 60000))} min`
+            : 'departed from here';
+          fact(vessel.routeName || vessel.label, eta);
+        }
+      } else {
+        fact('Live vessels', 'None reporting on these routes right now');
+      }
+    } else if (entity.kind === 'ferry-scheduled') {
+      // NEVER presented as live. This operator broadcasts no positions at all,
+      // so the boat is drawn where the published timetable says it should be —
+      // the same honesty the aircraft card keeps when its altitude is
+      // compressed for display.
+      subtitle.textContent = entity.operator || 'Scheduled sailing';
+      chips.append(chip('Scheduled', 'mustard', 'vessel'));
+      chips.append(chip(entity.routeName, 'coral'));
+      fact('Where this comes from', 'The published timetable, not a live position — this operator does not broadcast one.');
+      if (entity.from && entity.to) fact('Sailing', `${entity.from} to ${entity.to}`);
+      fact('Departs', entity.departs);
+      fact('Due', entity.arrives);
     } else if (entity.kind === 'aircraft') {
       // Every number here is the TRUE reading from the transponder. Only the
       // height the aircraft is DRAWN at is compressed (see aircraft.js dispY),

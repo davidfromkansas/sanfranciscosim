@@ -59,6 +59,10 @@ import { createFeedPanel } from './feed.js';
 import { createLiveFerries } from './ferries.js';
 import { createLiveMuni } from './muni.js';
 import { createMuniStopLayer } from './munistoplayer.js';
+import { createFerryTerminals } from './ferryterminals.js';
+import { createFerryRoutes } from './ferryroutes.js';
+import { createFerryBadges } from './ferrybadges.js';
+import { createScheduledFerries } from './ferryscheduled.js';
 import { createLiveAircraft } from './aircraft.js';
 import { createCameraRig } from './camera.js';
 import { createSigns } from './signs.js';
@@ -254,6 +258,20 @@ async function boot() {
   // Clickable markers over the real bus stops; the shelters themselves are
   // street furniture placed by the tile worker at the same coordinates.
   const muniStops = createMuniStopLayer(scene, data, muni);
+  // Clickable markers over the WETA berths, from the same GTFS bake that will
+  // carry the route lines. Nine of the fifteen terminals are inside the water
+  // plane; the rest (Vallejo, Richmond, Harbor Bay, Mare Island) are off-scene.
+  const ferryTerminals = createFerryTerminals(scene, data, ferries);
+  // Route walls along every ferry alignment, in each service's livery colour.
+  // Unlike the bus walls these are always on: a crossing is not a street, and
+  // nothing else in the Bay marks where the boats actually go.
+  const ferryRoutes = createFerryRoutes(scene);
+  // Route pills over the live hulls, in the same livery as the walls below them.
+  const ferryBadges = createFerryBadges(scene, ferries);
+  // Golden Gate, Angel Island and Treasure Island broadcast no positions, so
+  // their boats are placed from the published timetable and labelled as
+  // scheduled rather than live.
+  const ferryScheduled = createScheduledFerries(scene);
   // Real aircraft from /api/flights. Like the Muni layer this one simply stays
   // empty when the feed is away — nothing else in the city depends on it.
   const aircraft = createLiveAircraft(scene, data);
@@ -317,6 +335,10 @@ async function boot() {
     clouds.setQuality(key);
     rain.setQuality(key);
     fogBanks.setQuality(key);
+    ferryTerminals.setQuality(key);
+    ferryRoutes.setQuality(key);
+    ferryBadges.setQuality(key);
+    ferryScheduled.setQuality(key);
     post.setSamples(quality.samples);
     renderer.setSize(window.innerWidth, window.innerHeight, false);
     post.setSize();
@@ -732,7 +754,7 @@ async function boot() {
   let vesselCardAge = 0;
   function trackVessel(dt) {
     const selected = focus.entity;
-    const LIVE_KINDS = ['vessel', 'transit', 'aircraft', 'transit-stop'];
+    const LIVE_KINDS = ['vessel', 'transit', 'aircraft', 'transit-stop', 'ferry-terminal'];
     if (!LIVE_KINDS.includes(selected?.kind)) return;
     // A stop does not move, but what is coming to it does — refreshing it keeps
     // the arrival times on an open card honest.
@@ -743,7 +765,9 @@ async function boot() {
           ? muni.busEntity(selected.id)
           : selected.kind === 'transit-stop'
             ? muniStops.stopEntity(selected.id)
-            : aircraft.aircraftEntity(selected.id);
+            : selected.kind === 'ferry-terminal'
+              ? ferryTerminals.terminalEntity(selected.id)
+              : aircraft.aircraftEntity(selected.id);
     if (!fresh) return;
     focus.entity = fresh;
     overlay.show(fresh, { toy: style === 'toy', groundY: 0 });
@@ -765,10 +789,14 @@ async function boot() {
     if (plane) return plane;
     const vessel = ferries.pickVessel(pickRay.ray.origin, pickRay.ray.direction);
     if (vessel) return vessel;
+    const scheduled = ferryScheduled.pickVessel(pickRay.ray.origin, pickRay.ray.direction);
+    if (scheduled) return scheduled;
     const bus = muni.pickBus(pickRay.ray.origin, pickRay.ray.direction);
     if (bus) return bus;
     const stop = muniStops.pickStop(pickRay.ray.origin, pickRay.ray.direction);
     if (stop) return stop;
+    const berth = ferryTerminals.pickTerminal(pickRay.ray.origin, pickRay.ray.direction);
+    if (berth) return berth;
     return context.pick(pickRay.ray.origin, pickRay.ray.direction, hasGround ? groundPoint : null, {
       toy: style === 'toy',
     });
@@ -804,8 +832,10 @@ async function boot() {
     const over =
       aircraft.pickAircraft(origin, direction) ||
       ferries.pickVessel(origin, direction) ||
+      ferryScheduled.pickVessel(origin, direction) ||
       muni.pickBus(origin, direction) ||
-      muniStops.pickStop(origin, direction);
+      muniStops.pickStop(origin, direction) ||
+      ferryTerminals.pickTerminal(origin, direction);
     canvas.style.cursor = over ? 'pointer' : 'default';
   });
 
@@ -861,6 +891,10 @@ async function boot() {
     fogBanks,
     muni,
     muniStops,
+    ferryTerminals,
+    ferryRoutes,
+    ferryBadges,
+    ferryScheduled,
     aircraft,
     // Which aircraft the camera is locked to, or null. Exposed because the
     // follow is otherwise unobservable from outside and QA has to be able to
@@ -1030,6 +1064,10 @@ async function boot() {
     fogBanks.update(Math.min(1, elapsed));
     muni.update(dt, camera);
     muniStops.update(dt, camera, pivotWorld);
+    ferryTerminals.update(dt, camera, pivotWorld);
+    ferryRoutes.update();
+    ferryBadges.update(dt, camera);
+    ferryScheduled.update(dt, camera, clockOverride === null ? Date.now() : clockOverride);
     aircraft.update(dt, camera);
     trackVessel(dt);
     landmarks.update();
@@ -1081,6 +1119,9 @@ async function boot() {
           `ferries    ${ferries.count}${ferries.live ? ' live' : ' procedural'}`,
           `muni       ${muni.count}${muni.live ? ` live (${muni.onShapeCount} on-route${muni.degraded ? ', degraded' : ''})` : ' off'}`,
           `stops      ${muniStops.count} shown / ${muniStops.total}`,
+          `berths     ${ferryTerminals.count} shown / ${ferryTerminals.total}`,
+          `ferry rts  ${ferryRoutes.routes}${ferryRoutes.visible ? '' : ' (hidden)'}`,
+          `ferry sched ${ferryScheduled.count} on timetable`,
           `aircraft   ${aircraft.count}${aircraft.live ? ` live (${aircraft.source})` : ' off'}`,
           `altitude   ${(camera.position.y - rig.state.pivot.y).toFixed(0)} m`,
           `zoom       ${rig.state.distance.toFixed(0)} m`,
