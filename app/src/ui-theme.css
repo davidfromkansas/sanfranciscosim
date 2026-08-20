@@ -735,12 +735,53 @@
    right, and a search bar centred on the window sits visibly off-axis. */
 #search {
   position: fixed;
-  left: calc((100vw - var(--feed-w)) / 2);
+  /* Centred in the GAP between the deck and the feed column, NOT on the city.
+     Centring on the city ignores that the deck owns the top-left, and drove
+     the bar into it at every width below ~1350: 13px of overlap at 1280 and
+     198px at exactly 900, where the feed column appears while the window is
+     still narrow. Measure both edges before changing this. */
+  left: calc((100vw - var(--feed-w) + var(--deck-right)) / 2);
   top: 14px;
   transform: translateX(-50%);
   width: 420px;
-  max-width: calc(100vw - var(--feed-w) - 28px);
+  max-width: calc(100vw - var(--feed-w) - var(--deck-right) - 28px);
   z-index: 7;
+}
+
+/* Below 640px the deck (251px) and a usable search bar cannot share the top
+   row, so the bar collapses to a button in the opposite corner and opens over
+   the city on demand. The open state is a class, not :focus-within — the bar
+   has to stay open while a result is tapped, which blurs the input. */
+#search.is-compact {
+  left: auto;
+  right: 10px;
+  top: 10px;
+  width: auto;
+  max-width: none;
+  transform: none;
+}
+
+/* No physical keyboard here, so the "/" affordance is noise. */
+#search.is-compact #search-hint {
+  display: none;
+}
+
+#search.is-compact:not(.is-open) #search-box {
+  width: 44px;
+  height: 44px;
+  padding: 0;
+  justify-content: center;
+  border-radius: 50%;
+  cursor: pointer;
+}
+
+#search.is-compact:not(.is-open) #search-input {
+  display: none;
+}
+
+#search.is-compact.is-open {
+  left: 10px;
+  right: 10px;
 }
 
 #search-box {

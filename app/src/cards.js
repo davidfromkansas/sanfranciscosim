@@ -400,6 +400,57 @@ export function createSearch({ onPick, onEmpty }) {
   let items = [];
   let active = -1;
 
+  // Below 640px the bar is a button until it is opened: at that width a full
+  // bar covers the deck outright (247px of overlap on a phone). Above it,
+  // nothing here applies and the bar is always visible.
+  const compact = window.matchMedia('(max-width: 640px)');
+  let expanded = false;
+
+  function applyCompact() {
+    if (!compact.matches) expanded = false;
+    wrap.classList.toggle('is-compact', compact.matches);
+    wrap.classList.toggle('is-open', expanded);
+    // Collapsed, the box IS the control — the input inside it is display:none
+    // and cannot take focus, so the box has to carry the role and the label.
+    const collapsed = compact.matches && !expanded;
+    if (collapsed) {
+      box.setAttribute('role', 'button');
+      box.setAttribute('aria-label', 'Open search');
+      box.tabIndex = 0;
+    } else {
+      box.removeAttribute('role');
+      box.removeAttribute('aria-label');
+      box.tabIndex = -1;
+    }
+  }
+
+  function expand() {
+    expanded = true;
+    applyCompact();
+    input.focus();
+    input.select();
+  }
+
+  function collapse() {
+    if (!compact.matches || !expanded) return;
+    expanded = false;
+    input.value = '';
+    results.hidden = true;
+    applyCompact();
+  }
+
+  box.addEventListener('click', () => {
+    if (compact.matches && !expanded) expand();
+  });
+  box.addEventListener('keydown', (event) => {
+    if (compact.matches && !expanded && (event.key === 'Enter' || event.key === ' ')) {
+      expand();
+      event.preventDefault();
+    }
+  });
+  compact.addEventListener('change', applyCompact);
+  applyCompact();
+
   function render(list, query) {
     items = list;
     active = list.length ? 0 : -1;
@@ -457,17 +508,20 @@ export function createSearch({ onPick, onEmpty }) {
       input.value = '';
       results.hidden = true;
       input.blur();
+      collapse();
     }
   });
   input.addEventListener('keyup', (event) => event.stopPropagation());
-  input.addEventListener('blur', () => setTimeout(() => (results.hidden = true), 160));
+  input.addEventListener('blur', () => setTimeout(() => {
+    results.hidden = true;
+    collapse();
+  }, 160));
 
   return {
     input,
     render,
     focus() {
-      input.focus();
-      input.select();
+      expand();
     },
     close() {
       results.hidden = true;
