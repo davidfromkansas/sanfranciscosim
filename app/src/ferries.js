@@ -20,6 +20,7 @@ import {
   Vector2,
 } from 'three';
 import { createGLTFLoader } from './gltf.js';
+import { loadFerryNetwork } from './ferrynetwork.js';
 import { mergeGeometries } from 'three/addons/utils/BufferGeometryUtils.js';
 // Motion, freshness and scene-tenure rules live in one tested module — see its
 // header before changing anything about whether a vessel moves or stays.
@@ -104,55 +105,63 @@ function mergeFerry(root) {
   return { body: join(body), glow: join(glow) };
 }
 
-// Three synthetic vessels for ?ferries=demo: a normal Oakland loop, an Alameda
-// loop that stops reporting (exercising stale removal) and a Vallejo run that
-// reports no bearing and sails north off-scene (heading derivation + culling).
-const DEMO_ROUTES = [
+// Three synthetic vessels for ?ferries=demo, each sailing a REAL route shape
+// from the bake rather than invented waypoints.
+//
+// The first version of this listed hand-typed legs — the Oakland boat ran along
+// a constant latitude, a dead-straight line across the Bay — which was fine when
+// nothing else was drawn on the water. Now that the route walls trace the
+// published alignments, a demo boat on an invented path visibly ignores them,
+// which makes the preview misleading exactly where it is used to judge the work.
+//
+// Each spec still exercises what it was written to exercise: a published
+// bearing versus one derived from motion, a vessel that stops reporting (stale
+// removal), and one that sails off the edge of the water plane (culling).
+const DEMO_SPECS = [
   {
     id: 'DEMO:Oakland',
     label: 'Hydrus (demo)',
-    routeName: 'Oakland',
+    route: 'SB:OA',
+    routeName: 'Oakland & Alameda',
     originName: 'Oakland Ferry Terminal',
-    destination: 'San Francisco Ferry Building Gate B',
+    destination: 'San Francisco Ferry Building',
     bearings: true,
     stopsAfterMs: Infinity,
-    legs: [
-      [-122.3931, 37.7955],
-      [-122.3505, 37.7955],
-      [-122.3341, 37.7955],
-    ],
+    startFrac: 0.1,
   },
   {
-    id: 'DEMO:Alameda',
+    id: 'DEMO:Seaplane',
     label: 'Pyxis (demo)',
+    route: 'SB:SEA',
     routeName: 'Alameda Seaplane',
-    originName: 'San Francisco Ferry Building Gate F',
-    destination: 'Alameda Seaplane Lagoon',
+    originName: 'San Francisco Ferry Building',
+    destination: 'Alameda Seaplane Lagoon Ferry Terminal',
     bearings: true,
+    // Stops reporting, so stale removal is exercised.
     stopsAfterMs: 100 * 1000,
-    legs: [
-      [-122.3931, 37.7948],
-      [-122.3720, 37.7855],
-      [-122.3416, 37.7823],
-    ],
+    startFrac: 0.35,
   },
   {
     id: 'DEMO:Vallejo',
     label: 'Vela (demo)',
+    route: 'SB:VJO',
     routeName: 'Vallejo',
     originName: null, // exercises the "unknown origin" card copy
     destination: 'Vallejo Ferry Terminal',
     bearings: false, // heading must be derived from movement
     stopsAfterMs: Infinity,
-    legs: [
-      [-122.3931, 37.7960],
-      [-122.3700, 37.8300],
-      [-122.3200, 37.9200],
-      [-122.2600, 38.1000], // off-scene: culled, not floated over void
-    ],
+    // Measured against the bake, not guessed: this shape runs Vallejo -> SF and
+    // only its last 12 km (arc 34.6 km of 46.8 km) is inside the 30 km water
+    // plane. 0.62 put the boat 5 km outside it, invisible for the first several
+    // minutes. 0.78 starts it just inside, sailing in — and the return leg
+    // still takes it back out, which is the culling path this spec exists for.
+    startFrac: 0.78,
   },
 ];
 
+// Realistic hull speed for the stand-ins, so they read like the real fleet
+// rather than skating across the Bay.
+const DEMO_SPEED_MS = 12;
 // Module-scope scratch: the update loop and the picker must not allocate.
 const dummy = new Object3D();
 const scratch = new Vector2();
@@ -182,11 +191,20 @@ export function createLiveFerries(scene, data, agents) {
   let polling = false;
   let warnedFetch = false;
   let demoStart = 0;
+  // The baked route shapes the demo vessels sail along (demo mode only).
+  let demoNetwork = null;
 
   function setFallback(fallback) {
     if (live === !fallback) return;
     live = !fallback;
     agents?.setProceduralFerriesVisible?.(fallback);
+  }
+
+  if (demo) {
+    loadFerryNetwork().then((n) => {
+      demoNetwork = n;
+      if (!n) console.warn('sf-ferries: ?ferries=demo needs the route bake — no shapes, no demo boats');
+    });
   }
 
   async function load() {
@@ -256,7 +274,12 @@ export function createLiveFerries(scene, data, agents) {
     for (const state of vessels.values()) state.seen = false;
 
     for (const vessel of list) {
-      const [x, z] = data.project(vessel.lon, vessel.lat);
+      // Demo fixes arrive already in scene space (they are read straight off
+      // the baked shapes); live ones arrive as lon/lat and are projected here.
+      const [x, z] =
+        vessel.x != null && vessel.z != null
+          ? [vessel.x, vessel.z]
+          : data.project(vessel.lon, vessel.lat);
       let state = vessels.get(vessel.id);
       if (!state) {
         // WETA runs ~15 boats; the table is capped anyway so a runaway feed
@@ -353,46 +376,84 @@ export function createLiveFerries(scene, data, agents) {
     );
   }
 
+  // Position along a baked shape at a given arc length, in SCENE coordinates.
+  // Returns the point and the direction of travel there.
+  function alongShape(shape, metres) {
+    const F = demoNetwork.verts;
+    const base = shape.vertexOffset * 3;
+    const last = shape.vertexCount - 1;
+    const target = Math.max(0, Math.min(shape.lengthM, metres));
+    for (let i = 0; i < last; i++) {
+      const o = base + i * 3;
+      const q = o + 3;
+      const s0 = F[o + 2];
+      const s1 = F[q + 2];
+      if (target > s1 && i < last - 1) continue;
+      const span = Math.max(1e-6, s1 - s0);
+      const t = Math.max(0, Math.min(1, (target - s0) / span));
+      const x = F[o] + (F[q] - F[o]) * t;
+      const z = F[o + 1] + (F[q + 1] - F[o + 1]) * t;
+      return { x, z, dx: F[q] - F[o], dz: F[q + 1] - F[o + 1] };
+    }
+    return { x: F[base], z: F[base + 1], dx: 1, dz: 0 };
+  }
+
+  // Compass bearing (deg cw from north) for a scene-space direction. The
+  // inverse of motionToYaw's convention in ferry-motion.js: -z is north.
+  function directionToBearing(dx, dz) {
+    return ((Math.atan2(dx, -dz) * 180) / Math.PI + 360) % 360;
+  }
+
   function demoFixes(now) {
+    if (!demoNetwork) return []; // shapes not in yet; boats appear a beat later
     const elapsed = now - demoStart;
     const list = [];
-    for (const route of DEMO_ROUTES) {
-      if (elapsed > route.stopsAfterMs) continue;
-      // 260 s out, 260 s back, so a full leg is walked in either direction.
-      const cycle = 520 * 1000;
-      const t = (elapsed % cycle) / cycle;
-      const along = t < 0.5 ? t * 2 : (1 - t) * 2;
-      const span = route.legs.length - 1;
-      const seg = Math.min(span - 1, Math.floor(along * span));
-      const local = along * span - seg;
-      const a = route.legs[seg];
-      const b = route.legs[seg + 1];
-      const lon = a[0] + (b[0] - a[0]) * local;
-      const lat = a[1] + (b[1] - a[1]) * local;
-      let bearingDeg = null;
-      if (route.bearings) {
-        const dir = t < 0.5 ? 1 : -1;
-        const east = (b[0] - a[0]) * dir;
-        const north = (b[1] - a[1]) * dir;
-        bearingDeg = ((Math.atan2(east, north) * 180) / Math.PI + 360) % 360;
+    for (const spec of DEMO_SPECS) {
+      if (elapsed > spec.stopsAfterMs) continue;
+      const route = demoNetwork.routes.get(spec.route);
+      if (!route) continue;
+      // Longest shape, the same one the wall for this route is drawn from, so
+      // the boat and its lane cannot disagree.
+      let shapeIdx = null;
+      for (const idx of route.shapes) {
+        const shape = demoNetwork.shapes[idx];
+        if (!shape) continue;
+        if (shapeIdx === null || shape.lengthM > demoNetwork.shapes[shapeIdx].lengthM) shapeIdx = idx;
       }
+      const shape = demoNetwork.shapes[shapeIdx];
+      if (!shape || !shape.lengthM) continue;
+
+      // Ping-pong along the route at a constant speed, so a leg is walked in
+      // both directions and the heading logic sees a reversal.
+      const run = shape.lengthM;
+      const travelled = spec.startFrac * run + (elapsed / 1000) * DEMO_SPEED_MS;
+      const cycle = travelled % (run * 2);
+      const outbound = cycle <= run;
+      const metres = outbound ? cycle : run * 2 - cycle;
+      const point = alongShape(shape, metres);
+      const dx = outbound ? point.dx : -point.dx;
+      const dz = outbound ? point.dz : -point.dz;
+
       list.push({
-        id: route.id,
-        label: route.label,
-        lat,
-        lon,
-        bearingDeg,
-        routeName: route.routeName,
-        destination: route.destination,
+        id: spec.id,
+        label: spec.label,
+        // Scene coordinates straight from the bake — no projection needed, and
+        // deliberately no INVERSE projection invented (AGENTS: one projection
+        // function, never re-derived).
+        x: point.x,
+        z: point.z,
+        bearingDeg: spec.bearings ? directionToBearing(dx, dz) : null,
+        routeName: spec.routeName,
+        destination: spec.destination,
         inService: true,
         recordedAt: now,
         origin: {
           ref: null,
-          name: route.originName,
-          departedAt: route.originName ? now - 11 * 60 * 1000 : null,
+          name: spec.originName,
+          departedAt: spec.originName ? now - 11 * 60 * 1000 : null,
         },
         next: {
-          name: route.destination,
+          name: spec.destination,
           arrivalAt: now + 7 * 60 * 1000,
           scheduledArrivalAt: now + 6 * 60 * 1000,
           departureAt: null,
