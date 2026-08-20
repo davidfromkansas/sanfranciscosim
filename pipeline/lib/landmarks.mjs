@@ -3762,6 +3762,53 @@ export const LANDMARKS = [
     // a destination.
     camera: { distance: 200, yaw: 135, pitch: 28 },
   },
+  {
+    // 2 Folsom Street / 250 Embarcadero - Gap Inc.'s headquarters, Robert A.M.
+    // Stern with Gensler, 2001. A whole block: 84.31 x 77.14 m, 6,341 m2, with
+    // a base at 32.28 m, a brick superstructure deck at 72.11 m and a limestone
+    // crown at 87.95 m, all three measured from one DataSF LiDAR row over
+    // 25,463 cells.
+    //
+    // Exclusion, measured from the ANCHOR against the real bake inputs
+    // (pipeline/data/overture_buildings.geojsonseq and
+    // buildings_datasf.geojson), by ring VERTEX and by centroid, because
+    // excluded() in buildings.mjs fires on either:
+    //
+    //   TO DROP  datasf   201006.0000175  centroid 0.10 m, vertices 35.64-57.04 m
+    //   TO KEEP  nearest neighbour vertex  66.93 m  (overture 98232020, the
+    //            17.2 m block across Folsom, centroid 111.66 m)
+    //            then 69.53 m (MIRA, 129 m), 70.10 m, 71.23 m (201 Spear)
+    //
+    // Both sources trace this building - overture d31f359f sits at centroid
+    // 2.26 m with vertices 34.98-56.83 m - but only ONE ring is ever baked:
+    // buildings.mjs takes Overture as GAP-FILL, so a footprint DataSF already
+    // has is not added twice. Measured on the re-bake, origin/main -> here:
+    // 98 -> 97 footprints across cells 23_11 + 24_11, a delta of exactly one.
+    // Do not expect two here just because two sources list it.
+    //
+    // Safe window (0.10, 66.93). 60 sits 2.9 m outside the asset's own furthest
+    // corner (57.14 m half-diagonal) and 6.9 m inside the nearest neighbour
+    // vertex. Verified by decoding the baked tile rather than by counting it:
+    // 0 footprints keep a vertex inside r=60, and the nearest surviving vertex
+    // is at 67.86 m, so nothing is left under the asset and no neighbour was
+    // taken. The dropped block topped out at 94.5 m - SIX AND A HALF METRES
+    // TALLER than the 88.0 m asset - which is why this landmark cannot be
+    // judged without its re-bake applied: unexcluded, the procedural block
+    // swallows the GLB whole and the asset simply never appears.
+    id: '2Folsom',
+    name: '2 Folsom Street (Gap Inc. headquarters)',
+    lon: -122.390975,
+    lat: 37.790787,
+    height: 88.0,
+    exclude: 60,
+    // camera.js puts the eye at target + distance*(sin yaw, ., cos yaw) with +x
+    // east and +z south, so camera bearing = 180 - yaw. The Embarcadero
+    // elevation faces 45.2 deg and is the one the whole composition is aimed at
+    // ("at its boldest facing the harbor"), so yaw 135 stands the camera out
+    // over the waterfront onto it, with the Folsom front raking away. 300 m at
+    // 88 m tall keeps the base, the setback and the crown in one frame.
+    camera: { distance: 300, yaw: 135, pitch: 30 },
+  },
 ];
 
 // Parks/green spaces the landcover bake must match at least one source polygon
