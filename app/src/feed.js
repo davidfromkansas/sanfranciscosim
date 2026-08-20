@@ -335,11 +335,16 @@ function createComposer({ onPosted }) {
   async function submit() {
     if (loading || !header.value.trim() || !body.value.trim()) return;
     loading = true;
-    message.textContent = "Reviewing your post…";
+    // Covers the whole wait, not just its first phase. The request grades the
+    // post, samples its voters and writes its first replies before it answers,
+    // so "reviewing" alone left the reader watching a spinner wondering what
+    // was taking so long.
+    message.textContent =
+      "Reviewing your post and showing it to the neighbours…";
     message.className = "rs-compose-message rs-compose-loading";
     form.classList.add("rs-compose-is-loading");
     post.innerHTML =
-      '<span class="rs-compose-spinner" aria-hidden="true"></span> Reviewing…';
+      '<span class="rs-compose-spinner" aria-hidden="true"></span> Posting…';
     cancel.disabled = true;
     header.disabled = true;
     body.disabled = true;
@@ -362,7 +367,13 @@ function createComposer({ onPosted }) {
         clear();
         back.hidden = true;
         fab.focus();
-        onPosted();
+        // The feed as it stands WITH their post in it, straight out of the
+        // response. Handing this to the panel rather than asking it to go and
+        // fetch is what makes their own post appear the moment the composer
+        // closes: /api/feed is CDN-cached for thirty seconds with
+        // stale-while-revalidate, so a refresh fired now is precisely the one
+        // likely to be answered from an edge copy that predates the post.
+        onPosted(result.feed ?? null);
         return;
       }
       message.textContent = `Score ${result.score}/${result.threshold}: ${result.reason}`;
@@ -692,21 +703,31 @@ export function createFeedPanel({
   root.append(head, list, detail.view);
   const rulesCard = createRulesCard();
   let refresh;
-  createComposer({ onPosted: () => refresh?.() });
+  // A fresh post hands its own feed straight in; anything else falls back to
+  // fetching, with the cache stepped round so the reader is never shown an
+  // edge copy older than the thing they just did.
+  createComposer({ onPosted: (feed) => refresh?.({ feed, bust: true }) });
   let community = { name: "r/simfrancisco", rules: [] };
   rulesButton.addEventListener("click", () =>
     rulesCard.show(community.name, community.rules),
   );
   let lastKey = "";
 
-  refresh = async function refresh() {
-    let payload;
-    try {
-      const res = await fetch(ENDPOINT);
-      payload = await res.json();
-    } catch {
-      status.textContent = "Cannot reach the feed.";
-      return;
+  refresh = async function refresh({ feed = null, bust = false } = {}) {
+    let payload = feed;
+    if (!payload) {
+      try {
+        // `bust` makes the URL unique so the CDN has nothing stored against it
+        // and has to ask the origin. Only used after the reader did something
+        // whose result they are entitled to see immediately; the polling path
+        // stays cacheable, which is what keeps a busy feed cheap.
+        const url = bust ? `${ENDPOINT}?t=${Date.now()}` : ENDPOINT;
+        const res = await fetch(url);
+        payload = await res.json();
+      } catch {
+        status.textContent = "Cannot reach the feed.";
+        return;
+      }
     }
     // Name and purpose both come from the server, so the panel can never claim
     // to be a community the writers were not told they were posting in.
