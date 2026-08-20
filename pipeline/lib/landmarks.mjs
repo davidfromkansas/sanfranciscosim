@@ -3320,6 +3320,48 @@ export const LANDMARKS = [
     // frontispiece head-on with the shed and its monitor running away NE.
     camera: { distance: 450, yaw: 235, pitch: 20 },
   },
+  {
+    // The Southern Pacific Building, 1916-17, Bliss & Faville. Eleven storeys
+    // of Roman brick in a U around a 55.5 x 35.9 m courtyard that opens
+    // south-east; the courtyard carries One Market Plaza's glazed atrium and
+    // the asset models it, because it cannot be spared (see the exclusion note).
+    //
+    // height 48.7 = the rooftop plant crest (DataSF LiDAR modal 48.69 m), which
+    // is the asset's bounding-box top. The architectural height - the crowning
+    // cornice - is 46.1 m, measured twice: LiDAR median 46.12 and a Street View
+    // photogrammetric solve at 46.03. Wikipedia's 65 m / 213 ft is wrong and so
+    // is OSM's 60.05; see docs/asset-plans/1-market.md 2.1.
+    //
+    // exclude 20 m, measured against the real bake input (both DataSF and the
+    // Overture gap-fill, after simplifyRing at 0.6 m, testing centroid AND
+    // vertices exactly as excluded() does). Gates, nearest first:
+    //     2.4 m  overture "Southern Pacific Building" h=60.05 - the OSM trace
+    //            of THIS building as a solid diamond with no court. It has to
+    //            go, or the gap-fill re-adds a 60 m block into the ground the
+    //            DataSF drop just freed.
+    //     7.4 m  datasf SF3713006 h=46.12 - this building
+    //    16.0 m  datasf SF3713007 h=39.71 - the atrium in the courtyard, on the
+    //            TOWER parcel. Unavoidable collateral: no radius takes the two
+    //            above and spares it, which is why the asset carries the atrium
+    //            roof rather than leaving a 55 x 36 m hole.
+    //    35.4 m  datasf SF3713007 h=172.41 - SPEAR TOWER, and h=27.75, the
+    //            podium. Both must survive.
+    // Safe window (16, 35.4), 19.4 m wide; 20 sits 4 m above the floor and
+    // 15.4 m below the ceiling, both far over the 0.6 m simplify tolerance.
+    // Do not widen: 35.4 deletes a 172 m tower.
+    //
+    // camera.js puts the eye at target + distance*(sin yaw, ., cos yaw), so
+    // camera bearing = 180 - yaw; yaw 200 stands it NNW on Market Street, 25 deg
+    // off the front's 315.2 deg normal, which gets the portal, the Steuart flank
+    // and the atrium apex over the Market wing in one frame.
+    id: '1Market',
+    name: '1 Market Street (Southern Pacific Building)',
+    lon: -122.3948075,
+    lat: 37.7938412,
+    height: 48.7,
+    exclude: 20,
+    camera: { distance: 330, yaw: 200, pitch: 24 },
+  },
 ];
 
 // Parks/green spaces the landcover bake must match at least one source polygon

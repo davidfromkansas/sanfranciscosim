@@ -156,6 +156,7 @@ route, and the park plans depend on it (§E8 of the parks README).
 | [Hills Brothers Building (2 Harrison Street)](./hills-brothers-building.md) | `hills-brothers-building` | 53.2 m (tower finial, LiDAR maximum — see its 2.15 risk 1; main parapet 25.6 m derived) | new landmark |
 | [345 Spear Street (Hills Plaza)](./345-spear.md) | `345-spear` | 68.5 m (LiDAR max, read as the tower's mechanical crown; podium 24.2/28.4 m) | new landmark |
 | [Pier 9](./pier-9.md) | `pier-9` | 17.6 m (vertical extent, deck-top origin: pile stubs −2.6 m to bulkhead attic crest +15.0 m; photogrammetric + dual-LiDAR corroborated) | new landmark |
+| [1 Market Street (Southern Pacific Building)](./1-market.md) | `1-market` | 48.7 m (rooftop plant crest, LiDAR modal; crowning cornice 46.1 m, measured two ways) | new landmark |
 
 - Style: `docs/styles/miniature-toy.md` (authoritative for artistic decisions)
 - Technical contract: `.agents/skills/sf-asset-check/SKILL.md` (authoritative for the GLB)
