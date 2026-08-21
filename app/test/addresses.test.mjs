@@ -46,4 +46,21 @@ describe('address lookup', () => {
     assert.deepEqual(hit, { x: 12, z: 22, exact: false, matchedNumber: 121, street: 'N POINT AVE' });
     assert.equal(lookupAddress(shard, { number: 150, streetKey: 'n point ave' }), null);
   });
+
+  it('accepts a unique street prefix but rejects an ambiguous one', () => {
+    assert.equal(lookupAddress(shard, parseAddressQuery('1726 Anza')).street, 'ANZA ST');
+    const ambiguous = {
+      streets: {
+        'n point ave': { name: 'N POINT AVE', n: [100], x: [1], z: [2] },
+        'n point park': { name: 'N POINT PARK', n: [100], x: [3], z: [4] },
+      },
+    };
+    assert.equal(lookupAddress(ambiguous, { number: 100, streetKey: 'n point' }), null);
+    assert.equal(lookupAddress(shard, parseAddressQuery('1726 Anza Str')).street, 'ANZA ST');
+  });
+
+  it('accepts a nearest number exactly twenty away but not twenty-one', () => {
+    assert.equal(lookupAddress(shard, { number: 141, streetKey: 'n point ave' }).matchedNumber, 121);
+    assert.equal(lookupAddress(shard, { number: 142, streetKey: 'n point ave' }), null);
+  });
 });

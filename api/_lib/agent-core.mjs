@@ -259,6 +259,17 @@ function selfBase() {
 }
 
 const LIVE_FETCH_TIMEOUT_MS = 5000;
+const SEARCH_CACHE = new WeakMap();
+
+function indexedSearch(search) {
+  let indexed = SEARCH_CACHE.get(search);
+  if (!indexed) {
+    // q is the one canonical searchable key, normalized once per dataset.
+    indexed = search.map((entry) => ({ ...entry, q: normalizeStreetName(entry.n) }));
+    SEARCH_CACHE.set(search, indexed);
+  }
+  return indexed;
+}
 
 // Shrink one feed's payload to its share of the tool budget by halving its
 // largest array (vessels, vehicles, …) until it fits, recording what was cut.
@@ -283,6 +294,7 @@ function fitBudget(payload, budget) {
 // only from the city's own feed endpoints.
 export function createTools(data) {
   const { search, places, parks, neighborhoods, streets, stats, muniStops, muniRoutes = [], addresses } = data;
+  const searchable = indexedSearch(search);
 
   function pointInRings(x, z, rings) {
     for (const ring of rings) {
@@ -470,9 +482,9 @@ export function createTools(data) {
       const q = normalizeStreetName(query);
       if (!q) return [];
       const out = [];
-      for (const entry of search) {
+      for (const entry of searchable) {
         if (kind !== 'any' && entry.t !== kind) continue;
-        if (!normalizeStreetName(entry.n).includes(q)) continue;
+        if (!entry.q.includes(q)) continue;
         out.push({ id: entry.id, name: entry.n, kind: entry.t, x: entry.x, z: entry.z });
         if (out.length >= Math.min(20, Math.max(1, limit))) break;
       }

@@ -685,9 +685,7 @@ async function boot() {
   const search = createSearch({
     onPick: async (entry) => {
       if (entry.t === 'address') {
-        const address = await context.geocodeAddress(entry.n);
-        if (!address) return;
-        const building = await context.buildingAt(address.x, address.z);
+        const building = await context.buildingAt(entry.x, entry.z);
         if (building) {
           selectEntity(building, { fly: true });
           return;
@@ -695,14 +693,14 @@ async function boot() {
         selectEntity({
           kind: 'address',
           id: entry.id,
-          title: address.label,
-          name: address.label,
-          street: address.street,
-          number: address.number,
-          matchedNumber: address.matchedNumber,
-          exact: address.exact,
-          x: address.x,
-          z: address.z,
+          title: entry.n,
+          name: entry.n,
+          street: entry.street,
+          number: entry.number,
+          matchedNumber: entry.matchedNumber,
+          exact: entry.exact,
+          x: entry.x,
+          z: entry.z,
           source: 'DataSF Enterprise Addressing System',
           confidence: 3,
         }, { fly: true });

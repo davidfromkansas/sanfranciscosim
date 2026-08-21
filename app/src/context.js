@@ -62,6 +62,8 @@ export const humanize = (value) =>
     .replace(/_/g, ' ')
     .replace(/^./, (c) => c.toUpperCase());
 
+const humanizeWords = (value) => String(value).split(' ').map(humanize).join(' ');
+
 export function sourceLabel(source) {
   return SOURCE_LABELS[source] || humanize(source);
 }
@@ -431,7 +433,11 @@ export async function createContext(data) {
     if (!searchPromise) {
       searchPromise = fetch(tileUrl('context/search-index.json'))
         .then((r) => r.json())
-        .then((list) => (searchIndex = list));
+        .then((list) => {
+          // q is the one canonical searchable key, normalized once per entry.
+          searchIndex = list.map((entry) => ({ ...entry, q: normalizeStreetName(entry.n) }));
+          return searchIndex;
+        });
     }
     return searchPromise;
   }
@@ -477,18 +483,22 @@ export async function createContext(data) {
     if (address) {
       hits.push({
         entry: {
-          n: address.label,
+          n: humanizeWords(address.label.toLowerCase()),
           t: 'address',
           id: `addr:${address.streetKey}:${address.number}`,
           x: address.x,
           z: address.z,
+          street: humanizeWords(address.street.toLowerCase()),
+          number: address.number,
+          matchedNumber: address.matchedNumber,
+          exact: address.exact,
         },
         rank: -10,
         at: 0,
       });
     }
     for (const entry of list) {
-      const at = normalizeStreetName(entry.n).indexOf(q);
+      const at = entry.q.indexOf(q);
       if (at < 0) continue;
       const rank = (at === 0 ? 0 : 1) * 10 + GROUP_ORDER.indexOf(entry.t) + (entry.tier === 'A' ? -0.5 : 0);
       hits.push({ entry, rank, at });

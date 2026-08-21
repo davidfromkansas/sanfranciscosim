@@ -20,6 +20,7 @@ const STREET_TYPES = {
   crossing: 'xing',
   tunnel: 'tunl',
   passage: 'psge',
+  str: 'st',
 };
 
 const DIRECTIONS = { north: 'n', south: 's', east: 'e', west: 'w' };
@@ -86,8 +87,23 @@ function compareNumber(a, b) {
   return a - b;
 }
 
+function streetForKey(shard, streetKey) {
+  const streets = shard?.streets;
+  const exact = streets?.[streetKey];
+  if (exact) return exact;
+  if (!streetKey || !streets) return null;
+  const prefix = `${streetKey} `;
+  let match = null;
+  for (const [key, street] of Object.entries(streets)) {
+    if (!key.startsWith(prefix)) continue;
+    if (match) return null;
+    match = street;
+  }
+  return match;
+}
+
 export function lookupAddress(shard, { number, streetKey } = {}) {
-  const street = shard?.streets?.[streetKey];
+  const street = streetForKey(shard, streetKey);
   if (!street || !Number.isFinite(number)) return null;
   const numbers = street.n || [];
   if (!numbers.length) return null;
