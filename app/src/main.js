@@ -3,6 +3,8 @@
 // the load with fog and lifts onto the finished frame; behind it the city has
 // always been building, and there is still no style transition of any kind.
 
+import { inject } from '@vercel/analytics';
+
 import {
   ACESFilmicToneMapping,
   PCFShadowMap,
@@ -1313,6 +1315,9 @@ function toCameraTarget(preset, data) {
     distance: preset.camera.distance,
   };
 }
+
+// Initialize Vercel Web Analytics
+inject();
 
 boot().catch((error) => {
   console.error(error);
