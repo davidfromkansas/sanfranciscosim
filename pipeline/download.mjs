@@ -140,6 +140,44 @@ async function streets() {
   );
 }
 
+// DataSF Enterprise Addressing System, base addresses only. Stable ordering is
+// required because Socrata pages are assembled into one cached JSON file.
+async function addresses() {
+  if (exists('addresses_datasf.json')) {
+    console.log('= addresses_datasf.json (cached)');
+    return;
+  }
+  const pages = [];
+  const limit = 50000;
+  const select = [
+    'address_number',
+    'street_name',
+    'street_type',
+    'street_full_street_name',
+    'unit_number',
+    'longitude',
+    'latitude',
+    'nhood',
+  ].join(',');
+  for (let offset = 0; ; offset += limit) {
+    const params = new URLSearchParams({
+      '$limit': String(limit),
+      '$offset': String(offset),
+      '$order': 'eas_baseid',
+      '$select': select,
+      '$where': 'unit_number IS NULL AND latitude IS NOT NULL',
+    });
+    const url = `https://data.sfgov.org/resource/ramy-di5m.json?${params}`;
+    console.log(`↓ addresses page offset=${offset}`);
+    const res = await fetchRetry(url);
+    const page = await res.json();
+    pages.push(...page);
+    if (page.length < limit) break;
+  }
+  console.log(`  ${pages.length} base address rows`);
+  await writeFile(localPath('addresses_datasf.json'), JSON.stringify(pages));
+}
+
 const OVERPASS_ENDPOINTS = [
   'https://overpass-api.de/api/interpreter',
   'https://overpass.kumi.systems/api/interpreter',
@@ -230,6 +268,7 @@ await ensureDir();
 await buildings();
 await overtureBuildings('overture_buildings.geojsonseq');
 await streets();
+await addresses();
 await overpass();
 console.log('all raw data present');
 console.log('next: `npm run loredata` for the identity sources lore.mjs needs');

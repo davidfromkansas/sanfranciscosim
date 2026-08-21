@@ -528,6 +528,9 @@ async function boot() {
     if (entity.kind === 'vessel') {
       return { x: entity.x, z: entity.z, y: 20, yaw: 210, pitch: style === 'toy' ? 30 : 22, distance: 300 };
     }
+    if (entity.kind === 'address') {
+      return { x: entity.x, z: entity.z, y: ground, yaw: 210, pitch: style === 'toy' ? 35 : 30, distance: 350 };
+    }
     if (entity.kind === 'person') {
       // Down among them: a resident framed like a building is a dot. Aimed at
       // the head, not the pavement, so the fly-in lands where the follow holds.
@@ -681,6 +684,30 @@ async function boot() {
 
   const search = createSearch({
     onPick: async (entry) => {
+      if (entry.t === 'address') {
+        const address = await context.geocodeAddress(entry.n);
+        if (!address) return;
+        const building = await context.buildingAt(address.x, address.z);
+        if (building) {
+          selectEntity(building, { fly: true });
+          return;
+        }
+        selectEntity({
+          kind: 'address',
+          id: entry.id,
+          title: address.label,
+          name: address.label,
+          street: address.street,
+          number: address.number,
+          matchedNumber: address.matchedNumber,
+          exact: address.exact,
+          x: address.x,
+          z: address.z,
+          source: 'DataSF Enterprise Addressing System',
+          confidence: 3,
+        }, { fly: true });
+        return;
+      }
       if (entry.t === 'building') {
         const entity = await context.loadBuilding(Number(entry.id.slice(2)), entry.x, entry.z);
         if (entity) {

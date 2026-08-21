@@ -7,6 +7,7 @@
 // itself, clamped to the city's own extent.
 
 import { skySnapshot } from './astro.mjs';
+import { lookupAddress, normalizeStreetName, parseAddressQuery } from './addresses.mjs';
 // Imported only to enumerate the registered live feeds for the live_data tool:
 // the registrations run here, but this function never fetches an upstream —
 // live_data goes through the deployment's own /api/<feed> URLs, so reads hit
@@ -36,6 +37,10 @@ You can move the viewer: call set_camera, focus_entity or highlight. Prefer
 focus_entity with a real entity id from a tool result. Coordinates are metres in
 the model's own frame (x east, z south of Duboce Triangle), not latitude and
 longitude.
+
+When a user gives a street address, call geocode_address first. Then call
+set_camera with its x/z for a close-in view (distance about 350, pitch about
+35). If the result is not exact, say that the house number was approximated.
 
 The model's sky is the real one: it runs on San Francisco's wall clock, with the
 sun and moon where they actually are. Call sky_now for anything about the time,
@@ -86,6 +91,16 @@ const TOOLS = [
         limit: { type: 'integer' },
       },
       required: ['query'],
+    },
+  },
+  {
+    name: 'geocode_address',
+    description:
+      'Resolve a San Francisco street address against the DataSF Enterprise Addressing System. Use this first for street addresses. Returns model coordinates and whether the house number was exact.',
+    input_schema: {
+      type: 'object',
+      properties: { address: { type: 'string' } },
+      required: ['address'],
     },
   },
   {
@@ -267,7 +282,7 @@ function fitBudget(payload, budget) {
 // The read-only tools. `data` is the loaded bake; only live_data fetches, and
 // only from the city's own feed endpoints.
 export function createTools(data) {
-  const { search, places, parks, neighborhoods, streets, stats, muniStops, muniRoutes = [] } = data;
+  const { search, places, parks, neighborhoods, streets, stats, muniStops, muniRoutes = [], addresses } = data;
 
   function pointInRings(x, z, rings) {
     for (const ring of rings) {
@@ -432,13 +447,32 @@ export function createTools(data) {
       };
     },
 
+    geocode_address({ address }) {
+      if (!addresses) return { error: 'address geocoding is unavailable' };
+      const parsed = parseAddressQuery(address);
+      if (!parsed) return { error: 'that does not look like a street address' };
+      const hit = lookupAddress(addresses, parsed);
+      if (!hit) return { error: 'address not found in the DataSF index' };
+      const neighborhood = neighborhoods.find((n) => pointInRings(hit.x, hit.z, n.rings));
+      return {
+        address: parsed.label,
+        street: hit.street,
+        number: hit.matchedNumber,
+        x: hit.x,
+        z: hit.z,
+        exact: hit.exact,
+        neighborhood: neighborhood?.name || null,
+        source: 'DataSF Enterprise Addressing System',
+      };
+    },
+
     search_city({ query, kind = 'any', limit = 8 }) {
-      const q = String(query || '').toLowerCase().trim();
+      const q = normalizeStreetName(query);
       if (!q) return [];
       const out = [];
       for (const entry of search) {
         if (kind !== 'any' && entry.t !== kind) continue;
-        if (!entry.q.includes(q)) continue;
+        if (!normalizeStreetName(entry.n).includes(q)) continue;
         out.push({ id: entry.id, name: entry.n, kind: entry.t, x: entry.x, z: entry.z });
         if (out.length >= Math.min(20, Math.max(1, limit))) break;
       }
