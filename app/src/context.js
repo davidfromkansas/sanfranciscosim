@@ -488,6 +488,7 @@ export async function createContext(data) {
           id: `addr:${address.streetKey}:${address.number}`,
           x: address.x,
           z: address.z,
+          streetKey: address.streetKey,
           street: humanizeWords(address.street.toLowerCase()),
           number: address.number,
           matchedNumber: address.matchedNumber,

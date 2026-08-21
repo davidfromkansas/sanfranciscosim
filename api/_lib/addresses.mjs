@@ -87,39 +87,45 @@ function compareNumber(a, b) {
   return a - b;
 }
 
-function streetForKey(shard, streetKey) {
+function exactIndex(numbers, number) {
+  let lo = 0;
+  let hi = numbers.length - 1;
+  while (lo <= hi) {
+    const mid = (lo + hi) >> 1;
+    if (numbers[mid] === number) return mid;
+    if (numbers[mid] < number) lo = mid + 1;
+    else hi = mid - 1;
+  }
+  return -1;
+}
+
+function streetForKey(shard, streetKey, number) {
   const streets = shard?.streets;
   const exact = streets?.[streetKey];
   if (exact) return exact;
   if (!streetKey || !streets) return null;
   const prefix = `${streetKey} `;
-  let match = null;
+  const candidates = [];
   for (const [key, street] of Object.entries(streets)) {
-    if (!key.startsWith(prefix)) continue;
-    if (match) return null;
-    match = street;
+    if (!key.startsWith(prefix) && !key.startsWith(streetKey)) continue;
+    candidates.push(street);
   }
-  return match;
+  const exactMatches = candidates.filter((street) => exactIndex(street.n || [], number) >= 0);
+  return exactMatches.length === 1 ? exactMatches[0] : null;
 }
 
 export function lookupAddress(shard, { number, streetKey } = {}) {
-  const street = streetForKey(shard, streetKey);
-  if (!street || !Number.isFinite(number)) return null;
+  if (!Number.isFinite(number)) return null;
+  const street = streetForKey(shard, streetKey, number);
+  if (!street) return null;
   const numbers = street.n || [];
   if (!numbers.length) return null;
-  let lo = 0;
-  let hi = numbers.length - 1;
-  while (lo <= hi) {
-    const mid = (lo + hi) >> 1;
-    if (numbers[mid] === number) {
-      return { x: street.x[mid], z: street.z[mid], exact: true, matchedNumber: numbers[mid], street: street.name };
-    }
-    if (numbers[mid] < number) lo = mid + 1;
-    else hi = mid - 1;
+  const exact = exactIndex(numbers, number);
+  if (exact >= 0) {
+    return { x: street.x[exact], z: street.z[exact], exact: true, matchedNumber: numbers[exact], street: street.name };
   }
   const candidates = [];
-  for (const index of [hi, lo]) {
-    if (index < 0 || index >= numbers.length) continue;
+  for (let index = 0; index < numbers.length; index++) {
     const delta = Math.abs(numbers[index] - number);
     if (delta <= 20) candidates.push(index);
   }

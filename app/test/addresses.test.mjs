@@ -6,6 +6,8 @@ import { lookupAddress, normalizeStreetName, parseAddressQuery } from '../../api
 const shard = {
   streets: {
     'anza st': { name: 'ANZA ST', n: [1700, 1726, 1740], x: [1, 2, 3], z: [4, 5, 6] },
+    'anza ave': { name: 'ANZA AVE', n: [100], x: [7], z: [8] },
+    'anzavista ave': { name: 'ANZAVISTA AVE', n: [100], x: [9], z: [10] },
     'n point ave': { name: 'N POINT AVE', n: [100, 102, 121], x: [10, 11, 12], z: [20, 21, 22] },
   },
 };
@@ -62,5 +64,19 @@ describe('address lookup', () => {
   it('accepts a nearest number exactly twenty away but not twenty-one', () => {
     assert.equal(lookupAddress(shard, { number: 141, streetKey: 'n point ave' }).matchedNumber, 121);
     assert.equal(lookupAddress(shard, { number: 142, streetKey: 'n point ave' }), null);
+  });
+
+  it('uses same-parity numbers even when the opposite side is closer', () => {
+    const parityShard = {
+      streets: {
+        '3rd st': {
+          name: '3RD ST',
+          n: [2191, 2202],
+          x: [1, 2],
+          z: [3, 4],
+        },
+      },
+    };
+    assert.equal(lookupAddress(parityShard, parseAddressQuery('2200 3rd St')).matchedNumber, 2202);
   });
 });

@@ -68,6 +68,7 @@ import { createScheduledFerries } from './ferryscheduled.js';
 import { createLiveAircraft } from './aircraft.js';
 import { createCameraRig } from './camera.js';
 import { createSigns } from './signs.js';
+import { parseAddressQuery } from '../../api/_lib/addresses.mjs';
 import { createToyPost } from './toypost.js';
 import { QUALITY, QUALITY_LADDER, createUI } from './ui.js';
 import { createBootScreen } from './boot.js';
@@ -686,7 +687,9 @@ async function boot() {
     onPick: async (entry) => {
       if (entry.t === 'address') {
         const building = await context.buildingAt(entry.x, entry.z);
-        if (building) {
+        const buildingAddress = building?.address && parseAddressQuery(building.address);
+        const buildingContradictsAddress = buildingAddress && buildingAddress.streetKey !== entry.streetKey;
+        if (building && !buildingContradictsAddress) {
           selectEntity(building, { fly: true });
           return;
         }
