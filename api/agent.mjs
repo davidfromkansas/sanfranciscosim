@@ -47,7 +47,12 @@ function loadData() {
     // Stop index for transit_nearby. Optional: a deployment without it just
     // loses that one tool rather than failing to answer anything at all.
     read('./_data/muni-stops.json').catch(() => null),
-  ]).then(([places, search, parks, neighborhoods, streets, stats, muniStops]) => ({
+    // Optional: a deployment without the address bake keeps the concierge
+    // online, and the tool reports its own unavailability.
+    read('./_data/addresses.json').catch(() => null),
+    // Optional to preserve the same graceful degradation as the address index.
+    read('./_data/projection.json').catch(() => null),
+  ]).then(([places, search, parks, neighborhoods, streets, stats, muniStops, addresses, projection]) => ({
     places,
     search,
     parks,
@@ -56,6 +61,8 @@ function loadData() {
     stats,
     muniStops: muniStops?.stops || null,
     muniRoutes: muniStops?.busRoutes || [],
+    addresses,
+    projection,
   }));
   return dataPromise;
 }

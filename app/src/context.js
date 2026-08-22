@@ -7,6 +7,7 @@
 // colour-id pass would cost a second render of the whole city.
 
 import { tileUrl } from './data.js';
+import { lookupAddress, normalizeStreetName, parseAddressQuery } from '../../api/_lib/addresses.mjs';
 
 const CELL_SIZE = 500;
 const TTL_MS = 15 * 60 * 1000;
@@ -51,6 +52,8 @@ const SOURCE_LABELS = {
   heuristic: 'Inferred from height and footprint',
   511: 'Live 511.org feed (SF Bay Ferry)',
   demo: 'Simulated demo vessel',
+  address: 'DataSF Enterprise Addressing System',
+  google: 'Google Places',
 };
 
 const CONFIDENCE_LABELS = ['inferred', 'single source', 'two sources agree', 'three or more sources agree'];
@@ -59,6 +62,8 @@ export const humanize = (value) =>
   String(value)
     .replace(/_/g, ' ')
     .replace(/^./, (c) => c.toUpperCase());
+
+const humanizeWords = (value) => String(value).split(' ').map(humanize).join(' ');
 
 export function sourceLabel(source) {
   return SOURCE_LABELS[source] || humanize(source);
@@ -256,6 +261,31 @@ export async function createContext(data) {
     return null;
   }
 
+  async function buildingAt(x, z) {
+    const key = cellKeyAt(x, z);
+    if (!key) return null;
+    const cell = await loadCell(key);
+    if (!cell) return null;
+    const p = cell.pick;
+    let best = -1;
+    let bestArea = Infinity;
+    for (let i = 0; i < p.id.length; i++) {
+      const cos = Math.cos(-p.r[i]);
+      const sin = Math.sin(-p.r[i]);
+      const dx = x - p.x[i];
+      const dz = z - p.z[i];
+      const localX = dx * cos - dz * sin;
+      const localZ = dx * sin + dz * cos;
+      if (Math.abs(localX) > p.w[i] || Math.abs(localZ) > p.d[i]) continue;
+      const area = p.w[i] * p.d[i];
+      if (area < bestArea) {
+        best = i;
+        bestArea = area;
+      }
+    }
+    return best < 0 ? null : buildingEntity(p.id[best], cell, best);
+  }
+
   async function loadBuilding(id, x, z) {
     const key = cellKeyAt(x, z);
     if (key) await loadCell(key);
@@ -404,18 +434,132 @@ export async function createContext(data) {
     if (!searchPromise) {
       searchPromise = fetch(tileUrl('context/search-index.json'))
         .then((r) => r.json())
-        .then((list) => (searchIndex = list));
+        .then((list) => {
+          // q is the one canonical searchable key, normalized once per entry.
+          searchIndex = list.map((entry) => ({ ...entry, q: normalizeStreetName(entry.n) }));
+          return searchIndex;
+        });
     }
     return searchPromise;
+  }
+
+  const addressBuckets = new Map();
+  const addressPromises = new Map();
+  function addressBucket(streetKey) {
+    return /^[a-z]/.test(streetKey) ? streetKey[0] : `0-${streetKey[0] || 'x'}`;
+  }
+  function loadAddressBucket(bucket) {
+    if (addressBuckets.has(bucket)) return Promise.resolve(addressBuckets.get(bucket));
+    let promise = addressPromises.get(bucket);
+    if (!promise) {
+      promise = fetch(tileUrl(`context/addr/${bucket}.json`))
+        .then((res) => (res.ok ? res.json() : null))
+        .catch(() => null)
+        .then((shard) => {
+          addressBuckets.set(bucket, shard);
+          addressPromises.delete(bucket);
+          return shard;
+        });
+      addressPromises.set(bucket, promise);
+    }
+    return promise;
+  }
+
+  async function geocodeAddress(query) {
+    const parsed = parseAddressQuery(query);
+    if (!parsed) return null;
+    const shard = await loadAddressBucket(addressBucket(parsed.streetKey));
+    const hit = lookupAddress(shard, parsed);
+    return hit ? { ...parsed, ...hit } : null;
+  }
+
+  const placePromises = new Map();
+  const placeResults = new Map();
+  const placesEndpoint = `${import.meta.env.BASE_URL}api/places`;
+
+  async function autocompletePlaces(query) {
+    const input = String(query || '').trim().replace(/\s+/g, ' ');
+    if (input.length < 3) return [];
+    if (placeResults.has(input)) return placeResults.get(input);
+    let promise = placePromises.get(input);
+    if (!promise) {
+      promise = fetch(placesEndpoint, {
+        method: 'POST',
+        headers: { 'content-type': 'application/json' },
+        body: JSON.stringify({ action: 'autocomplete', input }),
+      })
+        .then((response) => (response.ok ? response.json() : null))
+        .then((body) => {
+          const predictions = Array.isArray(body?.predictions) ? body.predictions : [];
+          const entries = predictions.map((prediction) => ({
+            n: prediction.text || prediction.mainText,
+            t: 'place',
+            id: `place:${prediction.placeId || prediction.text}`,
+            placeId: prediction.placeId,
+            query: prediction.text || prediction.mainText,
+            secondary: prediction.secondaryText,
+            source: 'google',
+          }));
+          placeResults.set(input, entries);
+          while (placeResults.size > 100) {
+            placeResults.delete(placeResults.keys().next().value);
+          }
+          placePromises.delete(input);
+          return entries;
+        })
+        .catch(() => {
+          placePromises.delete(input);
+          return [];
+        });
+      placePromises.set(input, promise);
+    }
+    return promise;
+  }
+
+  async function resolvePlace(entry) {
+    if (!entry?.query) return null;
+    try {
+      const response = await fetch(placesEndpoint, {
+        method: 'POST',
+        headers: { 'content-type': 'application/json' },
+        body: JSON.stringify({ action: 'resolve', query: entry.query, placeId: entry.placeId }),
+      });
+      if (!response.ok) return null;
+      const place = (await response.json())?.place;
+      if (!place || !Number.isFinite(Number(place.lat)) || !Number.isFinite(Number(place.lon))) return null;
+      const [x, z] = data.project(Number(place.lon), Number(place.lat));
+      return { ...place, x, z, source: 'google' };
+    } catch {
+      return null;
+    }
   }
 
   const GROUP_ORDER = ['landmark', 'view', 'neighborhood', 'park', 'street', 'building'];
 
   async function search(query, limit = 8) {
     const list = await loadSearch();
-    const q = query.trim().toLowerCase();
+    const q = normalizeStreetName(query);
     if (!q) return [];
     const hits = [];
+    const address = await geocodeAddress(query);
+    if (address) {
+      hits.push({
+        entry: {
+          n: humanizeWords(address.label.toLowerCase()),
+          t: 'address',
+          id: `addr:${address.streetKey}:${address.number}`,
+          x: address.x,
+          z: address.z,
+          streetKey: address.streetKey,
+          street: humanizeWords(address.street.toLowerCase()),
+          number: address.number,
+          matchedNumber: address.matchedNumber,
+          exact: address.exact,
+        },
+        rank: -10,
+        at: 0,
+      });
+    }
     for (const entry of list) {
       const at = entry.q.indexOf(q);
       if (at < 0) continue;
@@ -424,7 +568,8 @@ export async function createContext(data) {
       if (hits.length > 400) break;
     }
     hits.sort((a, b) => a.rank - b.rank || a.entry.n.length - b.entry.n.length);
-    return hits.slice(0, limit).map((h) => h.entry);
+    if (hits.length) return hits.slice(0, limit).map((h) => h.entry);
+    return [];
   }
 
   let statsPromise = null;
@@ -439,6 +584,10 @@ export async function createContext(data) {
     search,
     stats,
     loadBuilding,
+    buildingAt,
+    geocodeAddress,
+    autocompletePlaces,
+    resolvePlace,
     findBuilding,
     landmarks: landmarkFile.landmarks,
     views: landmarkFile.views,

@@ -12,7 +12,7 @@
     "build": "npm run lint && npm run lint:api && npm test && vite build && node scripts/compress-tiles.mjs",
     "preview": "vite preview",
     "lint": "eslint src test",
-    "test": "node --test test/muni-motion.test.mjs test/ferry-motion.test.mjs test/ferry-palette.test.mjs test/ferry-schedule.test.mjs test/asset-loading.test.mjs test/moods.test.mjs",
+    "test": "node --test test/muni-motion.test.mjs test/ferry-motion.test.mjs test/ferry-palette.test.mjs test/ferry-schedule.test.mjs test/asset-loading.test.mjs test/moods.test.mjs test/addresses.test.mjs test/places.test.mjs",
     "lint:api": "cd .. && ./app/node_modules/.bin/eslint api"
   },
   "dependencies": {
