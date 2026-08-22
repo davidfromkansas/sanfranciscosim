@@ -405,7 +405,14 @@ export function createSkyClock({ read, readWeather = () => null }) {
   // type size instead. The grills still carry the hi-fi faceplate read.
   logo.append(grillLeft, logoText, grillRight);
 
-  panel.append(row, logo);
+  const credit = document.createElement('a');
+  credit.className = 'deck-credit';
+  credit.href = 'https://www.linkedin.com/in/davidfromkansas';
+  credit.target = '_blank';
+  credit.rel = 'noopener noreferrer';
+  credit.textContent = 'Made by David Lietjauw';
+
+  panel.append(row, logo, credit);
   document.body.appendChild(panel);
 
   function renderWeather() {

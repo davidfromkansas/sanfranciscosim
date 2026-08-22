@@ -670,6 +670,34 @@
   white-space: nowrap;
 }
 
+/* --------------------------------------------------------------- credit --- */
+
+/* A maker's plate engraved on the chassis below the marquee: chassis metal,
+   no card stock, and the only pointer target on the deck besides the player. */
+.deck-credit {
+  align-self: center;
+  font-size: 10px;
+  font-weight: 700;
+  letter-spacing: 0.5px;
+  color: #3a3a3a;
+  text-decoration: none;
+  text-shadow: 0 1px 0 #ffffff40;
+  padding: 1px 2px;
+  pointer-events: auto;
+}
+
+.deck-credit:hover,
+.deck-credit:focus-visible {
+  color: #14141a;
+  text-decoration: underline;
+}
+
+.deck-credit:focus-visible {
+  outline: 2px solid var(--neon);
+  outline-offset: 1px;
+  border-radius: 4px;
+}
+
 @media (prefers-reduced-motion: reduce) {
   .player-disc {
     animation: none;
