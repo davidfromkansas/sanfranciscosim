@@ -121,12 +121,15 @@ describe('Google Places access', () => {
     );
   });
 
-  it('resolves a selected place by id through location-only Place Details', async () => {
+  it('resolves a selected place by id through Essentials Place Details fields', async () => {
     process.env.GOOGLE_PLACES_KEY = 'test-key';
     let request;
     globalThis.fetch = async (url, options) => {
       request = { url, options };
-      return response({ location: { latitude: 37.79, longitude: -122.4 } });
+      return response({
+        formattedAddress: '580 19th St, San Francisco, CA',
+        location: { latitude: 37.79, longitude: -122.4 },
+      });
     };
     assert.deepEqual(await resolvePlace({
       query: 'The Ferry Building, San Francisco, CA',
@@ -135,7 +138,7 @@ describe('Google Places access', () => {
       query: 'The Ferry Building, San Francisco, CA',
       place: {
         name: 'The Ferry Building, San Francisco, CA',
-        address: null,
+        address: '580 19th St, San Francisco, CA',
         lat: 37.79,
         lon: -122.4,
         types: [],
@@ -144,7 +147,7 @@ describe('Google Places access', () => {
     });
     assert.equal(request.url, 'https://places.googleapis.com/v1/places/ferry_123');
     assert.equal(request.options.method, 'GET');
-    assert.equal(request.options.headers['X-Goog-FieldMask'], 'location');
+    assert.equal(request.options.headers['X-Goog-FieldMask'], 'location,formattedAddress');
     assert.equal('body' in request.options, false);
   });
 
@@ -187,21 +190,21 @@ describe('Google Places access', () => {
         ? response({ suggestions: [] })
         : response({ places: [] });
     };
-    for (let i = 0; i < 24; i++) await autocomplete({ input: `query ${i}` });
+    for (let i = 0; i < 250; i++) await autocomplete({ input: `query ${i}` });
     assert.deepEqual(await autocomplete({ input: 'query over cap' }), {
       error: 'place search is over its daily budget — try again tomorrow',
     });
-    assert.equal(calls, 24);
+    assert.equal(calls, 250);
     assert.deepEqual(await findPlace({ query: 'still available' }), {
       query: 'still available',
       results: [],
     });
-    assert.equal(calls, 25);
+    assert.equal(calls, 251);
     for (let i = 0; i < 6; i++) await findPlace({ query: `search ${i}` });
     assert.deepEqual(await findPlace({ query: 'search over cap' }), {
       error: 'place search is over its daily budget — try again tomorrow',
     });
-    assert.equal(calls, 31);
+    assert.equal(calls, 257);
 
     resetPlacesForTests();
     calls = 0;

@@ -9,7 +9,7 @@ const AUTOCOMPLETE_FIELDS =
   'suggestions.placePrediction.place,suggestions.placePrediction.text,suggestions.placePrediction.structuredFormat';
 const SEARCH_FIELDS =
   'places.displayName,places.formattedAddress,places.location,places.types,places.businessStatus';
-const DETAILS_FIELDS = 'location';
+const DETAILS_FIELDS = 'location,formattedAddress';
 
 // The rectangle is intentionally the city and immediate shoreline, not the
 // Bay Area. Both endpoints use this same hard geographic fence.
@@ -19,7 +19,7 @@ export const SF_RECTANGLE = {
 };
 
 const DAILY_CAPS = {
-  autocomplete: 24,
+  autocomplete: 250,
   search: 7,
   details: 7,
 };
@@ -235,7 +235,9 @@ export async function resolvePlace({ query, placeId: selectedId } = {}) {
       query: cleanQuery(query),
       place: {
         name: cleanQuery(query),
-        address: null,
+        address: body.formattedAddress
+          ? String(body.formattedAddress).slice(0, 120)
+          : null,
         lat: Number(lat.toFixed(6)),
         lon: Number(lon.toFixed(6)),
         types: [],
