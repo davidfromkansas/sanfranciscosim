@@ -376,7 +376,9 @@ export function createContextCard({ onFly, onAsk, onSelectHistory, onClose }) {
     askButton.hidden =
       entity.kind === 'vessel' || entity.kind === 'transit' || entity.kind === 'transit-stop';
 
-    const bits = [`Source: ${sourceLabel(entity.source)}`];
+    const bits = [
+      `Source: ${entity.kind === 'place' ? 'Google Places' : sourceLabel(entity.source)}`,
+    ];
     if (entity.kind === 'building') bits.push(confidenceLabel(entity.confidence));
     source.replaceChildren(document.createTextNode(bits.join(' · ')));
     if (entity.wikidata) {

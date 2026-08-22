@@ -4,9 +4,12 @@
 
 const AUTOCOMPLETE_URL = 'https://places.googleapis.com/v1/places:autocomplete';
 const SEARCH_URL = 'https://places.googleapis.com/v1/places:searchText';
-const AUTOCOMPLETE_FIELDS = 'suggestions.placePrediction.{place,text,structuredFormat}';
+const DETAILS_URL = 'https://places.googleapis.com/v1/places/';
+const AUTOCOMPLETE_FIELDS =
+  'suggestions.placePrediction.place,suggestions.placePrediction.text,suggestions.placePrediction.structuredFormat';
 const SEARCH_FIELDS =
   'places.displayName,places.formattedAddress,places.location,places.types,places.businessStatus';
+const DETAILS_FIELDS = 'location';
 
 // The rectangle is intentionally the city and immediate shoreline, not the
 // Bay Area. Both endpoints use this same hard geographic fence.
@@ -15,16 +18,24 @@ export const SF_RECTANGLE = {
   high: { latitude: 37.84, longitude: -122.35 },
 };
 
-const DAILY_CAP = 150;
+const DAILY_CAPS = {
+  autocomplete: 24,
+  search: 7,
+  details: 7,
+};
 const CACHE_TTL = 24 * 60 * 60 * 1000;
 const MAX_CACHE = 500;
 const NO_KEY = 'place search is not configured';
 const OVER_BUDGET = 'place search is over its daily budget — try again tomorrow';
+const INPUT_REQUIRED = 'place input is required';
+const QUERY_REQUIRED = 'place query is required';
+const INVALID_PLACE_ID = 'place id is invalid';
 
 const cache = new Map();
 let day = '';
-let count = 0;
-let exhaustedUntil = 0;
+let counts = { autocomplete: 0, search: 0, details: 0 };
+let exhaustedUntil = { autocomplete: 0, search: 0, details: 0 };
+let quotaExhaustedUntil = 0;
 
 export function placesKey() {
   return process.env.GOOGLE_PLACES_KEY || null;
@@ -48,19 +59,20 @@ function resetDay() {
   const current = today();
   if (day !== current) {
     day = current;
-    count = 0;
-    exhaustedUntil = 0;
+    counts = { autocomplete: 0, search: 0, details: 0 };
+    exhaustedUntil = { autocomplete: 0, search: 0, details: 0 };
+    quotaExhaustedUntil = 0;
   }
 }
 
-function budgetAvailable() {
+function budgetAvailable(kind) {
   resetDay();
-  if (Date.now() < exhaustedUntil) return false;
-  if (count >= DAILY_CAP) {
-    exhaustedUntil = nextUtcMidnight();
+  if (Date.now() < quotaExhaustedUntil || Date.now() < exhaustedUntil[kind]) return false;
+  if (counts[kind] >= DAILY_CAPS[kind]) {
+    exhaustedUntil[kind] = nextUtcMidnight();
     return false;
   }
-  count += 1;
+  counts[kind] += 1;
   return true;
 }
 
@@ -80,20 +92,20 @@ function store(key, value) {
   return value;
 }
 
-async function post(url, key, fields, body) {
+async function request(url, key, fields, options = {}) {
   try {
     const response = await fetch(url, {
-      method: 'POST',
+      method: options.method || 'POST',
       signal: AbortSignal.timeout(4000),
       headers: {
-        'Content-Type': 'application/json',
         'X-Goog-Api-Key': key,
         'X-Goog-FieldMask': fields,
+        ...(options.method === 'GET' ? {} : { 'Content-Type': 'application/json' }),
       },
-      body: JSON.stringify(body),
+      ...(options.method === 'GET' ? {} : { body: JSON.stringify(options.body) }),
     });
     if (response.status === 429) {
-      exhaustedUntil = nextUtcMidnight();
+      quotaExhaustedUntil = nextUtcMidnight();
       return { error: OVER_BUDGET };
     }
     if (!response.ok) return { error: `place search failed (${response.status})` };
@@ -106,17 +118,20 @@ async function post(url, key, fields, body) {
 export async function autocomplete({ input } = {}) {
   const key = placesKey();
   if (!key) return { error: NO_KEY };
+  if (typeof input !== 'string') return { error: INPUT_REQUIRED };
   const query = cleanQuery(input);
   if (query.length < 3) return { predictions: [] };
   const cacheKey = `autocomplete:${query.toLowerCase()}`;
   const hit = cached(cacheKey);
   if (hit) return hit;
-  if (!budgetAvailable()) return { error: OVER_BUDGET };
+  if (!budgetAvailable('autocomplete')) return { error: OVER_BUDGET };
 
-  const body = await post(AUTOCOMPLETE_URL, key, AUTOCOMPLETE_FIELDS, {
-    input: query,
-    includedRegionCodes: ['us'],
-    locationRestriction: { rectangle: SF_RECTANGLE },
+  const body = await request(AUTOCOMPLETE_URL, key, AUTOCOMPLETE_FIELDS, {
+    body: {
+      input: query,
+      includedRegionCodes: ['us'],
+      locationRestriction: { rectangle: SF_RECTANGLE },
+    },
   });
   if (body.error) return body;
   const predictions = (body.suggestions || [])
@@ -136,18 +151,21 @@ export async function autocomplete({ input } = {}) {
 export async function findPlace({ query: input } = {}) {
   const key = placesKey();
   if (!key) return { error: NO_KEY };
+  if (typeof input !== 'string') return { error: INPUT_REQUIRED };
   const query = cleanQuery(input);
-  if (!query) return { error: 'place query is required' };
+  if (!query) return { error: QUERY_REQUIRED };
   const cacheKey = `search:${query.toLowerCase()}`;
   const hit = cached(cacheKey);
   if (hit) return hit;
-  if (!budgetAvailable()) return { error: OVER_BUDGET };
+  if (!budgetAvailable('search')) return { error: OVER_BUDGET };
 
-  const body = await post(SEARCH_URL, key, SEARCH_FIELDS, {
-    textQuery: query,
-    maxResultCount: 5,
-    regionCode: 'US',
-    locationRestriction: { rectangle: SF_RECTANGLE },
+  const body = await request(SEARCH_URL, key, SEARCH_FIELDS, {
+    body: {
+      textQuery: query,
+      maxResultCount: 5,
+      regionCode: 'US',
+      locationRestriction: { rectangle: SF_RECTANGLE },
+    },
   });
   if (body.error) return body;
   const results = (body.places || [])
@@ -181,10 +199,68 @@ export async function findPlace({ query: input } = {}) {
   return store(cacheKey, { query, results });
 }
 
-export async function resolvePlace({ query } = {}) {
+function placeId(value) {
+  const id = cleanQuery(value).replace(/^places\//, '');
+  return /^[A-Za-z0-9_-]+$/.test(id) ? id : null;
+}
+
+export async function resolvePlace({ query, placeId: selectedId } = {}) {
+  const key = placesKey();
+  if (!key) return { error: NO_KEY };
+  const id = placeId(selectedId);
+  if (selectedId != null && !id) return { error: INVALID_PLACE_ID };
+  if (id) {
+    const cacheKey = `details:${id}`;
+    const hit = cached(cacheKey);
+    if (hit) return hit;
+    if (!budgetAvailable('details')) return { error: OVER_BUDGET };
+    const body = await request(`${DETAILS_URL}${encodeURIComponent(id)}`, key, DETAILS_FIELDS, {
+      method: 'GET',
+    });
+    if (body.error) return body;
+    const lat = Number(body.location?.latitude);
+    const lon = Number(body.location?.longitude);
+    if (!Number.isFinite(lat) || !Number.isFinite(lon)) {
+      return { error: 'place details returned no location' };
+    }
+    if (
+      lat < SF_RECTANGLE.low.latitude ||
+      lat > SF_RECTANGLE.high.latitude ||
+      lon < SF_RECTANGLE.low.longitude ||
+      lon > SF_RECTANGLE.high.longitude
+    ) {
+      return { error: 'place is outside San Francisco' };
+    }
+    const result = {
+      query: cleanQuery(query),
+      place: {
+        name: cleanQuery(query),
+        address: null,
+        lat: Number(lat.toFixed(6)),
+        lon: Number(lon.toFixed(6)),
+        types: [],
+        status: null,
+      },
+    };
+    return store(cacheKey, result);
+  }
   const result = await findPlace({ query });
   if (result.error) return result;
   return { query: result.query, place: result.results[0] || null };
+}
+
+export function placesStatus(result) {
+  if (!result?.error) return 200;
+  if (
+    result.error === INPUT_REQUIRED ||
+    result.error === QUERY_REQUIRED ||
+    result.error === INVALID_PLACE_ID
+  ) {
+    return 400;
+  }
+  if (result.error === OVER_BUDGET) return 429;
+  if (result.error === NO_KEY) return 503;
+  return 503;
 }
 
 // Kept out of the production API surface; unit tests use it to isolate cache
@@ -192,6 +268,7 @@ export async function resolvePlace({ query } = {}) {
 export function resetPlacesForTests() {
   cache.clear();
   day = '';
-  count = 0;
-  exhaustedUntil = 0;
+  counts = { autocomplete: 0, search: 0, details: 0 };
+  exhaustedUntil = { autocomplete: 0, search: 0, details: 0 };
+  quotaExhaustedUntil = 0;
 }

@@ -16,7 +16,7 @@ import {
   readSubreddit,
   submitHumanPost,
 } from "./_lib/feeds/residents.mjs";
-import { autocomplete, resolvePlace } from "./_lib/places.mjs";
+import { autocomplete, placesStatus, resolvePlace } from "./_lib/places.mjs";
 
 const COMPOSE_WINDOW_MINUTE = 60 * 1000;
 const COMPOSE_WINDOW_DAY = 24 * 60 * 60 * 1000;
@@ -87,16 +87,20 @@ async function servePlaces(req, res) {
     res.status(400).json({ error: "request body must be valid JSON" });
     return;
   }
+  if (!body || typeof body !== "object" || Array.isArray(body)) {
+    res.status(400).json({ error: "request body must be an object" });
+    return;
+  }
   let result;
   if (body.action === "autocomplete") {
     result = await autocomplete({ input: body.input });
   } else if (body.action === "resolve") {
-    result = await resolvePlace({ query: body.query });
+    result = await resolvePlace({ query: body.query, placeId: body.placeId });
   } else {
     res.status(400).json({ error: "unknown places action" });
     return;
   }
-  res.status(result.error ? 503 : 200).json(result);
+  res.status(placesStatus(result)).json(result);
 }
 
 async function serveCompose(req, res) {

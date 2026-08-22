@@ -202,6 +202,11 @@ function liveFeeds() {
                 .status(400)
                 .json({ error: "request body must be valid JSON" });
             }
+            if (!body || typeof body !== "object" || Array.isArray(body)) {
+              return void shim
+                .status(400)
+                .json({ error: "request body must be an object" });
+            }
             const mod = await import(
               /* @vite-ignore */
               `${new URL("../api/_lib/", import.meta.url).href}places.mjs`
@@ -210,13 +215,13 @@ function liveFeeds() {
             if (body.action === "autocomplete") {
               result = await mod.autocomplete({ input: body.input });
             } else if (body.action === "resolve") {
-              result = await mod.resolvePlace({ query: body.query });
+              result = await mod.resolvePlace({ query: body.query, placeId: body.placeId });
             } else {
               return void shim
                 .status(400)
                 .json({ error: "unknown places action" });
             }
-            return void shim.status(result.error ? 503 : 200).json(result);
+            return void shim.status(mod.placesStatus(result)).json(result);
           }
           const core = await loadFeeds(server);
           if (!core) return next();

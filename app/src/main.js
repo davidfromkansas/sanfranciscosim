@@ -760,21 +760,26 @@ async function boot() {
   });
 
   let searchSerial = 0;
-  let searchTimer = null;
+  let placesTimer = null;
   search.input.addEventListener('input', () => {
     const query = search.input.value.trim();
     searchSerial += 1;
     const serial = searchSerial;
-    clearTimeout(searchTimer);
+    clearTimeout(placesTimer);
     if (!query) {
       search.close();
       return;
     }
-    searchTimer = setTimeout(async () => {
-      const results = await context.search(query);
+    context.search(query).then((results) => {
       if (serial !== searchSerial || search.input.value.trim() !== query) return;
       search.render(results, query);
-    }, 140);
+      if (results.length) return;
+      placesTimer = setTimeout(async () => {
+        const places = await context.autocompletePlaces(query);
+        if (serial !== searchSerial || search.input.value.trim() !== query) return;
+        if (places.length) search.render(places, query);
+      }, 140);
+    });
   });
 
   const concierge = createConcierge({

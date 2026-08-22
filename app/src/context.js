@@ -501,6 +501,9 @@ export async function createContext(data) {
             source: 'google',
           }));
           placeResults.set(input, entries);
+          while (placeResults.size > 100) {
+            placeResults.delete(placeResults.keys().next().value);
+          }
           placePromises.delete(input);
           return entries;
         })
@@ -566,7 +569,7 @@ export async function createContext(data) {
     }
     hits.sort((a, b) => a.rank - b.rank || a.entry.n.length - b.entry.n.length);
     if (hits.length) return hits.slice(0, limit).map((h) => h.entry);
-    return autocompletePlaces(query);
+    return [];
   }
 
   let statsPromise = null;
@@ -583,6 +586,7 @@ export async function createContext(data) {
     loadBuilding,
     buildingAt,
     geocodeAddress,
+    autocompletePlaces,
     resolvePlace,
     findBuilding,
     landmarks: landmarkFile.landmarks,
