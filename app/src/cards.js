@@ -20,6 +20,7 @@ const GLYPHS = {
   transit: '<rect x="5" y="4" width="14" height="13" rx="2"/><path d="M5 12h14M8 20l1-3M16 20l-1-3"/><circle cx="9" cy="15" r=".5"/><circle cx="15" cy="15" r=".5"/>',
   aircraft: '<path d="M12 3c.9 0 1.4.9 1.4 2v4.2l7.1 4v2l-7.1-2.2V17l2.2 1.6v1.7L12 19.5l-3.6.8v-1.7L10.6 17v-3.9L3.5 15.3v-2l7.1-4V5c0-1.1.5-2 1.4-2z"/>',
   address: '<path d="M4 20V5h16v15M8 9h8M8 13h8M8 17h5"/>',
+  place: '<path d="M12 21s7-6.2 7-12A7 7 0 0 0 5 9c0 5.8 7 12 7 12z"/><circle cx="12" cy="9" r="2.5"/>',
 };
 
 const KIND_GLYPH = {
@@ -37,10 +38,12 @@ const KIND_GLYPH = {
   'ferry-scheduled': 'vessel',
   aircraft: 'aircraft',
   address: 'address',
+  place: 'place',
 };
 
 const KIND_LABEL = {
   address: 'Address',
+  place: 'Place',
 };
 
 const CAT_TONE = [
@@ -184,6 +187,14 @@ export function createContextCard({ onFly, onAsk, onSelectHistory, onClose }) {
       chips.append(chip('Address', 'navy', 'address'));
       fact('House number', entity.number);
       if (!entity.exact) fact('Match', `Number approximated to ${entity.matchedNumber}`);
+      if (neighborhood) fact('Neighbourhood', neighborhood.name);
+    } else if (entity.kind === 'place') {
+      subtitle.textContent = entity.address || 'Google Places result';
+      chips.append(chip('Place', 'coral', 'place'));
+      if (entity.status && entity.status !== 'operational') {
+        chips.append(chip(entity.status, 'mustard'));
+      }
+      if (entity.types?.length) fact('Type', entity.types.slice(0, 3).join(' · '));
       if (neighborhood) fact('Neighbourhood', neighborhood.name);
     } else if (entity.kind === 'street') {
       subtitle.textContent = 'Street';
@@ -483,7 +494,17 @@ export function createSearch({ onPick, onEmpty }) {
       const button = el('button', 'result');
       button.type = 'button';
       button.setAttribute('aria-selected', String(i === 0));
-      button.append(glyph(KIND_GLYPH[entry.t] || 'building'), el('strong', null, entry.n), el('span', null, KIND_LABEL[entry.t] || entry.t));
+      button.append(
+        glyph(KIND_GLYPH[entry.t] || 'building'),
+        el('strong', null, entry.n),
+        el(
+          'span',
+          null,
+          [KIND_LABEL[entry.t] || entry.t, entry.source === 'google' ? 'Google Places' : null]
+            .filter(Boolean)
+            .join(' · '),
+        ),
+      );
       button.addEventListener('click', () => choose(i));
       results.append(button);
     });

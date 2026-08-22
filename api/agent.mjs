@@ -50,7 +50,9 @@ function loadData() {
     // Optional: a deployment without the address bake keeps the concierge
     // online, and the tool reports its own unavailability.
     read('./_data/addresses.json').catch(() => null),
-  ]).then(([places, search, parks, neighborhoods, streets, stats, muniStops, addresses]) => ({
+    // Optional to preserve the same graceful degradation as the address index.
+    read('./_data/projection.json').catch(() => null),
+  ]).then(([places, search, parks, neighborhoods, streets, stats, muniStops, addresses, projection]) => ({
     places,
     search,
     parks,
@@ -60,6 +62,7 @@ function loadData() {
     muniStops: muniStops?.stops || null,
     muniRoutes: muniStops?.busRoutes || [],
     addresses,
+    projection,
   }));
   return dataPromise;
 }

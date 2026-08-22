@@ -53,6 +53,7 @@ const SOURCE_LABELS = {
   511: 'Live 511.org feed (SF Bay Ferry)',
   demo: 'Simulated demo vessel',
   address: 'DataSF Enterprise Addressing System',
+  google: 'Google Places',
 };
 
 const CONFIDENCE_LABELS = ['inferred', 'single source', 'two sources agree', 'three or more sources agree'];
@@ -472,6 +473,64 @@ export async function createContext(data) {
     return hit ? { ...parsed, ...hit } : null;
   }
 
+  const placePromises = new Map();
+  const placeResults = new Map();
+  const placesEndpoint = `${import.meta.env.BASE_URL}api/places`;
+
+  async function autocompletePlaces(query) {
+    const input = String(query || '').trim().replace(/\s+/g, ' ');
+    if (input.length < 3) return [];
+    if (placeResults.has(input)) return placeResults.get(input);
+    let promise = placePromises.get(input);
+    if (!promise) {
+      promise = fetch(placesEndpoint, {
+        method: 'POST',
+        headers: { 'content-type': 'application/json' },
+        body: JSON.stringify({ action: 'autocomplete', input }),
+      })
+        .then((response) => (response.ok ? response.json() : null))
+        .then((body) => {
+          const predictions = Array.isArray(body?.predictions) ? body.predictions : [];
+          const entries = predictions.map((prediction) => ({
+            n: prediction.text || prediction.mainText,
+            t: 'place',
+            id: `place:${prediction.placeId || prediction.text}`,
+            placeId: prediction.placeId,
+            query: prediction.text || prediction.mainText,
+            secondary: prediction.secondaryText,
+            source: 'google',
+          }));
+          placeResults.set(input, entries);
+          placePromises.delete(input);
+          return entries;
+        })
+        .catch(() => {
+          placePromises.delete(input);
+          return [];
+        });
+      placePromises.set(input, promise);
+    }
+    return promise;
+  }
+
+  async function resolvePlace(entry) {
+    if (!entry?.query) return null;
+    try {
+      const response = await fetch(placesEndpoint, {
+        method: 'POST',
+        headers: { 'content-type': 'application/json' },
+        body: JSON.stringify({ action: 'resolve', query: entry.query, placeId: entry.placeId }),
+      });
+      if (!response.ok) return null;
+      const place = (await response.json())?.place;
+      if (!place || !Number.isFinite(Number(place.lat)) || !Number.isFinite(Number(place.lon))) return null;
+      const [x, z] = data.project(Number(place.lon), Number(place.lat));
+      return { ...place, x, z, source: 'google' };
+    } catch {
+      return null;
+    }
+  }
+
   const GROUP_ORDER = ['landmark', 'view', 'neighborhood', 'park', 'street', 'building'];
 
   async function search(query, limit = 8) {
@@ -506,7 +565,8 @@ export async function createContext(data) {
       if (hits.length > 400) break;
     }
     hits.sort((a, b) => a.rank - b.rank || a.entry.n.length - b.entry.n.length);
-    return hits.slice(0, limit).map((h) => h.entry);
+    if (hits.length) return hits.slice(0, limit).map((h) => h.entry);
+    return autocompletePlaces(query);
   }
 
   let statsPromise = null;
@@ -523,6 +583,7 @@ export async function createContext(data) {
     loadBuilding,
     buildingAt,
     geocodeAddress,
+    resolvePlace,
     findBuilding,
     landmarks: landmarkFile.landmarks,
     views: landmarkFile.views,

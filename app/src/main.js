@@ -709,6 +709,34 @@ async function boot() {
         }, { fly: true });
         return;
       }
+      if (entry.t === 'place') {
+        const place = await context.resolvePlace(entry);
+        if (!place) return;
+        const placeAddress = place.address && parseAddressQuery(place.address);
+        const building = await context.buildingAt(place.x, place.z);
+        const buildingAddress = building?.address && parseAddressQuery(building.address);
+        const buildingContradictsPlace =
+          placeAddress &&
+          buildingAddress &&
+          buildingAddress.streetKey !== placeAddress.streetKey;
+        if (building && !buildingContradictsPlace) {
+          selectEntity(building, { fly: true });
+          return;
+        }
+        selectEntity({
+          kind: 'place',
+          id: entry.id,
+          title: place.name || entry.n,
+          name: place.name || entry.n,
+          address: place.address,
+          types: place.types,
+          status: place.status,
+          x: place.x,
+          z: place.z,
+          source: 'google',
+        }, { fly: true });
+        return;
+      }
       if (entry.t === 'building') {
         const entity = await context.loadBuilding(Number(entry.id.slice(2)), entry.x, entry.z);
         if (entity) {
@@ -731,13 +759,22 @@ async function boot() {
     onEmpty: (query) => concierge.ask(query),
   });
 
-  search.input.addEventListener('input', async () => {
+  let searchSerial = 0;
+  let searchTimer = null;
+  search.input.addEventListener('input', () => {
     const query = search.input.value.trim();
+    searchSerial += 1;
+    const serial = searchSerial;
+    clearTimeout(searchTimer);
     if (!query) {
       search.close();
       return;
     }
-    search.render(await context.search(query), query);
+    searchTimer = setTimeout(async () => {
+      const results = await context.search(query);
+      if (serial !== searchSerial || search.input.value.trim() !== query) return;
+      search.render(results, query);
+    }, 140);
   });
 
   const concierge = createConcierge({

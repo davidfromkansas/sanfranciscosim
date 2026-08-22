@@ -16,12 +16,18 @@ import {
   readSubreddit,
   submitHumanPost,
 } from "./_lib/feeds/residents.mjs";
+import { autocomplete, resolvePlace } from "./_lib/places.mjs";
 
 const COMPOSE_WINDOW_MINUTE = 60 * 1000;
 const COMPOSE_WINDOW_DAY = 24 * 60 * 60 * 1000;
 const COMPOSE_PER_MINUTE = 3;
 const COMPOSE_PER_DAY = 24;
 const composeHits = new Map();
+const PLACES_WINDOW_MINUTE = 60 * 1000;
+const PLACES_WINDOW_DAY = 24 * 60 * 60 * 1000;
+const PLACES_PER_MINUTE = 30;
+const PLACES_PER_DAY = 500;
+const placesHits = new Map();
 
 function composeRateLimited(ip) {
   const now = Date.now();
@@ -48,6 +54,49 @@ function requestIp(req) {
   return (
     (req.headers["x-forwarded-for"] || "").split(",")[0].trim() || "local"
   );
+}
+
+function placesRateLimited(ip) {
+  const now = Date.now();
+  const record = placesHits.get(ip) || { minute: [], day: [] };
+  record.minute = record.minute.filter((at) => now - at < PLACES_WINDOW_MINUTE);
+  record.day = record.day.filter((at) => now - at < PLACES_WINDOW_DAY);
+  if (
+    record.minute.length >= PLACES_PER_MINUTE ||
+    record.day.length >= PLACES_PER_DAY
+  ) {
+    placesHits.set(ip, record);
+    return true;
+  }
+  record.minute.push(now);
+  record.day.push(now);
+  placesHits.set(ip, record);
+  if (placesHits.size > 5000) placesHits.clear();
+  return false;
+}
+
+async function servePlaces(req, res) {
+  if (placesRateLimited(requestIp(req))) {
+    res.status(429).json({ error: "too many place searches — try again shortly" });
+    return;
+  }
+  let body;
+  try {
+    body = typeof req.body === "string" ? JSON.parse(req.body) : req.body || {};
+  } catch {
+    res.status(400).json({ error: "request body must be valid JSON" });
+    return;
+  }
+  let result;
+  if (body.action === "autocomplete") {
+    result = await autocomplete({ input: body.input });
+  } else if (body.action === "resolve") {
+    result = await resolvePlace({ query: body.query });
+  } else {
+    res.status(400).json({ error: "unknown places action" });
+    return;
+  }
+  res.status(result.error ? 503 : 200).json(result);
 }
 
 async function serveCompose(req, res) {
@@ -150,6 +199,14 @@ export default async function handler(req, res) {
 
   if (pathname === "/api/compose" && req.method === "POST") {
     await serveCompose(req, res);
+    return;
+  }
+  if (pathname === "/api/places") {
+    if (req.method !== "POST") {
+      res.status(405).json({ error: "method not allowed" });
+      return;
+    }
+    await servePlaces(req, res);
     return;
   }
   if (req.method && req.method !== "GET") {

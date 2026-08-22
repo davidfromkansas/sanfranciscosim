@@ -33,6 +33,23 @@ const tilesVersion = [stamp("manifest.json"), stamp("toy.json")]
 // not the dev server.
 let feedsPromise = null;
 const composeHits = new Map();
+const placesHits = new Map();
+
+function placesRateLimited(ip) {
+  const now = Date.now();
+  const record = placesHits.get(ip) || { minute: [], day: [] };
+  record.minute = record.minute.filter((at) => now - at < 60_000);
+  record.day = record.day.filter((at) => now - at < 24 * 60 * 60 * 1000);
+  if (record.minute.length >= 30 || record.day.length >= 500) {
+    placesHits.set(ip, record);
+    return true;
+  }
+  record.minute.push(now);
+  record.day.push(now);
+  placesHits.set(ip, record);
+  if (placesHits.size > 5000) placesHits.clear();
+  return false;
+}
 
 function loadFeeds(server) {
   if (feedsPromise) return feedsPromise;
@@ -141,6 +158,66 @@ function liveFeeds() {
         const pathname = url.pathname.replace(/\/+$/, "");
         if (!pathname.startsWith("/api/")) return next();
         try {
+          if (pathname === "/api/places") {
+            const shim = {
+              status(code) {
+                res.statusCode = code;
+                return this;
+              },
+              json(body) {
+                res.setHeader("content-type", "application/json");
+                res.end(JSON.stringify(body));
+              },
+            };
+            if (req.method !== "POST") {
+              return void shim.status(405).json({ error: "method not allowed" });
+            }
+            const ip =
+              (req.headers["x-forwarded-for"] || "").split(",")[0].trim() ||
+              "local";
+            if (placesRateLimited(ip)) {
+              return void shim
+                .status(429)
+                .json({ error: "too many place searches — try again shortly" });
+            }
+            let body;
+            try {
+              body = await new Promise((resolve, reject) => {
+                let raw = "";
+                req.setEncoding("utf8");
+                req.on("data", (chunk) => {
+                  raw += chunk;
+                });
+                req.on("end", () => {
+                  try {
+                    resolve(raw ? JSON.parse(raw) : {});
+                  } catch {
+                    reject(new Error("request body must be valid JSON"));
+                  }
+                });
+                req.on("error", reject);
+              });
+            } catch {
+              return void shim
+                .status(400)
+                .json({ error: "request body must be valid JSON" });
+            }
+            const mod = await import(
+              /* @vite-ignore */
+              `${new URL("../api/_lib/", import.meta.url).href}places.mjs`
+            );
+            let result;
+            if (body.action === "autocomplete") {
+              result = await mod.autocomplete({ input: body.input });
+            } else if (body.action === "resolve") {
+              result = await mod.resolvePlace({ query: body.query });
+            } else {
+              return void shim
+                .status(400)
+                .json({ error: "unknown places action" });
+            }
+            return void shim.status(result.error ? 503 : 200).json(result);
+          }
           const core = await loadFeeds(server);
           if (!core) return next();
           // The registry writes through an Express-style res; adapt node's.
