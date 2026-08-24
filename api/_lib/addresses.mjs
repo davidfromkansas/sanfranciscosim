@@ -108,6 +108,9 @@ function exactIndex(numbers, number) {
   return -1;
 }
 
+const OPPOSITE_PARITY_WINDOW = 20;
+const SAME_PARITY_WINDOW = OPPOSITE_PARITY_WINDOW * 2;
+
 function streetForKey(shard, streetKey, number) {
   const streets = shard?.streets;
   const exact = streets?.[streetKey];
@@ -136,7 +139,9 @@ export function lookupAddress(shard, { number, streetKey } = {}) {
   const candidates = [];
   for (let index = 0; index < numbers.length; index++) {
     const delta = Math.abs(numbers[index] - number);
-    if (delta <= 20) candidates.push(index);
+    const sameParity = (numbers[index] & 1) === (number & 1);
+    const window = sameParity ? SAME_PARITY_WINDOW : OPPOSITE_PARITY_WINDOW;
+    if (delta <= window) candidates.push(index);
   }
   if (!candidates.length) return null;
   candidates.sort((a, b) => {
