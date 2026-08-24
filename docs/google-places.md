@@ -32,3 +32,8 @@ Pro-tier field and is deliberately omitted.
 The results come from Google's index and include Google attribution; they are
 not a live business-status feed. Pricing source:
 [Google Maps Platform pricing](https://developers.google.com/maps/billing-and-pricing/pricing).
+
+The San Francisco rectangle sent to Text Search is a geographic bias, not a
+guarantee that Google will reject every irrelevant result. The server therefore
+also applies a typo-tolerant significant-token relevance gate to Text Search
+results, and discards results that do not match the query closely enough.

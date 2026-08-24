@@ -12,7 +12,8 @@ const SEARCH_FIELDS =
 const DETAILS_FIELDS = 'location,formattedAddress';
 
 // The rectangle is intentionally the city and immediate shoreline, not the
-// Bay Area. Both endpoints use this same hard geographic fence.
+// Bay Area. Requests use it as a geographic bias; returned coordinates are
+// still checked against this fence below.
 export const SF_RECTANGLE = {
   low: { latitude: 37.70, longitude: -122.525 },
   high: { latitude: 37.84, longitude: -122.35 },
@@ -90,6 +91,67 @@ function store(key, value) {
   cache.set(key, { at: Date.now(), value });
   while (cache.size > MAX_CACHE) cache.delete(cache.keys().next().value);
   return value;
+}
+
+const GENERIC_SEARCH_TOKENS = new Set([
+  'ca',
+  'francisco',
+  'san',
+  'sf',
+  'the',
+  'united',
+  'states',
+  'usa',
+]);
+
+function significantTokens(value) {
+  return String(value || '')
+    .toLowerCase()
+    .normalize('NFKD')
+    .replace(/[^\p{L}\p{N}]+/gu, ' ')
+    .split(/\s+/)
+    .filter((token) => token.length >= 3 && !GENERIC_SEARCH_TOKENS.has(token));
+}
+
+function withinEditDistance(a, b, limit) {
+  if (Math.abs(a.length - b.length) > limit) return false;
+  let previous = Array.from({ length: b.length + 1 }, (_, i) => i);
+  for (let i = 1; i <= a.length; i += 1) {
+    const current = [i];
+    let rowMin = current[0];
+    for (let j = 1; j <= b.length; j += 1) {
+      const cost = a[i - 1] === b[j - 1] ? 0 : 1;
+      current[j] = Math.min(
+        current[j - 1] + 1,
+        previous[j] + 1,
+        previous[j - 1] + cost,
+      );
+      rowMin = Math.min(rowMin, current[j]);
+    }
+    if (rowMin > limit) return false;
+    previous = current;
+  }
+  return previous[b.length] <= limit;
+}
+
+function tokenMatches(queryToken, resultTokens) {
+  const limit = queryToken.length <= 5 ? 1 : 2;
+  return resultTokens.some(
+    (resultToken) =>
+      resultToken === queryToken ||
+      (queryToken.length >= 4 && resultToken.startsWith(queryToken)) ||
+      withinEditDistance(queryToken, resultToken, limit),
+  );
+}
+
+function relevantSearchResult(query, place) {
+  const queryTokens = significantTokens(query);
+  if (!queryTokens.length) return false;
+  const resultTokens = significantTokens(
+    `${place.displayName?.text || ''} ${place.formattedAddress || ''}`,
+  );
+  const matched = queryTokens.filter((token) => tokenMatches(token, resultTokens)).length;
+  return matched >= Math.ceil(queryTokens.length / 2);
 }
 
 async function request(url, key, fields, options = {}) {
@@ -170,6 +232,7 @@ export async function findPlace({ query: input } = {}) {
   if (body.error) return body;
   const results = (body.places || [])
     .slice(0, 5)
+    .filter((place) => relevantSearchResult(query, place))
     .map((place) => {
       const lat = Number(place.location?.latitude);
       const lon = Number(place.location?.longitude);

@@ -121,6 +121,49 @@ describe('Google Places access', () => {
     );
   });
 
+  it('drops a geographically biased but textually irrelevant result', async () => {
+    process.env.GOOGLE_PLACES_KEY = 'test-key';
+    globalThis.fetch = async () => response({
+      places: [{
+        displayName: { text: 'Panoramic view of San Francisco Oakland Bay Bridge' },
+        formattedAddress: 'Vallejo St, San Francisco, CA',
+        location: { latitude: 37.8, longitude: -122.4 },
+      }],
+    });
+    assert.deepEqual(await findPlace({ query: 'Oakland Museum of California' }), {
+      query: 'Oakland Museum of California',
+      results: [],
+    });
+  });
+
+  it('keeps typo-tolerant misspelled addresses from Text Search', async () => {
+    process.env.GOOGLE_PLACES_KEY = 'test-key';
+    globalThis.fetch = async () => response({
+      places: [{
+        displayName: { text: '1726 Anza Street' },
+        formattedAddress: '1726 Anza Street, San Francisco, CA, USA',
+        location: { latitude: 37.779195, longitude: -122.466856 },
+      }],
+    });
+    const result = await findPlace({ query: '1726 Anzza Steet' });
+    assert.equal(result.results.length, 1);
+    assert.equal(result.results[0].name, '1726 Anza Street');
+  });
+
+  it('keeps a business when at least half its significant tokens match', async () => {
+    process.env.GOOGLE_PLACES_KEY = 'test-key';
+    globalThis.fetch = async () => response({
+      places: [{
+        displayName: { text: 'Tartine Manufactory' },
+        formattedAddress: '595 Alabama St, San Francisco, CA',
+        location: { latitude: 37.75, longitude: -122.41 },
+      }],
+    });
+    const result = await findPlace({ query: 'tartine bakery' });
+    assert.equal(result.results.length, 1);
+    assert.equal(result.results[0].name, 'Tartine Manufactory');
+  });
+
   it('resolves a selected place by id through Essentials Place Details fields', async () => {
     process.env.GOOGLE_PLACES_KEY = 'test-key';
     let request;
