@@ -72,8 +72,13 @@ describe('address lookup', () => {
   });
 
   it('accepts a nearest number exactly twenty away but not twenty-one', () => {
-    assert.equal(lookupAddress(shard, { number: 141, streetKey: 'n point ave' }).matchedNumber, 121);
-    assert.equal(lookupAddress(shard, { number: 142, streetKey: 'n point ave' }), null);
+    const windowShard = {
+      streets: {
+        'n point ave': { name: 'N POINT AVE', n: [121], x: [1], z: [2] },
+      },
+    };
+    assert.equal(lookupAddress(windowShard, { number: 141, streetKey: 'n point ave' }).matchedNumber, 121);
+    assert.equal(lookupAddress(windowShard, { number: 142, streetKey: 'n point ave' }), null);
   });
 
   it('uses same-parity numbers even when the opposite side is closer', () => {
@@ -88,5 +93,73 @@ describe('address lookup', () => {
       },
     };
     assert.equal(lookupAddress(parityShard, parseAddressQuery('2200 3rd St')).matchedNumber, 2202);
+  });
+
+  it('uses a wider same-parity window before opposite-parity fallback', () => {
+    const parityShard = {
+      streets: {
+        '3rd st': {
+          name: '3RD ST',
+          n: [2191, 2230],
+          x: [1, 2],
+          z: [3, 4],
+        },
+      },
+    };
+    const hit = lookupAddress(parityShard, parseAddressQuery('2200 3rd St'));
+    assert.equal(hit.matchedNumber, 2230);
+    assert.equal(lookupAddress(parityShard, parseAddressQuery('2210 3rd St')).matchedNumber, 2230);
+  });
+
+  it('keeps opposite-parity fallback within twenty when no same-parity match exists', () => {
+    const parityShard = {
+      streets: {
+        '3rd st': {
+          name: '3RD ST',
+          n: [2191],
+          x: [1],
+          z: [3],
+        },
+      },
+    };
+    assert.equal(lookupAddress(parityShard, parseAddressQuery('2200 3rd St')).matchedNumber, 2191);
+  });
+
+  it('enforces the wider same-parity boundary and does not search arbitrarily far', () => {
+    const inside = {
+      streets: {
+        '3rd st': {
+          name: '3RD ST',
+          n: [2191, 2238],
+          x: [1, 2],
+          z: [3, 4],
+        },
+      },
+    };
+    assert.equal(lookupAddress(inside, { number: 2200, streetKey: '3rd st' }).matchedNumber, 2238);
+
+    const outside = {
+      streets: {
+        '3rd st': {
+          name: '3RD ST',
+          n: [2191, 2242],
+          x: [1, 2],
+          z: [3, 4],
+        },
+      },
+    };
+    assert.equal(lookupAddress(outside, { number: 2200, streetKey: '3rd st' }).matchedNumber, 2191);
+
+    const beyondBothWindows = {
+      streets: {
+        '3rd st': {
+          name: '3RD ST',
+          n: [2159, 2242],
+          x: [1, 2],
+          z: [3, 4],
+        },
+      },
+    };
+    assert.equal(lookupAddress(beyondBothWindows, { number: 2200, streetKey: '3rd st' }), null);
   });
 });
