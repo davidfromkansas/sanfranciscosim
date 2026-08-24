@@ -18,7 +18,7 @@ const MOVE_KEYS = [
 
 const TURN_KEYS = [
   { cap: 'Q', label: 'Turn counter-clockwise' },
-  { cap: 'W', label: 'Turn clockwise' },
+  { cap: 'E', label: 'Turn clockwise' },
 ];
 
 function el(tag, className, text) {

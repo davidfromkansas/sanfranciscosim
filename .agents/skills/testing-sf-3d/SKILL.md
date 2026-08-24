@@ -24,9 +24,8 @@ No env vars or secrets are required. **Devin Secrets Needed:** none.
   `2` Ferry Building, `3` South Park, `4` Palace of Fine Arts, `5` Coit, `6` Sutro, `7` Golden Gate
   Bridge, `8` Bay Bridge, `9` Salesforce Tower. `H` returns home. The on-screen legend
   (`app/src/controls.js`, bottom left) reads the same manifest, so it never drifts from the bindings.
-- Camera (`app/src/camera.js`): arrows (or `A`/`S`/`D`) pan — left arrow moves the view left, right
-  moves it right; `Q`/`W` spin the heading smoothly (`E` is still an alias for `W`), `R`/`F` or
-  PageUp/PageDown zoom,
+- Camera (`app/src/camera.js`): WASD/arrows pan — left arrow moves the view left, right moves it
+  right; `Q`/`E` spin the heading smoothly (no 45-degree stops), `R`/`F` or PageUp/PageDown zoom,
   wheel zooms toward the cursor, right-drag orbits (pitch+yaw), left-drag grab-pans, screen edges scroll,
   Shift boosts.
 - HUD (`app/src/ui.js`): View select, Quality select (Ultra/High/Medium/Low), and a `stats` button;

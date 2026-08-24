@@ -42,8 +42,8 @@ export function createCameraRig(camera, domElement, sampleElevation, extent) {
 
   // Diorama mode: the money shot is locked. Pitch never moves and zoom rides in
   // and out along that fixed angle. Yaw steps through eight 45-degree headings
-  // when it is dragged or twisted, and spins smoothly under Q/W. Pan, wheel
-  // zoom, edge scroll and the arrow keys all keep working.
+  // when it is dragged or twisted, and spins smoothly under Q/E. Pan, wheel
+  // zoom, edge scroll and WASD all keep working.
   // `max` is the zoom-out ceiling. It has to clear the cloud deck: the whole
   // point of the deck's altitude is that you START below it and can climb
   // ABOVE it, so 28800 m of orbit (x sin 42 = ~19.2 km of height) sits well
@@ -466,7 +466,7 @@ export function createCameraRig(camera, domElement, sampleElevation, extent) {
 
     let mx = 0;
     let mz = 0;
-    if (keys.has('ArrowUp')) mz += 1;
+    if (keys.has('KeyW') || keys.has('ArrowUp')) mz += 1;
     if (keys.has('KeyS') || keys.has('ArrowDown')) mz -= 1;
     if (keys.has('KeyD') || keys.has('ArrowRight')) mx += 1;
     if (keys.has('KeyA') || keys.has('ArrowLeft')) mx -= 1;
@@ -491,13 +491,13 @@ export function createCameraRig(camera, domElement, sampleElevation, extent) {
 
     if (diorama) state.pitch = DIORAMA.pitch;
 
-    // Keyboard yaw is continuous in both modes: Q spins one way, W (E kept as an
-    // alias) the other, and holding a key glides the heading instead of
-    // clicking through 45-degree stops. Drag and twist still step, so a held key
-    // cancels any step tween in flight rather than fighting it.
+    // Keyboard yaw is continuous in both modes: Q spins one way, E the other,
+    // and holding a key glides the heading instead of clicking through
+    // 45-degree stops. Drag and twist still step, so a held key cancels any step
+    // tween in flight rather than fighting it.
     let yawInput = 0;
     if (keys.has('KeyQ')) yawInput += 1;
-    if (keys.has('KeyW') || keys.has('KeyE')) yawInput -= 1;
+    if (keys.has('KeyE')) yawInput -= 1;
     if (yawInput !== 0) yawStep = null;
 
     if (yawStep) {
