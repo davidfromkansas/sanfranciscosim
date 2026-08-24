@@ -76,6 +76,7 @@ import { createGovernor } from './governor.js';
 import { createContext } from './context.js';
 import { createFocusOverlay } from './focus.js';
 import { createContextCard, createSearch } from './cards.js';
+import { createControlsLegend } from './controls.js';
 import { createConcierge } from './concierge.js';
 import { createSkyClock } from './sky-clock.js';
 import { createWeather } from './weather.js';
@@ -682,6 +683,10 @@ async function boot() {
     onSelectHistory: (entity) => selectEntity(entity),
     onClose: () => stopFollowing(),
   });
+
+  // Mounted after the card on purpose: both own the bottom-left corner and the
+  // stylesheet yields the legend to the card through a sibling selector.
+  createControlsLegend(presets);
 
   const search = createSearch({
     onPick: async (entry) => {

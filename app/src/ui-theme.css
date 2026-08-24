@@ -964,12 +964,179 @@
   z-index: 6;
 }
 
+/* ----------------------------------------------------- controls legend --- */
+
+/* Drawn keycaps in the bottom-left corner. Same card stock as everything else,
+   one step smaller, and it never takes a click that belongs to the city:
+   pointer-events live on the fold toggle only. */
+#controls-legend {
+  position: fixed;
+  left: 14px;
+  bottom: 30px;
+  width: 226px;
+  padding: 8px 10px 10px;
+  z-index: 5;
+  pointer-events: none;
+  font-size: 12px;
+}
+
+/* The corner belongs to the selection when there is one: the card is taller,
+   more useful, and sits in exactly this spot. */
+#context-card:not([hidden]) ~ #controls-legend,
+#controls-legend[hidden] {
+  display: none;
+}
+
+.legend-toggle {
+  pointer-events: auto;
+  display: flex;
+  align-items: center;
+  gap: 7px;
+  width: 100%;
+  padding: 0;
+  font: inherit;
+  color: var(--ink);
+  background: none;
+  border: 0;
+  cursor: pointer;
+}
+
+.legend-title {
+  font-size: 11px;
+  font-weight: 800;
+  letter-spacing: 0.6px;
+  text-transform: uppercase;
+  flex: 1;
+  text-align: left;
+}
+
+.legend-chevron {
+  font-size: 10px;
+  color: var(--ink-soft);
+  transform: rotate(-90deg);
+}
+
+#controls-legend.is-open .legend-chevron {
+  transform: none;
+}
+
+.legend-body {
+  margin-top: 8px;
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.legend-group {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+
+/* The arrow keys in their real shape — up over down, left and right flanking —
+   because the cluster is the thing being named. */
+.legend-cluster {
+  display: grid;
+  grid-template-columns: repeat(3, 22px);
+  grid-template-rows: repeat(2, 22px);
+  gap: 3px;
+  flex: none;
+}
+
+.legend-cluster .keycap[data-dir='forward'] {
+  grid-area: 1 / 2;
+}
+
+.legend-cluster .keycap[data-dir='left'] {
+  grid-area: 2 / 1;
+}
+
+.legend-cluster .keycap[data-dir='back'] {
+  grid-area: 2 / 2;
+}
+
+.legend-cluster .keycap[data-dir='right'] {
+  grid-area: 2 / 3;
+}
+
+.keycap {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  min-width: 22px;
+  height: 22px;
+  padding: 0 4px;
+  font: 700 12px/1 -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+  color: var(--ink);
+  background: var(--paper-2);
+  border: 2px solid var(--ink);
+  border-radius: 6px;
+  /* The hard 2px drop is what makes a flat rectangle read as a key. */
+  box-shadow: 0 2px 0 var(--ink);
+  flex: none;
+}
+
+.keycap.is-glyph {
+  background: var(--mustard);
+}
+
+.legend-list {
+  margin: 0;
+  padding: 0;
+  list-style: none;
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+}
+
+.legend-row {
+  display: flex;
+  align-items: center;
+  gap: 7px;
+}
+
+.legend-label {
+  color: var(--ink-soft);
+  font-size: 11.5px;
+  line-height: 1.35;
+}
+
+.legend-heading {
+  margin: 2px 0 0;
+  font-size: 10.5px;
+  font-weight: 800;
+  letter-spacing: 0.6px;
+  text-transform: uppercase;
+  color: var(--ink);
+}
+
+/* Nine numbered flights in two columns: one column runs past the deck's
+   height, two keep the legend inside the corner. */
+.legend-numbers {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 4px 8px;
+}
+
+.legend-numbers .keycap {
+  background: var(--paper);
+}
+
+.legend-numbers .legend-label {
+  font-size: 10.5px;
+  line-height: 1.2;
+}
+
 @media (max-width: 640px) {
   #context-card,
   #concierge {
     left: 14px;
     right: 14px;
     width: auto;
+  }
+  /* No keyboard to legend on a phone. */
+  #controls-legend {
+    display: none;
   }
   #concierge {
     bottom: auto;
