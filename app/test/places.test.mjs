@@ -84,6 +84,104 @@ describe('Google Places access', () => {
     assert.deepEqual(request.body.locationRestriction.rectangle, SF_RECTANGLE);
   });
 
+  it('rejects Oakland autocomplete predictions with the strict all-token gate', async () => {
+    process.env.GOOGLE_PLACES_KEY = 'test-key';
+    globalThis.fetch = async () => response({
+      suggestions: [
+        {
+          placePrediction: {
+            place: 'places/museum_sf',
+            text: { text: 'Museum of San Francisco, Commercial Street, San Francisco, California, USA' },
+            structuredFormat: {
+              mainText: { text: 'Museum of San Francisco' },
+              secondaryText: { text: 'Commercial Street, San Francisco, California, USA' },
+            },
+          },
+        },
+        {
+          placePrediction: {
+            place: 'places/bay_bridge',
+            text: { text: 'Panoramic view of San Francisco Oakland Bay Bridge, San Francisco, CA, USA' },
+            structuredFormat: {
+              mainText: { text: 'Panoramic view of San Francisco Oakland Bay Bridge' },
+              secondaryText: { text: 'San Francisco, CA, USA' },
+            },
+          },
+        },
+        {
+          placePrediction: {
+            place: 'places/oakland_museum',
+            text: { text: 'Oakland Museum of California, Oakland, CA, USA' },
+            structuredFormat: {
+              mainText: { text: 'Oakland Museum of California' },
+              secondaryText: { text: 'Oakland, CA, USA' },
+            },
+          },
+        },
+      ],
+    });
+    assert.deepEqual(await autocomplete({ input: 'Oakland Museum of California' }), {
+      predictions: [],
+    });
+  });
+
+  it('accepts typo-tolerant misspelled address predictions', async () => {
+    process.env.GOOGLE_PLACES_KEY = 'test-key';
+    globalThis.fetch = async () => response({
+      suggestions: [{
+        placePrediction: {
+          place: 'places/anza_1726',
+          text: { text: '1726 Anza Street, San Francisco, CA, USA' },
+          structuredFormat: {
+            mainText: { text: '1726 Anza Street' },
+            secondaryText: { text: 'San Francisco, CA, USA' },
+          },
+        },
+      }],
+    });
+    const result = await autocomplete({ input: '1726 Anzza Steet' });
+    assert.equal(result.predictions.length, 1);
+    assert.equal(result.predictions[0].text, '1726 Anza Street, San Francisco, CA, USA');
+  });
+
+  it('accepts legitimate multi-token business predictions', async () => {
+    process.env.GOOGLE_PLACES_KEY = 'test-key';
+    globalThis.fetch = async () => response({
+      suggestions: [{
+        placePrediction: {
+          place: 'places/tartine',
+          text: { text: 'Tartine Bakery, 600 Guerrero St, San Francisco, CA, USA' },
+          structuredFormat: {
+            mainText: { text: 'Tartine Bakery' },
+            secondaryText: { text: '600 Guerrero St, San Francisco, CA, USA' },
+          },
+        },
+      }],
+    });
+    const result = await autocomplete({ input: 'Tartine Bakery' });
+    assert.equal(result.predictions.length, 1);
+    assert.equal(result.predictions[0].placeId, 'tartine');
+  });
+
+  it('rejects an out-of-city prediction even when all query tokens match', async () => {
+    process.env.GOOGLE_PLACES_KEY = 'test-key';
+    globalThis.fetch = async () => response({
+      suggestions: [{
+        placePrediction: {
+          place: 'places/tartine_oakland',
+          text: { text: 'Tartine Bakery, Oakland, CA, USA' },
+          structuredFormat: {
+            mainText: { text: 'Tartine Bakery' },
+            secondaryText: { text: 'Oakland, CA, USA' },
+          },
+        },
+      }],
+    });
+    assert.deepEqual(await autocomplete({ input: 'Tartine Bakery' }), {
+      predictions: [],
+    });
+  });
+
   it('builds a capped text-search request and normalizes its first result', async () => {
     process.env.GOOGLE_PLACES_KEY = 'test-key';
     const requests = [];

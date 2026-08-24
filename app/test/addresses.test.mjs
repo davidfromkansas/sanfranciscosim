@@ -1,7 +1,12 @@
 import assert from 'node:assert/strict';
 import { describe, it } from 'node:test';
 
-import { lookupAddress, normalizeStreetName, parseAddressQuery } from '../../api/_lib/addresses.mjs';
+import {
+  formatAddressLabel,
+  lookupAddress,
+  normalizeStreetName,
+  parseAddressQuery,
+} from '../../api/_lib/addresses.mjs';
 
 const shard = {
   streets: {
@@ -34,6 +39,11 @@ describe('address normalization and parsing', () => {
     assert.equal(parseAddressQuery('2200 Third Street').streetKey, parseAddressQuery('2200 3rd St').streetKey);
     assert.equal(normalizeStreetName('03rd Street'), '3rd st');
     assert.equal(normalizeStreetName('North Point Avenue'), 'n point ave');
+  });
+
+  it('formats resolved address cards from the canonical street', () => {
+    assert.equal(formatAddressLabel(1726, 'ANZA ST'), '1726 Anza St');
+    assert.equal(formatAddressLabel(2200, '3RD ST'), '2200 3rd St');
   });
 });
 

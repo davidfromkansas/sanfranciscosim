@@ -7,7 +7,12 @@
 // colour-id pass would cost a second render of the whole city.
 
 import { tileUrl } from './data.js';
-import { lookupAddress, normalizeStreetName, parseAddressQuery } from '../../api/_lib/addresses.mjs';
+import {
+  formatAddressLabel,
+  lookupAddress,
+  normalizeStreetName,
+  parseAddressQuery,
+} from '../../api/_lib/addresses.mjs';
 
 const CELL_SIZE = 500;
 const TTL_MS = 15 * 60 * 1000;
@@ -545,7 +550,7 @@ export async function createContext(data) {
     if (address) {
       hits.push({
         entry: {
-          n: humanizeWords(address.label.toLowerCase()),
+          n: formatAddressLabel(address.number, address.street),
           t: 'address',
           id: `addr:${address.streetKey}:${address.number}`,
           x: address.x,

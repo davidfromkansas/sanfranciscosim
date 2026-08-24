@@ -37,3 +37,6 @@ The San Francisco rectangle sent to Text Search is a geographic bias, not a
 guarantee that Google will reject every irrelevant result. The server therefore
 also applies a typo-tolerant significant-token relevance gate to Text Search
 results, and discards results that do not match the query closely enough.
+Autocomplete has no coordinates in its response, so its rectangle is likewise
+not a hard geography filter; prediction text and secondary text must name San
+Francisco, and every significant query token must match.

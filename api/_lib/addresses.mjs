@@ -83,6 +83,15 @@ export function parseAddressQuery(query) {
   return { number, streetKey, label: `${number} ${streetKey.toUpperCase()}` };
 }
 
+export function formatAddressLabel(number, street) {
+  return `${number} ${String(street || '')}`
+    .trim()
+    .toLowerCase()
+    .split(/\s+/)
+    .map((word) => word.replace(/^./, (character) => character.toUpperCase()))
+    .join(' ');
+}
+
 function compareNumber(a, b) {
   return a - b;
 }

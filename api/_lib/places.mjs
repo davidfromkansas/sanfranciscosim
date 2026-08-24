@@ -95,6 +95,7 @@ function store(key, value) {
 
 const GENERIC_SEARCH_TOKENS = new Set([
   'ca',
+  'california',
   'francisco',
   'san',
   'sf',
@@ -104,13 +105,22 @@ const GENERIC_SEARCH_TOKENS = new Set([
   'usa',
 ]);
 
-function significantTokens(value) {
+function normalizedTokens(value) {
   return String(value || '')
     .toLowerCase()
     .normalize('NFKD')
     .replace(/[^\p{L}\p{N}]+/gu, ' ')
     .split(/\s+/)
-    .filter((token) => token.length >= 3 && !GENERIC_SEARCH_TOKENS.has(token));
+    .filter(Boolean);
+}
+
+function significantTokens(value, { includeCalifornia = true } = {}) {
+  return normalizedTokens(value)
+    .filter(
+      (token) =>
+        token.length >= 3 &&
+        (!GENERIC_SEARCH_TOKENS.has(token) || (!includeCalifornia && token === 'california')),
+    );
 }
 
 function withinEditDistance(a, b, limit) {
@@ -145,13 +155,27 @@ function tokenMatches(queryToken, resultTokens) {
 }
 
 function relevantSearchResult(query, place) {
-  const queryTokens = significantTokens(query);
+  // Keep the established Text Search threshold stable: California was added
+  // for the stricter prediction gate, but is not allowed to reduce existing
+  // search queries from three significant tokens to two.
+  const queryTokens = significantTokens(query, { includeCalifornia: false });
   if (!queryTokens.length) return false;
   const resultTokens = significantTokens(
     `${place.displayName?.text || ''} ${place.formattedAddress || ''}`,
   );
   const matched = queryTokens.filter((token) => tokenMatches(token, resultTokens)).length;
   return matched >= Math.ceil(queryTokens.length / 2);
+}
+
+function relevantAutocompletePrediction(query, prediction) {
+  const queryTokens = significantTokens(query);
+  if (!queryTokens.length) return false;
+  const predictionText = `${prediction.text} ${prediction.secondaryText}`;
+  const locationTokens = normalizedTokens(predictionText);
+  const textTokens = normalizedTokens(prediction.text);
+  const namesSanFrancisco = locationTokens.includes('san') && locationTokens.includes('francisco');
+  if (!namesSanFrancisco) return false;
+  return queryTokens.every((token) => tokenMatches(token, textTokens));
 }
 
 async function request(url, key, fields, options = {}) {
@@ -199,14 +223,15 @@ export async function autocomplete({ input } = {}) {
   const predictions = (body.suggestions || [])
     .map((suggestion) => suggestion.placePrediction)
     .filter(Boolean)
-    .slice(0, 5)
     .map((prediction) => ({
       placeId: String(prediction.place || '').replace(/^places\//, ''),
       text: prediction.text?.text || '',
       mainText: prediction.structuredFormat?.mainText?.text || '',
       secondaryText: prediction.structuredFormat?.secondaryText?.text || '',
     }))
-    .filter((prediction) => prediction.text);
+    .filter((prediction) => prediction.text)
+    .filter((prediction) => relevantAutocompletePrediction(query, prediction))
+    .slice(0, 5);
   return store(cacheKey, { predictions });
 }
 
