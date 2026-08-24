@@ -40,19 +40,22 @@ export function createCameraRig(camera, domElement, sampleElevation, extent) {
   let animation = null;
   let pitchLocked = false;
 
-  // Diorama mode: the money shot is locked. Pitch never moves, the yaw only
-  // visits eight 45-degree headings, and zoom rides in and out along that fixed
-  // angle. Pan, wheel zoom, edge scroll and WASD all keep working.
+  // Diorama mode: the money shot is locked. Pitch never moves and zoom rides in
+  // and out along that fixed angle. Yaw steps through eight 45-degree headings
+  // when it is dragged or twisted, and spins smoothly under Q/E. Pan, wheel
+  // zoom, edge scroll and WASD all keep working.
   // `max` is the zoom-out ceiling. It has to clear the cloud deck: the whole
   // point of the deck's altitude is that you START below it and can climb
   // ABOVE it, so 28800 m of orbit (x sin 42 = ~19.2 km of height) sits well
   // over DECK_ALTITUDE in clouds.js. Raise one and check the other.
-  const DIORAMA = { pitch: 42 * DEG, step: 45 * DEG, min: 150, max: 28800, dragPx: 60 };
+  const DIORAMA = { pitch: 42 * DEG, step: 45 * DEG, min: 150, max: 28800, dragPx: 60, spin: 1.1 };
   let diorama = false;
   let dioramaSaved = null;
   let yawStep = null;
   let dragYaw = 0;
 
+  // One 45-degree heading, tweened. Drag and twist gestures step; the keyboard
+  // spins continuously instead (see update()).
   function stepYaw(direction) {
     const from = state.yaw;
     const target = yawStep ? yawStep.to : Math.round(from / DIORAMA.step) * DIORAMA.step;
@@ -179,11 +182,6 @@ export function createCameraRig(camera, domElement, sampleElevation, extent) {
     if (event.metaKey || event.ctrlKey) return;
     keys.add(event.code);
     if (event.code === 'ShiftLeft' || event.code === 'ShiftRight') state.boost = 3.4;
-    // Diorama yaw is discrete: one heading per keypress, not a continuous spin.
-    if (diorama && !event.repeat) {
-      if (event.code === 'KeyQ') stepYaw(1);
-      if (event.code === 'KeyE') stepYaw(-1);
-    }
   }
 
   function onKeyUp(event) {
@@ -461,7 +459,10 @@ export function createCameraRig(camera, domElement, sampleElevation, extent) {
     // the screen whether you are on Market St or 9 km up.
     const speed = Math.max(60, state.distance * 0.85) * state.boost;
     forward.set(-Math.sin(state.yaw), 0, -Math.cos(state.yaw));
-    right.set(forward.z, 0, -forward.x);
+    // Screen right, so a right-arrow moves the view right. With up = +Y and the
+    // camera looking along `forward`, that is up x forward, not forward x up —
+    // the flipped sign is what made the arrows feel mirrored.
+    right.set(-forward.z, 0, forward.x);
 
     let mx = 0;
     let mz = 0;
@@ -488,25 +489,31 @@ export function createCameraRig(camera, domElement, sampleElevation, extent) {
     state.pivot.addScaledVector(state.velocity, dt);
     clampPivot();
 
-    if (diorama) {
-      state.pitch = DIORAMA.pitch;
-      if (yawStep) {
-        const t = Math.min(1, (performance.now() - yawStep.start) / (yawStep.duration * 1000));
-        const e = t * t * (3 - 2 * t);
-        // Shortest path: the target is normalised against the current heading, so
-        // a step across 0/360 never unwinds the long way round.
-        const to = normaliseYaw(yawStep.from, yawStep.to);
-        state.yaw = yawStep.from + (to - yawStep.from) * e;
-        if (t >= 1) {
-          state.yaw = to;
-          yawStep = null;
-        }
+    if (diorama) state.pitch = DIORAMA.pitch;
+
+    // Keyboard yaw is continuous in both modes: Q spins one way, E the other,
+    // and holding a key glides the heading instead of clicking through
+    // 45-degree stops. Drag and twist still step, so a held key cancels any step
+    // tween in flight rather than fighting it.
+    let yawInput = 0;
+    if (keys.has('KeyQ')) yawInput += 1;
+    if (keys.has('KeyE')) yawInput -= 1;
+    if (yawInput !== 0) yawStep = null;
+
+    if (yawStep) {
+      const t = Math.min(1, (performance.now() - yawStep.start) / (yawStep.duration * 1000));
+      const e = t * t * (3 - 2 * t);
+      // Shortest path: the target is normalised against the current heading, so
+      // a step across 0/360 never unwinds the long way round.
+      const to = normaliseYaw(yawStep.from, yawStep.to);
+      state.yaw = yawStep.from + (to - yawStep.from) * e;
+      if (t >= 1) {
+        state.yaw = to;
+        yawStep = null;
       }
     } else {
-      let yawInput = 0;
-      if (keys.has('KeyQ')) yawInput += 1;
-      if (keys.has('KeyE')) yawInput -= 1;
-      state.yawVelocity += (yawInput * 1.5 - state.yawVelocity) * Math.min(1, dt * 8);
+      const rate = diorama ? DIORAMA.spin : 1.5;
+      state.yawVelocity += (yawInput * rate - state.yawVelocity) * Math.min(1, dt * 8);
       state.yaw += state.yawVelocity * dt;
     }
 

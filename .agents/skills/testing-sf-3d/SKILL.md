@@ -20,10 +20,12 @@ No env vars or secrets are required. **Devin Secrets Needed:** none.
 
 ## Reaching the features (traced in code)
 - Number keys fly to presets/landmarks (`app/src/main.js` keydown handler); the mapping lives in
-  `app/public/tiles/manifest.json` (`viewPresets[].key`, `landmarks[].key`): `0` hero, `1` Golden Gate
-  Bridge, `2` Bay Bridge, `3` Salesforce Tower, `4` Transamerica, `5` Coit, `6` Sutro, `7` Ferry
-  Building, `8` Palace of Fine Arts, `9` City Hall. `H` returns home.
-- Camera (`app/src/camera.js`): WASD/arrows pan, `Q`/`E` rotate, `R`/`F` or PageUp/PageDown zoom,
+  `app/public/tiles/manifest.json` (`viewPresets[].key`, `landmarks[].key`): `0` hero, `1` City Hall,
+  `2` Ferry Building, `3` South Park, `4` Palace of Fine Arts, `5` Coit, `6` Sutro, `7` Golden Gate
+  Bridge, `8` Bay Bridge, `9` Salesforce Tower. `H` returns home. The on-screen legend
+  (`app/src/controls.js`, bottom left) reads the same manifest, so it never drifts from the bindings.
+- Camera (`app/src/camera.js`): WASD/arrows pan — left arrow moves the view left, right moves it
+  right; `Q`/`E` spin the heading smoothly (no 45-degree stops), `R`/`F` or PageUp/PageDown zoom,
   wheel zooms toward the cursor, right-drag orbits (pitch+yaw), left-drag grab-pans, screen edges scroll,
   Shift boosts.
 - HUD (`app/src/ui.js`): View select, Quality select (Ultra/High/Medium/Low), and a `stats` button;
