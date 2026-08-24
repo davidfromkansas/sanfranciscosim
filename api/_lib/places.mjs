@@ -114,12 +114,13 @@ function normalizedTokens(value) {
     .filter(Boolean);
 }
 
-function significantTokens(value, { includeCalifornia = true } = {}) {
+function significantTokens(value, { treatCaliforniaAsGeneric = true } = {}) {
   return normalizedTokens(value)
     .filter(
       (token) =>
         token.length >= 3 &&
-        (!GENERIC_SEARCH_TOKENS.has(token) || (!includeCalifornia && token === 'california')),
+        (!GENERIC_SEARCH_TOKENS.has(token) ||
+          (!treatCaliforniaAsGeneric && token === 'california')),
     );
 }
 
@@ -158,7 +159,7 @@ function relevantSearchResult(query, place) {
   // Keep the established Text Search threshold stable: California was added
   // for the stricter prediction gate, but is not allowed to reduce existing
   // search queries from three significant tokens to two.
-  const queryTokens = significantTokens(query, { includeCalifornia: false });
+  const queryTokens = significantTokens(query, { treatCaliforniaAsGeneric: false });
   if (!queryTokens.length) return false;
   const resultTokens = significantTokens(
     `${place.displayName?.text || ''} ${place.formattedAddress || ''}`,
