@@ -68,6 +68,7 @@ import { createScheduledFerries } from './ferryscheduled.js';
 import { createLiveAircraft } from './aircraft.js';
 import { createCameraRig } from './camera.js';
 import { createSigns } from './signs.js';
+import { parseAddressQuery } from '../../api/_lib/addresses.mjs';
 import { createToyPost } from './toypost.js';
 import { QUALITY, QUALITY_LADDER, createUI } from './ui.js';
 import { createBootScreen } from './boot.js';
@@ -528,6 +529,9 @@ async function boot() {
     if (entity.kind === 'vessel') {
       return { x: entity.x, z: entity.z, y: 20, yaw: 210, pitch: style === 'toy' ? 30 : 22, distance: 300 };
     }
+    if (entity.kind === 'address') {
+      return { x: entity.x, z: entity.z, y: ground, yaw: 210, pitch: style === 'toy' ? 35 : 30, distance: 350 };
+    }
     if (entity.kind === 'person') {
       // Down among them: a resident framed like a building is a dot. Aimed at
       // the head, not the pavement, so the fly-in lands where the follow holds.
@@ -681,6 +685,58 @@ async function boot() {
 
   const search = createSearch({
     onPick: async (entry) => {
+      if (entry.t === 'address') {
+        const building = await context.buildingAt(entry.x, entry.z);
+        const buildingAddress = building?.address && parseAddressQuery(building.address);
+        const buildingContradictsAddress = buildingAddress && buildingAddress.streetKey !== entry.streetKey;
+        if (building && !buildingContradictsAddress) {
+          selectEntity(building, { fly: true });
+          return;
+        }
+        selectEntity({
+          kind: 'address',
+          id: entry.id,
+          title: entry.n,
+          name: entry.n,
+          street: entry.street,
+          number: entry.number,
+          matchedNumber: entry.matchedNumber,
+          exact: entry.exact,
+          x: entry.x,
+          z: entry.z,
+          source: 'DataSF Enterprise Addressing System',
+          confidence: 3,
+        }, { fly: true });
+        return;
+      }
+      if (entry.t === 'place') {
+        const place = await context.resolvePlace(entry);
+        if (!place) return;
+        const placeAddress = place.address && parseAddressQuery(place.address);
+        const building = await context.buildingAt(place.x, place.z);
+        const buildingAddress = building?.address && parseAddressQuery(building.address);
+        const buildingContradictsPlace =
+          placeAddress &&
+          buildingAddress &&
+          buildingAddress.streetKey !== placeAddress.streetKey;
+        if (building && !buildingContradictsPlace) {
+          selectEntity(building, { fly: true });
+          return;
+        }
+        selectEntity({
+          kind: 'place',
+          id: entry.id,
+          title: place.name || entry.n,
+          name: place.name || entry.n,
+          address: place.address,
+          types: place.types,
+          status: place.status,
+          x: place.x,
+          z: place.z,
+          source: 'google',
+        }, { fly: true });
+        return;
+      }
       if (entry.t === 'building') {
         const entity = await context.loadBuilding(Number(entry.id.slice(2)), entry.x, entry.z);
         if (entity) {
@@ -703,13 +759,27 @@ async function boot() {
     onEmpty: (query) => concierge.ask(query),
   });
 
-  search.input.addEventListener('input', async () => {
+  let searchSerial = 0;
+  let placesTimer = null;
+  search.input.addEventListener('input', () => {
     const query = search.input.value.trim();
+    searchSerial += 1;
+    const serial = searchSerial;
+    clearTimeout(placesTimer);
     if (!query) {
       search.close();
       return;
     }
-    search.render(await context.search(query), query);
+    context.search(query).then((results) => {
+      if (serial !== searchSerial || search.input.value.trim() !== query) return;
+      search.render(results, query);
+      if (results.length) return;
+      placesTimer = setTimeout(async () => {
+        const places = await context.autocompletePlaces(query);
+        if (serial !== searchSerial || search.input.value.trim() !== query) return;
+        if (places.length) search.render(places, query);
+      }, 140);
+    });
   });
 
   const concierge = createConcierge({

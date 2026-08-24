@@ -7,6 +7,8 @@
 // itself, clamped to the city's own extent.
 
 import { skySnapshot } from './astro.mjs';
+import { lookupAddress, normalizeStreetName, parseAddressQuery } from './addresses.mjs';
+import { findPlace } from './places.mjs';
 // Imported only to enumerate the registered live feeds for the live_data tool:
 // the registrations run here, but this function never fetches an upstream —
 // live_data goes through the deployment's own /api/<feed> URLs, so reads hit
@@ -36,6 +38,12 @@ You can move the viewer: call set_camera, focus_entity or highlight. Prefer
 focus_entity with a real entity id from a tool result. Coordinates are metres in
 the model's own frame (x east, z south of Duboce Triangle), not latitude and
 longitude.
+
+When a user gives a street address, call geocode_address first. If that fails,
+or the user names a business, venue or misspelled place, call find_place. Then
+call set_camera with the resulting x/z for a close-in view (distance about 350,
+pitch about 35). If address geocoding is not exact, say that the house number
+was approximated.
 
 The model's sky is the real one: it runs on San Francisco's wall clock, with the
 sun and moon where they actually are. Call sky_now for anything about the time,
@@ -85,6 +93,26 @@ const TOOLS = [
         kind: { type: 'string', enum: ['any', 'building', 'street', 'park', 'neighborhood', 'landmark'] },
         limit: { type: 'integer' },
       },
+      required: ['query'],
+    },
+  },
+  {
+    name: 'geocode_address',
+    description:
+      'Resolve a San Francisco street address against the DataSF Enterprise Addressing System. Use this first for street addresses. Returns model coordinates and whether the house number was exact.',
+    input_schema: {
+      type: 'object',
+      properties: { address: { type: 'string' } },
+      required: ['address'],
+    },
+  },
+  {
+    name: 'find_place',
+    description:
+      'Resolve a named San Francisco business, venue or place with the optional Google Places index. Use only after geocode_address fails for an address-shaped query, or for a named or misspelled place. Returns up to five candidates with model coordinates; call set_camera with the selected x/z.',
+    input_schema: {
+      type: 'object',
+      properties: { query: { type: 'string' } },
       required: ['query'],
     },
   },
@@ -244,6 +272,17 @@ function selfBase() {
 }
 
 const LIVE_FETCH_TIMEOUT_MS = 5000;
+const SEARCH_CACHE = new WeakMap();
+
+function indexedSearch(search) {
+  let indexed = SEARCH_CACHE.get(search);
+  if (!indexed) {
+    // q is the one canonical searchable key, normalized once per dataset.
+    indexed = search.map((entry) => ({ ...entry, q: normalizeStreetName(entry.n) }));
+    SEARCH_CACHE.set(search, indexed);
+  }
+  return indexed;
+}
 
 // Shrink one feed's payload to its share of the tool budget by halving its
 // largest array (vessels, vehicles, …) until it fits, recording what was cut.
@@ -267,7 +306,8 @@ function fitBudget(payload, budget) {
 // The read-only tools. `data` is the loaded bake; only live_data fetches, and
 // only from the city's own feed endpoints.
 export function createTools(data) {
-  const { search, places, parks, neighborhoods, streets, stats, muniStops, muniRoutes = [] } = data;
+  const { search, places, parks, neighborhoods, streets, stats, muniStops, muniRoutes = [], addresses, projection } = data;
+  const searchable = indexedSearch(search);
 
   function pointInRings(x, z, rings) {
     for (const ring of rings) {
@@ -432,11 +472,49 @@ export function createTools(data) {
       };
     },
 
+    geocode_address({ address }) {
+      if (!addresses) return { error: 'address geocoding is unavailable' };
+      const parsed = parseAddressQuery(address);
+      if (!parsed) return { error: 'that does not look like a street address' };
+      const hit = lookupAddress(addresses, parsed);
+      if (!hit) return { error: 'address not found in the DataSF index' };
+      const neighborhood = neighborhoods.find((n) => pointInRings(hit.x, hit.z, n.rings));
+      return {
+        address: parsed.label,
+        street: hit.street,
+        number: hit.matchedNumber,
+        x: hit.x,
+        z: hit.z,
+        exact: hit.exact,
+        neighborhood: neighborhood?.name || null,
+        source: 'DataSF Enterprise Addressing System',
+      };
+    },
+
+    async find_place({ query }) {
+      if (!projection) return { error: 'place search projection is unavailable' };
+      const result = await findPlace({ query });
+      if (result.error) return result;
+      const results = result.results.map((place) => {
+        const x = (place.lon - projection.lon0) * projection.mPerDegLon;
+        const z = -(place.lat - projection.lat0) * projection.mPerDegLat;
+        const neighborhood = neighborhoods.find((n) => pointInRings(x, z, n.rings));
+        return {
+          ...place,
+          x: Math.round(x),
+          z: Math.round(z),
+          neighborhood: neighborhood?.name || null,
+          source: 'Google Places',
+        };
+      });
+      return { query: result.query, results };
+    },
+
     search_city({ query, kind = 'any', limit = 8 }) {
-      const q = String(query || '').toLowerCase().trim();
+      const q = normalizeStreetName(query);
       if (!q) return [];
       const out = [];
-      for (const entry of search) {
+      for (const entry of searchable) {
         if (kind !== 'any' && entry.t !== kind) continue;
         if (!entry.q.includes(q)) continue;
         out.push({ id: entry.id, name: entry.n, kind: entry.t, x: entry.x, z: entry.z });

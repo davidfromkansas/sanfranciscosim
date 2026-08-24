@@ -11,6 +11,7 @@ import { PALETTE } from './lib/districts.mjs';
 
 const OUT = new URL('./out/', import.meta.url);
 const APP_TILES = new URL('../app/public/tiles/', import.meta.url);
+const API_DATA = new URL('../api/_data/', import.meta.url);
 
 const failures = [];
 const notes = [];
@@ -170,7 +171,12 @@ const manifest = {
 // that dead-reckon, and it took a hand-restore twice (e7ed9a46, and again
 // during the five-landmark batch in #113) before the cause was found here.
 await mkdir(APP_TILES, { recursive: true });
+await mkdir(API_DATA, { recursive: true });
 await writeFile(new URL('manifest.json', APP_TILES), JSON.stringify(manifest));
+await writeFile(
+  new URL('projection.json', API_DATA),
+  JSON.stringify(manifest.projection),
+);
 await copyFile(new URL('terrain.bin', OUT), new URL('terrain.bin', APP_TILES));
 await copyFile(new URL('landuse.bin', OUT), new URL('landuse.bin', APP_TILES));
 for (const name of ['buildings', 'streets', 'landcover']) {
