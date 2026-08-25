@@ -1027,6 +1027,13 @@
   gap: 8px;
 }
 
+/* An author `display` beats the UA rule for [hidden], so folding the legend
+   needs this line or the body stays on screen with the chevron pointing at a
+   panel that never closed. */
+.legend-body[hidden] {
+  display: none;
+}
+
 .legend-group {
   display: flex;
   align-items: center;

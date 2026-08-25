@@ -104,6 +104,9 @@ module parses.
   `xdotool mousemove <x> <y>; xdotool click 4` (zoom in) / `click 5` (zoom out).
 - For held drags (orbit/pan), use `xdotool mousemove X Y mousedown 3 ... mousemove_relative ... mouseup 3`
   and screenshot while the button is still held.
+- Edge scrolling can only be exercised on the LEFT edge in a desktop window: the r/simfrancisco feed
+  column overlays the right side, so the cursor never reaches the canvas's right 22 px band. Both
+  edges share one basis vector (`right` in `camera.js`), so the left edge is the sign test.
 - Time of day is not a widget any more — pin it from the console with `SF.setClock(...)` (see below).
   The clock panel sits top-left at 1024x768 tool coordinates around (14–120, 14–95).
 - The window manager does not support `_NET_CLIENT_LIST`, so `wmctrl -r :ACTIVE:` fails; Chrome is
