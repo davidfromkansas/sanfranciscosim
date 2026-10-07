@@ -596,9 +596,9 @@ function pickAnyone(cast, thread) {
 
 // ------------------------------------------------------------- when to post
 //
-// Six posts an hour, but not on the clock. A post landing at exactly :00, :10,
-// :20 reads as a machine the moment anyone notices the pattern, and people
-// notice patterns quickly. So the hour is cut into six windows and each window
+// Posts paced by WINDOW_MINUTES, but not on the clock. Landing on exact
+// multiples reads as a machine the moment anyone notices the pattern, and
+// people notice patterns quickly. So time is cut into windows and each window
 // draws its OWN minute to fire on.
 //
 // The draw is deterministic from the window number rather than random, which is
@@ -606,11 +606,13 @@ function pickAnyone(cast, thread) {
 // window compute the same minute, so the cron can fire every minute against any
 // instance and still produce exactly one post per window. Random would have
 // needed somewhere to write the decision down.
-const WINDOW_MS = 10 * 60_000;
+// Owner dial (2026-10-06): 2 minutes until 10pm PT, then 30 minutes.
+const WINDOW_MINUTES = 2;
+const WINDOW_MS = WINDOW_MINUTES * 60_000;
 
-export function dueMinuteFor(window) {
+export function dueMinuteFor(window, minutes = WINDOW_MINUTES) {
   // xorshift-multiply on the window index — cheap, and spreads adjacent windows
-  // apart instead of drifting one minute at a time the way `window % 10` would.
+  // apart instead of drifting one minute at a time the way `window % N` would.
   // Math.imul, not `*`: a plain multiply of two 32-bit values exceeds what a
   // double holds exactly, and the bits that fall off the end took the sign with
   // them — the first version handed out minute -8.
@@ -618,12 +620,12 @@ export function dueMinuteFor(window) {
   h ^= h >>> 15;
   h = Math.imul(h, 2246822519) >>> 0;
   h ^= h >>> 13;
-  return (h >>> 0) % 10;
+  return (h >>> 0) % minutes;
 }
 
 let lastWindow = -1;
 
-// True at most once per ten-minute window. `>=` rather than `===` so a window
+// True at most once per window. `>=` rather than `===` so a window
 // whose minute was missed — a cold start, a deploy, a slow generation running
 // long — still gets its post late rather than losing it entirely.
 export function postIsDue(now = Date.now()) {
@@ -1243,12 +1245,11 @@ const EVENT = {
   maxChars: { title: 120, body: 200 },
 };
 
-// Ten minutes to match the residents' own cadence — up to six wire posts an
-// hour, each on a randomised minute inside its window. Chosen for the demo to
-// feel live rather than for sustainability, and said so out loud: at this rate
-// the wire roughly doubles the feed's model spend, and the dial back to a
-// calmer cadence is this one number.
-const EVENT_WINDOW_MS = 10 * 60_000;
+// Match the residents' own cadence — one wire post per window, on a randomised
+// minute inside it. At a fast cadence the wire roughly doubles the feed's
+// model spend; dial both windows together.
+const EVENT_WINDOW_MINUTES = WINDOW_MINUTES;
+const EVENT_WINDOW_MS = EVENT_WINDOW_MINUTES * 60_000;
 // Links already posted. A ceiling rather than a quota: if the newsrooms have
 // filed nothing new this quarter hour, the city stays quiet rather than
 // reaching for filler. Cross-outlet duplicates are NOT merged yet — three
@@ -1264,7 +1265,7 @@ export function eventIsDue(now = Date.now()) {
   // residents' own schedule, so the wire and the residents do not always post
   // in the same breath.
   const minute = Math.floor((now % EVENT_WINDOW_MS) / 60_000);
-  if (minute < dueMinuteFor(window + 7919)) return false;
+  if (minute < dueMinuteFor(window + 7919, EVENT_WINDOW_MINUTES)) return false;
   lastEventWindow = window;
   return true;
 }
