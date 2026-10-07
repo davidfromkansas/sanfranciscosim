@@ -607,7 +607,7 @@ function pickAnyone(cast, thread) {
 // instance and still produce exactly one post per window. Random would have
 // needed somewhere to write the decision down.
 // Owner dial (2026-10-06): 2 minutes until 10pm PT, then 30 minutes.
-const WINDOW_MINUTES = 2;
+const WINDOW_MINUTES = 30;
 const WINDOW_MS = WINDOW_MINUTES * 60_000;
 
 export function dueMinuteFor(window, minutes = WINDOW_MINUTES) {
