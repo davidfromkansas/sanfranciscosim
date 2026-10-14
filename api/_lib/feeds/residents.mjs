@@ -115,7 +115,9 @@ const MAX_VOTES_PER_REFRESH = 24;
 // city was that hour. A thread is finished the moment its roll fails, so new
 // posts are the only thing that keeps the feed moving.
 const NEW_THREADS_PER_REFRESH = 1;
-const RETIRE_AFTER = 24 * 60 * 60 * 1000;
+// Owner decision (2026-10-14): keep every thread forever so the full history
+// stays visible in the webapp. Nothing retires on age.
+const RETIRE_AFTER = Infinity;
 // A day at one post every ten minutes is 144 threads, so a 50-thread cap would
 // have filled in eight hours and then silently stopped the subreddit — new
 // posts blocked, nothing retiring for another sixteen. The cap has to be a
@@ -1184,7 +1186,7 @@ export async function advanceSubreddit() {
   // as several crossed twenty-four hours together. A cap that stops the feed is
   // worse than no cap. It bounds SIZE now, not whether the city speaks.
   live.sort((a, b) => b.startedAt - a.startedAt);
-  while (live.length >= MAX_THREADS) live.pop(); // oldest is last
+  // No cap on history (owner decision 2026-10-14): old threads are never evicted.
 
   // The wire, on its own quarter-hour clock, before the residents' own post.
   // If the budget runs short the news is the thing that cannot wait: a
