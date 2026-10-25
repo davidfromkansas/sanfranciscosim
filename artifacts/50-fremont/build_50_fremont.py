@@ -52,16 +52,17 @@ def build():
     tk.prism("crown_cap", tk.offset_poly(top, 0.4), H_TOP - 1.2, H_TOP, "trim", bev=0.2)
     tk.glow_ring("crown_light", top, z + 0.8, H_TOP - 2.0, 0.5, "white_Glow")
     tk.roof_kit("roof_lo", plan(STEPS[-1][1]), z, seed=3.0, parapet=0.9, plant_frac=0.2, yaw=YAW)
-    # the Salesforce cloud on the Fremont (SE) face, semantically enlarged
-    a, b = tk.xform([(-6, -W / 2), (6, -W / 2)], YAW)
-    nx, ny = tk.rot2((0, -1), YAW)
+    # Orientation: local +y faces 45 deg = Fremont St (NE, the long entrance face); local +x
+    # faces 135 deg = Mission St (SE). The Salesforce cloud goes on the Fremont face,
+    # semantically enlarged.
+    nx, ny = tk.rot2((0, 1), YAW)
     for k, (dx, w, h, dz) in enumerate(((-3.5, 5.0, 3.6, 0.0), (0.0, 7.0, 5.2, 0.6), (3.6, 4.4, 3.2, 0.2))):
-        cx, cy = tk.rot2((dx, -W / 2 - 0.5), YAW)
+        cx, cy = tk.rot2((dx, W / 2 + 0.5), YAW)
         tk.box(f"cloud_{k}", cx, cy, 24.0 + dz, 24.0 + dz + h, w, 1.0, "sky", yaw=YAW, bev=0.4)
-    tk.flat_quad("cloud_glow", tk.rot2((-6.2, -W / 2 - 1.05), YAW), tk.rot2((6.2, -W / 2 - 1.05), YAW),
+    tk.flat_quad("cloud_glow", tk.rot2((6.2, W / 2 + 1.05), YAW), tk.rot2((-6.2, W / 2 + 1.05), YAW),
                  24.4, 28.8, 0.0, "sky_Glow", (nx, ny))
     tk.plinth("plaza", base, h=0.3, out=3.0)
-    p0, p1 = tk.xform([(-L / 2 + 4, -W / 2 - 2.2), (L / 2 - 4, -W / 2 - 2.2)], YAW)
+    p0, p1 = tk.xform([(-L / 2 + 4, W / 2 + 2.2), (L / 2 - 4, W / 2 + 2.2)], YAW)  # Fremont
     tk.tree_row("trees", p0, p1, 0.3, 3, h=6.0, seed=1.5)
 
 

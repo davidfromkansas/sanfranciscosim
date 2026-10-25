@@ -33,8 +33,9 @@ def build():
     tk.prism("base_glass", plan(-2.5), 0.0, H_BASE, "glass")
     tk.glow_ring("base_lit", plan(-2.5), 0.8, H_BASE - 1.2, 0.06, "sand_Glow")
     tk.pier_grid("base_cols", plan(-0.5), 0.0, H_BASE, 7.0, 1.4, 1.4, "cream", skip_short=5.0)
-    # ribbon windows: cream spandrels proud of a dark glass core, one per floor
-    tk.shaft("shaft", p, H_BASE, H_TOP - 3.0, 4.0, glass="glassd", band="cream", band_h=2.3,
+    # ribbon windows: cream spandrels proud of a dark glass core, one per floor; the pitch
+    # divides the shaft into whole storeys so the loft never ends in a zero-height sliver
+    tk.shaft("shaft", p, H_BASE, H_TOP - 3.0, (H_TOP - 3.0 - H_BASE) / 33, glass="glassd", band="cream", band_h=2.3,
              band_out=0.45, fins=None, lit=0.3, seed=2.4, lit_spacing=3.2)
     tk.prism("roof_band", tk.offset_poly(p, 0.45), H_TOP - 3.0, H_TOP - 0.6, "cream", bev=0.2)
     tk.roof_kit("roof", tk.offset_poly(p, -0.2), H_TOP - 0.6, seed=8.0, parapet=0.6, plant_frac=0.45,

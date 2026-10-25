@@ -44,7 +44,7 @@ def build():
     tk.glow_ring("base_lit", tk.offset_poly(p, -2.0), 0.8, H_BASE - 1.2, 0.06, "sand_Glow")
     tk.pier_grid("base_cols", tk.offset_poly(p, -0.4), 0.0, H_BASE, 5.0, 1.2, 1.2, "granite", skip_short=4.5)
     tk.shaft("shaft", p, H_BASE, H_TOP - 2.0, 4.2, glass="glassd", band="bronze", band_h=0.5,
-             band_out=0.15, fins=(1.9, 0.75, 0.5, "terracotta"), lit=0.3, seed=7.1, lit_spacing=1.9)
+             band_out=0.15, fins=(2.8, 0.85, 0.55, "terracotta"), lit=0.3, seed=7.1, lit_spacing=2.8)
     tk.prism("cap", tk.offset_poly(p, 0.5), H_TOP - 2.0, H_TOP - 0.8, "terracotta", bev=0.2)
     tk.roof_kit("roof", tk.offset_poly(p, -0.2), H_TOP - 0.8, seed=5.0, parapet=0.8, plant_frac=0.45,
                 yaw=YAW)

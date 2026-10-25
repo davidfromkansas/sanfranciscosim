@@ -30,27 +30,33 @@ def build():
     # the glass lobby: tall, clear, with the LED wall and a hovering shaft above
     tk.prism("lobby_glass", tk.offset_poly(plan, -1.2), 0.0, H_LOBBY, "glassl")
     tk.glow_ring("lobby_lit", tk.offset_poly(plan, -1.2), 0.8, H_LOBBY - 1.0, 0.06, "sand_Glow")
-    tk.pier_grid("lobby_mullions", tk.offset_poly(plan, -1.0), 0.0, H_LOBBY, 4.5, 0.25, 0.3, "steel")
-    # LED media wall facing Mission (NW): a sky-blue slab that glows at night
-    a, b = tk.xform([(-L / 2 + 6, W / 2 - 1.6), (L / 2 - 6, W / 2 - 1.6)], YAW)
-    nx, ny = tk.rot2((0, 1), YAW)
-    tk.box("led_wall", (a[0] + b[0]) / 2 - nx * 0.6, (a[1] + b[1]) / 2 - ny * 0.6, 3.0, H_LOBBY - 2.5,
-           L - 12, 0.8, "sky", yaw=YAW)
-    tk.flat_quad("led_wall_glow", a, b, 3.2, H_LOBBY - 2.7, -0.15, "sky_Glow", (nx, ny))
+    # mullions stand 0.6 m proud of the glass so the lit lobby band behind them stays visible
+    tk.pier_grid("lobby_mullions", tk.offset_poly(plan, -0.6), 0.0, H_LOBBY, 4.5, 0.25, 0.3, "steel")
+    # Orientation: local +x faces 135 deg = Mission St (SE); local -y faces 225 deg = Fremont St
+    # (SW); the Mission x Fremont corner is local (+x, -y).
+    # LED media wall facing Mission. The real one is inside the lobby; a toy model's opaque
+    # glass would hide it, so it is brought out as a screen on the lobby face: a sky-blue
+    # panel with an outward glow quad that lights at night.
+    nx, ny = tk.rot2((1, 0), YAW)
+    cx, cy = tk.rot2((L / 2 - 0.125, 0), YAW)
+    tk.box("led_wall", cx, cy, 3.0, H_LOBBY - 2.5, 0.25, W - 12, "sky", yaw=YAW)
+    a, b = tk.xform([(L / 2, -W / 2 + 6), (L / 2, W / 2 - 6)], YAW)  # this order faces outward
+    tk.flat_quad("led_wall_glow", a, b, 3.2, H_LOBBY - 2.7, 0.05, "sky_Glow", (nx, ny))
     tk.prism("transfer", plan, H_LOBBY, H_LOBBY + 1.2, "steel", bev=0.15)
-    # shaft: two-tone blue bands read as the canted pixel panels
-    tk.shaft("shaft", plan, H_LOBBY + 1.2, H_TOP - 4.5, 4.2, glass="glass", band="glassl", band_h=1.6,
-             band_out=0.25, fins=(4.6, 0.25, 0.3, "glassl"), lit=0.3, seed=9.0, lit_spacing=3.0)
+    # shaft: two-tone blue bands read as the canted pixel panels; 25 whole storeys (no sliver band)
+    tk.shaft("shaft", plan, H_LOBBY + 1.2, H_TOP - 4.5, (H_TOP - 4.5 - H_LOBBY - 1.2) / 25, glass="glass", band="glassl", band_h=1.6,
+             band_out=0.25, fins=(4.6, 0.25, 0.3, "glassl"), lit=0.3, seed=9.0, lit_spacing=4.6)
     tk.ring_band("crown_screen", tk.offset_poly(plan, -0.3), H_TOP - 4.5, H_TOP, 0.3, "glass")
     tk.prism("roof_deck", tk.offset_poly(plan, -0.4), H_TOP - 4.8, H_TOP - 4.4, "roofd")
     tk.hvac_cluster("roof_plant", 0, 0, H_TOP - 4.4, YAW, L * 0.6, W * 0.5, seed=4.0, hmax=4.0)
     tk.glow_ring("crown_light", plan, H_TOP - 3.5, H_TOP - 1.0, 0.36, "white_Glow")
-    # Salesforce cloud by the corner, semantically enlarged
-    for k, (dx, w, h, dz) in enumerate(((-2.6, 3.6, 2.6, 0.0), (0.0, 5.0, 3.8, 0.5), (2.6, 3.2, 2.4, 0.1))):
-        cx, cy = tk.rot2((dx - 10, W / 2 + 0.4), YAW)
-        tk.box(f"cloud_{k}", cx, cy, 22.0 + dz, 22.0 + dz + h, w, 0.8, "sky", yaw=YAW, bev=0.3)
+    # Salesforce cloud on the Mission face near the Fremont corner, semantically enlarged
+    for k, (dy, w, h, dz) in enumerate(((-2.6, 3.6, 2.6, 0.0), (0.0, 5.0, 3.8, 0.5), (2.6, 3.2, 2.4, 0.1))):
+        cx, cy = tk.rot2((L / 2 + 0.75, dy - 9), YAW)
+        tk.box(f"cloud_{k}", cx, cy, 22.0 + dz, 22.0 + dz + h, 0.8, w, "sky", yaw=YAW, bev=0.3)
     tk.plinth("plaza", plan, h=0.3, out=3.0)
-    p0, p1 = tk.xform([(-L / 2 + 4, W / 2 + 2.2), (L / 2 - 4, W / 2 + 2.2)], YAW)
+    # street trees along Fremont (SW)
+    p0, p1 = tk.xform([(-L / 2 + 4, -W / 2 - 2.2), (L / 2 - 4, -W / 2 - 2.2)], YAW)
     tk.tree_row("trees", p0, p1, 0.3, 3, h=6.0, seed=3.3)
 
 

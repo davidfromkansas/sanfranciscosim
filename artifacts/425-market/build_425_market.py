@@ -42,7 +42,9 @@ def build():
     tk.prism("roof_parapet_base", plan, H_ROOF - 0.2, H_ROOF + 0.3, "steel")
     tk.hvac_cluster("roof_plant", 0, 0, H_ROOF + 0.3, YAW, L * 0.9, 3.0, seed=2.0, hmax=3.2)
     tk.plinth("plaza", plan, h=0.3, out=4.0)
-    p0, p1 = tk.xform([(-L / 2 + 5, -W / 2 - 3), (L / 2 - 5, -W / 2 - 3)], YAW)
+    # Orientation: local -x faces 315 deg = Market St (NW, short face); local +y faces
+    # 45 deg = Fremont St (NE, long face). Street trees along Fremont.
+    p0, p1 = tk.xform([(-L / 2 + 5, W / 2 + 3), (L / 2 - 5, W / 2 + 3)], YAW)
     tk.tree_row("trees", p0, p1, 0.3, 4, h=6.0, seed=8.0)
 
 
