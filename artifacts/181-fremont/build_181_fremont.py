@@ -42,6 +42,46 @@ def roof_z(x, y):
     return H_ROOF_LO + (H_ROOF_HI - H_ROOF_LO) * max(0.0, min(1.0, t))
 
 
+def drop_hidden_panes(obj, segments, clear):
+    """Delete lit panes that a brace or mullion crosses: the bar hides them, and
+    a glow face buried under body geometry would fail the outward check."""
+    import bmesh
+    from mathutils import Vector
+    from mathutils.geometry import intersect_point_line
+    bm = bmesh.new()
+    bm.from_mesh(obj.data)
+    segs = [(Vector(a), Vector(b)) for a, b in segments]
+    dead = []
+    for f in bm.faces:
+        c = f.calc_center_median()
+        half = (f.verts[0].co - f.verts[1].co).length / 2  # pane half-width
+        for a, b in segs:
+            q, t = intersect_point_line(c, a, b)
+            if -0.05 <= t <= 1.05 and (q - c).length < clear + half:
+                dead.append(f)
+                break
+    bmesh.ops.delete(bm, geom=dead, context="FACES")
+    bm.to_mesh(obj.data)
+    bm.free()
+
+
+def fin_axes(plan_fn, z0, z1, spacing, skip_short=4.0):
+    """The axes tk.loft_fins puts its mullions on (same loop, same spacing)."""
+    lo, hi = tk.ccw(plan_fn(z0, 0.0)), tk.ccw(plan_fn(z1, 0.0))
+    out = []
+    for i in range(len(lo)):
+        a0, a1, b0, b1 = lo[i], lo[(i + 1) % len(lo)], hi[i], hi[(i + 1) % len(hi)]
+        L = math.dist(a0, a1)
+        if L < skip_short:
+            continue
+        cnt = max(1, int(round(L / spacing)))
+        for k in range(1, cnt):
+            t = k / cnt
+            out.append(((a0[0] + (a1[0] - a0[0]) * t, a0[1] + (a1[1] - a0[1]) * t, z0),
+                        (b0[0] + (b1[0] - b0[0]) * t, b0[1] + (b1[1] - b0[1]) * t, z1)))
+    return out
+
+
 def build():
     # shaft: glass loft with storey-group bands, then the sloped top cut
     pitch = 7.6
@@ -77,30 +117,37 @@ def build():
 
     # thin white mullions every ~4.5 m: the fine vertical grain of the wall
     tk.loft_fins("mullions", plan_at, H_LOBBY, H_ROOF_LO, 4.5, 0.35, 0.3, "trim")
-    # mega-braces: a giant "A" on every face (bottom corners -> top centre)
+    # mega-braces: stacked X's on every face. Each brace runs from one corner
+    # at the base of a half to the opposite corner at the top of it, so around
+    # every corner the braces draw a tall diamond (wide at mid-height, closing
+    # on the corner at grade and at the crown) - what the photograph shows.
     z0, z1 = H_LOBBY, H_ROOF_LO - 2
+    zm = (z0 + z1) / 2
+    braces = []
     for fi in range(4):
         rot = YAW + fi * math.pi / 2
         def half(z):
             t = min(max(z / H_ROOF_HI, 0.0), 1.0)
             w, d, c = W0 + (W1 - W0) * t, D0 + (D1 - D0) * t, CH0 + (CH1 - CH0) * t
             return ((w if fi % 2 == 0 else d) / 2, (d if fi % 2 == 0 else w) / 2, c)
-        hw0, hd0, c0 = half(z0)
-        hw1, hd1, c1 = half(z1)
-        for side in (-1, 1):
-            a = (*tk.rot2((side * (hw0 - c0), -hd0 - 0.35), rot), z0)
-            b = (*tk.rot2((side * 0.9, -hd1 - 0.35), rot), z1)
-            tk.tube(f"brace_{fi}_{side}", a, b, 2.2, 1.0, tk.rot2((0, -1), rot), "white")
-        # horizontal ties where the A's cross-bar would be
-        zt = z0 + (z1 - z0) * 0.5
-        hwt, hdt, ct = half(zt)
-        xa = (hw0 - c0) + ((0.9) - (hw0 - c0)) * 0.5
-        a = (*tk.rot2((-xa, -hdt - 0.35), rot), zt)
-        b = (*tk.rot2((xa, -hdt - 0.35), rot), zt)
-        tk.tube(f"tie_{fi}", a, b, 1.2, 0.7, tk.rot2((0, -1), rot), "white")
+
+        def pt(z, side):
+            hw, hd, c = half(z)
+            return (*tk.rot2((side * (hw - c - 0.6), -hd - 0.35), rot), z)
+        for k, (za, zb) in enumerate(((z0, zm), (zm, z1))):
+            for side in (-1, 1):
+                tk.tube(f"brace_{fi}_{k}_{side}", pt(za, side), pt(zb, -side), 2.0, 1.0,
+                        tk.rot2((0, -1), rot), "white")
+                braces.append((pt(za, side), pt(zb, -side)))
+        # horizontal ties where the X's meet at mid-height and under the crown
+        for k, zt in enumerate((zm, z1)):
+            tk.tube(f"tie_{fi}_{k}", pt(zt, -1), pt(zt, 1), 1.3, 0.8, tk.rot2((0, -1), rot), "white")
+            braces.append((pt(zt, -1), pt(zt, 1)))
     # night: residential floors lit warm, crown lit cool
     bands = tk.floors(H_LOBBY + 1, H_ROOF_LO - 4, pitch / 2)
-    tk.lit_loop_windows("win", plan_at, bands, 0.32, seed=5.1, out=-0.1, margin=0.7, subdiv=3, gap=0.1)
+    win = tk.lit_loop_windows("win", plan_at, bands, 0.5, seed=5.1, out=-0.1, margin=0.7, subdiv=3, gap=0.1)
+    drop_hidden_panes(win, braces, 1.2)
+    drop_hidden_panes(win, fin_axes(plan_at, H_LOBBY, H_ROOF_LO, 4.5), 0.25)
     tk.glow_ring("crown_light", plan_at(H_ROOF_LO + 1, -0.1), H_ROOF_LO + 1, H_ROOF_LO + 6, 0.0, "white_Glow")
 
     # lobby: tall glazed base set back behind white columns

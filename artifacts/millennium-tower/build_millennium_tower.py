@@ -41,7 +41,10 @@ def build():
     z = H_LOBBY
     for i, (zt, frac) in enumerate(TIERS):
         p = plan(frac)
-        tk.shaft(f"tier{i}", p, z, zt, 6.0, glass="navy", band="glass", band_h=0.6, band_out=0.12,
+        # whole storey-groups per tier: a leftover sliver shorter than a band
+        # would leave a zero-height loft row (degenerate triangles)
+        pitch = (zt - z) / max(1, round((zt - z) / 6.0))
+        tk.shaft(f"tier{i}", p, z, zt, pitch, glass="navy", band="glass", band_h=0.6, band_out=0.12,
                  fins=(3.0, 0.32, 0.35, "white"), lit=0.34, seed=2.0 + i, lit_spacing=3.0)
         # terrace edge on each setback, with a planter line
         nxt = TIERS[i + 1][1] if i + 1 < len(TIERS) else None

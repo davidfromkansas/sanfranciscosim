@@ -5,7 +5,7 @@
 v2 (2026-10-25, Transbay landmark batch) rebuilds the August asset to the
 batch's standard. What changed and why is in REPORT.md; the short version:
 
-* the shaft is PALE: silvery light glass (`Toy_glassl`) crossed by white
+* the shaft is PALE: silvery glass (`Toy_glassg`) crossed by white
   sunshade bands, which is how the tower reads from anywhere in the city.
   v1 used dark `Toy_glass` and read as a navy cylinder;
 * the profile follows the photographs: a gentle taper to about two thirds of
@@ -94,11 +94,9 @@ def door_edge(px, py, nx, ny, w, out):
 
 
 def build():
-    tk.reset()
-
     # --- shaft: pale glass + white sunshade bands (one loft) -------------
     tk.banded_loft("shaft", outline, H_LOBBY, H_ROOF, PITCH, BAND_H, BAND_OUT,
-                   tk.material("glassl"), tk.material("white"), glass_in=-0.25)
+                   tk.material("glassg"), tk.material("white"), glass_in=-0.25)
     office = []
     z = H_LOBBY
     while z + PITCH <= H_LED:
@@ -191,17 +189,12 @@ def build():
         tk.tree_row(f"trees_{name}", (px - tx * 24, py - ty * 24), (px - tx * 10, py - ty * 10), 0.3, 2,
                     h=7.0, r=2.4, seed=4.0 if name == "mission" else 9.0)
 
-    tk.recalc_all()
-    tk.merge_by_material(SLUG)
 
 
 def main():
-    argv = sys.argv[sys.argv.index("--") + 1:] if "--" in sys.argv else []
-    out = argv[argv.index("--out") + 1] if "--out" in argv else HERE
-    build()
-    mn, mx = tk.bbox()
-    print("bbox", tuple(round(v, 3) for v in mn), tuple(round(v, 3) for v in mx), "tris", tk.tri_count())
-    tk.export(SLUG, out)
+    # tk.run resets, builds, recalcs normals, merges by material, recentres,
+    # normalizes the crest to H_ARCH and exports <slug>.glb/.blend
+    tk.run(SLUG, build, HERE, (-122.396930, 37.789775), H_ARCH)
 
 
 if __name__ == "__main__":
