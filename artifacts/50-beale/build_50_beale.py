@@ -41,7 +41,7 @@ def build():
     tk.ring_band("parapet", tk.offset_poly(plan, -0.5), H_ROOF, H_ROOF + 1.0, 0.5, "ink")
     # Beale Street plaza: the famous mature trees by the entrance
     tk.plinth("plaza", plan, h=0.3, out=5.0)
-    p0, p1 = tk.xform([(-L / 2 + 4, -W / 2 - 3.5), (L / 2 - 4, -W / 2 - 3.5)], YAW)
+    p0, p1 = tk.xform([(-L / 2 + 4, W / 2 + 3.5), (L / 2 - 4, W / 2 + 3.5)], YAW)  # Beale St (NE) face
     tk.tree_row("trees", p0, p1, 0.3, 5, h=7.5, r=3.0, seed=2.5)
 
 

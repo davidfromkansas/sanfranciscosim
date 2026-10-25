@@ -41,21 +41,27 @@ def build():
     # shaft: plain cream with punched windows
     tk.punched_block("shaft", base, H_BASE + 1.0, H_SHAFT, 3.9, wall="cream", win="glassd", spacing=2.9,
                      gap=1.3, margin=0.9, lit=0.32, seed=2.0, bev=0.15)
-    tk.cornice("shaft_cornice", base, H_SHAFT, h=1.0, out=0.7, mat="terracotta")
-    # setbacks: two receding tiers, the upper one with the arched loggia
-    t1 = P(L - 5, W - 5)
-    tk.punched_block("tier1", t1, H_SHAFT + 1.0, 68.5, 3.8, wall="cream", win="glassd", spacing=2.9,
+    # crown, per the Commons photo of the Market face: a row of tall two-storey
+    # arched windows flush with the shaft, a deep cornice, an attic storey with
+    # urns/balustrade, and the set-back top storeys
+    tk.ring_band("arch_band", base, H_SHAFT - 0.5, H_SHAFT + 0.5, 0.35, "terracotta")
+    tk.prism("arch_storey", base, H_SHAFT + 0.5, 67.0, "cream", bev=0.15)
+    tk.arched_panes("arches", base, H_SHAFT + 1.2, 66.0, 4.6, 3.0, mat="glassd")
+    tk.arched_panes("arches_lit", base, H_SHAFT + 1.6, 65.2, 4.6, 2.2, mat="sand_Glow", out=0.1, suffix="_glow")
+    tk.cornice("crown_cornice", base, 67.0, h=1.6, out=1.2, mat="terracotta")
+    t1 = P(L - 3, W - 3)
+    tk.punched_block("attic", t1, 68.6, 72.5, 3.9, wall="cream", win="glassd", spacing=2.9,
                      gap=1.3, margin=0.9, lit=0.35, seed=3.0)
-    t2 = P(L - 11, W - 11)
-    tk.prism("tier2", t2, 68.5, 76.0, "cream", bev=0.15)
-    tk.arched_panes("loggia", t2, 69.3, 74.8, 3.4, 2.3, mat="glassd")
-    tk.arched_panes("loggia_lit", t2, 69.6, 74.0, 3.4, 1.7, mat="sand_Glow", out=0.1, suffix="_glow")
-    tk.cornice("crown_cornice", t2, 76.0, h=1.6, out=1.1, mat="terracotta")
-    # roof terraces on the setbacks, and plant on the top
-    tk.prism("roof_t1", tk.offset_poly(t1, -0.3), 68.4, 68.6, "roofd")
-    tk.hvac_cluster("plant", 0, 0, 77.6, YAW, (L - 15) * 0.7, (W - 15) * 0.6, seed=3.0, hmax=H_TOP - 77.6)
+    tk.ring_band("balustrade", tk.offset_poly(base, -0.2), 68.6, 69.8, 0.4, "terracotta")
+    t2 = P(L - 13, W - 13)
+    tk.punched_block("top", t2, 72.5, 77.0, 4.2, wall="cream", win="glassd", spacing=2.9,
+                     gap=1.3, margin=0.9, lit=0.4, seed=4.0)
+    tk.cornice("top_cornice", t2, 77.0, h=1.0, out=0.6, mat="terracotta")
+    tk.prism("roof_t1", tk.offset_poly(t1, -0.3), 72.4, 72.6, "roofd")
+    tk.ring_band("t1_parapet", tk.offset_poly(t1, -0.4), 72.5, 73.4, 0.4, "terracotta")
+    tk.hvac_cluster("plant", 0, 0, 78.0, YAW, (L - 15) * 0.6, (W - 15) * 0.5, seed=3.0, hmax=H_TOP - 78.0)
     tk.plinth("plaza", base, h=0.25, out=3.0)
-    p0, p1 = tk.xform([(-L / 2 + 4, -W / 2 - 2.2), (L / 2 - 4, -W / 2 - 2.2)], YAW)
+    p0, p1 = tk.xform([(-L / 2 - 2.2, -W / 2 + 4), (-L / 2 - 2.2, W / 2 - 4)], YAW)  # Market (NW) face
     tk.tree_row("trees", p0, p1, 0.25, 3, h=6.0, seed=4.0)
 
 

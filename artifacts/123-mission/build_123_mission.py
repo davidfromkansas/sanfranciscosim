@@ -45,7 +45,7 @@ def build():
     tk.ring_band("crown_parapet", tk.offset_poly(top, -0.4), H_TOP - 4.0, H_TOP - 2.8, 0.4, "stone")
     tk.hvac_cluster("plant", 0, 0, H_TOP - 4.0, YAW, (L - 6) * 0.6, (W - 6) * 0.5, seed=1.0, hmax=4.0)
     tk.plinth("plaza", p, h=0.3, out=3.0)
-    p0, p1 = tk.xform([(-L / 2 + 4, W / 2 + 2.2), (L / 2 - 4, W / 2 + 2.2)], YAW)
+    p0, p1 = tk.xform([(-L / 2 - 2.2, -W / 2 + 4), (-L / 2 - 2.2, W / 2 - 4)], YAW)  # Mission St (NW) face
     tk.tree_row("trees", p0, p1, 0.3, 3, h=6.0, seed=6.6)
 
 

@@ -32,13 +32,15 @@ def build():
     tk.prism("base", base, 0.0, H_BASE, "terracotta", bev=0.2)
     tk.arched_panes("arcade", base, 0.6, H_BASE - 1.8, 4.6, 3.0, mat="glassd")
     tk.lit_windows("arcade_lit", base, [(0.6, H_BASE - 3.6)], 4.6, 0.85, seed=5.0, out=0.1, margin=0.4, gap=2.0)
-    # the grand entrance arch on Market (NW face)
-    nx, ny = tk.rot2((0, 1), YAW)
-    c = tk.rot2((0, W / 2), YAW)
-    tk.box("portal", c[0] + nx * 0.5, c[1] + ny * 0.5, 0.0, H_BASE + 1.5, 9.0, 1.2, "cream", yaw=YAW, bev=0.2)
-    a, b = tk.xform([(-3.2, W / 2 + 1.1), (3.2, W / 2 + 1.1)], YAW)
-    tk.arched_panes("portal_arch", [a, b, tk.rot2((0, W / 2 + 6), YAW)], 0.3, H_BASE + 0.6, 7.0, 6.2,
-                    mat="glassd", out=0.0, edge_filter=lambda ei, *_: ei == 0)
+    # the grand entrance arch on Market: the NW face, local -X (local +X is bearing 135.4)
+    c = tk.rot2((-L / 2 - 0.5, 0.0), YAW)
+    tk.box("portal", c[0], c[1], 0.0, H_BASE + 1.5, 1.2, 9.0, "cream", yaw=YAW, bev=0.2)
+    x = -L / 2 - 1.15
+    tri = tk.xform([(x, 3.1), (x, -3.1), (x + 6.0, 0.0)], YAW)
+    tk.arched_panes("portal_arch", tri, 0.3, H_BASE + 0.6, 7.0, 6.2, mat="glassd", out=0.0,
+                    edge_filter=lambda ei, *_: ei == 0)
+    tk.arched_panes("portal_lit", tri, 0.3, H_BASE - 1.0, 7.0, 4.4, mat="sand_Glow", out=0.05,
+                    edge_filter=lambda ei, *_: ei == 0, suffix="_glow")
     tk.cornice("base_cornice", base, H_BASE, h=1.0, out=0.6, mat="cream")
     tk.punched_block("shaft", base, H_BASE + 1.0, H_SHAFT, 3.85, wall="cream", win="glassd", spacing=2.8,
                      gap=1.2, margin=0.9, lit=0.32, seed=6.0, bev=0.15)
@@ -50,7 +52,15 @@ def build():
     tk.cornice("cornice", base, 68.0, h=2.0, out=1.6, mat="cream")
     tk.ring_band("balustrade", tk.offset_poly(base, 0.6), 70.0, 71.4, 0.5, "terracotta")
     tk.prism("roof", tk.offset_poly(base, 0.5), 69.8, 70.2, "roofd")
-    tk.hvac_cluster("plant", 0, 0, 70.2, YAW, L * 0.45, W * 0.4, seed=8.0, hmax=H_TOP - 70.2)
+    # rooftop penthouse: the small arcaded loggia block seen over the Market
+    # cornice in the Commons photo (position on the roof inferred)
+    ph = tk.xform(tk.rect(10.0, 18.0, -5.0, 0.0), YAW)
+    tk.prism("penthouse", ph, 70.2, 72.4, "cream", bev=0.12)
+    tk.arched_panes("penthouse_arches", ph, 70.5, 72.1, 2.6, 1.6, mat="glassd")
+    tk.arched_panes("penthouse_lit", ph, 70.7, 71.8, 2.6, 1.1, mat="sand_Glow", out=0.1, suffix="_glow")
+    tk.cornice("penthouse_cornice", ph, 72.4, h=0.6, out=0.5, mat="terracotta")
+    pc = tk.rot2((9.0, 0.0), YAW)
+    tk.hvac_cluster("plant", pc[0], pc[1], 70.2, YAW, L * 0.25, W * 0.4, seed=8.0, hmax=1.8)
     tk.plinth("plaza", base, h=0.25, out=3.0)
 
 
