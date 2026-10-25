@@ -71,4 +71,8 @@ Lit arcade, lit arched-window row, scattered `Toy_sand_Glow` windows on shaft, a
 
 ## Gate 3 — approval
 
-Pending: renders sent to David.
+Approved by David on 2026-10-25 (contact sheets sent in four batches of five): "approve all".
+
+## Stage 4 — optimize
+
+Shipped as `app/public/sf-assets/landmarks/pge-general-office.glb`, meshopt-compressed with the intake flags of `pipeline/compress-assets.mjs` (`gltfpack -c -km -kn -noq`): **210 KB → 89 KB** (58% smaller). Geometry is unchanged. The kit merges every landmark into one body mesh and one glow mesh, so the Phase B cleanup in `tools/glb-optimize/` finds nothing to join or weld; a trial run saved 0 triangles and grew the file 1–5%, so it was not applied. The limited dissolve is skipped as GLB-OPTIMIZE-PROMPT §3 step 3 requires for assets with ring bands and parapets. Gate G3 (three.js GLTFLoader round-trip with MeshoptDecoder, `tools/glb-optimize/g3check`) passes.

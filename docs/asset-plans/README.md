@@ -145,7 +145,7 @@ route, and the park plans depend on it (§E8 of the parks README).
 | [1 South Park (One South Park)](./1-south-park.md) | `1-south-park` | 20.2 m (LiDAR `hgt_max`; penthouse roof 18.6 m, cornice crest 15.75 m) | new landmark |
 | [The Audiffred Building (1 Mission Street)](./audiffred-building.md) | `audiffred-building` | 17.5 m (estimated — barrel-vault crest, Overture + photogrammetric; LiDAR roof deck 15.4 m measured, `hgt_max` 19.18 m rejected as rooftop plant) | new landmark |
 
-## Shared contract (all 135)
+## Shared contract (all 155)
 | [252–254 Ritch Street](./254-ritch.md) | `254-ritch` | 8.8 m (LiDAR maximum, the roof flue; cornice crest 8.05 m estimated) | new landmark |
 | [434 Brannan Street (Art Deco loft, 1929)](./434-brannan.md) | `434-brannan` | 13.79 m (LiDAR maximum, read as the rooftop mechanical penthouse; roof deck 11.46 m measured, parapet crest ~12.4 m estimated) | new landmark |
 | [226 Ritch Street (226 Ritch Street Condominiums)](./226-ritch.md) | `226-ritch` | 18.1 m (roof crest, LiDAR-derived; 16.0 m parapet) | new landmark |
@@ -179,6 +179,26 @@ route, and the park plans depend on it (§E8 of the parks README).
 | [8 Mission Street (1 Hotel San Francisco / Hotel Vitale)](./8-mission.md) | `8-mission` | 28.66 m to the turret crown (LiDAR max; roof plateaus 25.10 / 19.64 / 14.18 m) | new landmark |
 | [Ferry Station Post Office Building (Agriculture Building)](./ferry-station-post-office.md) | `ferry-station-post-office` | 12.65 m (LiDAR tile-ridge; eave 10.8 m measured) | new landmark |
 | [Pier 17 (The Embarcadero at Green St)](./pier-17.md) | `pier-17` | 21.3 m (flagpole tip above water; facade gable apex 16.9 m, LiDAR-derived; the asset carries its own 2.0 m pier deck) | new landmark |
+| [Salesforce Tower](./salesforce-tower.md) | `salesforce-tower` | 326 m (published) | rebuilt (v2), replaces procedural |
+| [181 Fremont](./181-fremont.md) | `181-fremont` | 244.4 m | new landmark |
+| [Millennium Tower](./millennium-tower.md) | `millennium-tower` | 197 m | new landmark |
+| [Park Tower at Transbay](./park-tower.md) | `park-tower` | 183 m | new landmark |
+| [Salesforce Transit Center](./transit-center.md) | `transit-center` | 30 m (OSM, estimated; park deck 21.3 m) | new landmark |
+| [350 Mission Street (Salesforce East)](./350-mission.md) | `350-mission` | 129 m | new landmark |
+| [45 Fremont Street](./45-fremont.md) | `45-fremont` | 145 m | new landmark |
+| [Salesforce West (50 Fremont Center)](./50-fremont.md) | `50-fremont` | 183 m | new landmark |
+| [425 Market Street](./425-market.md) | `425-market` | 160 m | new landmark |
+| [333 Market Street](./333-market.md) | `333-market` | 144 m | new landmark |
+| [Pacific Gas & Electric Building (77 Beale Street)](./77-beale.md) | `77-beale` | 150 m | new landmark |
+| [PG&E General Office Building (245 Market Street)](./pge-general-office.md) | `pge-general-office` | 79.8 m | new landmark |
+| [Matson Building](./matson-building.md) | `matson-building` | 73 m (estimated) | new landmark |
+| [50 Beale Street](./50-beale.md) | `50-beale` | 100 m | new landmark |
+| [123 Mission Street](./123-mission.md) | `123-mission` | 124 m | new landmark |
+| [201 Mission Street](./201-mission.md) | `201-mission` | 135.9 m | new landmark |
+| [60 Spear Street](./60-spear.md) | `60-spear` | 57.9 m | new landmark |
+| [100 First Plaza](./100-first.md) | `100-first` | 136.25 m | new landmark |
+| [Rincon Annex (Rincon Center)](./rincon-annex.md) | `rincon-annex` | 29.7 m | new landmark |
+| [Federal Reserve Bank of San Francisco](./federal-reserve.md) | `federal-reserve` | 63.1 m | new landmark |
 
 - Style: `docs/styles/miniature-toy.md` (authoritative for artistic decisions)
 - Technical contract: `.agents/skills/sf-asset-check/SKILL.md` (authoritative for the GLB)

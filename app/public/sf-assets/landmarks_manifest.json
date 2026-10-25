@@ -22,19 +22,19 @@
     "id": "salesforce-tower",
     "file": "salesforce-tower.glb",
     "anchor": [
-      -122.3969270512,
-      37.7897756184
+      -122.39693,
+      37.789775
     ],
     "targetHeightM": 326,
-    "cat": 16,
+    "cat": 3,
     "name": "Salesforce Tower",
     "estimated": false,
     "dims": [
-      73.3818,
-      73.5321,
-      326
+      78.9968,
+      78.9968,
+      326.0
     ],
-    "tris": 20086
+    "tris": 17508
   },
   {
     "id": "ferry-building",
@@ -1507,12 +1507,12 @@
     "id": "76-south-park",
     "file": "76-south-park.glb",
     "anchor": [
-      -122.3940170,
+      -122.394017,
       37.7820261
     ],
     "targetHeightM": 16.28,
     "cat": 2,
-    "name": "76–82 South Park",
+    "name": "76\u201382 South Park",
     "estimated": true,
     "dims": [
       26.6145,
@@ -1602,7 +1602,7 @@
     "id": "318-brannan",
     "file": "318-brannan.glb",
     "anchor": [
-      -122.3927890,
+      -122.392789,
       37.7816014
     ],
     "targetHeightM": 8.6,
@@ -2097,7 +2097,7 @@
     "file": "audiffred-building.glb",
     "anchor": [
       -122.3927766,
-      37.7933230
+      37.793323
     ],
     "targetHeightM": 17.5,
     "cat": 3,
@@ -2470,6 +2470,367 @@
       182.7369
     ],
     "tris": 1998,
+    "loadRadius": 2500
+  },
+  {
+    "id": "181-fremont",
+    "file": "181-fremont.glb",
+    "anchor": [
+      -122.395309,
+      37.789766
+    ],
+    "targetHeightM": 244.4,
+    "cat": 3,
+    "name": "181 Fremont",
+    "estimated": false,
+    "dims": [
+      50.4264,
+      50.4264,
+      244.4
+    ],
+    "tris": 3346,
+    "loadRadius": 7332
+  },
+  {
+    "id": "millennium-tower",
+    "file": "millennium-tower.glb",
+    "anchor": [
+      -122.396191,
+      37.790415
+    ],
+    "targetHeightM": 197.0,
+    "cat": 2,
+    "name": "Millennium Tower",
+    "estimated": false,
+    "dims": [
+      53.2833,
+      53.4808,
+      197.0
+    ],
+    "tris": 9766,
+    "loadRadius": 5910
+  },
+  {
+    "id": "park-tower",
+    "file": "park-tower.glb",
+    "anchor": [
+      -122.394279,
+      37.790436
+    ],
+    "targetHeightM": 183.0,
+    "cat": 3,
+    "name": "Park Tower at Transbay",
+    "estimated": false,
+    "dims": [
+      81.883,
+      81.883,
+      183.0
+    ],
+    "tris": 5054,
+    "loadRadius": 5490
+  },
+  {
+    "id": "transit-center",
+    "file": "transit-center.glb",
+    "anchor": [
+      -122.3968739,
+      37.7891093
+    ],
+    "targetHeightM": 30.0,
+    "cat": 25,
+    "name": "Salesforce Transit Center",
+    "estimated": true,
+    "dims": [
+      342.4867,
+      340.3212,
+      30.0
+    ],
+    "tris": 6780,
+    "loadRadius": 2500
+  },
+  {
+    "id": "350-mission",
+    "file": "350-mission.glb",
+    "anchor": [
+      -122.39672,
+      37.790872
+    ],
+    "targetHeightM": 129.0,
+    "cat": 3,
+    "name": "350 Mission Street (Salesforce East)",
+    "estimated": false,
+    "dims": [
+      61.3769,
+      61.3769,
+      129.0
+    ],
+    "tris": 3048,
+    "loadRadius": 3870
+  },
+  {
+    "id": "45-fremont",
+    "file": "45-fremont.glb",
+    "anchor": [
+      -122.397149,
+      37.791231
+    ],
+    "targetHeightM": 145.0,
+    "cat": 3,
+    "name": "45 Fremont Street",
+    "estimated": false,
+    "dims": [
+      57.7729,
+      57.6396,
+      145.0
+    ],
+    "tris": 4064,
+    "loadRadius": 4350
+  },
+  {
+    "id": "50-fremont",
+    "file": "50-fremont.glb",
+    "anchor": [
+      -122.397241,
+      37.79051
+    ],
+    "targetHeightM": 183.0,
+    "cat": 3,
+    "name": "Salesforce West (50 Fremont Center)",
+    "estimated": false,
+    "dims": [
+      63.8784,
+      63.8451,
+      183.0
+    ],
+    "tris": 7780,
+    "loadRadius": 5490
+  },
+  {
+    "id": "425-market",
+    "file": "425-market.glb",
+    "anchor": [
+      -122.398153,
+      37.791204
+    ],
+    "targetHeightM": 160.0,
+    "cat": 3,
+    "name": "425 Market Street",
+    "estimated": false,
+    "dims": [
+      80.1431,
+      80.0876,
+      160.0
+    ],
+    "tris": 6756,
+    "loadRadius": 4800
+  },
+  {
+    "id": "333-market",
+    "file": "333-market.glb",
+    "anchor": [
+      -122.397403,
+      37.791938
+    ],
+    "targetHeightM": 144.0,
+    "cat": 3,
+    "name": "333 Market Street",
+    "estimated": false,
+    "dims": [
+      59.6849,
+      59.7516,
+      144.0
+    ],
+    "tris": 10990,
+    "loadRadius": 4320
+  },
+  {
+    "id": "77-beale",
+    "file": "77-beale.glb",
+    "anchor": [
+      -122.395754,
+      37.791782
+    ],
+    "targetHeightM": 150.0,
+    "cat": 3,
+    "name": "Pacific Gas & Electric Building (77 Beale Street)",
+    "estimated": false,
+    "dims": [
+      74.1048,
+      74.1048,
+      150.0
+    ],
+    "tris": 8186,
+    "loadRadius": 4500
+  },
+  {
+    "id": "pge-general-office",
+    "file": "pge-general-office.glb",
+    "anchor": [
+      -122.396849,
+      37.792385
+    ],
+    "targetHeightM": 79.8,
+    "cat": 3,
+    "name": "PG&E General Office Building (245 Market Street)",
+    "estimated": false,
+    "dims": [
+      67.7332,
+      67.748,
+      79.8
+    ],
+    "tris": 3936,
+    "loadRadius": 2500
+  },
+  {
+    "id": "matson-building",
+    "file": "matson-building.glb",
+    "anchor": [
+      -122.396508,
+      37.792655
+    ],
+    "targetHeightM": 73.0,
+    "cat": 3,
+    "name": "Matson Building",
+    "estimated": true,
+    "dims": [
+      68.4374,
+      68.4571,
+      73.0
+    ],
+    "tris": 4114,
+    "loadRadius": 2500
+  },
+  {
+    "id": "50-beale",
+    "file": "50-beale.glb",
+    "anchor": [
+      -122.396486,
+      37.791257
+    ],
+    "targetHeightM": 100.0,
+    "cat": 3,
+    "name": "50 Beale Street",
+    "estimated": false,
+    "dims": [
+      90.4472,
+      90.2892,
+      100.0
+    ],
+    "tris": 5282,
+    "loadRadius": 3000
+  },
+  {
+    "id": "123-mission",
+    "file": "123-mission.glb",
+    "anchor": [
+      -122.394447,
+      37.791824
+    ],
+    "targetHeightM": 124.0,
+    "cat": 3,
+    "name": "123 Mission Street",
+    "estimated": false,
+    "dims": [
+      56.2261,
+      56.1397,
+      124.0
+    ],
+    "tris": 5742,
+    "loadRadius": 3720
+  },
+  {
+    "id": "201-mission",
+    "file": "201-mission.glb",
+    "anchor": [
+      -122.3949073,
+      37.7911895
+    ],
+    "targetHeightM": 135.9,
+    "cat": 3,
+    "name": "201 Mission Street",
+    "estimated": false,
+    "dims": [
+      114.0744,
+      85.5104,
+      135.9
+    ],
+    "tris": 8578,
+    "loadRadius": 4077
+  },
+  {
+    "id": "60-spear",
+    "file": "60-spear.glb",
+    "anchor": [
+      -122.394585,
+      37.792566
+    ],
+    "targetHeightM": 57.9,
+    "cat": 3,
+    "name": "60 Spear Street",
+    "estimated": false,
+    "dims": [
+      58.216,
+      58.174,
+      57.9
+    ],
+    "tris": 2238,
+    "loadRadius": 2500
+  },
+  {
+    "id": "100-first",
+    "file": "100-first.glb",
+    "anchor": [
+      -122.3977206,
+      37.7891952
+    ],
+    "targetHeightM": 136.25,
+    "cat": 3,
+    "name": "100 First Plaza",
+    "estimated": false,
+    "dims": [
+      95.4871,
+      91.7661,
+      136.25
+    ],
+    "tris": 4800,
+    "loadRadius": 4088
+  },
+  {
+    "id": "rincon-annex",
+    "file": "rincon-annex.glb",
+    "anchor": [
+      -122.3931571,
+      37.7925049
+    ],
+    "targetHeightM": 29.7,
+    "cat": 3,
+    "name": "Rincon Annex (Rincon Center)",
+    "estimated": false,
+    "dims": [
+      129.4039,
+      130.5617,
+      29.7
+    ],
+    "tris": 1546,
+    "loadRadius": 2500
+  },
+  {
+    "id": "federal-reserve",
+    "file": "federal-reserve.glb",
+    "anchor": [
+      -122.39552,
+      37.793002
+    ],
+    "targetHeightM": 63.1,
+    "cat": 18,
+    "name": "Federal Reserve Bank of San Francisco",
+    "estimated": false,
+    "dims": [
+      129.9662,
+      129.9662,
+      63.1
+    ],
+    "tris": 4514,
     "loadRadius": 2500
   }
 ]
