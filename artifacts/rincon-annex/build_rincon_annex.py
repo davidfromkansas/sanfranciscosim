@@ -38,7 +38,7 @@ def build():
     tk.lit_windows("tall_lit", p, [(H_BASE + 0.6, 11.0)], 6.5, 0.6, seed=2.0, out=0.1, margin=0.6, gap=3.8)
     tk.panes("upper_win", p, [(12.4, 15.2)], 6.5, mat="ink", gap=4.2, margin=0.0)
     # the dolphin friezes: blue relief panels over each tall window
-    tk.lit_windows("dolphins", p, [(11.2, 12.2)], 6.5, 1.01, out=0.12, margin=0.0, mat="sky", gap=3.6,
+    tk.lit_windows("dolphins", p, [(10.9, 12.3)], 6.5, 1.01, out=0.12, margin=0.0, mat="sky", gap=3.0,
                    suffix="_panes")
     tk.ring_band("cornice", p, H_PARAPET - 1.2, H_PARAPET, 0.35, "glassl")
     tk.prism("roof", tk.offset_poly(p, -0.6), H_PARAPET - 1.4, H_PARAPET - 1.0, "roofd")
@@ -55,7 +55,7 @@ def build():
         tk.box(f"skylight_{k}", c2[0], c2[1], H_PARAPET - 1.0, H_PARAPET + 0.6, 4.0, 40.0, "glassl",
                yaw=YAW, bev=0.15)
     tk.plinth("sidewalk", p, h=0.25, out=3.0)
-    a, b = tk.xform([(-36.0, 36.0), (36.0, 36.0)], YAW)
+    a, b = tk.xform([(-34.0, 48.5), (34.0, 48.5)], YAW)   # Mission St sidewalk (NW face at y~45-47)
     tk.tree_row("mission_trees", a, b, 0.25, 5, h=6.0, seed=6.0)
 
 
