@@ -35,10 +35,13 @@ check(
   `${buildings.stats.total} baked (${buildings.stats.datasf} DataSF + ${buildings.stats.overtureAdded} Overture)`
 );
 
+// A units guard: feet would push the peak well past 340. The floor dropped from
+// 200 m when the Transbay batch made 181 Fremont (244 m) a bespoke model; the
+// tallest procedural tower is now The Avery at 488 Folsom (188 m).
 const proceduralTallest = buildings.stats.tallest.height;
 check(
-  'tallest procedural building 200-340 m',
-  proceduralTallest >= 200 && proceduralTallest <= 340,
+  'tallest procedural building 150-340 m',
+  proceduralTallest >= 150 && proceduralTallest <= 340,
   `${proceduralTallest} m (heights in meters, not feet)`
 );
 
