@@ -1,76 +1,76 @@
 {
- "generated": "2026-08-20T00:24:53.964Z",
- "buildings": 174647,
+ "generated": "2026-10-26T01:48:08.568Z",
+ "buildings": 174523,
  "cells": 596,
  "categories": [
   {
    "cat": 0,
    "id": "misc",
    "label": "Building",
-   "count": 10526,
+   "count": 10524,
    "night": 3
   },
   {
    "cat": 1,
    "id": "house",
    "label": "House",
-   "count": 124512,
+   "count": 124511,
    "night": 0
   },
   {
    "cat": 2,
    "id": "apartments",
    "label": "Apartments",
-   "count": 14008,
+   "count": 14007,
    "night": 0
   },
   {
    "cat": 3,
    "id": "office",
    "label": "Office",
-   "count": 2721,
+   "count": 2648,
    "night": 3
   },
   {
    "cat": 4,
    "id": "retail",
    "label": "Retail",
-   "count": 8035,
+   "count": 8030,
    "night": 1
   },
   {
    "cat": 5,
    "id": "restaurant_cafe",
    "label": "Restaurant / Café",
-   "count": 2835,
+   "count": 2838,
    "night": 1
   },
   {
    "cat": 6,
    "id": "bar",
    "label": "Bar",
-   "count": 523,
+   "count": 522,
    "night": 1
   },
   {
    "cat": 7,
    "id": "hotel",
    "label": "Hotel",
-   "count": 1454,
+   "count": 1437,
    "night": 0
   },
   {
    "cat": 8,
    "id": "worship",
    "label": "Place of worship",
-   "count": 630,
+   "count": 631,
    "night": 3
   },
   {
    "cat": 9,
    "id": "school",
    "label": "School",
-   "count": 1058,
+   "count": 1057,
    "night": 3
   },
   {
@@ -84,14 +84,14 @@
    "cat": 11,
    "id": "hospital",
    "label": "Hospital",
-   "count": 116,
+   "count": 115,
    "night": 2
   },
   {
    "cat": 12,
    "id": "clinic",
    "label": "Clinic",
-   "count": 1387,
+   "count": 1386,
    "night": 2
   },
   {
@@ -119,14 +119,14 @@
    "cat": 16,
    "id": "museum",
    "label": "Museum",
-   "count": 231,
+   "count": 230,
    "night": 1
   },
   {
    "cat": 17,
    "id": "theater_cinema",
    "label": "Theater / Cinema",
-   "count": 275,
+   "count": 273,
    "night": 1
   },
   {
@@ -161,21 +161,21 @@
    "cat": 22,
    "id": "supermarket",
    "label": "Supermarket",
-   "count": 344,
+   "count": 345,
    "night": 1
   },
   {
    "cat": 23,
    "id": "parking_garage",
    "label": "Parking garage",
-   "count": 1836,
+   "count": 1812,
    "night": 3
   },
   {
    "cat": 24,
    "id": "gym",
    "label": "Gym",
-   "count": 402,
+   "count": 403,
    "night": 1
   },
   {
@@ -195,22 +195,22 @@
   {
    "sub": "shop",
    "label": "Shop",
-   "count": 2151
+   "count": 2153
   },
   {
    "sub": "office",
    "label": "Office",
-   "count": 1875
+   "count": 1854
   },
   {
    "sub": "restaurant",
    "label": "Restaurant",
-   "count": 1821
+   "count": 1825
   },
   {
    "sub": "hotel",
    "label": "Hotel",
-   "count": 1302
+   "count": 1287
   },
   {
    "sub": "salon",
@@ -220,7 +220,7 @@
   {
    "sub": "clinic",
    "label": "Clinic",
-   "count": 960
+   "count": 959
   },
   {
    "sub": "house",
@@ -230,7 +230,7 @@
   {
    "sub": "parking_garage",
    "label": "Parking garage",
-   "count": 890
+   "count": 866
   },
   {
    "sub": "community_center",
@@ -265,12 +265,12 @@
   {
    "sub": "elementary_school",
    "label": "Elementary school",
-   "count": 444
+   "count": 443
   },
   {
    "sub": "bar",
    "label": "Bar",
-   "count": 415
+   "count": 414
   },
   {
    "sub": "civic_office",
@@ -285,7 +285,7 @@
   {
    "sub": "gym",
    "label": "Gym",
-   "count": 302
+   "count": 303
   },
   {
    "sub": "corner_store",
@@ -305,12 +305,12 @@
   {
    "sub": "theater",
    "label": "Theater",
-   "count": 224
+   "count": 223
   },
   {
    "sub": "grocery",
    "label": "Grocery store",
-   "count": 217
+   "count": 218
   },
   {
    "sub": "laundromat",
@@ -325,12 +325,12 @@
   {
    "sub": "bank",
    "label": "Bank",
-   "count": 187
+   "count": 188
   },
   {
    "sub": "taqueria",
    "label": "Taquería",
-   "count": 177
+   "count": 176
   },
   {
    "sub": "gallery",
@@ -355,7 +355,7 @@
   {
    "sub": "tech_hq",
    "label": "Tech office",
-   "count": 132
+   "count": 133
   },
   {
    "sub": "supermarket",
@@ -410,7 +410,7 @@
   {
    "sub": "hospital",
    "label": "Hospital",
-   "count": 66
+   "count": 65
   },
   {
    "sub": "high_school",
@@ -440,7 +440,7 @@
   {
    "sub": "museum",
    "label": "Museum",
-   "count": 56
+   "count": 55
   },
   {
    "sub": "post_office",
@@ -543,19 +543,19 @@
    "count": 31
   },
   {
-   "sub": "concert_hall",
-   "label": "Concert hall",
-   "count": 29
-  },
-  {
    "sub": "brewery",
    "label": "Brewery",
    "count": 29
   },
   {
+   "sub": "concert_hall",
+   "label": "Concert hall",
+   "count": 28
+  },
+  {
    "sub": "inn",
    "label": "Inn",
-   "count": 24
+   "count": 23
   },
   {
    "sub": "police_station",
@@ -568,13 +568,13 @@
    "count": 22
   },
   {
-   "sub": "coworking",
-   "label": "Coworking space",
-   "count": 16
-  },
-  {
    "sub": "ev_charging",
    "label": "EV charging",
+   "count": 15
+  },
+  {
+   "sub": "coworking",
+   "label": "Coworking space",
    "count": 15
   },
   {
@@ -628,13 +628,13 @@
    "count": 3
   },
   {
-   "sub": "data_center",
-   "label": "Data center",
-   "count": 2
-  },
-  {
    "sub": "cathedral",
    "label": "Cathedral",
+   "count": 3
+  },
+  {
+   "sub": "data_center",
+   "label": "Data center",
    "count": 2
   },
   {
@@ -654,18 +654,18 @@
   }
  ],
  "sources": {
-  "landuse": 140658,
-  "business": 10201,
-  "heuristic": 7275,
-  "osm": 8591,
-  "overture": 6643,
+  "landuse": 140594,
+  "business": 10192,
+  "heuristic": 7274,
+  "osm": 8565,
+  "overture": 6619,
   "datasf": 1279
  },
  "confidence": [
-  147933,
-  15303,
-  4471,
-  6940
+  147868,
+  15275,
+  4444,
+  6936
  ],
  "streets": {
   "named": 2509,
