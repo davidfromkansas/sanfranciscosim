@@ -2832,5 +2832,1905 @@
     ],
     "tris": 4514,
     "loadRadius": 2500
+  },
+  {
+    "id": "1-bush-street",
+    "file": "1-bush-street.glb",
+    "anchor": [
+      -122.40006,
+      37.7909563
+    ],
+    "targetHeightM": 93.9,
+    "cat": 3,
+    "name": "Crown Zellerbach Building (One Bush Plaza)",
+    "estimated": false,
+    "dims": [
+      75.5086,
+      53.3574,
+      93.9
+    ],
+    "tris": 3618,
+    "loadRadius": 2817
+  },
+  {
+    "id": "1-california-street",
+    "file": "1-california-street.glb",
+    "anchor": [
+      -122.3971792,
+      37.7932326
+    ],
+    "targetHeightM": 133.5,
+    "cat": 3,
+    "name": "One California",
+    "estimated": false,
+    "dims": [
+      54.3742,
+      54.8593,
+      133.5
+    ],
+    "tris": 2762,
+    "loadRadius": 4005
+  },
+  {
+    "id": "1-front-street",
+    "file": "1-front-street.glb",
+    "anchor": [
+      -122.3988578,
+      37.7917996
+    ],
+    "targetHeightM": 164.0,
+    "cat": 3,
+    "name": "One Front Street",
+    "estimated": false,
+    "dims": [
+      56.2188,
+      65.0635,
+      164.0
+    ],
+    "tris": 4518,
+    "loadRadius": 4920
+  },
+  {
+    "id": "1-grant-avenue",
+    "file": "1-grant-avenue.glb",
+    "anchor": [
+      -122.4051939,
+      37.786999
+    ],
+    "targetHeightM": 30.22,
+    "cat": 3,
+    "name": "Savings Union Bank Building",
+    "estimated": false,
+    "dims": [
+      35.71,
+      33.612,
+      30.22
+    ],
+    "tris": 858,
+    "loadRadius": 2500
+  },
+  {
+    "id": "1-post-street",
+    "file": "1-post-street.glb",
+    "anchor": [
+      -122.4026603,
+      37.7887621
+    ],
+    "targetHeightM": 161.0,
+    "cat": 3,
+    "name": "One Post Street",
+    "estimated": false,
+    "dims": [
+      46.8054,
+      49.6789,
+      161.0
+    ],
+    "tris": 2866,
+    "loadRadius": 4830
+  },
+  {
+    "id": "1-sansome-street",
+    "file": "1-sansome-street.glb",
+    "anchor": [
+      -122.4011756,
+      37.7904654
+    ],
+    "targetHeightM": 168.0,
+    "cat": 3,
+    "name": "One Sansome Street",
+    "estimated": false,
+    "dims": [
+      84.0755,
+      58.0822,
+      168.0
+    ],
+    "tris": 4202,
+    "loadRadius": 5040
+  },
+  {
+    "id": "100-bush-street",
+    "file": "100-bush-street.glb",
+    "anchor": [
+      -122.3999801,
+      37.7915717
+    ],
+    "targetHeightM": 115.22,
+    "cat": 3,
+    "name": "Shell Building (100 Bush Street)",
+    "estimated": false,
+    "dims": [
+      48.3073,
+      52.1586,
+      115.22
+    ],
+    "tris": 2760,
+    "loadRadius": 3457
+  },
+  {
+    "id": "100-montgomery-street",
+    "file": "100-montgomery-street.glb",
+    "anchor": [
+      -122.4018706,
+      37.7903435
+    ],
+    "targetHeightM": 107.9,
+    "cat": 3,
+    "name": "100 Montgomery Street (Equitable Life Building)",
+    "estimated": false,
+    "dims": [
+      61.7195,
+      46.1684,
+      107.9
+    ],
+    "tris": 2156,
+    "loadRadius": 3237
+  },
+  {
+    "id": "100-pine-center",
+    "file": "100-pine-center.glb",
+    "anchor": [
+      -122.3990118,
+      37.7926485
+    ],
+    "targetHeightM": 145.0,
+    "cat": 3,
+    "name": "100 Pine Center",
+    "estimated": false,
+    "dims": [
+      48.984,
+      49.0617,
+      145.0
+    ],
+    "tris": 2820,
+    "loadRadius": 4350
+  },
+  {
+    "id": "100-sansome-street",
+    "file": "100-sansome-street.glb",
+    "anchor": [
+      -122.4004726,
+      37.7915113
+    ],
+    "targetHeightM": 58.2,
+    "cat": 3,
+    "name": "Adam Grant Building",
+    "estimated": false,
+    "dims": [
+      54.2544,
+      51.7427,
+      58.2
+    ],
+    "tris": 2754,
+    "loadRadius": 2500
+  },
+  {
+    "id": "101-california-street",
+    "file": "101-california-street.glb",
+    "anchor": [
+      -122.3981206,
+      37.792957
+    ],
+    "targetHeightM": 183.0,
+    "cat": 3,
+    "name": "101 California Street",
+    "estimated": false,
+    "dims": [
+      94.9862,
+      95.1195,
+      183.0
+    ],
+    "tris": 4308,
+    "loadRadius": 5490
+  },
+  {
+    "id": "101-montgomery-street",
+    "file": "101-montgomery-street.glb",
+    "anchor": [
+      -122.4024908,
+      37.7903643
+    ],
+    "targetHeightM": 123.1,
+    "cat": 3,
+    "name": "101 Montgomery (Schwab Building)",
+    "estimated": false,
+    "dims": [
+      33.7451,
+      72.9064,
+      123.1
+    ],
+    "tris": 3956,
+    "loadRadius": 3693
+  },
+  {
+    "id": "111-pine-street",
+    "file": "111-pine-street.glb",
+    "anchor": [
+      -122.3989068,
+      37.7921569
+    ],
+    "targetHeightM": 76.0,
+    "cat": 3,
+    "name": "111 Pine Street",
+    "estimated": false,
+    "dims": [
+      52.4675,
+      39.6667,
+      76.0
+    ],
+    "tris": 4548,
+    "loadRadius": 2500
+  },
+  {
+    "id": "120-kearny-street",
+    "file": "120-kearny-street.glb",
+    "anchor": [
+      -122.4033381,
+      37.7891873
+    ],
+    "targetHeightM": 152.4,
+    "cat": 3,
+    "name": "One Montgomery Tower (120 Kearny Street)",
+    "estimated": false,
+    "dims": [
+      65.9566,
+      53.2045,
+      152.4
+    ],
+    "tris": 4720,
+    "loadRadius": 4572
+  },
+  {
+    "id": "121-2nd-street",
+    "file": "121-2nd-street.glb",
+    "anchor": [
+      -122.3992003,
+      37.7878349
+    ],
+    "targetHeightM": 27.5,
+    "cat": 3,
+    "name": "The Rapp Building",
+    "estimated": false,
+    "dims": [
+      36.2117,
+      35.4245,
+      27.5
+    ],
+    "tris": 598,
+    "loadRadius": 2500
+  },
+  {
+    "id": "130-150-sutter-street",
+    "file": "130-150-sutter-street.glb",
+    "anchor": [
+      -122.4030681,
+      37.790212
+    ],
+    "targetHeightM": 30.3,
+    "cat": 3,
+    "name": "Hallidie Building",
+    "estimated": false,
+    "dims": [
+      47.1872,
+      55.7648,
+      30.3
+    ],
+    "tris": 1182,
+    "loadRadius": 2500
+  },
+  {
+    "id": "140-new-montgomery-street",
+    "file": "140-new-montgomery-street.glb",
+    "anchor": [
+      -122.4000285,
+      37.7866863
+    ],
+    "targetHeightM": 132.7,
+    "cat": 3,
+    "name": "140 New Montgomery (Pacific Telephone Building)",
+    "estimated": false,
+    "dims": [
+      74.6329,
+      59.8669,
+      132.7
+    ],
+    "tris": 4792,
+    "loadRadius": 3981
+  },
+  {
+    "id": "150-california-street",
+    "file": "150-california-street.glb",
+    "anchor": [
+      -122.3985069,
+      37.7936972
+    ],
+    "targetHeightM": 100.6,
+    "cat": 3,
+    "name": "150 California Street",
+    "estimated": false,
+    "dims": [
+      51.1677,
+      52.7719,
+      100.6
+    ],
+    "tris": 3464,
+    "loadRadius": 3018
+  },
+  {
+    "id": "150-stockton-street",
+    "file": "150-stockton-street.glb",
+    "anchor": [
+      -122.4059211,
+      37.7873699
+    ],
+    "targetHeightM": 33.9,
+    "cat": 4,
+    "name": "Neiman Marcus Union Square (City of Paris rotunda)",
+    "estimated": false,
+    "dims": [
+      104.715,
+      63.0629,
+      33.9
+    ],
+    "tris": 1528,
+    "loadRadius": 2500
+  },
+  {
+    "id": "151-3rd-street",
+    "file": "151-3rd-street.glb",
+    "anchor": [
+      -122.4006347,
+      37.7859319
+    ],
+    "targetHeightM": 60.0,
+    "cat": 16,
+    "name": "San Francisco Museum of Modern Art (SFMOMA)",
+    "estimated": true,
+    "dims": [
+      137.262,
+      112.9403,
+      60.0
+    ],
+    "tris": 2554,
+    "loadRadius": 2500
+  },
+  {
+    "id": "155-sansome-street",
+    "file": "155-sansome-street.glb",
+    "anchor": [
+      -122.4012628,
+      37.7916701
+    ],
+    "targetHeightM": 64.05,
+    "cat": 3,
+    "name": "Stock Exchange Tower",
+    "estimated": false,
+    "dims": [
+      53.5496,
+      21.9022,
+      64.05
+    ],
+    "tris": 2642,
+    "loadRadius": 2500
+  },
+  {
+    "id": "180-montgomery-street",
+    "file": "180-montgomery-street.glb",
+    "anchor": [
+      -122.4020113,
+      37.790747
+    ],
+    "targetHeightM": 109.8,
+    "cat": 3,
+    "name": "180 Montgomery Street (Bank of the West Building)",
+    "estimated": false,
+    "dims": [
+      53.325,
+      49.3411,
+      109.8
+    ],
+    "tris": 2848,
+    "loadRadius": 3294
+  },
+  {
+    "id": "191-sutter-street",
+    "file": "191-sutter-street.glb",
+    "anchor": [
+      -122.4035145,
+      37.7896065
+    ],
+    "targetHeightM": 32.1,
+    "cat": 7,
+    "name": "Galleria Park Hotel",
+    "estimated": false,
+    "dims": [
+      41.8307,
+      47.2339,
+      32.1
+    ],
+    "tris": 1214,
+    "loadRadius": 2500
+  },
+  {
+    "id": "199-fremont-street",
+    "file": "199-fremont-street.glb",
+    "anchor": [
+      -122.3948792,
+      37.7900023
+    ],
+    "targetHeightM": 110.9,
+    "cat": 3,
+    "name": "199 Fremont Street",
+    "estimated": false,
+    "dims": [
+      74.2273,
+      69.6048,
+      110.9
+    ],
+    "tris": 4814,
+    "loadRadius": 3327
+  },
+  {
+    "id": "2-grant-avenue",
+    "file": "2-grant-avenue.glb",
+    "anchor": [
+      -122.4046839,
+      37.7871305
+    ],
+    "targetHeightM": 19.5,
+    "cat": 4,
+    "name": "Union Trust Bank Building (2 Grant Avenue)",
+    "estimated": false,
+    "dims": [
+      35.6519,
+      46.5038,
+      19.5
+    ],
+    "tris": 1126,
+    "loadRadius": 2500
+  },
+  {
+    "id": "201-sansome-street",
+    "file": "201-sansome-street.glb",
+    "anchor": [
+      -122.4012641,
+      37.7922609
+    ],
+    "targetHeightM": 41.3,
+    "cat": 2,
+    "name": "Royal Insurance Building",
+    "estimated": false,
+    "dims": [
+      35.2254,
+      30.0658,
+      41.3
+    ],
+    "tris": 2138,
+    "loadRadius": 2500
+  },
+  {
+    "id": "201-spear-street",
+    "file": "201-spear-street.glb",
+    "anchor": [
+      -122.3919788,
+      37.7912423
+    ],
+    "targetHeightM": 79.2,
+    "cat": 3,
+    "name": "201 Spear Street",
+    "estimated": false,
+    "dims": [
+      69.4837,
+      69.1046,
+      79.2
+    ],
+    "tris": 3444,
+    "loadRadius": 2500
+  },
+  {
+    "id": "211-main-street",
+    "file": "211-main-street.glb",
+    "anchor": [
+      -122.392854,
+      37.7905944
+    ],
+    "targetHeightM": 82.0,
+    "cat": 3,
+    "name": "211 Main Street (Charles Schwab Building)",
+    "estimated": false,
+    "dims": [
+      73.2826,
+      72.8776,
+      82.0
+    ],
+    "tris": 2152,
+    "loadRadius": 2500
+  },
+  {
+    "id": "220-bush-street",
+    "file": "220-bush-street.glb",
+    "anchor": [
+      -122.4013027,
+      37.7914191
+    ],
+    "targetHeightM": 92.0,
+    "cat": 3,
+    "name": "Mills Tower (220 Bush Street)",
+    "estimated": false,
+    "dims": [
+      25.6872,
+      50.3996,
+      92.0
+    ],
+    "tris": 2226,
+    "loadRadius": 2760
+  },
+  {
+    "id": "222-2nd-street",
+    "file": "222-2nd-street.glb",
+    "anchor": [
+      -122.3982516,
+      37.7863336
+    ],
+    "targetHeightM": 112.8,
+    "cat": 3,
+    "name": "222 Second Street (LinkedIn)",
+    "estimated": false,
+    "dims": [
+      76.7918,
+      72.6906,
+      112.8
+    ],
+    "tris": 4502,
+    "loadRadius": 3384
+  },
+  {
+    "id": "225-bush-street",
+    "file": "225-bush-street.glb",
+    "anchor": [
+      -122.4013094,
+      37.7908371
+    ],
+    "targetHeightM": 100.0,
+    "cat": 3,
+    "name": "225 Bush Street (Standard Oil Building)",
+    "estimated": false,
+    "dims": [
+      94.8698,
+      60.9589,
+      100.0
+    ],
+    "tris": 4804,
+    "loadRadius": 3000
+  },
+  {
+    "id": "250-montgomery-street",
+    "file": "250-montgomery-street.glb",
+    "anchor": [
+      -122.4023007,
+      37.7916998
+    ],
+    "targetHeightM": 69.88,
+    "cat": 3,
+    "name": "250 Montgomery Street",
+    "estimated": false,
+    "dims": [
+      33.7097,
+      43.1404,
+      69.88
+    ],
+    "tris": 2170,
+    "loadRadius": 2500
+  },
+  {
+    "id": "300-clay-street",
+    "file": "300-clay-street.glb",
+    "anchor": [
+      -122.3992506,
+      37.7956183
+    ],
+    "targetHeightM": 121.3,
+    "cat": 3,
+    "name": "One Maritime Plaza (Alcoa Building)",
+    "estimated": false,
+    "dims": [
+      62.7108,
+      88.4797,
+      121.3
+    ],
+    "tris": 4622,
+    "loadRadius": 3639
+  },
+  {
+    "id": "301-battery-street",
+    "file": "301-battery-street.glb",
+    "anchor": [
+      -122.4008159,
+      37.7943076
+    ],
+    "targetHeightM": 47.6,
+    "cat": 3,
+    "name": "Old Federal Reserve Bank (Bently Reserve)",
+    "estimated": false,
+    "dims": [
+      82.5657,
+      51.3874,
+      47.6
+    ],
+    "tris": 2814,
+    "loadRadius": 2500
+  },
+  {
+    "id": "301-pine-street",
+    "file": "301-pine-street.glb",
+    "anchor": [
+      -122.4013037,
+      37.7918447
+    ],
+    "targetHeightM": 15.9,
+    "cat": 3,
+    "name": "Pacific Coast Stock Exchange",
+    "estimated": false,
+    "dims": [
+      48.0994,
+      36.0449,
+      15.9
+    ],
+    "tris": 1226,
+    "loadRadius": 2500
+  },
+  {
+    "id": "33-new-montgomery-street",
+    "file": "33-new-montgomery-street.glb",
+    "anchor": [
+      -122.4014689,
+      37.7886469
+    ],
+    "targetHeightM": 101.8,
+    "cat": 3,
+    "name": "33 New Montgomery",
+    "estimated": true,
+    "dims": [
+      55.2705,
+      71.5069,
+      101.8
+    ],
+    "tris": 3450,
+    "loadRadius": 3054
+  },
+  {
+    "id": "333-bush-street",
+    "file": "333-bush-street.glb",
+    "anchor": [
+      -122.4030673,
+      37.7905789
+    ],
+    "targetHeightM": 151.0,
+    "cat": 3,
+    "name": "333 Bush Street",
+    "estimated": false,
+    "dims": [
+      58.7734,
+      57.6589,
+      151.0
+    ],
+    "tris": 4464,
+    "loadRadius": 4530
+  },
+  {
+    "id": "345-california-street",
+    "file": "345-california-street.glb",
+    "anchor": [
+      -122.4004566,
+      37.7925878
+    ],
+    "targetHeightM": 211.8,
+    "cat": 3,
+    "name": "345 California Center",
+    "estimated": false,
+    "dims": [
+      95.6132,
+      59.5307,
+      211.8
+    ],
+    "tris": 4924,
+    "loadRadius": 6354
+  },
+  {
+    "id": "350-bush-street",
+    "file": "350-bush-street.glb",
+    "anchor": [
+      -122.4033004,
+      37.7913475
+    ],
+    "targetHeightM": 85.0,
+    "cat": 3,
+    "name": "350 Bush Street (with the Curb Exchange)",
+    "estimated": true,
+    "dims": [
+      63.5937,
+      95.1582,
+      85.0
+    ],
+    "tris": 4542,
+    "loadRadius": 2550
+  },
+  {
+    "id": "388-market-building",
+    "file": "388-market-building.glb",
+    "anchor": [
+      -122.3980735,
+      37.7921812
+    ],
+    "targetHeightM": 111.9,
+    "cat": 3,
+    "name": "388 Market Street",
+    "estimated": false,
+    "dims": [
+      64.7478,
+      58.1355,
+      111.9
+    ],
+    "tris": 3468,
+    "loadRadius": 3357
+  },
+  {
+    "id": "3rd-street-tower",
+    "file": "3rd-street-tower.glb",
+    "anchor": [
+      -122.4013679,
+      37.7863061
+    ],
+    "targetHeightM": 147.5,
+    "cat": 7,
+    "name": "St. Regis Museum Tower (125 Third Street)",
+    "estimated": false,
+    "dims": [
+      68.5944,
+      81.3845,
+      147.5
+    ],
+    "tris": 3632,
+    "loadRadius": 4425
+  },
+  {
+    "id": "425-california-street",
+    "file": "425-california-street.glb",
+    "anchor": [
+      -122.4013729,
+      37.7928108
+    ],
+    "targetHeightM": 109.4,
+    "cat": 3,
+    "name": "425 California Street",
+    "estimated": false,
+    "dims": [
+      34.2478,
+      33.0283,
+      109.4
+    ],
+    "tris": 2834,
+    "loadRadius": 3282
+  },
+  {
+    "id": "433-clay-street",
+    "file": "433-clay-street.glb",
+    "anchor": [
+      -122.4008922,
+      37.7946815
+    ],
+    "targetHeightM": 81.0,
+    "cat": 7,
+    "name": "The Jay (former Le M\u00e9ridien San Francisco)",
+    "estimated": false,
+    "dims": [
+      92.2273,
+      45.2796,
+      81.0
+    ],
+    "tris": 3006,
+    "loadRadius": 2500
+  },
+  {
+    "id": "44-montgomery-street",
+    "file": "44-montgomery-street.glb",
+    "anchor": [
+      -122.4017708,
+      37.789628
+    ],
+    "targetHeightM": 172.2,
+    "cat": 3,
+    "name": "44 Montgomery Street",
+    "estimated": false,
+    "dims": [
+      63.5031,
+      96.3661,
+      172.2
+    ],
+    "tris": 4806,
+    "loadRadius": 5166
+  },
+  {
+    "id": "450-sutter-street",
+    "file": "450-sutter-street.glb",
+    "anchor": [
+      -122.4078718,
+      37.7896331
+    ],
+    "targetHeightM": 105.0,
+    "cat": 3,
+    "name": "450 Sutter Street (Four Fifty Sutter Building)",
+    "estimated": false,
+    "dims": [
+      55.4222,
+      58.9497,
+      105.0
+    ],
+    "tris": 4172,
+    "loadRadius": 3150
+  },
+  {
+    "id": "456-montgomery-street",
+    "file": "456-montgomery-street.glb",
+    "anchor": [
+      -122.402634,
+      37.7935913
+    ],
+    "targetHeightM": 115.2,
+    "cat": 3,
+    "name": "456 Montgomery Street",
+    "estimated": false,
+    "dims": [
+      41.8414,
+      49.3577,
+      115.2
+    ],
+    "tris": 3296,
+    "loadRadius": 3456
+  },
+  {
+    "id": "466-bush-street",
+    "file": "466-bush-street.glb",
+    "anchor": [
+      -122.4052342,
+      37.7908797
+    ],
+    "targetHeightM": 34.55,
+    "cat": 7,
+    "name": "Orchard Garden Hotel",
+    "estimated": false,
+    "dims": [
+      20.5618,
+      47.4349,
+      34.55
+    ],
+    "tris": 2036,
+    "loadRadius": 2500
+  },
+  {
+    "id": "475-sansome-street",
+    "file": "475-sansome-street.glb",
+    "anchor": [
+      -122.4019375,
+      37.7945747
+    ],
+    "targetHeightM": 89.7,
+    "cat": 3,
+    "name": "475 Sansome Street",
+    "estimated": false,
+    "dims": [
+      72.3412,
+      48.6114,
+      89.7
+    ],
+    "tris": 3662,
+    "loadRadius": 2691
+  },
+  {
+    "id": "49-stevenson-street",
+    "file": "49-stevenson-street.glb",
+    "anchor": [
+      -122.3993904,
+      37.789706
+    ],
+    "targetHeightM": 64.44,
+    "cat": 3,
+    "name": "49 Stevenson Street",
+    "estimated": false,
+    "dims": [
+      53.7203,
+      53.7598,
+      64.44
+    ],
+    "tris": 2356,
+    "loadRadius": 2500
+  },
+  {
+    "id": "50-3rd-street",
+    "file": "50-3rd-street.glb",
+    "anchor": [
+      -122.4030905,
+      37.7865616
+    ],
+    "targetHeightM": 114.0,
+    "cat": 7,
+    "name": "Hyatt Regency Downtown SOMA (50 Third Street)",
+    "estimated": false,
+    "dims": [
+      86.8477,
+      84.8809,
+      114.0
+    ],
+    "tris": 3570,
+    "loadRadius": 3420
+  },
+  {
+    "id": "50-california-street",
+    "file": "50-california-street.glb",
+    "anchor": [
+      -122.3973858,
+      37.7940826
+    ],
+    "targetHeightM": 148.44,
+    "cat": 3,
+    "name": "50 California Street",
+    "estimated": false,
+    "dims": [
+      57.085,
+      72.3941,
+      148.44
+    ],
+    "tris": 3176,
+    "loadRadius": 4453
+  },
+  {
+    "id": "500-california-street",
+    "file": "500-california-street.glb",
+    "anchor": [
+      -122.4031981,
+      37.7931217
+    ],
+    "targetHeightM": 65.3,
+    "cat": 7,
+    "name": "Omni San Francisco Hotel (Financial Center Building)",
+    "estimated": false,
+    "dims": [
+      54.0911,
+      54.1823,
+      65.3
+    ],
+    "tris": 3630,
+    "loadRadius": 2500
+  },
+  {
+    "id": "525-market-street",
+    "file": "525-market-street.glb",
+    "anchor": [
+      -122.399158,
+      37.7905074
+    ],
+    "targetHeightM": 161.0,
+    "cat": 3,
+    "name": "525 Market Street",
+    "estimated": false,
+    "dims": [
+      83.3787,
+      83.3573,
+      161.0
+    ],
+    "tris": 2954,
+    "loadRadius": 4830
+  },
+  {
+    "id": "535-mission-street",
+    "file": "535-mission-street.glb",
+    "anchor": [
+      -122.398156,
+      37.7888721
+    ],
+    "targetHeightM": 115.0,
+    "cat": 3,
+    "name": "535 Mission Street",
+    "estimated": false,
+    "dims": [
+      60.142,
+      58.6236,
+      115.0
+    ],
+    "tris": 2282,
+    "loadRadius": 3450
+  },
+  {
+    "id": "544-market-street",
+    "file": "544-market-street.glb",
+    "anchor": [
+      -122.400786,
+      37.7900167
+    ],
+    "targetHeightM": 36.6,
+    "cat": 3,
+    "name": "Flatiron Building (540\u2013544 Market Street)",
+    "estimated": false,
+    "dims": [
+      27.2539,
+      32.456,
+      36.6
+    ],
+    "tris": 1358,
+    "loadRadius": 2500
+  },
+  {
+    "id": "55-2nd-street",
+    "file": "55-2nd-street.glb",
+    "anchor": [
+      -122.400334,
+      37.7888147
+    ],
+    "targetHeightM": 100.6,
+    "cat": 3,
+    "name": "KPMG Building (55 Second Street)",
+    "estimated": false,
+    "dims": [
+      68.5501,
+      67.9062,
+      100.6
+    ],
+    "tris": 4810,
+    "loadRadius": 3018
+  },
+  {
+    "id": "555-market-street",
+    "file": "555-market-street.glb",
+    "anchor": [
+      -122.3999542,
+      37.7899805
+    ],
+    "targetHeightM": 94.8,
+    "cat": 3,
+    "name": "555 Market Street (Market Center)",
+    "estimated": false,
+    "dims": [
+      62.1833,
+      62.1261,
+      94.8
+    ],
+    "tris": 3580,
+    "loadRadius": 2844
+  },
+  {
+    "id": "555-mission-street",
+    "file": "555-mission-street.glb",
+    "anchor": [
+      -122.3985546,
+      37.7885452
+    ],
+    "targetHeightM": 147.0,
+    "cat": 3,
+    "name": "555 Mission Street",
+    "estimated": false,
+    "dims": [
+      73.022,
+      70.061,
+      147.0
+    ],
+    "tris": 4754,
+    "loadRadius": 4410
+  },
+  {
+    "id": "560-mission-street",
+    "file": "560-mission-street.glb",
+    "anchor": [
+      -122.3995478,
+      37.7888279
+    ],
+    "targetHeightM": 128.02,
+    "cat": 3,
+    "name": "JPMorgan Chase Building (560 Mission Street)",
+    "estimated": false,
+    "dims": [
+      85.1472,
+      84.5771,
+      128.02
+    ],
+    "tris": 4832,
+    "loadRadius": 3841
+  },
+  {
+    "id": "575-market-street",
+    "file": "575-market-street.glb",
+    "anchor": [
+      -122.4003805,
+      37.7895456
+    ],
+    "targetHeightM": 174.65,
+    "cat": 3,
+    "name": "575 Market Street",
+    "estimated": false,
+    "dims": [
+      62.559,
+      62.5992,
+      174.65
+    ],
+    "tris": 4916,
+    "loadRadius": 5240
+  },
+  {
+    "id": "580-california-street",
+    "file": "580-california-street.glb",
+    "anchor": [
+      -122.404152,
+      37.7929843
+    ],
+    "targetHeightM": 107.0,
+    "cat": 3,
+    "name": "580 California Street",
+    "estimated": false,
+    "dims": [
+      50.0296,
+      51.0103,
+      107.0
+    ],
+    "tris": 3794,
+    "loadRadius": 3210
+  },
+  {
+    "id": "582-market-street",
+    "file": "582-market-street.glb",
+    "anchor": [
+      -122.4016363,
+      37.789466
+    ],
+    "targetHeightM": 87.0,
+    "cat": 3,
+    "name": "Hobart Building (582 Market Street)",
+    "estimated": false,
+    "dims": [
+      27.5354,
+      55.828,
+      87.0
+    ],
+    "tris": 2156,
+    "loadRadius": 2610
+  },
+  {
+    "id": "595-market-street",
+    "file": "595-market-street.glb",
+    "anchor": [
+      -122.4007917,
+      37.7892292
+    ],
+    "targetHeightM": 125.0,
+    "cat": 3,
+    "name": "595 Market Street",
+    "estimated": false,
+    "dims": [
+      66.3268,
+      66.3268,
+      125.0
+    ],
+    "tris": 3610,
+    "loadRadius": 3750
+  },
+  {
+    "id": "605-market-street",
+    "file": "605-market-street.glb",
+    "anchor": [
+      -122.4013149,
+      37.7889421
+    ],
+    "targetHeightM": 54.3,
+    "cat": 3,
+    "name": "601\u2013605 Market Street (1917 office tower)",
+    "estimated": false,
+    "dims": [
+      38.3046,
+      38.0379,
+      54.3
+    ],
+    "tris": 2192,
+    "loadRadius": 2500
+  },
+  {
+    "id": "650-california-street",
+    "file": "650-california-street.glb",
+    "anchor": [
+      -122.4052193,
+      37.7928669
+    ],
+    "targetHeightM": 142.0,
+    "cat": 3,
+    "name": "650 California Street (Hartford Building)",
+    "estimated": false,
+    "dims": [
+      51.0575,
+      51.206,
+      142.0
+    ],
+    "tris": 3398,
+    "loadRadius": 4260
+  },
+  {
+    "id": "690-market-street",
+    "file": "690-market-street.glb",
+    "anchor": [
+      -122.4032006,
+      37.7882605
+    ],
+    "targetHeightM": 95.0,
+    "cat": 2,
+    "name": "Old Chronicle Building (690 Market Street)",
+    "estimated": false,
+    "dims": [
+      47.1894,
+      46.4498,
+      95.0
+    ],
+    "tris": 3938,
+    "loadRadius": 2850
+  },
+  {
+    "id": "700-market-street",
+    "file": "700-market-street.glb",
+    "anchor": [
+      -122.4038192,
+      37.7877278
+    ],
+    "targetHeightM": 57.9,
+    "cat": 3,
+    "name": "Mutual Savings Bank Building (700 Market Street)",
+    "estimated": false,
+    "dims": [
+      30.2498,
+      32.5953,
+      57.9
+    ],
+    "tris": 1596,
+    "loadRadius": 2500
+  },
+  {
+    "id": "706-mission-street",
+    "file": "706-mission-street.glb",
+    "anchor": [
+      -122.4024839,
+      37.7862352
+    ],
+    "targetHeightM": 44.0,
+    "cat": 3,
+    "name": "Aronson Building (706 Mission Street)",
+    "estimated": false,
+    "dims": [
+      49.901,
+      49.239,
+      44.0
+    ],
+    "tris": 1814,
+    "loadRadius": 2500
+  },
+  {
+    "id": "715-market-street",
+    "file": "715-market-street.glb",
+    "anchor": [
+      -122.4037015,
+      37.7868764
+    ],
+    "targetHeightM": 32.6,
+    "cat": 3,
+    "name": "715\u2013719 Market Street (Digital Garage)",
+    "estimated": false,
+    "dims": [
+      62.0963,
+      55.4454,
+      32.6
+    ],
+    "tris": 1290,
+    "loadRadius": 2500
+  },
+  {
+    "id": "735-market-street",
+    "file": "735-market-street.glb",
+    "anchor": [
+      -122.4041285,
+      37.7865717
+    ],
+    "targetHeightM": 27.4,
+    "cat": 3,
+    "name": "735 Market Street",
+    "estimated": false,
+    "dims": [
+      57.272,
+      56.9981,
+      27.4
+    ],
+    "tris": 1042,
+    "loadRadius": 2500
+  },
+  {
+    "id": "736-mission-street",
+    "file": "736-mission-street.glb",
+    "anchor": [
+      -122.4036821,
+      37.7860166
+    ],
+    "targetHeightM": 24.0,
+    "cat": 16,
+    "name": "Contemporary Jewish Museum (736 Mission Street)",
+    "estimated": false,
+    "dims": [
+      81.9536,
+      83.2589,
+      24.0
+    ],
+    "tris": 638,
+    "loadRadius": 2500
+  },
+  {
+    "id": "74-new-montgomery-street",
+    "file": "74-new-montgomery-street.glb",
+    "anchor": [
+      -122.4013268,
+      37.7874752
+    ],
+    "targetHeightM": 32.7,
+    "cat": 2,
+    "name": "The Montgomery",
+    "estimated": false,
+    "dims": [
+      79.9738,
+      79.9738,
+      32.7
+    ],
+    "tris": 2068,
+    "loadRadius": 2500
+  },
+  {
+    "id": "757-market-street",
+    "file": "757-market-street.glb",
+    "anchor": [
+      -122.4042447,
+      37.7862212
+    ],
+    "targetHeightM": 130.1,
+    "cat": 7,
+    "name": "Four Seasons Hotel and Residences (757 Market Street)",
+    "estimated": false,
+    "dims": [
+      108.8653,
+      109.8358,
+      130.1
+    ],
+    "tris": 4738,
+    "loadRadius": 3903
+  },
+  {
+    "id": "alexander-building",
+    "file": "alexander-building.glb",
+    "anchor": [
+      -122.4025768,
+      37.7907411
+    ],
+    "targetHeightM": 60.13,
+    "cat": 3,
+    "name": "Alexander Building",
+    "estimated": false,
+    "dims": [
+      24.9303,
+      29.3465,
+      60.13
+    ],
+    "tris": 2426,
+    "loadRadius": 2500
+  },
+  {
+    "id": "bank-of-america-building",
+    "file": "bank-of-america-building.glb",
+    "anchor": [
+      -122.4016814,
+      37.7886452
+    ],
+    "targetHeightM": 60.1,
+    "cat": 3,
+    "name": "625 Market Street (\"Bank of America Building\")",
+    "estimated": false,
+    "dims": [
+      40.6249,
+      40.8323,
+      60.1
+    ],
+    "tris": 1424,
+    "loadRadius": 2500
+  },
+  {
+    "id": "california-bank-and-trust",
+    "file": "california-bank-and-trust.glb",
+    "anchor": [
+      -122.4021502,
+      37.7925691
+    ],
+    "targetHeightM": 59.4,
+    "cat": 3,
+    "name": "Merchants Exchange Building",
+    "estimated": false,
+    "dims": [
+      50.2966,
+      64.9855,
+      59.4
+    ],
+    "tris": 2806,
+    "loadRadius": 2500
+  },
+  {
+    "id": "central-tower",
+    "file": "central-tower.glb",
+    "anchor": [
+      -122.4035852,
+      37.7871882
+    ],
+    "targetHeightM": 91.0,
+    "cat": 3,
+    "name": "Central Tower (703 Market Street)",
+    "estimated": false,
+    "dims": [
+      39.9676,
+      39.4503,
+      91.0
+    ],
+    "tris": 1570,
+    "loadRadius": 2730
+  },
+  {
+    "id": "embarcadero-center-1",
+    "file": "embarcadero-center-1.glb",
+    "anchor": [
+      -122.3996222,
+      37.7944829
+    ],
+    "targetHeightM": 173.4,
+    "cat": 3,
+    "name": "One Embarcadero Center",
+    "estimated": false,
+    "dims": [
+      84.9689,
+      45.1028,
+      173.4
+    ],
+    "tris": 4696,
+    "loadRadius": 5202
+  },
+  {
+    "id": "embarcadero-center-2",
+    "file": "embarcadero-center-2.glb",
+    "anchor": [
+      -122.3985117,
+      37.7949992
+    ],
+    "targetHeightM": 126.0,
+    "cat": 3,
+    "name": "Two Embarcadero Center",
+    "estimated": false,
+    "dims": [
+      96.0272,
+      57.6816,
+      126.0
+    ],
+    "tris": 4316,
+    "loadRadius": 3780
+  },
+  {
+    "id": "embarcadero-center-3",
+    "file": "embarcadero-center-3.glb",
+    "anchor": [
+      -122.3973647,
+      37.7951182
+    ],
+    "targetHeightM": 126.0,
+    "cat": 3,
+    "name": "Three Embarcadero Center",
+    "estimated": false,
+    "dims": [
+      94.0973,
+      58.3978,
+      126.0
+    ],
+    "tris": 4204,
+    "loadRadius": 3780
+  },
+  {
+    "id": "embarcadero-center-west",
+    "file": "embarcadero-center-west.glb",
+    "anchor": [
+      -122.4004675,
+      37.7938599
+    ],
+    "targetHeightM": 123.1,
+    "cat": 3,
+    "name": "Embarcadero Center West (275 Battery Street)",
+    "estimated": false,
+    "dims": [
+      51.7243,
+      47.9189,
+      123.1
+    ],
+    "tris": 4460,
+    "loadRadius": 3693
+  },
+  {
+    "id": "first-and-market-usps",
+    "file": "first-and-market-usps.glb",
+    "anchor": [
+      -122.3984381,
+      37.7908114
+    ],
+    "targetHeightM": 96.9,
+    "cat": 3,
+    "name": "Central Plaza (455 Market Street)",
+    "estimated": false,
+    "dims": [
+      91.3512,
+      83.4028,
+      96.9
+    ],
+    "tris": 4770,
+    "loadRadius": 2907
+  },
+  {
+    "id": "folger-coffee-building",
+    "file": "folger-coffee-building.glb",
+    "anchor": [
+      -122.3925976,
+      37.7909315
+    ],
+    "targetHeightM": 26.74,
+    "cat": 3,
+    "name": "Folger Coffee Company Building",
+    "estimated": false,
+    "dims": [
+      57.558,
+      57.4148,
+      26.74
+    ],
+    "tris": 2152,
+    "loadRadius": 2500
+  },
+  {
+    "id": "hearst-building",
+    "file": "hearst-building.glb",
+    "anchor": [
+      -122.4030128,
+      37.7874579
+    ],
+    "targetHeightM": 50.2,
+    "cat": 3,
+    "name": "Hearst Building",
+    "estimated": false,
+    "dims": [
+      53.1946,
+      53.3389,
+      50.2
+    ],
+    "tris": 2998,
+    "loadRadius": 2500
+  },
+  {
+    "id": "hunter-dulin-building",
+    "file": "hunter-dulin-building.glb",
+    "anchor": [
+      -122.4025497,
+      37.7897258
+    ],
+    "targetHeightM": 93.88,
+    "cat": 3,
+    "name": "Hunter-Dulin Building (111 Sutter Street)",
+    "estimated": false,
+    "dims": [
+      61.058,
+      47.4516,
+      93.88
+    ],
+    "tris": 4190,
+    "loadRadius": 2816
+  },
+  {
+    "id": "i-magnin-building",
+    "file": "i-magnin-building.glb",
+    "anchor": [
+      -122.4047306,
+      37.7875148
+    ],
+    "targetHeightM": 50.5,
+    "cat": 3,
+    "name": "I. Magnin & Co. Building",
+    "estimated": false,
+    "dims": [
+      39.6817,
+      56.519,
+      50.5
+    ],
+    "tris": 1916,
+    "loadRadius": 2500
+  },
+  {
+    "id": "marriott-marquis",
+    "file": "marriott-marquis.glb",
+    "anchor": [
+      -122.40448,
+      37.7853374
+    ],
+    "targetHeightM": 133.0,
+    "cat": 7,
+    "name": "San Francisco Marriott Marquis",
+    "estimated": false,
+    "dims": [
+      149.4689,
+      157.2098,
+      133.0
+    ],
+    "tris": 4820,
+    "loadRadius": 3990
+  },
+  {
+    "id": "matson-building-annex",
+    "file": "matson-building-annex.glb",
+    "anchor": [
+      -122.3962538,
+      37.7924632
+    ],
+    "targetHeightM": 23.4,
+    "cat": 3,
+    "name": "Matson Building Annex",
+    "estimated": false,
+    "dims": [
+      43.9994,
+      42.9502,
+      23.4
+    ],
+    "tris": 734,
+    "loadRadius": 2500
+  },
+  {
+    "id": "mechanics-institute",
+    "file": "mechanics-institute.glb",
+    "anchor": [
+      -122.4030408,
+      37.7887368
+    ],
+    "targetHeightM": 43.0,
+    "cat": 15,
+    "name": "Mechanics' Institute (57 Post Street)",
+    "estimated": false,
+    "dims": [
+      31.454,
+      41.8278,
+      43.0
+    ],
+    "tris": 1882,
+    "loadRadius": 2500
+  },
+  {
+    "id": "mills-building",
+    "file": "mills-building.glb",
+    "anchor": [
+      -122.4018804,
+      37.7913406
+    ],
+    "targetHeightM": 47.0,
+    "cat": 3,
+    "name": "Mills Building",
+    "estimated": false,
+    "dims": [
+      95.6553,
+      60.2391,
+      47.0
+    ],
+    "tris": 2929,
+    "loadRadius": 2500
+  },
+  {
+    "id": "old-saint-marys-cathedral",
+    "file": "old-saint-marys-cathedral.glb",
+    "anchor": [
+      -122.4057137,
+      37.7928426
+    ],
+    "targetHeightM": 33.65,
+    "cat": 8,
+    "name": "Old Saint Mary's Cathedral",
+    "estimated": false,
+    "dims": [
+      53.2554,
+      56.5804,
+      33.65
+    ],
+    "tris": 1694,
+    "loadRadius": 2500
+  },
+  {
+    "id": "one-hawthorne-street",
+    "file": "one-hawthorne-street.glb",
+    "anchor": [
+      -122.3989026,
+      37.7857768
+    ],
+    "targetHeightM": 83.9,
+    "cat": 2,
+    "name": "One Hawthorne",
+    "estimated": false,
+    "dims": [
+      64.7939,
+      58.3946,
+      83.9
+    ],
+    "tris": 3272,
+    "loadRadius": 2517
+  },
+  {
+    "id": "palace-hotel",
+    "file": "palace-hotel.glb",
+    "anchor": [
+      -122.4019446,
+      37.7879687
+    ],
+    "targetHeightM": 40.0,
+    "cat": 7,
+    "name": "Palace Hotel",
+    "estimated": false,
+    "dims": [
+      136.8422,
+      136.663,
+      40.0
+    ],
+    "tris": 2220,
+    "loadRadius": 2500
+  },
+  {
+    "id": "paramount",
+    "file": "paramount.glb",
+    "anchor": [
+      -122.4020234,
+      37.786703
+    ],
+    "targetHeightM": 128.0,
+    "cat": 2,
+    "name": "The Paramount (680 Mission Street)",
+    "estimated": false,
+    "dims": [
+      76.3795,
+      70.5152,
+      128.0
+    ],
+    "tris": 3898,
+    "loadRadius": 3840
+  },
+  {
+    "id": "pge-annex",
+    "file": "pge-annex.glb",
+    "anchor": [
+      -122.3965063,
+      37.7921155
+    ],
+    "targetHeightM": 55.8,
+    "cat": 3,
+    "name": "PG&E General Office Building Annex",
+    "estimated": false,
+    "dims": [
+      65.7542,
+      65.3062,
+      55.8
+    ],
+    "tris": 2200,
+    "loadRadius": 2500
+  },
+  {
+    "id": "phelan-building",
+    "file": "phelan-building.glb",
+    "anchor": [
+      -122.4054628,
+      37.7863863
+    ],
+    "targetHeightM": 47.0,
+    "cat": 3,
+    "name": "Phelan Building",
+    "estimated": false,
+    "dims": [
+      96.6113,
+      82.16,
+      47.0
+    ],
+    "tris": 2748,
+    "loadRadius": 2500
+  },
+  {
+    "id": "stevenson-place",
+    "file": "stevenson-place.glb",
+    "anchor": [
+      -122.3997358,
+      37.7893616
+    ],
+    "targetHeightM": 103.0,
+    "cat": 3,
+    "name": "Stevenson Place (71 Stevenson Street)",
+    "estimated": false,
+    "dims": [
+      67.0601,
+      58.2913,
+      103.0
+    ],
+    "tris": 4414,
+    "loadRadius": 3090
+  },
+  {
+    "id": "us-customs-house",
+    "file": "us-customs-house.glb",
+    "anchor": [
+      -122.4009459,
+      37.7962972
+    ],
+    "targetHeightM": 30.46,
+    "cat": 18,
+    "name": "U.S. Custom House",
+    "estimated": false,
+    "dims": [
+      50.8194,
+      89.0101,
+      30.46
+    ],
+    "tris": 2834,
+    "loadRadius": 2500
+  },
+  {
+    "id": "white-house-building",
+    "file": "white-house-building.glb",
+    "anchor": [
+      -122.404777,
+      37.7894367
+    ],
+    "targetHeightM": 32.1,
+    "cat": 4,
+    "name": "The White House (Raphael Weill & Co.)",
+    "estimated": false,
+    "dims": [
+      94.6486,
+      61.8832,
+      32.1
+    ],
+    "tris": 1712,
+    "loadRadius": 2500
+  },
+  {
+    "id": "ybca-galleries",
+    "file": "ybca-galleries.glb",
+    "anchor": [
+      -122.4021445,
+      37.7855959
+    ],
+    "targetHeightM": 17.3,
+    "cat": 16,
+    "name": "Yerba Buena Center for the Arts \u2014 Galleries",
+    "estimated": false,
+    "dims": [
+      83.8882,
+      113.4626,
+      17.3
+    ],
+    "tris": 1222,
+    "loadRadius": 2500
   }
 ]

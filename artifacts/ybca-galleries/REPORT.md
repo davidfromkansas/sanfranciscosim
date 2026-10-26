@@ -71,4 +71,8 @@ Lit ground storey (60%), lit gardens glass (50%), glowing clerestory (90%). Glow
 
 ## Gate 3 — approval
 
-Pending: renders sent to David.
+Approved by David on 2026-10-26 (renders sent as twelve day/night overview sheets): "approve all".
+
+## Stage 4 — optimize
+
+Shipped as `app/public/sf-assets/landmarks/ybca-galleries.glb`, meshopt-compressed with the intake flags of `pipeline/compress-assets.mjs` (`gltfpack -c -km -kn -noq`): **69 KB → 34 KB** (51% smaller). Geometry is unchanged. Kit assets are already one body mesh and one glow mesh, so the Blender cleanup pass and the limited dissolve are skipped, as for the Transbay batch. Gate G3 (three.js GLTFLoader round-trip with MeshoptDecoder, `tools/glb-optimize/g3check`) passes.
