@@ -361,11 +361,15 @@ function placeGeneric(box, entry, data) {
 // standard gates catches it.
 //   103 landmarks (before the Embarcadero batch)  1,434,764 body verts
 //   131 landmarks (after it)                      2,072,002 body verts
+//   149 landmarks (Transbay batch)                2,228,902 body verts
+//   249 landmarks (Financial District batch)      2,705,083 body verts
 // Measured from GLB accessor counts, which survive meshopt: sum POSITION.count
 // per primitive, split by material (/_Glow$/ -> glow batch, everything else ->
 // body); mergeGeometries(.., false) concatenates without welding, so that sum
-// is what addGeometry consumes. Occupancy at the ceiling, all-resident: body
-// 86.3% verts / 65.6% indices, glow 44.9% verts / 23.3% indices.
+// is what addGeometry consumes. The FiDi batch outgrew the old 2.4M / 250k
+// ceilings (body 113%, glow 99.4%), so both were raised. Occupancy at the
+// ceiling, all-resident: body 84.5% verts / 73.8% indices, glow 77.7% verts /
+// 42.6% indices.
 //
 // What the reserve is at any moment, though, is ELASTIC, and on a phone that
 // is the difference between a running tab and a killed one. A BatchedMesh
@@ -381,8 +385,8 @@ function placeGeneric(box, entry, data) {
 // defragmenting first, since deleteGeometry leaves holes that are free space)
 // toward the ceiling, then shrink back once the camera leaves a dense district.
 // Behaviour at the ceiling is unchanged.
-const BODY_CEILING = { verts: 2_400_000, indices: 5_200_000 };
-const GLOW_CEILING = { verts: 250_000, indices: 750_000 };
+const BODY_CEILING = { verts: 3_200_000, indices: 6_000_000 };
+const GLOW_CEILING = { verts: 320_000, indices: 900_000 };
 // Start: comfortably above the always-loaded skyline pieces, so booting and
 // sitting still never resizes at all.
 const BODY_START = { verts: 500_000, indices: 1_100_000 };

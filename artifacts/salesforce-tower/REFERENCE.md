@@ -1,117 +1,85 @@
-# Salesforce Tower reference dossier
+# Salesforce Tower — reference dossier (v2)
 
-Research checked 2026-08-10. Dimensions and history below distinguish published facts from visual inference. No third-party reference imagery is committed with the model; the model and review renders are original.
+v2 checked 2026-10-25 for the Transbay landmark batch. It reuses the v1 research
+(2026-08-10) where it still holds and corrects it where the batch's sources or the
+photographs disagree. Labels: **published** (architect / CTBUH / owner),
+**measured** (OSM geometry, our own measurement), **inferred** (read from photographs),
+**estimated** (a modelling choice).
 
-## Verified facts
+## Sources
 
-| Item | Value | Confidence / source |
+- [Pelli Clarke & Partners — Salesforce Tower](https://pcparch.com/work/salesforce-tower): architect, 1,070 ft height, tapered rounded plan, exterior sunshades.
+- [CTBUH / Skyscraper Center — building 290](https://www.skyscrapercenter.com/building/building/290): architectural height 326 m, 61 floors, roof/architectural distinction.
+- [Salesforce Tower — Artwork](https://salesforcetower.com/artwork/) and [Jim Campbell — Day for Night](https://www.jimcampbell.tv/portfolio/day-for-night): the six-floor, ~11,000-LED crown installation.
+- [OpenStreetMap way 431972186](https://www.openstreetmap.org/way/431972186): the tower footprint used by the batch (82 nodes, 2,656 m², OBB 54.5 × 54.1 m, bearing 139.5°, `height=326`, `building:levels=61`). v1 cited way 119890395; the batch re-resolved the building and this is the way it uses.
+- [Wikipedia — Salesforce Tower](https://en.wikipedia.org/wiki/Salesforce_Tower): cross-check of height, floors, completion (2018).
+- Commons: [Salesforce Tower from Sacramento and Davis Street 2021](https://commons.wikimedia.org/wiki/File:Salesforce_Tower_from_Sacramento_and_Davis_Street_2021.jpg) and [Salesforce tower facing south](https://commons.wikimedia.org/wiki/File:Salesforce_tower_facing_south.jpg) — the two photos the v2 review was done against.
+- DataSF building footprints / 2010 LiDAR: **no usable record** — the survey predates construction.
+
+## Verified dimensions and location
+
+| Item | Value | Basis |
 |---|---:|---|
-| Address | 415 Mission Street, San Francisco | Architect and building-owner pages |
-| WGS84 anchor | **-122.3969270512, 37.7897756184** | OpenStreetMap building centroid; suitable as the future manifest anchor |
-| Architectural height | **326 m / 1,070 ft** | CTBUH / Skyscraper Center and architect page |
-| Roof / occupied-tower height | approximately **296 m** | CTBUH data; crown accounts for roughly the upper 30 m |
-| Floors | 61 | Architect, owner, and CTBUH |
-| Completion | 2018 | Architect / CTBUH |
-| Architect | Pelli Clarke Pelli Architects | Architect page |
-| Published site area | 50,514 ft² / 4,692.9 m² | Architect / property descriptions |
-| Mapped tower footprint | approximately 2,656 m²; roughly 54.1 × 55.3 m facade-aligned | OpenStreetMap polygon; used as the shaft footprint, not the full site |
-| Crown lighting | `Day for Night`, a six-floor LED installation using about 11,000 LEDs | Jim Campbell and building-owner art pages |
+| Address | 415 Mission Street (Mission x Fremont x First) | published |
+| Architectural height (crown rim) | **326.0 m** | published (CTBUH, architect) |
+| Occupied roof | ~297 m | published CTBUH roof ≈ 296 m; model 297 m (estimated) |
+| LED crown floors | top six floors, modelled 272–297 m | published (Campbell); heights estimated |
+| Footprint across the flats | 54.5 × 54.1 m | measured (OSM OBB) |
+| Plan at the crown rim | ~56% of the base width | inferred from photographs |
+| Anchor (manifest) | **-122.3969300, 37.7897750** | measured: OSM OBB centre, shifted by the bbox recentre (`tk.run`) |
+| Floors / completion / architect | 61 / 2018 / Pelli Clarke Pelli | published |
 
-The overall-height conflict is mostly definitional. CTBUH and the architect publish 1,070 ft / 326 m architectural height; some general sources round the tower to 1,070 ft while roof-height datasets describe the occupied roof around 296 m. The asset preserves 326 m overall and treats the upper portion as the crown/topper.
-
-## Source list and what each establishes
-
-- [Pelli Clarke & Partners — Salesforce Tower](https://pcparch.com/work/salesforce-tower): architect, address, 1,070 ft height, completion, sustainability, elliptical/rounded tapered form, exterior sunshades, and the relationship to the transit center.
-- [CTBUH / Skyscraper Center — building 290](https://www.skyscrapercenter.com/building/building/290): architectural height, roof-height distinction, floor count, construction dates, structural use, and authoritative tall-building nomenclature.
-- [Salesforce Tower](https://salesforcetower.com/): owner information, address, tower/public-space context, and project identity.
-- [Salesforce Tower — Artwork](https://salesforcetower.com/artwork/): the crown as a media surface and the official description of `Day for Night`.
-- [Jim Campbell — Day for Night](https://www.jimcampbell.tv/portfolio/day-for-night): six upper floors, roughly 11,000 LEDs, imagery sourced from cameras around San Francisco, and day/night behavior.
-- [Architectural Record — Salesforce Tower by Pelli Clarke Pelli](https://www.architecturalrecord.com/articles/13511-salesforce-tower-by-pelli-clarke-pelli): critical architectural description of the taper, rounded plan, curtain wall, exterior shading and ground condition.
-- [OpenStreetMap](https://www.openstreetmap.org/way/119890395): geospatial anchor, footprint, street-grid orientation and mapped building tags. The polygon was measured locally for the model plan.
-- [Wikimedia Commons — Salesforce Tower category](https://commons.wikimedia.org/wiki/Category:Salesforce_Tower): geolocated day, street-level, distant and roof/aerial photography used to cross-check all elevations. Representative pages include [street level](https://commons.wikimedia.org/wiki/File:Salesforce_Tower_Street_Level.png), [facing south](https://commons.wikimedia.org/wiki/File:Salesforce_tower_facing_south.jpg), [from Salesforce Park](https://commons.wikimedia.org/wiki/File:Salesforce_Tower_from_Salesforce_Park.jpg), [Sacramento and Davis](https://commons.wikimedia.org/wiki/File:Salesforce_Tower_from_Sacramento_and_Davis_Street_2021.jpg), and [2021 street canyon view](https://commons.wikimedia.org/wiki/File:Salesforce_Tower_2021.jpg).
+The v1 anchor (-122.3969271, 37.7897756, an OSM centroid) and the v2 anchor differ by
+about 0.3 m — immaterial; v2 uses the batch convention (OBB centre).
 
 ## Orientation
 
-OpenStreetMap geometry places the tower on the SoMa grid. The mapped facade axes are about **45.9° / 135.9° clockwise from true north**. The model therefore rotates its rounded-square plan **44.13° around +Z**, with Blender `+Y` treated as true north and `+X` as east. Because the tower is nearly four-way symmetric and the asset contract requires one canonical front, the simplified entrance/cloud-sign cue is placed on Blender **`-Y`**. This preserves the measured shell orientation while making front direction mechanically unambiguous; it should not be used as a survey of the real entrance's exact face position.
+The flats face **45° / 135° / 225° / 315°** (OSM OBB bearing 139.5°; model yaw 44.6°).
+Blender +Y = true north, +X = east; the loader applies no rotation. Street sides:
+**Mission St = NW face (315°)**, **Fremont St = NE face (45°)**, First St = SW face,
+the Transit Center / Salesforce Park side = SE face. v1 moved its entrance cue to
+canonical −Y for an older contract; v2 puts both entrances on their real faces.
 
-## Directional observations
+## Recognition cues (ranked)
 
-### North
+1. The **bullet silhouette**: a rounded square that tapers gently, then rolls in at the
+   shoulders (~215 m) to a blunt, open top about half the base width. Not a point.
+2. **Pale silvery skin**: light glass crossed by white horizontal sunshades. From any
+   distance it reads as near-white, not blue (v1's dark `Toy_glass` read navy).
+3. The **perforated white crown screen** above the roof, open at the top, with the LED
+   floors and roof plant seen inside it from above.
+4. **Night**: the LED crown glowing cool white over a warm, sparsely lit shaft.
+5. Ground: tall glass lobby behind white piers, canopies on Mission and Fremont, the
+   blue cloud sign by the Mission doors (semantically enlarged).
 
-- Read from the financial-district / Market Street side.
-- Rounded corners make the plan appear softer than a rectangular office slab.
-- Dense pale horizontal sunshade lines dominate over the blue glass.
-- The shaft narrows continuously, with the strongest curvature toward the upper third.
-- The crown reads as a white, partially open/perforated veil rather than a separate antenna.
+## Preserved
 
-### East
+- 326 m crest, OSM footprint and heading; rounded-square plan; shoulder roll-in.
+- Horizontal sunshade rhythm (one band per two real floors, 8.3 m pitch).
+- Open crown with deck, plant, BMU and masts visible from the aerial camera.
+- Both entrances on their real streets.
 
-- Viewed from the waterfront / Embarcadero direction, the full-height taper is especially clear against the skyline.
-- The rounded corner and even facade module make the elevation visually similar to the north side.
-- Lower floors are often obscured by the transit center; that context is deliberately excluded from the GLB.
-- The upper facade/crown is brighter and more opaque than the occupied shaft in daytime.
+## Simplified
 
-### South
+- 61 floors → ~34 white bands; fine fins and the mesh screen → 11 hoops + vertical ribs.
+- LED artwork → one flat `Toy_white_Glow` skin (no imagery, no animation).
+- Office lighting → hashed scattered panes (`Toy_sand_Glow`), stable per build.
+- Plaza → a stone apron with four street trees; Transit Center and Salesforce Park are
+  separate assets and are not in this GLB.
 
-- The southern view from SoMa shows the broad shaft and strong rounded shoulders.
-- The facade rhythm remains continuous: dark blue-gray glazing crossed by light projecting horizontal shades.
-- No large side annex or setback changes the main silhouette.
-- Ground-level entries and mullions are simplified into one recessed lobby volume and chunky perimeter piers.
+## Uncertainties
 
-### West
+- The shoulder height (215 m) and crown-rim width (≈ 56%) are read from photographs;
+  no published section was found.
+- Roof height 297 m vs CTBUH ~296 m is within a band; the crest (326 m) is what the
+  loader scales on and is exact.
+- `Toy_glassg` (pale silvery glass) is off the core palette (a WARN, not a fail); it is
+  the documented batch extra for this tower and Park Tower.
 
-- The west / downtown-canyon view confirms the same rounded-square plan and continuous taper.
-- A few broader pale vertical zones are visible in photos, but they are secondary to the horizontal floor/sunshade rhythm and are omitted at city scale.
-- The north-west / Mission Street quadrant informs the ground-level massing research; the miniature moves its one abstract entrance cue to canonical `-Y` to satisfy the asset front contract.
+## v1 (2026-08)
 
-### Top / crown
-
-- Aerial photography shows an **open roof**, not a sealed dome: plant decks, two long central mechanical clusters, circulation/walkway geometry, perimeter rails/screens and BMU equipment.
-- The white crown is a perforated exterior screen continuing above and around the upper floors. The real perforation is fine and layered; the miniature reduces it to broad separated hoops that expose the dark roof plant below.
-- Night imagery is displayed across the upper six LED floors, producing a luminous crown. Only the crown/upper-light materials use `_Glow` in the asset.
-
-## Ground level
-
-- The tower rises from a transparent, double-height lobby condition with pale structural/mullion elements and projecting canopies.
-- The transit center, Salesforce Park, plaza landscaping, roads, neighboring towers and people are not physical parts of the exported tower and are excluded.
-- The model includes only a recessed lobby, perimeter piers, one oversized entrance canopy, and an abstract blue cloud sign for one-second recognition.
-
-## Day and night appearance
-
-- **Day:** cool blue-gray curtain wall; pale warm-white mullions and perforated sunshades; white crown against the sky.
-- **Night:** most shaft glass remains non-emissive; the upper crown/media zone becomes the identity feature. The Campbell artwork changes with captured city imagery, so no literal image is baked into the asset. Flat `Toy_white_Glow` marks only the media/crown surfaces and `Toy_red_Glow` marks the small aviation beacon.
-
-## Strongest recognition cues
-
-1. **Very tall, continuously tapering rounded-square silhouette** with a compact base and strongly softened corners.
-2. **Dense pale horizontal sunshade rhythm** wrapped over a blue-gray glass curtain wall.
-3. **White perforated crown / topper** continuing the taper above the occupied roof.
-4. **Luminous media crown at night**, represented without textures by contract-compliant glow materials.
-5. **Blue Salesforce cloud at the entrance**, selectively enlarged as a semantic identity cue.
-
-## Translation to the SF-SIM miniature style
-
-### Preserved
-
-- Real 326 m overall height and plausible ~55 m footprint.
-- SoMa-grid orientation and base-center origin.
-- Rounded-square plan, continuous taper and compact high-rise proportion.
-- Broad facade rhythm and projecting sunshade relief.
-- Hollow crown silhouette, visible roof plant and nighttime crown designation.
-- Glazed double-height base and entrance canopy.
-
-### Simplified / exaggerated
-
-- Roughly 61 real floor lines are grouped into about 30 chunky readable bands; each stands farther proud than scale accuracy would permit.
-- Fine perforated aluminum mesh is reduced to six broad open crown hoops.
-- Thousands of LEDs become one flat `_Glow` material; no texture, animation or transparency.
-- Roof systems become four plant blocks, a ring walkway/rail and a compact BMU.
-- Ground-level complexity becomes eight piers, one lobby shell, one canopy and a simple three-lobed cloud sign.
-- Material response is matte painted-resin rather than photoreal glass/metal.
-
-## Uncertainties and decisions
-
-- Public sources provide consistent overall height but do not expose a simple surveyed shaft cross-section. The footprint comes from OSM and the changing corner radius/taper comes from multi-direction photography.
-- The exact face that should map to a single canonical "front" is ambiguous because the tower is nearly symmetric. The measured shell keeps its true-north orientation, while the simplified identity entrance is deliberately placed on Blender `-Y` to satisfy the technical contract; true-north review cameras remain independent.
-- The topper is variously described as nine crown floors and as an LED artwork spanning six floors. The model reserves the upper six-floor-equivalent zone for glow while treating the larger upper enclosure as the architectural crown.
-- The real roof photo shows more plant complexity than is legible in SF-SIM. The chosen roof is intentionally a designed abstraction, not a plan reproduction.
+v1 (20,086 tris, Blender 4.5) was a dark-blue tapered shaft closing to an ogive point,
+with six broad crown hoops, a single entrance cue on −Y and its own render/validate
+scripts. It was integrated in August 2026 as the manifest's `salesforce-tower`
+(replacing the procedural `salesforceTower`). v2 keeps the id, file name and height;
+see REPORT.md for what changed.

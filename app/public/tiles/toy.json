@@ -6,7 +6,7 @@
   "cols": 32,
   "rows": 32
  },
- "generated": "2026-08-20T00:24:51.409Z",
+ "generated": "2026-10-26T01:48:06.974Z",
  "dev": null,
  "palette": [
   {
@@ -332,17 +332,17 @@
   }
  ],
  "stats": {
-  "baseBuildings": 174647,
-  "records": 230624,
-  "pitched": 149352,
-  "garnish": 55977,
+  "baseBuildings": 174523,
+  "records": 230263,
+  "pitched": 149356,
+  "garnish": 55740,
   "helipads": 6,
-  "tallest": 200,
-  "trees": 271648,
+  "tallest": 189,
+  "trees": 271631,
   "bytes": {
-   "buildings": 12214758,
+   "buildings": 12192934,
    "streets": 8576096,
-   "landcover": 5635612
+   "landcover": 5635492
   }
  },
  "cells": [
@@ -2629,8 +2629,8 @@
    "cz": 13,
    "originX": 2000,
    "originZ": -1500,
-   "buildings": 637,
-   "bytes": 34990
+   "buildings": 639,
+   "bytes": 35292
   },
   {
    "key": "20_14",
@@ -2827,8 +2827,8 @@
    "cz": 10,
    "originX": 2500,
    "originZ": -3000,
-   "buildings": 1244,
-   "bytes": 66006
+   "buildings": 1240,
+   "bytes": 65882
   },
   {
    "key": "21_11",
@@ -2836,8 +2836,8 @@
    "cz": 11,
    "originX": 2500,
    "originZ": -2500,
-   "buildings": 862,
-   "bytes": 46814
+   "buildings": 851,
+   "bytes": 46164
   },
   {
    "key": "21_12",
@@ -2845,8 +2845,8 @@
    "cz": 12,
    "originX": 2500,
    "originZ": -2000,
-   "buildings": 382,
-   "bytes": 22294
+   "buildings": 358,
+   "bytes": 20370
   },
   {
    "key": "21_13",
@@ -3052,8 +3052,8 @@
    "cz": 10,
    "originX": 3000,
    "originZ": -3000,
-   "buildings": 441,
-   "bytes": 24844
+   "buildings": 396,
+   "bytes": 21648
   },
   {
    "key": "22_11",
@@ -3061,8 +3061,8 @@
    "cz": 11,
    "originX": 3000,
    "originZ": -2500,
-   "buildings": 429,
-   "bytes": 23922
+   "buildings": 240,
+   "bytes": 13042
   },
   {
    "key": "22_12",
@@ -3070,8 +3070,8 @@
    "cz": 12,
    "originX": 3000,
    "originZ": -2000,
-   "buildings": 296,
-   "bytes": 16848
+   "buildings": 260,
+   "bytes": 14512
   },
   {
    "key": "22_13",
@@ -3277,8 +3277,8 @@
    "cz": 10,
    "originX": 3500,
    "originZ": -3000,
-   "buildings": 79,
-   "bytes": 4832
+   "buildings": 70,
+   "bytes": 3972
   },
   {
    "key": "23_11",
@@ -3286,8 +3286,8 @@
    "cz": 11,
    "originX": 3500,
    "originZ": -2500,
-   "buildings": 173,
-   "bytes": 9806
+   "buildings": 123,
+   "bytes": 6796
   },
   {
    "key": "23_12",
@@ -3295,8 +3295,8 @@
    "cz": 12,
    "originX": 3500,
    "originZ": -2000,
-   "buildings": 249,
-   "bytes": 14442
+   "buildings": 253,
+   "bytes": 15046
   },
   {
    "key": "23_13",
@@ -3484,8 +3484,8 @@
    "cz": 11,
    "originX": 4000,
    "originZ": -2500,
-   "buildings": 91,
-   "bytes": 5124
+   "buildings": 92,
+   "bytes": 5374
   },
   {
    "key": "24_12",
@@ -12910,8 +12910,8 @@
    "originX": 2500,
    "originZ": -2500,
    "triangles": 196,
-   "trees": 127,
-   "bytes": 3636
+   "trees": 116,
+   "bytes": 3556
   },
   {
    "key": "21_12",
@@ -13120,8 +13120,8 @@
    "originX": 3000,
    "originZ": -3000,
    "triangles": 61,
-   "trees": 138,
-   "bytes": 1856
+   "trees": 128,
+   "bytes": 1788
   },
   {
    "key": "22_11",
@@ -13130,8 +13130,8 @@
    "originX": 3000,
    "originZ": -2500,
    "triangles": 119,
-   "trees": 75,
-   "bytes": 2204
+   "trees": 59,
+   "bytes": 2092
   },
   {
    "key": "22_12",
@@ -13140,8 +13140,8 @@
    "originX": 3000,
    "originZ": -2000,
    "triangles": 391,
-   "trees": 169,
-   "bytes": 6428
+   "trees": 173,
+   "bytes": 6456
   },
   {
    "key": "22_13",
@@ -13300,8 +13300,8 @@
    "originX": 3500,
    "originZ": -2500,
    "triangles": 555,
-   "trees": 135,
-   "bytes": 7508
+   "trees": 151,
+   "bytes": 7620
   },
   {
    "key": "23_12",

@@ -145,7 +145,7 @@ route, and the park plans depend on it (§E8 of the parks README).
 | [1 South Park (One South Park)](./1-south-park.md) | `1-south-park` | 20.2 m (LiDAR `hgt_max`; penthouse roof 18.6 m, cornice crest 15.75 m) | new landmark |
 | [The Audiffred Building (1 Mission Street)](./audiffred-building.md) | `audiffred-building` | 17.5 m (estimated — barrel-vault crest, Overture + photogrammetric; LiDAR roof deck 15.4 m measured, `hgt_max` 19.18 m rejected as rooftop plant) | new landmark |
 
-## Shared contract (all 135)
+## Shared contract (all 255)
 | [252–254 Ritch Street](./254-ritch.md) | `254-ritch` | 8.8 m (LiDAR maximum, the roof flue; cornice crest 8.05 m estimated) | new landmark |
 | [434 Brannan Street (Art Deco loft, 1929)](./434-brannan.md) | `434-brannan` | 13.79 m (LiDAR maximum, read as the rooftop mechanical penthouse; roof deck 11.46 m measured, parapet crest ~12.4 m estimated) | new landmark |
 | [226 Ritch Street (226 Ritch Street Condominiums)](./226-ritch.md) | `226-ritch` | 18.1 m (roof crest, LiDAR-derived; 16.0 m parapet) | new landmark |
@@ -179,6 +179,126 @@ route, and the park plans depend on it (§E8 of the parks README).
 | [8 Mission Street (1 Hotel San Francisco / Hotel Vitale)](./8-mission.md) | `8-mission` | 28.66 m to the turret crown (LiDAR max; roof plateaus 25.10 / 19.64 / 14.18 m) | new landmark |
 | [Ferry Station Post Office Building (Agriculture Building)](./ferry-station-post-office.md) | `ferry-station-post-office` | 12.65 m (LiDAR tile-ridge; eave 10.8 m measured) | new landmark |
 | [Pier 17 (The Embarcadero at Green St)](./pier-17.md) | `pier-17` | 21.3 m (flagpole tip above water; facade gable apex 16.9 m, LiDAR-derived; the asset carries its own 2.0 m pier deck) | new landmark |
+| [Salesforce Tower](./salesforce-tower.md) | `salesforce-tower` | 326 m (published) | rebuilt (v2), replaces procedural |
+| [181 Fremont](./181-fremont.md) | `181-fremont` | 244.4 m | new landmark |
+| [Millennium Tower](./millennium-tower.md) | `millennium-tower` | 197 m | new landmark |
+| [Park Tower at Transbay](./park-tower.md) | `park-tower` | 183 m | new landmark |
+| [Salesforce Transit Center](./transit-center.md) | `transit-center` | 30 m (OSM, estimated; park deck 21.3 m) | new landmark |
+| [350 Mission Street (Salesforce East)](./350-mission.md) | `350-mission` | 129 m | new landmark |
+| [45 Fremont Street](./45-fremont.md) | `45-fremont` | 145 m | new landmark |
+| [Salesforce West (50 Fremont Center)](./50-fremont.md) | `50-fremont` | 183 m | new landmark |
+| [425 Market Street](./425-market.md) | `425-market` | 160 m | new landmark |
+| [333 Market Street](./333-market.md) | `333-market` | 144 m | new landmark |
+| [Pacific Gas & Electric Building (77 Beale Street)](./77-beale.md) | `77-beale` | 150 m | new landmark |
+| [PG&E General Office Building (245 Market Street)](./pge-general-office.md) | `pge-general-office` | 79.8 m | new landmark |
+| [Matson Building](./matson-building.md) | `matson-building` | 73 m (estimated) | new landmark |
+| [50 Beale Street](./50-beale.md) | `50-beale` | 100 m | new landmark |
+| [123 Mission Street](./123-mission.md) | `123-mission` | 124 m | new landmark |
+| [201 Mission Street](./201-mission.md) | `201-mission` | 135.9 m | new landmark |
+| [60 Spear Street](./60-spear.md) | `60-spear` | 57.9 m | new landmark |
+| [100 First Plaza](./100-first.md) | `100-first` | 136.25 m | new landmark |
+| [Rincon Annex (Rincon Center)](./rincon-annex.md) | `rincon-annex` | 29.7 m | new landmark |
+| [Federal Reserve Bank of San Francisco](./federal-reserve.md) | `federal-reserve` | 63.1 m | new landmark |
+| [Crown Zellerbach Building (One Bush Plaza)](./1-bush-street.md) | `1-bush-street` | 93.9 m | new landmark |
+| [One California](./1-california-street.md) | `1-california-street` | 133.5 m | new landmark |
+| [One Front Street](./1-front-street.md) | `1-front-street` | 164 m | new landmark |
+| [Savings Union Bank Building](./1-grant-avenue.md) | `1-grant-avenue` | 30.22 m | new landmark |
+| [One Post Street](./1-post-street.md) | `1-post-street` | 161 m | new landmark |
+| [One Sansome Street](./1-sansome-street.md) | `1-sansome-street` | 168 m | new landmark |
+| [Shell Building (100 Bush Street)](./100-bush-street.md) | `100-bush-street` | 115.22 m | new landmark |
+| [100 Montgomery Street (Equitable Life Building)](./100-montgomery-street.md) | `100-montgomery-street` | 107.9 m | new landmark |
+| [100 Pine Center](./100-pine-center.md) | `100-pine-center` | 145 m | new landmark |
+| [Adam Grant Building](./100-sansome-street.md) | `100-sansome-street` | 58.2 m | new landmark |
+| [101 California Street](./101-california-street.md) | `101-california-street` | 183 m | new landmark |
+| [101 Montgomery (Schwab Building)](./101-montgomery-street.md) | `101-montgomery-street` | 123.1 m | new landmark |
+| [111 Pine Street](./111-pine-street.md) | `111-pine-street` | 76 m | new landmark |
+| [One Montgomery Tower (120 Kearny Street)](./120-kearny-street.md) | `120-kearny-street` | 152.4 m | new landmark |
+| [The Rapp Building](./121-2nd-street.md) | `121-2nd-street` | 27.5 m | new landmark |
+| [Hallidie Building](./130-150-sutter-street.md) | `130-150-sutter-street` | 30.3 m | new landmark |
+| [140 New Montgomery (Pacific Telephone Building)](./140-new-montgomery-street.md) | `140-new-montgomery-street` | 132.7 m | new landmark |
+| [150 California Street](./150-california-street.md) | `150-california-street` | 100.6 m | new landmark |
+| [Neiman Marcus Union Square (City of Paris rotunda)](./150-stockton-street.md) | `150-stockton-street` | 33.9 m | new landmark |
+| [San Francisco Museum of Modern Art (SFMOMA)](./151-3rd-street.md) | `151-3rd-street` | 60 m (estimated) | new landmark |
+| [Stock Exchange Tower](./155-sansome-street.md) | `155-sansome-street` | 64.05 m | new landmark |
+| [180 Montgomery Street (Bank of the West Building)](./180-montgomery-street.md) | `180-montgomery-street` | 109.8 m | new landmark |
+| [Galleria Park Hotel](./191-sutter-street.md) | `191-sutter-street` | 32.1 m | new landmark |
+| [199 Fremont Street](./199-fremont-street.md) | `199-fremont-street` | 110.9 m | new landmark |
+| [Union Trust Bank Building (2 Grant Avenue)](./2-grant-avenue.md) | `2-grant-avenue` | 19.5 m | new landmark |
+| [Royal Insurance Building](./201-sansome-street.md) | `201-sansome-street` | 41.3 m | new landmark |
+| [201 Spear Street](./201-spear-street.md) | `201-spear-street` | 79.2 m | new landmark |
+| [211 Main Street (Charles Schwab Building)](./211-main-street.md) | `211-main-street` | 82 m | new landmark |
+| [Mills Tower (220 Bush Street)](./220-bush-street.md) | `220-bush-street` | 92 m | new landmark |
+| [222 Second Street (LinkedIn)](./222-2nd-street.md) | `222-2nd-street` | 112.8 m | new landmark |
+| [225 Bush Street (Standard Oil Building)](./225-bush-street.md) | `225-bush-street` | 100 m | new landmark |
+| [250 Montgomery Street](./250-montgomery-street.md) | `250-montgomery-street` | 69.88 m | new landmark |
+| [One Maritime Plaza (Alcoa Building)](./300-clay-street.md) | `300-clay-street` | 121.3 m | new landmark |
+| [Old Federal Reserve Bank (Bently Reserve)](./301-battery-street.md) | `301-battery-street` | 47.6 m | new landmark |
+| [Pacific Coast Stock Exchange](./301-pine-street.md) | `301-pine-street` | 15.9 m | new landmark |
+| [33 New Montgomery](./33-new-montgomery-street.md) | `33-new-montgomery-street` | 101.8 m (estimated) | new landmark |
+| [333 Bush Street](./333-bush-street.md) | `333-bush-street` | 151 m | new landmark |
+| [345 California Center](./345-california-street.md) | `345-california-street` | 211.8 m | new landmark |
+| [350 Bush Street (with the Curb Exchange)](./350-bush-street.md) | `350-bush-street` | 85 m (estimated) | new landmark |
+| [388 Market Street](./388-market-building.md) | `388-market-building` | 111.9 m | new landmark |
+| [St. Regis Museum Tower (125 Third Street)](./3rd-street-tower.md) | `3rd-street-tower` | 147.5 m | new landmark |
+| [425 California Street](./425-california-street.md) | `425-california-street` | 109.4 m | new landmark |
+| [The Jay (former Le Méridien San Francisco)](./433-clay-street.md) | `433-clay-street` | 81 m | new landmark |
+| [44 Montgomery Street](./44-montgomery-street.md) | `44-montgomery-street` | 172.2 m | new landmark |
+| [450 Sutter Street (Four Fifty Sutter Building)](./450-sutter-street.md) | `450-sutter-street` | 105 m | new landmark |
+| [456 Montgomery Street](./456-montgomery-street.md) | `456-montgomery-street` | 115.2 m | new landmark |
+| [Orchard Garden Hotel](./466-bush-street.md) | `466-bush-street` | 34.55 m | new landmark |
+| [475 Sansome Street](./475-sansome-street.md) | `475-sansome-street` | 89.7 m | new landmark |
+| [49 Stevenson Street](./49-stevenson-street.md) | `49-stevenson-street` | 64.44 m | new landmark |
+| [Hyatt Regency Downtown SOMA (50 Third Street)](./50-3rd-street.md) | `50-3rd-street` | 114 m | new landmark |
+| [50 California Street](./50-california-street.md) | `50-california-street` | 148.44 m | new landmark |
+| [Omni San Francisco Hotel (Financial Center Building)](./500-california-street.md) | `500-california-street` | 65.3 m | new landmark |
+| [525 Market Street](./525-market-street.md) | `525-market-street` | 161 m | new landmark |
+| [535 Mission Street](./535-mission-street.md) | `535-mission-street` | 115 m | new landmark |
+| [Flatiron Building (540–544 Market Street)](./544-market-street.md) | `544-market-street` | 36.6 m | new landmark |
+| [KPMG Building (55 Second Street)](./55-2nd-street.md) | `55-2nd-street` | 100.6 m | new landmark |
+| [555 Market Street (Market Center)](./555-market-street.md) | `555-market-street` | 94.8 m | new landmark |
+| [555 Mission Street](./555-mission-street.md) | `555-mission-street` | 147 m | new landmark |
+| [JPMorgan Chase Building (560 Mission Street)](./560-mission-street.md) | `560-mission-street` | 128.02 m | new landmark |
+| [575 Market Street](./575-market-street.md) | `575-market-street` | 174.65 m | new landmark |
+| [580 California Street](./580-california-street.md) | `580-california-street` | 107 m | new landmark |
+| [Hobart Building (582 Market Street)](./582-market-street.md) | `582-market-street` | 87 m | new landmark |
+| [595 Market Street](./595-market-street.md) | `595-market-street` | 125 m | new landmark |
+| [601–605 Market Street (1917 office tower)](./605-market-street.md) | `605-market-street` | 54.3 m | new landmark |
+| [650 California Street (Hartford Building)](./650-california-street.md) | `650-california-street` | 142 m | new landmark |
+| [Old Chronicle Building (690 Market Street)](./690-market-street.md) | `690-market-street` | 95 m | new landmark |
+| [Mutual Savings Bank Building (700 Market Street)](./700-market-street.md) | `700-market-street` | 57.9 m | new landmark |
+| [Aronson Building (706 Mission Street)](./706-mission-street.md) | `706-mission-street` | 44 m | new landmark |
+| [715–719 Market Street (Digital Garage)](./715-market-street.md) | `715-market-street` | 32.6 m | new landmark |
+| [735 Market Street](./735-market-street.md) | `735-market-street` | 27.4 m | new landmark |
+| [Contemporary Jewish Museum (736 Mission Street)](./736-mission-street.md) | `736-mission-street` | 24 m | new landmark |
+| [The Montgomery](./74-new-montgomery-street.md) | `74-new-montgomery-street` | 32.7 m | new landmark |
+| [Four Seasons Hotel and Residences (757 Market Street)](./757-market-street.md) | `757-market-street` | 130.1 m | new landmark |
+| [Alexander Building](./alexander-building.md) | `alexander-building` | 60.13 m | new landmark |
+| [625 Market Street ("Bank of America Building")](./bank-of-america-building.md) | `bank-of-america-building` | 60.1 m | new landmark |
+| [Merchants Exchange Building](./california-bank-and-trust.md) | `california-bank-and-trust` | 59.4 m | new landmark |
+| [Central Tower (703 Market Street)](./central-tower.md) | `central-tower` | 91 m | new landmark |
+| [One Embarcadero Center](./embarcadero-center-1.md) | `embarcadero-center-1` | 173.4 m | new landmark |
+| [Two Embarcadero Center](./embarcadero-center-2.md) | `embarcadero-center-2` | 126 m | new landmark |
+| [Three Embarcadero Center](./embarcadero-center-3.md) | `embarcadero-center-3` | 126 m | new landmark |
+| [Embarcadero Center West (275 Battery Street)](./embarcadero-center-west.md) | `embarcadero-center-west` | 123.1 m | new landmark |
+| [Central Plaza (455 Market Street)](./first-and-market-usps.md) | `first-and-market-usps` | 96.9 m | new landmark |
+| [Folger Coffee Company Building](./folger-coffee-building.md) | `folger-coffee-building` | 26.74 m | new landmark |
+| [Hearst Building](./hearst-building.md) | `hearst-building` | 50.2 m | new landmark |
+| [Hunter-Dulin Building (111 Sutter Street)](./hunter-dulin-building.md) | `hunter-dulin-building` | 93.88 m | new landmark |
+| [I. Magnin & Co. Building](./i-magnin-building.md) | `i-magnin-building` | 50.5 m | new landmark |
+| [San Francisco Marriott Marquis](./marriott-marquis.md) | `marriott-marquis` | 133 m | new landmark |
+| [Matson Building Annex](./matson-building-annex.md) | `matson-building-annex` | 23.4 m | new landmark |
+| [Mechanics' Institute (57 Post Street)](./mechanics-institute.md) | `mechanics-institute` | 43 m | new landmark |
+| [Mills Building](./mills-building.md) | `mills-building` | 47 m | new landmark |
+| [Old Saint Mary's Cathedral](./old-saint-marys-cathedral.md) | `old-saint-marys-cathedral` | 33.65 m | new landmark |
+| [One Hawthorne](./one-hawthorne-street.md) | `one-hawthorne-street` | 83.9 m | new landmark |
+| [Palace Hotel](./palace-hotel.md) | `palace-hotel` | 40 m | new landmark |
+| [The Paramount (680 Mission Street)](./paramount.md) | `paramount` | 128 m | new landmark |
+| [PG&E General Office Building Annex](./pge-annex.md) | `pge-annex` | 55.8 m | new landmark |
+| [Phelan Building](./phelan-building.md) | `phelan-building` | 47 m | new landmark |
+| [Stevenson Place (71 Stevenson Street)](./stevenson-place.md) | `stevenson-place` | 103 m | new landmark |
+| [U.S. Custom House](./us-customs-house.md) | `us-customs-house` | 30.46 m | new landmark |
+| [The White House (Raphael Weill & Co.)](./white-house-building.md) | `white-house-building` | 32.1 m | new landmark |
+| [Yerba Buena Center for the Arts — Galleries](./ybca-galleries.md) | `ybca-galleries` | 17.3 m | new landmark |
 
 - Style: `docs/styles/miniature-toy.md` (authoritative for artistic decisions)
 - Technical contract: `.agents/skills/sf-asset-check/SKILL.md` (authoritative for the GLB)
